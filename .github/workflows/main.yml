@@ -20,15 +20,16 @@ jobs:
     name: Reset Private Files for Umbraco Cloud
     runs-on: ubuntu-latest
     steps:
+      uses: actions/checkout@v4
 
       # Testing with simple text.txt
-      name: Test
-      shell: pwsh
-      run: >
-        ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-        -FolderPath '${{GITHUB.WORKSPACE}}'
-        -FileName 'text.txt'
-        -FileContents 'test string'
+      - name: Test
+        shell: pwsh
+        run: >
+          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
+          -FolderPath '${{GITHUB.WORKSPACE}}'
+          -FileName 'text.txt'
+          -FileContents 'test string'
 
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
