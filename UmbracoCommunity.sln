@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.UI", "UmbracoCommunity.Web.UI\UmbracoCommunity.Web.UI.csproj", "{716A5A5E-C5B2-4885-800F-56BE3C51248A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{02200206-9B5D-45F4-964D-B9789864A2A5}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		.umbraco = .umbraco
+		NuGet.config = NuGet.config
+		Readme.md = Readme.md
+		UmbracoCommunity.Web.UI\umbraco-cloud.json = UmbracoCommunity.Web.UI\umbraco-cloud.json
+	EndProjectSection
+EndProject

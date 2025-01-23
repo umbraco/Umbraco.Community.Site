@@ -1,0 +1,3 @@
+[project]
+base = "UmbracoCommunity.Web.UI"
+csproj = "UmbracoCommunity.Web.UI.csproj"
