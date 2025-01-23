@@ -6,9 +6,47 @@ on:
     branches:
      - main
 
+env:
+  deployLicenseKey: ${{ secrets.deployLicenseKey }}
+  formsLicenseKey: ${{ secrets.formsLicenseKey }}
+  umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
+
 jobs:
+
   # Intentionally NOT Syncing from Cloud as all patches/updates etc being done manually on GitHub repo
-      
+
+  # Replace the private files needed by Cloud from GitHub secrets
+  reset-private-files:
+    name: Reset Private Files for Umbraco Cloud
+    runs-on: ubuntu-latest
+    steps:
+
+      # Umbraco Cloud Deploy license
+      - name: Deploy license
+        shell: pwsh
+        run: >
+          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
+          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
+          -NewContents ${{ env.deployLicenseKey }}
+
+      # Umbraco Cloud Forms license
+      - name: Forms license
+        shell: pwsh
+        run: >
+          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
+          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic
+          -NewContents ${{ env.formsLicenseKey }}
+
+       # Umbraco Cloud umbraco-cloud.json
+       # NB any single quotes in the UMBRACO_CLOUD_JSON secret must be replaced with ''
+       # double quotes are fine :)
+      - name: umbraco-cloud.json
+        shell: pwsh
+        run: >
+          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
+          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco-cloud.json
+          -NewContents '${{ env.umbracoCloudJson }}'
+
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
     uses: ./.github/workflows/cloud-deployment.yml

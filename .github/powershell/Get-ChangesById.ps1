@@ -42,7 +42,7 @@ if ($GetDiffDeploymentId -eq '') {
 
 # ensure folder exists
 if (!(Test-Path $DownloadFolder -PathType Container)) { 
-  Write-Host "Creting folder $($DownloadFolder)"
+  Write-Host "Creating folder $($DownloadFolder)"
   New-Item -ItemType Directory -Force -Path $DownloadFolder
 }
 
