@@ -5,8 +5,11 @@ param(
     
     [Parameter(Position=1)]
     [string] 
-    $NewContents
+    $FileContents
 )
+
+Write-Host "FilePath: $FilePath"
+Write-Host "FileContents: $FileContents"
 
 
 if (Test-Path $FilePath) { 
@@ -16,4 +19,4 @@ else {
   Write-Host "Creating file"
 }
 
-new-item -ItemType File -Path ($FilePath) -Value $NewContents -Force
+new-item -ItemType File -Path ($FilePath) -Value $FileContents -Force

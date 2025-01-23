@@ -26,16 +26,16 @@ jobs:
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
-          -NewContents ${{ env.deployLicenseKey }}
+          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic'
+          -FileContents '${{ env.deployLicenseKey }}'
 
       # Umbraco Cloud Forms license
       - name: Forms license
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic
-          -NewContents ${{ env.formsLicenseKey }}
+          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic'
+          -FileContents '${{ env.formsLicenseKey }}'
 
        # Umbraco Cloud umbraco-cloud.json
        # NB any single quotes in the UMBRACO_CLOUD_JSON secret must be replaced with ''
@@ -44,8 +44,8 @@ jobs:
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath ${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco-cloud.json
-          -NewContents '${{ env.umbracoCloudJson }}'
+          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco-cloud.json'
+          -FileContents '${{ env.umbracoCloudJson }}'
 
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
