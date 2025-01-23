@@ -25,7 +25,7 @@ jobs:
       shell: pwsh
       run: >
         ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-        -FolderPath '${{ github.workspace }}'
+        -FolderPath '${{GITHUB.WORKSPACE}}'
         -FileName 'text.txt'
         -FileContents 'test string'
 
