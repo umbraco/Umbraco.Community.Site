@@ -11,7 +11,6 @@ jobs:
       
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
-    needs: cloud-sync
     uses: ./.github/workflows/cloud-deployment.yml
     secrets:
       projectId: ${{ secrets.PROJECT_ID }}
