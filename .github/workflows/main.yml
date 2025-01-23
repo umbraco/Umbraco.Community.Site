@@ -22,13 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Testing with simple text.txt
+      # Umbraco Cloud's Deploy license (TEST)
       - name: Test
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FolderPath '${{GITHUB.WORKSPACE}}'
-          -FileName 'text.txt'
+          -FolderPath '${{GITHUB.WORKSPACE}}/src/UmbracoCommunity.Web.UI/umbraco/Licenses'
+          -FileName 'umbracoDeploy.lic'
           -FileContents 'test string'
 
   # Package and Deploy to Umbraco Cloud
