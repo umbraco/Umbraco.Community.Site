@@ -22,6 +22,7 @@ jobs:
     steps:
 
       # Testing with simple text.txt
+      name: Test
       shell: pwsh
       run: >
         ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
