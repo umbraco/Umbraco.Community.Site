@@ -1,22 +1,19 @@
 param(    
     [Parameter(Position=0)]
     [string] 
-    $FilePath,
-    
+    $FolderPath,
+
     [Parameter(Position=1)]
+    [string] 
+    $FileName,
+
+    [Parameter(Position=2)]
     [string] 
     $FileContents
 )
 
+$FilePath = "$FolderPath\$FileName"
+
 Write-Host "FilePath: $FilePath"
-Write-Host "FileContents: $FileContents"
-
-
-if (Test-Path $FilePath) { 
-  Write-Host "Overwriting file"
-}
-else {
-  Write-Host "Creating file"
-}
 
 new-item -ItemType File -Path ($FilePath) -Value $FileContents -Force
