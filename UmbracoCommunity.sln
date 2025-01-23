@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.UI", "UmbracoCommunity.Web.UI\UmbracoCommunity.Web.UI.csproj", "{716A5A5E-C5B2-4885-800F-56BE3C51248A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.UI", "src\UmbracoCommunity.Web.UI\UmbracoCommunity.Web.UI.csproj", "{716A5A5E-C5B2-4885-800F-56BE3C51248A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +29,5 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		.umbraco = .umbraco
 		NuGet.config = NuGet.config
 		Readme.md = Readme.md
-		UmbracoCommunity.Web.UI\umbraco-cloud.json = UmbracoCommunity.Web.UI\umbraco-cloud.json
 	EndProjectSection
 EndProject
