@@ -13,7 +13,7 @@ env:
 
 jobs:
 
-  # Intentionally NOT Syncing from Cloud as all patches/updates etc being done manually on GitHub repo
+  # Intentionally NOT syncing from Cloud as all patches/updates etc being done manually on GitHub repo
 
   # Replace the private files needed by Cloud from GitHub secrets
   reset-private-files:
@@ -22,30 +22,10 @@ jobs:
     steps:
 
       # Umbraco Cloud Deploy license
-      - name: Deploy license
-        shell: pwsh
-        run: >
-          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic'
-          -FileContents '${{ env.deployLicenseKey }}'
-
-      # Umbraco Cloud Forms license
-      - name: Forms license
-        shell: pwsh
-        run: >
-          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic'
-          -FileContents '${{ env.formsLicenseKey }}'
-
-       # Umbraco Cloud umbraco-cloud.json
-       # NB any single quotes in the UMBRACO_CLOUD_JSON secret must be replaced with ''
-       # double quotes are fine :)
-      - name: umbraco-cloud.json
-        shell: pwsh
-        run: >
-          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FilePath '${{ GITHUB.WORKSPACE }}/src/UmbracoCommunity.Web.UI/umbraco-cloud.json'
-          -FileContents '${{ env.umbracoCloudJson }}'
+      - name: Create umbracoDeploy.lic
+        run: |
+           touch src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
+           echo "${{ env.deployLicenseKey }}" > ~/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
 
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
