@@ -24,11 +24,11 @@ jobs:
       # Umbraco Cloud Deploy license
       - name: Create umbracoDeploy.lic
         run: |
-           touch src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
-           echo "${{ env.deployLicenseKey }}" > ~/src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
+           printf "${{ env.deployLicenseKey }}" > src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
 
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
+    needs: reset-private-files
     uses: ./.github/workflows/cloud-deployment.yml
     secrets:
       projectId: ${{ secrets.PROJECT_ID }}
