@@ -11,6 +11,8 @@ on:
 env:
   projectId: ${{ secrets.projectId }}
   umbracoCloudApiKey: ${{ secrets.umbracoCloudApiKey }}
+  umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
+  pathToWebsite: "src/UmbracoCommunity.Web.UI"
 
 jobs:
   doDeployment:
@@ -20,6 +22,12 @@ jobs:
       runningDeploymentId: ${{ steps.deployment-meta.outputs.deploymentId }}
     steps:
       - uses: actions/checkout@v4
+
+      # reset the umbraco-cloud.json file from the Secret contents
+      - name: Umbraco Cloud Json
+        working-directory: ${{env.pathToWebsite}}
+        shell: pwsh
+        run: set-content 'umbraco-cloud.json' -value '${{ env.umbracoCloudJson }}' 
 
       # switch the gitignore files so cloud does not ignore the build frontend assets
       - name: Prepare Cloud Git Ignore

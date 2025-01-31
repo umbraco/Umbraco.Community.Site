@@ -6,32 +6,14 @@ on:
     branches:
      - main
 
-env:
-  deployLicenseKey: ${{ secrets.deployLicenseKey }}
-  formsLicenseKey: ${{ secrets.formsLicenseKey }}
-  umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
-  pathToWebsite: "src/UmbracoCommunity.Web.UI"
-
 jobs:
 
   # Intentionally NOT syncing from Cloud as all patches/updates etc being done manually on GitHub repo
 
-  # Replace the private files needed by Cloud from GitHub secrets
-  reset-private-files:
-    name: Reset Private Files before zipping for Cloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Umbraco Cloud Json
-        working-directory: ${{env.pathToWebsite}}
-        shell: pwsh
-        run: set-content 'umbraco-cloud.json' -value '${{ secrets.UMBRACO_CLOUD_JSON }}'
-
   # Package and Deploy to Umbraco Cloud (without saving as artifact)
   cloud-deployment:
-    needs: reset-private-files
     uses: ./.github/workflows/cloud-deployment.yml
     secrets:
       projectId: ${{ secrets.PROJECT_ID }}
       umbracoCloudApiKey: ${{ secrets.UMBRACO_CLOUD_API_KEY }}
+      umbracoCloudJson: ${{ secrets.UMBRACO_CLOUD_JSON }}
