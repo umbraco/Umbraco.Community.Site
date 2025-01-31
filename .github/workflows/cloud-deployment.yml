@@ -9,11 +9,17 @@ on:
         required: true
       umbracoCloudJson:
         required: true
+      deployLicenseKey:
+        required: true
+      formsLicenseKey:
+        required: true
 
 env:
   projectId: ${{ secrets.projectId }}
   umbracoCloudApiKey: ${{ secrets.umbracoCloudApiKey }}
   umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
+  deployLicenseKey: ${{ secrets.deployLicenseKey }}
+  formsLicenseKey: ${{ secrets.formsLicenseKey }}
   pathToWebsite: "src/UmbracoCommunity.Web.UI"
 
 jobs:
@@ -25,11 +31,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # reset the umbraco-cloud.json file from the Secret contents
+      # reset the umbraco-cloud.json file from Secret
       - name: Umbraco Cloud Json
         working-directory: ${{env.pathToWebsite}}
         shell: pwsh
         run: set-content 'umbraco-cloud.json' -value '${{ env.umbracoCloudJson }}' 
+
+      # reset Deploy license key from Secret
+      - name: Deploy License Key
+        working-directory: "${{env.pathToWebsite}}/umbraco/Licenses"
+        shell: pwsh
+        run: set-content 'umbracoDeploy.lic' -value '${{ env.deployLicenseKey }}' 
+
+      # reset Forms license key from Secret
+      - name: Forms License Key
+        working-directory: "${{env.pathToWebsite}}/umbraco/Licenses"
+        shell: pwsh
+        run: set-content 'umbracoForms.lic' -value '${{ env.formsLicenseKey }}' 
 
       # switch the gitignore files so cloud does not ignore the build frontend assets
       - name: Prepare Cloud Git Ignore
