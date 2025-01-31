@@ -10,7 +10,7 @@ env:
   deployLicenseKey: ${{ secrets.deployLicenseKey }}
   formsLicenseKey: ${{ secrets.formsLicenseKey }}
   umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
-  pathToWebsite: "src/UmbracoCommununity.Web.UI"
+  pathToWebsite: "src/UmbracoCommunity.Web.UI"
 
 jobs:
 
