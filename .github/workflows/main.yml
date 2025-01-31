@@ -26,12 +26,11 @@ jobs:
       - name: Test
         working-directory: ${{env.pathToWebsite}}
         shell: pwsh
-        run: |
-          set-content -path 'umbraco-cloud.txt' -value "Hello World"
+        run: set-content 'umbraco-cloud.txt' -value "Hello World"
 
   # Package and Deploy to Umbraco Cloud
-  cloud-deployment:
-    uses: ./.github/workflows/cloud-deployment.yml
-    secrets:
-      projectId: ${{ secrets.PROJECT_ID }}
-      umbracoCloudApiKey: ${{ secrets.UMBRACO_CLOUD_API_KEY }}
+  #cloud-deployment:
+  #  uses: ./.github/workflows/cloud-deployment.yml
+  #  secrets:
+  #    projectId: ${{ secrets.PROJECT_ID }}
+  #   umbracoCloudApiKey: ${{ secrets.UMBRACO_CLOUD_API_KEY }}
