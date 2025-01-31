@@ -18,15 +18,15 @@ jobs:
 
   # Replace the private files needed by Cloud from GitHub secrets
   reset-private-files:
-    name: Test Private Files for Umbraco Cloud
+    name: Reset Private Files before zipping for Cloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Test
+      - name: Umbraco Cloud Json
         working-directory: ${{env.pathToWebsite}}
         shell: pwsh
-        run: set-content 'umbraco-cloud.txt' -value "Hello World"
+        run: set-content 'umbraco-cloud.json' -value '${{ secrets.UMBRACO_CLOUD_JSON }}'
 
   # Package and Deploy to Umbraco Cloud (without saving as artifact)
   cloud-deployment:
