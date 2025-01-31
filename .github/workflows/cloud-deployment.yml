@@ -7,6 +7,8 @@ on:
         required: true
       umbracoCloudApiKey:
         required: true
+      umbracoCloudJson:
+        required: true
 
 env:
   projectId: ${{ secrets.projectId }}
