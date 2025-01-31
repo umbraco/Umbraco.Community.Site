@@ -10,6 +10,7 @@ env:
   deployLicenseKey: ${{ secrets.deployLicenseKey }}
   formsLicenseKey: ${{ secrets.formsLicenseKey }}
   umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
+  pathToWebsite: "src/UmbracoCommununity.Web.UI"
 
 jobs:
 
@@ -17,23 +18,19 @@ jobs:
 
   # Replace the private files needed by Cloud from GitHub secrets
   reset-private-files:
-    name: Reset Private Files for Umbraco Cloud
+    name: Test Private Files for Umbraco Cloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Umbraco Cloud's Deploy license (TEST)
       - name: Test
+        working-directory: ${{env.pathToWebsite}}
         shell: pwsh
-        run: >
-          ${{GITHUB.WORKSPACE}}/.github/powershell/Replace-File-Contents.ps1 
-          -FolderPath '${{GITHUB.WORKSPACE}}/src/UmbracoCommunity.Web.UI/umbraco/Licenses'
-          -FileName 'umbracoDeploy.lic'
-          -FileContents 'test string'
+        run: |
+          set-content -path 'umbraco-cloud.txt' -value "Hello World"
 
   # Package and Deploy to Umbraco Cloud
   cloud-deployment:
-    needs: reset-private-files
     uses: ./.github/workflows/cloud-deployment.yml
     secrets:
       projectId: ${{ secrets.PROJECT_ID }}
