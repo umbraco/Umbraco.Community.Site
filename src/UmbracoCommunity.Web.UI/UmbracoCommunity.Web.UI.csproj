@@ -13,7 +13,7 @@
     <PackageReference Include="Umbraco.Cms" Version="13.5.3" />
     <PackageReference Include="Umbraco.Deploy.Cloud" Version="13.3.2" />
     <PackageReference Include="Umbraco.Deploy.Contrib" Version="13.3.0" />
-    <PackageReference Include="Umbraco.Forms" Version="13.4.0" />
+    <PackageReference Include="Umbraco.Forms" Version="13.4.2" />
     <PackageReference Include="Umbraco.Forms.Deploy" Version="13.0.2" />
   </ItemGroup>
 
