@@ -15,6 +15,11 @@ on:
         required: true
 
 env:
+  projectId: ${{ secrets.projectId }}
+  umbracoCloudApiKey: ${{ secrets.umbracoCloudApiKey }}
+  umbracoCloudJson: ${{ secrets.umbracoCloudJson }}
+  deployLicenseKey: ${{ secrets.deployLicenseKey }}
+  formsLicenseKey: ${{ secrets.formsLicenseKey }}
   pathToWebsite: "src/UmbracoCommunity.Web.UI"
 
 jobs:
@@ -30,19 +35,19 @@ jobs:
       - name: Umbraco Cloud Json
         working-directory: ${{env.pathToWebsite}}
         shell: pwsh
-        run: set-content 'umbraco-cloud.json' -value '${{ secrets.umbracoCloudJson }}' 
+        run: set-content 'umbraco-cloud.json' -value '${{ env.umbracoCloudJson }}' 
 
       # reset Deploy license key from Secret
       - name: Deploy License Key
         working-directory: "${{env.pathToWebsite}}/umbraco/Licenses"
         shell: pwsh
-        run: set-content 'umbracoDeploy.lic' -value '${{ secrets.deployLicenseKey }}' 
+        run: set-content 'umbracoDeploy.lic' -value '${{ env.deployLicenseKey }}' 
 
       # reset Forms license key from Secret
       - name: Forms License Key
         working-directory: "${{env.pathToWebsite}}/umbraco/Licenses"
         shell: pwsh
-        run: set-content 'umbracoForms.lic' -value '${{ secrets.formsLicenseKey }}' 
+        run: set-content 'umbracoForms.lic' -value '${{ env.formsLicenseKey }}' 
 
       # switch the gitignore files so cloud does not ignore the build frontend assets
       - name: Prepare Cloud Git Ignore
@@ -62,8 +67,8 @@ jobs:
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/New-Deployment.ps1 
-          -ProjectId ${{ secrets.projectId }} 
-          -ApiKey ${{ secrets.umbracoCloudApiKey }} 
+          -ProjectId ${{ env.projectId }} 
+          -ApiKey ${{ env.umbracoCloudApiKey }} 
           -CommitMessage "Run number ${{github.run_number}}" 
           -PipelineVendor GITHUB
 
@@ -72,9 +77,9 @@ jobs:
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Add-DeploymentPackage.ps1 
-          -ProjectId ${{ secrets.projectId }} 
+          -ProjectId ${{ env.projectId }} 
           -DeploymentId ${{ steps.deployment-meta.outputs.deploymentId }} 
-          -ApiKey ${{ secrets.umbracoCloudApiKey }} 
+          -ApiKey ${{ env.umbracoCloudApiKey }} 
           -FilePath sources.zip
 
       # Actually request to start the deployment process in cloud
@@ -82,9 +87,9 @@ jobs:
         shell: pwsh
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Start-Deployment.ps1 
-          -ProjectId ${{ secrets.projectId }} 
+          -ProjectId ${{ env.projectId }} 
           -DeploymentId ${{ steps.deployment-meta.outputs.deploymentId }} 
-          -ApiKey ${{ secrets.umbracoCloudApiKey }}
+          -ApiKey ${{ env.umbracoCloudApiKey }}
 
   awaitDeploymentFinished:
     name: Await deployment to finish
@@ -100,6 +105,6 @@ jobs:
           runningDeploymentId: ${{ needs.doDeployment.outputs.runningDeploymentId }}
         run: >
           ${{GITHUB.WORKSPACE}}/.github/powershell/Test-DeploymentStatus.ps1 
-          -ProjectId ${{ secrets.projectId }} 
-          -DeploymentId ${{ secrets.runningDeploymentId }} 
-          -ApiKey ${{ secrets.umbracoCloudApiKey }}
+          -ProjectId ${{ env.projectId }} 
+          -DeploymentId ${{ env.runningDeploymentId }} 
+          -ApiKey ${{ env.umbracoCloudApiKey }}
