@@ -416,5 +416,11 @@ healthchecksdb
 **/Views/Partials/Forms/Themes/default/
 
 # CUSTOM ignores for this project for Github repo only (do NOT add to cloud.gitignore)
-**/umbraco/Licenses/umbracoDeploy.lic
-**/umbraco/Licenses/umbracoForms.lic
+
+# Do not commit any of the files containing secrets
+src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
+src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic
+src/UmbracoCommunity.Web.UI/umbraco-cloud.json
+
+# Created by Umbraco.Deploy.OnPrem when running locally - not needed in Cloud repo
+src/UmbracoCommunity.Web.UI/TriggerDeploy.ps1

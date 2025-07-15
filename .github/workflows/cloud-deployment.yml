@@ -31,11 +31,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # reset to use Umbraco.Deploy.Cloud in .csproj
-      - name: Reset to use Deploy Cloud, not OnPrem
+      # enable Umbraco.Cloud.Identity.Cms in .csproj
+      - name: Enable Umbraco.Cloud.Identity.Cms
         working-directory: ${{env.pathToWebsite}}
         shell: pwsh
-        run: (Get-Content 'UmbracoCommunity.Web.UI.csproj') -replace "Umbraco.Deploy.OnPrem", "Umbraco.Deploy.Cloud" | Set-Content 'UmbracoCommunity.Web.UI.csproj' 
+        run: (Get-Content 'UmbracoCommunity.Web.UI.csproj') -replace '<!--<PackageReference Include="Umbraco.Cloud.Identity.Cms" Version="13.2.4" />-->', '<PackageReference Include="Umbraco.Cloud.Identity.Cms" Version="13.2.4" />' | Set-Content 'UmbracoCommunity.Web.UI.csproj' 
+
+      # enable Umbraco.Deploy.Cloud and remove Umbraco.Deploy.OnPrem from .csproj
+      - name: Switch Umbraco.Deploy.OnPrem to Umbraco.Deploy.Cloud
+        working-directory: ${{env.pathToWebsite}}
+        shell: pwsh
+        run: |
+          (Get-Content 'UmbracoCommunity.Web.UI.csproj') -replace '<!--<PackageReference Include="Umbraco.Deploy.Cloud" Version="13.4.0" />-->', '<PackageReference Include="Umbraco.Deploy.Cloud" Version="13.4.0" />' | Set-Content 'UmbracoCommunity.Web.UI.csproj' 
+          (Get-Content 'UmbracoCommunity.Web.UI.csproj') -replace '<PackageReference Include="Umbraco.Deploy.OnPrem" Version="13.4.0" />', '<!--<PackageReference Include="Umbraco.Deploy.OnPrem" Version="13.4.0" />-->' | Set-Content 'UmbracoCommunity.Web.UI.csproj' 
 
       # reset the umbraco-cloud.json file from Secret
       - name: Umbraco Cloud Json
