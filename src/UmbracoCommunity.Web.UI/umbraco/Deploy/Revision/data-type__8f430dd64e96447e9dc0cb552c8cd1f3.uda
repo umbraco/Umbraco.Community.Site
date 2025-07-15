@@ -1,0 +1,30 @@
+{
+  "Name": "Upload Audio",
+  "Alias": "",
+  "EditorAlias": "Umbraco.UploadField",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "fileExtensions": [
+      {
+        "id": 0,
+        "value": "mp3"
+      },
+      {
+        "id": 1,
+        "value": "weba"
+      },
+      {
+        "id": 2,
+        "value": "oga"
+      },
+      {
+        "id": 3,
+        "value": "opus"
+      }
+    ]
+  },
+  "Udi": "umb://data-type/8f430dd64e96447e9dc0cb552c8cd1f3",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "13.4.0"
+}

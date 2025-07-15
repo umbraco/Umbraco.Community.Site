@@ -1,0 +1,26 @@
+{
+  "Name": "Upload Article",
+  "Alias": "",
+  "EditorAlias": "Umbraco.UploadField",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "fileExtensions": [
+      {
+        "id": 0,
+        "value": "pdf"
+      },
+      {
+        "id": 1,
+        "value": "docx"
+      },
+      {
+        "id": 2,
+        "value": "doc"
+      }
+    ]
+  },
+  "Udi": "umb://data-type/bc1e266cdac44164bf088a1ec6a7143d",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "13.4.0"
+}

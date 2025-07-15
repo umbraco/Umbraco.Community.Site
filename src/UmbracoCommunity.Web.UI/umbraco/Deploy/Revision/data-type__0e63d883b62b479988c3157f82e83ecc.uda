@@ -1,0 +1,16 @@
+{
+  "Name": "Multiple Image Media Picker",
+  "Alias": "",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "Configuration": {
+    "filter": "Image",
+    "multiple": true,
+    "validationLimit": {},
+    "enableLocalFocalPoint": false,
+    "ignoreUserStartNodes": false
+  },
+  "Udi": "umb://data-type/0e63d883b62b479988c3157f82e83ecc",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "13.4.0"
+}
