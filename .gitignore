@@ -414,3 +414,7 @@ healthchecksdb
 **/Views/Partials/Forms/Export/excel.cshtml
 **/Views/Partials/Forms/Themes/bootstrap3-horizontal/
 **/Views/Partials/Forms/Themes/default/
+
+# CUSTOM ignores for this project for Github repo only (do NOT add to cloud.gitignore)
+**/umbraco/Licenses/umbracoDeploy.lic
+**/umbraco/Licenses/umbracoForms.lic
