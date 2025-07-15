@@ -1,1 +1,20 @@
-﻿<h1>Test Home Page!</h1>
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+	Layout = null;
+	var mediaItem = Model.Value<IPublishedContent>("mediaItem");
+}
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <h1>Test Home Page!</h1>
+        @if (mediaItem != null)
+        {
+        <div>
+            <img src="@mediaItem.Url()" style="width:200px;" />
+        </div>
+        }
+    </body>
+</html>
