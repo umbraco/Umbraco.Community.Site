@@ -31,6 +31,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # reset to use Umbraco.Deploy.Cloud in .csproj
+      - name: Reset to use Deploy Cloud, not OnPrem
+        working-directory: ${{env.pathToWebsite}}
+        shell: pwsh
+        run: (Get-Content 'UmbracoCommunity.Web.UI.csproj') -replace "Umbraco.Deploy.OnPrem", "Umbraco.Deploy.Cloud" | Set-Content 'UmbracoCommunity.Web.UI.csproj' 
+
       # reset the umbraco-cloud.json file from Secret
       - name: Umbraco Cloud Json
         working-directory: ${{env.pathToWebsite}}
