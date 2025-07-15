@@ -13,3 +13,9 @@ jobs:
   # Package and Deploy to Umbraco Cloud (without saving as artifact)
   cloud-deployment:
     uses: ./.github/workflows/cloud-deployment.yml
+    secrets:
+      projectId: ${{ secrets.PROJECT_ID }}
+      umbracoCloudApiKey: ${{ secrets.UMBRACO_CLOUD_API_KEY }}
+      umbracoCloudJson: ${{ secrets.UMBRACO_CLOUD_JSON }}
+      deployLicenseKey: ${{ secrets.DEPLOY_LICENSE_KEY }}
+      formsLicenseKey: ${{ secrets.FORMS_LICENSE_KEY }}
