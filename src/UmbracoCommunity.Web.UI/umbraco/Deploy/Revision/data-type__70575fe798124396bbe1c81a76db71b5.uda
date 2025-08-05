@@ -1,26 +1,18 @@
 {
   "Name": "Upload Video",
-  "Alias": "",
   "EditorAlias": "Umbraco.UploadField",
+  "EditorUiAlias": "Umb.PropertyEditorUi.UploadField",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "fileExtensions": [
-      {
-        "id": 0,
-        "value": "mp4"
-      },
-      {
-        "id": 1,
-        "value": "webm"
-      },
-      {
-        "id": 2,
-        "value": "ogv"
-      }
-    ]
+      "mp4",
+      "webm",
+      "ogv"
+    ],
+    "umbMigrationV14": "2025-08-05T16:24:15.7846525\u002B00:00"
   },
   "Udi": "umb://data-type/70575fe798124396bbe1c81a76db71b5",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

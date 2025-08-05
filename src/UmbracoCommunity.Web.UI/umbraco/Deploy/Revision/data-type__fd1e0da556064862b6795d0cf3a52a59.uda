@@ -1,14 +1,11 @@
 {
   "Name": "Content Picker",
-  "Alias": "",
   "EditorAlias": "Umbraco.ContentPicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.DocumentPicker",
   "DatabaseType": "Nvarchar",
-  "Configuration": {
-    "showOpenButton": false,
-    "ignoreUserStartNodes": false
-  },
+  "Configuration": {},
   "Udi": "umb://data-type/fd1e0da556064862b6795d0cf3a52a59",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

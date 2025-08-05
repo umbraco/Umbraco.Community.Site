@@ -1,26 +1,18 @@
 {
   "Name": "Upload Article",
-  "Alias": "",
   "EditorAlias": "Umbraco.UploadField",
+  "EditorUiAlias": "Umb.PropertyEditorUi.UploadField",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "fileExtensions": [
-      {
-        "id": 0,
-        "value": "pdf"
-      },
-      {
-        "id": 1,
-        "value": "docx"
-      },
-      {
-        "id": 2,
-        "value": "doc"
-      }
-    ]
+      "pdf",
+      "docx",
+      "doc"
+    ],
+    "umbMigrationV14": "2025-08-05T16:24:15.7830628\u002B00:00"
   },
   "Udi": "umb://data-type/bc1e266cdac44164bf088a1ec6a7143d",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

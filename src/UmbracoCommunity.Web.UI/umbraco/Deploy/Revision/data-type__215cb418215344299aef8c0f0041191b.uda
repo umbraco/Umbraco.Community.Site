@@ -1,18 +1,16 @@
 {
   "Name": "Upload Vector Graphics",
-  "Alias": "",
   "EditorAlias": "Umbraco.UploadField",
+  "EditorUiAlias": "Umb.PropertyEditorUi.UploadField",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "fileExtensions": [
-      {
-        "id": 0,
-        "value": "svg"
-      }
-    ]
+      "svg"
+    ],
+    "umbMigrationV14": "2025-08-05T16:24:15.7703884\u002B00:00"
   },
   "Udi": "umb://data-type/215cb418215344299aef8c0f0041191b",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

@@ -1,40 +1,45 @@
 {
   "Name": "List View - Members",
-  "Alias": "",
   "EditorAlias": "Umbraco.ListView",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Collection",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "pageSize": 10,
+    "orderBy": "username",
     "orderDirection": "asc",
     "includeProperties": [
       {
         "alias": "username",
-        "isSystem": 1
+        "header": "User name",
+        "nameTemplate": null,
+        "isSystem": true
       },
       {
         "alias": "email",
-        "isSystem": 1
+        "header": "Email",
+        "nameTemplate": null,
+        "isSystem": true
       },
       {
         "alias": "updateDate",
         "header": "Last edited",
-        "isSystem": 1
+        "nameTemplate": null,
+        "isSystem": true
       }
     ],
-    "orderBy": "username",
     "layouts": [
       {
         "name": "List",
-        "path": "views/propertyeditors/listview/layouts/list/list.html",
+        "collectionView": "Umb.CollectionView.Document.Table",
         "icon": "icon-list",
-        "isSystem": 1,
+        "isSystem": true,
         "selected": true
       },
       {
         "name": "Grid",
-        "path": "views/propertyeditors/listview/layouts/grid/grid.html",
+        "collectionView": "Umb.CollectionView.Document.Grid",
         "icon": "icon-thumbnails-small",
-        "isSystem": 1,
+        "isSystem": true,
         "selected": true
       }
     ],
@@ -45,11 +50,13 @@
       "allowBulkMove": true,
       "allowBulkDelete": true
     },
+    "icon": "icon-badge color-black",
     "showContentFirst": false,
-    "useInfiniteEditor": false
+    "useInfiniteEditor": false,
+    "umbMigrationV14": "2025-08-05T16:24:15.791137\u002B00:00"
   },
   "Udi": "umb://data-type/aa2c52a0ce874e65a47c7df09358585d",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

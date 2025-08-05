@@ -77,5 +77,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MediaTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

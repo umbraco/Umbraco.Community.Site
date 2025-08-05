@@ -1,38 +1,40 @@
 {
   "Name": "List View - Media",
-  "Alias": "",
   "EditorAlias": "Umbraco.ListView",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Collection",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "pageSize": 100,
-    "orderDirection": "desc",
-    "includeProperties": [
-      {
-        "alias": "updateDate",
-        "header": "Last edited",
-        "isSystem": 1
-      },
-      {
-        "alias": "owner",
-        "header": "Updated by",
-        "isSystem": 1
-      }
-    ],
     "orderBy": "updateDate",
+    "orderDirection": "desc",
     "layouts": [
       {
         "name": "Grid",
-        "path": "views/propertyeditors/listview/layouts/grid/grid.html",
+        "collectionView": "Umb.CollectionView.Media.Grid",
         "icon": "icon-thumbnails-small",
-        "isSystem": 1,
+        "isSystem": true,
         "selected": true
       },
       {
         "name": "List",
-        "path": "views/propertyeditors/listview/layouts/list/list.html",
+        "collectionView": "Umb.CollectionView.Media.Table",
         "icon": "icon-list",
-        "isSystem": 1,
+        "isSystem": true,
         "selected": true
+      }
+    ],
+    "includeProperties": [
+      {
+        "alias": "updateDate",
+        "header": "Last edited",
+        "nameTemplate": null,
+        "isSystem": true
+      },
+      {
+        "alias": "creator",
+        "header": "Updated by",
+        "nameTemplate": null,
+        "isSystem": true
       }
     ],
     "bulkActionPermissions": {
@@ -42,11 +44,13 @@
       "allowBulkMove": true,
       "allowBulkDelete": true
     },
+    "icon": "icon-badge color-black",
     "showContentFirst": false,
-    "useInfiniteEditor": false
+    "useInfiniteEditor": false,
+    "umbMigrationV14": "2025-08-05T16:24:15.8059593\u002B00:00"
   },
   "Udi": "umb://data-type/3a0156c43b8c4803bdc16871faa83fff",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "13.4.0"
+  "__version": "16.0.0"
 }

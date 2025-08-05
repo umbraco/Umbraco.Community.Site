@@ -1,8 +1,8 @@
 {
-  "Name": "Related Form",
-  "Alias": "umbForm",
+  "Name": "Related Member",
+  "Alias": "umbMember",
   "IsDependency": true,
-  "Udi": "umb://relation-type/be98a22dd0f84615b2e41aae86bf89be",
+  "Udi": "umb://relation-type/bf2a9ac5b791377ebafb9d06ed87864d",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.RelationTypeArtifact",
   "__version": "16.0.0"
