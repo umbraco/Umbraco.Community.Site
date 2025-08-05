@@ -58,6 +58,8 @@ jobs:
           # Disable Umbraco.Deploy.OnPrem (comment out)
           $content = $content -replace '(?s)<PackageReference\s+(?=[^>]*Include="Umbraco\.Deploy\.OnPrem")(?=[^>]*Version="([^"]*)")[^>]*/?>', '<!-- <PackageReference Include="Umbraco.Deploy.OnPrem" Version="$1" /> -->'
           
+          echo $content
+
           Set-Content '${{ inputs.csprojFile }}' $content
           
       # Create umbraco-cloud.json file from Secret
