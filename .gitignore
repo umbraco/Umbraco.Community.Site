@@ -415,12 +415,18 @@ healthchecksdb
 **/Views/Partials/Forms/Themes/bootstrap3-horizontal/
 **/Views/Partials/Forms/Themes/default/
 
-# CUSTOM ignores for this project for Github repo only (do NOT add to cloud.gitignore)
 
-# Do not commit any of the files containing secrets
-src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoDeploy.lic
-src/UmbracoCommunity.Web.UI/umbraco/Licenses/umbracoForms.lic
-src/UmbracoCommunity.Web.UI/umbraco-cloud.json
+# --------------------------------------------------------------
+# CUSTOM rules only for the .gitignore used when working locally
+# do not duplicate these into the cloud.gitignore file
+# --------------------------------------------------------------
 
-# Created by Umbraco.Deploy.OnPrem when running locally - not needed in Cloud repo
-src/UmbracoCommunity.Web.UI/TriggerDeploy.ps1
+**/git-patch.diff
+
+# Never commit any of the files containing secrets (just in case someone uses the real files locally!)
+**/umbraco/Licenses/umbracoDeploy.lic
+**/umbraco/Licenses/umbracoForms.lic
+**/umbraco-cloud.json
+
+# Umbraco.Deploy.OnPrem creates this file when running locally - file not needed in Cloud repo
+**/TriggerDeploy.ps1

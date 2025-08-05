@@ -1,0 +1,104 @@
+name: Prepare and Upload Artifact
+
+on:
+  workflow_call:
+    inputs:
+      newSha:
+        required: false
+        type: string
+      pathToWebsite:
+        required: false
+        type: string
+      pathToFrontendClient:
+        required: false
+        type: string
+      csprojFile:
+        required: false
+        type: string
+    secrets:
+      projectId:
+        required: true
+      umbracoCloudApiKey:
+        required: true
+      umbracoCloudJson:
+        required: true
+      deployLicenseKey:
+        required: true
+      formsLicenseKey:
+        required: true
+    outputs:
+      artifactId:
+        description: 'The Id of the uploaded artifact'
+        value: ${{ jobs.prepareDeployment.outputs.artifactId }}
+
+jobs:
+  prepareDeployment:
+    name: Prepare Artifact to cloud
+    runs-on: ubuntu-latest
+    outputs:
+      artifactId: ${{ steps.upload-artifact.outputs.artifactId }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.newSha }}
+
+      # Enable/disable package references in .csproj 
+      - name: Update csproj
+        working-directory: ${{ inputs.pathToWebsite }}
+        shell: pwsh
+        run: |
+          $content = Get-Content '${{ inputs.csprojFile }}' -Raw
+          
+          # Enable Umbraco.Cloud.Cms (uncomment)
+          $content = $content -replace '(?s)<!--\s*<PackageReference\s+(?=[^>]*Include="Umbraco\.Cloud\.Identity\.Cms")(?=[^>]*Version="([^"]*)")[^>]*/?>\s*-->', '<PackageReference Include="Umbraco.Cloud.Cms" Version="$1" />'
+                    
+          # Enable Umbraco.Deploy.Cloud (uncomment)
+          $content = $content -replace '(?s)<!--\s*<PackageReference\s+(?=[^>]*Include="Umbraco\.Deploy\.Cloud")(?=[^>]*Version="([^"]*)")[^>]*/?>\s*-->', '<PackageReference Include="Umbraco.Deploy.Cloud" Version="$1" />'
+                    
+          # Disable Umbraco.Deploy.OnPrem (comment out)
+          $content = $content -replace '(?s)<PackageReference\s+(?=[^>]*Include="Umbraco\.Deploy\.OnPrem")(?=[^>]*Version="([^"]*)")[^>]*/?>', '<!-- <PackageReference Include="Umbraco.Deploy.OnPrem" Version="$1" /> -->'
+          
+          Set-Content '${{ inputs.csprojFile }}' $content
+          
+      # Create umbraco-cloud.json file from Secret
+      - name: Umbraco Cloud Json
+        working-directory: ${{ inputs.pathToWebsite }}
+        shell: pwsh
+        run: set-content 'umbraco-cloud.json' -value '${{ secrets.umbracoCloudJson }}' 
+
+      # Create Deploy license key file from Secret
+      - name: Deploy License Key
+        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
+        shell: pwsh
+        run: set-content 'umbracoDeploy.lic' -value '${{ secrets.deployLicenseKey }}' 
+
+      # Create Forms license key file from Secret
+      - name: Forms License Key
+        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
+        shell: pwsh
+        run: set-content 'umbracoForms.lic' -value '${{ secrets.formsLicenseKey }}' 
+
+      # switch the gitignore files so cloud does not ignore the build frontend assets
+      - name: Prepare Cloud Git Ignore
+        run: cp cloud.gitignore .gitignore
+        shell: bash
+        
+      # zip everything, except what is defined in the 'cloud.zipignore'
+      - name: Zip Source Code
+        run: |
+          echo "Packing artifact for upload"
+          zip -r sources.zip . -x@cloud.zipignore
+        shell: bash
+
+      # Upload your zipped artifact
+      - name: Post Zipped Artifact
+        id: upload-artifact
+        shell: pwsh
+        run: >
+          ${{GITHUB.WORKSPACE}}/.github/powershell/APIv2/Add-DeploymentArtifact.ps1 
+          -ProjectId ${{ secrets.projectId }} 
+          -ApiKey ${{ secrets.umbracoCloudApiKey }} 
+          -FilePath ${{ GITHUB.WORKSPACE }}/sources.zip
+          -Description "Artifact for ${{github.run_number}}"
+          -Version "${{github.run_number}}"
+          -PipelineVendor GITHUB

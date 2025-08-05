@@ -13,22 +13,26 @@ param(
     $DeploymentId, 
 
     [Parameter(Position=3)]
+    [string] 
+    $TargetEnvironmentAlias,
+
+    [Parameter(Position=4)]
     [string]
     $DownloadFolder,
 
-    [Parameter(Position=4)]
+    [Parameter(Position=5)]
     [string] 
     $PipelineVendor, ## GITHUB or AZUREDEVOPS
 
-    [Parameter(Position=5)]    
+    [Parameter(Position=6)]    
     [string] 
     $BaseUrl = "https://api.cloud.umbraco.com"
 )
 
 ### Endpoint docs
-# https://docs.umbraco.com/umbraco-cloud/set-up/project-settings/umbraco-cicd/umbracocloudapi#get-deployment-diff
-
-$ChangeUrl = "$BaseUrl/v1/projects/$ProjectId/deployments/$DeploymentId/diff"
+# https://docs.umbraco.com/umbraco-cloud/set-up/project-settings/umbraco-cicd/umbracocloudapi/todo-v2
+#
+$ChangeUrl = "$BaseUrl/v2/projects/$ProjectId/deployments/$DeploymentId/diff?targetEnvironmentAlias=$TargetEnvironmentAlias"
 
 $Headers = @{
   'Umbraco-Cloud-Api-Key' = $ApiKey
@@ -42,7 +46,7 @@ if ($GetDiffDeploymentId -eq '') {
 
 # ensure folder exists
 if (!(Test-Path $DownloadFolder -PathType Container)) { 
-  Write-Host "Creating folder $($DownloadFolder)"
+  Write-Host "Creting folder $($DownloadFolder)"
   New-Item -ItemType Directory -Force -Path $DownloadFolder
 }
 
@@ -89,6 +93,12 @@ try {
 }
 catch {
   Write-Host "---Error---"
-  Write-Host $_
+  Write-Host $_.Exception.Message
+  if ($null -ne $_.Exception.Response) {
+      $responseStream = $_.Exception.Response.GetResponseStream()
+      $reader = New-Object System.IO.StreamReader($responseStream)
+      $responseBody = $reader.ReadToEnd()
+      Write-Host "Response Body: $responseBody"
+  }  
   exit 1
 }
