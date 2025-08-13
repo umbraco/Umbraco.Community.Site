@@ -1,0 +1,25 @@
+.avatar {
+    display: flex;
+    margin-bottom:var(--unit);
+
+    @media(--md) {
+        margin-bottom:var(--unit-md);
+    }
+
+    .author-description {
+        flex-direction: column;
+        display: flex;
+        margin: 0 10px;
+        font-weight: bold;
+
+        &.small {
+            font-size: 0.8rem;
+        }
+    }
+
+    img {
+        width:50px;
+        height:50px;
+        border-radius:25px;
+    }
+}

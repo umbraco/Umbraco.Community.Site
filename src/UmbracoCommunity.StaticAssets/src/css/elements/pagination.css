@@ -1,0 +1,19 @@
+@import "../base/media-queries.css";
+
+.pagination {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: var(--unit) 0 0;
+  column-gap: var(--unit);
+
+  .disabled {
+    opacity: 0.5;
+  }
+
+  @media (--md) {
+    margin: var(--unit-lg) 0 0;
+  }
+}

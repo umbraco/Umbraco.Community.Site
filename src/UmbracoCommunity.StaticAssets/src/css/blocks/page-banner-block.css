@@ -1,0 +1,40 @@
+.dc-page-banner-block h1 {
+  font-weight: 500;
+  max-width: 27ch;
+  margin: 0;
+  line-height: normal;
+  z-index: 1;
+}
+
+.dc-page-banner-block__container {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: var(--border-radius-xl);
+  display: flex;
+  align-items: center;
+  padding: var(--unit-lg);
+  background-size: cover;
+  background-position: center center;
+  background-image: var(--page-banner-background-image);
+  background-color: var(--page-banner-background-color);
+  color: var(--page-banner-text-color);
+
+  .has-bg & {
+    color: var(--color-white);
+  }
+
+  @media (--sm) {
+    min-height: 270px;
+    padding: var(--unit-lg) var(--unit-xl);
+  }
+}
+
+.dc-page-banner-block__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}

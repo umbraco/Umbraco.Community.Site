@@ -1,0 +1,79 @@
+@import './fonts.css';
+@import './animations.css';
+@import './media-queries.css';
+@import './section.css';
+@import './typography.css';
+@import './utilities.css';
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-page-surface);
+  color: var(--color-black);
+  font-family: var(--font-family);
+  line-height: 1.6;
+}
+
+body.scroll-disabled {
+  overflow: hidden;
+}
+
+main {
+  overflow-x: hidden;
+  padding: 0 var(--unit);
+
+  @media (--sm) {
+    padding: 0 var(--unit-md);
+  }
+
+  @media (--md) {
+    padding-top: var(--unit-md);
+  }
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background-color: var(--color-blue);
+  color: var(--color-white);
+}
+
+.g2-embed {
+  display: flex;
+}
+
+.g2-embed iframe {
+  border: none;
+}
+
+.g2-embed iframe:not([width]) {
+  width: 100%;
+}
+
+.calendly-popup {
+  max-height: unset !important;
+}
+
+.calendly-popup-close {
+  top: 125px !important;
+  right: 150px !important;
+}

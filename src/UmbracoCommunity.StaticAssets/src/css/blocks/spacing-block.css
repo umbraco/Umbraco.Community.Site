@@ -1,0 +1,19 @@
+.dc-spacing-block {
+  --spacing-small: 20px;
+  --spacing-medium: 40px;
+  --spacing-large: 60px;
+
+  display: block;
+}
+
+.dc-spacing-block.spacing-small {
+  padding: calc(var(--spacing-small)/2) 0;
+}
+
+.dc-spacing-block.spacing-medium {
+  padding: calc(var(--spacing-medium)/2) 0;
+}
+
+.dc-spacing-block.spacing-large {
+  padding: calc(var(--spacing-large)/2) 0;
+}

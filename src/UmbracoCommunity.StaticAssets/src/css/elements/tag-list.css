@@ -1,0 +1,21 @@
+.tag-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    li {
+        background-color: var(--color-light);
+        border-radius: var(--border-radius);
+        font-size: .75rem;
+        padding:0.25em 0.75em;
+        white-space: nowrap;
+        text-transform: lowercase;
+    }
+
+    a {
+        text-decoration: none;
+    }
+}

@@ -1,0 +1,77 @@
+.dc-faqs {
+    h2 {
+        margin: 0 auto var(--unit);
+        text-align: center;
+    }
+
+    input {
+        display: none;
+    }
+
+    label {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: color ease-in-out .2s;
+        font-weight: 500;
+    }
+
+    label:hover {
+        color: var(--color-blue);
+    }
+
+    dt {
+        padding: var(--unit-xxs) 0;
+        border-bottom: 2px solid #e7e7e7;
+        margin-bottom: var(--unit)
+    }
+
+    dd {
+        min-height: 0;
+        transition: visibility .2s;
+        visibility: hidden;
+        margin-left: 0;
+    }
+
+    .plus-icon {
+        width: var(--unit);
+        height: var(--unit);
+        transition: transform ease-in-out .2s;
+    }
+
+    .expand {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows .2s;
+        overflow: hidden;
+    }
+}
+
+.dc-faq-block {
+    max-width: var(--narrow-width);
+    margin-left: auto;
+    margin-right: auto;
+
+    &+.dc-faq-block {
+        margin-top: var(--unit);
+    }
+}
+
+.dc-faq-block:has(:checked) {
+    label {
+        color: var(--color-blue);
+    }
+
+    .expand {
+        grid-template-rows: 1fr;
+    }
+
+    .plus-icon {
+        transform: rotate(45deg);
+    }
+
+    dd {
+        visibility: visible;
+    }
+}

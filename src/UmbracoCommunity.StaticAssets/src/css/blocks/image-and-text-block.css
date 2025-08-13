@@ -1,0 +1,106 @@
+@import "../base/media-queries.css";
+
+.dc-image-and-text-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.dc-image-and-text-block__image-container {
+  margin-bottom: 3rem;
+}
+
+.dc-image-and-text-block__image-container img {
+  border-radius: 20px;
+}
+
+.dc-image-and-text-block__content-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-left: 5.25rem;
+}
+
+.dc-image-and-text-block__content{
+  max-width: 460px;
+}
+
+.dc-image-and-text-block__content h2{
+  color: var(--color-blue);
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 35px; /* 116.667% */
+  margin-top: 0;
+}
+
+.dc-image-and-text-block__content p {
+  color: var(--color-blue);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
+}
+
+.dc-image-and-text-block__content .cta {
+  margin-top: 1.5rem;
+}
+
+@media (--md) {
+  .dc-image-and-text-block {
+    flex-direction: row;
+    column-gap: 3rem;
+  }
+
+  .dc-image-and-text-block.text-alignment-left {
+    flex-direction: row-reverse;
+  }
+
+  .dc-image-and-text-block__image-container {
+    margin-bottom: 0;
+    flex: 2.75;
+  }
+
+  .dc-image-and-text-block__content-container {
+    flex: 1;
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .dc-image-and-text-block.vertical-text-position-top .dc-image-and-text-block__content-container {
+    align-items: flex-start;
+  }
+
+  .dc-image-and-text-block.vertical-text-position-center .dc-image-and-text-block__content-container {
+    align-items: center;
+  }
+
+  .dc-image-and-text-block.vertical-text-position-bottom .dc-image-and-text-block__content-container {
+    align-items: flex-end;
+  }
+
+  .dc-image-and-text-block.text-alignment-right .dc-image-and-text-block__content-container {
+    justify-content: flex-start;
+    padding-left: 0;
+  }
+
+  .dc-image-and-text-block__content p {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 25px;
+  }
+}
+
+@media (--lg) {
+  .dc-image-and-text-block {
+    column-gap: 5rem;
+  }
+
+  .dc-image-and-text-block__content p {
+    max-width: 382px;
+  }
+}
+
+@media (--xl) {
+  .dc-image-and-text-block {
+    column-gap: 6.25rem;
+  }
+}

@@ -1,0 +1,97 @@
+h1 {
+  font-size: 2rem;
+  margin-bottom: var(--unit-xs);
+  line-height: 1.125;
+}
+
+h2 {
+  font-size: 1.5rem;
+
+  &.large {
+    font-size: 2rem;
+    line-height: 1.125;
+  }
+
+  &.ultra-large {
+    font-size: 2.5rem;
+    margin-bottom: var(--unit-sm);
+  }
+}
+
+h3 {
+  font-size: 1.3rem;
+}
+
+h4 {
+  font-size: 1.1rem;
+  margin-bottom: var(--unit);
+}
+
+h5 {
+  font-size: var(--font-size);
+}
+
+h6 {
+  font-size: var(--font-size);
+}
+
+@media (--sm) {
+  h1 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (--md) {
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+a {
+  color: var(--link-color);
+}
+
+.lead {
+  font-size: 1.1rem;
+  text-align: center;
+  margin: var(--unit-sm) auto var(--unit-md);
+}
+
+/* Fonts */
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-small {
+  font-size: 0.9rem;
+}
+
+.font-normal {
+  font-weight: normal !important;
+}
+
+.font-italic {
+  font-style: italic;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+table {
+  td, th {
+    padding: var(--unit-sm);
+  }
+}

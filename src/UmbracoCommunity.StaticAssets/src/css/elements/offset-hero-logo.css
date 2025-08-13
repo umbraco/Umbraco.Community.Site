@@ -1,0 +1,19 @@
+@import '../base/media-queries.css';
+
+.offset-hero-logo {
+    background: white;
+    padding: var(--unit);
+    width: 156px;
+    z-index: 5;
+    margin: var(--unit) auto 0;
+    box-shadow: var(--base-box-shadow);
+  
+    @media (--md) {
+      margin: -78px auto;
+    }
+  
+    img {
+      width: 120px;
+      height: 120px;
+    }
+  }

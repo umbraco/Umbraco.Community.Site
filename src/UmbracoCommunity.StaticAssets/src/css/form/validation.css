@@ -1,0 +1,40 @@
+.umbraco-forms-indicator {
+  color: var(--color-red);
+}
+
+.umbraco-forms-form form {
+  .field-validation-error {
+    padding-left: 0;
+    line-height: 1.3;
+    font-size: var(--font-size-sm);
+    display: inline-block;
+    margin-top: var(--unit-xs);
+  }
+
+  .validation-summary-errors ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .editor-field .field-validation-error,
+  .validation-summary-errors li {
+    line-height: 1.3;
+    font-size: var(--font-size-sm);
+    color: var(--color-red);
+  }
+}
+
+.umbraco-forms-field-wrapper p.error {
+  font-size: var(--unit-sm);
+  margin: 0;
+}
+
+.honey {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  z-index: -1;
+}

@@ -1,0 +1,67 @@
+@import "./text-block.css";
+@import "./cta-block.css";
+@import "./image-block.css";
+@import "./hero-block.css";
+@import "./columns.css";
+@import "./sliders/sliders.css";
+@import "./faqs-block.css";
+@import "./faqs-and-image-block.css";
+@import "./intro-teaser-block.css";
+@import "./logo-picker-block.css";
+@import "./page-banner-block.css";
+@import "./results-block.css";
+@import "./g2-reviews-block.css";
+@import "./boxes-row.css";
+@import "./timeline-block.css";
+@import "./plan-comparison.css";
+@import "./steps-block.css";
+@import "./careers.css";
+@import "./spacing-block.css";
+@import "./headline-block.css";
+@import "./numbers-block.css";
+@import "./cards-block.css";
+@import "./image-and-text-block.css";
+@import "./big-cta-block.css";
+@import "./carousel/carousels.css";
+@import "./multiple-cards.css";
+@import "./quote-block.css";
+@import "./testimonial-logos-block.css";
+
+.dc-block-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-lg);
+  max-width: var(--max-width);
+  margin: 0 auto;
+
+  @media (--md) {
+    gap: var(--unit-xl);
+
+    .dc-block-list {
+      gap: var(--unit-lg);
+    }
+  }
+
+  > .umbraco-forms-dotcom {
+    form {
+      max-width: 800px;
+      margin: 1em;
+
+      @media (--sm) {
+        margin: 0 2em;
+      }
+
+      @media (--md) {
+        margin: 0 3em;
+      }
+
+      @media (--lg) {
+        margin: 0 5em;
+      }
+
+      @media (min-width: 1635px) {
+        margin: 0 auto;
+      }
+    }
+  }
+}

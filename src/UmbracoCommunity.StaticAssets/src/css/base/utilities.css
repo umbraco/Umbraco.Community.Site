@@ -1,0 +1,141 @@
+﻿/* refer to postcss-rhythm.mixin.ts to see how this works and what it generates */
+@mixin rhythm padding;
+@mixin rhythm margin;
+
+.narrow {
+  max-width: var(--narrow-width);
+  margin:0 auto;
+}
+
+.relative {
+  position: relative;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+@media (--lg) {
+  .overflow-visible-lg {
+    overflow: visible !important;
+  }
+}
+
+.z-indexed {
+  position: relative;
+  z-index: 10;
+}
+
+/* Colours */
+.is-success {
+  background: var(--color-green);
+  color: white;
+}
+
+.color-white {
+  color: var(--color-white);
+}
+
+.color-blue {
+  color: var(--color-blue);
+}
+
+.has-everything-white {
+  color: var(--color-white);
+
+  & a {
+    color: inherit;
+  }
+
+  & a:hover {
+    opacity: 0.9;
+  }
+}
+
+@media (--sm) {
+  .has-space-between-xs {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+@media (--md) {
+  .is-flexible-tablet {
+    display: flex;
+  }
+}
+
+/* Spaced */
+.spaced-bottom {
+  margin-bottom: 30px;
+}
+
+.faded {
+  color: var(--color-grey);
+}
+
+.display-none {
+  display: none;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.overflow-visible {
+  overflow: initial !important;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+/* lists */
+.list-unstyled {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rounded {
+  border-radius: var(--border-radius-xl);
+}
+
+/* using global styles for hiding filtered elements, to avoid
+ duplicating rules in filter element hosts */
+[filter-out] {
+  display: none;
+}
+
+.wide-bg {
+  position: relative;
+}
+
+.wide-bg::before {
+  content: "";
+  display: block;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  position: absolute;
+}

@@ -1,0 +1,142 @@
+.btn {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  text-align: center;
+  box-shadow: none;
+  background-color: transparent;
+  border-radius: 20px;
+  border: 1px solid var(--color-identity-blue);
+  cursor: pointer;
+  color: var(--color-identity-blue);
+  padding: 0 20px;
+  transition: all ease-out 0.2s;
+  appearance: none;
+  text-decoration: none;
+}
+
+.btn svg {
+  background-color: transparent;
+}
+
+.btn:hover {
+  background-color: var(--color-identity-blue);
+  color: var(--color-white);
+}
+
+.btn.is-blue,
+.btn.is-white:hover {
+  color: var(--color-white);
+  background-color: var(--color-identity-blue);
+}
+
+.btn.is-blue:hover {
+  color: var(--color-identity-blue);
+  background-color: var(--color-white);
+}
+
+.btn.is-transparent {
+  border-color: var(--color-white);
+  color: var(--color-white);
+}
+
+.btn.is-transparent:hover {
+  background-color: var(--color-white);
+  color: var(--color-identity-blue);
+}
+
+.btn.arrow {
+  padding: 0 4px 0 20px;
+}
+
+.btn.arrow svg {
+  width: 32px;
+  height: 32px;
+  border: 4px solid transparent;
+  transform: rotate(45deg);
+}
+
+.btn.arrow:hover svg path {
+  stroke: var(--color-white);
+}
+
+.btn.cta svg {
+  transform: rotate(0);
+  background-color: var(--color-white);
+  border-color: var(--color-white);
+  border-radius: 50%;
+  transition: all ease-out 0.2s;
+}
+
+.btn.cta:hover svg {
+  transform: rotate(45deg);
+}
+
+.btn.cta.is-transparentblue svg {
+  background-color: var(--color-blue);
+  border-color: var(--color-blue);
+}
+
+.btn.cta.is-transparentblue svg path {
+  stroke: var(--color-white);
+}
+
+.btn.cta.is-transparentblue:hover svg {
+  background-color: var(--color-white);
+  border-color: var(--color-white);
+}
+
+.btn.cta.is-transparentblue:hover svg path {
+  stroke: var(--color-blue);
+}
+
+.btn.cta svg path,
+.btn.cta.is-white:hover svg path {
+  stroke: var(--color-identity-blue);
+}
+
+.btn.cta:hover svg {
+  background-color: var(--color-identity-blue);
+  border-color: var(--color-identity-blue);
+}
+
+.btn.is-white {
+  background-color: var(--color-white);
+}
+
+.btn.cta.is-white:hover svg {
+  background-color: var(--color-white);
+  border-color: var(--color-white);
+  border-radius: 50%;
+}
+
+.btn.cta.is-white svg {
+  background-color: var(--color-identity-blue);
+  border-color: var(--color-identity-blue);
+}
+
+.btn.cta.is-white svg path {
+  stroke: var(--color-white);
+}
+
+.btn.cta.is-whitepink {
+  background-color: var(--color-white);
+}
+
+.btn.cta.is-whitepink svg {
+  background-color: var(--color-pink);
+  border-color: var(--color-pink);
+}
+
+.btn.cta.is-whitepink:hover {
+  background-color: var(--color-pink);
+  color: var(--color-blue);
+}
+
+.btn.cta.is-whitepink:hover svg path {
+  stroke: var(--color-blue);
+}

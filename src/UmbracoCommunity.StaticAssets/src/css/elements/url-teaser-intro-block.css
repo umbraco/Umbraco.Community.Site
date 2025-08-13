@@ -1,0 +1,26 @@
+.url-teaser-intro-block {
+  &:first-child {
+    margin-top: var(--unit-lg);
+  }
+}
+
+.url-teaser-intro-block__url {
+  text-align: center;
+  margin-bottom: var(--unit-md);
+  font-weight: bold;
+}
+
+.url-teaser-intro-block__teaser {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.1rem;
+
+  p:first-child {
+    margin-top: 0;
+  }
+
+  p:last-child {
+    margin-bottom:0;
+  }
+}

@@ -1,0 +1,95 @@
+@keyframes nav-mobile-open {
+    0% {
+        top: calc(100vh - 90px);
+        opacity: 0;
+    }
+
+    50%{
+        opacity: 0.25;
+    }
+
+    100% {
+        top: 90px;
+        opacity: 1;
+    }
+}
+
+@keyframes nav-mobile-close {
+    0% {
+        top: 90px;
+    }
+
+    100% {
+        top: calc(100vh - 90px);
+    }
+}
+
+@keyframes nav-mobile-open-nav-list {
+    0% {
+        top: calc(100vh);
+    }
+
+    100% {
+        top: 0;
+    }
+}
+
+@keyframes nav-mobile-close-nav-list {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: calc(100vh);
+    }
+}
+
+@keyframes old-nav-mobile-open {
+    0% {
+        top: calc(100vh - 90px);
+    }
+
+    100% {
+        top: 22px;
+    }
+}
+
+@keyframes old-nav-mobile-close {
+    0% {
+        top: 22px;
+    }
+
+    100% {
+        top: calc(100vh - 90px);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes expand {
+    0% {
+        margin-top: -100%;
+    }
+
+    100% {
+        margin-top: 0;
+    }
+}

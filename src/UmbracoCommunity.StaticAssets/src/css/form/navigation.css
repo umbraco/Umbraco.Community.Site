@@ -1,0 +1,32 @@
+.umbraco-forms-form form .umbraco-forms-navigation {
+  padding: 0;
+  margin-top: var(--unit-md);
+}
+
+.umbraco-forms-navigation input[type="submit"] {
+  background-color: var(--color-dark);
+  border: none;
+  cursor: pointer;
+  color: var(--color-white);
+
+  &:hover {
+    background-color: var(--color-blue);
+    color: var(--color-pink);
+  }
+
+  &:disabled {
+    background: var(--color-light-grey);
+
+    &:hover {
+      background: var(--color-grey);
+    }
+  }
+}
+
+a.form-link {
+  color: var(--color-black);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
