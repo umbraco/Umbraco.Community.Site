@@ -1,6 +1,28 @@
-@using Umbraco.Extensions
+@using Joonasw.AspNetCore.SecurityHeaders.Csp
 @using Umbraco.Cms.Web.Common.PublishedModels
 @using Umbraco.Cms.Web.Common.Views
 @using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+@using Umbraco.Forms.Web
+@using Umbraco.Forms.Web.Extensions
+
 @using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Hosting;
+@using Microsoft.Extensions.Hosting;
+
+@using UmbracoCommunity.Web
+@using UmbracoCommunity.Web.Extensions
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Smidge
+@addTagHelper *, UmbracoCommunity.Web
+@addTagHelper *, Umbraco.Forms.Web
+@addTagHelper *, Joonasw.AspNetCore.SecurityHeaders
+
+@inject ICspNonceService nonceService;
+@inject IWebHostEnvironment webHostEnvironment;
+
+@if (webHostEnvironment.IsProduction())
+{
+    <script id="gtmScript" asp-add-nonce data-nonce="@nonceService.GetNonce()">(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = "https://load.sst.umbraco.com/1tsxmrrbeo.js?" + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'evkn1fvu=aWQ9R1RNLVQ2VEtNVDI%3D&apiKey=f8823aac');</script>
+}
