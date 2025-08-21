@@ -1,0 +1,85 @@
+.dc-timeline {
+  --timeline-border-color: var(--color-pink);
+  --timeline-padding-left: var(--unit-sm);
+  --timeline-title-padding: var(--unit-sm) 0 var(--unit-sm) var(--unit);
+  --timeline-item-padding: 0 0 0 var(--unit);
+  --timeline-headline-marker-diameter: var(--unit);
+  --timeline-title-marker-diameter: var(--unit-sm);
+
+  position: relative;
+
+  &:before {
+    content: "";
+    border: 1px solid var(--timeline-border-color);
+    border-image-source: linear-gradient(
+      to bottom,
+      var(--timeline-border-color) 85%,
+      transparent
+    );
+    border-image-slice: 1;
+    position: absolute;
+    height: 100%;
+    top: var(--unit-md);
+  }
+
+  h2,
+  h3 {
+    margin: 0;
+  }
+}
+
+.dc-timeline-image {
+  padding-bottom: var(--unit);
+}
+
+.dc-timeline-headline {
+  --marker-diameter: var(--timeline-headline-marker-diameter);
+  --marker-background-color: var(--color-blue);
+}
+
+.dc-timeline-title {
+  --marker-diameter: var(--timeline-title-marker-diameter);
+  --marker-background-color: var(--color-dark);
+}
+
+.dc-timeline-headline,
+.dc-timeline-title {
+  padding: var(--timeline-title-padding);
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--color-dark);
+
+  &::before {
+    content: "";
+    width: var(--marker-diameter);
+    height: var(--marker-diameter);
+    border-radius: var(--marker-diameter);
+    background-color: var(--marker-background-color);
+    position: absolute;
+    left: 1px;
+    transform: translate(-50%);
+    border: 2px solid var(--timeline-border-color);
+  }
+}
+
+.dc-timeline-item {
+  padding: var(--timeline-item-padding);
+}
+
+@media (--sm) {
+  .dc-timeline {
+    --timeline-padding-left: var(--unit-md);
+    --timeline-title-padding: var(--unit-sm) var(--unit-md);
+    --timeline-item-padding: 0 var(--unit-md) var(--unit-sm);
+    --timeline-headline-marker-diameter: var(--unit-md);
+    --timeline-title-marker-diameter: var(--unit);
+  }
+}
+
+@media (--md) {
+  .dc-timeline {
+    --timeline-item-padding: 0 0 var(--unit-sm) var(--unit-md);
+    max-width: calc(800px + 4rem) !important;
+  }
+}

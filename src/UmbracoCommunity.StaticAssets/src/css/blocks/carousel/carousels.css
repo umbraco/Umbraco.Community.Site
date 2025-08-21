@@ -1,0 +1,97 @@
+@import "./testimonials-carousel.css";
+@import "./cards-carousel.css";
+
+dc-carousel {
+    display: flex;
+    position: relative;
+    flex-direction: column-reverse;
+    gap: 2rem;
+}
+
+dc-carousel .controls {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 2rem;
+}
+
+dc-carousel .carousel-items {
+    display: flex;
+    column-gap: 20px;
+}
+
+.carousel__item {
+    display: block;
+    position: relative;
+    width: var(--item-width);
+    height: var(--item-height);
+}
+
+a.carousel__item:hover {
+    transform: scale(1.05);
+}
+
+a.carousel__item .link-arrow {
+    position: absolute;
+    bottom: .75rem;
+    right: .75rem;
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+}
+
+a.carousel__item.active .link-arrow {
+    background-color: var(--color-white);
+}
+
+.carousel__item-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.carousel__item p {
+    margin: 0;
+    width: calc(var(--item-width) - 2 * var(--item-side-margin));
+}
+
+@media (--sm) {
+    dc-carousel .carousel-items-wrapper {
+        display: flex;
+        width: var(--slide-width);
+        margin-top: var(--wrapper-margin-top);
+        justify-content: flex-start;
+    }
+}
+
+@media (--md) {
+    dc-carousel {
+        --item-width: 377px;
+        --item-height: 465px;
+        --item-side-margin: 2rem;
+    }
+
+    dc-carousel .carousel__nav {
+        display: flex;
+        position: relative;
+        z-index: 1;
+        background: var(--color-page-surface)
+    }
+
+    dc-carousel .carousel__nav:after {
+        content: " ";
+        height: var(--item-height);
+        width: 30px;
+        background: rgb(241, 240, 238);
+        background: linear-gradient(270deg, rgba(241, 240, 238, 0) 0%, rgba(241, 240, 238, 0.5) 25%, rgba(241, 240, 238, 0.75) 50%, rgba(241, 240, 238, 1) 100%);
+        position: absolute;
+        right: -30px;
+    }
+
+    dc-carousel .controls {
+        justify-content: space-between;
+    }
+}

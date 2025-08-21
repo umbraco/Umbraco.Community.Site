@@ -1,0 +1,9 @@
+::backdrop {
+  background-color: rgba(0, 0, 0, 0.69);
+}
+
+dialog {
+  border: none;
+  padding: var(--unit-lg);
+  max-width: 650px;
+}

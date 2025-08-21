@@ -1,0 +1,43 @@
+.dc-headline__container {
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 0 2.75rem;
+  row-gap: 1.5rem;
+}
+
+.dc-headline__container > span {
+  color: var(--color-blue);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+}
+
+.dc-headline__container > h2 {
+  color: var(--color-blue);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 45px;
+  margin: 0;
+}
+
+@media (--md) {
+  .dc-headline__container {
+    flex-direction: row;
+  }
+
+  .dc-headline__container > span {
+    font-size: 16px;
+    letter-spacing: 1.28px;
+    flex: 1;
+  }
+
+  .dc-headline__container > h2 {
+    font-size: 60px;
+    font-weight: 400;
+    line-height: 70px;
+    flex: 2;
+  }
+}

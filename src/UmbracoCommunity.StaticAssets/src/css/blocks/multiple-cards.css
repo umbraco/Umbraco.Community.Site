@@ -1,0 +1,124 @@
+@import '../base/media-queries.css';
+
+.dc-multiple-cards {
+  --card-item-width: 388px;
+  --card-item-height: 360px;
+  --cards-gap: 1.25rem;
+
+  display: flex;
+  gap: var(--cards-gap);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dc-multiple-cards__item {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-white);
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  width: var(--card-item-width);
+  height: var(--card-item-height);
+}
+
+.dc-multiple-cards__item img {
+  width: 160px;
+  height: 160px;
+}
+
+.dc-multiple-cards__item h2 {
+  color: var(--color-blue);
+  text-align: center;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 27px; /* 122.727% */
+  margin: 1rem 0 0;
+}
+
+.dc-multiple-cards__item p {
+  color: var(--color-blue);
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px; /* 131.25% */
+  margin: 1rem 0 0;
+}
+
+.dc-multiple-cards__item a {
+  color: var(--color-blue);
+  text-align: center;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 23px; /* 164.286% */
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+  text-transform: uppercase;
+  margin: 1rem 0 0;
+}
+
+@media (min-width: 880px) {
+  .dc-multiple-cards {
+    --cards-gap: 2rem;
+  }
+}
+
+@media (min-width: 899px) {
+  .dc-multiple-cards {
+    justify-content: unset;
+    margin: auto;
+    width: calc((2 * var(--card-item-width)) + var(--cards-gap));
+  }
+}
+
+@media (--lg) {
+  .dc-multiple-cards {
+    --card-item-width: 426px;
+    --card-item-height: 462px;
+    --cards-gap: 1.25rem;
+  }
+
+  .dc-multiple-cards__item {
+    padding: 2rem;
+  }
+
+  .dc-multiple-cards__item img {
+    width: 130px;
+    height: 130px;
+  }
+
+  .dc-multiple-cards__item h2 {
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 35px; /* 116.667% */
+  }
+
+  .dc-multiple-cards__item p {
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 25px; /* 125% */
+  }
+
+  .dc-multiple-cards__item a{
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 23px; /* 115% */
+  }
+}
+
+@media (--xl) {
+  .dc-multiple-cards {
+    width: calc((3 * var(--card-item-width)) + (2 * var(--cards-gap)));
+  }
+}

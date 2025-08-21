@@ -1,0 +1,57 @@
+@import "../base/media-queries.css";
+
+.dc-cta-block {
+  --default-color: var(--color-blue);
+
+  text-decoration: none !important;
+  display: flex;
+  gap: var(--unit);
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    --link-color: var(--dc-cta-text-color, var(--default-color));
+    text-decoration: underline !important;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 3px;
+  }
+
+  &:hover circle {
+    fill: #fff;
+  }
+
+  h2 {
+    color: var(--dc-cta-text-color, var(--default-color));
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 49px;
+    margin: 0;
+  }
+
+  svg {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+  }
+
+  path,
+  circle {
+    stroke: var(--dc-cta-text-color, var(--default-color));
+    stroke-width: 2px;
+  }
+
+  path {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+@media (--sm) {
+  .dc-cta-block {
+    gap: var(--unit-md);
+
+    h2 {
+      font-size: 38px;
+    }
+  }
+}

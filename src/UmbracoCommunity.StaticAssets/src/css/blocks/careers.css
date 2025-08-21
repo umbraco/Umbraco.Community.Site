@@ -1,0 +1,17 @@
+dc-careers {
+  uui-loader {
+    display: block;
+    margin: var(--unit-lg) auto;
+    text-align: center;
+  }
+
+  a {
+    font-size: 10px;
+    color:#aaa !important;
+    text-decoration: none !important;
+  }
+
+  .career-container {
+    text-align: right;
+  }
+}

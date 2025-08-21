@@ -1,21 +1,15 @@
-﻿@using Umbraco.Cms.Web.Common.PublishedModels;
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+﻿@using UmbracoCommunity.Web.Models.Pages.Testing
+@inherits UmbracoViewPage<TestHomePageViewModel>
+
 @{
-	Layout = null;
-	var mediaItem = Model.Value<IPublishedContent>("mediaItem");
+    Layout = "_Layout.cshtml";
 }
-<html>
-    <head>
-        
-    </head>
-    <body>
-    <h1>Test Home Page!!!</h1>
-    <p>New community site</p>
-    @if (mediaItem != null)
-    {
-        <div>
-            <img src="@mediaItem.Url()" style="width:200px;" />
-        </div>
-    }
-    </body>
-</html>
+
+<h1>Test Home Page!!!</h1>
+<p>New community site</p>
+@if (Model.MediaItemUrl != null) 
+{
+    <div>
+        <img src="@Model.MediaItemUrl" style="width:200px;" />
+    </div>
+}

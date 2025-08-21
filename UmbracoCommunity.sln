@@ -5,21 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.UI", "src\UmbracoCommunity.Web.UI\UmbracoCommunity.Web.UI.csproj", "{716A5A5E-C5B2-4885-800F-56BE3C51248A}"
 EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-EndGlobal
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{02200206-9B5D-45F4-964D-B9789864A2A5}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
@@ -31,3 +16,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web", "src\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj", "{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{716A5A5E-C5B2-4885-800F-56BE3C51248A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F82B796A-0297-45AF-BD1E-5CA3C452ED80}
+	EndGlobalSection
+EndGlobal

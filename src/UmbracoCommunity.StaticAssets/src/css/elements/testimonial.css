@@ -1,0 +1,56 @@
+@import "../base/media-queries.css";
+
+/* testimonials are imported as html blobs, potentially with inline styles, 
+*  hence the liberal use of !important in this file.
+*/
+.testimonial {
+  --background-color: var(--color-dark);
+
+  position: relative;
+
+  .testimonial__content {
+    padding: var(--unit-md);
+    background-color: var(--background-color);
+    color: var(--color-white);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+
+    > :first-child {
+      margin-top: 0;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    @media (--md) {
+      > :first-child {
+        font-size: var(--font-size-large);
+      }
+    }
+  }
+
+  .testimonial__logo {
+    background: linear-gradient(transparent 50%, var(--background-color) 50%);
+  }
+
+  .testimonial__logo img {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+    border-radius: 70px;
+    background-color: var(--background-color) !important;
+    border: 4px solid var(--background-color) !important;
+  }
+
+  .testimonial__author {
+    text-align: center;
+    font-size: var(--font-size-sm);
+  }
+}
+
+.dc-text-block:has(.testimonial) {
+  justify-content: center;
+}

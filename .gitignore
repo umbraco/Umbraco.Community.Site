@@ -415,6 +415,14 @@ healthchecksdb
 **/Views/Partials/Forms/Themes/bootstrap3-horizontal/
 **/Views/Partials/Forms/Themes/default/
 
+# Tests
+tests/**/appsettings-schema.*.json
+
+ood.flag
+/src/UmbracoCommunity.Web.UI/wwwroot/assets
+/src/UmbracoCommunity.StaticAssets/dist
+/src/UmbracoCommunity.StaticAssets/tsconfig.tsbuildinfo
+/src/UmbracoCommunity.Web.UI/appsettings.Local.json
 
 # --------------------------------------------------------------
 # CUSTOM rules only for the .gitignore used when working locally

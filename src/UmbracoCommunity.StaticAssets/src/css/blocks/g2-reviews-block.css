@@ -1,0 +1,26 @@
+.g2-reviews-container {
+    background: var(--g2-bg-color);
+    height: 377px;
+    position: relative;
+    width: 220px;
+}
+
+.g2-reviews-container.dark {
+    border: solid 1px #ccc;
+}
+
+.g2-reviews-container a {
+    display: block;
+    position: absolute;
+    bottom: 6px;
+    left: 0;
+    color: #333;
+    font-size: 10px;
+    font-weight: 600;
+    width: 220px;
+    text-align: center;
+}
+
+.g2-reviews-container a:hover {
+    text-decoration: underline;
+}

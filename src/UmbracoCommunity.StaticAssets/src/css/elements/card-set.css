@@ -1,0 +1,24 @@
+@import "../base/media-queries.css";
+
+.card-set {
+  display: grid;
+  gap: var(--unit-md);
+}
+
+@media (--sm) {
+  .card-set {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .card-set--3up {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .card-featured {
+    grid-column: 1 / 3;
+  }
+
+  .card-content {
+    row-gap: var(--unit);
+  }
+}

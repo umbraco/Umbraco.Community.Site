@@ -1,0 +1,29 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@using UmbracoCommunity.Web.Models.Pages
+@inherits UmbracoViewPage<PageViewModelBase>
+
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
+<head>
+    <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
+    <script vite-src="@Model.ContentTypeAlias" ></script>
+    @RenderSection("Links", required: false)
+    @RenderSection("CSS", required: false)
+    <title>Umbraco Community | @Model.Name</title>
+</head>
+
+<body class="@GetBodyClasses()">
+    <main>
+        @RenderBody()
+    </main>
+</body>
+
+</html>
+
+@{
+    string GetBodyClasses()
+    {
+        var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
+        return string.Join(" ", bodyClasses);
+    }
+}

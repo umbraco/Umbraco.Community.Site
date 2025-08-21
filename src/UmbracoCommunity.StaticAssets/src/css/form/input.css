@@ -1,0 +1,67 @@
+/* form selector ensures our specificity outweighs the default forms theme */
+.umbraco-forms-form form .umbraco-forms-field {
+  input:not([type="file"]),
+  textarea,
+  select {
+    display: block;
+    width: 100%;
+    padding: 0 10px;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-light-grey);
+    border-radius: var(--border-radius);
+    font-size: var(--unit);
+    outline-color: var(--color-blue);
+    transition: all ease-in-out 0.1s;
+    margin: 0;
+
+    &.is-large {
+      height: 55px;
+    }
+
+    &.is-red,
+    &.is-blue {
+      color: var(--color-white);
+    }
+
+    &.is-red {
+      background-color: var(--color-red);
+      border-color: var(--color-red);
+    }
+
+    &.is-blue {
+      --disabled: rgba(53, 68, 177, 0.59);
+      background: var(--color-blue);
+      border: none;
+
+      &:disabled {
+        background-color: var(--disabled);
+
+        &:hover {
+          background-color: var(--disabled);
+        }
+      }
+    }
+  }
+
+  textarea {
+    font-family: var(--font-family);
+    line-height: 28px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  input:not([type="file"]),
+  select {
+    height: 44px;
+  }
+
+  input[type="file"] {
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+  }
+
+  input[type="hidden"] {
+    width: 0 !important;
+    height: 0 !important;
+  }
+}

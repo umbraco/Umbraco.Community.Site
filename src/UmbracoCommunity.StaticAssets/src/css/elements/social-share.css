@@ -1,0 +1,57 @@
+.social-share {
+    display: flex;
+}
+
+.social-share.invisible,
+.social-share .invisible {
+    display: none;
+}
+
+.social-share .icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.social-share .icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-light);
+    border-radius: 50%;
+    color: var(--color-dark);
+    cursor: pointer;
+    transform: scale(0);
+    animation: appear .5s ease forwards;
+}
+
+.social-share .icon:not(.social-share__toggle) {
+    margin-right: 10px;
+}
+
+.social-share__items {
+    display: flex;
+}
+
+.social-share__items:nth-child(1) {
+    animation-delay: .15s;
+}
+
+.social-share__items:nth-child(2) {
+    animation-delay: .10s;
+}
+
+.social-share__items:nth-child(3) {
+    animation-delay: .05s;
+}
+
+@keyframes appear {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

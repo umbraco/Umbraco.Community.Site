@@ -1,0 +1,11 @@
+.intercom-facade,
+.intercom-lightweight-app {
+    display: none;
+}
+
+@media only screen and (min-width: 1024px) {
+    .intercom-facade,
+    .intercom-lightweight-app {
+        display: block;
+    }
+}

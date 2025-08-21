@@ -1,0 +1,31 @@
+@import './header.css';
+@import './header-mobile.css';
+@import './footer.css';
+
+main .logo-link {
+    display: none;
+}
+
+.logo-link {
+    display: flex;
+    line-height: 44px;
+    text-decoration: none;
+}
+
+.logo-link span {
+    color: var(--color-blue);
+    font-style: normal;
+    font-weight: 700;
+}
+
+.mobile main .logo-link {
+    display: flex;
+    padding: 30px;
+    justify-content: center;
+}
+
+main {
+    position: relative;
+    background-color: var( --color-page-surface);
+    z-index: 1;
+}

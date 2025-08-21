@@ -1,0 +1,40 @@
+.dc-text-block {
+  position: relative;
+  background: var(--block-background-color);
+  color: var(--block-text-color);
+  display: flex;
+
+  &.has-bg {
+    padding: var(--unit-md);
+  }
+
+  a {
+    color: var(--block-link-color);
+  }
+
+  a.btn {
+    padding: 0 var(--unit);
+    line-height: var(--unit-md);
+  }
+
+  h2 {
+    margin: 1rem 0;
+  }
+
+  h3 {
+    margin: 0.5rem 0;
+  }
+}
+
+.dc-text-block__content {
+  max-width: 100%;
+  overflow: auto;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
