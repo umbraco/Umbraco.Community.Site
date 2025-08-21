@@ -1,6 +1,7 @@
 ﻿using Joonasw.AspNetCore.SecurityHeaders;
 using Joonasw.AspNetCore.SecurityHeaders.Csp.Builder;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -22,23 +23,23 @@ namespace UmbracoCommunity.Web.Extensions
 
         public static void UseSecurityHeaders(this WebApplication app)
         {
-            //app.Use(async (context, next) =>
-            //{
-            //    context.Response.Headers.Append("X-Xss-Protection", "1; mode=block");
-            //    context.Response.Headers.Append("Referrer-Policy", "no-referrer-when-downgrade");
-            //    context.Response.Headers.Append("X-Frame-Options", "SAMEORIGIN");
-            //    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-            //    context.Response.Headers.Remove("X-Powered-By");
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Append("X-Xss-Protection", "1; mode=block");
+                context.Response.Headers.Append("Referrer-Policy", "no-referrer-when-downgrade");
+                context.Response.Headers.Append("X-Frame-Options", "SAMEORIGIN");
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Remove("X-Powered-By");
 
-            //    // The following was generated at https://www.permissionspolicy.com/:
-            //    // - no permissions were selected for all features
-            //    // - apart from the following found to be in use: unload
-            //    // - removed references to the following features that throw unrecognised warnings in the browser console: ambient-light-sensor, battery, document-domain, execution-while-not-rendered, execution-while-out-of-viewport, navigation-override, speaker-selection, conversion-measurement, focus-without-user-activation, sync-script, trust-token-redemption, window-placement, vertical-scroll
-            //    const string PermissionsPolicyValue = "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=(self)";
-            //    context.Response.Headers.Append("Permissions-Policy", PermissionsPolicyValue);
+                // The following was generated at https://www.permissionspolicy.com/:
+                // - no permissions were selected for all features
+                // - apart from the following found to be in use: unload
+                // - removed references to the following features that throw unrecognised warnings in the browser console: ambient-light-sensor, battery, document-domain, execution-while-not-rendered, execution-while-out-of-viewport, navigation-override, speaker-selection, conversion-measurement, focus-without-user-activation, sync-script, trust-token-redemption, window-placement, vertical-scroll
+                const string PermissionsPolicyValue = "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=(self)";
+                context.Response.Headers.Append("Permissions-Policy", PermissionsPolicyValue);
 
-            //    await next();
-            //});
+                await next();
+            });
 
             app.UseCsp(csp =>
             {

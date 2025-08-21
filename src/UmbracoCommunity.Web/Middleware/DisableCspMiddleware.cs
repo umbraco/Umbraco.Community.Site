@@ -14,7 +14,7 @@ namespace UmbracoCommunity.Web.Middleware
 
         private const string CspHeaderName = "Content-Security-Policy";
 
-        private readonly string[] _disabledCspBlocks = ["careersContentBlock"];
+        private readonly string[] _disabledCspBlocks = [];
         private readonly string[] _disabledCspProperties = [PropertyEditors.Aliases.BlockList];
 
         public DisableCspMiddleware(IUmbracoContextAccessor umbracoContextAccessor, RequestDelegate next)
