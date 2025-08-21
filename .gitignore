@@ -421,6 +421,7 @@ tests/**/appsettings-schema.*.json
 ood.flag
 /src/UmbracoCommunity.Web.UI/wwwroot/assets
 /src/UmbracoCommunity.StaticAssets/dist
+/src/UmbracoCommunity.StaticAssets/tsconfig.tsbuildinfo
 /src/UmbracoCommunity.Web.UI/appsettings.Local.json
 
 # --------------------------------------------------------------
