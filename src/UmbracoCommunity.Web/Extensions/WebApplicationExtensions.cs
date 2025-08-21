@@ -3,6 +3,7 @@ using Joonasw.AspNetCore.SecurityHeaders.Csp.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using UmbracoCommunity.Web.Middleware;
@@ -45,7 +46,7 @@ namespace UmbracoCommunity.Web.Extensions
             {
                 SetProductionCspRules(csp);
 
-                if (app.Environment.IsDevelopmentEnvironment())
+                if (app.Environment.IsDevelopment())
                 {
                     SetDevelopmentCspRules(csp);
                 }

@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Vite.Models;
 
 namespace UmbracoCommunity.Web.Vite.TagHelpers;
@@ -58,7 +58,7 @@ public abstract class ViteTagHelperBase : TagHelper
         ViteDevServerUrl = configuration["ViteDevServerUrl"] ?? "https://localhost:5123";
     }
 
-    protected bool IsLocalEnvironment() => _webHostEnvironment.IsLocalEnvironment();
+    protected bool IsDevelopmentEnvironment() => _webHostEnvironment.IsDevelopment();
 
     /// <summary>
     /// Prefixes the entry with the correct static web assets base path

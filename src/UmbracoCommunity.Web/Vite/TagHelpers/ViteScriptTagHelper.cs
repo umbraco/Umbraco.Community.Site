@@ -38,7 +38,7 @@ public class ViteScriptTagHelper : ViteTagHelperBase
             return;
         }
 
-        if (IsLocalEnvironment())
+        if (IsDevelopmentEnvironment())
         {
             output.Attributes.SetAttribute("src", ViteDevServerUrl + "/" + entryName);
             output.Attributes.SetAttribute("type", "module");

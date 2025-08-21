@@ -24,11 +24,8 @@ public class ViteLinkTagHelper : ViteTagHelperBase
     /// <inheritdoc />
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
-        // <link rel="stylesheet" vite-href="index"></link>
-
-        if (IsLocalEnvironment() || string.IsNullOrEmpty(Href))
+        if (IsDevelopmentEnvironment() || string.IsNullOrEmpty(Href))
         {
-            // Stylesheet is loaded by JavaScript chunk during development
             output.SuppressOutput();
             return;
         }
