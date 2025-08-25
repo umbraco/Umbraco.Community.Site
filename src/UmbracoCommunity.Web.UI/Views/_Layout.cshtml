@@ -13,9 +13,20 @@
 </head>
 
 <body class="@GetBodyClasses()">
+    <partial name="~/Views/Partials/Components/Header.cshtml" />
+    <partial name="~/Views/Partials/Components/Menu.cshtml" />
+    <partial name="~/Views/Partials/Components/Hero.cshtml" />
+
     <main>
         @RenderBody()
     </main>
+
+    <partial name="~/Views/Partials/Components/Footer.cshtml" />
+    <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
+    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
+
+    @RenderSection("JS", required: false)
+    @Html.PageScripts()
 </body>
 
 </html>
@@ -24,6 +35,6 @@
     string GetBodyClasses()
     {
         var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
-        return string.Join(" ", bodyClasses);
+        return string.Join("top-banner ", bodyClasses);
     }
 }

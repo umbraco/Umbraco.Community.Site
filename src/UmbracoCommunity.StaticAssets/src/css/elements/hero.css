@@ -58,7 +58,9 @@
   padding: var(--unit-md);
   position: relative;
   z-index: 5;
-  max-width: var(--screen-lg);
+  max-width: 1000px;
+  background: rgba(22, 35, 53, 0.8);
+  border-radius: var(--border-radius-xl);
 }
 
 .hero-footnote {

@@ -1,5 +1,6 @@
 @import './header.css';
 @import './header-mobile.css';
+@import './menu.css';
 @import './footer.css';
 
 main .logo-link {
@@ -16,6 +17,10 @@ main .logo-link {
     color: var(--color-blue);
     font-style: normal;
     font-weight: 700;
+}
+
+.logo-link__sitename {
+    padding-left: 15px;
 }
 
 .mobile main .logo-link {

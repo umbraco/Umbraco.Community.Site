@@ -1,0 +1,30 @@
+{
+  "Name": "Blog year folder",
+  "Alias": "blogYearFolder",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-calendar-alt",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": [
+      "umb://document-type/0882af1f52dd48ca894a53282767d6d6"
+    ]
+  },
+  "Parent": "umb://document-type-container/decae04a31d249b99677705099d9f4d4",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a2e62df6e6724502be225307cd157245",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/decae04a31d249b99677705099d9f4d4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/0882af1f52dd48ca894a53282767d6d6",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.0"
+}
