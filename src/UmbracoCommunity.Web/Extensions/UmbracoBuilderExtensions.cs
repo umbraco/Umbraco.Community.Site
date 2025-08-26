@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.Pages.Testing;
+using UmbracoCommunity.Web.Models.ViewModels.Components;
 using UmbracoCommunity.Web.ViewModelBuilders;
+using UmbracoCommunity.Web.ViewModelBuilders.Components;
 using UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 namespace UmbracoCommunity.Web.Extensions
@@ -32,6 +34,8 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
+
+            builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
 
             return builder;
         }

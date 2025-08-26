@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Joonasw.AspNetCore.SecurityHeaders.Csp;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Models.ViewModels.Components;
+using UmbracoCommunity.Web.ViewModelBuilders;
 
 namespace UmbracoCommunity.Web.Attributes
 {
@@ -12,18 +17,32 @@ namespace UmbracoCommunity.Web.Attributes
 
         private class ApplyNavigationFilter : ApplyFilterBase, IResultFilter
         {
-
-            //private readonly ICspNonceService _nonceService;
+            private readonly IViewModelBuilder<MenuViewModel> _menuViewModelBuilder;
+            private readonly ICspNonceService _nonceService;
 
             public ApplyNavigationFilter(
-                IUmbracoContextAccessor umbracoContextAccessor)
+                IUmbracoContextAccessor umbracoContextAccessor,
+                IViewModelBuilder<MenuViewModel> menuViewModelBuilder,
+                ICspNonceService nonceService)
                 : base(umbracoContextAccessor)
             {
-                //_nonceService = nonceService;
+                _menuViewModelBuilder = menuViewModelBuilder;
+                _nonceService = nonceService;
             }
 
             public void OnResultExecuting(ResultExecutingContext context)
             {
+                if (!TryGetPageAndUmbracoContext(context, out PageViewModelBase? viewModel, out IUmbracoContext? umbracoContext))
+                {
+                    return;
+                }
+
+                if (!TryGetPublishedContent(umbracoContext, out IPublishedContent? publishedContent))
+                {
+                    return;
+                }
+
+                viewModel.Menu = _menuViewModelBuilder.Build(publishedContent, umbracoContext);
             }
 
             public void OnResultExecuted(ResultExecutedContext context)

@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
+using UmbracoCommunity.Web.Models.ViewModels.Components;
 
 namespace UmbracoCommunity.Web.Models.Pages;
 
@@ -18,6 +19,8 @@ public abstract class PageViewModelBase
     public string Name { get; }
 
     public string ContentTypeAlias { get; }
+
+    public MenuViewModel Menu { get; set; } = new();
 
     public string MetaTitle { get; set; } = string.Empty;
 
