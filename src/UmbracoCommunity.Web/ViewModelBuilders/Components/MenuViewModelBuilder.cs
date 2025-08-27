@@ -42,7 +42,77 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
     {
         MenuViewModel viewModel = new();
 
-        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "test", Url = "test" }));
+        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "Events", Url = "events" }));
+
+        var devLearnSection = new NavigationSection
+        {
+            Headline = "Source"
+        };
+        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Documentation", Url = "docs" }));
+        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Packages", Url = "packages" }));
+        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Download", Url = "download" }));
+
+        var devConnectSection = new NavigationSection
+        {
+            Headline = "Help"
+        };
+        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contribute", Url = "contribute" }));
+        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Forum", Url = "forum" }));
+        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Discord", Url = "discord" }));
+
+        var devDropdown = new NavigationDropdown("Developer", 2);
+        devDropdown.AddSection(devLearnSection);
+        devDropdown.AddSection(devConnectSection);
+
+        viewModel.AddTopLevelNavigationItem(devDropdown);
+
+        var communityInvolvedSection = new NavigationSection
+        {
+            Headline = "Get involved"
+        };
+        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Community teams", Url = "teams" }));
+        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Advisory boards", Url = "boards" }));
+        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Guilds", Url = "guilds" }));
+
+        var communityRecognitionSection = new NavigationSection
+        {
+            Headline = "Advocate"
+        };
+        communityRecognitionSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "MVP Program", Url = "mvps" }));
+        communityRecognitionSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contribute as an agency", Url = "agency" }));
+
+        var communityDropdown = new NavigationDropdown("Community", 2);
+        communityDropdown.AddSection(communityInvolvedSection);
+        communityDropdown.AddSection(communityRecognitionSection);
+
+        viewModel.AddTopLevelNavigationItem(communityDropdown);
+
+        var deiSection = new NavigationSection
+        {
+            Headline = "About"
+        };
+        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Diversity, Equity and Inclusion group", Url = "dei" }));
+        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Mission", Url = "dei-mission" }));
+        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Releases 2025", Url = "releases" }));
+
+        var deiDropdown = new NavigationDropdown("Diversity", 1);
+        deiDropdown.AddSection(deiSection);
+
+        viewModel.AddTopLevelNavigationItem(deiDropdown);
+
+        var devrelSection = new NavigationSection
+        {
+            Headline = "About"
+        };
+        devrelSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "About us", Url = "about" }));
+        devrelSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contact", Url = "contact" }));
+
+        var devrelDropdown = new NavigationDropdown("DevRel", 1);
+        devrelDropdown.AddSection(devrelSection);
+
+        viewModel.AddTopLevelNavigationItem(devrelDropdown);
+
+        viewModel.AddCtaButton(new Link { Name = "Sign in", Url = "login" });
 
         return viewModel;
     }

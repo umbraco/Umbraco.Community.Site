@@ -1,11 +1,38 @@
 ﻿@using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Models.ViewModels.Blocks.Cards
 @inherits UmbracoViewPage<HomePageViewModel>
 
 @{
     Layout = "_Layout.cshtml";
+
+    var multipleCards = new MultipleCardsBlockViewModel
+    {
+        Items = new List<MultipleCardsItemBlockViewModel>
+        {
+            new MultipleCardsItemBlockViewModel
+            {
+                Headline = "Recent forum posts",
+                HasTable = true,
+            },
+            new MultipleCardsItemBlockViewModel
+            {
+                Headline = "UmbraCalendar"
+            },
+            new MultipleCardsItemBlockViewModel
+            {
+                Headline = "Upcoming festivals"
+            }
+        }
+    };
 }
 
-<section>
+<div class="dc-block-list">
+    <partial name="@($"~/Views/Partials/Blocks/PageBannerBlock.cshtml")" />
+    <partial name="@($"~/Views/Partials/Blocks/TextBlock.cshtml")" />
+    <partial name="@($"~/Views/Partials/Blocks/MultipleCardsBlock.cshtml")" model="multipleCards" />
+</div>
+
+@* <section>
     <div class="dc-block-list block-list-root">
 
         <div class="dc-text-block justify-center " id="MEGMU">
@@ -224,4 +251,4 @@
         </div>
 
     </div>
-</section>
+</section> *@

@@ -54,6 +54,12 @@ public class MenuViewModel : NavigationViewModelBase, ICloneable
     {
         private readonly List<NavigationSection> _sections = [];
 
+        public NavigationDropdown(string name, decimal columnsCount = 1)
+        {
+            Name = name;
+            ColumnsCount = columnsCount;
+        }
+
         public NavigationDropdown(NavigationDropdown dropdownItem)
         {
             Name = dropdownItem.Name;

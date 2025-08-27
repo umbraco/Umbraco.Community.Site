@@ -1,0 +1,81 @@
+@using UmbracoCommunity.Web.Models.ViewModels.Blocks.Cards
+@model MultipleCardsBlockViewModel
+
+@if (Model.Items is null || !Model.Items.Any())
+{
+    return;
+}
+
+<div class="dc-multiple-cards" style="--card-item-height: auto;">
+    @foreach (var item in Model.Items)
+    {
+        <div class="dc-multiple-cards__item">
+            @if (item.HasIcon)
+            {
+                <img src="@item.Icon!.Url" alt="@item.Icon.AltText" loading="lazy"/>
+            }
+            <h2>@item.Headline</h2>
+            @if (item.HasText)
+            {
+                <p>@item.Text</p>
+            }
+            @if (item.HasLink)
+            {
+                <a href="@item.Link!.Url" title="@item.Link.Name" target="@item.Link.Target">@item.Link.Name</a>
+            }
+            @if (item.HasTable)
+            {
+                <dl class="dc-faqs">
+                    <div class="dc-faq-block">
+                        <dt>
+                            <input type="checkbox" id="cb-ulPyX">
+                            <label for="cb-ulPyX">
+                                <p>LDAPS issue umbraco v15</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon, var(--color-blue))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plus-icon">
+                                    <path d="M5 12h14"></path>
+                                    <path d="M12 5v14"></path>
+                                </svg>
+
+                            </label>
+                        </dt>
+                        <div class="expand">
+                            <dd><p class="p1">Umbraco Cloud is a fully managed platform for hosting and operating Umbraco CMS projects. It includes built-in tools for automated upgrades, CI/CD, content deployment, and centralized project management — all hosted on Microsoft Azure.</p></dd>
+                        </div>
+                    </div>
+                    <div class="dc-faq-block">
+                        <dt>
+                            <input type="checkbox" id="cb-ScVXV">
+                            <label for="cb-ScVXV">
+                                <p>Readonly content name field</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon, var(--color-blue))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plus-icon">
+                                    <path d="M5 12h14"></path>
+                                    <path d="M12 5v14"></path>
+                                </svg>
+
+                            </label>
+                        </dt>
+                        <div class="expand">
+                            <dd><p class="p1">While Umbraco CMS is the open-source core platform, Umbraco Cloud provides a managed environment with added services like automated updates, built-in CI/CD, scalable hosting, and enhanced security — all tailored specifically for Umbraco projects.</p></dd>
+                        </div>
+                    </div>
+                    <div class="dc-faq-block">
+                        <dt>
+                            <input type="checkbox" id="cb-sUDHx">
+                            <label for="cb-sUDHx">
+                                <p>Umbraco 16 Media not showing</p>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--color-icon, var(--color-blue))" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plus-icon">
+                                    <path d="M5 12h14"></path>
+                                    <path d="M12 5v14"></path>
+                                </svg>
+
+                            </label>
+                        </dt>
+                        <div class="expand">
+                            <dd><p class="p1">Umbraco Cloud is ideal for developers, digital agencies, and enterprises looking to reduce infrastructure overhead, streamline workflows, and scale projects efficiently using a fully supported, cloud-hosted Umbraco setup.</p></dd>
+                        </div>
+                    </div>
+                </dl>
+            }
+        </div>
+    }
+</div>

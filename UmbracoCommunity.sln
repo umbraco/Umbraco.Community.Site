@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web", "src\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj", "{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Common", "UmbracoCommunity.Common\UmbracoCommunity.Common.csproj", "{B75DFA56-9176-4F40-BFF2-CCEF192E237E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B75DFA56-9176-4F40-BFF2-CCEF192E237E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B75DFA56-9176-4F40-BFF2-CCEF192E237E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B75DFA56-9176-4F40-BFF2-CCEF192E237E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B75DFA56-9176-4F40-BFF2-CCEF192E237E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
