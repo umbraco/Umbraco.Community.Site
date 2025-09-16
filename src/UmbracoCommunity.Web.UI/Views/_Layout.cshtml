@@ -35,6 +35,6 @@
     string GetBodyClasses()
     {
         var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
-        return string.Join("top-banner ", bodyClasses);
+        return string.Join(" ", bodyClasses);
     }
 }
