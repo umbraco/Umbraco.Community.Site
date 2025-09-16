@@ -55,8 +55,8 @@ After creating the element types, Models Builder will **not** automatically gene
 Create a view model that inherits from `BlockViewModelBase`:
 
 ```csharp
-// src/UmbracoDotCom.Web/Models/ViewModels/Blocks/MyCustomBlockViewModel.cs
-namespace UmbracoDotCom.Web.Models.ViewModels.Blocks;
+// src/UmbracoCommunity.Web/Models/ViewModels/Blocks/MyCustomBlockViewModel.cs
+namespace UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
 public class MyCustomBlockViewModel : BlockViewModelBase
 {
@@ -80,8 +80,8 @@ public class MyCustomBlockViewModel : BlockViewModelBase
 Create a builder that inherits from `BlockViewModelBuilderBase<TContentModel, TSettingsModel>`:
 
 ```csharp
-// src/UmbracoDotCom.Web/ViewModelBuilders/Blocks/MyCustomBlockViewModelBuilder.cs
-namespace UmbracoDotCom.Web.ViewModelBuilders.Blocks;
+// src/UmbracoCommunity.Web/ViewModelBuilders/Blocks/MyCustomBlockViewModelBuilder.cs
+namespace UmbracoCommunity.Web.ViewModelBuilders.Blocks;
 
 internal class MyCustomBlockViewModelBuilder : BlockViewModelBuilderBase<MyCustomBlock, MyCustomBlockSettings>
 {
@@ -126,7 +126,7 @@ internal class MyCustomBlockViewModelBuilder : BlockViewModelBuilderBase<MyCusto
 Register your block view model builder in the DI container:
 
 ```csharp
-// src/UmbracoDotCom.Web/Extensions/UmbracoBuilderExtensions.cs
+// src/UmbracoCommunity.Web/Extensions/UmbracoBuilderExtensions.cs
 public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBuilder builder)
 {
     // ... existing registrations ...
@@ -141,7 +141,7 @@ public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBui
 Create a Razor partial view for your block:
 
 ```cshtml
-@* src/UmbracoDotCom.Web.UI/Views/Partials/Blocks/MyCustomBlock.cshtml *@
+@* src/UmbracoCommunity.Web.UI/Views/Partials/Blocks/MyCustomBlock.cshtml *@
 @model MyCustomBlockViewModel
 
 (...)
@@ -152,7 +152,7 @@ Create a Razor partial view for your block:
 Create CSS for your block:
 
 ```css
-/* src/UmbracoDotCom.StaticAssets/src/css/blocks/my-custom-block.css */
+/* src/UmbracoCommunity.StaticAssets/src/css/blocks/my-custom-block.css */
 .dc-my-custom-block {
     padding: var(--unit-lg);
     background-color: var(--block-background-color, transparent);
@@ -170,7 +170,7 @@ Create CSS for your block:
 Import your CSS in the main blocks file:
 
 ```css
-/* src/UmbracoDotCom.StaticAssets/src/css/blocks/blocks.css */
+/* src/UmbracoCommunity.StaticAssets/src/css/blocks/blocks.css */
 @import './my-custom-block.css';
 ```
 
@@ -179,8 +179,8 @@ Import your CSS in the main blocks file:
 Create comprehensive unit tests for your block view model builder:
 
 ```csharp
-// tests/UmbracoDotCom.Web.Tests/ViewModelBuilders/Blocks/MyCustomBlockViewModelBuilderTests.cs
-namespace UmbracoDotCom.Web.Tests.ViewModelBuilders.Blocks;
+// tests/UmbracoCommunity.Web.Tests/ViewModelBuilders/Blocks/MyCustomBlockViewModelBuilderTests.cs
+namespace UmbracoCommunity.Web.Tests.ViewModelBuilders.Blocks;
 
 public class MyCustomBlockViewModelBuilderTests : ViewModelBuilderTestsBase
 {

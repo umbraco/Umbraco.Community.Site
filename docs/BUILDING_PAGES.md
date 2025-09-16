@@ -41,8 +41,8 @@ After creating the document type, Models Builder will **not** automatically gene
 Create a view model that inherits from `PageViewModelBase`:
 
 ```csharp
-// src/UmbracoDotCom.Web/Models/ViewModels/Pages/MyCustomPageViewModel.cs
-namespace UmbracoDotCom.Web.Models.ViewModels.Pages;
+// src/UmbracoCommunity.Web/Models/ViewModels/Pages/MyCustomPageViewModel.cs
+namespace UmbracoCommunity.Web.Models.ViewModels.Pages;
 
 public class MyCustomPageViewModel : PageViewModelBase
 {
@@ -63,8 +63,8 @@ public class MyCustomPageViewModel : PageViewModelBase
 Create a builder that implements `IViewModelBuilder<T>` or `IAsyncViewModelBuilder<T>`:
 
 ```csharp
-// src/UmbracoDotCom.Web/ViewModelBuilders/Pages/MyCustomPageViewModelBuilder.cs
-namespace UmbracoDotCom.Web.ViewModelBuilders.Pages;
+// src/UmbracoCommunity.Web/ViewModelBuilders/Pages/MyCustomPageViewModelBuilder.cs
+namespace UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 internal class MyCustomPageViewModelBuilder : ViewModelBuilderBase, IAsyncViewModelBuilder<MyCustomPageViewModel>
 {
@@ -112,16 +112,16 @@ internal class MyCustomPageViewModelBuilder : ViewModelBuilderBase, IAsyncViewMo
 Create a controller that inherits from `RenderController`:
 
 ```csharp
-// src/UmbracoDotCom.Web/Controllers/MyCustomPageController.cs
+// src/UmbracoCommunity.Web/Controllers/MyCustomPageController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
-using UmbracoDotCom.Web.Attributes;
-using UmbracoDotCom.Web.ViewModelBuilders;
+using UmbracoCommunity.Web.Attributes;
+using UmbracoCommunity.Web.ViewModelBuilders;
 
-namespace UmbracoDotCom.Web.Controllers;
+namespace UmbracoCommunity.Web.Controllers;
 
 public class MyCustomPageController : RenderController
 {
@@ -154,7 +154,7 @@ public class MyCustomPageController : RenderController
 Register your view model builder in the DI container:
 
 ```csharp
-// src/UmbracoDotCom.Web/Extensions/UmbracoBuilderExtensions.cs
+// src/UmbracoCommunity.Web/Extensions/UmbracoBuilderExtensions.cs
 public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBuilder builder)
 {
     // ... existing registrations ...
@@ -169,8 +169,8 @@ public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBui
 Create a Razor view for your page:
 
 ```cshtml
-@* src/UmbracoDotCom.Web.UI/Views/MyCustomPage.cshtml *@
-@model UmbracoDotCom.Web.Models.ViewModels.Pages.MyCustomPageViewModel
+@* src/UmbracoCommunity.Web.UI/Views/MyCustomPage.cshtml *@
+@model UmbracoCommunity.Web.Models.ViewModels.Pages.MyCustomPageViewModel
 @{
     Layout = "_Layout";
 }
@@ -183,8 +183,8 @@ Create a Razor view for your page:
 Create comprehensive unit tests for your view model builder:
 
 ```csharp
-// tests/UmbracoDotCom.Web.Tests/ViewModelBuilders/Pages/MyCustomPageViewModelBuilderTests.cs
-namespace UmbracoDotCom.Web.Tests.ViewModelBuilders.Pages;
+// tests/UmbracoCommunity.Web.Tests/ViewModelBuilders/Pages/MyCustomPageViewModelBuilderTests.cs
+namespace UmbracoCommunity.Web.Tests.ViewModelBuilders.Pages;
 
 public class MyCustomPageViewModelBuilderTests : ViewModelBuilderTestsBase
 {
