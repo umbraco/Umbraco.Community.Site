@@ -18,14 +18,24 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Home</summary>
-	[PublishedModel("home")]
-	public partial class Home : PublishedContentModel, ICContentBlocksHomepage
+	// Mixin Content Type with alias "cContentBlocksHomepage"
+	/// <summary>[C] Content blocks - homepage</summary>
+	public partial interface ICContentBlocksHomepage : IPublishedElement
+	{
+		/// <summary>Content blocks</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks { get; }
+	}
+
+	/// <summary>[C] Content blocks - homepage</summary>
+	[PublishedModel("cContentBlocksHomepage")]
+	public partial class CContentBlocksHomepage : PublishedElementModel, ICContentBlocksHomepage
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
-		public new const string ModelTypeAlias = "home";
+		public new const string ModelTypeAlias = "cContentBlocksHomepage";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
@@ -34,14 +44,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<Home, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<CContentBlocksHomepage, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public Home(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+		public CContentBlocksHomepage(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -55,6 +65,11 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("contentBlocks")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CContentBlocksHomepage.GetContentBlocks(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => GetContentBlocks(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Content blocks</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel GetContentBlocks(ICContentBlocksHomepage that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(publishedValueFallback, "contentBlocks");
 	}
 }

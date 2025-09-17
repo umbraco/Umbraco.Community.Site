@@ -1,0 +1,13 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageBlock>>
+@using Umbraco.Community.BlockPreview.Extensions
+@using UmbracoCommunity.Web.Models.PublishedModels
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <p>We're looking at this block in the backoffice only - this text will not appear on the front-end</p>
+}
+
+@if (Model.Content.Image is not null)
+{
+    <img src="@Model.Content.Image.GetCropUrl()" alt="@Model.Content.Image.Name" />
+}
