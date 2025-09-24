@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Text block</summary>
 	[PublishedModel("settingsTextBlock")]
-	public partial class SettingsTextBlock : PublishedElementModel
+	public partial class SettingsTextBlock : PublishedElementModel, ISettingsColour
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -55,6 +55,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.1.1+7e82c25")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("backgroundColour")]
-		public virtual string BackgroundColour => this.Value<string>(_publishedValueFallback, "backgroundColour");
+		public virtual string BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
 	}
 }

@@ -1,7 +1,14 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TextBlock>>
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <p>This is a text block in the backoffice</p>
+}
+
+@if (Model.Content.Text != null) {
 <div class="dc-text-block justify-center transparent" id="xyz">
     <div class="dc-text-block__content">
-        <h2>Welcome to the Umbraco Community</h2>
-        <p>The Umbraco Community is a part of the Umbraco ecosystem, which through action, involvement and co-operation, makes Umbraco what it is today!</p>
-        <p>Come and explore the ways the Community stays connected, what makes it so special, and how you can get involved. From Umbraco meetups to MVP's, Community Teams to Contribution Stories and so much more, what are you waiting for?</p>
+        @Html.Raw(Model.Content.Text.ToHtmlString())
     </div>
 </div>
+}

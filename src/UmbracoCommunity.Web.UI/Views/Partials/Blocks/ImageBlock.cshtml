@@ -1,13 +1,31 @@
-﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageBlock>>
-@using Umbraco.Community.BlockPreview.Extensions
-@using UmbracoCommunity.Web.Models.PublishedModels
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageBlock, SettingsImageBlock>>
+@{
+    var cols = Model.GridColumns ?? 12;
+    var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
+}
 
 @if (Context.Request.IsBlockPreviewRequest())
 {
     <p>We're looking at this block in the backoffice only - this text will not appear on the front-end</p>
+    <p>@imgWidth [ @Model.ColumnSpan @Model.GridColumns ]</p>
 }
 
 @if (Model.Content.Image is not null)
 {
-    <img src="@Model.Content.Image.GetCropUrl()" alt="@Model.Content.Image.Name" />
+    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg")" id="@Model.ContentKey">
+        <style asp-add-nonce="true">
+            #@Model.ContentKey {
+                --block-background-color: @Model.Settings?.BackgroundColour ?? 'none';
+            }
+        </style>
+        <div class="dc-image-wrapper">
+            <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image" loading="lazy" />
+
+            @if (Model.Content.ApplyOverlay)
+            {
+                <div class="overlay"></div>
+                <div class="text">@Html.Raw(Model.Content.OverlayText)</div>
+            }
+        </div>
+    </div>
 }
