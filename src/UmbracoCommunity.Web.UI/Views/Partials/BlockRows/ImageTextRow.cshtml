@@ -1,0 +1,30 @@
+﻿@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
+
+
+<div class="dc-image-and-text-block vertical-text-position-center" id="@Model.IdHash">
+    @foreach (var block in Model.Blocks)
+    {
+        if (block.Content.ContentType.Alias == ImageBlock.ModelTypeAlias)
+        {
+            var typedBlock = block.Content as ImageBlock;
+            if (typedBlock?.Image != null) {
+                <div class="dc-image-and-text-block__image-container">
+                    <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
+                        sizes="(max-width: 400px) 386px, 906px"
+                        src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                        loading="lazy" />
+                </div>
+            }
+        }
+        if (block.Content.ContentType.Alias == TextBlock.ModelTypeAlias)
+        {
+            var typedBlock = block.Content as TextBlock;
+            <div class="dc-image-and-text-block__content-container">
+                <div class="dc-image-and-text-block__content">
+                    @Html.Raw(typedBlock?.Text?.ToHtmlString())
+                </div>
+            </div>
+        }
+    }
+</div>

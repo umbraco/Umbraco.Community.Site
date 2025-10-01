@@ -4,15 +4,9 @@
     var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
 }
 
-@if (Context.Request.IsBlockPreviewRequest())
-{
-    <p>We're looking at this block in the backoffice only - this text will not appear on the front-end</p>
-    <p>@imgWidth [ @Model.ColumnSpan @Model.GridColumns ]</p>
-}
-
 @if (Model.Content.Image is not null)
 {
-    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg")" id="@Model.ContentKey">
+    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.ContentKey">
         <style asp-add-nonce="true">
             #@Model.ContentKey {
                 --block-background-color: @Model.Settings?.BackgroundColour ?? 'none';

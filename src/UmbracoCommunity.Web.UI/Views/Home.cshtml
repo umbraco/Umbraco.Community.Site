@@ -4,250 +4,45 @@
 
 @{
     Layout = "_Layout.cshtml";
-
-    var multipleCards = new MultipleCardsBlockViewModel
-    {
-        Items = new List<MultipleCardsItemBlockViewModel>
-        {
-            new MultipleCardsItemBlockViewModel
-            {
-                Headline = "Recent forum posts",
-                HasTable = true,
-            },
-            new MultipleCardsItemBlockViewModel
-            {
-                Headline = "UmbraCalendar"
-            },
-            new MultipleCardsItemBlockViewModel
-            {
-                Headline = "Upcoming festivals"
-            }
-        }
-    };
 }
 
 <div class="dc-block-list">
-    <partial name="@($"~/Views/Partials/Blocks/PageBannerBlock.cshtml")" />
-    <partial name="@($"~/Views/Partials/Blocks/MultipleCardsBlock.cshtml")" model="multipleCards" />
+    @foreach(var row in Model.BlockContent)
+    {
+        if (row.HasMultipleBlocks)
+        {
+            <partial name="@($"~/Views/Partials/BlockRows/{row.Alias}.cshtml")" model="row" />
+        } else
+        {
+            var block = row.Blocks.FirstOrDefault();
+            if (block != null)
+            {
+                <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
+            }
+        }
+    }
+
+    <a class="dc-cta-block" href="#" target="#">
+        <h2>This is a small call to action</h2>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="21" />
+            <path d="M13 21.2964H31.5849" />
+            <path d="M29.9883 23.8701L24.4951 29.4882" />
+            <path d="M23.7979 13.3184L31.6055 21.2963" />
+        </svg>
+    </a>
+
+    <div class="dc-big-cta-block__content align-center">
+        <h2>block.Headline</h2>
+        <div>
+            <p>block.Text</p>
+            <a href="#" class="btn arrow cta is-blue" target="_self" title="#">
+                Here is an inline cta
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path id="Vector" d="M6.41675 6.41663H15.5834V15.5833" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path id="Vector_2" d="M6.41675 15.5833L15.5834 6.41663" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
+            </a>
+        </div>
+    </div>
+
 </div>
 
-@* <section>
-    <div class="dc-block-list block-list-root">
 
-        <div class="dc-text-block justify-center " id="MEGMU">
-            <style nonce="">
-                #MEGMU {
-                    --block-background-color: transparent;
-                    --block-text-color: #162335;
-                    --link-color: var(--color-blue);
-                }
-            </style>
-            <div class="dc-text-block__content">
-                <h2 style="text-align: center;">Welcome to the Umbraco Community!</h2>
-                <p style="text-align: center;">The Umbraco Community is a part of the Umbraco ecosystem, which through action, involvement and co-operation, makes Umbraco what it is today!</p>
-                <p style="text-align: center;">Come and explore the ways the Community stays connected, what makes it so special, and how you can get involved.</p>
-                <p style="text-align: center;">From Umbraco meetups to MVP's, Community Teams to Contribution Stories and so much more, what are you waiting for?</p>
-            </div>
-        </div>
-
-        <div class="dc-columns no-outline " id="uHvEH">
-            <style nonce="">
-                #uHvEH {
-                    --block-background-color: transparent;
-                    --block-text-color: #162335;
-                    --block-link-color: #162335;
-                }
-            </style>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-                    <div class="dc-image-block " id="qleMC">
-                        <style nonce="">
-                            #qleMC {
-                                --block-background-color: transparent;
-                            }
-                        </style>
-
-                        <div class="dc-image-wrapper">
-                            <img src="/media/zz2bofhx/mvp-summit-audience.jpg?rmode=pad&amp;width=680&amp;v=1dad67ccb364070" alt="Img 9124 1" class="dc-image" loading="lazy">
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-
-                    <div class="dc-text-block justify-center " id="bYggB">
-                        <style nonce="">
-                            #bYggB {
-                                --block-background-color: transparent;
-                                --block-text-color: #162335;
-                                --link-color: var(--color-blue);
-                            }
-                        </style>
-                        <div class="dc-text-block__content">
-                            <h2><strong>Community Events</strong></h2>
-                            <p>Being social brings, and holds, the community together.&nbsp;</p> <p>There are numerous events, meetups and festivals of all shapes and sizes, already&nbsp; happening all the time in the community, across<br>the globe. If you'd like to attend, see what's coming up in your timezone on <a rel="noopener" href="https://umbracalendar.com" target="_blank">umbracalendar.com</a>!</p> <p>
-                                If you're interested in setting up a local meetup or have an event idea, please <a rel="noopener" href="#" target="_blank" title="Starting your own Umbraco Meetups">read how&nbsp; we can help you</a>.
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="dc-columns no-outline " id="ZdMNG">
-            <style nonce="">
-                #ZdMNG {
-                    --block-background-color: transparent;
-                    --block-text-color: #162335;
-                    --block-link-color: #162335;
-                }
-            </style>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-
-                    <div class="dc-text-block justify-center " id="YwYho">
-                        <style nonce="">
-                            #YwYho {
-                                --block-background-color: transparent;
-                                --block-text-color: #162335;
-                                --link-color: var(--color-blue);
-                            }
-                        </style>
-                        <div class="dc-text-block__content">
-                            <h2><strong>The Community Teams</strong></h2>
-                            <p>HQ'ers and members of the community work hand-in-hand in the spirit of Openness.</p>
-                            <p>From Packages to Documentation, Accessibility to Diversity and Inclusion, our Community Teams endeavour to improve Umbraco and all it has to offer, for the benefit of developers and users alike.</p>
-                            <p>Would you like to get involved in a community team? Find out how, <a rel="noopener" href="/learn-about-the-community/community-teams/" target="_blank" title="Community Teams">here</a>.</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-                    <div class="dc-image-block " id="atmMI">
-                        <style nonce="">
-                            #atmMI {
-                                --block-background-color: transparent;
-                            }
-                        </style>
-
-                        <div class="dc-image-wrapper">
-                            <img src="/media/iudinajh/sus-team.jpeg?rmode=pad&amp;width=680&amp;v=1dad67d3ac201e0" alt="Niklas Hammock2" class="dc-image" loading="lazy">
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="dc-columns no-outline " id="nttli">
-            <style nonce="">
-                #nttli {
-                    --block-background-color: transparent;
-                    --block-text-color: #162335;
-                    --block-link-color: #162335;
-                }
-            </style>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-                    <div class="dc-image-block " id="DLQdx">
-                        <style nonce="">
-                            #DLQdx {
-                                --block-background-color: transparent;
-                            }
-                        </style>
-
-                        <div class="dc-image-wrapper">
-                            <img src="/media/rkwcc3nc/47992111981_b19c5a06b1_c.jpg?rmode=pad&amp;width=680&amp;v=1dad67d5dc700f0" alt="Max Awards2 2" class="dc-image" loading="lazy">
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="column-block">
-                <div class="dc-block-list">
-
-
-                    <div class="dc-text-block justify-center " id="ItWAI">
-                        <style nonce="">
-                            #ItWAI {
-                                --block-background-color: transparent;
-                                --block-text-color: #162335;
-                                --link-color: var(--color-blue);
-                            }
-                        </style>
-                        <div class="dc-text-block__content">
-                            <h2><strong>Most Valuable People</strong></h2>
-                            <p>AKA, MVPs. We run an award program here at Umbraco. Each year we select members from our rich and talented community, to become our MVPs, in recognition of their efforts in contributing back to our CMS and the Community.</p>
-                            <p>How do you become an MVP, we hear you ask? Click the below button to read all about the program and how you too could one day become an Umbraco MVP.</p>
-                            <p style="text-align: center;">
-                                <a rel="noopener" href="/mvp-program/how-do-you-become-an-mvp/" target="_blank" title="How do you become an MVP?" class="btn is-white" style="text-align: center;">Umbraco MVP Program</a>
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="dc-text-block justify-center">
-            <div class="dc-text-block__content">
-                <h2 style="text-align: center;">uProfile</h2>
-                <p>Members of Our Community all have unique and meaningful stories about their Umbraco journey and what the community means to them. uProfile is a blog post series dedicated to highlighting these experiences and the profiles of individual Umbraco community members.</p>
-            </div>
-        </div>
-
-        <div class="dc-columns no-outline">
-            <div class="column-block">
-                <div class="dc-block-list">
-                    <div class="dc-cards-block">
-                        <a id="zmxOl" href="#" class="dc-cards-block__card card-image">
-                            <picture>
-                                <source media="(min-width:1024px)" srcset="/media/gvhj0ua3/alice-meng400x400-uprofile-thumb-homepage.png?width=509&amp;height=493&amp;v=1dbbda906097f50&amp;format=webp">
-                                <img src="/media/gvhj0ua3/alice-meng400x400-uprofile-thumb-homepage.png?width=388&amp;height=354&amp;v=1dbbda906097f50&amp;format=webp" alt="Stability Without Complexity" loading="lazy">
-                            </picture>
-                            <p>Alice Meng</p>
-                            <span>Read Alice's uProfile</span>
-                        </a>
-                        <a id="xjUsS" href="#" class="dc-cards-block__card card-image ">
-                            <picture>
-                                <source media="(min-width:1024px)" srcset="/media/vt2lg2uw/lee-kelleher400x400-uprofile-thumb-homepage.png?width=509&amp;height=493&amp;v=1dbbdaae317a830&amp;format=webp">
-                                <img src="/media/vt2lg2uw/lee-kelleher400x400-uprofile-thumb-homepage.png?width=388&amp;height=354&amp;v=1dbbdaae317a830&amp;format=webp" alt="Work Limitations" loading="lazy">
-                            </picture>
-                            <p>Lee Kelleher</p>
-                            <span>Read Lee's uProfile</span>
-                        </a>
-                        <a id="hvCje" href="#" class="dc-cards-block__card card-image ">
-                            <picture>
-                                <source media="(min-width:1024px)" srcset="/media/cztcusb3/maud-langaskens400x400-uprofile-thumb-homepage.png?rxy=0.5%2c0.3085226728702184&amp;width=509&amp;height=493&amp;v=1db0045e7b788b0&amp;format=webp">
-                                <img src="/media/cztcusb3/maud-langaskens400x400-uprofile-thumb-homepage.png?rxy=0.5%2c0.3085226728702184&amp;width=388&amp;height=354&amp;v=1db0045e7b788b0&amp;format=webp" alt="Webdeveloper working at desk" loading="lazy">
-                            </picture>
-                            <p>Maud Langaskens</p>
-                            <span>Read Maud's uProfile'</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="dc-text-block justify-center " id="ZsDNe">
-            <div class="dc-text-block__content">
-                <p>
-                    <a rel="noopener" href="#" target="_blank" class="btn is-blue">Learn more about the Umbraco Community</a>
-                </p>
-            </div>
-        </div>
-
-    </div>
-</section> *@

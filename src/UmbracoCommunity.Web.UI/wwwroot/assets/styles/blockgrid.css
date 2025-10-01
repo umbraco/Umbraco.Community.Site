@@ -1,0 +1,7 @@
+﻿.backoffice-img-block, .backoffice-text-block {
+    padding: 20px;
+}
+
+img {
+    max-width: 100%;
+}
