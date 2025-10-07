@@ -57,23 +57,3 @@ video {
   color: var(--color-white);
 }
 
-.g2-embed {
-  display: flex;
-}
-
-.g2-embed iframe {
-  border: none;
-}
-
-.g2-embed iframe:not([width]) {
-  width: 100%;
-}
-
-.calendly-popup {
-  max-height: unset !important;
-}
-
-.calendly-popup-close {
-  top: 125px !important;
-  right: 150px !important;
-}

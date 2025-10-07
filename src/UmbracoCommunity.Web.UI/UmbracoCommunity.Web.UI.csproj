@@ -12,18 +12,18 @@
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="16.0.0" /> -->
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="16.0.0" />
-    <PackageReference Include="Umbraco.Cms" Version="16.1.1" />
+    <PackageReference Include="Umbraco.Cms" Version="16.2.0" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.3" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" Version="16.0.0" /> -->
-    <PackageReference Include="Umbraco.Deploy.OnPrem" Version="16.0.0" />
-    <PackageReference Include="Umbraco.Forms" Version="16.0.0" />
-    <PackageReference Include="Umbraco.Forms.Deploy" Version="16.0.0" />
+    <PackageReference Include="Umbraco.Deploy.OnPrem" Version="16.0.3" />
+    <PackageReference Include="Umbraco.Forms" Version="16.1.0" />
+    <PackageReference Include="Umbraco.Forms.Deploy" Version="16.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-    <ProjectReference Include="..\..\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.Web.UI.Client\UmbracoCommunity.Web.UI.Client.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj" />
     <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
   </ItemGroup>

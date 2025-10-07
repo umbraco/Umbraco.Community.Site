@@ -1,4 +1,4 @@
-namespace UmbracoDotCom.Common.Utilities;
+namespace UmbracoCommunity.Common.Utilities;
 
 public static class StringUtilities
 {

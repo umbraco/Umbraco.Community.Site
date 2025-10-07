@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.Blocks;
-using UmbracoDotCom.Common.Utilities;
+using UmbracoCommunity.Common.Utilities;
 
 namespace UmbracoCommunity.Web.Models.ViewModels.Blocks
 {

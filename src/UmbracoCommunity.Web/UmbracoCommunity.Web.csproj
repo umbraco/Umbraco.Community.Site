@@ -13,9 +13,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.3.0" />
     <PackageReference Include="Schema.NET" Version="13.0.0" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="16.1.1" />
-    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="16.1.1" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="16.1.1" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="16.2.0" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="16.2.0" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="16.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.Web.UI.Client\UmbracoCommunity.Web.UI.Client.csproj" />
   </ItemGroup>
 
 </Project>
