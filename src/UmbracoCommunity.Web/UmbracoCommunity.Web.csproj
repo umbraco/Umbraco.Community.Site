@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj" />
-    <ProjectReference Include="..\UmbracoCommunity.Web.UI.Client\UmbracoCommunity.Web.UI.Client.csproj" />
   </ItemGroup>
 
 </Project>
