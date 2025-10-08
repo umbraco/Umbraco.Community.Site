@@ -1,11 +1,11 @@
 {
-  "Name": "_Layout",
-  "Alias": "_Layout",
-  "File": "umb://template-file/_Layout.cshtml",
+  "Name": "Layout",
+  "Alias": "Layout",
+  "File": "umb://template-file/Layout.cshtml",
   "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Dependencies": [
     {
-      "Udi": "umb://template-file/_Layout.cshtml",
+      "Udi": "umb://template-file/Layout.cshtml",
       "Ordering": true,
       "Mode": "Exist"
     }
