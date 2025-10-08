@@ -1,0 +1,38 @@
+{
+  "Name": "Background colour",
+  "EditorAlias": "Umbraco.ColorPicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.ColorPicker",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "items": [
+      {
+        "value": "F5C1BC",
+        "label": ""
+      },
+      {
+        "value": "3544B1",
+        "label": ""
+      },
+      {
+        "value": "DADADA",
+        "label": ""
+      },
+      {
+        "value": "F1F2F7",
+        "label": ""
+      },
+      {
+        "value": "8E755E",
+        "label": ""
+      },
+      {
+        "value": "ffffff",
+        "label": ""
+      }
+    ]
+  },
+  "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.0"
+}

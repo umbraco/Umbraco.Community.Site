@@ -1,0 +1,13 @@
+{
+  "Name": "Single URL picker",
+  "EditorAlias": "Umbraco.MultiUrlPicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MultiUrlPicker",
+  "Configuration": {
+    "minNumber": 1,
+    "maxNumber": 1
+  },
+  "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.3"
+}

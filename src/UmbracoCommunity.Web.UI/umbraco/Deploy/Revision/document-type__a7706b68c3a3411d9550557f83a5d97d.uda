@@ -1,0 +1,43 @@
+{
+  "Name": "Settings - colour",
+  "Alias": "settingsColour",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-colorpicker color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "db8bb90b-c24a-4d51-be87-35185ec30861",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "edc64d55-8cc8-4eb9-960d-c29829a73234",
+          "Alias": "backgroundColour",
+          "DataType": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+          "Name": "Background colour"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.0"
+}
