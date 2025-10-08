@@ -1,0 +1,75 @@
+{
+  "Name": "Call to action block",
+  "Alias": "callToActionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-arrow-right",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "550dc790-b74a-4daf-b2d3-a6396ffdf7e6",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "4aa024e6-c7ea-41a0-889a-008980a1446c",
+          "Alias": "description",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Description",
+          "SortOrder": 1
+        },
+        {
+          "Key": "76aae28c-864f-4289-8586-76ad99cfd5f2",
+          "Alias": "callToActionLink",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "Mandatory": true,
+          "Name": "Call to action link",
+          "SortOrder": 3
+        },
+        {
+          "Key": "8215cd08-da12-45fb-b717-3adbb5f29fa9",
+          "Alias": "headline",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Headline"
+        },
+        {
+          "Key": "fb03d7ba-1f8d-4c8e-8b7a-2ef480c3c7c0",
+          "Alias": "callToActionLinkText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "If not added, the title of the link will be used",
+          "Name": "Call to action link text",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.3"
+}

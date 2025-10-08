@@ -1,0 +1,26 @@
+﻿@using UmbracoCommunity.Web.Models.Pages
+@inherits UmbracoViewPage<HomePageViewModel>
+
+@{
+    Layout = "Layout.cshtml";
+}
+
+<div class="dc-block-list">
+    @foreach(var row in Model.BlockContent)
+    {
+        if (row.HasMultipleBlocks)
+        {
+            <partial name="@($"~/Views/Partials/BlockRows/{row.Alias}.cshtml")" model="row" />
+        } else
+        {
+            var block = row.Blocks.FirstOrDefault();
+            if (block != null)
+            {
+                <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
+            }
+        }
+    }
+
+</div>
+
+

@@ -1,0 +1,25 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageBlock, SettingsImageBlock>>
+@{
+    var cols = Model.GridColumns ?? 12;
+    var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
+}
+
+@if (Model.Content.Image is not null)
+{
+    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.ContentKey">
+        <style asp-add-nonce="true">
+            #@Model.ContentKey {
+                --block-background-color: @Model.Settings?.BackgroundColour ?? 'none';
+            }
+        </style>
+        <div class="dc-image-wrapper">
+            <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image" loading="lazy" />
+
+            @if (Model.Content.ApplyOverlay)
+            {
+                <div class="overlay"></div>
+                <div class="text">@Html.Raw(Model.Content.OverlayText)</div>
+            }
+        </div>
+    </div>
+}

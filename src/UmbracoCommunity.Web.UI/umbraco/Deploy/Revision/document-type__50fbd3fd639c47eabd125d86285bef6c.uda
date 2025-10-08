@@ -1,0 +1,57 @@
+{
+  "Name": "Call to action link block",
+  "Alias": "callToActionLinkBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-link",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "ed546c68-0c12-4380-bc96-ea18022c3cb6",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "3e39652d-d422-4a1f-a52c-97c0fb361c93",
+          "Alias": "callToActionLinkText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "If not added, the title of the link will be used",
+          "Name": "Call to action link text"
+        },
+        {
+          "Key": "b44bab91-8459-4ca3-a777-856690ae864f",
+          "Alias": "callToActionLink",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "Mandatory": true,
+          "Name": "Call to action link",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/50fbd3fd639c47eabd125d86285bef6c",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.3"
+}

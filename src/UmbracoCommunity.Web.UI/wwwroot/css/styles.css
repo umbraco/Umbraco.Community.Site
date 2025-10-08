@@ -1,0 +1,128 @@
+/* Basic styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    font-family: 'Lato';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjxAwXjeu.woff2) format('woff2');
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Backoffice specific block styling */
+.backoffice-img-block,
+.backoffice-text-block,
+.backoffice-cta-block {
+    padding: 20px;
+}
+
+.backoffice-cta-block {
+    text-align: center;
+}
+
+/* Call to action block styling */
+.btn {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 40px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: none;
+    background-color: transparent;
+    border-radius: 20px;
+    border: 1px solid #283A97;
+    cursor: pointer;
+    color: #283A97;
+    padding: 0 20px;
+    transition: all ease-out 0.2s;
+    appearance: none;
+    text-decoration: none;
+}
+
+.btn svg {
+    background-color: transparent;
+}
+
+.btn:hover {
+    background-color: #283A97;
+    color: #ffffff;
+}
+
+.btn.is-blue {
+    color: #ffffff;
+    background-color: #283A97;
+}
+
+.btn.is-blue:hover {
+    color: #283A97;
+    background-color: #ffffff;
+}
+
+.btn.arrow {
+    padding: 0 0 0 20px;
+}
+
+.btn.arrow svg {
+    width: 32px;
+    height: 32px;
+    border: 4px solid transparent;
+    transform: rotate(45deg);
+}
+
+.btn.arrow:hover svg path {
+    stroke: #ffffff;
+}
+
+.btn.cta svg {
+    transform: rotate(0);
+    background-color: #ffffff;
+    border-color: #ffffff;
+    border-radius: 50%;
+    transition: all ease-out 0.2s;
+}
+
+.btn.cta:hover svg {
+    transform: rotate(45deg);
+}
+
+.btn.cta svg path {
+    stroke: #283A97;
+}
+
+.btn.cta:hover svg {
+    background-color: #283A97;
+    border-color: #283A97;
+}
+
+.dc-big-cta-block__content h2 {
+    font-size: 40px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 45px;
+    margin: 0;
+}
+
+.dc-big-cta-block__content p {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 21px;
+    padding: 1.25rem 0 0 0;
+    margin: 0;
+}
+
+.dc-big-cta-block__content .btn {
+  margin-top: 1.25rem;
+}

@@ -1,0 +1,25 @@
+{
+  "Name": "Media Picker - Image Block",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "crops": [
+      {
+        "label": "Desktop",
+        "alias": "desktop",
+        "width": 906,
+        "height": 605
+      },
+      {
+        "label": "Mobile",
+        "alias": "mobile",
+        "width": 386,
+        "height": 265
+      }
+    ]
+  },
+  "Udi": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.3"
+}

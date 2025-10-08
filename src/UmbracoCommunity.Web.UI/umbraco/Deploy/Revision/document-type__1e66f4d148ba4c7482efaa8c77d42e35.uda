@@ -1,0 +1,32 @@
+{
+  "Name": "Content page",
+  "Alias": "contentPage",
+  "DefaultTemplate": "umb://template/9ec150a01fee402ab085938a7ea2db97",
+  "AllowedTemplates": [
+    "umb://template/9ec150a01fee402ab085938a7ea2db97"
+  ],
+  "HistoryCleanup": {},
+  "Icon": "icon-notepad",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.3"
+}

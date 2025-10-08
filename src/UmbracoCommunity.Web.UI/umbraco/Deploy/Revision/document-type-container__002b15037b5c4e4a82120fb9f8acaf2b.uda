@@ -1,0 +1,15 @@
+{
+  "Name": "Blocks",
+  "ContainedObjectType": "a2cb7800-f571-4787-9638-bc48539a0efb",
+  "Parent": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+  "Udi": "umb://document-type-container/002b15037b5c4e4a82120fb9f8acaf2b",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContainerArtifact",
+  "__version": "16.0.3"
+}

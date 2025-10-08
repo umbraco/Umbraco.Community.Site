@@ -24,6 +24,10 @@
   position: relative;
   border-radius: var(--border-radius-xl);
 
+  img {
+    width: 100%;
+  }
+
   .overlay {
     position: absolute;
     width: 100%;

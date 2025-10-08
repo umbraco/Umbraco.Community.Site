@@ -1,0 +1,21 @@
+{
+  "Name": "Content page",
+  "Alias": "ContentPage",
+  "File": "umb://template-file/ContentPage.cshtml",
+  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
+  "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
+  "Dependencies": [
+    {
+      "Udi": "umb://template-file/ContentPage.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "16.0.3"
+}

@@ -1,0 +1,10 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TextBlock>>
+
+@if (Model.Content.Text != null)
+{
+    <div class="dc-text-block justify-center transparent @(Context.Request.IsBlockPreviewRequest() ? "backoffice-text-block" : "")" id="@Model.ContentKey">
+        <div class="dc-text-block__content">
+            @Html.Raw(Model.Content.Text.ToHtmlString())
+        </div>
+    </div>
+}
