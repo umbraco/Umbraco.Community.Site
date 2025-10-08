@@ -1,5 +1,5 @@
 {
-  "Name": "Content block grid - homepage",
+  "Name": "General content block grid",
   "EditorAlias": "Umbraco.BlockGrid",
   "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
   "Configuration": {
