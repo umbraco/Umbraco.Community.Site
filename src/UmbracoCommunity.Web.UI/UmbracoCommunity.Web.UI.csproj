@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <!-- Commented out packages will be enabled when pushing to Cloud (and Deploy.OnPrem removed) -->
-    <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="16.0.3" /> -->
+    <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="16.0.0" /> -->
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="16.0.0" />
     <PackageReference Include="Umbraco.Cms" Version="16.2.0" />
