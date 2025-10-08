@@ -43,6 +43,7 @@
           "Key": "fb03d7ba-1f8d-4c8e-8b7a-2ef480c3c7c0",
           "Alias": "callToActionLinkText",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "If not added, the title of the link will be used",
           "Name": "Call to action link text",
           "SortOrder": 2
         }

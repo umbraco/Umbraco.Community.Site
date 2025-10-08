@@ -20,7 +20,8 @@
           "Umb.Tiptap.Toolbar.Link",
           "Umb.Tiptap.Toolbar.Unlink",
           "Umb.Tiptap.Toolbar.EmbeddedMedia",
-          "Umb.Tiptap.Toolbar.MediaPicker"
+          "Umb.Tiptap.Toolbar.MediaPicker",
+          "Umb.Tiptap.Toolbar.BlockPicker"
         ]
       ]
     ],
@@ -38,7 +39,8 @@
       "Umb.Tiptap.Superscript",
       "Umb.Tiptap.Figure",
       "Umb.Tiptap.Image",
-      "Umb.Tiptap.Underline"
+      "Umb.Tiptap.Underline",
+      "Umb.Tiptap.Block"
     ],
     "maxImageSize": 500,
     "statusbar": [
@@ -52,10 +54,18 @@
     "stylesheets": [
       "/richtext-styles.css",
       "/styles.css"
+    ],
+    "blocks": [
+      {
+        "contentElementTypeKey": "50fbd3fd-639c-47ea-bd12-5d86285bef6c"
+      }
     ]
   },
   "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
   "Dependencies": [
+    {
+      "Udi": "umb://document-type/50fbd3fd639c47eabd125d86285bef6c"
+    },
     {
       "Udi": "umb://stylesheet/styles.css",
       "Mode": "Exist"
