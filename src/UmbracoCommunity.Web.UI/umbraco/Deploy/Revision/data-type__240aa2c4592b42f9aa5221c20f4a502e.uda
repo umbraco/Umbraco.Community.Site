@@ -17,18 +17,6 @@
           },
           {
             "columnSpan": 12
-          },
-          {
-            "columnSpan": 3
-          },
-          {
-            "columnSpan": 9
-          },
-          {
-            "columnSpan": 4
-          },
-          {
-            "columnSpan": 8
           }
         ],
         "label": "Text block",
@@ -44,12 +32,6 @@
           },
           {
             "columnSpan": 6
-          },
-          {
-            "columnSpan": 3
-          },
-          {
-            "columnSpan": 9
           }
         ],
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
