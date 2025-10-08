@@ -1,0 +1,20 @@
+{
+  "src/entrypoints/_home.ts": {
+    "file": "_home-BjG8cZ0w.js",
+    "name": "_home",
+    "src": "src/entrypoints/_home.ts",
+    "isEntry": true,
+    "css": [
+      "_home-DvA16TjQ.css"
+    ]
+  },
+  "src/entrypoints/_index.ts": {
+    "file": "_index-BF68Zokg.js",
+    "name": "_index",
+    "src": "src/entrypoints/_index.ts",
+    "isEntry": true,
+    "css": [
+      "_index-BTgHvtRW.css"
+    ]
+  }
+}
