@@ -440,3 +440,5 @@ ood.flag
 **/TriggerDeploy.ps1
 src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
+
+!src/UmbracoCommunity.Web/Models/Releases
