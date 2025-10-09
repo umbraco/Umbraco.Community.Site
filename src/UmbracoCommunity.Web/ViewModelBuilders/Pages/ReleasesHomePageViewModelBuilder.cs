@@ -18,7 +18,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public ReleaseDiscussionViewModel ParseReleaseDiscussion(Features.GitHubSync.Models.GitHubDiscussion discussion,
+        public ReleaseDiscussionViewModel? ParseReleaseDiscussion(Features.GitHubSync.Models.GitHubDiscussion discussion,
             Dictionary<string, (int features, int issues, int breaking)> releaseStats)
         {
             // Find the release label (format: "release/X.Y.Z")
