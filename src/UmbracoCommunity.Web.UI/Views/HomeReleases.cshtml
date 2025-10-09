@@ -1,0 +1,280 @@
+﻿@using UmbracoCommunity.Web.Models.Pages
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ReleasesHomePageViewModel>
+@{
+	Layout = "LayoutReleases.cshtml";
+}
+@section CSS
+{ 
+    <link rel="stylesheet" href="/css/releases.css" />
+}
+
+<div class="dc-block-list">
+	@foreach(var row in Model.BlockContent)
+	{
+		if (row.HasMultipleBlocks)
+		{
+			<partial name="@($"~/Views/Partials/BlockRows/{row.Alias}.cshtml")" model="row" />
+		} else
+		{
+			var block = row.Blocks.FirstOrDefault();
+			if (block != null)
+			{
+				<partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
+			}
+		}
+	}
+
+</div>
+
+<div class="dc-block-list releases-container">
+    <div class="releases-header">
+        @if (!string.IsNullOrEmpty(Model.SelectedRepo))
+        {
+            <p>Repository: <strong>@Model.SelectedRepo</strong></p>
+        }
+        else
+        {
+            <h2>In progress</h2>
+            <p class="subtitle">Versions of Umbraco currently in production</p>
+        }
+    </div>
+
+    @if (string.IsNullOrEmpty(Model.SelectedRepo))
+    {
+        @* Show upcoming releases timeline when no repo is selected *@
+        @if (Model.LatestRelease == null && !Model.UpcomingReleases.Any())
+        {
+            <div class="empty-state">
+                <p>No release information available yet. Release discussions will be synced from GitHub automatically.</p>
+                <p>Make sure the <code>fetch-release-discussions</code> Hangfire job has run successfully.</p>
+            </div>
+        }
+
+        @if (Model.LatestRelease != null)
+        {
+            <div class="latest-release-section">
+                <h2>Latest Release</h2>
+                <div class="release-timeline-item latest">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <h3><a href="?repo=Umbraco-CMS&release=@Model.LatestRelease.ReleaseLabel">@Model.LatestRelease.Version</a></h3>
+                        <p class="release-date">Released on: @Model.LatestRelease.FormattedReleaseDate</p>
+                        <div class="release-stats">
+                            <span>Features: @Model.LatestRelease.FeatureCount</span>
+                            <span>Issues: @Model.LatestRelease.IssueCount</span>
+                            <span>Breaking changes: @Model.LatestRelease.BreakingChangesCount</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.UpcomingReleases.Any())
+        {
+            <div class="upcoming-releases-section">
+                <h2>Upcoming Releases</h2>
+                <div class="release-timeline">
+                    @foreach (var release in Model.UpcomingReleases)
+                    {
+                        <div class="release-timeline-item @(release.ReleaseDate.HasValue && !release.IsReleaseDateTba ? "" : "tba")">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h3><a href="?repo=Umbraco-CMS&release=@release.ReleaseLabel">@release.Version</a></h3>
+                                @if (release.IsReleaseDateTba || !release.ReleaseDate.HasValue)
+                                {
+                                    <p class="release-date candidate">Release candidate available</p>
+                                }
+                                else
+                                {
+                                    <p class="release-date">Release date: @release.FormattedReleaseDate</p>
+                                }
+                                <div class="release-stats">
+                                    <span>Features: @release.FeatureCount</span>
+                                    <span>Issues: @release.IssueCount</span>
+                                    <span>Breaking changes: @release.BreakingChangesCount</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else if (!string.IsNullOrEmpty(Model.SelectedRepo))
+    {
+        @if (Model.AvailableReleases.Any())
+        {
+            <div class="releases-filters">
+                <label>Filter by release:</label>
+                <select id="releaseFilter">
+                    <option value="">All releases</option>
+                    @foreach (var release in Model.AvailableReleases)
+                    {
+                        <option value="@release" selected="@(release == Model.SelectedRelease)">@release</option>
+                    }
+                </select>
+
+                @if (!string.IsNullOrEmpty(Model.SelectedRelease))
+                {
+                    <a href="?repo=@Model.SelectedRepo">Clear filter</a>
+                }
+            </div>
+
+            @foreach (var releaseGroup in Model.Releases)
+            {
+                <div class="release-group">
+                    <div class="release-header">
+                        <h2>@releaseGroup.ReleaseLabel</h2>
+                    </div>
+
+                    @if (Model.ReleaseInfo != null && Model.ReleaseInfo.ReleaseLabel == releaseGroup.ReleaseLabel)
+                    {
+                        <div>
+                            <h2>Release notes</h2>
+                            @if (Model.ReleaseInfo.ReleaseDate.HasValue)
+                            {
+                                @if (Model.ReleaseInfo.IsReleased)
+                                {
+                                    <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                                }
+                                else
+                                {
+                                    <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                                }
+                            }
+                            else
+                            {
+                                <p class="release-date"><strong>Target release date:</strong> To be announced</p>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ReleaseInfo.Description))
+                            {
+                                <div class="release-description">
+                                    @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="contributors-summary">
+                        <h2>Contributors</h2>
+                        <p>Of the @releaseGroup.TotalCount bug fixes and feature additions in @releaseGroup.ReleaseLabel, a total of @releaseGroup.CommunityCount of them have been contributed by the community, by @releaseGroup.UniqueCommunityContributorsCount unique contributors.</p>
+                        @if (releaseGroup.FirstTimeContributorsCount > 0)
+                        {
+                            <p>
+                                We're welcoming @releaseGroup.FirstTimeContributorsCount brand new @(releaseGroup.FirstTimeContributorsCount == 1 ? "contributor" : "contributors") who @(releaseGroup.FirstTimeContributorsCount == 1 ? "has" : "have") made their first pull request for @releaseGroup.RepositoryName. Welcome to the contributor club:
+                                @for (int i = 0; i < releaseGroup.FirstTimeContributors.Count; i++)
+                                {
+                                    var contributor = releaseGroup.FirstTimeContributors[i];
+                                    <a href="https://github.com/umbraco/@releaseGroup.RepositoryName/pulls/@contributor.Login" target="_blank">@contributor.Name</a>@(i < releaseGroup.FirstTimeContributors.Count - 1 ? ", " : "")
+                                }
+                                🏆
+                            </p>
+                        }
+                    </div>
+
+                    <div class="release-categories">
+                    @foreach (var category in releaseGroup.Categories)
+                    {
+                        <details class="release-category" open>
+                            <summary>
+                                @category.CategoryName
+                                <uui-badge color="default" look="primary">@category.Count</uui-badge>
+                            </summary>
+                            <div class="pr-list">
+                                @foreach (var pr in category.PullRequests)
+                                {
+                                    <div class="pr-item">
+                                        @if (pr.IsHqMember)
+                                        {
+                                            <img src="@Model.UmbracoLogoPath" alt="HQ Member" class="pr-hq-indicator" title="Created by Umbraco HQ member" />
+                                        }
+                                        else if (!string.IsNullOrEmpty(pr.AvatarUrl))
+                                        {
+                                            <img src="@pr.AvatarUrl" alt="@pr.AuthorLogin" class="pr-hq-indicator" title="@pr.AuthorLogin" />
+                                        }
+                                        else
+                                        {
+                                            <div class="pr-spacer"></div>
+                                        }
+
+                                        <div class="pr-content">
+                                            <p class="pr-title">
+                                                <a href="@pr.Url" target="_blank" class="pr-number @(pr.IsIssue ? "pr-issue" : "")">#@pr.Number</a>
+                                                @pr.Title
+                                                @if (pr.AlertMessage != null)
+                                                {
+                                                    <uui-badge color="warning">@pr.AlertMessage</uui-badge>
+                                                }
+                                            </p>
+                                            @if (pr.Labels.Any())
+                                            {
+                                                <div class="pr-labels">
+                                                    @foreach (var label in pr.Labels)
+                                                    {
+                                                        <uui-badge color="default" look="placeholder">@label</uui-badge>
+                                                    }
+                                                </div>
+                                            }
+                                            <div class="pr-meta">
+                                                by
+                                                @if (!string.IsNullOrEmpty(pr.AuthorUrl))
+                                                {
+                                                    <a href="@pr.AuthorUrl" target="_blank" class="pr-author">@@@pr.AuthorLogin</a>
+                                                }
+                                                else
+                                                {
+                                                    <span>@@@pr.AuthorLogin</span>
+                                                }
+                                                on @pr.CreatedAt.ToString("MMM d, yyyy")
+                                                @if (!string.IsNullOrEmpty(pr.MergedByLogin))
+                                                {
+                                                    <span>
+                                                        • merged by
+                                                        @if (!string.IsNullOrEmpty(pr.MergedByUrl))
+                                                        {
+                                                            <a href="@pr.MergedByUrl" target="_blank" class="pr-author">@(pr.MergedByName ?? pr.MergedByLogin)</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(pr.MergedByName ?? pr.MergedByLogin)</span>
+                                                        }
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </details>
+                    }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No releases found with <code>release/*</code> labels for this repository.</p>
+        }
+    }
+</div>
+
+<script nonce="@nonceService.GetNonce()">
+    document.addEventListener('DOMContentLoaded', function() {
+        const releaseFilter = document.getElementById('releaseFilter');
+        if (releaseFilter) {
+            releaseFilter.addEventListener('change', function() {
+                const releaseLabel = this.value;
+                const urlParams = new URLSearchParams(window.location.search);
+                if (releaseLabel) {
+                    urlParams.set('release', releaseLabel);
+                } else {
+                    urlParams.delete('release');
+                }
+                window.location.search = urlParams.toString();
+            });
+        }
+
+    });
+</script>
+
+
