@@ -18,6 +18,8 @@
 
             public static readonly string[] DefaultAllowFrames = [];
 
+            public static readonly string[] DefaultAllowScripts = [];
+
             public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com"];
 
             public static readonly string[] DefaultAllowFormActions = [];
