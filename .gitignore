@@ -441,5 +441,4 @@ ood.flag
 src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
 
-!src/UmbracoCommunity.Web/Models/Releases
 Hangfire.db*
