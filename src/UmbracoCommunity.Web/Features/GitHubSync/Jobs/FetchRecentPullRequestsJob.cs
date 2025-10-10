@@ -8,11 +8,11 @@ namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 public class FetchRecentPullRequestsJob
 {
     private readonly GitHubApiClient _apiClient;
-    private readonly GitHubDataStore _dataStore;
+    private readonly GitHubCosmosDbStore _dataStore;
 
     public FetchRecentPullRequestsJob(
         GitHubApiClient apiClient,
-        GitHubDataStore dataStore)
+        GitHubCosmosDbStore dataStore)
     {
         _apiClient = apiClient;
         _dataStore = dataStore;

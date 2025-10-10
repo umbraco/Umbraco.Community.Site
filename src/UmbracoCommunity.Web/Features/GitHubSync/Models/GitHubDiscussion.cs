@@ -1,11 +1,11 @@
-using LiteDB;
+using Newtonsoft.Json;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Models;
 
 public class GitHubDiscussion
 {
-    [BsonId]
-    public ObjectId Id { get; set; } = ObjectId.Empty;
+    [JsonProperty("id")]
+    public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public int Number { get; set; }
     public string Url { get; set; } = string.Empty;

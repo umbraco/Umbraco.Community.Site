@@ -15,7 +15,7 @@ public class RegisterServices : IComposer
             builder.Config.GetSection(GitHubSyncOptions.SectionName));
         
         // Register infrastructure
-        builder.Services.AddSingleton<GitHubDataStore>();
+        builder.Services.AddSingleton<GitHubCosmosDbStore>();
         builder.Services.AddScoped<GitHubApiClient>();
         
         // Register jobs

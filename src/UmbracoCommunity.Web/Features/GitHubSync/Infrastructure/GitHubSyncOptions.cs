@@ -10,4 +10,9 @@ public class GitHubSyncOptions
     public string DatabasePath { get; set; } = "App_Data/github-sync.db";
     public List<string> Repositories { get; set; } = new();
     public List<string> HqOnlyTeams { get; set; } = new();
+
+    // CosmosDB settings
+    public string CosmosDbEndpoint { get; set; } = string.Empty;
+    public string CosmosDbMasterKey { get; set; } = string.Empty;
+    public string CosmosDatabaseName { get; set; } = "Community";
 }

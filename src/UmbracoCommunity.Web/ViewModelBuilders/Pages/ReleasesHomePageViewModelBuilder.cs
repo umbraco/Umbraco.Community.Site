@@ -9,10 +9,10 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
     internal class ReleasesHomePageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<ReleasesHomePageViewModel>
     {
-        private readonly GitHubDataStore _dataStore;
+        private readonly GitHubCosmosDbStore _dataStore;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ReleasesHomePageViewModelBuilder(GitHubDataStore dataStore, IHttpContextAccessor httpContextAccessor)
+        public ReleasesHomePageViewModelBuilder(GitHubCosmosDbStore dataStore, IHttpContextAccessor httpContextAccessor)
         {
             _dataStore = dataStore;
             _httpContextAccessor = httpContextAccessor;

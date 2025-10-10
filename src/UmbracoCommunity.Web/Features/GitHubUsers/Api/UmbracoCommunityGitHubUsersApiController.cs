@@ -12,11 +12,11 @@ namespace UmbracoCommunity.Web.Features.GitHubUsers.Api;
 public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUsersApiControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly GitHubDataStore _dataStore;
+    private readonly GitHubCosmosDbStore _dataStore;
 
     public UmbracoCommunityGitHubUsersApiController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        GitHubDataStore dataStore)
+        GitHubCosmosDbStore dataStore)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dataStore = dataStore;
@@ -30,12 +30,12 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         return Ok(members);
     }
 
-    [HttpGet("hqmembers/{id}")]
+    [HttpGet("hqmembers/{login}")]
     [ProducesResponseType<GitHubHqMember>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetHqMember(int id)
+    public IActionResult GetHqMember(string login)
     {
-        var member = _dataStore.GetHqMembers().FirstOrDefault(m => m.Id == id);
+        var member = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
         if (member == null)
         {
             return NotFound();
@@ -59,21 +59,21 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
             return BadRequest("A member with this login already exists");
         }
 
-        member.Id = 0; // Let the database assign the ID
+        member.Id = member.Login; // Use Login as ID
         _dataStore.UpsertHqMembers(new[] { member });
 
-        // Retrieve the inserted member to get the assigned ID
+        // Retrieve the inserted member
         var created = _dataStore.GetHqMembers().First(m => m.Login == member.Login);
-        return CreatedAtAction(nameof(GetHqMember), new { id = created.Id }, created);
+        return CreatedAtAction(nameof(GetHqMember), new { login = created.Login }, created);
     }
 
-    [HttpPut("hqmembers/{id}")]
+    [HttpPut("hqmembers/{login}")]
     [ProducesResponseType<GitHubHqMember>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult UpdateHqMember(int id, [FromBody] GitHubHqMember member)
+    public IActionResult UpdateHqMember(string login, [FromBody] GitHubHqMember member)
     {
-        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Id == id);
+        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
         if (existing == null)
         {
             return NotFound();
@@ -85,32 +85,30 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         }
 
         // Check if login is being changed to one that already exists
-        var duplicateLogin = _dataStore.GetHqMembers()
-            .FirstOrDefault(m => m.Login == member.Login && m.Id != id);
-        if (duplicateLogin != null)
+        if (member.Login != login)
         {
-            return BadRequest("A member with this login already exists");
+            return BadRequest("Cannot change login");
         }
 
-        member.Id = id; // Ensure the ID matches
+        member.Id = member.Login; // Ensure the ID matches
         _dataStore.UpsertHqMembers(new[] { member });
 
-        var updated = _dataStore.GetHqMembers().First(m => m.Id == id);
+        var updated = _dataStore.GetHqMembers().First(m => m.Login == login);
         return Ok(updated);
     }
 
-    [HttpDelete("hqmembers/{id}")]
+    [HttpDelete("hqmembers/{login}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteHqMember(int id)
+    public IActionResult DeleteHqMember(string login)
     {
-        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Id == id);
+        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
         if (existing == null)
         {
             return NotFound();
         }
 
-        _dataStore.DeleteHqMember(id);
+        _dataStore.DeleteHqMember(login);
         return NoContent();
     }
 }

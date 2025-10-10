@@ -11,12 +11,12 @@ namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 public class FetchHqMembersJob
 {
     private readonly GitHubApiClient _apiClient;
-    private readonly GitHubDataStore _dataStore;
+    private readonly GitHubCosmosDbStore _dataStore;
     private readonly GitHubSyncOptions _options;
 
     public FetchHqMembersJob(
         GitHubApiClient apiClient,
-        GitHubDataStore dataStore,
+        GitHubCosmosDbStore dataStore,
         IOptions<GitHubSyncOptions> options)
     {
         _apiClient = apiClient;
