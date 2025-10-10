@@ -1,5 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
-using UmbracoCommunity.Web.Models.Releases;
+using UmbracoCommunity.Web.Models.ReleaseOverview;
 using UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
 namespace UmbracoCommunity.Web.Models.Pages
