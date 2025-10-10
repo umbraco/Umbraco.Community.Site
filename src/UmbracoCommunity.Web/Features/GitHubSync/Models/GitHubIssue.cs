@@ -15,4 +15,8 @@ public class GitHubIssue
     public GitHubAuthor? Author { get; set; }
     public GitHubRepository Repository { get; set; } = new();
     public List<string> Labels { get; set; } = new();
+
+    // Computed property for efficient querying of release labels
+    [JsonProperty("releaseLabels")]
+    public List<string> ReleaseLabels { get; set; } = new();
 }

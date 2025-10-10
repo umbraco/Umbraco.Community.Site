@@ -46,6 +46,11 @@ public class GitHubCosmosDbStore : IDisposable
                 pr.Id = $"{pr.Repository.Name}-pr-{pr.Number}";
             }
 
+            // Populate ReleaseLabels for efficient querying
+            pr.ReleaseLabels = pr.Labels
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
             try
             {
                 var existing = await _pullRequestsContainer.ReadItemAsync<GitHubPullRequest>(
@@ -82,6 +87,11 @@ public class GitHubCosmosDbStore : IDisposable
             {
                 issue.Id = $"{issue.Repository.Name}-issue-{issue.Number}";
             }
+
+            // Populate ReleaseLabels for efficient querying
+            issue.ReleaseLabels = issue.Labels
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
             try
             {
@@ -307,18 +317,54 @@ public class GitHubCosmosDbStore : IDisposable
 
     public IEnumerable<GitHubPullRequest> GetPullRequestsByLabelPattern(string repositoryName, string labelPattern)
     {
-        // Get all PRs for this repository, then filter in-memory for label pattern
-        var query = new QueryDefinition("SELECT * FROM c WHERE c.Repository.Name = @repoName")
+        // If labelPattern is a specific release label (not just "release/"), query for exact match
+        if (labelPattern.Length > "release/".Length && labelPattern.StartsWith("release/"))
+        {
+            return GetPullRequestsBySpecificLabel(repositoryName, labelPattern);
+        }
+
+        // Query using ReleaseLabels array with ARRAY_LENGTH check for efficiency
+        var query = new QueryDefinition(
+            @"SELECT * FROM c
+              WHERE c.Repository.Name = @repoName
+              AND ARRAY_LENGTH(c.releaseLabels) > 0")
             .WithParameter("@repoName", repositoryName);
 
-        var queryIterator = _pullRequestsContainer.GetItemQueryIterator<GitHubPullRequest>(query);
+        var queryIterator = _pullRequestsContainer.GetItemQueryIterator<GitHubPullRequest>(
+            query,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(repositoryName) });
+
         var prs = new List<GitHubPullRequest>();
 
         while (queryIterator.HasMoreResults)
         {
             var response = queryIterator.ReadNextAsync().GetAwaiter().GetResult();
-            // Filter in-memory for StartsWith since Cosmos doesn't support it directly
-            prs.AddRange(response.Where(x => x.Labels.Any(l => l.StartsWith(labelPattern, StringComparison.OrdinalIgnoreCase))));
+            prs.AddRange(response);
+        }
+
+        return prs.OrderByDescending(x => x.CreatedAt);
+    }
+
+    private IEnumerable<GitHubPullRequest> GetPullRequestsBySpecificLabel(string repositoryName, string releaseLabel)
+    {
+        // Query for specific release label using ARRAY_CONTAINS
+        var query = new QueryDefinition(
+            @"SELECT * FROM c
+              WHERE c.Repository.Name = @repoName
+              AND ARRAY_CONTAINS(c.releaseLabels, @releaseLabel)")
+            .WithParameter("@repoName", repositoryName)
+            .WithParameter("@releaseLabel", releaseLabel);
+
+        var queryIterator = _pullRequestsContainer.GetItemQueryIterator<GitHubPullRequest>(
+            query,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(repositoryName) });
+
+        var prs = new List<GitHubPullRequest>();
+
+        while (queryIterator.HasMoreResults)
+        {
+            var response = queryIterator.ReadNextAsync().GetAwaiter().GetResult();
+            prs.AddRange(response);
         }
 
         return prs.OrderByDescending(x => x.CreatedAt);
@@ -326,18 +372,54 @@ public class GitHubCosmosDbStore : IDisposable
 
     public IEnumerable<GitHubIssue> GetIssuesByLabelPattern(string repositoryName, string labelPattern)
     {
-        // Get all issues for this repository, then filter in-memory for label pattern
-        var query = new QueryDefinition("SELECT * FROM c WHERE c.Repository.Name = @repoName")
+        // If labelPattern is a specific release label (not just "release/"), query for exact match
+        if (labelPattern.Length > "release/".Length && labelPattern.StartsWith("release/"))
+        {
+            return GetIssuesBySpecificLabel(repositoryName, labelPattern);
+        }
+
+        // Query using ReleaseLabels array with ARRAY_LENGTH check for efficiency
+        var query = new QueryDefinition(
+            @"SELECT * FROM c
+              WHERE c.Repository.Name = @repoName
+              AND ARRAY_LENGTH(c.releaseLabels) > 0")
             .WithParameter("@repoName", repositoryName);
 
-        var queryIterator = _issuesContainer.GetItemQueryIterator<GitHubIssue>(query);
+        var queryIterator = _issuesContainer.GetItemQueryIterator<GitHubIssue>(
+            query,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(repositoryName) });
+
         var issues = new List<GitHubIssue>();
 
         while (queryIterator.HasMoreResults)
         {
             var response = queryIterator.ReadNextAsync().GetAwaiter().GetResult();
-            // Filter in-memory for StartsWith since Cosmos doesn't support it directly
-            issues.AddRange(response.Where(x => x.Labels.Any(l => l.StartsWith(labelPattern, StringComparison.OrdinalIgnoreCase))));
+            issues.AddRange(response);
+        }
+
+        return issues.OrderByDescending(x => x.CreatedAt);
+    }
+
+    private IEnumerable<GitHubIssue> GetIssuesBySpecificLabel(string repositoryName, string releaseLabel)
+    {
+        // Query for specific release label using ARRAY_CONTAINS
+        var query = new QueryDefinition(
+            @"SELECT * FROM c
+              WHERE c.Repository.Name = @repoName
+              AND ARRAY_CONTAINS(c.releaseLabels, @releaseLabel)")
+            .WithParameter("@repoName", repositoryName)
+            .WithParameter("@releaseLabel", releaseLabel);
+
+        var queryIterator = _issuesContainer.GetItemQueryIterator<GitHubIssue>(
+            query,
+            requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(repositoryName) });
+
+        var issues = new List<GitHubIssue>();
+
+        while (queryIterator.HasMoreResults)
+        {
+            var response = queryIterator.ReadNextAsync().GetAwaiter().GetResult();
+            issues.AddRange(response);
         }
 
         return issues.OrderByDescending(x => x.CreatedAt);

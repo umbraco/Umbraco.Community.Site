@@ -107,7 +107,6 @@
             <div class="releases-filters">
                 <label>Filter by release:</label>
                 <select id="releaseFilter">
-                    <option value="">All releases</option>
                     @foreach (var release in Model.AvailableReleases)
                     {
                         <option value="@release" selected="@(release == Model.SelectedRelease)">@release</option>

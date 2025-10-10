@@ -140,9 +140,21 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             viewModel.CompareRelease1 = compareRelease1;
             viewModel.CompareRelease2 = compareRelease2;
 
-            // Get all PRs and Issues with release/* labels
-            var allPrs = _dataStore.GetPullRequestsByLabelPattern(repo, "release/").ToList();
-            var allIssues = _dataStore.GetIssuesByLabelPattern(repo, "release/").ToList();
+            // If a specific release is selected, only query for that release
+            string labelPattern = "release/";
+            if (!string.IsNullOrEmpty(selectedRelease))
+            {
+                labelPattern = selectedRelease;
+            }
+            else if (!string.IsNullOrEmpty(compareRelease1) && !string.IsNullOrEmpty(compareRelease2))
+            {
+                // For comparison, we still need all releases (handled below)
+                labelPattern = "release/";
+            }
+
+            // Get PRs and Issues with release labels
+            var allPrs = _dataStore.GetPullRequestsByLabelPattern(repo, labelPattern).ToList();
+            var allIssues = _dataStore.GetIssuesByLabelPattern(repo, labelPattern).ToList();
 
             // Get first-time contributor PR numbers (maps login to their first PR number)
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repo);
