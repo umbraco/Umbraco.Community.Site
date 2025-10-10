@@ -9,22 +9,27 @@
   },
   "scripts": {
     "dev": "vite --port 5123",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && cross-env BUILD_TARGET=backoffice vite build",
+    "build:backoffice": "tsc && cross-env BUILD_TARGET=backoffice vite build",
     "build:for:cloud": "npm run build && node ./devops/copy-for-cloud.js",
     "preview": "vite preview"
   },
   "dependencies": {
     "@googlemaps/markerclusterer": "^2.5.2",
-    "@umbraco-ui/uui": "^1.8.2",
+    "@umbraco-ui/uui": "^1.15.0",
     "@ungap/custom-elements": "^1.3.0",
-    "lit": "^2.7.6",
+    "lit": "^3.3.0",
     "query-selector-shadow-dom": "^1.0.1",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@hey-api/client-fetch": "^0.12.0",
+    "@hey-api/openapi-ts": "^0.71.0",
     "@types/google.maps": "^3.54.10",
     "@types/node": "^20.5.9",
+    "@umbraco-cms/backoffice": "^*",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "cross-env": "^7.0.3",
     "glob": "^10.3.10",
     "postcss": "^8.5.6",
     "postcss-calc": "^10.1.1",
