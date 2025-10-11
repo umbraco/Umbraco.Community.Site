@@ -4,8 +4,10 @@ public class ReleaseDiscussionViewModel
 {
     public string Version { get; set; } = string.Empty;
     public string ReleaseLabel { get; set; } = string.Empty;
+    public string? ActualLatestVersion { get; set; }
     public DateTime? ReleaseDate { get; set; }
     public bool IsReleaseDateTba { get; set; }
+    public bool IsLts { get; set; }
     public string Description { get; set; } = string.Empty;
     public int FeatureCount { get; set; }
     public int IssueCount { get; set; }
@@ -23,4 +25,6 @@ public class ReleaseDiscussionViewModel
             return "To be announced";
         }
     }
+
+    public string DisplayVersion => ActualLatestVersion ?? Version;
 }

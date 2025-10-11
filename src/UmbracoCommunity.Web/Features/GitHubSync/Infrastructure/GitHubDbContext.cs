@@ -15,6 +15,7 @@ public class GitHubDbContext : DbContext
     public DbSet<HqMemberEntity> HqMembers => Set<HqMemberEntity>();
     public DbSet<PullRequestReleaseEntity> PullRequestReleases => Set<PullRequestReleaseEntity>();
     public DbSet<IssueReleaseEntity> IssueReleases => Set<IssueReleaseEntity>();
+    public DbSet<NuGetPackageVersionEntity> NuGetPackageVersions => Set<NuGetPackageVersionEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -107,6 +108,20 @@ public class GitHubDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => e.ReleaseLabel);
+        });
+
+        // NuGetPackageVersion configuration
+        modelBuilder.Entity<NuGetPackageVersionEntity>(entity =>
+        {
+            entity.ToTable("NuGetPackageVersions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PackageId).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Version).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.PublishedDate).IsRequired();
+            entity.Property(e => e.LastSyncedAt).IsRequired();
+
+            entity.HasIndex(e => new { e.PackageId, e.Version }).IsUnique();
+            entity.HasIndex(e => e.PackageId);
         });
     }
 }

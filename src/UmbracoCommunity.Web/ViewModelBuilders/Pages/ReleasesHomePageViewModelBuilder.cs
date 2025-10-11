@@ -13,12 +13,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
         private readonly GitHubSqlStore _dataStore;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _memoryCache;
+        private readonly GitHubSyncOptions _options;
 
-        public ReleasesHomePageViewModelBuilder(GitHubSqlStore dataStore, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
+        public ReleasesHomePageViewModelBuilder(GitHubSqlStore dataStore, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, Microsoft.Extensions.Options.IOptions<GitHubSyncOptions> options)
         {
             _dataStore = dataStore;
             _httpContextAccessor = httpContextAccessor;
             _memoryCache = memoryCache;
+            _options = options.Value;
         }
 
         public ReleaseDiscussionViewModel? ParseReleaseDiscussion(Features.GitHubSync.Models.GitHubDiscussion discussion,
@@ -71,6 +73,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
             // If no valid date found, keep isTba = true and releaseDate = null
 
+            // Parse LTS status from body
+            bool isLts = false;
+            var ltsPattern = @"\*\*Long term supported version\*\*\?\s*(Yes|yes)";
+            var ltsMatch = System.Text.RegularExpressions.Regex.Match(discussion.Body, ltsPattern);
+            if (ltsMatch.Success)
+            {
+                isLts = true;
+            }
+
             // Extract description (everything after release date until "### Links")
             var description = string.Empty;
             var bodyLines = discussion.Body.Split('\n');
@@ -106,6 +117,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 ReleaseLabel = releaseLabel,
                 ReleaseDate = releaseDate,
                 IsReleaseDateTba = isTba,
+                IsLts = isLts,
                 Description = description,
                 FeatureCount = features,
                 IssueCount = issues,
@@ -319,6 +331,16 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
+            // Get NuGet package versions from database (use as fallback for missing version info)
+            // Find the NuGet package ID for this repository
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+
+            Dictionary<string, DateTime> nugetVersions = new();
+            if (repoConfig?.HasNuGetPackage == true)
+            {
+                nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
+            }
+
             // Parse discussions into release view models
             var allReleases = new List<ReleaseDiscussionViewModel>();
             foreach (var discussion in discussions)
@@ -329,6 +351,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 {
                     System.Diagnostics.Debug.WriteLine(
                         $"  Parsed successfully: {releaseVm.Version}, ReleaseDate: {releaseVm.ReleaseDate}, IsTba: {releaseVm.IsReleaseDateTba}");
+
                     allReleases.Add(releaseVm);
                 }
                 else
@@ -337,20 +360,69 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 }
             }
 
+            // For each major version, check if there's a newer released version in NuGet than what we have in discussions
+            var now = DateTime.UtcNow;
+            var discussionsByMajor = allReleases
+                .GroupBy(r => ParseVersion(r.ReleaseLabel).Major)
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(r => ParseVersion(r.ReleaseLabel)).First());
+
+            // Get all release labels from PRs/issues to know what versions exist
+            var allReleaseLabels = allPrs
+                .SelectMany(pr => pr.Labels.Where(l => l.StartsWith("release/")))
+                .Concat(allIssues.SelectMany(i => i.Labels.Where(l => l.StartsWith("release/"))))
+                .Distinct()
+                .Select(label => new { Label = label, Version = ParseVersion(label), VersionString = label.Replace("release/", "") })
+                .Where(x => x.Version.Major > 0)
+                .ToList();
+
+            // For each major version in discussions, check if NuGet has a newer version
+            foreach (var majorVersion in discussionsByMajor.Keys.ToList())
+            {
+                var discussionVm = discussionsByMajor[majorVersion];
+
+                // Get all versions for this major from release labels
+                var versionsForMajor = allReleaseLabels
+                    .Where(x => x.Version.Major == majorVersion)
+                    .ToList();
+
+                // Find the highest version that exists in NuGet and has a release date in the past
+                var latestNuGetVersion = versionsForMajor
+                    .Where(x => nugetVersions.TryGetValue(x.VersionString, out var date) && date <= now)
+                    .OrderByDescending(x => x.Version)
+                    .FirstOrDefault();
+
+                if (latestNuGetVersion != null && ParseVersion(latestNuGetVersion.Label) > ParseVersion(discussionVm.ReleaseLabel))
+                {
+                    // There's a newer version in NuGet - update the discussion VM to point to it
+                    discussionVm.ActualLatestVersion = latestNuGetVersion.VersionString;
+                    discussionVm.ReleaseLabel = latestNuGetVersion.Label;
+                    discussionVm.ReleaseDate = nugetVersions[latestNuGetVersion.VersionString];
+                    discussionVm.IsReleaseDateTba = false;
+                }
+            }
+
             // Sort by version (descending)
             allReleases = allReleases.OrderByDescending(r => ParseVersion(r.ReleaseLabel)).ToList();
 
-            // Separate upcoming and released
-            var now = DateTime.UtcNow;
-            viewModel.UpcomingReleases = allReleases
-                .Where(r => !r.ReleaseDate.HasValue || r.ReleaseDate.Value > now || r.IsReleaseDateTba)
-                .ToList();
-
-            // Find latest release (highest version with past release date)
+            // Find latest release (highest version number among all released versions)
             viewModel.LatestRelease = allReleases
-                .Where(r => r.ReleaseDate.HasValue && r.ReleaseDate.Value <= now && !r.IsReleaseDateTba)
+                .Where(r => r.IsReleased)
                 .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
                 .FirstOrDefault();
+
+            // Find LTS releases (all released LTS versions, sorted by version descending)
+            viewModel.LtsReleases = allReleases
+                .Where(r => r.IsReleased && r.IsLts)
+                .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
+                .ToList();
+
+            // Upcoming releases: not yet released, excluding the latest release
+            viewModel.UpcomingReleases = allReleases
+                .Where(r => !r.IsReleased)
+                .OrderBy(r => !r.ReleaseDate.HasValue || r.IsReleaseDateTba ? 1 : 0) // Releases without dates go last
+                .ThenBy(r => r.ReleaseDate ?? DateTime.MaxValue) // Sort by date (if they have one)
+                .ThenByDescending(r => ParseVersion(r.ReleaseLabel)) // Sort by version for releases without dates
+                .ToList();
         }
 
         private void PopulateReleaseInfo(ReleasesHomePageViewModel viewModel, string repositoryName, string releaseLabel)

@@ -52,6 +52,7 @@ public class RegisterServices : IComposer
         // Register infrastructure
         builder.Services.AddSingleton<GitHubSqlStore>();
         builder.Services.AddScoped<GitHubApiClient>();
+        builder.Services.AddHttpClient<NuGetApiClient>();
 
         // Register jobs
         builder.Services.AddScoped<FetchAllPullRequestsJob>();
@@ -60,6 +61,7 @@ public class RegisterServices : IComposer
         builder.Services.AddScoped<FetchRecentIssuesJob>();
         builder.Services.AddScoped<FetchHqMembersJob>();
         builder.Services.AddScoped<FetchReleaseDiscussionsJob>();
+        builder.Services.AddScoped<FetchNuGetPackageVersionsJob>();
 
     }
 }

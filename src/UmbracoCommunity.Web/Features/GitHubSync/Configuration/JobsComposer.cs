@@ -66,6 +66,16 @@ public class JobsComposer : IComposer
             {
                 TimeZone = TimeZoneInfo.Utc
             });
+
+        // NuGet package versions sync - Daily at 5 AM
+        RecurringJob.AddOrUpdate<FetchNuGetPackageVersionsJob>(
+            "fetch-nuget-package-versions",
+            job => job.ExecuteAsync(null, CancellationToken.None),
+            GetCronExpression("0 5 * * *"), // Cron: Daily at 5 AM
+            new RecurringJobOptions
+            {
+                TimeZone = TimeZoneInfo.Utc
+            });
     }
 
     private static string GetCronExpression(string productionCron)

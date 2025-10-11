@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
@@ -11,35 +12,32 @@ using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 namespace UmbracoCommunity.Web.Migrations
 {
     [DbContext(typeof(GitHubDbContext))]
-    [Migration("20251011102855_InitialGitHubDatabase")]
-    partial class InitialGitHubDatabase
+    [Migration("20251011121208_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.DiscussionEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<int>("Number")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Number");
 
                     b.Property<string>("RepositoryName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -54,17 +52,14 @@ namespace UmbracoCommunity.Web.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.HqMemberEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -77,23 +72,18 @@ namespace UmbracoCommunity.Web.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.IssueEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<int>("Number")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Number");
 
                     b.Property<string>("RepositoryName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -108,12 +98,10 @@ namespace UmbracoCommunity.Web.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.IssueReleaseEntity", b =>
                 {
                     b.Property<string>("IssueId")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.Property<string>("ReleaseLabel")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50);
 
                     b.HasKey("IssueId", "ReleaseLabel");
 
@@ -122,26 +110,48 @@ namespace UmbracoCommunity.Web.Migrations
                     b.ToTable("GitHubIssueReleases", (string)null);
                 });
 
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.NuGetPackageVersionEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("LastSyncedAt");
+
+                    b.Property<string>("PackageId")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.Property<DateTime>("PublishedDate");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.HasIndex("PackageId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("NuGetPackageVersions", (string)null);
+                });
+
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.PullRequestEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Data")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<int>("Number")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Number");
 
                     b.Property<string>("RepositoryName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -156,12 +166,10 @@ namespace UmbracoCommunity.Web.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.GitHubSync.Infrastructure.Entities.PullRequestReleaseEntity", b =>
                 {
                     b.Property<string>("PullRequestId")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.Property<string>("ReleaseLabel")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(50);
 
                     b.HasKey("PullRequestId", "ReleaseLabel");
 

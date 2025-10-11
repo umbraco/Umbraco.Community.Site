@@ -27,18 +27,6 @@
 </div>
 
 <div class="dc-block-list releases-container">
-    <div class="releases-header">
-        @if (!string.IsNullOrEmpty(Model.SelectedRepo))
-        {
-            <p>Repository: <strong>@Model.SelectedRepo</strong></p>
-        }
-        else
-        {
-            <h2>In progress</h2>
-            <p class="subtitle">Versions of Umbraco currently in production</p>
-        }
-    </div>
-
     @if (string.IsNullOrEmpty(Model.SelectedRepo))
     {
         @* Show upcoming releases timeline when no repo is selected *@
@@ -50,21 +38,51 @@
             </div>
         }
 
-        @if (Model.LatestRelease != null)
+        @if (Model.LtsReleases.Any() || Model.LatestRelease != null)
         {
-            <div class="latest-release-section">
-                <h2>Latest Release</h2>
-                <div class="release-timeline-item latest">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <h3><a href="?repo=Umbraco-CMS&release=@Model.LatestRelease.ReleaseLabel">@Model.LatestRelease.Version</a></h3>
-                        <p class="release-date">Released on: @Model.LatestRelease.FormattedReleaseDate</p>
-                        <div class="release-stats">
-                            <span>Features: @Model.LatestRelease.FeatureCount</span>
-                            <span>Issues: @Model.LatestRelease.IssueCount</span>
-                            <span>Breaking changes: @Model.LatestRelease.BreakingChangesCount</span>
+            // If the latest release is an LTS, only show LTS releases
+            var showLatestRelease = Model.LatestRelease != null && !Model.LatestRelease.IsLts;
+            
+            <div class="current-releases-section">
+                <h2>Current Umbraco-CMS releases</h2>
+                <div class="current-releases-grid">
+                    @if (Model.LtsReleases.Any())
+                    {
+                        @foreach (var release in Model.LtsReleases)
+                        {
+                            var ltsMajorVersion = release.Version.Split('.')[0];
+                            <div class="release-card lts">
+                                <div class="release-card-badge">Recommended for most users</div>
+                                <h3>
+                                    <a href="?repo=Umbraco-CMS&release=@release.ReleaseLabel">Umbraco @ltsMajorVersion</a>
+                                    <span class="lts-badge">LTS</span>
+                                </h3>
+                                <p class="release-version">Latest: @release.DisplayVersion</p>
+                                <p class="release-date">Released: @release.FormattedReleaseDate</p>
+                                <div class="release-stats">
+                                    <span>Features: @release.FeatureCount</span>
+                                    <span>Issues: @release.IssueCount</span>
+                                    <span>Breaking changes: @release.BreakingChangesCount</span>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @if (showLatestRelease)
+                    {
+                        var latestMajorVersion = Model.LatestRelease.Version.Split('.')[0];
+                        <div class="release-card latest">
+                            <div class="release-card-badge">Latest features</div>
+                            <h3><a href="?repo=Umbraco-CMS&release=@Model.LatestRelease.ReleaseLabel">Umbraco @latestMajorVersion</a></h3>
+                            <p class="release-version">Latest: @Model.LatestRelease.DisplayVersion</p>
+                            <p class="release-date">Released: @Model.LatestRelease.FormattedReleaseDate</p>
+                            <div class="release-stats">
+                                <span>Features: @Model.LatestRelease.FeatureCount</span>
+                                <span>Issues: @Model.LatestRelease.IssueCount</span>
+                                <span>Breaking changes: @Model.LatestRelease.BreakingChangesCount</span>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         }
@@ -72,27 +90,24 @@
         @if (Model.UpcomingReleases.Any())
         {
             <div class="upcoming-releases-section">
-                <h2>Upcoming Releases</h2>
-                <div class="release-timeline">
+                <h2>Upcoming releases</h2>
+                <div class="upcoming-releases-list">
                     @foreach (var release in Model.UpcomingReleases)
                     {
-                        <div class="release-timeline-item @(release.ReleaseDate.HasValue && !release.IsReleaseDateTba ? "" : "tba")">
-                            <div class="timeline-marker"></div>
-                            <div class="timeline-content">
-                                <h3><a href="?repo=Umbraco-CMS&release=@release.ReleaseLabel">@release.Version</a></h3>
-                                @if (release.IsReleaseDateTba || !release.ReleaseDate.HasValue)
-                                {
-                                    <p class="release-date candidate">Release candidate available</p>
-                                }
-                                else
-                                {
-                                    <p class="release-date">Release date: @release.FormattedReleaseDate</p>
-                                }
-                                <div class="release-stats">
-                                    <span>Features: @release.FeatureCount</span>
-                                    <span>Issues: @release.IssueCount</span>
-                                    <span>Breaking changes: @release.BreakingChangesCount</span>
-                                </div>
+                        <div class="upcoming-release-item">
+                            <h3><a href="?repo=Umbraco-CMS&release=@release.ReleaseLabel">@release.Version</a></h3>
+                            @if (release.IsReleaseDateTba || !release.ReleaseDate.HasValue)
+                            {
+                                <p class="release-date">Release date: to be determined</p>
+                            }
+                            else
+                            {
+                                <p class="release-date">Release date: @release.FormattedReleaseDate</p>
+                            }
+                            <div class="release-stats">
+                                <span>Features: @release.FeatureCount</span>
+                                <span>Issues: @release.IssueCount</span>
+                                <span>Breaking changes: @release.BreakingChangesCount</span>
                             </div>
                         </div>
                     }

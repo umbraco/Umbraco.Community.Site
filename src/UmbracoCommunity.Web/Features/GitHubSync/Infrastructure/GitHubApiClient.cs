@@ -202,7 +202,7 @@ public class GitHubApiClient
         var repositories = specificRepo != null
             ? new List<string> { specificRepo }
             : _options.Repositories.Count > 0
-                ? _options.Repositories
+                ? _options.Repositories.Select(r => r.Name).ToList()
                 : await FetchAllRepositoriesAsync(log, cancellationToken);
 
         var allPRs = new List<GitHubPullRequest>();
@@ -234,7 +234,7 @@ public class GitHubApiClient
         var repositories = specificRepo != null
             ? new List<string> { specificRepo }
             : _options.Repositories.Count > 0
-                ? _options.Repositories
+                ? _options.Repositories.Select(r => r.Name).ToList()
                 : await FetchAllRepositoriesAsync(log, cancellationToken);
 
         var allIssues = new List<GitHubIssue>();
@@ -267,7 +267,7 @@ public class GitHubApiClient
         var repositories = specificRepo != null
             ? new List<string> { specificRepo }
             : _options.Repositories.Count > 0
-                ? _options.Repositories
+                ? _options.Repositories.Select(r => r.Name).ToList()
                 : await FetchAllRepositoriesAsync(log, cancellationToken);
 
         var allPRs = new List<GitHubPullRequest>();
@@ -300,7 +300,7 @@ public class GitHubApiClient
         var repositories = specificRepo != null
             ? new List<string> { specificRepo }
             : _options.Repositories.Count > 0
-                ? _options.Repositories
+                ? _options.Repositories.Select(r => r.Name).ToList()
                 : await FetchAllRepositoriesAsync(log, cancellationToken);
 
         var allIssues = new List<GitHubIssue>();

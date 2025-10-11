@@ -473,4 +473,67 @@ public class GitHubSqlStore
 
         return false;
     }
+
+    public GitHubSyncResult UpsertNuGetPackageVersions(string packageId, Dictionary<string, DateTime> versions)
+    {
+        return UpsertNuGetPackageVersionsAsync(packageId, versions).GetAwaiter().GetResult();
+    }
+
+    private async Task<GitHubSyncResult> UpsertNuGetPackageVersionsAsync(string packageId, Dictionary<string, DateTime> versions)
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+        var result = new GitHubSyncResult();
+        var now = DateTime.UtcNow;
+
+        foreach (var kvp in versions)
+        {
+            var version = kvp.Key;
+            var publishedDate = kvp.Value;
+
+            var entity = await context.NuGetPackageVersions
+                .FirstOrDefaultAsync(e => e.PackageId == packageId && e.Version == version);
+
+            if (entity == null)
+            {
+                entity = new NuGetPackageVersionEntity
+                {
+                    PackageId = packageId,
+                    Version = version,
+                    PublishedDate = publishedDate,
+                    LastSyncedAt = now
+                };
+                context.NuGetPackageVersions.Add(entity);
+                result.Added++;
+            }
+            else
+            {
+                entity.PublishedDate = publishedDate;
+                entity.LastSyncedAt = now;
+                result.Updated++;
+            }
+        }
+
+        await context.SaveChangesAsync();
+
+        // Clear cache for NuGet versions
+        _memoryCache.Remove($"NuGet_{packageId}_Versions");
+
+        return result;
+    }
+
+    public Dictionary<string, DateTime> GetNuGetPackageVersions(string packageId)
+    {
+        return GetNuGetPackageVersionsAsync(packageId).GetAwaiter().GetResult();
+    }
+
+    private async Task<Dictionary<string, DateTime>> GetNuGetPackageVersionsAsync(string packageId)
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+
+        var versions = await context.NuGetPackageVersions
+            .Where(e => e.PackageId == packageId)
+            .ToDictionaryAsync(e => e.Version, e => e.PublishedDate);
+
+        return versions;
+    }
 }

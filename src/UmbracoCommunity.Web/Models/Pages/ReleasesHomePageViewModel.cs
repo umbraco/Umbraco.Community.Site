@@ -17,6 +17,7 @@ namespace UmbracoCommunity.Web.Models.Pages
         public string UmbracoLogoPath { get; set; } = "/img/umbraco_logo.png";
         public List<ReleaseDiscussionViewModel> UpcomingReleases { get; set; } = new();
         public ReleaseDiscussionViewModel? LatestRelease { get; set; }
+        public List<ReleaseDiscussionViewModel> LtsReleases { get; set; } = new();
         public ReleaseDiscussionViewModel? ReleaseInfo { get; set; }
     }
 }

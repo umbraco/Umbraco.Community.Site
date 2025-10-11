@@ -310,6 +310,141 @@ uui-badge[color="warning"] {
     color: #000 !important;
 }
 
+/* Current releases card layout */
+.current-releases-section {
+    margin-bottom: 0;
+}
+
+.current-releases-section h2 {
+    margin-bottom: 2rem;
+    margin-top: 0;
+    color: #3544b1;
+}
+
+.current-releases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 0;
+}
+
+.release-card {
+    position: relative;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    background-color: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.release-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.release-card h3 a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.release-card-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.4rem 1rem;
+    background-color: #3544b1;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 4px;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+
+.release-card.lts .release-card-badge {
+    background-color: #3544b1;
+}
+
+.release-card.latest .release-card-badge {
+    background-color: #22c55e;
+}
+
+.release-card h3 {
+    margin: 1.5rem 0 0.5rem 0;
+    font-size: 2rem;
+    color: #1a1a1a;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.release-card h3 a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.release-card h3 a:hover {
+    color: #3544b1;
+}
+
+.lts-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #3544b1;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.release-card .release-version {
+    margin: 0.5rem 0 0 0;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.release-card .release-date {
+    margin: 0.25rem 0 1rem 0;
+    color: #666;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.release-card .release-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.release-card .release-stats span {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .current-releases-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Timeline styles */
 .subtitle {
     font-style: italic;
@@ -337,16 +472,84 @@ uui-badge[color="warning"] {
     font-family: monospace;
 }
 
-.latest-release-section,
 .upcoming-releases-section {
-    margin: 2rem 0;
+    margin: -2rem 0 2rem 0;
 }
 
-.latest-release-section h2,
 .upcoming-releases-section h2 {
     font-size: 1.75rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
     color: #3544b1;
+}
+
+.upcoming-releases-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.upcoming-release-item {
+    position: relative;
+    padding: 2rem;
+    background-color: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+
+.upcoming-release-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #3544b1;
+}
+
+.upcoming-release-item h3 a::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.upcoming-release-item h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.upcoming-release-item h3 a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+.upcoming-release-item h3 a:hover {
+    color: #3544b1;
+}
+
+.upcoming-release-item .release-date {
+    margin: 0 0 1rem 0;
+    color: #666;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.upcoming-release-item .release-stats {
+    display: flex;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.upcoming-release-item .release-stats span {
+    display: flex;
+    align-items: center;
 }
 
 .release-timeline {

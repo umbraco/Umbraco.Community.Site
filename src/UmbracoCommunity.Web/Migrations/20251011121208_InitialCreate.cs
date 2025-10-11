@@ -6,22 +6,20 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UmbracoCommunity.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialGitHubDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            var isSqlite = migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.Sqlite";
-
             migrationBuilder.CreateTable(
                 name: "GitHubDiscussions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
-                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(maxLength: 100, nullable: false),
+                    Number = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Data = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,9 +30,9 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubHqMembers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    Login = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(maxLength: 100, nullable: false),
+                    Login = table.Column<string>(maxLength: 100, nullable: false),
+                    Data = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,11 +43,11 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubIssues",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
-                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(maxLength: 100, nullable: false),
+                    Number = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Data = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,11 +58,11 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubPullRequests",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
-                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(maxLength: 100, nullable: false),
+                    Number = table.Column<int>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Data = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,11 +70,28 @@ namespace UmbracoCommunity.Web.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NuGetPackageVersions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1")
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PackageId = table.Column<string>(maxLength: 200, nullable: false),
+                    Version = table.Column<string>(maxLength: 50, nullable: false),
+                    PublishedDate = table.Column<DateTime>(nullable: false),
+                    LastSyncedAt = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NuGetPackageVersions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GitHubIssueReleases",
                 columns: table => new
                 {
-                    IssueId = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    ReleaseLabel = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(50)", maxLength: 50, nullable: false)
+                    IssueId = table.Column<string>(maxLength: 100, nullable: false),
+                    ReleaseLabel = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -93,8 +108,8 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubPullRequestReleases",
                 columns: table => new
                 {
-                    PullRequestId = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
-                    ReleaseLabel = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(50)", maxLength: 50, nullable: false)
+                    PullRequestId = table.Column<string>(maxLength: 100, nullable: false),
+                    ReleaseLabel = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -155,6 +170,17 @@ namespace UmbracoCommunity.Web.Migrations
                 table: "GitHubPullRequests",
                 columns: new[] { "RepositoryName", "Number" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NuGetPackageVersions_PackageId",
+                table: "NuGetPackageVersions",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NuGetPackageVersions_PackageId_Version",
+                table: "NuGetPackageVersions",
+                columns: new[] { "PackageId", "Version" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -171,6 +197,9 @@ namespace UmbracoCommunity.Web.Migrations
 
             migrationBuilder.DropTable(
                 name: "GitHubPullRequestReleases");
+
+            migrationBuilder.DropTable(
+                name: "NuGetPackageVersions");
 
             migrationBuilder.DropTable(
                 name: "GitHubIssues");
