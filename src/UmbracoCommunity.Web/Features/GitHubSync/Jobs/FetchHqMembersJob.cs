@@ -11,12 +11,12 @@ namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 public class FetchHqMembersJob
 {
     private readonly GitHubApiClient _apiClient;
-    private readonly GitHubCosmosDbStore _dataStore;
+    private readonly GitHubSqlStore _dataStore;
     private readonly GitHubSyncOptions _options;
 
     public FetchHqMembersJob(
         GitHubApiClient apiClient,
-        GitHubCosmosDbStore dataStore,
+        GitHubSqlStore dataStore,
         IOptions<GitHubSyncOptions> options)
     {
         _apiClient = apiClient;
@@ -65,6 +65,7 @@ public class FetchHqMembersJob
                         // Add new member with open-ended period
                         existingMembersFromDb[login] = new GitHubHqMember
                         {
+                            Id = login,
                             Login = login,
                             Name = name,
                             Periods = new List<EmploymentPeriod>

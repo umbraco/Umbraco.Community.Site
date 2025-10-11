@@ -421,6 +421,7 @@ public class GitHubApiClient
                         {
                             prs.Add(new GitHubPullRequest
                             {
+                                Id = $"{repoName}#{pr.Number}",
                                 Title = pr.Title,
                                 Number = pr.Number,
                                 Url = pr.Url,
@@ -575,6 +576,7 @@ public class GitHubApiClient
                         {
                             issues.Add(new GitHubIssue
                             {
+                                Id = $"{repoName}#{issue.Number}",
                                 Title = issue.Title,
                                 Number = issue.Number,
                                 Url = issue.Url,
@@ -682,6 +684,7 @@ public class GitHubApiClient
 
                     discussions.Add(new GitHubDiscussion
                     {
+                        Id = $"{repositoryName}#{discussion.Number}",
                         Title = discussion.Title,
                         Number = discussion.Number,
                         Url = discussion.Url,

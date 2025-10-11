@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
@@ -9,13 +10,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
     internal class ReleasesHomePageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<ReleasesHomePageViewModel>
     {
-        private readonly GitHubCosmosDbStore _dataStore;
+        private readonly GitHubSqlStore _dataStore;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
-        public ReleasesHomePageViewModelBuilder(GitHubCosmosDbStore dataStore, IHttpContextAccessor httpContextAccessor)
+        public ReleasesHomePageViewModelBuilder(GitHubSqlStore dataStore, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache)
         {
             _dataStore = dataStore;
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
         }
 
         public ReleaseDiscussionViewModel? ParseReleaseDiscussion(Features.GitHubSync.Models.GitHubDiscussion discussion,
@@ -192,7 +195,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         AuthorLogin = authorLogin,
                         AuthorName = pr.Author?.Name,
                         AuthorUrl = pr.Author?.Url,
-                        AvatarUrl = authorLogin != "unknown" ? $"https://github.com/{authorLogin}.png" : null,
+                        AvatarUrl = !isHqMember && authorLogin != "unknown" ? $"https://github.com/{authorLogin}.png" : null,
                         CreatedAt = pr.CreatedAt,
                         Labels = pr.Labels,
                         IsHqMember = isHqMember,
@@ -230,7 +233,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         AuthorLogin = authorLogin,
                         AuthorName = issue.Author?.Name,
                         AuthorUrl = issue.Author?.Url,
-                        AvatarUrl = authorLogin != "unknown" ? $"https://github.com/{authorLogin}.png" : null,
+                        AvatarUrl = !isHqMember && authorLogin != "unknown" ? $"https://github.com/{authorLogin}.png" : null,
                         CreatedAt = issue.CreatedAt,
                         Labels = issue.Labels,
                         IsHqMember = isHqMember,
@@ -273,7 +276,27 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             viewModel.Releases = releases;
-            viewModel.AvailableReleases = releaseGroups.Keys.OrderByDescending(ParseVersion).ToList();
+
+            // Get all unique release labels from PRs and Issues to populate the dropdown
+            // Cache this list since it doesn't change between sync jobs
+            var cacheKey = $"AvailableReleases_{repo}";
+            var allReleaseLabels = _memoryCache.GetOrCreate(cacheKey, entry =>
+            {
+                // Cache indefinitely - will be cleared by sync jobs when data changes
+                entry.Priority = CacheItemPriority.Normal;
+
+                var allReleasePrs = _dataStore.GetPullRequestsByLabelPattern(repo, "release/").ToList();
+                var allReleaseIssues = _dataStore.GetIssuesByLabelPattern(repo, "release/").ToList();
+
+                return allReleasePrs
+                    .SelectMany(pr => pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase)))
+                    .Concat(allReleaseIssues.SelectMany(i => i.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))))
+                    .Distinct()
+                    .OrderByDescending(ParseVersion)
+                    .ToList();
+            });
+
+            viewModel.AvailableReleases = allReleaseLabels!;
 
             return viewModel;
         }

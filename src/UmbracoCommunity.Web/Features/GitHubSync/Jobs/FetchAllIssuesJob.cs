@@ -8,11 +8,11 @@ namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 public class FetchAllIssuesJob
 {
     private readonly GitHubApiClient _apiClient;
-    private readonly GitHubCosmosDbStore _dataStore;
+    private readonly GitHubSqlStore _dataStore;
 
     public FetchAllIssuesJob(
         GitHubApiClient apiClient,
-        GitHubCosmosDbStore dataStore)
+        GitHubSqlStore dataStore)
     {
         _apiClient = apiClient;
         _dataStore = dataStore;

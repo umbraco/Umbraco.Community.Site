@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.GitHubSync.Jobs;
@@ -13,11 +14,24 @@ public class RegisterServices : IComposer
         builder.Services.AddHttpClient();
         builder.Services.Configure<GitHubSyncOptions>(
             builder.Config.GetSection(GitHubSyncOptions.SectionName));
-        
+
+        // Register SQL Server DbContext (using Umbraco's connection string)
+        builder.Services.AddDbContextFactory<GitHubDbContext>((serviceProvider, options) =>
+        {
+            var connectionString = builder.Config["ConnectionStrings:umbracoDbDSN"];
+            options.UseSqlServer(connectionString, sqlOptions =>
+            {
+                sqlOptions.MigrationsAssembly("UmbracoCommunity.Web");
+            });
+        });
+
+        // Register automatic database migration on startup
+        builder.Services.AddHostedService<DatabaseMigrationHostedService>();
+
         // Register infrastructure
-        builder.Services.AddSingleton<GitHubCosmosDbStore>();
+        builder.Services.AddSingleton<GitHubSqlStore>();
         builder.Services.AddScoped<GitHubApiClient>();
-        
+
         // Register jobs
         builder.Services.AddScoped<FetchAllPullRequestsJob>();
         builder.Services.AddScoped<FetchAllIssuesJob>();

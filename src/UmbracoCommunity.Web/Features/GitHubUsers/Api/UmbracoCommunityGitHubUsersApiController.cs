@@ -12,11 +12,11 @@ namespace UmbracoCommunity.Web.Features.GitHubUsers.Api;
 public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUsersApiControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly GitHubCosmosDbStore _dataStore;
+    private readonly GitHubSqlStore _dataStore;
 
     public UmbracoCommunityGitHubUsersApiController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        GitHubCosmosDbStore dataStore)
+        GitHubSqlStore dataStore)
     {
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _dataStore = dataStore;
@@ -26,7 +26,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
     [ProducesResponseType<IEnumerable<GitHubHqMember>>(StatusCodes.Status200OK)]
     public IActionResult GetHqMembers()
     {
-        var members = _dataStore.GetHqMembers();
+        var members = _dataStore.GetAllHqMembers();
         return Ok(members);
     }
 
@@ -35,7 +35,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetHqMember(string login)
     {
-        var member = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
+        var member = _dataStore.GetHqMemberByLogin(login);
         if (member == null)
         {
             return NotFound();
@@ -53,7 +53,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
             return BadRequest("Login is required");
         }
 
-        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == member.Login);
+        var existing = _dataStore.GetHqMemberByLogin(member.Login);
         if (existing != null)
         {
             return BadRequest("A member with this login already exists");
@@ -63,7 +63,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         _dataStore.UpsertHqMembers(new[] { member });
 
         // Retrieve the inserted member
-        var created = _dataStore.GetHqMembers().First(m => m.Login == member.Login);
+        var created = _dataStore.GetHqMemberByLogin(member.Login)!;
         return CreatedAtAction(nameof(GetHqMember), new { login = created.Login }, created);
     }
 
@@ -73,7 +73,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult UpdateHqMember(string login, [FromBody] GitHubHqMember member)
     {
-        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
+        var existing = _dataStore.GetHqMemberByLogin(login);
         if (existing == null)
         {
             return NotFound();
@@ -93,7 +93,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         member.Id = member.Login; // Ensure the ID matches
         _dataStore.UpsertHqMembers(new[] { member });
 
-        var updated = _dataStore.GetHqMembers().First(m => m.Login == login);
+        var updated = _dataStore.GetHqMemberByLogin(login)!;
         return Ok(updated);
     }
 
@@ -102,13 +102,12 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult DeleteHqMember(string login)
     {
-        var existing = _dataStore.GetHqMembers().FirstOrDefault(m => m.Login == login);
-        if (existing == null)
+        var deleted = _dataStore.DeleteHqMemberByLogin(login);
+        if (!deleted)
         {
             return NotFound();
         }
 
-        _dataStore.DeleteHqMember(login);
         return NoContent();
     }
 }
