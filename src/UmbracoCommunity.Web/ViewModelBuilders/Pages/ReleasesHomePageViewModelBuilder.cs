@@ -360,44 +360,27 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 }
             }
 
-            // For each major version, check if there's a newer released version in NuGet than what we have in discussions
+            // For each release discussion, check if there's a newer released version in NuGet
             var now = DateTime.UtcNow;
-            var discussionsByMajor = allReleases
-                .GroupBy(r => ParseVersion(r.ReleaseLabel).Major)
-                .ToDictionary(g => g.Key, g => g.OrderByDescending(r => ParseVersion(r.ReleaseLabel)).First());
-
-            // Get all release labels from PRs/issues to know what versions exist
-            var allReleaseLabels = allPrs
-                .SelectMany(pr => pr.Labels.Where(l => l.StartsWith("release/")))
-                .Concat(allIssues.SelectMany(i => i.Labels.Where(l => l.StartsWith("release/"))))
-                .Distinct()
-                .Select(label => new { Label = label, Version = ParseVersion(label), VersionString = label.Replace("release/", "") })
-                .Where(x => x.Version.Major > 0)
-                .ToList();
-
-            // For each major version in discussions, check if NuGet has a newer version
-            foreach (var majorVersion in discussionsByMajor.Keys.ToList())
+            foreach (var release in allReleases)
             {
-                var discussionVm = discussionsByMajor[majorVersion];
+                var majorVersion = ParseVersion(release.ReleaseLabel).Major;
 
-                // Get all versions for this major from release labels
-                var versionsForMajor = allReleaseLabels
+                // Get all NuGet versions for this major that have been released (date <= now)
+                var latestNuGetVersion = nugetVersions
+                    .Where(kvp => kvp.Value <= now)
+                    .Select(kvp => new { VersionString = kvp.Key, Version = ParseVersion($"release/{kvp.Key}"), PublishedDate = kvp.Value })
                     .Where(x => x.Version.Major == majorVersion)
-                    .ToList();
-
-                // Find the highest version that exists in NuGet and has a release date in the past
-                var latestNuGetVersion = versionsForMajor
-                    .Where(x => nugetVersions.TryGetValue(x.VersionString, out var date) && date <= now)
                     .OrderByDescending(x => x.Version)
                     .FirstOrDefault();
 
-                if (latestNuGetVersion != null && ParseVersion(latestNuGetVersion.Label) > ParseVersion(discussionVm.ReleaseLabel))
+                if (latestNuGetVersion != null && latestNuGetVersion.Version > ParseVersion(release.ReleaseLabel))
                 {
                     // There's a newer version in NuGet - update the discussion VM to point to it
-                    discussionVm.ActualLatestVersion = latestNuGetVersion.VersionString;
-                    discussionVm.ReleaseLabel = latestNuGetVersion.Label;
-                    discussionVm.ReleaseDate = nugetVersions[latestNuGetVersion.VersionString];
-                    discussionVm.IsReleaseDateTba = false;
+                    release.ActualLatestVersion = latestNuGetVersion.VersionString;
+                    release.ReleaseLabel = $"release/{latestNuGetVersion.VersionString}";
+                    release.ReleaseDate = latestNuGetVersion.PublishedDate;
+                    release.IsReleaseDateTba = false;
                 }
             }
 
