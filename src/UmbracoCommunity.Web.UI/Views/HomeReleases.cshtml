@@ -3,10 +3,6 @@
 @{
 	Layout = "LayoutReleases.cshtml";
 }
-@section CSS
-{ 
-    <link rel="stylesheet" href="/css/releases.css" />
-}
 
 <div class="dc-block-list">
 	@foreach(var row in Model.BlockContent)
@@ -44,7 +40,7 @@
             var showLatestRelease = Model.LatestRelease != null && !Model.LatestRelease.IsLts;
             
             <div class="current-releases-section">
-                <h2>Current Umbraco-CMS releases</h2>
+                <h2 class="releases-section-title">Current Umbraco-CMS releases</h2>
                 <div class="current-releases-grid">
                     @if (Model.LtsReleases.Any())
                     {
@@ -53,16 +49,16 @@
                             var ltsMajorVersion = release.Version.Split('.')[0];
                             <div class="release-card lts">
                                 <div class="release-card-badge">Recommended for most users</div>
-                                <h3>
+                                <h3 class="release-card-title">
                                     <a href="?repo=Umbraco-CMS&release=@release.ReleaseLabel">Umbraco @ltsMajorVersion</a>
                                     <span class="lts-badge">LTS</span>
                                 </h3>
                                 <p class="release-version">Latest: @release.DisplayVersion</p>
                                 <p class="release-date">Released: @release.FormattedReleaseDate</p>
                                 <div class="release-stats">
-                                    <span>Features: @release.FeatureCount</span>
-                                    <span>Issues: @release.IssueCount</span>
-                                    <span>Breaking changes: @release.BreakingChangesCount</span>
+                                    <span data-count="@release.FeatureCount">Features</span>
+                                    <span data-count="@release.IssueCount">Issues</span>
+                                    <span data-count="@release.BreakingChangesCount">Breaking changes</span>
                                 </div>
                             </div>
                         }
@@ -73,13 +69,15 @@
                         var latestMajorVersion = Model.LatestRelease.Version.Split('.')[0];
                         <div class="release-card latest">
                             <div class="release-card-badge">Latest features</div>
-                            <h3><a href="?repo=Umbraco-CMS&release=@Model.LatestRelease.ReleaseLabel">Umbraco @latestMajorVersion</a></h3>
+                            <h3 class="release-card-title">
+                                <a href="?repo=Umbraco-CMS&release=@Model.LatestRelease.ReleaseLabel">Umbraco @latestMajorVersion</a>
+                            </h3>
                             <p class="release-version">Latest: @Model.LatestRelease.DisplayVersion</p>
                             <p class="release-date">Released: @Model.LatestRelease.FormattedReleaseDate</p>
                             <div class="release-stats">
-                                <span>Features: @Model.LatestRelease.FeatureCount</span>
-                                <span>Issues: @Model.LatestRelease.IssueCount</span>
-                                <span>Breaking changes: @Model.LatestRelease.BreakingChangesCount</span>
+                                <span data-count="@Model.LatestRelease.FeatureCount">Features</span>
+                                <span data-count="@Model.LatestRelease.IssueCount">Issues</span>
+                                <span data-count="@Model.LatestRelease.BreakingChangesCount">Breaking changes</span>
                             </div>
                         </div>
                     }
@@ -90,7 +88,7 @@
         @if (Model.UpcomingReleases.Any())
         {
             <div class="upcoming-releases-section">
-                <h2>Upcoming releases</h2>
+                <h2 class="releases-section-title">Upcoming releases</h2>
                 <div class="upcoming-releases-list">
                     @foreach (var release in Model.UpcomingReleases)
                     {
@@ -122,8 +120,8 @@
             @foreach (var releaseGroup in Model.Releases)
             {
                 <div class="release-group">
-                    <div>
-                        <h2>Release notes for @Model.SelectedRepo <text>v</text>@Model.ReleaseInfo.Version</h2>
+                    <div class="release-notes-header">
+                        <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
                         @if (Model.ReleaseInfo.ReleaseDate.HasValue)
                         {
                             @if (Model.ReleaseInfo.IsReleased)
@@ -139,16 +137,19 @@
                         {
                             <p class="release-date"><strong>Target release date:</strong> To be announced</p>
                         }
-                        @if (!string.IsNullOrEmpty(Model.ReleaseInfo.Description))
-                        {
-                            <div class="release-description">
-                                @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
-                            </div>
-                        }
                     </div>
+                    @if (!string.IsNullOrEmpty(Model.ReleaseInfo.Description))
+                    {
+                        <div class="release-description">
+                            @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+                        </div>
+                    }
 
                     <div class="contributors-summary">
-                        <h2>Contributors</h2>
+                        <details class="contributors-details" open>
+                            <summary>
+                                <h2>Contributors</h2>
+                            </summary>
                         <p>Of the @releaseGroup.TotalCount bug fixes and feature additions in @releaseGroup.ReleaseLabel, a total of @releaseGroup.CommunityCount of them have been contributed by the community, by @releaseGroup.UniqueCommunityContributorsCount unique contributors.</p>
                         @if (releaseGroup.FirstTimeContributorsCount > 0)
                         {
@@ -204,9 +205,11 @@
                                                     firstTimers++;
                                                     <span class="first-time-star">⭐</span>
                                                 }
-                                                @contributor.Name
+                                                @contributor.Name<br/><span>@contributor.ContributionCount PR@(contributor.ContributionCount == 1 ? "" : "s")</span>
                                             </span>
+                                            
                                         </a>
+                                        
                                     }
                                 </div>
                                 @if (firstTimers > 0){
@@ -214,6 +217,7 @@
                                 }
                             </div>
                         }
+                        </details>
                     </div>
 
                     <div class="release-categories">
@@ -247,7 +251,7 @@
 
                                         <div class="pr-content">
                                             <p class="pr-title">
-                                                <a href="@pr.Url" target="_blank" class="pr-number @(pr.IsIssue ? "pr-issue" : "")">#@pr.Number</a>
+                                                <a href="@pr.Url" target="_blank" class="pr-number pr-main-link @(pr.IsIssue ? "pr-issue" : "")">#@pr.Number</a>
                                                 @pr.Title
                                                 @if (pr.AlertMessage != null)
                                                 {
