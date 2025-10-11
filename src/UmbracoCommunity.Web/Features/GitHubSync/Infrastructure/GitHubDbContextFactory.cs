@@ -9,8 +9,8 @@ public class GitHubDbContextFactory : IDesignTimeDbContextFactory<GitHubDbContex
     {
         var optionsBuilder = new DbContextOptionsBuilder<GitHubDbContext>();
 
-        // Use a placeholder connection string for design-time migrations
-        // At runtime, the actual connection string from umbracoDbDSN will be used
+        // Use SQL Server for design-time migrations
+        // At runtime, the actual connection string and provider from configuration will be used
         optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=UmbracoCommunity;Trusted_Connection=True;");
 
         return new GitHubDbContext(optionsBuilder.Options);

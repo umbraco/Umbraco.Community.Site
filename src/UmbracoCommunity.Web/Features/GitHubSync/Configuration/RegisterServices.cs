@@ -23,7 +23,12 @@ public class RegisterServices : IComposer
 
             if (providerName == "Microsoft.Data.Sqlite")
             {
-                options.UseSqlite(connectionString, sqliteOptions =>
+                // Resolve |DataDirectory| to the correct Umbraco data directory
+                var hostingEnvironment = serviceProvider.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+                var dataDirectory = System.IO.Path.Combine(hostingEnvironment.ContentRootPath, "umbraco", "Data");
+                var resolvedConnectionString = connectionString?.Replace("|DataDirectory|", dataDirectory);
+
+                options.UseSqlite(resolvedConnectionString, sqliteOptions =>
                 {
                     sqliteOptions.MigrationsAssembly("UmbracoCommunity.Web");
                 });

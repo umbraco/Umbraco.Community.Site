@@ -20,8 +20,6 @@ public class GitHubDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        var isSqlite = Database.IsSqlite();
-
         // PullRequest configuration
         modelBuilder.Entity<PullRequestEntity>(entity =>
         {
@@ -31,7 +29,7 @@ public class GitHubDbContext : DbContext
             entity.Property(e => e.RepositoryName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Number).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
-            entity.Property(e => e.Data).IsRequired().HasColumnType(isSqlite ? "TEXT" : "nvarchar(max)");
+            entity.Property(e => e.Data).IsRequired();
 
             entity.HasIndex(e => new { e.RepositoryName, e.Number }).IsUnique();
             entity.HasIndex(e => e.CreatedAt);
@@ -46,7 +44,7 @@ public class GitHubDbContext : DbContext
             entity.Property(e => e.RepositoryName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Number).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
-            entity.Property(e => e.Data).IsRequired().HasColumnType(isSqlite ? "TEXT" : "nvarchar(max)");
+            entity.Property(e => e.Data).IsRequired();
 
             entity.HasIndex(e => new { e.RepositoryName, e.Number }).IsUnique();
             entity.HasIndex(e => e.CreatedAt);
@@ -61,7 +59,7 @@ public class GitHubDbContext : DbContext
             entity.Property(e => e.RepositoryName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Number).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
-            entity.Property(e => e.Data).IsRequired().HasColumnType(isSqlite ? "TEXT" : "nvarchar(max)");
+            entity.Property(e => e.Data).IsRequired();
 
             entity.HasIndex(e => new { e.RepositoryName, e.Number }).IsUnique();
             entity.HasIndex(e => e.CreatedAt);
@@ -74,7 +72,7 @@ public class GitHubDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasMaxLength(100);
             entity.Property(e => e.Login).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Data).IsRequired().HasColumnType(isSqlite ? "TEXT" : "nvarchar(max)");
+            entity.Property(e => e.Data).IsRequired();
 
             entity.HasIndex(e => e.Login).IsUnique();
         });

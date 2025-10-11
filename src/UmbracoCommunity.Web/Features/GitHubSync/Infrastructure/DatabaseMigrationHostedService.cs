@@ -1,7 +1,9 @@
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.IO;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 
@@ -10,15 +12,18 @@ public class DatabaseMigrationHostedService : IHostedService
     private readonly IDbContextFactory<GitHubDbContext> _contextFactory;
     private readonly ILogger<DatabaseMigrationHostedService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly IIOHelper _ioHelper;
 
     public DatabaseMigrationHostedService(
         IDbContextFactory<GitHubDbContext> contextFactory,
         ILogger<DatabaseMigrationHostedService> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IIOHelper ioHelper)
     {
         _contextFactory = contextFactory;
         _logger = logger;
         _configuration = configuration;
+        _ioHelper = ioHelper;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -28,7 +33,32 @@ public class DatabaseMigrationHostedService : IHostedService
             _logger.LogInformation("Applying GitHub database migrations...");
             using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
 
+            var connectionString = context.Database.GetConnectionString();
+            _logger.LogInformation("Using connection string: {ConnectionString}", connectionString);
+
             var isSqlite = context.Database.IsSqlite();
+            _logger.LogInformation("Database provider: {Provider}", isSqlite ? "SQLite" : "SQL Server");
+
+            // Ensure the directory exists for SQLite database
+            if (isSqlite && connectionString != null)
+            {
+                var builder = new SqliteConnectionStringBuilder(connectionString);
+                var dbPath = builder.DataSource;
+                var directory = Path.GetDirectoryName(dbPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                    _logger.LogInformation("Created directory for SQLite database: {Directory}", directory);
+                }
+            }
+
+            // Log the actual database file path for SQLite
+            if (isSqlite)
+            {
+                await context.Database.OpenConnectionAsync(cancellationToken);
+                var actualPath = context.Database.GetDbConnection().DataSource;
+                _logger.LogInformation("Actual SQLite database file path: {Path}", actualPath);
+            }
 
             // Check if tables already exist
             var tablesExist = false;

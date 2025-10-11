@@ -11,15 +11,17 @@ namespace UmbracoCommunity.Web.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            var isSqlite = migrationBuilder.ActiveProvider == "Microsoft.EntityFrameworkCore.Sqlite";
+
             migrationBuilder.CreateTable(
                 name: "GitHubDiscussions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
+                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,9 +32,9 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubHqMembers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Login = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    Login = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,11 +45,11 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubIssues",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
+                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,11 +60,11 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubPullRequests",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    RepositoryName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Number = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    RepositoryName = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    Number = table.Column<int>(type: isSqlite ? "INTEGER" : "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: isSqlite ? "TEXT" : "datetime2", nullable: false),
+                    Data = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,8 +75,8 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubIssueReleases",
                 columns: table => new
                 {
-                    IssueId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ReleaseLabel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    IssueId = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    ReleaseLabel = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,8 +93,8 @@ namespace UmbracoCommunity.Web.Migrations
                 name: "GitHubPullRequestReleases",
                 columns: table => new
                 {
-                    PullRequestId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ReleaseLabel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    PullRequestId = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(100)", maxLength: 100, nullable: false),
+                    ReleaseLabel = table.Column<string>(type: isSqlite ? "TEXT" : "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
