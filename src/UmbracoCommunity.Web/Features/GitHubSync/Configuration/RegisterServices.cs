@@ -15,14 +15,30 @@ public class RegisterServices : IComposer
         builder.Services.Configure<GitHubSyncOptions>(
             builder.Config.GetSection(GitHubSyncOptions.SectionName));
 
-        // Register SQL Server DbContext (using Umbraco's connection string)
+        // Register DbContext (using Umbraco's connection string and provider)
         builder.Services.AddDbContextFactory<GitHubDbContext>((serviceProvider, options) =>
         {
             var connectionString = builder.Config["ConnectionStrings:umbracoDbDSN"];
-            options.UseSqlServer(connectionString, sqlOptions =>
+            var providerName = builder.Config["ConnectionStrings:umbracoDbDSN_ProviderName"];
+
+            if (providerName == "Microsoft.Data.Sqlite")
             {
-                sqlOptions.MigrationsAssembly("UmbracoCommunity.Web");
-            });
+                options.UseSqlite(connectionString, sqliteOptions =>
+                {
+                    sqliteOptions.MigrationsAssembly("UmbracoCommunity.Web");
+                });
+            }
+            else
+            {
+                options.UseSqlServer(connectionString, sqlOptions =>
+                {
+                    sqlOptions.MigrationsAssembly("UmbracoCommunity.Web");
+                });
+            }
+
+            // Suppress the pending model changes warning since we're handling both SQL Server and SQLite
+            options.ConfigureWarnings(warnings =>
+                warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         });
 
         // Register automatic database migration on startup
