@@ -119,55 +119,33 @@
     {
         @if (Model.AvailableReleases.Any())
         {
-            <div class="releases-filters">
-                <label>Filter by release:</label>
-                <select id="releaseFilter">
-                    @foreach (var release in Model.AvailableReleases)
-                    {
-                        <option value="@release" selected="@(release == Model.SelectedRelease)">@release</option>
-                    }
-                </select>
-
-                @if (!string.IsNullOrEmpty(Model.SelectedRelease))
-                {
-                    <a href="?repo=@Model.SelectedRepo">Clear filter</a>
-                }
-            </div>
-
             @foreach (var releaseGroup in Model.Releases)
             {
                 <div class="release-group">
-                    <div class="release-header">
-                        <h2>@releaseGroup.ReleaseLabel</h2>
-                    </div>
-
-                    @if (Model.ReleaseInfo != null && Model.ReleaseInfo.ReleaseLabel == releaseGroup.ReleaseLabel)
-                    {
-                        <div>
-                            <h2>Release notes</h2>
-                            @if (Model.ReleaseInfo.ReleaseDate.HasValue)
+                    <div>
+                        <h2>Release notes for @Model.SelectedRepo <text>v</text>@Model.ReleaseInfo.Version</h2>
+                        @if (Model.ReleaseInfo.ReleaseDate.HasValue)
+                        {
+                            @if (Model.ReleaseInfo.IsReleased)
                             {
-                                @if (Model.ReleaseInfo.IsReleased)
-                                {
-                                    <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
-                                }
-                                else
-                                {
-                                    <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
-                                }
+                                <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
                             }
                             else
                             {
-                                <p class="release-date"><strong>Target release date:</strong> To be announced</p>
+                                <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
                             }
-                            @if (!string.IsNullOrEmpty(Model.ReleaseInfo.Description))
-                            {
-                                <div class="release-description">
-                                    @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
-                                </div>
-                            }
-                        </div>
-                    }
+                        }
+                        else
+                        {
+                            <p class="release-date"><strong>Target release date:</strong> To be announced</p>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ReleaseInfo.Description))
+                        {
+                            <div class="release-description">
+                                @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+                            </div>
+                        }
+                    </div>
 
                     <div class="contributors-summary">
                         <h2>Contributors</h2>
@@ -184,6 +162,58 @@
                                 🏆
                             </p>
                         }
+
+                        @{
+                            var communityContributors = releaseGroup.PullRequests
+                                .Where(pr => !pr.IsHqMember && !pr.IsIssue)
+                                .GroupBy(pr => pr.AuthorLogin)
+                                .Select(g => new
+                                {
+                                    Login = g.Key,
+                                    Name = g.First().AuthorName ?? g.First().AuthorLogin,
+                                    AvatarUrl = g.First().AvatarUrl,
+                                    AuthorUrl = g.First().AuthorUrl,
+                                    IsFirstTime = g.First().IsFirstTimeContributor,
+                                    ContributionCount = g.Count()
+                                })
+                                .OrderBy(c => c.Name)
+                                .ToList();
+                        }
+
+                        @if (communityContributors.Any())
+                        {
+                            var firstTimers = 0;
+                            <div class="contributors-panel">
+                                <h3>All community contributors to this release</h3>
+                                <div class="contributors-grid">
+                                    @foreach (var contributor in communityContributors)
+                                    {
+                                        var contributionsUrl = $"https://github.com/umbraco/{releaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}+label:{releaseGroup.ReleaseLabel}";
+                                        <a href="@contributionsUrl" target="_blank" class="contributor-card" title="@contributor.ContributionCount @(contributor.ContributionCount == 1 ? "contribution" : "contributions") by @contributor.Name">
+                                            @if (!string.IsNullOrEmpty(contributor.AvatarUrl))
+                                            {
+                                                <img src="@contributor.AvatarUrl" alt="@contributor.Login" class="contributor-avatar" />
+                                            }
+                                            else
+                                            {
+                                                <div class="contributor-avatar-placeholder">@contributor.Name.Substring(0, 1).ToUpper()</div>
+                                            }
+                                            <span class="contributor-name">
+                                                @if (contributor.IsFirstTime)
+                                                {
+                                                    firstTimers++;
+                                                    <span class="first-time-star">⭐</span>
+                                                }
+                                                @contributor.Name
+                                            </span>
+                                        </a>
+                                    }
+                                </div>
+                                @if (firstTimers > 0){
+                                    <p>⭐ = First pull request to @Model.SelectedRepo</p>
+                                }
+                            </div>
+                        }
                     </div>
 
                     <div class="release-categories">
@@ -197,6 +227,10 @@
                             <div class="pr-list">
                                 @foreach (var pr in category.PullRequests)
                                 {
+                                    @if (pr.AlertMessage != null && !Model.LabelCheck)
+                                    {
+                                        continue;
+                                    }
                                     <div class="pr-item">
                                         @if (pr.IsHqMember)
                                         {
@@ -230,16 +264,24 @@
                                                 </div>
                                             }
                                             <div class="pr-meta">
-                                                by
-                                                @if (!string.IsNullOrEmpty(pr.AuthorUrl))
+                                                @if (pr.IsIssue)
                                                 {
-                                                    <a href="@pr.AuthorUrl" target="_blank" class="pr-author">@@@pr.AuthorLogin</a>
+                                                    <text>Issue by</text>
                                                 }
                                                 else
                                                 {
-                                                    <span>@@@pr.AuthorLogin</span>
+                                                    <text>PR by</text>
                                                 }
-                                                on @pr.CreatedAt.ToString("MMM d, yyyy")
+                                                
+                                                @if (!string.IsNullOrEmpty(pr.AuthorUrl))
+                                                {
+                                                    <a href="@pr.AuthorUrl" target="_blank" class="pr-author">@(pr.AuthorName ?? pr.AuthorLogin)</a>
+                                                }
+                                                else
+                                                {
+                                                    <span>@pr.AuthorLogin</span>
+                                                }
+                                                created on @pr.CreatedAt.ToString("MMM d, yyyy")
                                                 @if (!string.IsNullOrEmpty(pr.MergedByLogin))
                                                 {
                                                     <span>

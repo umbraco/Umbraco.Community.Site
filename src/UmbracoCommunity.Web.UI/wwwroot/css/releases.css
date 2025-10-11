@@ -216,11 +216,11 @@ body {
 }
 
 .pr-number.pr-issue {
-    color: #d42;
+    color: #3544b1;
 }
 
 .pr-number.pr-issue:hover {
-    color: #a11;
+    text-decoration: underline;
 }
 
 .pr-title {
@@ -776,4 +776,111 @@ uui-badge[color="warning"] {
 .release-group .release-description {
     margin-top: 1rem;
     color: #374151;
+}
+
+/* Contributors panel */
+.contributors-panel {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e5e5;
+}
+
+.contributors-panel h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    color: #1a1a1a;
+}
+
+.contributors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.contributor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: #fff;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    color: #1a1a1a;
+}
+
+.contributor-card:hover {
+    border-color: #3544b1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(53, 68, 177, 0.1);
+}
+
+.contributor-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e5e5e5;
+    transition: border-color 0.2s ease;
+}
+
+.contributor-card:hover .contributor-avatar {
+    border-color: #3544b1;
+}
+
+.contributor-avatar-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #3544b1;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 2px solid #e5e5e5;
+}
+
+.contributor-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+.first-time-star {
+    display: inline-block;
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-right: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .contributors-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .contributor-card {
+        padding: 0.75rem;
+    }
+
+    .contributor-avatar,
+    .contributor-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+    }
+
+    .contributor-avatar-placeholder {
+        font-size: 1.25rem;
+    }
+
+    .contributor-name {
+        font-size: 0.8125rem;
+    }
 }

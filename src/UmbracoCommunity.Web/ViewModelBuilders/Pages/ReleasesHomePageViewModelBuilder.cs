@@ -135,6 +135,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var selectedRelease = queryString?["release"].ToString();
             var compareRelease1 = queryString?["release1"].ToString();
             var compareRelease2 = queryString?["release2"].ToString();
+            var labelCheck = queryString?["labelCheck"].ToString();
+            viewModel.LabelCheck = !string.IsNullOrEmpty(labelCheck) && labelCheck.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             System.Diagnostics.Debug.WriteLine($"ReleasesViewModelBuilder.Build called. Repo: '{repo}'");
 
@@ -425,9 +427,40 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 if (releaseVm != null && releaseVm.ReleaseLabel == releaseLabel)
                 {
                     viewModel.ReleaseInfo = releaseVm;
-                    break;
+                    return;
                 }
             }
+
+            // If no discussion found, create a minimal ReleaseInfo from the label
+            var version = releaseLabel.Replace("release/", "").Trim();
+            var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
+            var (features, issues, breaking) = stats;
+
+            // Try to get release date from NuGet
+            DateTime? releaseDate = null;
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+            if (repoConfig?.HasNuGetPackage == true)
+            {
+                var nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
+                if (nugetVersions.TryGetValue(version, out var publishedDate))
+                {
+                    releaseDate = publishedDate;
+                }
+            }
+
+            viewModel.ReleaseInfo = new ReleaseDiscussionViewModel
+            {
+                Version = version,
+                ReleaseLabel = releaseLabel,
+                ReleaseDate = releaseDate,
+                IsReleaseDateTba = false,
+                IsLts = false,
+                Description = string.Empty,
+                FeatureCount = features,
+                IssueCount = issues,
+                BreakingChangesCount = breaking,
+                DiscussionUrl = string.Empty
+            };
         }
 
         private static Dictionary<string, (int features, int issues, int breaking)> CalculateReleaseStats(

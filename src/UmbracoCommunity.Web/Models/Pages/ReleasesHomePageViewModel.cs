@@ -19,5 +19,6 @@ namespace UmbracoCommunity.Web.Models.Pages
         public ReleaseDiscussionViewModel? LatestRelease { get; set; }
         public List<ReleaseDiscussionViewModel> LtsReleases { get; set; } = new();
         public ReleaseDiscussionViewModel? ReleaseInfo { get; set; }
+        public bool LabelCheck { get; set; }
     }
 }
