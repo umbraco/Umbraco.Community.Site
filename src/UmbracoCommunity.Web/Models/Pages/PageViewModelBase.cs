@@ -18,7 +18,7 @@ public abstract class PageViewModelBase
 
     public string Name { get; }
 
-    public string ContentTypeAlias { get; }
+    public string ContentTypeAlias { get; init; }
 
     public MenuViewModel Menu { get; set; } = new();
 

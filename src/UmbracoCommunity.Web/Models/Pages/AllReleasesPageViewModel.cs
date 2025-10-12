@@ -7,10 +7,9 @@ public class AllReleasesPageViewModel : PageViewModelBase
 {
     public AllReleasesPageViewModel(IPublishedContent currentPage) : base(currentPage)
     {
+        // Override to ensure the correct CSS entrypoint is loaded
+        ContentTypeAlias = "releasesHome";
     }
-
-    // Override to ensure the correct CSS entrypoint is loaded
-    public new string ContentTypeAlias => "releasesHome";
 
     public List<MajorVersionGroupViewModel> VersionGroups { get; set; } = new();
 }
