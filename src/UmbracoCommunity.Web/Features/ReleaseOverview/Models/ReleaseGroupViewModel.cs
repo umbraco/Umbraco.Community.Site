@@ -1,4 +1,4 @@
-﻿namespace UmbracoCommunity.Web.Models.ReleaseOverview;
+﻿namespace UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 
 public class ReleaseGroupViewModel
 {

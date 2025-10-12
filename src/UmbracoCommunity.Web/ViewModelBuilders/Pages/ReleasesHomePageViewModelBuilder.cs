@@ -3,8 +3,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
+using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
-using UmbracoCommunity.Web.Models.ReleaseOverview;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {

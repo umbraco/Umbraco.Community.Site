@@ -7,7 +7,7 @@ using UmbracoCommunity.Web.Attributes;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.ViewModelBuilders;
 
-namespace UmbracoCommunity.Web.Controllers
+namespace UmbracoCommunity.Web.Features.ReleaseOverview.Controllers
 {
     public class ReleasesHomeController : RenderController
     {
