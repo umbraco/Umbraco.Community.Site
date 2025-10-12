@@ -9,5 +9,8 @@ public class AllReleasesPageViewModel : PageViewModelBase
     {
     }
 
+    // Override to ensure the correct CSS entrypoint is loaded
+    public new string ContentTypeAlias => "releaseshome";
+
     public List<MajorVersionGroupViewModel> VersionGroups { get; set; } = new();
 }
