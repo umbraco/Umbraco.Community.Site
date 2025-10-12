@@ -2,24 +2,33 @@
 @model ReleaseCategoriesViewModel
 
 <div class="release-categories">
-    @foreach (var category in Model.ReleaseGroup.Categories)
+    @if (Model.ReleaseGroup.Categories.Any())
     {
-        <details class="release-category" open>
-            <summary>
-                @category.CategoryName
-                <uui-badge color="default" look="primary">@category.Count</uui-badge>
-            </summary>
-            <div class="pr-list">
-                @foreach (var pr in category.PullRequests)
-                {
-                    @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PullRequestItem.cshtml", new PullRequestItemViewModel
+        @foreach (var category in Model.ReleaseGroup.Categories)
+        {
+            <details class="release-category" open>
+                <summary>
+                    @category.CategoryName
+                    <uui-badge color="default" look="primary">@category.Count</uui-badge>
+                </summary>
+                <div class="pr-list">
+                    @foreach (var pr in category.PullRequests)
                     {
-                        PullRequest = pr,
-                        UmbracoLogoPath = Model.UmbracoLogoPath,
-                        LabelCheck = Model.LabelCheck
-                    })
-                }
-            </div>
-        </details>
+                        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PullRequestItem.cshtml", new PullRequestItemViewModel
+                        {
+                            PullRequest = pr,
+                            UmbracoLogoPath = Model.UmbracoLogoPath,
+                            LabelCheck = Model.LabelCheck
+                        })
+                    }
+                </div>
+            </details>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No related PRs or issues found on GitHub, more information might be available here: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/@Model.ReleaseGroup.ReleaseLabel.Replace("release/", "release-")" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/@Model.ReleaseGroup.ReleaseLabel.Replace("release/", "release-")</a></p>
+        </div>
     }
 </div>

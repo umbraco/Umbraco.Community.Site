@@ -4,28 +4,49 @@
 
 @if (Model.AvailableReleases.Any())
 {
-    @foreach (var releaseGroup in Model.Releases)
+    @if (Model.Releases.Any())
     {
+        @foreach (var releaseGroup in Model.Releases)
+        {
+            <div class="release-group">
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseNotesHeader.cshtml", new ReleaseNotesHeaderViewModel
+                {
+                    ReleaseInfo = Model.ReleaseInfo,
+                    SelectedRepo = Model.SelectedRepo,
+                    ReleaseGroup = releaseGroup
+                })
+
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
+                {
+                    ReleaseGroup = releaseGroup,
+                    SelectedRepo = Model.SelectedRepo
+                })
+
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCategories.cshtml", new ReleaseCategoriesViewModel
+                {
+                    ReleaseGroup = releaseGroup,
+                    UmbracoLogoPath = Model.UmbracoLogoPath,
+                    LabelCheck = Model.LabelCheck
+                })
+            </div>
+        }
+    }
+    else if (Model.ReleaseInfo != null)
+    {
+        @* Selected release has no PRs/Issues, but show the header and empty state *@
         <div class="release-group">
             @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseNotesHeader.cshtml", new ReleaseNotesHeaderViewModel
             {
                 ReleaseInfo = Model.ReleaseInfo,
                 SelectedRepo = Model.SelectedRepo,
-                ReleaseGroup = releaseGroup
+                ReleaseGroup = null
             })
 
-            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
-            {
-                ReleaseGroup = releaseGroup,
-                SelectedRepo = Model.SelectedRepo
-            })
-
-            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCategories.cshtml", new ReleaseCategoriesViewModel
-            {
-                ReleaseGroup = releaseGroup,
-                UmbracoLogoPath = Model.UmbracoLogoPath,
-                LabelCheck = Model.LabelCheck
-            })
+            <div class="release-categories">
+                <div class="empty-state">
+                    <p>No related PRs or issues found on GitHub, more information might be available here: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(Model.ReleaseInfo.Version)" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(Model.ReleaseInfo.Version)</a></p>
+                </div>
+            </div>
         </div>
     }
 }
