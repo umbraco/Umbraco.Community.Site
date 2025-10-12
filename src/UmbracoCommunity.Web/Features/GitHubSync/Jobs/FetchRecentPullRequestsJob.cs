@@ -1,7 +1,9 @@
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Server;
+using Microsoft.Extensions.Caching.Memory;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
+using UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 
@@ -9,13 +11,16 @@ public class FetchRecentPullRequestsJob
 {
     private readonly GitHubApiClient _apiClient;
     private readonly GitHubSqlStore _dataStore;
+    private readonly IMemoryCache _memoryCache;
 
     public FetchRecentPullRequestsJob(
         GitHubApiClient apiClient,
-        GitHubSqlStore dataStore)
+        GitHubSqlStore dataStore,
+        IMemoryCache memoryCache)
     {
         _apiClient = apiClient;
         _dataStore = dataStore;
+        _memoryCache = memoryCache;
     }
 
     [AutomaticRetry(Attempts = 3, DelaysInSeconds = new[] { 60, 300, 600 })]
@@ -41,6 +46,10 @@ public class FetchRecentPullRequestsJob
 
             var message = $"Sync completed: {result.Added} added, {result.Updated} updated, {result.Total} total";
             context?.WriteLine(message);
+
+            // Clear the all releases cache since data has changed
+            context?.WriteLine("Clearing all releases cache...");
+            _memoryCache.Remove(AllReleasesPageViewModelBuilder.CacheKey);
 
             // Log rate limit after completion
             context?.WriteLine("Final rate limit status:");

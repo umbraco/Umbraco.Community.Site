@@ -1,8 +1,10 @@
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.Server;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
+using UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 
@@ -11,15 +13,18 @@ public class FetchNuGetPackageVersionsJob
     private readonly NuGetApiClient _nugetClient;
     private readonly GitHubSqlStore _dataStore;
     private readonly GitHubSyncOptions _options;
+    private readonly IMemoryCache _memoryCache;
 
     public FetchNuGetPackageVersionsJob(
         NuGetApiClient nugetClient,
         GitHubSqlStore dataStore,
-        IOptions<GitHubSyncOptions> options)
+        IOptions<GitHubSyncOptions> options,
+        IMemoryCache memoryCache)
     {
         _nugetClient = nugetClient;
         _dataStore = dataStore;
         _options = options.Value;
+        _memoryCache = memoryCache;
     }
 
     [AutomaticRetry(Attempts = 3, DelaysInSeconds = new[] { 60, 300, 600 })]
@@ -61,6 +66,10 @@ public class FetchNuGetPackageVersionsJob
 
             var message = $"Sync completed: {totalAdded} added, {totalUpdated} updated across all packages";
             context?.WriteLine(message);
+
+            // Clear the all releases cache since data has changed
+            context?.WriteLine("Clearing all releases cache...");
+            _memoryCache.Remove(AllReleasesPageViewModelBuilder.CacheKey);
         }
         catch (Exception ex)
         {

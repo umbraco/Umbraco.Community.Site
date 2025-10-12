@@ -32,6 +32,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ReleasesHomePageViewModel>, ReleasesHomePageViewModelBuilder>();
+            builder.Services.AddScoped<IViewModelBuilder<AllReleasesPageViewModel>, AllReleasesPageViewModelBuilder>();
 
             builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<MenuReleasesViewModel>, MenuReleasesViewModelBuilder>();
