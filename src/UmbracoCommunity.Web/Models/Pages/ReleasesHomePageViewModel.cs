@@ -11,8 +11,6 @@ namespace UmbracoCommunity.Web.Models.Pages
         public List<ReleaseGroupViewModel> Releases { get; set; } = new();
         public string? SelectedRepo { get; set; }
         public string? SelectedRelease { get; set; }
-        public string? CompareRelease1 { get; set; }
-        public string? CompareRelease2 { get; set; }
         public List<string> AvailableReleases { get; set; } = new();
         public string UmbracoLogoPath { get; set; } = "/img/umbraco_logo.png";
         public List<ReleaseDiscussionViewModel> UpcomingReleases { get; set; } = new();

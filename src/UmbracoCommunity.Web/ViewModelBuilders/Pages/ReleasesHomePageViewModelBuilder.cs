@@ -133,8 +133,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var queryString = _httpContextAccessor.HttpContext?.Request.Query;
             var repo = queryString?["repo"].ToString();
             var selectedRelease = queryString?["release"].ToString();
-            var compareRelease1 = queryString?["release1"].ToString();
-            var compareRelease2 = queryString?["release2"].ToString();
             var labelCheck = queryString?["labelCheck"].ToString();
             viewModel.LabelCheck = !string.IsNullOrEmpty(labelCheck) && labelCheck.Equals("true", StringComparison.OrdinalIgnoreCase);
 
@@ -154,19 +152,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             viewModel.SelectedRepo = repo;
             viewModel.SelectedRelease = selectedRelease;
-            viewModel.CompareRelease1 = compareRelease1;
-            viewModel.CompareRelease2 = compareRelease2;
 
             // If a specific release is selected, only query for that release
             string labelPattern = "release/";
             if (!string.IsNullOrEmpty(selectedRelease))
             {
                 labelPattern = selectedRelease;
-            }
-            else if (!string.IsNullOrEmpty(compareRelease1) && !string.IsNullOrEmpty(compareRelease2))
-            {
-                // For comparison, we still need all releases (handled below)
-                labelPattern = "release/";
             }
 
             // Get PRs and Issues with release labels
@@ -275,18 +266,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 };
             }).OrderByDescending(r => ParseVersion(r.ReleaseLabel)).ToList();
 
-            // Filter based on selected release or comparison
+            // Filter based on selected release
             if (!string.IsNullOrEmpty(selectedRelease))
             {
                 releases = releases.Where(r => r.ReleaseLabel == selectedRelease).ToList();
 
                 // Populate release info for the selected release
                 PopulateReleaseInfo(viewModel, repo, selectedRelease);
-            }
-            else if (!string.IsNullOrEmpty(compareRelease1) && !string.IsNullOrEmpty(compareRelease2))
-            {
-                releases = releases.Where(r => r.ReleaseLabel == compareRelease1 || r.ReleaseLabel == compareRelease2)
-                    .ToList();
             }
 
             viewModel.Releases = releases;

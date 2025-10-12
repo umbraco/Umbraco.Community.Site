@@ -24,17 +24,15 @@ namespace UmbracoCommunity.Web.Features.ReleaseOverview.Controllers
         public sealed override IActionResult Index() => throw new NotImplementedException();
 
         [ApplyCommonElementsReleases]
-        public IActionResult Index(string? repo, string? release, string? release1, string? release2, CancellationToken cancellationToken)
+        public IActionResult Index(string? repo, string? release, CancellationToken cancellationToken)
         {
             ReleasesHomePageViewModel viewModel = _viewModelBuilder.Build(
                 CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null."),
                 UmbracoContext);
-            
+
             viewModel.SelectedRepo = repo;
             viewModel.SelectedRelease = release;
-            viewModel.CompareRelease1 = release1;
-            viewModel.CompareRelease2 = release2;
-            
+
             return CurrentTemplate(viewModel);
         }
     }
