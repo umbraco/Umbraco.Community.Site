@@ -1,0 +1,135 @@
+@using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ComparePageViewModel>
+@{
+    Layout = "LayoutReleases.cshtml";
+}
+
+<div class="dc-block-list releases-container compare-page">
+    <h1 class="compare-title">Compare Releases</h1>
+
+    <div class="compare-filters">
+        <form method="get" action="/compare" id="compareForm">
+            <div class="compare-dropdowns">
+                <div class="compare-dropdown-group">
+                    <label for="fromVersion">From version:</label>
+                    <select id="fromVersion" name="from" onchange="document.getElementById('compareForm').submit()">
+                        <option value="">Select version</option>
+                        @foreach (var version in Model.AvailableVersions)
+                        {
+                            @if (Model.FromVersion == version.Version)
+                            {
+                                <option value="@version.Version" selected>@version.Version</option>
+                            }
+                            else
+                            {
+                                <option value="@version.Version">@version.Version</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="compare-dropdown-group">
+                    <label for="toVersion">To version:</label>
+                    <select id="toVersion" name="to" onchange="document.getElementById('compareForm').submit()">
+                        <option value="">Select version</option>
+                        @foreach (var version in Model.AvailableVersions)
+                        {
+                            @if (Model.ToVersion == version.Version)
+                            {
+                                <option value="@version.Version" selected>@version.Version</option>
+                            }
+                            else
+                            {
+                                <option value="@version.Version">@version.Version</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <button type="submit" class="compare-button">Compare</button>
+            </div>
+        </form>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
+    {
+        <div class="compare-results">
+            <h2 class="compare-results-header">
+                Changes since @Model.LowestVersion until @Model.HighestVersion
+            </h2>
+
+            <div class="compare-summary">
+                <p><strong>@Model.FeatureCount</strong> new features and <strong>@Model.IssuesAndTasksCount</strong> issues & tasks were implemented</p>
+            </div>
+
+            <p class="upgrade-notes">
+                Make sure to read the <a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading/version-specific" target="_blank">version specific upgrades notes</a> for guidance.
+            </p>
+
+            @if (Model.VersionGroups.Any())
+            {
+                @foreach (var versionGroup in Model.VersionGroups)
+                {
+                    <div class="version-changes-group">
+                        <h3 class="version-changes-header">Changes in v@(versionGroup.Version)</h3>
+
+                        
+                        @if (!versionGroup.Features.Any() && !versionGroup.IssuesAndTasks.Any())
+                        {
+                            <div class="empty-state">
+                                <p>No known issues or PRs for this version, there may be more info on GitHub: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)</a></p>
+                            </div>
+                        }
+                        else
+                        {
+                            @if (versionGroup.Features.Any())
+                            {
+                                <div class="pr-list">
+                                    <h4 class="changes-category-header">Features</h4>
+                                    @foreach (var pr in versionGroup.Features)
+                                    {
+                                        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
+                                        {
+                                            PullRequest = pr,
+                                            UmbracoLogoPath = Model.UmbracoLogoPath,
+                                            LabelCheck = Model.LabelCheck
+                                        })
+                                    }
+                                </div>
+                            }
+
+                            @if (versionGroup.IssuesAndTasks.Any())
+                            {
+                                <div class="pr-list">
+                                    <h4 class="changes-category-header">Issues & Tasks</h4>
+                                    @foreach (var pr in versionGroup.IssuesAndTasks)
+                                    {
+                                        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
+                                        {
+                                            PullRequest = pr,
+                                            UmbracoLogoPath = Model.UmbracoLogoPath,
+                                            LabelCheck = Model.LabelCheck
+                                        })
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>No related PRs or issues found between these versions.</p>
+                </div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.FromVersion) || !string.IsNullOrEmpty(Model.ToVersion))
+    {
+        <div class="empty-state">
+            <p>Please select both versions to compare.</p>
+        </div>
+    }
+</div>
