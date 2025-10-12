@@ -10,7 +10,7 @@ public class ComparePageViewModel : PageViewModelBase
     }
 
     // Override to ensure the correct CSS entrypoint is loaded
-    public new string ContentTypeAlias => "releaseshome";
+    public new string ContentTypeAlias => "releasesHome";
 
     public List<ReleaseDiscussionViewModel> AvailableVersions { get; set; } = new();
     public string? FromVersion { get; set; }
