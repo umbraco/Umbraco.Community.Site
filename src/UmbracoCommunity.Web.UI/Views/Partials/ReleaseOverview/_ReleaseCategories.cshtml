@@ -1,0 +1,25 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model ReleaseCategoriesViewModel
+
+<div class="release-categories">
+    @foreach (var category in Model.ReleaseGroup.Categories)
+    {
+        <details class="release-category" open>
+            <summary>
+                @category.CategoryName
+                <uui-badge color="default" look="primary">@category.Count</uui-badge>
+            </summary>
+            <div class="pr-list">
+                @foreach (var pr in category.PullRequests)
+                {
+                    @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PullRequestItem.cshtml", new PullRequestItemViewModel
+                    {
+                        PullRequest = pr,
+                        UmbracoLogoPath = Model.UmbracoLogoPath,
+                        LabelCheck = Model.LabelCheck
+                    })
+                }
+            </div>
+        </details>
+    }
+</div>

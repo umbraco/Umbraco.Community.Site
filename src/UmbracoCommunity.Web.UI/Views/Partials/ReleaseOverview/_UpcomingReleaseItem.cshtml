@@ -1,0 +1,19 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model ReleaseDiscussionViewModel
+
+<div class="upcoming-release-item">
+    <h3><a href="?repo=Umbraco-CMS&release=@Model.ReleaseLabel">@Model.Version</a></h3>
+    @if (Model.IsReleaseDateTba || !Model.ReleaseDate.HasValue)
+    {
+        <p class="release-date">Release date: to be determined</p>
+    }
+    else
+    {
+        <p class="release-date">Release date: @Model.FormattedReleaseDate</p>
+    }
+    <div class="release-stats">
+        <span>Features: @Model.FeatureCount</span>
+        <span>Issues: @Model.IssueCount</span>
+        <span>Breaking changes: @Model.BreakingChangesCount</span>
+    </div>
+</div>

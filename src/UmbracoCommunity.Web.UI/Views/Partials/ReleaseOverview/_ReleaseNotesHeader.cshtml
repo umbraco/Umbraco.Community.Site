@@ -1,0 +1,36 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model ReleaseNotesHeaderViewModel
+
+<div class="release-notes-header">
+    @if (Model.ReleaseInfo != null)
+    {
+        <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
+        @if (Model.ReleaseInfo.ReleaseDate.HasValue)
+        {
+            @if (Model.ReleaseInfo.IsReleased)
+            {
+                <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+            }
+            else
+            {
+                <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+            }
+        }
+        else
+        {
+            <p class="release-date"><strong>Target release date:</strong> To be announced</p>
+        }
+    }
+    else if (Model.ReleaseGroup != null)
+    {
+        @* Comparing releases - show release label from the current group *@
+        <h2>Release notes for @Model.SelectedRepo @Model.ReleaseGroup.ReleaseLabel.Replace("release/", "v")</h2>
+    }
+</div>
+
+@if (Model.ReleaseInfo != null && !string.IsNullOrEmpty(Model.ReleaseInfo.Description))
+{
+    <div class="release-description">
+        @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+    </div>
+}
