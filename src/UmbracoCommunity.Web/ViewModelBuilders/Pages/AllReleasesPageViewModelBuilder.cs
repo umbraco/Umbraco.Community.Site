@@ -69,6 +69,8 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
             var releaseVm = ParseReleaseDiscussion(discussion, releaseStats);
             if (releaseVm != null)
             {
+                // Check if this version is available on NuGet
+                releaseVm.IsAvailableOnNuGet = nugetVersions.ContainsKey(releaseVm.Version);
                 allReleases[releaseVm.Version] = releaseVm;
             }
         }
@@ -95,7 +97,8 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
                     FeatureCount = features,
                     IssueCount = issues,
                     BreakingChangesCount = breaking,
-                    DiscussionUrl = string.Empty
+                    DiscussionUrl = string.Empty,
+                    IsAvailableOnNuGet = true // It's from NuGet
                 };
             }
             else
@@ -108,6 +111,8 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
                     existingRelease.ReleaseDate = nugetVersion.Value;
                     existingRelease.IsReleaseDateTba = false;
                 }
+                // Mark as available on NuGet since we found it there
+                existingRelease.IsAvailableOnNuGet = true;
             }
         }
 

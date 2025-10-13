@@ -52,7 +52,11 @@ public class RegisterServices : IComposer
         // Register infrastructure
         builder.Services.AddSingleton<GitHubSqlStore>();
         builder.Services.AddScoped<GitHubApiClient>();
-        builder.Services.AddHttpClient<NuGetApiClient>();
+        builder.Services.AddHttpClient<NuGetApiClient>()
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+            });
 
         // Register jobs
         builder.Services.AddScoped<FetchAllPullRequestsJob>();
@@ -62,6 +66,7 @@ public class RegisterServices : IComposer
         builder.Services.AddScoped<FetchHqMembersJob>();
         builder.Services.AddScoped<FetchReleaseDiscussionsJob>();
         builder.Services.AddScoped<FetchNuGetPackageVersionsJob>();
+        builder.Services.AddScoped<FetchRecentNuGetPackageVersionsJob>();
 
     }
 }

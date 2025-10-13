@@ -12,7 +12,8 @@ public class ReleaseDiscussionViewModel
     public int FeatureCount { get; set; }
     public int IssueCount { get; set; }
     public int BreakingChangesCount { get; set; }
-    public bool IsReleased => ReleaseDate.HasValue && ReleaseDate.Value <= DateTime.UtcNow;
+    public bool IsAvailableOnNuGet { get; set; }
+    public bool IsReleased => IsAvailableOnNuGet;
     public string DiscussionUrl { get; set; } = string.Empty;
     public string FormattedReleaseDate
     {

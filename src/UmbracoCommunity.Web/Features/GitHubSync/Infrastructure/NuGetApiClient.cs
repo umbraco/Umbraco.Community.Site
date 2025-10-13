@@ -5,14 +5,13 @@ namespace UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 public class NuGetApiClient
 {
     private readonly HttpClient _httpClient;
-    private const string NuGetApiUrl = "https://api.nuget.org/v3-flatcontainer";
 
     public NuGetApiClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<Dictionary<string, DateTime>> GetPackageVersionsAsync(string packageId)
+    public async Task<Dictionary<string, DateTime>> GetPackageVersionsAsync(string packageId, int? maxCount = null)
     {
         if (string.IsNullOrWhiteSpace(packageId))
         {
@@ -21,42 +20,80 @@ public class NuGetApiClient
 
         try
         {
-            // Get all versions
-            var versionsUrl = $"{NuGetApiUrl}/{packageId.ToLowerInvariant()}/index.json";
-            var versionsResponse = await _httpClient.GetStringAsync(versionsUrl);
-            var versionsDoc = JsonDocument.Parse(versionsResponse);
-            var versions = versionsDoc.RootElement.GetProperty("versions").EnumerateArray()
-                .Select(v => v.GetString()!)
-                .ToList();
+            var baseUrl = $"https://api.nuget.org/v3/registration5-gz-semver2/{packageId.ToLower()}/index.json";
+            var indexResponse = await _httpClient.GetStringAsync(baseUrl);
+            var indexDoc = JsonDocument.Parse(indexResponse);
 
-            var result = new Dictionary<string, DateTime>();
+            var allVersions = new List<(string Version, DateTime Published)>();
 
-            // For each version, get the catalog entry which contains the published date
-            foreach (var version in versions)
+            // Process all pages
+            if (indexDoc.RootElement.TryGetProperty("items", out var pagesElement))
             {
-                try
+                foreach (var page in pagesElement.EnumerateArray())
                 {
-                    var catalogUrl = $"https://api.nuget.org/v3/registration5-semver1/{packageId.ToLowerInvariant()}/{version.ToLowerInvariant()}.json";
-                    var catalogResponse = await _httpClient.GetStringAsync(catalogUrl);
-                    var catalogDoc = JsonDocument.Parse(catalogResponse);
+                    List<JsonElement> items;
 
-                    if (catalogDoc.RootElement.TryGetProperty("published", out var publishedElement))
+                    // Check if items are inlined in the page
+                    if (page.TryGetProperty("items", out var inlineItems))
                     {
-                        var publishedString = publishedElement.GetString();
-                        if (!string.IsNullOrEmpty(publishedString) && DateTime.TryParse(publishedString, out var publishedDate))
+                        items = inlineItems.EnumerateArray().ToList();
+                    }
+                    else if (page.TryGetProperty("@id", out var pageIdElement))
+                    {
+                        // Items are not inlined, fetch the page separately
+                        var pageUrl = pageIdElement.GetString();
+                        if (string.IsNullOrEmpty(pageUrl))
+                            continue;
+
+                        var pageResponse = await _httpClient.GetStringAsync(pageUrl);
+                        var pageDoc = JsonDocument.Parse(pageResponse);
+
+                        if (pageDoc.RootElement.TryGetProperty("items", out var pageItems))
                         {
-                            result[version] = publishedDate;
+                            items = pageItems.EnumerateArray().ToList();
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    // Extract version and published date from each item
+                    foreach (var item in items)
+                    {
+                        if (item.TryGetProperty("catalogEntry", out var catalogEntry))
+                        {
+                            var version = catalogEntry.TryGetProperty("version", out var versionElement)
+                                ? versionElement.GetString()
+                                : null;
+
+                            var publishedString = catalogEntry.TryGetProperty("published", out var publishedElement)
+                                ? publishedElement.GetString()
+                                : null;
+
+                            if (!string.IsNullOrEmpty(version) &&
+                                !string.IsNullOrEmpty(publishedString) &&
+                                DateTime.TryParse(publishedString, out var publishedDate))
+                            {
+                                allVersions.Add((version, publishedDate));
+                            }
                         }
                     }
                 }
-                catch
-                {
-                    // Skip versions we can't get dates for
-                    continue;
-                }
             }
 
-            return result;
+            // Sort by published date descending and apply max count if specified
+            var sortedVersions = allVersions.OrderByDescending(v => v.Published);
+
+            var finalVersions = maxCount.HasValue
+                ? sortedVersions.Take(maxCount.Value)
+                : sortedVersions;
+
+            return finalVersions.ToDictionary(v => v.Version, v => v.Published);
         }
         catch (Exception ex)
         {

@@ -67,11 +67,21 @@ public class JobsComposer : IComposer
                 TimeZone = TimeZoneInfo.Utc
             });
 
-        // NuGet package versions sync - Daily at 5 AM
+        // NuGet package versions sync - Daily at 5 AM (fetch ALL versions)
         RecurringJob.AddOrUpdate<FetchNuGetPackageVersionsJob>(
             "fetch-nuget-package-versions",
             job => job.ExecuteAsync(null, CancellationToken.None),
             GetCronExpression("0 5 * * *"), // Cron: Daily at 5 AM
+            new RecurringJobOptions
+            {
+                TimeZone = TimeZoneInfo.Utc
+            });
+
+        // Recent NuGet package versions sync - Every 15 minutes (fetch latest 20)
+        RecurringJob.AddOrUpdate<FetchRecentNuGetPackageVersionsJob>(
+            "fetch-recent-nuget-package-versions",
+            job => job.ExecuteAsync(null, CancellationToken.None),
+            GetCronExpression("*/15 * * * *"), // Cron: Every 15 minutes
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.Utc

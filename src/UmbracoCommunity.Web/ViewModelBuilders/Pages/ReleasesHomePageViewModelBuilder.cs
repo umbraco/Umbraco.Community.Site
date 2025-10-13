@@ -340,6 +340,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                     System.Diagnostics.Debug.WriteLine(
                         $"  Parsed successfully: {releaseVm.Version}, ReleaseDate: {releaseVm.ReleaseDate}, IsTba: {releaseVm.IsReleaseDateTba}");
 
+                    // Check if this version is available on NuGet
+                    releaseVm.IsAvailableOnNuGet = nugetVersions.ContainsKey(releaseVm.Version);
+
                     allReleases.Add(releaseVm);
                 }
                 else
@@ -369,6 +372,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                     release.ReleaseLabel = $"release/{latestNuGetVersion.VersionString}";
                     release.ReleaseDate = latestNuGetVersion.PublishedDate;
                     release.IsReleaseDateTba = false;
+                    release.IsAvailableOnNuGet = true; // It's in NuGet
                 }
             }
 
@@ -424,6 +428,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             // Try to get release date from NuGet
             DateTime? releaseDate = null;
+            bool isAvailableOnNuGet = false;
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
             if (repoConfig?.HasNuGetPackage == true)
             {
@@ -431,6 +436,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 if (nugetVersions.TryGetValue(version, out var publishedDate))
                 {
                     releaseDate = publishedDate;
+                    isAvailableOnNuGet = true;
                 }
             }
 
@@ -445,7 +451,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 FeatureCount = features,
                 IssueCount = issues,
                 BreakingChangesCount = breaking,
-                DiscussionUrl = string.Empty
+                DiscussionUrl = string.Empty,
+                IsAvailableOnNuGet = isAvailableOnNuGet
             };
         }
 

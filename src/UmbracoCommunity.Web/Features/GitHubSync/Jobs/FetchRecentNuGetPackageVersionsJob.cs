@@ -8,14 +8,14 @@ using UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 
-public class FetchNuGetPackageVersionsJob
+public class FetchRecentNuGetPackageVersionsJob
 {
     private readonly NuGetApiClient _nugetClient;
     private readonly GitHubSqlStore _dataStore;
     private readonly GitHubSyncOptions _options;
     private readonly IMemoryCache _memoryCache;
 
-    public FetchNuGetPackageVersionsJob(
+    public FetchRecentNuGetPackageVersionsJob(
         NuGetApiClient nugetClient,
         GitHubSqlStore dataStore,
         IOptions<GitHubSyncOptions> options,
@@ -30,7 +30,7 @@ public class FetchNuGetPackageVersionsJob
     [AutomaticRetry(Attempts = 3, DelaysInSeconds = new[] { 60, 300, 600 })]
     public async Task ExecuteAsync(PerformContext? context, CancellationToken cancellationToken = default)
     {
-        context?.WriteLine("Starting FetchNuGetPackageVersionsJob");
+        context?.WriteLine("Starting FetchRecentNuGetPackageVersionsJob");
 
         try
         {
@@ -50,9 +50,9 @@ public class FetchNuGetPackageVersionsJob
 
             foreach (var repo in repositoriesWithNuGet)
             {
-                context?.WriteLine($"Fetching ALL NuGet versions for {repo.Name} (package: {repo.NuGetPackageId})...");
+                context?.WriteLine($"Fetching latest 20 NuGet versions for {repo.Name} (package: {repo.NuGetPackageId})...");
 
-                var versions = await _nugetClient.GetPackageVersionsAsync(repo.NuGetPackageId!, maxCount: null);
+                var versions = await _nugetClient.GetPackageVersionsAsync(repo.NuGetPackageId!, maxCount: 20);
 
                 context?.WriteLine($"Found {versions.Count} versions");
 
