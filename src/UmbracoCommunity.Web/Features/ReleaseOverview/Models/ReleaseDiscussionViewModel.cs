@@ -15,6 +15,8 @@ public class ReleaseDiscussionViewModel
     public bool IsAvailableOnNuGet { get; set; }
     public bool IsReleased => IsAvailableOnNuGet;
     public string DiscussionUrl { get; set; } = string.Empty;
+    public bool HasPreRelease { get; set; }
+    public string? PreReleaseVersion { get; set; }
     public string FormattedReleaseDate
     {
         get

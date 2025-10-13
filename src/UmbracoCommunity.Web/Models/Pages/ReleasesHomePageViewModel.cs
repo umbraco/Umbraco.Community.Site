@@ -7,7 +7,7 @@ namespace UmbracoCommunity.Web.Models.Pages
     public class ReleasesHomePageViewModel(IPublishedContent currentPage) : PageViewModelBase(currentPage)
     {
         public IList<BlockGridRow> BlockContent { get; set; } = [];
-        
+
         public List<ReleaseGroupViewModel> Releases { get; set; } = new();
         public string? SelectedRepo { get; set; }
         public string? SelectedRelease { get; set; }
@@ -18,5 +18,6 @@ namespace UmbracoCommunity.Web.Models.Pages
         public List<ReleaseDiscussionViewModel> LtsReleases { get; set; } = new();
         public ReleaseDiscussionViewModel? ReleaseInfo { get; set; }
         public bool LabelCheck { get; set; }
+        public string? NuGetPackageId { get; set; }
     }
 }

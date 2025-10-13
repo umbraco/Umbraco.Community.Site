@@ -13,7 +13,8 @@
                 {
                     ReleaseInfo = Model.ReleaseInfo,
                     SelectedRepo = Model.SelectedRepo,
-                    ReleaseGroup = releaseGroup
+                    ReleaseGroup = releaseGroup,
+                    NuGetPackageId = Model.NuGetPackageId
                 })
 
                 @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
@@ -39,7 +40,8 @@
             {
                 ReleaseInfo = Model.ReleaseInfo,
                 SelectedRepo = Model.SelectedRepo,
-                ReleaseGroup = null
+                ReleaseGroup = null,
+                NuGetPackageId = Model.NuGetPackageId
             })
 
             <div class="release-categories">

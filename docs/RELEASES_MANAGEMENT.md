@@ -87,4 +87,4 @@ The following things are still on the roadmap:
 - [ ] A better page header with a background color so you can see the nav bar better 
 - [ ] Better logo
 - [x] ~~Filter out RC relesases by default, they're not relevant when a version has been released; however in the compare you can toggle "Also show pre-releases"~~
-- [ ] When a final version has not been released but pre-releases are available, show an indicator on the Home/Latest page
+- [x] ~~When a final version has not been released but pre-releases are available, show an indicator on the Home/Latest page~~
