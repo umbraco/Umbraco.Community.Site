@@ -66,7 +66,7 @@ export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
   #onCreateNew() {
     this._isCreating = true;
     this._editingMember = {
-      id: 0,
+      id: "",
       login: "",
       name: "",
       periods: [],

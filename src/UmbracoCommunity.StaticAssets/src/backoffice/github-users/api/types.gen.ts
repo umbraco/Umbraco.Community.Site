@@ -36,7 +36,7 @@ export enum EventMessageTypeModel {
 }
 
 export type GitHubHqMember = {
-    id: number;
+    id: string;
     login: string;
     name: string;
     periods: Array<EmploymentPeriod>;
@@ -256,7 +256,7 @@ export type CreateHqMemberResponse = CreateHqMemberResponses[keyof CreateHqMembe
 export type DeleteHqMemberData = {
     body?: never;
     path: {
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/umbraco/umbracocommunitygithubusers/api/v1/hqmembers/{id}';
@@ -285,7 +285,7 @@ export type DeleteHqMemberResponse = DeleteHqMemberResponses[keyof DeleteHqMembe
 export type GetHqMemberData = {
     body?: never;
     path: {
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/umbraco/umbracocommunitygithubusers/api/v1/hqmembers/{id}';
@@ -314,7 +314,7 @@ export type GetHqMemberResponse = GetHqMemberResponses[keyof GetHqMemberResponse
 export type UpdateHqMemberData = {
     body?: GitHubHqMember;
     path: {
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/umbraco/umbracocommunitygithubusers/api/v1/hqmembers/{id}';

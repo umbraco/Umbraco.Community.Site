@@ -30,12 +30,12 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         return Ok(members);
     }
 
-    [HttpGet("hqmembers/{login}")]
+    [HttpGet("hqmembers/{id}")]
     [ProducesResponseType<GitHubHqMember>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetHqMember(string login)
+    public IActionResult GetHqMember(string id)
     {
-        var member = _dataStore.GetHqMemberByLogin(login);
+        var member = _dataStore.GetHqMemberByLogin(id);
         if (member == null)
         {
             return NotFound();
@@ -64,16 +64,16 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
 
         // Retrieve the inserted member
         var created = _dataStore.GetHqMemberByLogin(member.Login)!;
-        return CreatedAtAction(nameof(GetHqMember), new { login = created.Login }, created);
+        return CreatedAtAction(nameof(GetHqMember), new { id = created.Login }, created);
     }
 
-    [HttpPut("hqmembers/{login}")]
+    [HttpPut("hqmembers/{id}")]
     [ProducesResponseType<GitHubHqMember>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult UpdateHqMember(string login, [FromBody] GitHubHqMember member)
+    public IActionResult UpdateHqMember(string id, [FromBody] GitHubHqMember member)
     {
-        var existing = _dataStore.GetHqMemberByLogin(login);
+        var existing = _dataStore.GetHqMemberByLogin(id);
         if (existing == null)
         {
             return NotFound();
@@ -85,7 +85,7 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         }
 
         // Check if login is being changed to one that already exists
-        if (member.Login != login)
+        if (member.Login != id)
         {
             return BadRequest("Cannot change login");
         }
@@ -93,16 +93,16 @@ public class UmbracoCommunityGitHubUsersApiController : UmbracoCommunityGitHubUs
         member.Id = member.Login; // Ensure the ID matches
         _dataStore.UpsertHqMembers(new[] { member });
 
-        var updated = _dataStore.GetHqMemberByLogin(login)!;
+        var updated = _dataStore.GetHqMemberByLogin(id)!;
         return Ok(updated);
     }
 
-    [HttpDelete("hqmembers/{login}")]
+    [HttpDelete("hqmembers/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteHqMember(string login)
+    public IActionResult DeleteHqMember(string id)
     {
-        var deleted = _dataStore.DeleteHqMemberByLogin(login);
+        var deleted = _dataStore.DeleteHqMemberByLogin(id);
         if (!deleted)
         {
             return NotFound();
