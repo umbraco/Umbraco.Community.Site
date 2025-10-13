@@ -32,7 +32,7 @@ public class JobsComposer : IComposer
         RecurringJob.AddOrUpdate<FetchRecentPullRequestsJob>(
             "fetch-recent-prs",
             job => job.ExecuteAsync(null, null, CancellationToken.None),
-            GetCronExpression("0 */6 * * *"), // Cron: Every 6 hours
+            GetCronExpression("0 */1 * * *"), // Cron: Every 1 hours
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.Utc
@@ -41,7 +41,7 @@ public class JobsComposer : IComposer
         RecurringJob.AddOrUpdate<FetchRecentIssuesJob>(
             "fetch-recent-issues",
             job => job.ExecuteAsync(null, null, CancellationToken.None),
-            GetCronExpression("0 */6 * * *"), // Cron: Every 6 hours
+            GetCronExpression("0 */1 * * *"), // Cron: Every 1 hours
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.Utc
@@ -61,7 +61,7 @@ public class JobsComposer : IComposer
         RecurringJob.AddOrUpdate<FetchReleaseDiscussionsJob>(
             "fetch-release-discussions",
             job => job.ExecuteAsync(null, null, CancellationToken.None),
-            GetCronExpression("0 4 * * *"), // Cron: Daily at 4 AM
+            GetCronExpression("0 */1 * * *"), // Cron: Daily at 4 AM
             new RecurringJobOptions
             {
                 TimeZone = TimeZoneInfo.Utc
