@@ -39,9 +39,12 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         var labelCheck = queryString?["labelCheck"].ToString();
         viewModel.LabelCheck = !string.IsNullOrEmpty(labelCheck) && labelCheck.Equals("true", StringComparison.OrdinalIgnoreCase);
 
+        var includePreReleases = queryString?["includePreReleases"].ToString();
+        viewModel.IncludePreReleases = !string.IsNullOrEmpty(includePreReleases) && includePreReleases.Equals("true", StringComparison.OrdinalIgnoreCase);
+
         // Get all available versions
         const string repositoryName = "Umbraco-CMS";
-        viewModel.AvailableVersions = GetAvailableVersions(repositoryName);
+        viewModel.AvailableVersions = GetAvailableVersions(repositoryName, viewModel.IncludePreReleases);
 
         // If both versions are selected, perform the comparison
         if (!string.IsNullOrEmpty(fromVersion) && !string.IsNullOrEmpty(toVersion))
@@ -77,6 +80,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     var ver = ParseVersion(v.Version);
                     return ver > lowestVer && ver <= highestVer;
                 })
+                .Where(v => viewModel.IncludePreReleases || !v.Version.Contains('-')) // Filter pre-releases unless explicitly included
                 .Select(v => v.Version)
                 .ToList();
 
@@ -224,11 +228,11 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         return viewModel;
     }
 
-    private List<ReleaseDiscussionViewModel> GetAvailableVersions(string repositoryName)
+    private List<ReleaseDiscussionViewModel> GetAvailableVersions(string repositoryName, bool includePreReleases)
     {
-        // Cache the version list
-        var cacheKey = $"CompareVersions_{repositoryName}";
-        return _memoryCache.GetOrCreate(cacheKey, entry =>
+        // Cache the version list with pre-releases included
+        var cacheKey = $"CompareVersions_{repositoryName}_All";
+        var allVersions = _memoryCache.GetOrCreate(cacheKey, entry =>
         {
             entry.Priority = CacheItemPriority.Normal;
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(6);
@@ -325,12 +329,19 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 };
             }
 
-            // Return all versions (including upcoming), excluding pre-releases, sorted by version descending
+            // Return all versions (including upcoming and pre-releases), sorted by version descending
             return allReleases.Values
-                .Where(r => !r.Version.Contains('-')) // Exclude pre-releases (e.g., "16.0.0-rc1")
                 .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
                 .ToList();
         })!;
+
+        // Filter pre-releases if not included
+        if (!includePreReleases)
+        {
+            return allVersions.Where(r => !r.Version.Contains('-')).ToList();
+        }
+
+        return allVersions;
     }
 
     private ReleaseDiscussionViewModel? ParseReleaseDiscussion(

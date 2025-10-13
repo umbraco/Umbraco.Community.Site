@@ -142,9 +142,9 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
                     ? nonPreReleases.First()
                     : null;
 
-                // All other releases (excluding the latest), ordered by version
+                // All other releases (excluding the latest and pre-releases), ordered by version
                 var otherReleases = sortedReleases
-                    .Where(r => r != latestRelease)
+                    .Where(r => r != latestRelease && !IsPreRelease(r.Version))
                     .ToList();
 
                 return new MajorVersionGroupViewModel

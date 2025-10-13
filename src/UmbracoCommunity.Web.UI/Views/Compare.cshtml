@@ -13,7 +13,7 @@
             <div class="compare-dropdowns">
                 <div class="compare-dropdown-group">
                     <label for="fromVersion">From version:</label>
-                    <select id="fromVersion" name="from" onchange="document.getElementById('compareForm').submit()">
+                    <select id="fromVersion" name="from">
                         <option value="">Select version</option>
                         @foreach (var version in Model.AvailableVersions)
                         {
@@ -31,7 +31,7 @@
 
                 <div class="compare-dropdown-group">
                     <label for="toVersion">To version:</label>
-                    <select id="toVersion" name="to" onchange="document.getElementById('compareForm').submit()">
+                    <select id="toVersion" name="to">
                         <option value="">Select version</option>
                         @foreach (var version in Model.AvailableVersions)
                         {
@@ -48,6 +48,17 @@
                 </div>
 
                 <button type="submit" class="compare-button">Compare</button>
+            </div>
+
+            <div class="compare-checkbox-group">
+                <label>
+                    <input type="checkbox"
+                           id="includePreReleases"
+                           name="includePreReleases"
+                           value="true"
+                           @if (Model.IncludePreReleases) { <text>checked="checked"</text> } />
+                    Include pre-release versions
+                </label>
             </div>
         </form>
     </div>

@@ -19,6 +19,7 @@ public class ComparePageViewModel : PageViewModelBase
     public List<VersionChangesGroup> VersionGroups { get; set; } = new();
     public string UmbracoLogoPath { get; set; } = "/img/umbraco_logo.png";
     public bool LabelCheck { get; set; }
+    public bool IncludePreReleases { get; set; }
     public int FeatureCount { get; set; }
     public int IssuesAndTasksCount { get; set; }
 }
