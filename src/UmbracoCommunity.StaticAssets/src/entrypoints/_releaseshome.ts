@@ -13,3 +13,33 @@ if (compareForm) {
     includePreReleases.addEventListener('change', () => compareForm.submit());
   }
 }
+
+// Handle sticky version bar on scroll
+const stickyVersionBar = document.getElementById('stickyVersionBar');
+if (stickyVersionBar) {
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+
+  const updateStickyBar = () => {
+    const scrollY = window.scrollY;
+
+    // Show sticky bar after scrolling down 200px
+    if (scrollY > 200) {
+      stickyVersionBar.classList.add('visible');
+    } else {
+      stickyVersionBar.classList.remove('visible');
+    }
+
+    lastScrollY = scrollY;
+    ticking = false;
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateStickyBar);
+      ticking = true;
+    }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+}

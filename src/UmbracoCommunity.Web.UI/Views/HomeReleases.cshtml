@@ -4,6 +4,31 @@
 	Layout = "LayoutReleases.cshtml";
 }
 
+<div class="sticky-version-bar" id="stickyVersionBar">
+    <div class="sticky-version-content">
+        @if (!string.IsNullOrEmpty(Model.SelectedRepo) && Model.ReleaseInfo != null)
+        {
+            <div class="sticky-version-title">
+                <span class="sticky-version-label">Viewing:</span>
+                <span>@Model.SelectedRepo v@(Model.ReleaseInfo.Version)</span>
+            </div>
+            @if (Model.ReleaseInfo.ReleaseDate.HasValue)
+            {
+                <div class="sticky-version-label">
+                    @if (Model.ReleaseInfo.IsReleased)
+                    {
+                        <span>Released: @Model.ReleaseInfo.FormattedReleaseDate</span>
+                    }
+                    else
+                    {
+                        <span>Target: @Model.ReleaseInfo.FormattedReleaseDate</span>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
 <div class="dc-block-list releases-container">
     @if (string.IsNullOrEmpty(Model.SelectedRepo))
     {

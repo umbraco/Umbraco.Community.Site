@@ -5,6 +5,21 @@
     Layout = "LayoutReleases.cshtml";
 }
 
+@if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
+{
+    <div class="sticky-version-bar" id="stickyVersionBar">
+    <div class="sticky-version-content">
+    <div class="sticky-version-title">
+    <span class="sticky-version-label">Comparing:</span>
+    <span>v@(Model.LowestVersion)→ v@(Model.HighestVersion)</span>
+            </div>
+            <div class="sticky-version-label">
+                <span>@Model.FeatureCount features, @Model.IssuesAndTasksCount issues & tasks</span>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="dc-block-list releases-container compare-page">
     <h1 class="compare-title">Compare Releases</h1>
 

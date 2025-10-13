@@ -1220,3 +1220,70 @@ uui-badge[color="warning"] {
 .nav-item a {
     white-space: nowrap;
 }
+
+/* ===================================
+   Sticky Version Indicator
+   =================================== */
+
+.sticky-version-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-dark) 100%);
+  color: var(--color-white);
+  padding: var(--unit) var(--unit-md);
+  padding-top: 130px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+
+  &.visible {
+    transform: translateY(0);
+  }
+
+  @media (--sm-down) {
+    padding: var(--unit-sm) var(--unit);
+    padding-top: 80px;
+  }
+}
+
+.sticky-version-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit);
+
+  @media (--sm-down) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--unit-xs);
+  }
+}
+
+.sticky-version-title {
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  gap: var(--unit-sm);
+
+  @media (--sm-down) {
+    font-size: 0.9375rem;
+  }
+}
+
+.sticky-version-label {
+  font-size: clamp(0.75rem, 1.25vw, 0.875rem);
+  opacity: 0.9;
+  font-weight: 400;
+
+  @media (--sm-down) {
+    font-size: 0.8125rem;
+  }
+}
