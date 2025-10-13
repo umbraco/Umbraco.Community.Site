@@ -9,7 +9,9 @@
   "Icon": "icon-notepad",
   "Thumbnail": "folder.png",
   "Permissions": {
-    "AllowedChildContentTypes": []
+    "AllowedChildContentTypes": [
+      "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35"
+    ]
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
   "CompositionContentTypes": [],
@@ -20,6 +22,10 @@
     {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
       "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
+      "Mode": "Exist"
     },
     {
       "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
