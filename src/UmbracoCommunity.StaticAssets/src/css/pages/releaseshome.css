@@ -370,6 +370,24 @@
     font-size: clamp(1rem, 1.5vw, 1.125rem);
   }
 
+  .release-nuget-link {
+    color: rgba(255, 255, 255, 0.9);
+    text-align: left;
+    font-size: clamp(1rem, 1.5vw, 1.125rem);
+    margin-top: var(--unit-sm);
+
+    a {
+      color: var(--color-white);
+      text-decoration: underline;
+      font-weight: 600;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
   @media (--sm-down) {
     padding: var(--unit-md);
   }

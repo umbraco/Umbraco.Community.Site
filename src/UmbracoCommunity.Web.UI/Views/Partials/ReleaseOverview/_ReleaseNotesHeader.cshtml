@@ -20,6 +20,13 @@
         {
             <p class="release-date"><strong>Target release date:</strong> To be announced</p>
         }
+
+        @if (Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
+        {
+            <p class="release-nuget-link">
+                <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@Model.NuGetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@Model.NuGetPackageId v@(Model.ReleaseInfo.Version)</a>
+            </p>
+        }
     }
     else if (Model.ReleaseGroup != null)
     {

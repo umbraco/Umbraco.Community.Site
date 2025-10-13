@@ -355,23 +355,23 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 }
             }
 
-            // For each release discussion, check if there's a newer released version in NuGet
+            // For each release discussion, check if there's a newer released version in NuGet (excluding pre-releases)
             var now = DateTime.UtcNow;
             foreach (var release in allReleases)
             {
                 var majorVersion = ParseVersion(release.ReleaseLabel).Major;
 
-                // Get all NuGet versions for this major that have been released (date <= now)
+                // Get all stable (non-pre-release) NuGet versions for this major that have been released (date <= now)
                 var latestNuGetVersion = nugetVersions
                     .Where(kvp => kvp.Value <= now)
-                    .Select(kvp => new { VersionString = kvp.Key, Version = ParseVersion($"release/{kvp.Key}"), PublishedDate = kvp.Value })
-                    .Where(x => x.Version.Major == majorVersion)
-                    .OrderByDescending(x => x.Version)
+                    .Select(kvp => new { VersionString = kvp.Key, SemVer = ParseSemVer(kvp.Key), PublishedDate = kvp.Value })
+                    .Where(x => x.SemVer.Version.Major == majorVersion && string.IsNullOrEmpty(x.SemVer.PreRelease))
+                    .OrderByDescending(x => x.SemVer.Version)
                     .FirstOrDefault();
 
-                if (latestNuGetVersion != null && latestNuGetVersion.Version > ParseVersion(release.ReleaseLabel))
+                if (latestNuGetVersion != null && latestNuGetVersion.SemVer.Version > ParseVersion(release.ReleaseLabel))
                 {
-                    // There's a newer version in NuGet - update the discussion VM to point to it
+                    // There's a newer stable version in NuGet - update the discussion VM to point to it
                     release.ActualLatestVersion = latestNuGetVersion.VersionString;
                     release.ReleaseLabel = $"release/{latestNuGetVersion.VersionString}";
                     release.ReleaseDate = latestNuGetVersion.PublishedDate;
@@ -450,12 +450,34 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
+            // Get NuGet package versions for this repository
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+            Dictionary<string, DateTime> nugetVersions = new();
+            if (repoConfig?.HasNuGetPackage == true)
+            {
+                nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
+            }
+
             // Find the matching discussion
             foreach (var discussion in discussions)
             {
                 var releaseVm = ParseReleaseDiscussion(discussion, releaseStats);
                 if (releaseVm != null && releaseVm.ReleaseLabel == releaseLabel)
                 {
+                    // Check NuGet for release date if missing or if version is on NuGet
+                    if (nugetVersions.TryGetValue(releaseVm.Version, out var nugetPublishedDate))
+                    {
+                        // Mark as available on NuGet
+                        releaseVm.IsAvailableOnNuGet = true;
+
+                        // If discussion doesn't have a release date, use NuGet's date
+                        if (!releaseVm.ReleaseDate.HasValue || releaseVm.IsReleaseDateTba)
+                        {
+                            releaseVm.ReleaseDate = nugetPublishedDate;
+                            releaseVm.IsReleaseDateTba = false;
+                        }
+                    }
+
                     viewModel.ReleaseInfo = releaseVm;
                     return;
                 }
@@ -466,18 +488,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
             var (features, issues, breaking) = stats;
 
-            // Try to get release date from NuGet
+            // Try to get release date from NuGet (using the already-fetched nugetVersions)
             DateTime? releaseDate = null;
             bool isAvailableOnNuGet = false;
-            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
-            if (repoConfig?.HasNuGetPackage == true)
+            if (nugetVersions.TryGetValue(version, out var publishedDate))
             {
-                var nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
-                if (nugetVersions.TryGetValue(version, out var publishedDate))
-                {
-                    releaseDate = publishedDate;
-                    isAvailableOnNuGet = true;
-                }
+                releaseDate = publishedDate;
+                isAvailableOnNuGet = true;
             }
 
             viewModel.ReleaseInfo = new ReleaseDiscussionViewModel
