@@ -614,10 +614,10 @@
    =================================== */
 
 .release-categories {
-  padding: var(--releases-spacing);
+  padding: var(--releases-spacing) 0;
 
   @media (--sm-down) {
-    padding: var(--unit-md);
+    padding: var(--unit-md) 0;
   }
 }
 
