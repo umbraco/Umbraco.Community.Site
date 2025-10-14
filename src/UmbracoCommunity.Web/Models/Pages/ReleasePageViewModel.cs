@@ -3,8 +3,13 @@ using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 
 namespace UmbracoCommunity.Web.Models.Pages
 {
-    public class ReleasePageViewModel(IPublishedContent currentPage) : PageViewModelBase(currentPage)
-    {
+    public class ReleasePageViewModel : PageViewModelBase
+    { 
+        public ReleasePageViewModel(IPublishedContent currentPage) : base(currentPage)
+        {
+            // Override to ensure the correct CSS entrypoint is loaded
+            ContentTypeAlias = "releasesHome";
+        }
         public string Organization { get; set; } = string.Empty;
         public string Repository { get; set; } = string.Empty;
         public string Version { get; set; } = string.Empty;
