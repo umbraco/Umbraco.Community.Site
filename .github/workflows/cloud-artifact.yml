@@ -84,6 +84,12 @@ jobs:
       - name: Prepare Cloud Git Ignore
         run: cp cloud.gitignore .gitignore
         shell: bash
+
+      # build the frontend assets
+      - name: Build frontend assets
+        working-directory: ${{ inputs.pathToFrontendClient }}
+        run: npm ci && npm run build:for:cloud --if-present
+        shell: bash
         
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code

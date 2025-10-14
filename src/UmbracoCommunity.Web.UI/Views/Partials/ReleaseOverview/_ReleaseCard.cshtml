@@ -1,0 +1,23 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model ReleaseCardViewModel
+@{
+    var majorVersion = Model.Release.Version.Split('.')[0];
+}
+
+<div class="release-card @Model.CardType">
+    <div class="release-card-badge">@(Model.CardType == "lts" ? "Recommended for most users" : "Latest features")</div>
+    <h3 class="release-card-title">
+        <a href="?repo=Umbraco-CMS&release=@Model.Release.ReleaseLabel">Umbraco @majorVersion</a>
+        @if (Model.CardType == "lts")
+        {
+            <span class="lts-badge">LTS</span>
+        }
+    </h3>
+    <p class="release-version">Latest: @Model.Release.DisplayVersion</p>
+    <p class="release-date">Released: @Model.Release.FormattedReleaseDate</p>
+    <div class="release-stats">
+        <span data-count="@Model.Release.FeatureCount">Features</span>
+        <span data-count="@Model.Release.IssueCount">Issues</span>
+        <span data-count="@Model.Release.BreakingChangesCount">Breaking changes</span>
+    </div>
+</div>

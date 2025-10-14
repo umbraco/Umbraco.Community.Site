@@ -60,6 +60,20 @@ public class ViteScriptTagHelper : ViteTagHelperBase
         {
             output.Attributes.SetAttribute("src", EntryNameWithBase(viteManifestEntry.File));
             output.Attributes.SetAttribute("type", "module");
+
+            // Add CSS link tags if the entry has associated CSS files
+            if (viteManifestEntry.Css?.Length > 0)
+            {
+                foreach (string css in viteManifestEntry.Css)
+                {
+                    TagBuilder linkTag = new("link");
+                    linkTag.Attributes["rel"] = "stylesheet";
+                    linkTag.Attributes["href"] = EntryNameWithBase(css);
+                    linkTag.TagRenderMode = TagRenderMode.SelfClosing;
+                    output.PreElement.AppendHtml(linkTag);
+                }
+            }
+
             return;
         }
 

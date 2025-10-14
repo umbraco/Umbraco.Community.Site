@@ -1,0 +1,57 @@
+@using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model ReleasesHomePageViewModel
+
+@* Show upcoming releases timeline when no repo is selected *@
+@if (Model.LatestRelease == null && !Model.UpcomingReleases.Any())
+{
+    <div class="empty-state">
+        <p>No release information available yet. Release discussions will be synced from GitHub automatically.</p>
+        <p>Make sure the <code>fetch-release-discussions</code> Hangfire job has run successfully.</p>
+    </div>
+}
+
+@if (Model.LtsReleases.Any() || Model.LatestRelease != null)
+{
+    // If the latest release is an LTS, only show LTS releases
+    var showLatestRelease = Model.LatestRelease != null && !Model.LatestRelease.IsLts;
+
+    <div class="current-releases-section">
+        <h2 class="releases-section-title">Current Umbraco-CMS releases</h2>
+        <div class="current-releases-grid">
+            @if (Model.LtsReleases.Any())
+            {
+                @foreach (var release in Model.LtsReleases)
+                {
+                    @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
+                    {
+                        Release = release,
+                        CardType = "lts"
+                    })
+                }
+            }
+
+            @if (showLatestRelease)
+            {
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
+                {
+                    Release = Model.LatestRelease,
+                    CardType = "latest"
+                })
+            }
+        </div>
+    </div>
+}
+
+@if (Model.UpcomingReleases.Any())
+{
+    <div class="upcoming-releases-section">
+        <h2 class="releases-section-title">Upcoming releases</h2>
+        <div class="upcoming-releases-list">
+            @foreach (var release in Model.UpcomingReleases)
+            {
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_UpcomingReleaseItem.cshtml", release)
+            }
+        </div>
+    </div>
+}

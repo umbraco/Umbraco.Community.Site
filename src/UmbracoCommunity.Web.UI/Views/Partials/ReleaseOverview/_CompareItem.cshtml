@@ -1,0 +1,18 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model PullRequestItemViewModel
+
+<div class="pr-item pr-item--compare">
+    <div class="pr-content">
+        <p class="pr-title">
+            <a href="@Model.PullRequest.Url" target="_blank" class="pr-number pr-main-link @(Model.PullRequest.IsIssue ? "pr-issue" : "")">#@Model.PullRequest.Number</a>
+            @Model.PullRequest.Title
+            @if (Model.PullRequest.Labels.Any())
+            {
+                @foreach (var label in Model.PullRequest.Labels)
+                {
+                    <uui-badge color="default" look="placeholder">@label</uui-badge>
+                }
+            }
+        </p>
+    </div>
+</div>

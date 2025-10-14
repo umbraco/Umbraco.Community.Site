@@ -1,0 +1,76 @@
+@using UmbracoCommunity.Web.Features.ReleaseOverview.Models
+@model PullRequestItemViewModel
+
+@if (Model.PullRequest.AlertMessage != null && !Model.LabelCheck)
+{
+    return;
+}
+
+<div class="pr-item">
+    @if (Model.PullRequest.IsHqMember)
+    {
+        <img src="@Model.UmbracoLogoPath" alt="HQ Member" class="pr-hq-indicator" title="Created by Umbraco HQ member" />
+    }
+    else if (!string.IsNullOrEmpty(Model.PullRequest.AvatarUrl))
+    {
+        <img src="@Model.PullRequest.AvatarUrl" alt="@Model.PullRequest.AuthorLogin" class="pr-hq-indicator" title="@Model.PullRequest.AuthorLogin" />
+    }
+    else
+    {
+        <div class="pr-spacer"></div>
+    }
+
+    <div class="pr-content">
+        <p class="pr-title">
+            <a href="@Model.PullRequest.Url" target="_blank" class="pr-number pr-main-link @(Model.PullRequest.IsIssue ? "pr-issue" : "")">#@Model.PullRequest.Number</a>
+            @Model.PullRequest.Title
+            @if (Model.PullRequest.AlertMessage != null)
+            {
+                <uui-badge color="warning">@Model.PullRequest.AlertMessage</uui-badge>
+            }
+        </p>
+        @if (Model.PullRequest.Labels.Any())
+        {
+            <div class="pr-labels">
+                @foreach (var label in Model.PullRequest.Labels)
+                {
+                    <uui-badge color="default" look="placeholder">@label</uui-badge>
+                }
+            </div>
+        }
+        <div class="pr-meta">
+            @if (Model.PullRequest.IsIssue)
+            {
+                <text>Issue by</text>
+            }
+            else
+            {
+                <text>PR by</text>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.PullRequest.AuthorUrl))
+            {
+                <a href="@Model.PullRequest.AuthorUrl" target="_blank" class="pr-author">@(Model.PullRequest.AuthorName ?? Model.PullRequest.AuthorLogin)</a>
+            }
+            else
+            {
+                <span>@Model.PullRequest.AuthorLogin</span>
+            }
+            created on @Model.PullRequest.CreatedAt.ToString("MMM d, yyyy")
+            @if (!string.IsNullOrEmpty(Model.PullRequest.MergedByLogin))
+            {
+                <span>
+                    • merged by
+                    @if (!string.IsNullOrEmpty(Model.PullRequest.MergedByUrl))
+                    {
+                        <a href="@Model.PullRequest.MergedByUrl" target="_blank" class="pr-author">@(Model.PullRequest.MergedByName ?? Model.PullRequest.MergedByLogin)</a>
+                    }
+                    else
+                    {
+                        <span>@(Model.PullRequest.MergedByName ?? Model.PullRequest.MergedByLogin)</span>
+                    }
+                </span>
+            }
+        </div>
+    </div>
+</div>

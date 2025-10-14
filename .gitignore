@@ -439,3 +439,7 @@ ood.flag
 # Umbraco.Deploy.OnPrem creates this file when running locally - file not needed in Cloud repo
 **/TriggerDeploy.ps1
 src/UmbracoCommunity.StaticAssets/.vite
+App_Data/
+
+Hangfire.db*
+/src/UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/

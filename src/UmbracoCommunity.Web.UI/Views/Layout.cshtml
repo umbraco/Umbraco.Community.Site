@@ -9,7 +9,7 @@
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
 <head>
     <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
-    <script vite-src="@Model.ContentTypeAlias" ></script>
+    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
     <title>Umbraco Community | @Model.Name</title>
@@ -23,8 +23,6 @@
     </main>
 
     <partial name="~/Views/Partials/Components/Footer.cshtml" />
-    <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
-    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
 
     @RenderSection("JS", required: false)
     @Html.PageScripts()
