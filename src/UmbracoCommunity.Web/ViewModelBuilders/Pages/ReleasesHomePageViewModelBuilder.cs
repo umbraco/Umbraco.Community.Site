@@ -97,6 +97,10 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                     if (line.TrimStart().StartsWith("### Links", StringComparison.OrdinalIgnoreCase))
                         break;
 
+                    // Skip LTS line
+                    if (System.Text.RegularExpressions.Regex.IsMatch(line, @"\*\*Long term supported version\*\*\?"))
+                        continue;
+
                     descriptionLines.Add(line);
                 }
             }

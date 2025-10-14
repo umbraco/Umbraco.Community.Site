@@ -84,7 +84,7 @@ The following things are still on the roadmap:
 - [ ] Ability to trigger a manual sync of the data so release managers don't have to wait an hour
 - [x] Responsive layout for usability/readability on mobile
 - [x] ~~A better way to keep the chosen version (or versions, in case of a compare ) in view while you're scrolling the list~~
-- [ ] A better page header with a background color so you can see the nav bar better 
+- [x] ~~A better page header with a background color so you can see the nav bar better ~~
 - [ ] Better logo
 - [x] ~~Filter out RC relesases by default, they're not relevant when a version has been released; however in the compare you can toggle "Also show pre-releases"~~
 - [x] ~~When a final version has not been released but pre-releases are available, show an indicator on the Home/Latest page~~
