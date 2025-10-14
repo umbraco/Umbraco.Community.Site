@@ -20,18 +20,12 @@ namespace UmbracoCommunity.Web.Features.ReleaseOverview.Controllers
             IViewModelBuilder<ReleasesHomePageViewModel> viewModelBuilder)
             : base(logger, compositeViewEngine, umbracoContextAccessor) => _viewModelBuilder = viewModelBuilder;
 
-        [NonAction]
-        public sealed override IActionResult Index() => throw new NotImplementedException();
-
         [ApplyCommonElementsReleases]
-        public IActionResult Index(string? repo, string? release, CancellationToken cancellationToken)
+        public override IActionResult Index()
         {
             ReleasesHomePageViewModel viewModel = _viewModelBuilder.Build(
                 CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null."),
                 UmbracoContext);
-
-            viewModel.SelectedRepo = repo;
-            viewModel.SelectedRelease = release;
 
             return CurrentTemplate(viewModel);
         }

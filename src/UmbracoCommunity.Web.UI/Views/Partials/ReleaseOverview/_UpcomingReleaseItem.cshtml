@@ -3,11 +3,11 @@
 
 <div class="upcoming-release-item">
     <h3>
-        <a href="?repo=Umbraco-CMS&release=@Model.ReleaseLabel">@Model.Version</a>
+        <a href="/release/umbraco/Umbraco-CMS/@Model.DisplayVersion">@Model.Version</a>
         @if (Model.HasPreRelease && !string.IsNullOrEmpty(Model.PreReleaseVersion))
         {
             <span class="pre-release-badge">
-                <a href="?repo=Umbraco-CMS&release=release/@Model.PreReleaseVersion" title="Pre-release version available">
+                <a href="/release/umbraco/Umbraco-CMS/@Model.PreReleaseVersion" title="Pre-release version available">
                     @Model.PreReleaseVersion available
                 </a>
             </span>
