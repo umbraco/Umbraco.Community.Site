@@ -1,0 +1,58 @@
+{
+  "Name": "Navigation section",
+  "Alias": "navigationSection",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-list",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "417bb5a9-f0c2-45ff-b620-ac94bc40dbf9",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "8fb0aa7c-9cbe-435b-94f9-c6a77e5f1185",
+          "Alias": "columns",
+          "DataType": "umb://data-type/29a83befe82e45e8a73792a2e242ea30",
+          "Description": "Minimum of 1 and maximum of 3 columns",
+          "Name": "Columns",
+          "SortOrder": 1,
+          "LabelOnTop": true
+        },
+        {
+          "Key": "de5780cf-24f4-471a-a135-9c3b69a4ac0b",
+          "Alias": "sectionName",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Description": "Section headline (max 25 chars)",
+          "Mandatory": true,
+          "Name": "Section name"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/1c214bd66f4845aa8e1e2e8357380fb8",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/29a83befe82e45e8a73792a2e242ea30",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.3"
+}

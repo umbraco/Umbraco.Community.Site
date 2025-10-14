@@ -1,0 +1,56 @@
+{
+  "Name": "Navigation settings",
+  "Alias": "navigationSettings",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-map-alt color-grey",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "5407f0be-a8e0-4566-bbc0-778e2e136716",
+      "Name": "Header",
+      "Type": 1,
+      "Alias": "header",
+      "PropertyTypes": [
+        {
+          "Key": "85a396fa-ba08-4ffa-b22a-3777989239f9",
+          "Alias": "headerNavigationItems",
+          "DataType": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
+          "Name": "Header navigation items",
+          "LabelOnTop": true
+        },
+        {
+          "Key": "8e271aea-fb83-49e1-b242-07b09734e8f6",
+          "Alias": "callToActionButtons",
+          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+          "Description": "Provide an optional link which will override the default call to action in the site header.",
+          "Name": "Call to action buttons",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/47c81d1472cf4e118877d117e86da978",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.3"
+}

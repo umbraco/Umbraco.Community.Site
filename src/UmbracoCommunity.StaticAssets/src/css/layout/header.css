@@ -491,10 +491,6 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
     margin: 0 calc(-2rem - 44px) 0 3rem;
   }
 
-  body:not(.mobile) .nav-start .logo-container {
-    width: 186px;
-  }
-
   body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
     padding: 2rem 5rem;
   }

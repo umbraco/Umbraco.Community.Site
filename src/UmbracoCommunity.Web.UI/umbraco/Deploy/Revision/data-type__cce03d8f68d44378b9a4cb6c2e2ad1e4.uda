@@ -1,0 +1,28 @@
+{
+  "Name": "Navigation section items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "dd701bc6-8aad-4a1c-b67c-300f48ee948e",
+        "label": "{umbLink: link}",
+        "editorSize": "large"
+      }
+    ],
+    "useInlineEditingAsDefault": true
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/cce03d8f68d44378b9a4cb6c2e2ad1e4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/dd701bc68aad4a1cb67c300f48ee948e"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.3"
+}
