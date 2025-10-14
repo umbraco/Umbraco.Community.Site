@@ -82,7 +82,7 @@ The Discussion is where any manual content for a version goes, the release date,
 The following things are still on the roadmap:
 
 - [ ] Ability to trigger a manual sync of the data so release managers don't have to wait an hour
-- [ ] Responsive layout for usability/readability on mobile
+- [x] Responsive layout for usability/readability on mobile
 - [x] ~~A better way to keep the chosen version (or versions, in case of a compare ) in view while you're scrolling the list~~
 - [ ] A better page header with a background color so you can see the nav bar better 
 - [ ] Better logo
