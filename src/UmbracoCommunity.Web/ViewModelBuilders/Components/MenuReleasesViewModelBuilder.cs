@@ -43,8 +43,8 @@ internal class MenuReleasesViewModelBuilder : NavigationViewModelBuilderBase, IV
         MenuReleasesViewModel viewModel = new();
 
         viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "Latest", Url = "/" }));
-        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "Compare", Url = "compare" }));
-        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "All releases", Url = "all-releases" }));
+        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "Compare", Url = "/compare" }));
+        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "All releases", Url = "/all-releases" }));
 
         return viewModel;
     }
