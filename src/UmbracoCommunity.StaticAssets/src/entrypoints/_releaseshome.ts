@@ -43,3 +43,14 @@ if (stickyVersionBar) {
 
   window.addEventListener('scroll', onScroll, { passive: true });
 }
+
+// Handle nav burger menu toggle
+const navBurger = document.getElementById('navBurger');
+const navMobileMenu = document.getElementById('navMobileMenu');
+
+if (navBurger && navMobileMenu) {
+    navBurger.addEventListener('click', () => {
+        navBurger.classList.toggle('active');
+        navMobileMenu.classList.toggle('active');
+    });
+}
