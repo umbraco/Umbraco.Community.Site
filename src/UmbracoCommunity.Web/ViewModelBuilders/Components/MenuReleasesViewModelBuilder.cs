@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
-using static UmbracoCommunity.Web.Models.ViewModels.Components.MenuViewModel;
+using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 

@@ -2,12 +2,15 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using UmbracoCommunity.Web.Extensions;
+using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
-using static UmbracoCommunity.Web.Models.ViewModels.Components.MenuViewModel;
+using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
@@ -42,75 +45,61 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
     {
         MenuViewModel viewModel = new();
 
-        viewModel.AddTopLevelNavigationItem(new NavigationItem(new Link { Name = "Events", Url = "events" }));
+        var navSettings = currentPage.GetNavigationSettings();
+        if (navSettings?.HeaderNavigationItems == null || !navSettings.HeaderNavigationItems.Any()) return viewModel;
 
-        var devLearnSection = new NavigationSection
+        foreach (var navItem in navSettings.HeaderNavigationItems)
         {
-            Headline = "Source"
-        };
-        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Documentation", Url = "docs" }));
-        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Packages", Url = "packages" }));
-        devLearnSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Download", Url = "download" }));
+            switch (navItem.Content.ContentType.Alias)
+            {
+                case LinkItem.ModelTypeAlias:
+                    var link = navItem.Content as LinkItem;
+                    if (link?.Link != null)
+                    {
+                        viewModel.AddTopLevelNavigationItem(new NavigationItem(link.Link));
+                    }
+                    break;
+                case NavigationSection.ModelTypeAlias:
+                    var linkSection = navItem.Content as NavigationSection;
+                    if (linkSection != null)
+                    {
+                        var section = new NavigationMenuItem(linkSection?.SectionName ?? "Title");
 
-        var devConnectSection = new NavigationSection
-        {
-            Headline = "Help"
-        };
-        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contribute", Url = "contribute" }));
-        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Forum", Url = "forum" }));
-        devConnectSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Discord", Url = "discord" }));
+                        if (linkSection.Columns != null && linkSection.Columns.Any())
+                        {
+                            foreach (var col in linkSection.Columns)
+                            {
+                                var columnArea = new NavigationSectionArea
+                                {
+                                    Headline = linkSection.SectionName
+                                };
+                                if (col != null)
+                                {
+                                    var column = col as BlockListItem<NavigationSectionColumn>;
+                                    if (column?.Content?.NavigationColumnItems == null) continue;
+                                    foreach (var item in column.Content.NavigationColumnItems)
+                                    {
+                                        var linkItem = item.Content as LinkWithIconAndCaption;
+                                        if (linkItem?.Link == null) continue;
+                                        var newLink = new NavigationLink(linkItem.Link)
+                                        {
+                                            Caption = linkItem.Caption,
+                                            IconUrl = linkItem.Icon != null ? linkItem.Icon.GetCropUrl() : null
+                                        };
+                                        columnArea.AddLink(newLink);
+                                    }
+                                }
+                                section.AddSection(columnArea);
+                            }
+                        }
 
-        var devDropdown = new NavigationDropdown("Developer", 2);
-        devDropdown.AddSection(devLearnSection);
-        devDropdown.AddSection(devConnectSection);
-
-        viewModel.AddTopLevelNavigationItem(devDropdown);
-
-        var communityInvolvedSection = new NavigationSection
-        {
-            Headline = "Get involved"
-        };
-        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Community teams", Url = "teams" }));
-        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Advisory boards", Url = "boards" }));
-        communityInvolvedSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Guilds", Url = "guilds" }));
-
-        var communityRecognitionSection = new NavigationSection
-        {
-            Headline = "Advocate"
-        };
-        communityRecognitionSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "MVP Program", Url = "mvps" }));
-        communityRecognitionSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contribute as an agency", Url = "agency" }));
-
-        var communityDropdown = new NavigationDropdown("Community", 2);
-        communityDropdown.AddSection(communityInvolvedSection);
-        communityDropdown.AddSection(communityRecognitionSection);
-
-        viewModel.AddTopLevelNavigationItem(communityDropdown);
-
-        var deiSection = new NavigationSection
-        {
-            Headline = "About"
-        };
-        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Diversity, Equity and Inclusion group", Url = "dei" }));
-        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Mission", Url = "dei-mission" }));
-        deiSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Releases 2025", Url = "releases" }));
-
-        var deiDropdown = new NavigationDropdown("Diversity", 1);
-        deiDropdown.AddSection(deiSection);
-
-        viewModel.AddTopLevelNavigationItem(deiDropdown);
-
-        var devrelSection = new NavigationSection
-        {
-            Headline = "About"
-        };
-        devrelSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "About us", Url = "about" }));
-        devrelSection.AddSectionItem(new NavigationSectionItem(new Link { Name = "Contact", Url = "contact" }));
-
-        var devrelDropdown = new NavigationDropdown("DevRel", 1);
-        devrelDropdown.AddSection(devrelSection);
-
-        viewModel.AddTopLevelNavigationItem(devrelDropdown);
+                        viewModel.AddTopLevelNavigationItem(section);
+                    }
+                    break;
+                default:
+                    continue;
+            }
+        }
 
         viewModel.AddCtaButton(new Link { Name = "Sign in", Url = "login" });
 

@@ -1,8 +1,6 @@
-using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace UmbracoCommunity.Web.Models.ViewModels.Components;
-
-public class NavigationViewModelBase
+namespace UmbracoCommunity.Web.Models.ViewModels.Components.Navigation
 {
     public class NavigationLink : ICloneable
     {
@@ -25,6 +23,10 @@ public class NavigationViewModelBase
         public string Url { get; set; }
 
         public string Target { get; set; }
+
+        public string? IconUrl { get; set; }
+
+        public string? Caption { get; set; }
 
         public virtual object Clone() => new NavigationLink(this);
     }
