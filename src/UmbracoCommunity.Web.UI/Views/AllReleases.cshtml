@@ -4,11 +4,6 @@
     Layout = "LayoutReleases.cshtml";
 }
 
-<div class="sticky-version-bar" id="stickyVersionBar">
-    <div class="sticky-version-content">
-    </div>
-</div>
-
 <div class="dc-block-list releases-container all-releases-page">
     <h1 class="all-releases-title">All Releases</h1>
 
@@ -35,7 +30,7 @@
                 var release = versionGroup.LatestRelease;
                 <div class="latest-release-card">
                     <h3 class="release-version">
-                        <a href="/?repo=Umbraco-CMS&release=@release.ReleaseLabel">v@(release.DisplayVersion)</a>
+                        <a href="/release/umbraco/Umbraco-CMS/@release.Version">v@(release.DisplayVersion)</a>
                     </h3>
                     <div class="release-meta">
                         @if (release.IssueCount > 0)
@@ -55,7 +50,7 @@
                 <div class="other-releases-grid">
                     @foreach (var release in versionGroup.OtherReleases)
                     {
-                        <a href="/?repo=Umbraco-CMS&release=@release.ReleaseLabel" class="release-link">
+                        <a href="/release/umbraco/Umbraco-CMS/@release.Version" class="release-link">
                             @release.Version
                         </a>
                     }

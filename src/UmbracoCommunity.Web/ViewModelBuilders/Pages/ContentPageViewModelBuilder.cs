@@ -1,6 +1,8 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
@@ -8,7 +10,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
     {
         public ContentPageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
         {
-            return new ContentPageViewModel(currentPage);
+            ContentPage contentModel = currentPage.As<ContentPage>();
+
+            var viewModel = new ContentPageViewModel(currentPage)
+            {
+                BlockContent = ParseBlockGrid(contentModel.ContentBlocks)
+            };
+
+            return viewModel;
         }
     }
 }

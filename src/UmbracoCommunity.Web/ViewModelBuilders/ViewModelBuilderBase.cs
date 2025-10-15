@@ -12,7 +12,7 @@ using UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders
 {
-    internal abstract class ViewModelBuilderBase
+    public abstract class ViewModelBuilderBase
     {
         protected static IList<BlockGridRow> ParseBlockGrid(BlockGridModel? contentBlocks)
         {

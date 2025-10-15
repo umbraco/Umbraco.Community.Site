@@ -8,9 +8,9 @@
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" vite-href="index" asp-add-nonce="true" />
+    <link rel="stylesheet" vite-href="@Model.ContentTypeAlias" />
     
-    <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
-    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
     <title>Umbraco Releases | @Model.Name</title>
@@ -24,6 +24,9 @@
     </main>
 
     <partial name="~/Views/Partials/Components/FooterReleases.cshtml" />
+
+    <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
+    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
 
     @RenderSection("JS", required: false)
     @Html.PageScripts()

@@ -1,11 +1,6 @@
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @model PullRequestItemViewModel
 
-@if (Model.PullRequest.AlertMessage != null && !Model.LabelCheck)
-{
-    return;
-}
-
 <div class="pr-item">
     @if (Model.PullRequest.IsHqMember)
     {
@@ -24,7 +19,7 @@
         <p class="pr-title">
             <a href="@Model.PullRequest.Url" target="_blank" class="pr-number pr-main-link @(Model.PullRequest.IsIssue ? "pr-issue" : "")">#@Model.PullRequest.Number</a>
             @Model.PullRequest.Title
-            @if (Model.PullRequest.AlertMessage != null)
+            @if (Model.LabelCheck && Model.PullRequest.AlertMessage != null)
             {
                 <uui-badge color="warning">@Model.PullRequest.AlertMessage</uui-badge>
             }
