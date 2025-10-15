@@ -21,7 +21,13 @@
           "Umb.Tiptap.Toolbar.Unlink",
           "Umb.Tiptap.Toolbar.EmbeddedMedia",
           "Umb.Tiptap.Toolbar.MediaPicker",
-          "Umb.Tiptap.Toolbar.BlockPicker"
+          "Umb.Tiptap.Toolbar.BlockPicker",
+          "Umb.Tiptap.Toolbar.TextColorForeground",
+          "Umb.Tiptap.Toolbar.Blockquote",
+          "Umb.Tiptap.Toolbar.FontSize",
+          "Umb.Tiptap.Toolbar.Heading1",
+          "Umb.Tiptap.Toolbar.Heading2",
+          "Umb.Tiptap.Toolbar.Heading3"
         ]
       ]
     ],
@@ -57,7 +63,8 @@
     ],
     "blocks": [
       {
-        "contentElementTypeKey": "50fbd3fd-639c-47ea-bd12-5d86285bef6c"
+        "contentElementTypeKey": "50fbd3fd-639c-47ea-bd12-5d86285bef6c",
+        "label": "{umbLink: callToActionLink}"
       }
     ]
   },
@@ -72,5 +79,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }

@@ -15,11 +15,16 @@
       "umb://media-type/c4b1efcfa9d541c49621e9d273b52a9c"
     ]
   },
+  "ListView": "3a0156c4-3b8c-4803-bdc1-6871faa83fff",
   "CompositionContentTypes": [],
   "PropertyGroups": [],
   "PropertyTypes": [],
   "Udi": "umb://media-type/f38bd2d765d048e695dc87ce06ec2d3d",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/3a0156c43b8c4803bdc16871faa83fff",
+      "Mode": "Exist"
+    },
     {
       "Udi": "umb://media-type/4c52d8ab54e640cd999c7a5f24903e4d",
       "Mode": "Exist"
@@ -50,5 +55,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MediaTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }
