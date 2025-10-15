@@ -9,12 +9,12 @@
   "Icon": "icon-notepad",
   "Thumbnail": "folder.png",
   "Permissions": {
-    "AllowedChildContentTypes": [
-      "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35"
-    ]
+    "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb"
+  ],
   "PropertyGroups": [],
   "PropertyTypes": [],
   "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
@@ -24,8 +24,8 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
-      "Mode": "Exist"
+      "Udi": "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
+      "Ordering": true
     },
     {
       "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
@@ -34,5 +34,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }
