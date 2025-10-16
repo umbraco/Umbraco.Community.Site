@@ -3,6 +3,16 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ComparePageViewModel>
 @{
     Layout = "LayoutReleases.cshtml";
+    ViewData["PageTitle"] = $"Compare Umbraco releases";
+    if(Model.FromVersion != null || Model.ToVersion != null)
+    {
+        ViewData["PageTitle"] = $"Comparing v{Model.FromVersion} → v{Model.ToVersion}";
+    }
+    
+    if(Model.FromVersion != null || Model.ToVersion != null)
+    {
+        ViewData["PageDescription"] = $"Comparing change in Umbraco from v{Model.FromVersion} to v{Model.ToVersion}";
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
