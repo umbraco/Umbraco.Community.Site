@@ -34,10 +34,6 @@
                         <a href="/release/umbraco/Umbraco-CMS/@release.Version">v@(release.DisplayVersion)</a>
                     </h3>
                     <div class="release-meta">
-                        @if (release.IssueCount > 0)
-                        {
-                            <span class="release-stat">Issues fixed: @release.IssueCount</span>
-                        }
                         @if (release.ReleaseDate.HasValue)
                         {
                             <span class="release-stat">Released: @release.ReleaseDate.Value.ToString("ddd MMM dd yyyy")</span>

@@ -88,6 +88,13 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
 
+            // For Umbraco-CMS, also include Announcements repo issues
+            if (repositoryName.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            {
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", "release/").ToList();
+                allIssues.AddRange(announcementsIssues);
+            }
+
             // Get first-time contributor PR numbers
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repositoryName);
 
@@ -243,6 +250,14 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             // Get all PRs and issues to calculate stats
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
+
+            // For Umbraco-CMS, also include Announcements repo issues for stats calculation
+            if (repositoryName.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            {
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", "release/").ToList();
+                allIssues.AddRange(announcementsIssues);
+            }
+
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
             // Get NuGet package versions
@@ -490,7 +505,17 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     stats[releaseLabel] = (0, 0, 0);
 
                 var current = stats[releaseLabel];
-                current.issues++;
+
+                // Issues with category/breaking label are counted as breaking changes
+                if (issue.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
+                {
+                    current.breaking++;
+                }
+                else
+                {
+                    current.issues++;
+                }
+
                 stats[releaseLabel] = current;
             }
         }

@@ -48,11 +48,6 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         const string repositoryName = "Umbraco-CMS";
         var discussions = _dataStore.GetDiscussionsByCategory(repositoryName, "releases").ToList();
 
-        // Calculate release stats from PRs and Issues
-        var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
-        var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
-        var releaseStats = CalculateReleaseStats(allPrs, allIssues);
-
         // Get NuGet package versions
         var repoConfig = _options.Repositories.FirstOrDefault(r =>
             r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
@@ -64,10 +59,10 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         }
 
         // Parse all discussions into release view models
-        var allReleases = new Dictionary<string, ReleaseDiscussionViewModel>();
+        var allReleases = new Dictionary<string, ReleaseInfoViewModel>();
         foreach (var discussion in discussions)
         {
-            var releaseVm = ParseReleaseDiscussion(discussion, releaseStats);
+            var releaseVm = ParseReleaseInfo(discussion);
             if (releaseVm != null)
             {
                 // Check if this version is available on NuGet
@@ -83,11 +78,9 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
             if (!allReleases.ContainsKey(nugetVersion.Key))
             {
                 var releaseLabel = $"release/{nugetVersion.Key}";
-                var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
-                var (features, issues, breaking) = stats;
 
                 // Create a minimal release view model from NuGet data
-                allReleases[nugetVersion.Key] = new ReleaseDiscussionViewModel
+                allReleases[nugetVersion.Key] = new ReleaseInfoViewModel
                 {
                     Version = nugetVersion.Key,
                     ReleaseLabel = releaseLabel,
@@ -95,9 +88,6 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
                     IsReleaseDateTba = false,
                     IsLts = false, // We don't know if it's LTS from NuGet alone
                     Description = string.Empty,
-                    FeatureCount = features,
-                    IssueCount = issues,
-                    BreakingChangesCount = breaking,
                     DiscussionUrl = string.Empty,
                     IsAvailableOnNuGet = true // It's from NuGet
                 };
@@ -159,9 +149,9 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
             .ToList();
     }
 
-    private class SemVerComparer : IComparer<ReleaseDiscussionViewModel>
+    private class SemVerComparer : IComparer<ReleaseInfoViewModel>
     {
-        public int Compare(ReleaseDiscussionViewModel? x, ReleaseDiscussionViewModel? y)
+        public int Compare(ReleaseInfoViewModel? x, ReleaseInfoViewModel? y)
         {
             if (x == null && y == null) return 0;
             if (x == null) return -1;
@@ -199,9 +189,8 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         }
     }
 
-    private ReleaseDiscussionViewModel? ParseReleaseDiscussion(
-        Features.GitHubSync.Models.GitHubDiscussion discussion,
-        Dictionary<string, (int features, int issues, int breaking)> releaseStats)
+    private ReleaseInfoViewModel? ParseReleaseInfo(
+        Features.GitHubSync.Models.GitHubDiscussion discussion)
     {
         var releaseLabel = discussion.Labels.FirstOrDefault(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase));
         if (string.IsNullOrEmpty(releaseLabel))
@@ -245,72 +234,15 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
             isLts = true;
         }
 
-        var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
-        var (features, issues, breaking) = stats;
-
-        return new ReleaseDiscussionViewModel
+        return new ReleaseInfoViewModel
         {
             Version = version,
             ReleaseLabel = releaseLabel,
             ReleaseDate = releaseDate,
             IsReleaseDateTba = isTba,
             IsLts = isLts,
-            FeatureCount = features,
-            IssueCount = issues,
-            BreakingChangesCount = breaking,
             DiscussionUrl = discussion.Url
         };
-    }
-
-    private static Dictionary<string, (int features, int issues, int breaking)> CalculateReleaseStats(
-        List<Features.GitHubSync.Models.GitHubPullRequest> allPrs,
-        List<Features.GitHubSync.Models.GitHubIssue> allIssues)
-    {
-        var stats = new Dictionary<string, (int features, int issues, int breaking)>();
-
-        foreach (var pr in allPrs)
-        {
-            foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/")))
-            {
-                if (!stats.ContainsKey(releaseLabel))
-                    stats[releaseLabel] = (0, 0, 0);
-
-                var current = stats[releaseLabel];
-
-                if (pr.Labels.Any(l => l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
-                                       l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
-                {
-                    current.features++;
-                }
-
-                if (pr.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
-                {
-                    current.breaking++;
-                }
-
-                if (pr.Labels.Any(l => l.Equals("category/bugfix", StringComparison.OrdinalIgnoreCase)))
-                {
-                    current.issues++;
-                }
-
-                stats[releaseLabel] = current;
-            }
-        }
-
-        foreach (var issue in allIssues)
-        {
-            foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/")))
-            {
-                if (!stats.ContainsKey(releaseLabel))
-                    stats[releaseLabel] = (0, 0, 0);
-
-                var current = stats[releaseLabel];
-                current.issues++;
-                stats[releaseLabel] = current;
-            }
-        }
-
-        return stats;
     }
 
     private static Version ParseVersion(string releaseLabel)

@@ -19,8 +19,37 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             _options = options.Value;
         }
 
-        public ReleaseDiscussionViewModel? ParseReleaseDiscussion(Features.GitHubSync.Models.GitHubDiscussion discussion,
+        public ReleaseDiscussionViewModel? ParseReleaseDiscussion(
+            Features.GitHubSync.Models.GitHubDiscussion discussion,
             Dictionary<string, (int features, int issues, int breaking)> releaseStats)
+        {
+            var baseInfo = ParseReleaseInfo(discussion);
+            if (baseInfo == null)
+                return null;
+
+            // Get stats for this release
+            var (features, issues, breaking) = releaseStats.GetValueOrDefault(baseInfo.ReleaseLabel, (0, 0, 0));
+
+            return new ReleaseDiscussionViewModel
+            {
+                Version = baseInfo.Version,
+                ReleaseLabel = baseInfo.ReleaseLabel,
+                ActualLatestVersion = baseInfo.ActualLatestVersion,
+                ReleaseDate = baseInfo.ReleaseDate,
+                IsReleaseDateTba = baseInfo.IsReleaseDateTba,
+                IsLts = baseInfo.IsLts,
+                Description = baseInfo.Description,
+                IsAvailableOnNuGet = baseInfo.IsAvailableOnNuGet,
+                DiscussionUrl = baseInfo.DiscussionUrl,
+                HasPreRelease = baseInfo.HasPreRelease,
+                PreReleaseVersion = baseInfo.PreReleaseVersion,
+                FeatureCount = features,
+                IssueCount = issues,
+                BreakingChangesCount = breaking
+            };
+        }
+
+        public ReleaseInfoViewModel? ParseReleaseInfo(Features.GitHubSync.Models.GitHubDiscussion discussion)
         {
             // Find the release label (format: "release/X.Y.Z")
             var releaseLabel =
@@ -107,11 +136,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             description = string.Join("\n", descriptionLines).Trim();
 
-            // Get stats for this release
-            var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
-            var (features, issues, breaking) = stats;
-
-            return new ReleaseDiscussionViewModel
+            return new ReleaseInfoViewModel
             {
                 Version = version,
                 ReleaseLabel = releaseLabel,
@@ -119,9 +144,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 IsReleaseDateTba = isTba,
                 IsLts = isLts,
                 Description = description,
-                FeatureCount = features,
-                IssueCount = issues,
-                BreakingChangesCount = breaking,
                 DiscussionUrl = discussion.Url
             };
         }
@@ -148,12 +170,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             if (!discussions.Any())
                 return;
 
-            // Calculate release stats from PRs and Issues
-            var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
-            var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
-
-            var releaseStats = CalculateReleaseStats(allPrs, allIssues);
-
             // Get NuGet package versions from database (use as fallback for missing version info)
             // Find the NuGet package ID for this repository
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
@@ -165,11 +181,11 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             // Parse discussions into release view models
-            var allReleases = new List<ReleaseDiscussionViewModel>();
+            var allReleases = new List<ReleaseInfoViewModel>();
             foreach (var discussion in discussions)
             {
                 System.Diagnostics.Debug.WriteLine($"Parsing discussion: {discussion.Title}");
-                var releaseVm = ParseReleaseDiscussion(discussion, releaseStats);
+                var releaseVm = ParseReleaseInfo(discussion);
                 if (releaseVm != null)
                 {
                     System.Diagnostics.Debug.WriteLine(
@@ -269,61 +285,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             return (Version.TryParse(versionString, out var ver) ? ver : new Version(0, 0, 0), string.Empty);
-        }
-        private static Dictionary<string, (int features, int issues, int breaking)> CalculateReleaseStats(
-            List<Features.GitHubSync.Models.GitHubPullRequest> allPrs,
-            List<Features.GitHubSync.Models.GitHubIssue> allIssues)
-        {
-            var stats = new Dictionary<string, (int features, int issues, int breaking)>();
-
-            // Count features, issues, and breaking changes per release label
-            foreach (var pr in allPrs)
-            {
-                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/")))
-                {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
-
-                    var current = stats[releaseLabel];
-
-                    // Check for features
-                    if (pr.Labels.Any(l => l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
-                                           l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        current.features++;
-                    }
-
-                    // Check for breaking changes
-                    if (pr.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        current.breaking++;
-                    }
-
-                    // Check for bugfixes (counted as "issues")
-                    if (pr.Labels.Any(l => l.Equals("category/bugfix", StringComparison.OrdinalIgnoreCase)))
-                    {
-                        current.issues++;
-                    }
-
-                    stats[releaseLabel] = current;
-                }
-            }
-
-            // Count issues
-            foreach (var issue in allIssues)
-            {
-                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/")))
-                {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
-
-                    var current = stats[releaseLabel];
-                    current.issues++;
-                    stats[releaseLabel] = current;
-                }
-            }
-
-            return stats;
         }
 
         private static Version ParseVersion(string releaseLabel)
