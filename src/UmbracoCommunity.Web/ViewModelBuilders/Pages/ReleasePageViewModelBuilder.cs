@@ -135,23 +135,19 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             // Convert to ReleaseGroupViewModel and categorize
             // For single release page, only include the matching release group
-            var releases = releaseGroups
-                .Where(kvp => kvp.Key == viewModel.ReleaseLabel)
-                .Select(kvp =>
+            if (releaseGroups.TryGetValue(viewModel.ReleaseLabel, out var prs))
+            {
+                var orderedPrs = prs.OrderByDescending(pr => pr.CreatedAt).ToList();
+                var categories = CategorizePullRequests(orderedPrs);
+
+                viewModel.Release = new ReleaseGroupViewModel
                 {
-                    var orderedPrs = kvp.Value.OrderByDescending(pr => pr.CreatedAt).ToList();
-                    var categories = CategorizePullRequests(orderedPrs);
-
-                    return new ReleaseGroupViewModel
-                    {
-                        ReleaseLabel = kvp.Key,
-                        RepositoryName = repository,
-                        PullRequests = orderedPrs,
-                        Categories = categories
-                    };
-                }).ToList();
-
-            viewModel.Releases = releases;
+                    ReleaseLabel = viewModel.ReleaseLabel,
+                    RepositoryName = repository,
+                    PullRequests = orderedPrs,
+                    Categories = categories
+                };
+            }
 
             // Get release info from discussions
             PopulateReleaseInfo(viewModel, repository, viewModel.ReleaseLabel);

@@ -3,9 +3,9 @@
 @{
     Layout = "LayoutReleases.cshtml";
     ViewData["PageTitle"] = $"{Model.Repository} v{Model.Version} release notes";
-    if (Model.Releases.FirstOrDefault() != null)
+    if (Model.Release != null)
     {
-        ViewData["PageDescription"] = $"{Model.Repository} v{Model.Version} has {Model.Releases.FirstOrDefault().TotalCount} bug fixes and improvements.";
+        ViewData["PageDescription"] = $"{Model.Repository} v{Model.Version} has {Model.Release.TotalCount} bug fixes and improvements.";
     }
 }
 
