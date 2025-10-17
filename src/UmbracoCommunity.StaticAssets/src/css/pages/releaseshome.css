@@ -1126,7 +1126,7 @@ uui-badge[color="warning"] {
 .compare-results-header {
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: 700;
-  color: var(--color-dark);
+  color: var(--color-white);
   margin: 0 0 var(--unit) 0;
 }
 
