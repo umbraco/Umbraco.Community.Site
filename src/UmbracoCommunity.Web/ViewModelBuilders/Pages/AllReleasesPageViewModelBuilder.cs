@@ -154,6 +154,7 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
                     OtherReleases = otherReleases
                 };
             })
+            .Where(g => g.LatestRelease != null || g.OtherReleases.Any())
             .ToList();
     }
 
