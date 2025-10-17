@@ -72,9 +72,11 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process PRs
             foreach (var pr in allPrs)
             {
-                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                         l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
+                // Find all release labels that match this repository
+                // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                var releaseLabels = pr.Labels
+                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -117,9 +119,11 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process Issues
             foreach (var issue in allIssues)
             {
-                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                            l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
+                // Find all release labels that match this repository
+                // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                var releaseLabels = issue.Labels
+                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -390,6 +394,29 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             // No prefix, return as-is
             return label;
+        }
+
+        /// <summary>
+        /// Checks if a release label is valid for the given repository.
+        /// Valid labels are: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches the repo's AnnouncementsPrefix.
+        /// </summary>
+        private static bool IsValidReleaseLabelForRepository(string label, RepositoryConfig? repoConfig)
+        {
+            // Always allow unprefixed "release/" labels
+            if (label.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // If the repo has an AnnouncementsPrefix, allow labels with that prefix
+            if (repoConfig?.HasAnnouncementsPrefix == true &&
+                !string.IsNullOrEmpty(repoConfig.AnnouncementsPrefix))
+            {
+                var prefixPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                if (label.StartsWith(prefixPattern, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            // Reject all other prefixed labels (e.g., "forms/release/", "commerce/release/", etc.)
+            return false;
         }
     }
 }
