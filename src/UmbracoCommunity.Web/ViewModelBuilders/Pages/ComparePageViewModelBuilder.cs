@@ -359,7 +359,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
             // Return all versions (including upcoming and pre-releases), sorted by version descending
             return allReleases.Values
-                .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
+                .OrderByDescending(r => r.Version, new SemVerComparer())
                 .ToList();
         })!;
 
