@@ -78,9 +78,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
                 foreach (var releaseLabel in releaseLabels)
                 {
-                    if (!releaseGroups.ContainsKey(releaseLabel))
+                    // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+
+                    if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
-                        releaseGroups[releaseLabel] = new List<ReleasePullRequestViewModel>();
+                        releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
                     var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
@@ -90,7 +93,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                                                  firstTimeContributorPrNumbers.TryGetValue(pr.Author.Login, out var firstPrNumber) &&
                                                  pr.Number == firstPrNumber;
 
-                    releaseGroups[releaseLabel].Add(new ReleasePullRequestViewModel
+                    releaseGroups[normalizedLabel].Add(new ReleasePullRequestViewModel
                     {
                         Number = pr.Number,
                         Title = pr.Title,
@@ -120,15 +123,18 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
                 foreach (var releaseLabel in releaseLabels)
                 {
-                    if (!releaseGroups.ContainsKey(releaseLabel))
+                    // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+
+                    if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
-                        releaseGroups[releaseLabel] = new List<ReleasePullRequestViewModel>();
+                        releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
                     var isHqMember = issue.Author != null && _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
                     var authorLogin = issue.Author?.Login ?? "unknown";
 
-                    releaseGroups[releaseLabel].Add(new ReleasePullRequestViewModel
+                    releaseGroups[normalizedLabel].Add(new ReleasePullRequestViewModel
                     {
                         Number = issue.Number,
                         Title = issue.Title,
@@ -257,10 +263,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
                                                                    l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                    var current = stats[releaseLabel];
+                    if (!stats.ContainsKey(normalizedLabel))
+                        stats[normalizedLabel] = (0, 0, 0);
+
+                    var current = stats[normalizedLabel];
 
                     if (pr.Labels.Any(l => l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
                                            l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
@@ -278,7 +286,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         current.issues++;
                     }
 
-                    stats[releaseLabel] = current;
+                    stats[normalizedLabel] = current;
                 }
             }
 
@@ -288,10 +296,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
                                                                      l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                    var current = stats[releaseLabel];
+                    if (!stats.ContainsKey(normalizedLabel))
+                        stats[normalizedLabel] = (0, 0, 0);
+
+                    var current = stats[normalizedLabel];
 
                     // Issues with category/breaking label are counted as breaking changes
                     if (issue.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
@@ -303,7 +313,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         current.issues++;
                     }
 
-                    stats[releaseLabel] = current;
+                    stats[normalizedLabel] = current;
                 }
             }
 
@@ -361,6 +371,25 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             return categories;
+        }
+
+        /// <summary>
+        /// Normalizes a release label by removing any prefix.
+        /// E.g., "cms/release/17.0.0" -> "release/17.0.0", "release/17.0.0" -> "release/17.0.0"
+        /// </summary>
+        private static string NormalizeReleaseLabel(string label)
+        {
+            var releasePart = "/release/";
+            var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
+
+            if (releaseIndex >= 0)
+            {
+                // Found a prefix before "/release/", extract "release/X.Y.Z" part
+                return "release" + label.Substring(releaseIndex + releasePart.Length - 1);
+            }
+
+            // No prefix, return as-is
+            return label;
         }
     }
 }

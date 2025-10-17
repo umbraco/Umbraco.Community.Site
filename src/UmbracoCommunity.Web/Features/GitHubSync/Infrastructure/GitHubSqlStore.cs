@@ -376,8 +376,8 @@ public class GitHubSqlStore
     public IEnumerable<GitHubPullRequest> GetPullRequestsByLabelPattern(string repositoryName, string labelPattern)
     {
         // For SQL implementation, we use the specific release label query
-        // If labelPattern is just "release/", return all PRs since we can't efficiently filter by pattern in SQL
-        if (labelPattern == "release/")
+        // If labelPattern ends with "release/" (e.g., "release/" or "cms/release/"), return all PRs since we can't efficiently filter by pattern in SQL
+        if (labelPattern.EndsWith("release/", StringComparison.OrdinalIgnoreCase))
         {
             return GetAllPullRequests(repositoryName);
         }
@@ -387,8 +387,8 @@ public class GitHubSqlStore
     public IEnumerable<GitHubIssue> GetIssuesByLabelPattern(string repositoryName, string labelPattern)
     {
         // For SQL implementation, we use the specific release label query
-        // If labelPattern is just "release/", return all issues since we can't efficiently filter by pattern in SQL
-        if (labelPattern == "release/")
+        // If labelPattern ends with "release/" (e.g., "release/" or "cms/release/"), return all issues since we can't efficiently filter by pattern in SQL
+        if (labelPattern.EndsWith("release/", StringComparison.OrdinalIgnoreCase))
         {
             return GetAllIssues(repositoryName);
         }

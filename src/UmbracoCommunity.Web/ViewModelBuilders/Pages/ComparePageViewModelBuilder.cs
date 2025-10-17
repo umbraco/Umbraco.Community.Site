@@ -216,16 +216,23 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 {
                     var allPrs = kvp.Value.OrderByDescending(pr => pr.CreatedAt).ToList();
                     var features = allPrs
-                        .Where(pr => pr.Labels.Any(l => l.Equals("type/feature", StringComparison.OrdinalIgnoreCase)))
+                        .Where(pr => pr.Labels.Any(l => l.Equals("type/feature", StringComparison.OrdinalIgnoreCase) ||
+                                                        l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
+                                                        l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
+                        .ToList();
+                    var breakingChanges = allPrs
+                        .Where(pr => !features.Contains(pr) &&
+                                     pr.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
                         .ToList();
                     var issuesAndTasks = allPrs
-                        .Where(pr => !pr.Labels.Any(l => l.Equals("type/feature", StringComparison.OrdinalIgnoreCase)))
+                        .Where(pr => !features.Contains(pr) && !breakingChanges.Contains(pr))
                         .ToList();
 
                     return new VersionChangesGroup
                     {
                         Version = kvp.Key,
                         Features = features,
+                        BreakingChanges = breakingChanges,
                         IssuesAndTasks = issuesAndTasks
                     };
                 })
@@ -233,6 +240,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
             // Calculate total counts
             viewModel.FeatureCount = viewModel.VersionGroups.Sum(vg => vg.Features.Count);
+            viewModel.BreakingChangesCount = viewModel.VersionGroups.Sum(vg => vg.BreakingChanges.Count);
             viewModel.IssuesAndTasksCount = viewModel.VersionGroups.Sum(vg => vg.IssuesAndTasks.Count);
         }
 
@@ -479,10 +487,12 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
                                                                l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
             {
-                if (!stats.ContainsKey(releaseLabel))
-                    stats[releaseLabel] = (0, 0, 0);
+                var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                var current = stats[releaseLabel];
+                if (!stats.ContainsKey(normalizedLabel))
+                    stats[normalizedLabel] = (0, 0, 0);
+
+                var current = stats[normalizedLabel];
 
                 if (pr.Labels.Any(l => l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
                                        l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
@@ -500,7 +510,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     current.issues++;
                 }
 
-                stats[releaseLabel] = current;
+                stats[normalizedLabel] = current;
             }
         }
 
@@ -510,10 +520,12 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
                                                                  l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
             {
-                if (!stats.ContainsKey(releaseLabel))
-                    stats[releaseLabel] = (0, 0, 0);
+                var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                var current = stats[releaseLabel];
+                if (!stats.ContainsKey(normalizedLabel))
+                    stats[normalizedLabel] = (0, 0, 0);
+
+                var current = stats[normalizedLabel];
 
                 // Issues with category/breaking label are counted as breaking changes
                 if (issue.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
@@ -525,16 +537,54 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     current.issues++;
                 }
 
-                stats[releaseLabel] = current;
+                stats[normalizedLabel] = current;
             }
         }
 
         return stats;
     }
 
-    private static Version ParseVersion(string releaseLabel)
+    /// <summary>
+    /// Normalizes a release label by removing any prefix.
+    /// E.g., "cms/release/17.0.0" -> "release/17.0.0", "release/17.0.0" -> "release/17.0.0"
+    /// </summary>
+    private static string NormalizeReleaseLabel(string label)
     {
-        var versionString = releaseLabel.Replace("release/", "").Trim();
+        var releasePart = "/release/";
+        var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
+
+        if (releaseIndex >= 0)
+        {
+            // Found a prefix before "/release/", extract "release/X.Y.Z" part
+            return "release" + label.Substring(releaseIndex + releasePart.Length - 1);
+        }
+
+        // No prefix, return as-is
+        return label;
+    }
+
+    /// <summary>
+    /// Extracts version string from label. Handles both "release/X.Y.Z" and "{prefix}/release/X.Y.Z" patterns.
+    /// </summary>
+    private static string ExtractVersionFromLabel(string label)
+    {
+        // Handle both "release/X.Y.Z" and "prefix/release/X.Y.Z" patterns
+        var releasePart = "/release/";
+        var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
+
+        if (releaseIndex >= 0)
+        {
+            // Extract everything after "/release/"
+            return label.Substring(releaseIndex + releasePart.Length);
+        }
+
+        // Fallback: assume it starts with "release/"
+        return label.Replace("release/", "").Trim();
+    }
+
+    private static Version ParseVersion(string versionString)
+    {
+        versionString = versionString.Trim();
 
         // Handle pre-release versions (e.g., "14.0.0-rc1" -> "14.0.0")
         var dashIndex = versionString.IndexOf('-');

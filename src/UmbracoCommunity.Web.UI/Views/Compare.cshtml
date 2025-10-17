@@ -24,7 +24,7 @@
     <span>v@(Model.LowestVersion)→ v@(Model.HighestVersion)</span>
             </div>
             <div class="sticky-version-label">
-                <span>@Model.FeatureCount features, @Model.IssuesAndTasksCount issues & tasks</span>
+                <span>@Model.FeatureCount features, @Model.BreakingChangesCount breaking changes, @Model.IssuesAndTasksCount issues & tasks</span>
             </div>
         </div>
     </div>
@@ -96,7 +96,7 @@
             </h2>
 
             <div class="compare-summary">
-                <p><strong>@Model.FeatureCount</strong> new features and <strong>@Model.IssuesAndTasksCount</strong> issues & tasks were implemented</p>
+                <p><strong>@Model.FeatureCount</strong> new features, <strong>@Model.BreakingChangesCount</strong> breaking changes, and <strong>@Model.IssuesAndTasksCount</strong> issues & tasks were implemented</p>
             </div>
 
             <p class="upgrade-notes">
@@ -110,8 +110,8 @@
                     <div class="version-changes-group">
                         <h3 class="version-changes-header">Changes in v@(versionGroup.Version)</h3>
 
-                        
-                        @if (!versionGroup.Features.Any() && !versionGroup.IssuesAndTasks.Any())
+
+                        @if (!versionGroup.Features.Any() && !versionGroup.BreakingChanges.Any() && !versionGroup.IssuesAndTasks.Any())
                         {
                             <div class="empty-state">
                                 <p>No known issues or PRs for this version, there may be more info on GitHub: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)</a></p>
@@ -124,6 +124,22 @@
                                 <div class="pr-list">
                                     <h4 class="changes-category-header">Features</h4>
                                     @foreach (var pr in versionGroup.Features)
+                                    {
+                                        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
+                                        {
+                                            PullRequest = pr,
+                                            UmbracoLogoPath = Model.UmbracoLogoPath,
+                                            LabelCheck = Model.LabelCheck
+                                        })
+                                    }
+                                </div>
+                            }
+
+                            @if (versionGroup.BreakingChanges.Any())
+                            {
+                                <div class="pr-list">
+                                    <h4 class="changes-category-header">Breaking changes</h4>
+                                    @foreach (var pr in versionGroup.BreakingChanges)
                                     {
                                         @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
                                         {
