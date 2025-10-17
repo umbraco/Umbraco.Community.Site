@@ -84,6 +84,14 @@
                            @if (Model.IncludePreReleases) { <text>checked="checked"</text> } />
                     Include pre-release versions
                 </label>
+                <label>
+                    <input type="checkbox"
+                           id="showNotesOnly"
+                           name="notes"
+                           value="1"
+                           @if (Model.ShowNotesOnly) { <text>checked="checked"</text> } />
+                    Show only breaking changes and release notes
+                </label>
             </div>
         </form>
     </div>
@@ -95,15 +103,31 @@
             <div class="release-group">
                 <div class="release-notes-header">
                     <h2>Changes in v@(versionGroup.Version)</h2>
-                    <p>
-                        <strong>@versionGroup.Features.Count</strong> new features,
-                        <strong>@versionGroup.BreakingChanges.Count</strong> breaking changes, and
-                        <strong>@versionGroup.IssuesAndTasks.Count</strong> issues & tasks were implemented
-                    </p>
+                    @if (!Model.ShowNotesOnly)
+                    {
+                        <p>
+                            <strong>@versionGroup.Features.Count</strong> new features,
+                            <strong>@versionGroup.BreakingChanges.Count</strong> breaking changes, and
+                            <strong>@versionGroup.IssuesAndTasks.Count</strong> issues & tasks were implemented
+                        </p>
+                    }
+                    else
+                    {
+                        <p>
+                            <strong>@versionGroup.BreakingChanges.Count</strong> breaking changes
+                        </p>
+                    }
                     <p class="release-nuget-link">
                         Make sure to read the <a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading/version-specific" target="_blank">version specific upgrades notes</a> for guidance.
                     </p>
                 </div>
+
+                @if (!string.IsNullOrEmpty(versionGroup.Description))
+                {
+                    <div class="release-description">
+                        @Html.Raw(Markdig.Markdown.ToHtml(versionGroup.Description))
+                    </div>
+                }
 
                 @if (!versionGroup.Features.Any() && !versionGroup.BreakingChanges.Any() && !versionGroup.IssuesAndTasks.Any())
                 {
@@ -116,7 +140,7 @@
                 else
                 {
                     <div class="release-categories">
-                        @if (versionGroup.Features.Any())
+                        @if (!Model.ShowNotesOnly && versionGroup.Features.Any())
                         {
                             <details class="release-category" open>
                                 <summary>
@@ -158,7 +182,7 @@
                             </details>
                         }
 
-                        @if (versionGroup.IssuesAndTasks.Any())
+                        @if (!Model.ShowNotesOnly && versionGroup.IssuesAndTasks.Any())
                         {
                             <details class="release-category" open>
                                 <summary>

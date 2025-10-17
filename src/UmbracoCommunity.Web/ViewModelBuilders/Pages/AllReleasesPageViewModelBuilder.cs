@@ -14,14 +14,20 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
     private readonly GitHubSqlStore _dataStore;
     private readonly GitHubSyncOptions _options;
     private readonly IMemoryCache _memoryCache;
+    private readonly ReleaseDiscussionParser _releaseParser;
 
     public const string CacheKey = "AllReleases_VersionGroups";
 
-    public AllReleasesPageViewModelBuilder(GitHubSqlStore dataStore, IOptions<GitHubSyncOptions> options, IMemoryCache memoryCache)
+    public AllReleasesPageViewModelBuilder(
+        GitHubSqlStore dataStore,
+        IOptions<GitHubSyncOptions> options,
+        IMemoryCache memoryCache,
+        ReleaseDiscussionParser releaseParser)
     {
         _dataStore = dataStore;
         _options = options.Value;
         _memoryCache = memoryCache;
+        _releaseParser = releaseParser;
     }
 
     public AllReleasesPageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -62,7 +68,7 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         var allReleases = new Dictionary<string, ReleaseInfoViewModel>();
         foreach (var discussion in discussions)
         {
-            var releaseVm = ParseReleaseInfo(discussion);
+            var releaseVm = _releaseParser.ParseReleaseInfo(discussion);
             if (releaseVm != null)
             {
                 // Check if this version is available on NuGet
@@ -187,62 +193,6 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
 
             return (Version.TryParse(versionString, out var ver) ? ver : new Version(0, 0, 0), string.Empty);
         }
-    }
-
-    private ReleaseInfoViewModel? ParseReleaseInfo(
-        Features.GitHubSync.Models.GitHubDiscussion discussion)
-    {
-        var releaseLabel = discussion.Labels.FirstOrDefault(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrEmpty(releaseLabel))
-            return null;
-
-        var version = releaseLabel.Substring("release/".Length);
-
-        DateTime? releaseDate = null;
-        bool isTba = true;
-
-        var releaseDatePattern = @"\*\*Release date:\*\*\s*(.+)";
-        var match = System.Text.RegularExpressions.Regex.Match(discussion.Body, releaseDatePattern,
-            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-        if (match.Success)
-        {
-            var dateString = match.Groups[1].Value.Trim();
-
-            if (dateString.Contains("TODO", StringComparison.OrdinalIgnoreCase))
-            {
-                var todoDatePattern = @"TODO\s*\((\d{4}-\d{2}-\d{2})\)";
-                var todoMatch = System.Text.RegularExpressions.Regex.Match(dateString, todoDatePattern);
-                if (todoMatch.Success && DateTime.TryParse(todoMatch.Groups[1].Value, out var parsedDate))
-                {
-                    releaseDate = parsedDate;
-                    isTba = true;
-                }
-            }
-            else if (DateTime.TryParse(dateString, out var parsedDate))
-            {
-                releaseDate = parsedDate;
-                isTba = false;
-            }
-        }
-
-        bool isLts = false;
-        var ltsPattern = @"\*\*Long term supported version\*\*\?\s*(Yes|yes)";
-        var ltsMatch = System.Text.RegularExpressions.Regex.Match(discussion.Body, ltsPattern);
-        if (ltsMatch.Success)
-        {
-            isLts = true;
-        }
-
-        return new ReleaseInfoViewModel
-        {
-            Version = version,
-            ReleaseLabel = releaseLabel,
-            ReleaseDate = releaseDate,
-            IsReleaseDateTba = isTba,
-            IsLts = isLts,
-            DiscussionUrl = discussion.Url
-        };
     }
 
     private static Version ParseVersion(string releaseLabel)

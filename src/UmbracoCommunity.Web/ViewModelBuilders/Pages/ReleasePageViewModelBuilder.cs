@@ -11,16 +11,16 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
     {
         private readonly GitHubSqlStore _dataStore;
         private readonly GitHubSyncOptions _options;
-        private readonly ReleasesHomePageViewModelBuilder _releasesHomeBuilder;
+        private readonly Utilities.ReleaseDiscussionParser _releaseParser;
 
         public ReleasePageViewModelBuilder(
             GitHubSqlStore dataStore,
             Microsoft.Extensions.Options.IOptions<GitHubSyncOptions> options,
-            ReleasesHomePageViewModelBuilder releasesHomeBuilder)
+            Utilities.ReleaseDiscussionParser releaseParser)
         {
             _dataStore = dataStore;
             _options = options.Value;
-            _releasesHomeBuilder = releasesHomeBuilder;
+            _releaseParser = releaseParser;
         }
 
         public ReleasePageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -203,7 +203,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             foreach (var discussion in discussions)
             {
-                var releaseVm = _releasesHomeBuilder.ParseReleaseDiscussion(discussion, releaseStats);
+                var releaseVm = _releaseParser.ParseReleaseDiscussion(discussion, releaseStats);
                 if (releaseVm != null && releaseVm.ReleaseLabel == releaseLabel)
                 {
                     if (nugetVersions.TryGetValue(releaseVm.Version, out var nugetPublishedDate))

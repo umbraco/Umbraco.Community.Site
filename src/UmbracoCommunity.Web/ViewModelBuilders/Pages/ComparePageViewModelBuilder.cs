@@ -15,17 +15,20 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
     private readonly GitHubSyncOptions _options;
     private readonly IMemoryCache _memoryCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly Utilities.ReleaseDiscussionParser _releaseParser;
 
     public ComparePageViewModelBuilder(
         GitHubSqlStore dataStore,
         IOptions<GitHubSyncOptions> options,
         IMemoryCache memoryCache,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor,
+        Utilities.ReleaseDiscussionParser releaseParser)
     {
         _dataStore = dataStore;
         _options = options.Value;
         _memoryCache = memoryCache;
         _httpContextAccessor = httpContextAccessor;
+        _releaseParser = releaseParser;
     }
 
     public ComparePageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -41,6 +44,9 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
         var includePreReleases = queryString?["includePreReleases"].ToString();
         viewModel.IncludePreReleases = !string.IsNullOrEmpty(includePreReleases) && includePreReleases.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+        var notes = queryString?["notes"].ToString();
+        viewModel.ShowNotesOnly = !string.IsNullOrEmpty(notes) && notes.Equals("1", StringComparison.OrdinalIgnoreCase);
 
         // Get all available versions
         const string repositoryName = "Umbraco-CMS";
@@ -228,9 +234,14 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                         .Where(pr => !features.Contains(pr) && !breakingChanges.Contains(pr))
                         .ToList();
 
+                    // Get release notes from available versions
+                    var releaseInfo = viewModel.AvailableVersions.FirstOrDefault(v => v.Version == kvp.Key);
+
                     return new VersionChangesGroup
                     {
                         Version = kvp.Key,
+                        Description = releaseInfo?.Description ?? string.Empty,
+                        DiscussionUrl = releaseInfo?.DiscussionUrl ?? string.Empty,
                         Features = features,
                         BreakingChanges = breakingChanges,
                         IssuesAndTasks = issuesAndTasks
@@ -287,7 +298,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var allReleases = new Dictionary<string, ReleaseDiscussionViewModel>();
             foreach (var discussion in discussions)
             {
-                var releaseVm = ParseReleaseDiscussion(discussion, releaseStats);
+                var releaseVm = _releaseParser.ParseReleaseDiscussion(discussion, releaseStats);
                 if (releaseVm != null)
                 {
                     allReleases[releaseVm.Version] = releaseVm;
@@ -370,69 +381,6 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         }
 
         return allVersions;
-    }
-
-    private ReleaseDiscussionViewModel? ParseReleaseDiscussion(
-        Features.GitHubSync.Models.GitHubDiscussion discussion,
-        Dictionary<string, (int features, int issues, int breaking)> releaseStats)
-    {
-        var releaseLabel = discussion.Labels.FirstOrDefault(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrEmpty(releaseLabel))
-            return null;
-
-        var version = releaseLabel.Substring("release/".Length);
-
-        DateTime? releaseDate = null;
-        bool isTba = true;
-
-        var releaseDatePattern = @"\*\*Release date:\*\*\s*(.+)";
-        var match = System.Text.RegularExpressions.Regex.Match(discussion.Body, releaseDatePattern,
-            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-        if (match.Success)
-        {
-            var dateString = match.Groups[1].Value.Trim();
-
-            if (dateString.Contains("TODO", StringComparison.OrdinalIgnoreCase))
-            {
-                var todoDatePattern = @"TODO\s*\((\d{4}-\d{2}-\d{2})\)";
-                var todoMatch = System.Text.RegularExpressions.Regex.Match(dateString, todoDatePattern);
-                if (todoMatch.Success && DateTime.TryParse(todoMatch.Groups[1].Value, out var parsedDate))
-                {
-                    releaseDate = parsedDate;
-                    isTba = true;
-                }
-            }
-            else if (DateTime.TryParse(dateString, out var parsedDate))
-            {
-                releaseDate = parsedDate;
-                isTba = false;
-            }
-        }
-
-        bool isLts = false;
-        var ltsPattern = @"\*\*Long term supported version\*\*\?\s*(Yes|yes)";
-        var ltsMatch = System.Text.RegularExpressions.Regex.Match(discussion.Body, ltsPattern);
-        if (ltsMatch.Success)
-        {
-            isLts = true;
-        }
-
-        var stats = releaseStats.GetValueOrDefault(releaseLabel, (0, 0, 0));
-        var (features, issues, breaking) = stats;
-
-        return new ReleaseDiscussionViewModel
-        {
-            Version = version,
-            ReleaseLabel = releaseLabel,
-            ReleaseDate = releaseDate,
-            IsReleaseDateTba = isTba,
-            IsLts = isLts,
-            FeatureCount = features,
-            IssueCount = issues,
-            BreakingChangesCount = breaking,
-            DiscussionUrl = discussion.Url
-        };
     }
 
     private class SemVerComparer : IComparer<string>
