@@ -15,15 +15,10 @@
     </h3>
     @if (Model.IsReleaseDateTba || !Model.ReleaseDate.HasValue)
     {
-        <p class="release-date">Release date: to be determined</p>
+        <p class="release-date">Release date: <br />to be determined</p>
     }
     else
     {
-        <p class="release-date">Release date: @Model.FormattedReleaseDate</p>
+        <p class="release-date">Release date: <br />@Model.FormattedReleaseDate</p>
     }
-    <div class="release-stats">
-        <span>Features: @Model.FeatureCount</span>
-        <span>Issues: @Model.IssueCount</span>
-        <span>Breaking changes: @Model.BreakingChangesCount</span>
-    </div>
 </div>
