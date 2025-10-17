@@ -4,7 +4,7 @@ using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 namespace UmbracoCommunity.Web.Models.Pages
 {
     public class ReleasePageViewModel : PageViewModelBase
-    { 
+    {
         public ReleasePageViewModel(IPublishedContent currentPage) : base(currentPage)
         {
             // Override to ensure the correct CSS entrypoint is loaded
@@ -18,5 +18,7 @@ namespace UmbracoCommunity.Web.Models.Pages
         public ReleaseGroupViewModel? Release { get; set; }
         public string? NuGetPackageId { get; set; }
         public bool LabelCheck { get; set; }
+        public bool IsPreRelease { get; set; }
+        public string StableVersion { get; set; } = string.Empty;
     }
 }

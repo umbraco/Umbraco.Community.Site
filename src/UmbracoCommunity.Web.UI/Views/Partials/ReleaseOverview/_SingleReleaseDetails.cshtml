@@ -13,6 +13,11 @@
             NuGetPackageId = Model.NuGetPackageId
         })
 
+        @if (Model.IsPreRelease)
+        {
+            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PreReleaseNotice.cshtml", Model)
+        }
+
         @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
         {
             ReleaseGroup = Model.Release,
@@ -38,6 +43,11 @@ else if (Model.ReleaseInfo != null)
             ReleaseGroup = null,
             NuGetPackageId = Model.NuGetPackageId
         })
+
+        @if (Model.IsPreRelease)
+        {
+            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PreReleaseNotice.cshtml", Model)
+        }
 
         <div class="release-categories">
             <div class="empty-state">

@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
@@ -40,7 +41,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 Organization = organization,
                 Repository = repository,
                 Version = version,
-                ReleaseLabel = $"release/{version}"
+                ReleaseLabel = $"release/{version}",
+                IsPreRelease = SemVerHelper.IsPreRelease(version),
+                StableVersion = SemVerHelper.GetStableVersion(version)
             };
 
             // Get NuGet package ID for this repository

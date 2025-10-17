@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
@@ -133,7 +134,7 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
 
                 // Get all non-pre-release versions for this major version
                 var nonPreReleases = sortedReleases
-                    .Where(r => !IsPreRelease(r.Version))
+                    .Where(r => !SemVerHelper.IsPreRelease(r.Version))
                     .ToList();
 
                 // If we have non-pre-release versions, use the latest one as the featured release
@@ -144,7 +145,7 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
 
                 // All other releases (excluding the latest and pre-releases), ordered by version
                 var otherReleases = sortedReleases
-                    .Where(r => r != latestRelease && !IsPreRelease(r.Version))
+                    .Where(r => r != latestRelease && !SemVerHelper.IsPreRelease(r.Version))
                     .ToList();
 
                 return new MajorVersionGroupViewModel
@@ -156,12 +157,6 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
             })
             .Where(g => g.LatestRelease != null || g.OtherReleases.Any())
             .ToList();
-    }
-
-    private static bool IsPreRelease(string version)
-    {
-        // A pre-release version contains a dash (e.g., "14.0.0-rc1")
-        return version.Contains("-");
     }
 
     private class SemVerComparer : IComparer<ReleaseDiscussionViewModel>
