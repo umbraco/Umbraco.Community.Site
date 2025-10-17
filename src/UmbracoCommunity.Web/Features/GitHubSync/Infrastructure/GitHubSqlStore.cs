@@ -61,8 +61,10 @@ public class GitHubSqlStore
                 .ToListAsync();
             context.PullRequestReleases.RemoveRange(existingLabels);
 
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
             var releaseLabels = pr.Labels
-                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                           l.Contains("/release/", StringComparison.OrdinalIgnoreCase))
                 .Select(l => new PullRequestReleaseEntity
                 {
                     PullRequestId = pr.Id,
@@ -126,8 +128,10 @@ public class GitHubSqlStore
                 .ToListAsync();
             context.IssueReleases.RemoveRange(existingLabels);
 
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
             var releaseLabels = issue.Labels
-                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                           l.Contains("/release/", StringComparison.OrdinalIgnoreCase))
                 .Select(l => new IssueReleaseEntity
                 {
                     IssueId = issue.Id,

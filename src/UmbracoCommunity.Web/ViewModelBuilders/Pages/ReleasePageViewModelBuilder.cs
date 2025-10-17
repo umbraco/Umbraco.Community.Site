@@ -46,7 +46,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 StableVersion = SemVerHelper.GetStableVersion(version)
             };
 
-            // Get NuGet package ID for this repository
+            // Get repository configuration
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repository, StringComparison.OrdinalIgnoreCase));
             viewModel.NuGetPackageId = repoConfig?.NuGetPackageId;
 
@@ -54,11 +54,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repository, viewModel.ReleaseLabel).ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repository, viewModel.ReleaseLabel).ToList();
 
-            // For Umbraco-CMS releases, also fetch issues from Announcements repo with the same release label
+            // If this repository has announcements with a prefix, fetch issues from Announcements repo
             // These will be categorized as Breaking Changes
-            if (repository.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            if (repoConfig?.HasAnnouncementsPrefix == true)
             {
-                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", viewModel.ReleaseLabel).ToList();
+                var prefixedReleaseLabel = $"{repoConfig.AnnouncementsPrefix}/{viewModel.ReleaseLabel}";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabel).ToList();
                 allIssues.AddRange(announcementsIssues);
             }
 
@@ -71,7 +72,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process PRs
             foreach (var pr in allPrs)
             {
-                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                         l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -111,7 +114,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process Issues
             foreach (var issue in allIssues)
             {
-                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                            l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -173,16 +178,17 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
 
-            // For Umbraco-CMS, also include Announcements repo issues for stats calculation
-            if (repositoryName.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            // If this repository has announcements with a prefix, include Announcements repo issues for stats calculation
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+            if (repoConfig?.HasAnnouncementsPrefix == true)
             {
-                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", "release/").ToList();
+                var prefixedReleaseLabelPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabelPattern).ToList();
                 allIssues.AddRange(announcementsIssues);
             }
 
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
-            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
             Dictionary<string, DateTime> nugetVersions = new();
             if (repoConfig?.HasNuGetPackage == true)
             {
@@ -247,7 +253,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             foreach (var pr in allPrs)
             {
-                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/")))
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                                   l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
                     if (!stats.ContainsKey(releaseLabel))
                         stats[releaseLabel] = (0, 0, 0);
@@ -276,7 +284,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             foreach (var issue in allIssues)
             {
-                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/")))
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                                     l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
                     if (!stats.ContainsKey(releaseLabel))
                         stats[releaseLabel] = (0, 0, 0);

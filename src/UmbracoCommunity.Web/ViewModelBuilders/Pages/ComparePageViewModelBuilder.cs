@@ -88,10 +88,12 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
 
-            // For Umbraco-CMS, also include Announcements repo issues
-            if (repositoryName.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            // If this repository has announcements with a prefix, include Announcements repo issues
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+            if (repoConfig?.HasAnnouncementsPrefix == true)
             {
-                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", "release/").ToList();
+                var prefixedReleaseLabelPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabelPattern).ToList();
                 allIssues.AddRange(announcementsIssues);
             }
 
@@ -108,12 +110,13 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             // Process PRs
             foreach (var pr in allPrs)
             {
-                // Find all release labels on this PR
-                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Find all release labels on this PR (match both "release/" and "{prefix}/release/" patterns)
+                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                         l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
 
                 // Find the earliest version in our range
                 var prVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(label.Replace("release/", "")) })
+                    .Select(label => new { Label = label, Version = ParseVersion(ExtractVersionFromLabel(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -121,7 +124,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 if (prVersionsInRange.Any())
                 {
                     var earliestVersion = prVersionsInRange.First();
-                    var versionString = earliestVersion.Label.Replace("release/", "");
+                    var versionString = ExtractVersionFromLabel(earliestVersion.Label);
 
                     var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
                     var authorLogin = pr.Author?.Login ?? "unknown";
@@ -160,12 +163,13 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             // Process Issues
             foreach (var issue in allIssues)
             {
-                // Find all release labels on this issue
-                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Find all release labels on this issue (match both "release/" and "{prefix}/release/" patterns)
+                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                            l.Contains("/release/", StringComparison.OrdinalIgnoreCase)).ToList();
 
                 // Find the earliest version in our range
                 var issueVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(label.Replace("release/", "")) })
+                    .Select(label => new { Label = label, Version = ParseVersion(ExtractVersionFromLabel(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -173,7 +177,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 if (issueVersionsInRange.Any())
                 {
                     var earliestVersion = issueVersionsInRange.First();
-                    var versionString = earliestVersion.Label.Replace("release/", "");
+                    var versionString = ExtractVersionFromLabel(earliestVersion.Label);
 
                     var isHqMember = issue.Author != null &&
                                      _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
@@ -251,18 +255,19 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
 
-            // For Umbraco-CMS, also include Announcements repo issues for stats calculation
-            if (repositoryName.Equals("Umbraco-CMS", StringComparison.OrdinalIgnoreCase))
+            // Get repository configuration
+            var repoConfig = _options.Repositories.FirstOrDefault(r =>
+                r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+
+            // If this repository has announcements with a prefix, include Announcements repo issues for stats calculation
+            if (repoConfig?.HasAnnouncementsPrefix == true)
             {
-                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", "release/").ToList();
+                var prefixedReleaseLabelPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabelPattern).ToList();
                 allIssues.AddRange(announcementsIssues);
             }
 
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
-
-            // Get NuGet package versions
-            var repoConfig = _options.Repositories.FirstOrDefault(r =>
-                r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
 
             Dictionary<string, DateTime> nugetVersions = new();
             if (repoConfig?.HasNuGetPackage == true)
@@ -470,7 +475,9 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
         foreach (var pr in allPrs)
         {
-            foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/")))
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+            foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                               l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
             {
                 if (!stats.ContainsKey(releaseLabel))
                     stats[releaseLabel] = (0, 0, 0);
@@ -499,7 +506,9 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
         foreach (var issue in allIssues)
         {
-            foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/")))
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+            foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                                 l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
             {
                 if (!stats.ContainsKey(releaseLabel))
                     stats[releaseLabel] = (0, 0, 0);
