@@ -1,11 +1,8 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Media;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
@@ -16,24 +13,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
 internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModelBuilder<MenuViewModel>
 {
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IImageUrlGenerator _imageUrlGenerator;
-    private readonly IPublishedValueFallback _publishedValueFallback;
-    private readonly IFileService _fileService;
-
-    public MenuViewModelBuilder(
-        IPublishedContentQuery publishedContentQuery,
-        IPublishedUrlProvider publishedUrlProvider,
-        IImageUrlGenerator imageUrlGenerator,
-        IPublishedValueFallback publishedValueFallback,
-        IFileService fileService,
-        AppCaches appCaches)
-        : base(publishedContentQuery, publishedUrlProvider, appCaches)
+    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches) : base(publishedContentQuery, publishedUrlProvider, appCaches)
     {
-        _publishedUrlProvider = publishedUrlProvider;
-        _imageUrlGenerator = imageUrlGenerator;
-        _publishedValueFallback = publishedValueFallback;
-        _fileService = fileService;
     }
 
     public MenuViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -104,7 +85,10 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
             }
         }
 
-        viewModel.AddCtaButton(new Link { Name = "Sign in", Url = "login" });
+        if (navSettings.CallToActionButton != null)
+        {
+            viewModel.CallToActionButton = new NavigationLink(navSettings.CallToActionButton);
+        }
 
         return viewModel;
     }

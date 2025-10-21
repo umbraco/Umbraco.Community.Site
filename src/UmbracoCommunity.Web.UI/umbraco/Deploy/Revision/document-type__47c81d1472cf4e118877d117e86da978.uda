@@ -26,10 +26,9 @@
         },
         {
           "Key": "8e271aea-fb83-49e1-b242-07b09734e8f6",
-          "Alias": "callToActionButtons",
-          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "Description": "Provide an optional link which will override the default call to action in the site header.",
-          "Name": "Call to action buttons",
+          "Alias": "callToActionButton",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "Name": "Call to action button",
           "SortOrder": 1
         }
       ]
@@ -39,11 +38,11 @@
   "Udi": "umb://document-type/47c81d1472cf4e118877d117e86da978",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "Udi": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
       "Ordering": true
     },
     {
@@ -52,5 +51,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }

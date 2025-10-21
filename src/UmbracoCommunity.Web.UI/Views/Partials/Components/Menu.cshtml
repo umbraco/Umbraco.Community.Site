@@ -8,7 +8,7 @@
         <div class="nav">
             <div class="nav-mobile-bg">
                 @{
-                    await RenderCtaButtons(true);
+                    RenderCtaButtons(true);
                 }
             </div>
             <div class="nav-start">
@@ -42,7 +42,7 @@
                     </div>
                 }
                 @{
-                    await RenderCtaButtons();
+                    RenderCtaButtons();
                 }
             </div>
             <div class="nav-mobile">
@@ -83,21 +83,16 @@
 
 @functions {
 
-    private async Task RenderCtaButtons(bool isMobileNav = false)
+    private void RenderCtaButtons(bool isMobileNav = false)
     {
-        if (!Model.CallToActionButtons.Any())
+        if (Model.CallToActionButton == null)
         {
             return;
         }
 
-        for (int i = 0; i < Model.CallToActionButtons.Count; i++)
-        {
-            var cta = Model.CallToActionButtons[i];
-
-            <div class="nav-mobile__item cta-btn">
-                @Html.RenderButtonCTA(cta.Url, cta.Text, cta.Target, cta.Text)
-            </div>
-        }
+        <div class="nav-mobile__item cta-btn">
+            @Html.RenderButtonCTA(Model.CallToActionButton.Url, Model.CallToActionButton.Text, Model.CallToActionButton.Target, Model.CallToActionButton.Text)
+        </div>
     }
 
     private void RenderSearchIcon()
