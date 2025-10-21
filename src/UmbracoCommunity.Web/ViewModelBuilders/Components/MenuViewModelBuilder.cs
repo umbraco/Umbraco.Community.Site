@@ -69,13 +69,15 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
                         {
                             foreach (var col in linkSection.Columns)
                             {
-                                var columnArea = new NavigationSectionArea
-                                {
-                                    Headline = linkSection.SectionName
-                                };
                                 if (col != null)
                                 {
                                     var column = col as BlockListItem<NavigationSectionColumn>;
+
+                                    var columnArea = new NavigationSectionArea
+                                    {
+                                        Headline = column?.Content.Headline
+                                    };
+
                                     if (column?.Content?.NavigationColumnItems == null) continue;
                                     foreach (var item in column.Content.NavigationColumnItems)
                                     {
@@ -88,8 +90,9 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
                                         };
                                         columnArea.AddLink(newLink);
                                     }
+
+                                    section.AddSection(columnArea);
                                 }
-                                section.AddSection(columnArea);
                             }
                         }
 

@@ -409,7 +409,7 @@ body.scroll .nav-header .nav .nav-list {
 }
 
 body.scroll .nav-header .nav .nav-list .nav-list__list {
-  flex: 0;
+  justify-content: center;
 }
 
 .nav-header__placeholder {
@@ -482,7 +482,7 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
   }
 
   body.scroll .nav-header .nav .nav-list {
-    margin-right: calc(-2rem - 44px);
+    padding-right: calc(-2rem - 44px);
   }
 }
 
