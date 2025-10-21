@@ -20,14 +20,22 @@ public static class PublishedContentExtensions
         return settingsNode?.As<Settings>();
     }
 
-    public static NavigationSettings? GetNavigationSettings(this IPublishedContent content)
+    public static NavigationSettings? GetNavigationSettings(this IPublishedContent content, IPublishedContent? settingsNode = null)
     {
-        var settingsRoot = content.GetSettingsNode();
-        if (settingsRoot == null)
+        Settings? settingsRoot = null;
+        if (settingsNode == null || settingsNode is not Settings)
         {
-            return null;
+            settingsRoot = content.GetSettingsNode();
+            if (settingsRoot == null)
+            {
+                return null;
+            }
         }
-        var navSettings = settingsRoot.Children(x => x.ContentType.Alias == NavigationSettings.ModelTypeAlias)?.FirstOrDefault();
+        else
+        {
+            settingsRoot = settingsNode as Settings;
+        }
+        var navSettings = settingsRoot?.Children(x => x.ContentType.Alias == NavigationSettings.ModelTypeAlias)?.FirstOrDefault();
         return navSettings?.As<NavigationSettings>();
     }
 

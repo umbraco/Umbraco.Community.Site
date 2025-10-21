@@ -48,5 +48,21 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Footer logo: If left blank, the main header logo will be used
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("footerLogo")]
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops FooterLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "footerLogo");
+
+		///<summary>
+		/// Header logo: The header logo that will be featured on initial load
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("headerLogo")]
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops HeaderLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "headerLogo");
 	}
 }

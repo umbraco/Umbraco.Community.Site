@@ -426,7 +426,7 @@ body:not(.mobile) .nav-start .logo-container {
 }
 
 body.scroll:not(.mobile) .nav-start .logo-container {
-  width: 50px;
+  height: 44px;
 }
 
 body:not(.mobile) .nav-start .logo-container svg {
@@ -435,6 +435,11 @@ body:not(.mobile) .nav-start .logo-container svg {
 
 body.hero-full-width:not(.scroll):not(.mobile) .nav-start .logo-link svg path {
   fill: var(--color-white);
+}
+
+body.scroll:not(.mobile) .header .nav .logo-container svg use:not(.main-logo) {
+  transition: opacity var(--nav-animation-duration) ease-in-out;
+  opacity: 0;
 }
 
 body.hero-full-width:not(.scroll):not(.mobile) .nav-start .icon-btn svg path,
@@ -461,7 +466,7 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
 
 @media(--md) {
   body:not(.mobile) .nav-start .logo-container {
-    width: 50px;
+    height: 44px;
   }
 
   body.hero-half-width .nav-header .header {

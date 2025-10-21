@@ -12,10 +12,39 @@
   },
   "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
   "CompositionContentTypes": [],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
+      "Name": "Theme",
+      "Type": 1,
+      "Alias": "theme",
+      "PropertyTypes": [
+        {
+          "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
+          "Alias": "headerLogo",
+          "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "Description": "The header logo that will be featured on initial load",
+          "Mandatory": true,
+          "Name": "Header logo"
+        },
+        {
+          "Key": "f7c32471-8614-4f4c-8e1d-261b91a57220",
+          "Alias": "footerLogo",
+          "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "Description": "If left blank, the main header logo will be used",
+          "Name": "Footer logo",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
       "Ordering": true
@@ -26,5 +55,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }

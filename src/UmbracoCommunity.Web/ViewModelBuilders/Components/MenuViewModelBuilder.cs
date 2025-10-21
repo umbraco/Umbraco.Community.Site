@@ -11,9 +11,9 @@ using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
-internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModelBuilder<MenuViewModel>
+internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
 {
-    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches) : base(publishedContentQuery, publishedUrlProvider, appCaches)
+    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches)
     {
     }
 
@@ -26,7 +26,10 @@ internal class MenuViewModelBuilder : NavigationViewModelBuilderBase, IViewModel
     {
         MenuViewModel viewModel = new();
 
-        var navSettings = currentPage.GetNavigationSettings();
+        var siteSettings = currentPage.GetSettingsNode();
+        viewModel.Logo = siteSettings?.HeaderLogo;
+
+        var navSettings = currentPage.GetNavigationSettings(siteSettings);
         if (navSettings?.HeaderNavigationItems == null || !navSettings.HeaderNavigationItems.Any()) return viewModel;
 
         foreach (var navItem in navSettings.HeaderNavigationItems)
