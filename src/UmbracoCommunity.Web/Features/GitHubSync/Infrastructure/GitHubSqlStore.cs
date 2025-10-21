@@ -61,8 +61,10 @@ public class GitHubSqlStore
                 .ToListAsync();
             context.PullRequestReleases.RemoveRange(existingLabels);
 
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
             var releaseLabels = pr.Labels
-                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                           l.Contains("/release/", StringComparison.OrdinalIgnoreCase))
                 .Select(l => new PullRequestReleaseEntity
                 {
                     PullRequestId = pr.Id,
@@ -126,8 +128,10 @@ public class GitHubSqlStore
                 .ToListAsync();
             context.IssueReleases.RemoveRange(existingLabels);
 
+            // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
             var releaseLabels = issue.Labels
-                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                .Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                           l.Contains("/release/", StringComparison.OrdinalIgnoreCase))
                 .Select(l => new IssueReleaseEntity
                 {
                     IssueId = issue.Id,
@@ -372,8 +376,8 @@ public class GitHubSqlStore
     public IEnumerable<GitHubPullRequest> GetPullRequestsByLabelPattern(string repositoryName, string labelPattern)
     {
         // For SQL implementation, we use the specific release label query
-        // If labelPattern is just "release/", return all PRs since we can't efficiently filter by pattern in SQL
-        if (labelPattern == "release/")
+        // If labelPattern ends with "release/" (e.g., "release/" or "cms/release/"), return all PRs since we can't efficiently filter by pattern in SQL
+        if (labelPattern.EndsWith("release/", StringComparison.OrdinalIgnoreCase))
         {
             return GetAllPullRequests(repositoryName);
         }
@@ -383,8 +387,8 @@ public class GitHubSqlStore
     public IEnumerable<GitHubIssue> GetIssuesByLabelPattern(string repositoryName, string labelPattern)
     {
         // For SQL implementation, we use the specific release label query
-        // If labelPattern is just "release/", return all issues since we can't efficiently filter by pattern in SQL
-        if (labelPattern == "release/")
+        // If labelPattern ends with "release/" (e.g., "release/" or "cms/release/"), return all issues since we can't efficiently filter by pattern in SQL
+        if (labelPattern.EndsWith("release/", StringComparison.OrdinalIgnoreCase))
         {
             return GetAllIssues(repositoryName);
         }

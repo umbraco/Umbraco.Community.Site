@@ -20,13 +20,18 @@ public class ComparePageViewModel : PageViewModelBase
     public string UmbracoLogoPath { get; set; } = "/img/umbraco_logo.png";
     public bool LabelCheck { get; set; }
     public bool IncludePreReleases { get; set; }
+    public bool ShowNotesOnly { get; set; }
     public int FeatureCount { get; set; }
+    public int BreakingChangesCount { get; set; }
     public int IssuesAndTasksCount { get; set; }
 }
 
 public class VersionChangesGroup
 {
     public string Version { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string DiscussionUrl { get; set; } = string.Empty;
     public List<ReleasePullRequestViewModel> Features { get; set; } = new();
+    public List<ReleasePullRequestViewModel> BreakingChanges { get; set; } = new();
     public List<ReleasePullRequestViewModel> IssuesAndTasks { get; set; } = new();
 }

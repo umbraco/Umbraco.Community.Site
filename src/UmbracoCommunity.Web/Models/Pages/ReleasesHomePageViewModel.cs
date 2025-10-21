@@ -7,8 +7,8 @@ namespace UmbracoCommunity.Web.Models.Pages
     public class ReleasesHomePageViewModel(IPublishedContent currentPage) : PageViewModelBase(currentPage)
     {
         public IList<BlockGridRow> BlockContent { get; set; } = [];
-        public List<ReleaseDiscussionViewModel> UpcomingReleases { get; set; } = new();
-        public ReleaseDiscussionViewModel? LatestRelease { get; set; }
-        public List<ReleaseDiscussionViewModel> LtsReleases { get; set; } = new();
+        public List<ReleaseInfoViewModel> UpcomingReleases { get; set; } = new();
+        public ReleaseInfoViewModel? LatestRelease { get; set; }
+        public List<ReleaseInfoViewModel> LtsReleases { get; set; } = new();
     }
 }

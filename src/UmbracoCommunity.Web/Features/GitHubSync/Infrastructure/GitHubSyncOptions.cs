@@ -15,9 +15,15 @@ public class RepositoryConfig
 {
     public string Name { get; set; } = string.Empty;
     public string? NuGetPackageId { get; set; }
+    public string? AnnouncementsPrefix { get; set; }
 
     /// <summary>
     /// Returns true if this repository has a NuGet package configured
     /// </summary>
     public bool HasNuGetPackage => !string.IsNullOrWhiteSpace(NuGetPackageId);
+
+    /// <summary>
+    /// Returns true if this repository has announcements in the Announcements repo with a specific prefix
+    /// </summary>
+    public bool HasAnnouncementsPrefix => !string.IsNullOrWhiteSpace(AnnouncementsPrefix);
 }

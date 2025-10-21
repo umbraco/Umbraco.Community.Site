@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
@@ -10,16 +11,16 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
     {
         private readonly GitHubSqlStore _dataStore;
         private readonly GitHubSyncOptions _options;
-        private readonly ReleasesHomePageViewModelBuilder _releasesHomeBuilder;
+        private readonly Utilities.ReleaseDiscussionParser _releaseParser;
 
         public ReleasePageViewModelBuilder(
             GitHubSqlStore dataStore,
             Microsoft.Extensions.Options.IOptions<GitHubSyncOptions> options,
-            ReleasesHomePageViewModelBuilder releasesHomeBuilder)
+            Utilities.ReleaseDiscussionParser releaseParser)
         {
             _dataStore = dataStore;
             _options = options.Value;
-            _releasesHomeBuilder = releasesHomeBuilder;
+            _releaseParser = releaseParser;
         }
 
         public ReleasePageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -40,16 +41,27 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 Organization = organization,
                 Repository = repository,
                 Version = version,
-                ReleaseLabel = $"release/{version}"
+                ReleaseLabel = $"release/{version}",
+                IsPreRelease = SemVerHelper.IsPreRelease(version),
+                StableVersion = SemVerHelper.GetStableVersion(version)
             };
 
-            // Get NuGet package ID for this repository
+            // Get repository configuration
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repository, StringComparison.OrdinalIgnoreCase));
             viewModel.NuGetPackageId = repoConfig?.NuGetPackageId;
 
             // Get PRs and Issues with this specific release label
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repository, viewModel.ReleaseLabel).ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repository, viewModel.ReleaseLabel).ToList();
+
+            // If this repository has announcements with a prefix, fetch issues from Announcements repo
+            // These will be categorized as Breaking Changes
+            if (repoConfig?.HasAnnouncementsPrefix == true)
+            {
+                var prefixedReleaseLabel = $"{repoConfig.AnnouncementsPrefix}/{viewModel.ReleaseLabel}";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabel).ToList();
+                allIssues.AddRange(announcementsIssues);
+            }
 
             // Get first-time contributor PR numbers
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repository);
@@ -60,13 +72,20 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process PRs
             foreach (var pr in allPrs)
             {
-                var releaseLabels = pr.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Find all release labels that match this repository
+                // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                var releaseLabels = pr.Labels
+                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
-                    if (!releaseGroups.ContainsKey(releaseLabel))
+                    // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+
+                    if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
-                        releaseGroups[releaseLabel] = new List<ReleasePullRequestViewModel>();
+                        releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
                     var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
@@ -76,7 +95,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                                                  firstTimeContributorPrNumbers.TryGetValue(pr.Author.Login, out var firstPrNumber) &&
                                                  pr.Number == firstPrNumber;
 
-                    releaseGroups[releaseLabel].Add(new ReleasePullRequestViewModel
+                    releaseGroups[normalizedLabel].Add(new ReleasePullRequestViewModel
                     {
                         Number = pr.Number,
                         Title = pr.Title,
@@ -100,19 +119,26 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Process Issues
             foreach (var issue in allIssues)
             {
-                var releaseLabels = issue.Labels.Where(l => l.StartsWith("release/")).ToList();
+                // Find all release labels that match this repository
+                // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                var releaseLabels = issue.Labels
+                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
-                    if (!releaseGroups.ContainsKey(releaseLabel))
+                    // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+
+                    if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
-                        releaseGroups[releaseLabel] = new List<ReleasePullRequestViewModel>();
+                        releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
                     var isHqMember = issue.Author != null && _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
                     var authorLogin = issue.Author?.Login ?? "unknown";
 
-                    releaseGroups[releaseLabel].Add(new ReleasePullRequestViewModel
+                    releaseGroups[normalizedLabel].Add(new ReleasePullRequestViewModel
                     {
                         Number = issue.Number,
                         Title = issue.Title,
@@ -135,23 +161,19 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             // Convert to ReleaseGroupViewModel and categorize
             // For single release page, only include the matching release group
-            var releases = releaseGroups
-                .Where(kvp => kvp.Key == viewModel.ReleaseLabel)
-                .Select(kvp =>
+            if (releaseGroups.TryGetValue(viewModel.ReleaseLabel, out var prs))
+            {
+                var orderedPrs = prs.OrderByDescending(pr => pr.CreatedAt).ToList();
+                var categories = CategorizePullRequests(orderedPrs);
+
+                viewModel.Release = new ReleaseGroupViewModel
                 {
-                    var orderedPrs = kvp.Value.OrderByDescending(pr => pr.CreatedAt).ToList();
-                    var categories = CategorizePullRequests(orderedPrs);
-
-                    return new ReleaseGroupViewModel
-                    {
-                        ReleaseLabel = kvp.Key,
-                        RepositoryName = repository,
-                        PullRequests = orderedPrs,
-                        Categories = categories
-                    };
-                }).ToList();
-
-            viewModel.Releases = releases;
+                    ReleaseLabel = viewModel.ReleaseLabel,
+                    RepositoryName = repository,
+                    PullRequests = orderedPrs,
+                    Categories = categories
+                };
+            }
 
             // Get release info from discussions
             PopulateReleaseInfo(viewModel, repository, viewModel.ReleaseLabel);
@@ -165,9 +187,18 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
             var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
+
+            // If this repository has announcements with a prefix, include Announcements repo issues for stats calculation
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
+            if (repoConfig?.HasAnnouncementsPrefix == true)
+            {
+                var prefixedReleaseLabelPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabelPattern).ToList();
+                allIssues.AddRange(announcementsIssues);
+            }
+
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
-            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
             Dictionary<string, DateTime> nugetVersions = new();
             if (repoConfig?.HasNuGetPackage == true)
             {
@@ -176,7 +207,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             foreach (var discussion in discussions)
             {
-                var releaseVm = _releasesHomeBuilder.ParseReleaseDiscussion(discussion, releaseStats);
+                var releaseVm = _releaseParser.ParseReleaseDiscussion(discussion, releaseStats);
                 if (releaseVm != null && releaseVm.ReleaseLabel == releaseLabel)
                 {
                     if (nugetVersions.TryGetValue(releaseVm.Version, out var nugetPublishedDate))
@@ -232,12 +263,16 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             foreach (var pr in allPrs)
             {
-                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/")))
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                                   l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                    var current = stats[releaseLabel];
+                    if (!stats.ContainsKey(normalizedLabel))
+                        stats[normalizedLabel] = (0, 0, 0);
+
+                    var current = stats[normalizedLabel];
 
                     if (pr.Labels.Any(l => l.Equals("category/feature", StringComparison.OrdinalIgnoreCase) ||
                                            l.Equals("category/notable", StringComparison.OrdinalIgnoreCase)))
@@ -255,20 +290,34 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         current.issues++;
                     }
 
-                    stats[releaseLabel] = current;
+                    stats[normalizedLabel] = current;
                 }
             }
 
             foreach (var issue in allIssues)
             {
-                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/")))
+                // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
+                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
+                                                                     l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
                 {
-                    if (!stats.ContainsKey(releaseLabel))
-                        stats[releaseLabel] = (0, 0, 0);
+                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
 
-                    var current = stats[releaseLabel];
-                    current.issues++;
-                    stats[releaseLabel] = current;
+                    if (!stats.ContainsKey(normalizedLabel))
+                        stats[normalizedLabel] = (0, 0, 0);
+
+                    var current = stats[normalizedLabel];
+
+                    // Issues with category/breaking label are counted as breaking changes
+                    if (issue.Labels.Any(l => l.Equals("category/breaking", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        current.breaking++;
+                    }
+                    else
+                    {
+                        current.issues++;
+                    }
+
+                    stats[normalizedLabel] = current;
                 }
             }
 
@@ -326,6 +375,48 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             return categories;
+        }
+
+        /// <summary>
+        /// Normalizes a release label by removing any prefix.
+        /// E.g., "cms/release/17.0.0" -> "release/17.0.0", "release/17.0.0" -> "release/17.0.0"
+        /// </summary>
+        private static string NormalizeReleaseLabel(string label)
+        {
+            var releasePart = "/release/";
+            var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
+
+            if (releaseIndex >= 0)
+            {
+                // Found a prefix before "/release/", extract "release/X.Y.Z" part
+                return "release" + label.Substring(releaseIndex + releasePart.Length - 1);
+            }
+
+            // No prefix, return as-is
+            return label;
+        }
+
+        /// <summary>
+        /// Checks if a release label is valid for the given repository.
+        /// Valid labels are: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches the repo's AnnouncementsPrefix.
+        /// </summary>
+        private static bool IsValidReleaseLabelForRepository(string label, RepositoryConfig? repoConfig)
+        {
+            // Always allow unprefixed "release/" labels
+            if (label.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // If the repo has an AnnouncementsPrefix, allow labels with that prefix
+            if (repoConfig?.HasAnnouncementsPrefix == true &&
+                !string.IsNullOrEmpty(repoConfig.AnnouncementsPrefix))
+            {
+                var prefixPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
+                if (label.StartsWith(prefixPattern, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            // Reject all other prefixed labels (e.g., "forms/release/", "commerce/release/", etc.)
+            return false;
         }
     }
 }

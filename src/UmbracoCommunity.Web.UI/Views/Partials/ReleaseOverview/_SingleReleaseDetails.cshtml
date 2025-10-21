@@ -2,33 +2,35 @@
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @model ReleasePageViewModel
 
-@if (Model.Releases.Any())
+@if (Model.Release != null)
 {
-    @foreach (var releaseGroup in Model.Releases)
-    {
-        <div class="release-group">
-            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseNotesHeader.cshtml", new ReleaseNotesHeaderViewModel
-            {
-                ReleaseInfo = Model.ReleaseInfo,
-                SelectedRepo = Model.Repository,
-                ReleaseGroup = releaseGroup,
-                NuGetPackageId = Model.NuGetPackageId
-            })
+    <div class="release-group">
+        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseNotesHeader.cshtml", new ReleaseNotesHeaderViewModel
+        {
+            ReleaseInfo = Model.ReleaseInfo,
+            SelectedRepo = Model.Repository,
+            ReleaseGroup = Model.Release,
+            NuGetPackageId = Model.NuGetPackageId
+        })
 
-            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
-            {
-                ReleaseGroup = releaseGroup,
-                SelectedRepo = Model.Repository
-            })
+        @if (Model.IsPreRelease)
+        {
+            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PreReleaseNotice.cshtml", Model)
+        }
 
-            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCategories.cshtml", new ReleaseCategoriesViewModel
-            {
-                ReleaseGroup = releaseGroup,
-                UmbracoLogoPath = "/img/umbraco_logo.png",
-                LabelCheck = Model.LabelCheck
-            })
-        </div>
-    }
+        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
+        {
+            ReleaseGroup = Model.Release,
+            SelectedRepo = Model.Repository
+        })
+
+        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCategories.cshtml", new ReleaseCategoriesViewModel
+        {
+            ReleaseGroup = Model.Release,
+            UmbracoLogoPath = "/img/umbraco_logo.png",
+            LabelCheck = Model.LabelCheck
+        })
+    </div>
 }
 else if (Model.ReleaseInfo != null)
 {
@@ -41,6 +43,11 @@ else if (Model.ReleaseInfo != null)
             ReleaseGroup = null,
             NuGetPackageId = Model.NuGetPackageId
         })
+
+        @if (Model.IsPreRelease)
+        {
+            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_PreReleaseNotice.cshtml", Model)
+        }
 
         <div class="release-categories">
             <div class="empty-state">

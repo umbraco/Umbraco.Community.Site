@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+using Microsoft.Extensions.Configuration;
 using Umbraco.Cms.Core.Composing;
+using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.GitHubSync.Jobs;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Configuration;
@@ -9,24 +11,35 @@ public class JobsComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        // Full sync jobs - Weekly on Sunday at 2 AM
-        RecurringJob.AddOrUpdate<FetchAllPullRequestsJob>(
-            "fetch-all-prs",
-            job => job.ExecuteAsync(null, null, CancellationToken.None),
-            GetCronExpression("0 2 * * 0"), // Cron: Sunday at 2 AM
-            new RecurringJobOptions
-            {
-                TimeZone = TimeZoneInfo.Utc
-            });
+        // Get configured repositories
+        var repositories = builder.Config.GetSection("GitHubSync:Repositories")
+            .Get<List<RepositoryConfig>>() ?? new List<RepositoryConfig>();
 
-        RecurringJob.AddOrUpdate<FetchAllIssuesJob>(
-            "fetch-all-issues",
-            job => job.ExecuteAsync(null, null, CancellationToken.None),
-            GetCronExpression("0 2 * * 0"), // Cron: Sunday at 2 AM
-            new RecurringJobOptions
-            {
-                TimeZone = TimeZoneInfo.Utc
-            });
+        // Full sync jobs - Weekly on Sunday at 2 AM
+        // Create separate jobs for each configured repository
+        foreach (var repo in repositories)
+        {
+            var repoName = repo.Name;
+            var sanitizedRepoName = repoName.ToLowerInvariant().Replace(".", "-");
+
+            RecurringJob.AddOrUpdate<FetchAllPullRequestsJob>(
+                $"fetch-all-prs-{sanitizedRepoName}",
+                job => job.ExecuteAsync(null, repoName, CancellationToken.None),
+                GetCronExpression("0 2 * * 0"), // Cron: Sunday at 2 AM
+                new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.Utc
+                });
+
+            RecurringJob.AddOrUpdate<FetchAllIssuesJob>(
+                $"fetch-all-issues-{sanitizedRepoName}",
+                job => job.ExecuteAsync(null, repoName, CancellationToken.None),
+                GetCronExpression("0 2 * * 0"), // Cron: Sunday at 2 AM
+                new RecurringJobOptions
+                {
+                    TimeZone = TimeZoneInfo.Utc
+                });
+        }
 
         // Recent sync jobs - Every 6 hours
         RecurringJob.AddOrUpdate<FetchRecentPullRequestsJob>(

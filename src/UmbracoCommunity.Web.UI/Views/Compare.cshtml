@@ -3,6 +3,16 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ComparePageViewModel>
 @{
     Layout = "LayoutReleases.cshtml";
+    ViewData["PageTitle"] = $"Compare Umbraco releases";
+    if(Model.FromVersion != null || Model.ToVersion != null)
+    {
+        ViewData["PageTitle"] = $"Comparing v{Model.FromVersion} → v{Model.ToVersion}";
+    }
+    
+    if(Model.FromVersion != null || Model.ToVersion != null)
+    {
+        ViewData["PageDescription"] = $"Comparing change in Umbraco from v{Model.FromVersion} to v{Model.ToVersion}";
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
@@ -14,7 +24,7 @@
     <span>v@(Model.LowestVersion)→ v@(Model.HighestVersion)</span>
             </div>
             <div class="sticky-version-label">
-                <span>@Model.FeatureCount features, @Model.IssuesAndTasksCount issues & tasks</span>
+                <span>@Model.FeatureCount features, @Model.BreakingChangesCount breaking changes, @Model.IssuesAndTasksCount issues & tasks</span>
             </div>
         </div>
     </div>
@@ -74,45 +84,70 @@
                            @if (Model.IncludePreReleases) { <text>checked="checked"</text> } />
                     Include pre-release versions
                 </label>
+                <label>
+                    <input type="checkbox"
+                           id="showNotesOnly"
+                           name="notes"
+                           value="1"
+                           @if (Model.ShowNotesOnly) { <text>checked="checked"</text> } />
+                    Show only breaking changes and release notes
+                </label>
             </div>
         </form>
     </div>
 
     @if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
     {
-        <div class="compare-results">
-            <h2 class="compare-results-header">
-                Changes since @Model.LowestVersion until @Model.HighestVersion
-            </h2>
+        @foreach (var versionGroup in Model.VersionGroups)
+        {
+            <div class="release-group">
+                <div class="release-notes-header">
+                    <h2>Changes in v@(versionGroup.Version)</h2>
+                    @if (!Model.ShowNotesOnly)
+                    {
+                        <p>
+                            <strong>@versionGroup.Features.Count</strong> new features,
+                            <strong>@versionGroup.BreakingChanges.Count</strong> breaking changes, and
+                            <strong>@versionGroup.IssuesAndTasks.Count</strong> issues & tasks were implemented
+                        </p>
+                    }
+                    else
+                    {
+                        <p>
+                            <strong>@versionGroup.BreakingChanges.Count</strong> breaking changes
+                        </p>
+                    }
+                    <p class="release-nuget-link">
+                        Make sure to read the <a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading/version-specific" target="_blank">version specific upgrades notes</a> for guidance.
+                    </p>
+                </div>
 
-            <div class="compare-summary">
-                <p><strong>@Model.FeatureCount</strong> new features and <strong>@Model.IssuesAndTasksCount</strong> issues & tasks were implemented</p>
-            </div>
-
-            <p class="upgrade-notes">
-                Make sure to read the <a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading/version-specific" target="_blank">version specific upgrades notes</a> for guidance.
-            </p>
-
-            @if (Model.VersionGroups.Any())
-            {
-                @foreach (var versionGroup in Model.VersionGroups)
+                @if (!string.IsNullOrEmpty(versionGroup.Description))
                 {
-                    <div class="version-changes-group">
-                        <h3 class="version-changes-header">Changes in v@(versionGroup.Version)</h3>
+                    <div class="release-description">
+                        @Html.Raw(Markdig.Markdown.ToHtml(versionGroup.Description))
+                    </div>
+                }
 
-                        
-                        @if (!versionGroup.Features.Any() && !versionGroup.IssuesAndTasks.Any())
+                @if (!versionGroup.Features.Any() && !versionGroup.BreakingChanges.Any() && !versionGroup.IssuesAndTasks.Any())
+                {
+                    <div class="release-categories">
+                        <div class="empty-state">
+                            <p>No known issues or PRs for this version, there may be more info on GitHub: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)</a></p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="release-categories">
+                        @if (!Model.ShowNotesOnly && versionGroup.Features.Any())
                         {
-                            <div class="empty-state">
-                                <p>No known issues or PRs for this version, there may be more info on GitHub: <a href="https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)" target="_blank">https://github.com/umbraco/Umbraco-CMS/releases/tag/release-@(versionGroup.Version)</a></p>
-                            </div>
-                        }
-                        else
-                        {
-                            @if (versionGroup.Features.Any())
-                            {
+                            <details class="release-category" open>
+                                <summary>
+                                    Features
+                                    <uui-badge color="default" look="primary">@versionGroup.Features.Count</uui-badge>
+                                </summary>
                                 <div class="pr-list">
-                                    <h4 class="changes-category-header">Features</h4>
                                     @foreach (var pr in versionGroup.Features)
                                     {
                                         @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
@@ -123,12 +158,38 @@
                                         })
                                     }
                                 </div>
-                            }
+                            </details>
+                        }
 
-                            @if (versionGroup.IssuesAndTasks.Any())
-                            {
+                        @if (versionGroup.BreakingChanges.Any())
+                        {
+                            <details class="release-category" open>
+                                <summary>
+                                    Breaking changes
+                                    <uui-badge color="default" look="primary">@versionGroup.BreakingChanges.Count</uui-badge>
+                                </summary>
                                 <div class="pr-list">
-                                    <h4 class="changes-category-header">Issues & Tasks</h4>
+                                    @foreach (var pr in versionGroup.BreakingChanges)
+                                    {
+                                        @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
+                                        {
+                                            PullRequest = pr,
+                                            UmbracoLogoPath = Model.UmbracoLogoPath,
+                                            LabelCheck = Model.LabelCheck
+                                        })
+                                    }
+                                </div>
+                            </details>
+                        }
+
+                        @if (!Model.ShowNotesOnly && versionGroup.IssuesAndTasks.Any())
+                        {
+                            <details class="release-category" open>
+                                <summary>
+                                    Issues & Tasks
+                                    <uui-badge color="default" look="primary">@versionGroup.IssuesAndTasks.Count</uui-badge>
+                                </summary>
+                                <div class="pr-list">
                                     @foreach (var pr in versionGroup.IssuesAndTasks)
                                     {
                                         @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_CompareItem.cshtml", new PullRequestItemViewModel
@@ -139,18 +200,19 @@
                                         })
                                     }
                                 </div>
-                            }
+                            </details>
                         }
                     </div>
                 }
-            }
-            else
-            {
-                <div class="empty-state">
-                    <p>No related PRs or issues found between these versions.</p>
-                </div>
-            }
-        </div>
+            </div>
+        }
+
+        @if (!Model.VersionGroups.Any())
+        {
+            <div class="empty-state">
+                <p>No related PRs or issues found between these versions.</p>
+            </div>
+        }
     }
     else if (!string.IsNullOrEmpty(Model.FromVersion) || !string.IsNullOrEmpty(Model.ToVersion))
     {

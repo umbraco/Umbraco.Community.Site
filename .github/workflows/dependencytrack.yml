@@ -42,7 +42,7 @@ jobs:
           else
             TARGET_FILE="$SOLUTION_FILE"
           fi
-          dotnet-CycloneDX "$TARGET_FILE" --output ./sbom --filename bom-dotnet.xml --output-format Xml
+          dotnet-CycloneDX "$TARGET_FILE" --output ./sbom --filename bom-dotnet.xml --output-format Xml --enable-github-licenses --github-bearer-token ${{ secrets.GITHUB_TOKEN }}
 
       # Node.js SBOM
       - name: Setup Node.js

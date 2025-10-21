@@ -2,6 +2,11 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ReleasePageViewModel>
 @{
     Layout = "LayoutReleases.cshtml";
+    ViewData["PageTitle"] = $"{Model.Repository} v{Model.Version} release notes";
+    if (Model.Release != null)
+    {
+        ViewData["PageDescription"] = $"{Model.Repository} v{Model.Version} has {Model.Release.TotalCount} bug fixes and improvements.";
+    }
 }
 
 <div class="sticky-version-bar" id="stickyVersionBar">

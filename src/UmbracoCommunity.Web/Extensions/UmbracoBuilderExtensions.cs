@@ -27,6 +27,9 @@ namespace UmbracoCommunity.Web.Extensions
 
         public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBuilder builder)
         {
+            // Register shared utilities
+            builder.Services.AddScoped<Utilities.ReleaseDiscussionParser>();
+
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
