@@ -27,7 +27,7 @@
         {
           "Key": "8e271aea-fb83-49e1-b242-07b09734e8f6",
           "Alias": "callToActionButton",
-          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
           "Name": "Call to action button",
           "SortOrder": 1
         }
@@ -38,7 +38,7 @@
   "Udi": "umb://document-type/47c81d1472cf4e118877d117e86da978",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
       "Ordering": true
     },
     {
