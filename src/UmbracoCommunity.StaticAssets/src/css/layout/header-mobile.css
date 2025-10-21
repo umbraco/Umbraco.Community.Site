@@ -42,7 +42,6 @@ body:not(.mobile) .nav-header .nav-mobile {
 }
 
 .mobile .nav-header .header .nav-mobile-bg {
-    animation: nav-mobile-close 0.3s ease;
     top: calc(100vh-85px);
 }
 
@@ -61,8 +60,17 @@ body:not(.mobile) .nav-header .nav-mobile {
     transition: all 0.3s ease-in-out;
 }
 
+.mobile .nav-header .header.menu-active .nav-mobile-bg.closing {
+    animation: nav-mobile-close 0.3s ease !important;
+}
+
 .top-banner.mobile:not(.scroll) .nav-header .header.menu-active .nav-mobile-bg {
     top: 130px;
+    animation: nav-mobile-open-no-scroll 0.3s ease;
+}
+
+.top-banner.mobile:not(.scroll) .nav-header .header.menu-active .nav-mobile-bg.closing {
+    animation: nav-mobile-close-no-scroll 0.3s ease !important;
 }
 
 .mobile .nav-header .header .nav-mobile-bg .cta-btn {
@@ -86,6 +94,10 @@ body:not(.mobile) .nav-header .nav-mobile {
     display: block;
     position: fixed;
     overflow: auto;
+}
+
+.mobile .nav-header .header.menu-active .nav-list.closing {
+    animation: nav-mobile-close-nav-list 0.15s ease !important;
 }
 
 .mobile .nav-header .header.menu-active .icon-menu {
@@ -139,7 +151,6 @@ body:not(.mobile) .nav-header .nav-mobile {
     flex-grow: unset;
     position: relative;
     display: none;
-    animation: nav-mobile-close 0.3s ease;
 }
 
 .top-banner.mobile .nav-header .header .nav-list {

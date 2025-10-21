@@ -89,6 +89,15 @@
         {
             return;
         }
+
+        for (int i = 0; i < Model.CallToActionButtons.Count; i++)
+        {
+            var cta = Model.CallToActionButtons[i];
+
+            <div class="nav-mobile__item cta-btn">
+                @Html.RenderButtonCTA(cta.Url, cta.Text, cta.Target, cta.Text)
+            </div>
+        }
     }
 
     private void RenderSearchIcon()
@@ -168,52 +177,56 @@
                           stroke-linejoin="round" />
                 </svg>
             </button>
-            <div class="nav-item__dropdown">
+            @if (item.Links != null && item.Links.Any())
+            {
+                <div class="nav-item__dropdown">
 
-                <ul class="nav-list__list nav-item__dropdown-list" style="@GetGridColumnsTemplate(item)">
-                    @foreach (var section in item.Links)
-                    {
-                        var hasHeadline = !string.IsNullOrEmpty(section.Headline);
-                        <li class="nav-item__dropdown-item @(!hasHeadline ? "no-headline" : "")">
-                            @if (hasHeadline)
-                            {
-                                <span>@(section.Headline)</span>
-                            }
-                            @foreach (var sectionItem in section.Links)
-                            {
-                                var hasCaption = !string.IsNullOrEmpty(sectionItem.Caption);
-                                <a href="@sectionItem.Url" title="@sectionItem.Text"
-                                   class="@(hasCaption ? "has-caption" : "")">
-                                    <section>
-                                        @if (!string.IsNullOrEmpty(sectionItem.IconUrl))
-                                        {
-                                            var isSvg = sectionItem.IconUrl.GetFileExtension() == ".svg";
-
-                                            <img class="@(isSvg ? "svg-icon" : "")" src="@sectionItem.IconUrl"
-                                                 alt="@sectionItem.Text" width="24"
-                                                 height="24" />
-                                        }
-                                        <span>
-                                            @sectionItem.Text
-                                            @if (hasCaption)
+                    <ul class="nav-list__list nav-item__dropdown-list" style="@GetGridColumnsTemplate(item)">
+                        @foreach (var section in item.Links)
+                        {
+                            var hasHeadline = !string.IsNullOrEmpty(section.Headline);
+                            <li class="nav-item__dropdown-item @(!hasHeadline ? "no-headline" : "")">
+                                @if (hasHeadline)
+                                {
+                                    <span>@(section.Headline)</span>
+                                }
+                                @foreach (var sectionItem in section.Links)
+                                {
+                                    var hasCaption = !string.IsNullOrEmpty(sectionItem.Caption);
+                                    <a href="@sectionItem.Url" title="@sectionItem.Text"
+                                       class="@(hasCaption ? "has-caption" : "")">
+                                        <section>
+                                            @if (!string.IsNullOrEmpty(sectionItem.IconUrl))
                                             {
-                                                <small>@sectionItem.Caption</small>
+                                                var isSvg = sectionItem.IconUrl.GetFileExtension() == ".svg";
+
+                                                <img class="@(isSvg ? "svg-icon" : "")" src="@sectionItem.IconUrl"
+                                                     alt="@sectionItem.Text" width="24"
+                                                     height="24" />
                                             }
-                                        </span>
-                                    </section>
-                                </a>
-                            }
-                        </li>
-                    }
-                </ul>
-            </div>
+                                            <span>
+                                                @sectionItem.Text
+                                                @if (hasCaption)
+                                                {
+                                                    <small>@sectionItem.Caption</small>
+                                                }
+                                            </span>
+                                        </section>
+                                    </a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
         </li>
     }
 
-    string GetGridColumnsTemplate(NavigationMenuItem menuItem)
+    string GetGridColumnsTemplate(NavigationMenuItem navItem)
     {
-        var columns = Enumerable.Repeat("1fr", (int)menuItem.Links.Count());
+        var columns = Enumerable.Repeat("1fr", (int)navItem.Links.Count);
         return $"grid-template-columns: {string.Join(' ', columns)};";
     }
 
 }
+
