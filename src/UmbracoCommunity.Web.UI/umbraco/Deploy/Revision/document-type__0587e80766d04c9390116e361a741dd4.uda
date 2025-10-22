@@ -1,0 +1,45 @@
+{
+  "Name": "Social settings",
+  "Alias": "socialSettings",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-share-alt color-grey",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/7e9b74a9d82340b9945e4855ac4169b8",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "1327b2d6-e90d-4e65-a0c6-46a7dd2e2e7b",
+      "Name": "SEO",
+      "Type": 1,
+      "Alias": "sEO",
+      "PropertyTypes": [
+        {
+          "Key": "0eecfee4-5ae5-40f0-94fe-5a848abd6c42",
+          "Alias": "siteWideOgImage",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Description": "Base image which is used when a page is shared on a social platform in the case that there is no image defined on the page",
+          "Mandatory": true,
+          "Name": "Site wide OG image"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/0587e80766d04c9390116e361a741dd4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/7e9b74a9d82340b9945e4855ac4169b8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

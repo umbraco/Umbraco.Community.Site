@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Home</summary>
 	[PublishedModel("home")]
-	public partial class Home : PublishedContentModel, IContentBlocksHomepage
+	public partial class Home : PublishedContentModel, IContentBlocksHomepage, ISeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,5 +56,52 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("contentBlocks")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlocksHomepage.GetContentBlocks(this, _publishedValueFallback);
+
+		///<summary>
+		/// Custom schema: Here you can provide a custom schema for specific page. The schema is used for better indexing in search engines and serving rich search results. No script tags.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("customSchema")]
+		public virtual string CustomSchema => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetCustomSchema(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide in sitemap: You can hide this page in sitemap by checking this toggle.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[ImplementPropertyType("hideInSitemap")]
+		public virtual bool HideInSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetHideInSitemap(this, _publishedValueFallback);
+
+		///<summary>
+		/// Meta description: Here you can provide a summary of the page. The summary is read by search engines to determine what the page is all about. Ideally 130-155 character
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("metaDescription")]
+		public virtual string MetaDescription => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetMetaDescription(this, _publishedValueFallback);
+
+		///<summary>
+		/// Meta title: Here you can provide a title that will be used in the browser tab. The page name will be used as a fallback, in case you do not provide a title. Ideally 50-60 characters.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("metaTitle")]
+		public virtual string MetaTitle => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetMetaTitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// OG Image: Here you can select an image that will be shown when the page is shared on social via open graph
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("ogImage")]
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops OgImage => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetOgImage(this, _publishedValueFallback);
+
+		///<summary>
+		/// Robots: Here you can override the robots meta tag on the current page to affect how search engines will crawl and index it.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.0+a504fd1")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("robots")]
+		public virtual string Robots => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetRobots(this, _publishedValueFallback);
 	}
 }

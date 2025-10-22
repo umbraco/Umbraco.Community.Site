@@ -64,6 +64,21 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             return rows;
         }
 
+        public static string? GetWebPageName(ISeo contentModel)
+        {
+            if (contentModel is Home)
+            {
+                return contentModel.MetaTitle;
+            }
+
+            if (contentModel is Blog && !string.IsNullOrEmpty(contentModel.MetaTitle))
+            {
+                return contentModel.MetaTitle;
+            }
+
+            return (contentModel as IPublishedContent)?.Name;
+        }
+
         protected static string? GetOptionalColor(string? color) =>
             !string.IsNullOrEmpty(color) ? CreateHtmlColor(color) : null;
 

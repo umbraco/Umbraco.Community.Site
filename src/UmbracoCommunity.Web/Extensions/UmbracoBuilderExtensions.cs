@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
 using UmbracoCommunity.Web.ViewModelBuilders;
 using UmbracoCommunity.Web.ViewModelBuilders.Components;
@@ -28,6 +29,8 @@ namespace UmbracoCommunity.Web.Extensions
         {
             // Register shared utilities
             builder.Services.AddScoped<Utilities.ReleaseDiscussionParser>();
+
+            builder.Services.AddScoped<IPageViewModelDecorator<Seo>, SeoMetaDataViewModelDecorator>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();

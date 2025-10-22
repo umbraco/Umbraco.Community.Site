@@ -39,6 +39,25 @@ public static class PublishedContentExtensions
         return navSettings?.As<NavigationSettings>();
     }
 
+    public static SocialSettings? GetSocialSettings(this IPublishedContent content, IPublishedContent? settingsNode = null)
+    {
+        Settings? settingsRoot = null;
+        if (settingsNode == null || settingsNode is not Settings)
+        {
+            settingsRoot = content.GetSettingsNode();
+            if (settingsRoot == null)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            settingsRoot = settingsNode as Settings;
+        }
+        var socialSettings = settingsRoot?.Children(x => x.ContentType.Alias == SocialSettings.ModelTypeAlias)?.FirstOrDefault();
+        return socialSettings?.As<SocialSettings>();
+    }
+
     private static string GetElementDescription(IPublishedContent? element)
     {
         if (element is null)

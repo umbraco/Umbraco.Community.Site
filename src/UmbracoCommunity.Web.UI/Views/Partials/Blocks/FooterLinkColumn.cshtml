@@ -7,7 +7,7 @@
         {
             <div class="footer-links__column-section">
 
-                <partial name="@($"~/Views/Partials/Blocks/HeaderWithLinksBlock.cshtml")" model="block" />
+                <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
 
             </div>
         }
