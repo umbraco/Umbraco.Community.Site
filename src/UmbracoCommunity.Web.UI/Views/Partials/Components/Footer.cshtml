@@ -15,14 +15,13 @@
             </div>
 
             <div class="footer-inner__links">
-                <div class="footer-links__column">
-                    <div class="footer-links__column-section">
-                        <h2>columnSection.Title</h2>
-                        <ul>
-                            <li><a href="link.Url" target="link.Target" title="link.Text">link.Text</a></li>
-                        </ul>
-                    </div>
-                </div>
+                @if (Model.LinkColumns != null && Model.LinkColumns.Any())
+                {
+                    foreach (var column in Model.LinkColumns)
+                    {
+                        <partial name="@($"~/Views/Partials/Blocks/FooterLinkColumn.cshtml")" model="column" />
+                    }
+                }
             </div>
         </div>
         <div class="footer-bottom">

@@ -49,7 +49,7 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
                     {
                         var section = new NavigationMenuItem(linkSection?.SectionName ?? "Title");
 
-                        if (linkSection.Columns != null && linkSection.Columns.Any())
+                        if (linkSection?.Columns != null && linkSection.Columns.Any())
                         {
                             foreach (var col in linkSection.Columns)
                             {

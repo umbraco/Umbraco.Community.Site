@@ -1,0 +1,19 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<FooterLinkColumn>>
+
+@{
+    var footerLinkArea = Model.Areas?.FirstOrDefault(x => x.Alias == "footerLinksArea");
+}
+
+@if (Model.Content.FooterLinkItems != null && Model.Content.FooterLinkItems.Any())
+{
+    <div class="footer-links__column">
+        @foreach (var block in Model.Content.FooterLinkItems)
+        {
+            <div class="footer-links__column-section">
+
+                <partial name="@($"~/Views/Partials/Blocks/HeaderWithLinksBlock.cshtml")" model="block" />
+
+            </div>
+        }
+    </div>
+}

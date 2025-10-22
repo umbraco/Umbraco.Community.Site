@@ -32,6 +32,23 @@
           "SortOrder": 1
         }
       ]
+    },
+    {
+      "Key": "90447b02-9841-48c3-aa70-3f4cb9007ee8",
+      "Name": "Footer",
+      "SortOrder": 1,
+      "Type": 1,
+      "Alias": "footer",
+      "PropertyTypes": [
+        {
+          "Key": "cc5e9678-13d7-4872-93e4-429f54518d3e",
+          "Alias": "footerLinks",
+          "DataType": "umb://data-type/45bfbb05838d4d289a7cf83babc05947",
+          "Description": "Maximum 4 columns",
+          "Name": "Footer links",
+          "LabelOnTop": true
+        }
+      ]
     }
   ],
   "PropertyTypes": [],
@@ -39,6 +56,10 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/45bfbb05838d4d289a7cf83babc05947",
       "Ordering": true
     },
     {
