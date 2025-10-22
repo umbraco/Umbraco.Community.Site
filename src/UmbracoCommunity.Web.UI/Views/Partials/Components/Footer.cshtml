@@ -26,20 +26,39 @@
         </div>
         <div class="footer-bottom">
             <div class="footer-bottom__bottom-links">
-                <ul>
-                    <li>
-                        <a href="bottomLink.Url" target="bottomLink.Target" title="bottomLink.Text">bottomLink.Text</a>
-                    </li>
-                </ul>
+                @if (Model.BottomLinks != null && Model.BottomLinks.Any())
+                {
+                    <ul>
+                        @foreach (var link in Model.BottomLinks)
+                        {
+                            <li>
+                                <a href="@link.Url" target="@link.Target" title="@link.Name">@link.Name</a>
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
             <div class="footer-bottom__social-links">
-                <ul>
-                    <li>
-                        <a href="socialLink.Link.Url" target="socialLink.Link.Target" title="socialLink.Link.Text">
-                            <img src="socialLink.Icon" width="24" height="24" alt="socialLink.Link.Text" />
-                        </a>
-                    </li>
-                </ul>
+                @if (Model.SocialLinks != null && Model.SocialLinks.Any())
+                {
+                    <ul>
+                        @foreach (var socialIcon in Model.SocialLinks)
+                        {
+                            <li>
+                                <a href="@socialIcon?.Content.Link?.Url" target="@socialIcon?.Content.Link?.Target" title="@socialIcon?.Content.Link?.Name">
+                                    @if (socialIcon?.Content.Icon != null)
+                                    {
+                                        <svg-src media="@socialIcon?.Content.Icon" width="24" height="24" alt-text="@socialIcon?.Content.Link?.Name"></svg-src>
+                                    }
+                                    else
+                                    {
+                                        @socialIcon?.Content.Link?.Name
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
             </div>
         </div>
     </footer>

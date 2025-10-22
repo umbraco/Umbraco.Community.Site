@@ -9,7 +9,7 @@
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
+  "Parent": "umb://document-type-container/99679eca2db64941b062d286f029823f",
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
@@ -27,7 +27,7 @@
         {
           "Key": "7b4675cc-0554-4d24-b2ee-6218ece1772b",
           "Alias": "icon",
-          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
           "Name": "Icon",
           "SortOrder": 1
         }
@@ -42,14 +42,14 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
+      "Udi": "umb://document-type-container/99679eca2db64941b062d286f029823f",
       "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }

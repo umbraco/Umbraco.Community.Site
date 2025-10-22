@@ -1,0 +1,14 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<LinkWithIcon>>
+
+@if (Model.Content != null && Model.Content.Link != null)
+{
+    <a href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        @if (Model.Content.Icon != null)
+        {
+            <svg-src media="@Model.Content.Icon" width="24" height="24" alt-text="@Model.Content.Link.Name"></svg-src>
+        } else
+        {
+            @Model.Content.Link.Name
+        }
+    </a>
+}

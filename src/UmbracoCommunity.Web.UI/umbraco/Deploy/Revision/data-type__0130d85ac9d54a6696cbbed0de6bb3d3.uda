@@ -1,0 +1,35 @@
+{
+  "Name": "Social sharing links grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 6,
+    "blocks": [
+      {
+        "contentElementTypeKey": "b28af919-ab91-4559-9a7d-41d5a78fa6f4",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Social sharing link",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 1
+          }
+        ]
+      }
+    ],
+    "createLabel": "Add new social link"
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/0130d85ac9d54a6696cbbed0de6bb3d3",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/b28af919ab9145599a7d41d5a78fa6f4"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

@@ -1,9 +1,9 @@
 {
-  "Name": "Single SVG Image picker",
+  "Name": "Single SVG picker",
   "EditorAlias": "Umbraco.MediaPicker3",
   "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
   "Configuration": {
-    "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c,cc07b313-0843-4aa8-bbda-871c8da728c8",
+    "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c",
     "validationLimit": {
       "max": 1
     }
@@ -12,10 +12,6 @@
   "Dependencies": [
     {
       "Udi": "umb://media-type/c4b1efcfa9d541c49621e9d273b52a9c",
-      "Mode": "Exist"
-    },
-    {
-      "Udi": "umb://media-type/cc07b31308434aa8bbda871c8da728c8",
       "Mode": "Exist"
     }
   ],

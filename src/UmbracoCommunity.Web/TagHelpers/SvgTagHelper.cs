@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using HtmlAgilityPack;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
+using StackExchange.Profiling.Internal;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -9,17 +12,28 @@ namespace UmbracoCommunity.Web.TagHelpers
     [HtmlTargetElement("svg-src")]
     public class SvgTagHelper : TagHelper
     {
-        private IPublishedUrlProvider _urlProvider;
-        private MediaFileManager _mediaFileManager;
+        private readonly IPublishedUrlProvider _urlProvider;
+        private readonly MediaFileManager _mediaFileManager;
+        private readonly ILogger<SvgTagHelper> _logger;
 
-        public SvgTagHelper(MediaFileManager mediaFileManager, IPublishedUrlProvider urlProvider)
+        public SvgTagHelper(MediaFileManager mediaFileManager, IPublishedUrlProvider urlProvider, ILogger<SvgTagHelper> logger)
         {
             _mediaFileManager = mediaFileManager;
             _urlProvider = urlProvider;
+            _logger = logger;
         }
 
         [HtmlAttributeName("media")]
         public MediaWithCrops? Media { get; set; }
+
+        [HtmlAttributeName("width")]
+        public int? Width { get; set; }
+
+        [HtmlAttributeName("height")]
+        public int? Height { get; set; }
+
+        [HtmlAttributeName("alt-text")]
+        public string? AltText { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -65,6 +79,40 @@ namespace UmbracoCommunity.Web.TagHelpers
             }
 
             output.Attributes.RemoveAll("media");
+
+            if (Width.HasValue || Height.HasValue || AltText.HasValue())
+            {
+                HtmlDocument doc = new HtmlDocument();
+                try
+                {
+                    doc.LoadHtml(cleanedFileContents);
+                    var svgs = doc.DocumentNode.SelectNodes("//svg");
+                    if (svgs != null && svgs.Count > 0)
+                    {
+                        foreach (var svgNode in svgs)
+                        {
+                            if (Width.HasValue)
+                            {
+                                svgNode.SetAttributeValue("width", Width.Value.ToString());
+                            }
+                            if (Height.HasValue)
+                            {
+                                svgNode.SetAttributeValue("height", Height.Value.ToString());
+                            }
+                            if (AltText.HasValue())
+                            {
+                                svgNode.SetAttributeValue("alt", AltText.ToString());
+                            }
+                        }
+
+                        cleanedFileContents = doc.DocumentNode.OuterHtml;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error processing svg for html output");
+                }
+            }
 
             output.TagName = null;
             output.Content.SetHtmlContent(cleanedFileContents);
