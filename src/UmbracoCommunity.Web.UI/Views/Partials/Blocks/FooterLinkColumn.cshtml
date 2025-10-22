@@ -1,9 +1,5 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<FooterLinkColumn>>
 
-@{
-    var footerLinkArea = Model.Areas?.FirstOrDefault(x => x.Alias == "footerLinksArea");
-}
-
 @if (Model.Content.FooterLinkItems != null && Model.Content.FooterLinkItems.Any())
 {
     <div class="footer-links__column">
