@@ -74,10 +74,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             {
                 // Find all release labels that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
-                // Only include labels with valid SemVer versions
                 var releaseLabels = pr.Labels
-                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelForRepository(l, repoConfig))
                     .ToList();
+
+                // Skip this PR entirely if ANY release label has an invalid SemVer version
+                if (releaseLabels.Any(l => !ReleaseLabelHelper.HasValidSemVer(l)))
+                    continue;
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -122,10 +125,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             {
                 // Find all release labels that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
-                // Only include labels with valid SemVer versions
                 var releaseLabels = issue.Labels
-                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelForRepository(l, repoConfig))
                     .ToList();
+
+                // Skip this issue entirely if ANY release label has an invalid SemVer version
+                if (releaseLabels.Any(l => !ReleaseLabelHelper.HasValidSemVer(l)))
+                    continue;
 
                 foreach (var releaseLabel in releaseLabels)
                 {
@@ -266,9 +272,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             foreach (var pr in allPrs)
             {
                 // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                // Only include labels with valid SemVer versions
-                foreach (var releaseLabel in pr.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
-                                                                   ReleaseLabelHelper.HasValidSemVer(l)))
+                var allReleaseLabels = pr.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l)).ToList();
+
+                // Skip this PR entirely if ANY release label has an invalid SemVer version
+                if (allReleaseLabels.Any(l => !ReleaseLabelHelper.HasValidSemVer(l)))
+                    continue;
+
+                foreach (var releaseLabel in allReleaseLabels)
                 {
                     var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
@@ -300,9 +310,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             foreach (var issue in allIssues)
             {
                 // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                // Only include labels with valid SemVer versions
-                foreach (var releaseLabel in issue.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
-                                                                     ReleaseLabelHelper.HasValidSemVer(l)))
+                var allReleaseLabels = issue.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l)).ToList();
+
+                // Skip this issue entirely if ANY release label has an invalid SemVer version
+                if (allReleaseLabels.Any(l => !ReleaseLabelHelper.HasValidSemVer(l)))
+                    continue;
+
+                foreach (var releaseLabel in allReleaseLabels)
                 {
                     var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
