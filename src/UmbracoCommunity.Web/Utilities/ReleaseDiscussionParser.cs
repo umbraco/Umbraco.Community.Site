@@ -46,6 +46,10 @@ public class ReleaseDiscussionParser
         // Extract version from label (e.g., "release/16.4.0" -> "16.4.0")
         var version = releaseLabel.Substring("release/".Length);
 
+        // Validate that the version is a valid SemVer version
+        if (!SemVerHelper.IsValidSemVer(version))
+            return null;
+
         // Parse release date from body
         DateTime? releaseDate = null;
         bool isTba = true;

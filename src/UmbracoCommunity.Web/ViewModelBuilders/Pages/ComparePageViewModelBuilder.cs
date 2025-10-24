@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
@@ -118,13 +119,14 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             {
                 // Find all release labels on this PR that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                // Only include labels with valid SemVer versions
                 var releaseLabels = pr.Labels
-                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
                     .ToList();
 
                 // Find the earliest version in our range
                 var prVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(ExtractVersionFromLabel(label)) })
+                    .Select(label => new { Label = label, Version = ParseVersion(ReleaseLabelHelper.ExtractVersion(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -132,7 +134,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 if (prVersionsInRange.Any())
                 {
                     var earliestVersion = prVersionsInRange.First();
-                    var versionString = ExtractVersionFromLabel(earliestVersion.Label);
+                    var versionString = ReleaseLabelHelper.ExtractVersion(earliestVersion.Label);
 
                     var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
                     var authorLogin = pr.Author?.Login ?? "unknown";
@@ -173,13 +175,14 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             {
                 // Find all release labels on this issue that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                // Only include labels with valid SemVer versions
                 var releaseLabels = issue.Labels
-                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
                     .ToList();
 
                 // Find the earliest version in our range
                 var issueVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(ExtractVersionFromLabel(label)) })
+                    .Select(label => new { Label = label, Version = ParseVersion(ReleaseLabelHelper.ExtractVersion(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -187,7 +190,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 if (issueVersionsInRange.Any())
                 {
                     var earliestVersion = issueVersionsInRange.First();
-                    var versionString = ExtractVersionFromLabel(earliestVersion.Label);
+                    var versionString = ReleaseLabelHelper.ExtractVersion(earliestVersion.Label);
 
                     var isHqMember = issue.Author != null &&
                                      _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
@@ -313,6 +316,10 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var now = DateTime.UtcNow;
             foreach (var nugetVersion in nugetVersions.Where(kvp => kvp.Value <= now))
             {
+                // Skip invalid semver versions
+                if (!SemVerHelper.IsValidSemVer(nugetVersion.Key))
+                    continue;
+
                 if (!allReleases.ContainsKey(nugetVersion.Key))
                 {
                     var releaseLabel = $"release/{nugetVersion.Key}";
@@ -349,6 +356,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             var allReleaseLabels = releaseStats.Keys
                 .Select(label => label.Replace("release/", ""))
                 .Where(version => !allReleases.ContainsKey(version))
+                .Where(version => SemVerHelper.IsValidSemVer(version)) // Only include valid SemVer versions
                 .ToList();
 
             foreach (var version in allReleaseLabels)
@@ -436,10 +444,11 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         foreach (var pr in allPrs)
         {
             // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-            foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                               l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
+            // Only include labels with valid SemVer versions
+            foreach (var releaseLabel in pr.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
+                                                               ReleaseLabelHelper.HasValidSemVer(l)))
             {
-                var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                 if (!stats.ContainsKey(normalizedLabel))
                     stats[normalizedLabel] = (0, 0, 0);
@@ -469,10 +478,11 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         foreach (var issue in allIssues)
         {
             // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-            foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                                 l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
+            // Only include labels with valid SemVer versions
+            foreach (var releaseLabel in issue.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
+                                                                 ReleaseLabelHelper.HasValidSemVer(l)))
             {
-                var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                 if (!stats.ContainsKey(normalizedLabel))
                     stats[normalizedLabel] = (0, 0, 0);
@@ -496,44 +506,6 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         return stats;
     }
 
-    /// <summary>
-    /// Normalizes a release label by removing any prefix.
-    /// E.g., "cms/release/17.0.0" -> "release/17.0.0", "release/17.0.0" -> "release/17.0.0"
-    /// </summary>
-    private static string NormalizeReleaseLabel(string label)
-    {
-        var releasePart = "/release/";
-        var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
-
-        if (releaseIndex >= 0)
-        {
-            // Found a prefix before "/release/", extract "release/X.Y.Z" part
-            return "release" + label.Substring(releaseIndex + releasePart.Length - 1);
-        }
-
-        // No prefix, return as-is
-        return label;
-    }
-
-    /// <summary>
-    /// Extracts version string from label. Handles both "release/X.Y.Z" and "{prefix}/release/X.Y.Z" patterns.
-    /// </summary>
-    private static string ExtractVersionFromLabel(string label)
-    {
-        // Handle both "release/X.Y.Z" and "prefix/release/X.Y.Z" patterns
-        var releasePart = "/release/";
-        var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
-
-        if (releaseIndex >= 0)
-        {
-            // Extract everything after "/release/"
-            return label.Substring(releaseIndex + releasePart.Length);
-        }
-
-        // Fallback: assume it starts with "release/"
-        return label.Replace("release/", "").Trim();
-    }
-
     private static Version ParseVersion(string versionString)
     {
         versionString = versionString.Trim();
@@ -553,26 +525,4 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         return new Version(0, 0, 0);
     }
 
-    /// <summary>
-    /// Checks if a release label is valid for the given repository.
-    /// Valid labels are: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches the repo's AnnouncementsPrefix.
-    /// </summary>
-    private static bool IsValidReleaseLabelForRepository(string label, RepositoryConfig? repoConfig)
-    {
-        // Always allow unprefixed "release/" labels
-        if (label.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        // If the repo has an AnnouncementsPrefix, allow labels with that prefix
-        if (repoConfig?.HasAnnouncementsPrefix == true &&
-            !string.IsNullOrEmpty(repoConfig.AnnouncementsPrefix))
-        {
-            var prefixPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
-            if (label.StartsWith(prefixPattern, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
-
-        // Reject all other prefixed labels (e.g., "forms/release/", "commerce/release/", etc.)
-        return false;
-    }
 }

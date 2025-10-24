@@ -74,14 +74,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             {
                 // Find all release labels that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                // Only include labels with valid SemVer versions
                 var releaseLabels = pr.Labels
-                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
                     .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
                     // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
-                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                    var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                     if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
@@ -121,14 +122,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             {
                 // Find all release labels that match this repository
                 // Include: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches this repo's AnnouncementsPrefix
+                // Only include labels with valid SemVer versions
                 var releaseLabels = issue.Labels
-                    .Where(l => IsValidReleaseLabelForRepository(l, repoConfig))
+                    .Where(l => ReleaseLabelHelper.IsValidReleaseLabelWithSemVer(l, repoConfig))
                     .ToList();
 
                 foreach (var releaseLabel in releaseLabels)
                 {
                     // Normalize label to remove prefix (e.g., "cms/release/17.0.0" -> "release/17.0.0")
-                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                    var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                     if (!releaseGroups.ContainsKey(normalizedLabel))
                     {
@@ -264,10 +266,11 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             foreach (var pr in allPrs)
             {
                 // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                foreach (var releaseLabel in pr.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                                   l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
+                // Only include labels with valid SemVer versions
+                foreach (var releaseLabel in pr.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
+                                                                   ReleaseLabelHelper.HasValidSemVer(l)))
                 {
-                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                    var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                     if (!stats.ContainsKey(normalizedLabel))
                         stats[normalizedLabel] = (0, 0, 0);
@@ -297,10 +300,11 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             foreach (var issue in allIssues)
             {
                 // Match both "release/" and "{prefix}/release/" patterns (e.g., "cms/release/17.0.0")
-                foreach (var releaseLabel in issue.Labels.Where(l => l.StartsWith("release/", StringComparison.OrdinalIgnoreCase) ||
-                                                                     l.Contains("/release/", StringComparison.OrdinalIgnoreCase)))
+                // Only include labels with valid SemVer versions
+                foreach (var releaseLabel in issue.Labels.Where(l => ReleaseLabelHelper.IsReleaseLabel(l) &&
+                                                                     ReleaseLabelHelper.HasValidSemVer(l)))
                 {
-                    var normalizedLabel = NormalizeReleaseLabel(releaseLabel);
+                    var normalizedLabel = ReleaseLabelHelper.Normalize(releaseLabel);
 
                     if (!stats.ContainsKey(normalizedLabel))
                         stats[normalizedLabel] = (0, 0, 0);
@@ -377,46 +381,5 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             return categories;
         }
 
-        /// <summary>
-        /// Normalizes a release label by removing any prefix.
-        /// E.g., "cms/release/17.0.0" -> "release/17.0.0", "release/17.0.0" -> "release/17.0.0"
-        /// </summary>
-        private static string NormalizeReleaseLabel(string label)
-        {
-            var releasePart = "/release/";
-            var releaseIndex = label.IndexOf(releasePart, StringComparison.OrdinalIgnoreCase);
-
-            if (releaseIndex >= 0)
-            {
-                // Found a prefix before "/release/", extract "release/X.Y.Z" part
-                return "release" + label.Substring(releaseIndex + releasePart.Length - 1);
-            }
-
-            // No prefix, return as-is
-            return label;
-        }
-
-        /// <summary>
-        /// Checks if a release label is valid for the given repository.
-        /// Valid labels are: "release/X.Y.Z" or "{prefix}/release/X.Y.Z" where prefix matches the repo's AnnouncementsPrefix.
-        /// </summary>
-        private static bool IsValidReleaseLabelForRepository(string label, RepositoryConfig? repoConfig)
-        {
-            // Always allow unprefixed "release/" labels
-            if (label.StartsWith("release/", StringComparison.OrdinalIgnoreCase))
-                return true;
-
-            // If the repo has an AnnouncementsPrefix, allow labels with that prefix
-            if (repoConfig?.HasAnnouncementsPrefix == true &&
-                !string.IsNullOrEmpty(repoConfig.AnnouncementsPrefix))
-            {
-                var prefixPattern = $"{repoConfig.AnnouncementsPrefix}/release/";
-                if (label.StartsWith(prefixPattern, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-
-            // Reject all other prefixed labels (e.g., "forms/release/", "commerce/release/", etc.)
-            return false;
-        }
     }
 }
