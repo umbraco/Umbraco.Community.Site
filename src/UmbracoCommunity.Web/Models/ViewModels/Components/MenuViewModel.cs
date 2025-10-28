@@ -9,6 +9,8 @@ public class MenuViewModel
 
     public MenuViewModel() { }
 
+    public string? SiteName { get; set; };
+
     public bool HasSearchPage => !string.IsNullOrEmpty(SearchPageUrl);
 
     public bool HasHeroLayout => !string.IsNullOrEmpty(HeroLayout);

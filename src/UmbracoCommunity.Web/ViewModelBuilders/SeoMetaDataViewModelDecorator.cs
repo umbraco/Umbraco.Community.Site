@@ -40,11 +40,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 return;
             }
 
-            var socialSettings = currentPage.GetSocialSettings();
+            var siteSettings = currentPage.GetSiteSettings();
+            viewModel.SiteName = siteSettings?.SiteName;
 
             viewModel.MetaTitle = string.IsNullOrEmpty(contentModel.MetaTitle) ? viewModel.Name : contentModel.MetaTitle;
             viewModel.MetaDescription = contentModel.MetaDescription ?? string.Empty;
+
+            var socialSettings = currentPage.GetSocialSettings(siteSettings);
             viewModel.OpenGraphImageUrl = GetOpenGraphImageUrl(contentModel.OgImage, socialSettings);
+
             viewModel.Robots = contentModel.Robots ?? string.Empty;
             viewModel.CanonicalUrl = GetCanonicalUrl(contentModel);
 

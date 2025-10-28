@@ -14,7 +14,9 @@
             <div class="nav-start">
                 @if (Model.Logo != null)
                 {
-                    <partial name="~/Views/Partials/Components/Logo.cshtml" for="Logo"/>
+                    <a href="/" title="Umbraco" class="logo-link">
+                        <partial name="~/Views/Partials/Components/Logo.cshtml" for="Logo"/>
+                    </a>
                 }
             </div>
             <nav class="nav-list">

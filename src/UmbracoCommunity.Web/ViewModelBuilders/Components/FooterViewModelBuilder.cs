@@ -20,7 +20,7 @@ internal class FooterViewModelBuilder : IViewModelBuilder<FooterViewModel>
     {
         FooterViewModel viewModel = new();
 
-        var siteSettings = currentPage.GetSettingsNode();
+        var siteSettings = currentPage.GetSiteSettings();
         viewModel.Logo = siteSettings?.FooterLogo ?? siteSettings?.HeaderLogo; // fallback to header logo as default
 
         var navSettings = currentPage.GetNavigationSettings(siteSettings);
