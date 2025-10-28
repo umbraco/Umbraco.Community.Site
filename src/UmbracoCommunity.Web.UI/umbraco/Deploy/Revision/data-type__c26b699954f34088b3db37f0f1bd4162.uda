@@ -1,0 +1,11 @@
+{
+  "Name": "Single form picker",
+  "EditorAlias": "UmbracoForms.FormPicker",
+  "EditorUiAlias": "Forms.PropertyEditorUi.FormPicker.Single",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {},
+  "Udi": "umb://data-type/c26b699954f34088b3db37f0f1bd4162",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

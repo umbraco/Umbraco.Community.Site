@@ -3,6 +3,7 @@
 }
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @using UmbracoCommunity.Web.Models.Pages
+@using Umbraco.Forms.Web
 @inherits UmbracoViewPage<PageViewModelBase>
 
 <!DOCTYPE html>
@@ -14,6 +15,7 @@
     <link rel="stylesheet" vite-href="@Model.ContentTypeAlias" />
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
+    @Html.RenderUmbracoFormDependencies(Url)
     <title>Umbraco Community | @Model.Name</title>
 </head>
 

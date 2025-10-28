@@ -8,7 +8,9 @@
       {
         "contentElementTypeKey": "e68f26bd-5b02-4e7b-a3f0-86346793f5c5",
         "allowAtRoot": true,
-        "allowInAreas": true
+        "allowInAreas": true,
+        "inlineEditing": false,
+        "hideContentEditor": false
       }
     ],
     "useLiveEditing": true,

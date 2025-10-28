@@ -153,3 +153,11 @@ img {
     font-size: 14px;
     color: #babcd5;
 }
+
+.umbraco-forms-page {
+    margin: 0 20px;
+}
+
+.umbraco-forms-page h4 {
+    margin: 0;
+}
