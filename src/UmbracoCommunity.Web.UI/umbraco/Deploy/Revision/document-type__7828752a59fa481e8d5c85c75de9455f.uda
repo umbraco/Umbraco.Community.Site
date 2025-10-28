@@ -15,6 +15,7 @@
     {
       "Key": "699a6dda-6059-40f6-b760-1c6342c693e1",
       "Name": "SEO",
+      "SortOrder": 10,
       "Type": 1,
       "Alias": "sEO",
       "PropertyTypes": [
