@@ -42,7 +42,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
             var socialSettings = currentPage.GetSocialSettings();
 
-            viewModel.MetaTitle = string.IsNullOrEmpty(contentModel.MetaTitle) ? viewModel.Name : contentModel.MetaTitle ?? string.Empty;
+            viewModel.MetaTitle = string.IsNullOrEmpty(contentModel.MetaTitle) ? viewModel.Name : contentModel.MetaTitle;
             viewModel.MetaDescription = contentModel.MetaDescription ?? string.Empty;
             viewModel.OpenGraphImageUrl = GetOpenGraphImageUrl(contentModel.OgImage, socialSettings);
             viewModel.Robots = contentModel.Robots ?? string.Empty;
@@ -61,7 +61,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 return null;
             }
 
-            var baseUri = new Uri($"https://community.umbraco.com"); // TODO: replace with site specific uri
+            var baseUri = new Uri("https://community.umbraco.com");
+            if (_httpContextAccessor.HttpContext is not null)
+            {
+                var hostname = _httpContextAccessor.HttpContext.Request.Host.Host;
+                if (!string.IsNullOrEmpty(hostname))
+                {
+                    baseUri = new Uri($"{_httpContextAccessor.HttpContext.Request.Scheme}://{hostname}");
+                }
+            }
 
             return new Uri(baseUri, contentRelativeUrl).ToString();
         }
