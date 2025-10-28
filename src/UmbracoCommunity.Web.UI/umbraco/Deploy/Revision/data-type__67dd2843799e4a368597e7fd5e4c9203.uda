@@ -1,0 +1,20 @@
+{
+  "Name": "Single SVG picker",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c",
+    "validationLimit": {
+      "max": 1
+    }
+  },
+  "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+  "Dependencies": [
+    {
+      "Udi": "umb://media-type/c4b1efcfa9d541c49621e9d273b52a9c",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

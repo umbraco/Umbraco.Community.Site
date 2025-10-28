@@ -1,0 +1,8 @@
+{
+  "Name": "Blocks lists",
+  "ContainedObjectType": "30a2a501-1978-4ddb-a57b-f7efed43ba3c",
+  "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContainerArtifact",
+  "__version": "16.0.3"
+}

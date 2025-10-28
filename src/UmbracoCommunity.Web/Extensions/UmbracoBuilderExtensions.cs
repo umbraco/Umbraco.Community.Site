@@ -1,7 +1,6 @@
 ﻿using Joonasw.AspNetCore.SecurityHeaders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
 using UmbracoCommunity.Web.ViewModelBuilders;
@@ -44,6 +43,12 @@ namespace UmbracoCommunity.Web.Extensions
 
             builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<MenuReleasesViewModel>, MenuReleasesViewModelBuilder>();
+            builder.Services.AddScoped<IViewModelBuilder<FooterViewModel>, FooterViewModelBuilder>();
+
+            builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
+            builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
+            builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
+            builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
 
             return builder;
         }

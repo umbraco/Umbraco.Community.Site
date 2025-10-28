@@ -1,0 +1,37 @@
+{
+  "Name": "Header navigation items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "1c214bd6-6f48-45aa-8e1e-2e8357380fb8",
+        "label": "{umbValue: sectionName}"
+      },
+      {
+        "contentElementTypeKey": "062504b8-276a-413d-bb6d-0a8092ca3fc6",
+        "label": "{umbLink: link}"
+      }
+    ],
+    "validationLimit": {
+      "max": 7
+    },
+    "useInlineEditingAsDefault": true
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/062504b8276a413dbb6d0a8092ca3fc6"
+    },
+    {
+      "Udi": "umb://document-type/1c214bd66f4845aa8e1e2e8357380fb8"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.3"
+}

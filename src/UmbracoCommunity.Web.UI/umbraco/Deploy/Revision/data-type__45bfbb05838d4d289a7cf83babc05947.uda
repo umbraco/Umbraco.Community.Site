@@ -1,0 +1,64 @@
+{
+  "Name": "Footer block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 4,
+    "useLiveEditing": true,
+    "blocks": [
+      {
+        "contentElementTypeKey": "6421a497-df28-4d4f-93e0-39a1165edcdd",
+        "allowAtRoot": true,
+        "allowInAreas": false,
+        "areas": [
+          {
+            "key": "3a09592f-1688-4708-97fa-08959c82b913",
+            "alias": "footerLinksArea",
+            "columnSpan": 2,
+            "rowSpan": 1,
+            "minAllowed": 0,
+            "specifiedAllowance": [
+              {
+                "minAllowed": 0,
+                "elementTypeKey": "e68f26bd-5b02-4e7b-a3f0-86346793f5c5"
+              }
+            ],
+            "createLabel": "Create footer links block"
+          }
+        ],
+        "columnSpanOptions": [
+          {
+            "columnSpan": 1
+          }
+        ],
+        "inlineEditing": true
+      },
+      {
+        "contentElementTypeKey": "e68f26bd-5b02-4e7b-a3f0-86346793f5c5",
+        "allowAtRoot": false,
+        "allowInAreas": true,
+        "label": "Add links block"
+      }
+    ],
+    "validationLimit": {
+      "max": 4
+    },
+    "createLabel": "Add new links column"
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/45bfbb05838d4d289a7cf83babc05947",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/6421a497df284d4f93e039a1165edcdd"
+    },
+    {
+      "Udi": "umb://document-type/e68f26bd5b024e7ba3f086346793f5c5"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

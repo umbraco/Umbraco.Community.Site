@@ -126,3 +126,30 @@ img {
 .dc-big-cta-block__content .btn {
   margin-top: 1.25rem;
 }
+
+/* footer links */
+.footer-links__column {
+    background-color: #283A97;
+    padding: 5px 10px;
+    color: #ffffff;
+}
+
+.footer-links__column ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer-links__column ul a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.footer-links__column ul a:hover {
+    color: #f5c1bc;
+}
+
+.footer-links__column h2 {
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #babcd5;
+}

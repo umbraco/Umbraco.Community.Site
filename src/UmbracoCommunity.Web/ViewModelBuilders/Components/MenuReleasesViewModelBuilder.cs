@@ -7,11 +7,11 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
-using static UmbracoCommunity.Web.Models.ViewModels.Components.MenuViewModel;
+using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
-internal class MenuReleasesViewModelBuilder : NavigationViewModelBuilderBase, IViewModelBuilder<MenuReleasesViewModel>
+internal class MenuReleasesViewModelBuilder : IViewModelBuilder<MenuReleasesViewModel>
 {
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -25,7 +25,6 @@ internal class MenuReleasesViewModelBuilder : NavigationViewModelBuilderBase, IV
         IPublishedValueFallback publishedValueFallback,
         IFileService fileService,
         AppCaches appCaches)
-        : base(publishedContentQuery, publishedUrlProvider, appCaches)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _imageUrlGenerator = imageUrlGenerator;

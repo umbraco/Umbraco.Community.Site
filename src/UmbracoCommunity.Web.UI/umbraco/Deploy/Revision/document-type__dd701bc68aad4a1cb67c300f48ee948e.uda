@@ -1,0 +1,67 @@
+{
+  "Name": "Link with icon and caption",
+  "Alias": "linkWithIconAndCaption",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-indent",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/99679eca2db64941b062d286f029823f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "107c108d-6e40-4947-9c36-b7d025080066",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "817ec50f-0c5b-42fb-a0d2-694c3f249373",
+          "Alias": "link",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "Mandatory": true,
+          "Name": "Link"
+        },
+        {
+          "Key": "82236666-87ba-4eaf-9e28-812044103c31",
+          "Alias": "icon",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Name": "Icon",
+          "SortOrder": 1
+        },
+        {
+          "Key": "f91614d5-33a6-4b6c-acb3-b9a542238074",
+          "Alias": "caption",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Description": "Short text under the link (max 25 chars)",
+          "Name": "Caption",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/dd701bc68aad4a1cb67c300f48ee948e",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/99679eca2db64941b062d286f029823f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

@@ -1,0 +1,43 @@
+{
+  "Name": "Footer link column",
+  "Alias": "footerLinkColumn",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-coverflow",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/7010665f24d54643a33f11d73d16cc09",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "e44234f9-ec01-41b2-8fe9-7a97b09a79c3",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "a19a1834-cb7b-485d-9d08-465428a20ee6",
+          "Alias": "footerLinkItems",
+          "DataType": "umb://data-type/f4585f3d873240c3a08318fb5d061063",
+          "Name": "Footer link items"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/6421a497df284d4f93e039a1165edcdd",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/f4585f3d873240c3a08318fb5d061063",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/7010665f24d54643a33f11d73d16cc09",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

@@ -16,7 +16,6 @@
 .dc-image-and-text-block__content-container {
   display: flex;
   justify-content: flex-end;
-  padding-left: 5.25rem;
 }
 
 .dc-image-and-text-block__content h2{

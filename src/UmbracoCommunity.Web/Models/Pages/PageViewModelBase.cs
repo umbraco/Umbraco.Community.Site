@@ -22,6 +22,8 @@ public abstract class PageViewModelBase
 
     public MenuViewModel Menu { get; set; } = new();
 
+    public FooterViewModel Footer { get; set; } = new();
+
     public string MetaTitle { get; set; } = string.Empty;
 
     public string MetaDescription { get; set; } = string.Empty;

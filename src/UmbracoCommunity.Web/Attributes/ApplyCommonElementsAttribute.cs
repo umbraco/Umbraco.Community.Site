@@ -18,15 +18,18 @@ namespace UmbracoCommunity.Web.Attributes
         private class ApplyNavigationFilter : ApplyFilterBase, IResultFilter
         {
             private readonly IViewModelBuilder<MenuViewModel> _menuViewModelBuilder;
+            private readonly IViewModelBuilder<FooterViewModel> _footerViewModelBuilder;
             private readonly ICspNonceService _nonceService;
 
             public ApplyNavigationFilter(
                 IUmbracoContextAccessor umbracoContextAccessor,
                 IViewModelBuilder<MenuViewModel> menuViewModelBuilder,
+                IViewModelBuilder<FooterViewModel> footerViewModelBuilder,
                 ICspNonceService nonceService)
                 : base(umbracoContextAccessor)
             {
                 _menuViewModelBuilder = menuViewModelBuilder;
+                _footerViewModelBuilder = footerViewModelBuilder;
                 _nonceService = nonceService;
             }
 
@@ -43,6 +46,7 @@ namespace UmbracoCommunity.Web.Attributes
                 }
 
                 viewModel.Menu = _menuViewModelBuilder.Build(publishedContent, umbracoContext);
+                viewModel.Footer = _footerViewModelBuilder.Build(publishedContent, umbracoContext);
             }
 
             public void OnResultExecuted(ResultExecutedContext context)

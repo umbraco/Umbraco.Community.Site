@@ -1,0 +1,14 @@
+﻿@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
+
+<div class="dc-image-and-text-block vertical-text-position-center" id="@Model.IdHash">
+    @foreach (var block in Model.Blocks)
+    {
+        var typedBlock = block.Content as TextBlock;
+        <div class="dc-image-and-text-block__content-container">
+            <div class="dc-image-and-text-block__content">
+                @Html.Raw(typedBlock?.Text?.ToHtmlString())
+            </div>
+        </div>
+    }
+</div>

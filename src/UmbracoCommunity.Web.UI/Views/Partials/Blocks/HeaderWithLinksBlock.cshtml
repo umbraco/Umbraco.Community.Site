@@ -1,0 +1,15 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeaderWithLinksBlock>>
+
+@if (!string.IsNullOrEmpty(Model.Content.Header))
+{
+    <h2>@Model.Content.Header</h2>
+}
+@if (Model.Content.Links != null && Model.Content.Links.Any())
+{
+    <ul>
+        @foreach (var link in Model.Content.Links)
+        {
+            <li><a href="@link.Url" target="@link.Target" title="@link.Name">@link.Name</a></li>
+        }
+    </ul>
+}
