@@ -12,7 +12,7 @@
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="16.0.0" /> -->
     
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="16.0.0" />
-    <PackageReference Include="Umbraco.Cms" Version="16.3.0" />
+    <PackageReference Include="Umbraco.Cms" Version="16.3.3" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="4.0.3" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" Version="16.0.4" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" Version="16.0.4" /> -->
@@ -23,7 +23,7 @@
     <PackageReference Include="Hangfire" Version="1.8.21" />
 	<PackageReference Include="Hangfire.Console" Version="1.4.3" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
-    <PackageReference Include="Markdig" Version="0.42.0" />	
+    <PackageReference Include="Markdig" Version="0.43.0" />	
   </ItemGroup>
 
   <ItemGroup>

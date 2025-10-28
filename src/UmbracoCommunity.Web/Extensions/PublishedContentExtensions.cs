@@ -8,7 +8,7 @@ public static class PublishedContentExtensions
     public static T As<T>(this IPublishedContent? content) where T : class, IPublishedContent =>
         content as T ?? throw new ArgumentException($"Provided published content is null or not composed of the expected content model: {typeof(T).FullName}. Content provided is {GetElementDescription(content)}.", nameof(content));
 
-    public static Settings? GetSettingsNode(this IPublishedContent content)
+    public static Settings? GetSiteSettings(this IPublishedContent content)
     {
         var root = content.Root();
         if (root == null)
@@ -25,7 +25,7 @@ public static class PublishedContentExtensions
         Settings? settingsRoot = null;
         if (settingsNode == null || settingsNode is not Settings)
         {
-            settingsRoot = content.GetSettingsNode();
+            settingsRoot = content.GetSiteSettings();
             if (settingsRoot == null)
             {
                 return null;
@@ -44,7 +44,7 @@ public static class PublishedContentExtensions
         Settings? settingsRoot = null;
         if (settingsNode == null || settingsNode is not Settings)
         {
-            settingsRoot = content.GetSettingsNode();
+            settingsRoot = content.GetSiteSettings();
             if (settingsRoot == null)
             {
                 return null;

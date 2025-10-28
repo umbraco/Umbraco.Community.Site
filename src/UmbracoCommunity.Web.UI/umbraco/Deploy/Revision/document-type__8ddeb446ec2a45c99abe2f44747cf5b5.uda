@@ -16,17 +16,26 @@
   "PropertyGroups": [
     {
       "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
-      "Name": "Theme",
+      "Name": "Site",
       "Type": 1,
-      "Alias": "theme",
+      "Alias": "site",
       "PropertyTypes": [
+        {
+          "Key": "17c407e6-51e5-4823-8b81-03544b0ee799",
+          "Alias": "siteName",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "This will be displayed in the site title",
+          "Mandatory": true,
+          "Name": "Site name"
+        },
         {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
           "Description": "The header logo that will be featured on initial load",
           "Mandatory": true,
-          "Name": "Header logo"
+          "Name": "Header logo",
+          "SortOrder": 1
         },
         {
           "Key": "f7c32471-8614-4f4c-8e1d-261b91a57220",
@@ -42,6 +51,10 @@
   "PropertyTypes": [],
   "Udi": "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
       "Ordering": true

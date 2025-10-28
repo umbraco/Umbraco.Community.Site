@@ -3,6 +3,25 @@ namespace UmbracoCommunity.Web.Utilities;
 public static class SemVerHelper
 {
     /// <summary>
+    /// Checks if a version string is a valid SemVer version.
+    /// Valid versions must have at least a major version number (e.g., "1.0", "1.0.0", "1.0.0-rc1").
+    /// </summary>
+    public static bool IsValidSemVer(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+            return false;
+
+        // Remove build metadata (after +)
+        var versionWithoutBuild = version.Split('+')[0];
+
+        // Remove pre-release identifier (after -)
+        var stableVersion = versionWithoutBuild.Split('-')[0];
+
+        // Try to parse as a valid Version (must have at least major.minor or major.minor.patch)
+        return Version.TryParse(stableVersion, out _);
+    }
+
+    /// <summary>
     /// Checks if a version string is a pre-release according to SemVer 2.0 specification.
     /// A pre-release version is identified by a hyphen followed by dot-separated identifiers.
     /// </summary>

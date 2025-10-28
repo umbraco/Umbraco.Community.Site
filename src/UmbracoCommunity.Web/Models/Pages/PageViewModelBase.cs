@@ -18,6 +18,8 @@ public abstract class PageViewModelBase
 
     public string Name { get; }
 
+    public string? SiteName { get; set; }
+
     public string ContentTypeAlias { get; init; }
 
     public MenuViewModel Menu { get; set; } = new();

@@ -81,6 +81,10 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         var now = DateTime.UtcNow;
         foreach (var nugetVersion in nugetVersions.Where(kvp => kvp.Value <= now))
         {
+            // Skip invalid semver versions
+            if (!SemVerHelper.IsValidSemVer(nugetVersion.Key))
+                continue;
+
             if (!allReleases.ContainsKey(nugetVersion.Key))
             {
                 var releaseLabel = $"release/{nugetVersion.Key}";

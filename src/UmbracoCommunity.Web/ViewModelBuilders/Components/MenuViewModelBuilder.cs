@@ -26,7 +26,8 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
     {
         MenuViewModel viewModel = new();
 
-        var siteSettings = currentPage.GetSettingsNode();
+        var siteSettings = currentPage.GetSiteSettings();
+        viewModel.SiteName = siteSettings?.SiteName;
         viewModel.Logo = siteSettings?.HeaderLogo;
 
         var navSettings = currentPage.GetNavigationSettings(siteSettings);
