@@ -14,7 +14,7 @@
             <div class="nav-start">
                 @if (Model.Logo != null)
                 {
-                    <a href="/" title="Umbraco" class="logo-link">
+                    <a href="/" title="@Model.SiteName" class="logo-link">
                         <partial name="~/Views/Partials/Components/Logo.cshtml" for="Logo"/>
                     </a>
                 }
@@ -53,7 +53,9 @@
             <div class="nav-mobile">
                 @if (Model.Logo != null)
                 {
-                    <partial name="~/Views/Partials/Components/Logo.cshtml" for="Logo" />
+                    <a href="/" title="@Model.SiteName" class="logo-link">
+                        <partial name="~/Views/Partials/Components/Logo.cshtml" for="Logo" />
+                    </a>
                 }
                 <div class="nav-mobile__buttons">
                     @if (Model.HasSearchPage)
