@@ -8,11 +8,12 @@
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
 <head>
+    <partial name="~/Views/Partials/Components/MetaTags.cshtml" />
+    <partial name="~/Views/Partials/Components/Robots.cshtml" for="Robots" />
     <link rel="stylesheet" vite-href="index" asp-add-nonce="true" />
     <link rel="stylesheet" vite-href="@Model.ContentTypeAlias" />
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
-    <title>Umbraco Community | @Model.Name</title>
 </head>
 
 <body class="@GetBodyClasses()">

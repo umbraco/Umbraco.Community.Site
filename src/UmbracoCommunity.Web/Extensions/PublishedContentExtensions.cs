@@ -8,7 +8,7 @@ public static class PublishedContentExtensions
     public static T As<T>(this IPublishedContent? content) where T : class, IPublishedContent =>
         content as T ?? throw new ArgumentException($"Provided published content is null or not composed of the expected content model: {typeof(T).FullName}. Content provided is {GetElementDescription(content)}.", nameof(content));
 
-    public static Settings? GetSettingsNode(this IPublishedContent content)
+    public static Settings? GetSiteSettings(this IPublishedContent content)
     {
         var root = content.Root();
         if (root == null)
@@ -25,7 +25,7 @@ public static class PublishedContentExtensions
         Settings? settingsRoot = null;
         if (settingsNode == null || settingsNode is not Settings)
         {
-            settingsRoot = content.GetSettingsNode();
+            settingsRoot = content.GetSiteSettings();
             if (settingsRoot == null)
             {
                 return null;
@@ -37,6 +37,25 @@ public static class PublishedContentExtensions
         }
         var navSettings = settingsRoot?.Children(x => x.ContentType.Alias == NavigationSettings.ModelTypeAlias)?.FirstOrDefault();
         return navSettings?.As<NavigationSettings>();
+    }
+
+    public static SocialSettings? GetSocialSettings(this IPublishedContent content, IPublishedContent? settingsNode = null)
+    {
+        Settings? settingsRoot = null;
+        if (settingsNode == null || settingsNode is not Settings)
+        {
+            settingsRoot = content.GetSiteSettings();
+            if (settingsRoot == null)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            settingsRoot = settingsNode as Settings;
+        }
+        var socialSettings = settingsRoot?.Children(x => x.ContentType.Alias == SocialSettings.ModelTypeAlias)?.FirstOrDefault();
+        return socialSettings?.As<SocialSettings>();
     }
 
     private static string GetElementDescription(IPublishedContent? element)

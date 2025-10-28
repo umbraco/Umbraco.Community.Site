@@ -1,0 +1,17 @@
+{
+  "Name": "Dropdown - Robots select",
+  "EditorAlias": "Umbraco.DropDown.Flexible",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "items": [
+      "index, nofollow",
+      "noindex, follow",
+      "noindex, nofollow"
+    ]
+  },
+  "Udi": "umb://data-type/5589914f74c04138aa6b8d628543fa19",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

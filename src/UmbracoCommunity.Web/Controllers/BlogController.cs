@@ -24,6 +24,7 @@ namespace UmbracoCommunity.Web.Controllers
         public sealed override IActionResult Index() => throw new NotImplementedException();
 
         [ApplyCommonElements]
+        [ApplyPageMetaData]
         public IActionResult Index(CancellationToken cancellationToken)
         {
             BlogPageViewModel viewModel = _viewModelBuilder.Build(
