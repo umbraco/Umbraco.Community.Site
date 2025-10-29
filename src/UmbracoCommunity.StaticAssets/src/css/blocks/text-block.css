@@ -3,6 +3,7 @@
   background: var(--block-background-color);
   color: var(--block-text-color);
   display: flex;
+  justify-content: center;
 
   &.has-bg {
     padding: var(--unit-md);

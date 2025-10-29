@@ -1,30 +1,41 @@
 {
-  "Name": "Footer links grid",
+  "Name": "Card grid",
   "EditorAlias": "Umbraco.BlockGrid",
   "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
   "Configuration": {
-    "gridColumns": 1,
+    "gridColumns": 12,
     "blocks": [
       {
-        "contentElementTypeKey": "e68f26bd-5b02-4e7b-a3f0-86346793f5c5",
+        "contentElementTypeKey": "f50886fa-f7f1-4c48-aff7-a85b672b23eb",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "inlineEditing": false,
-        "hideContentEditor": false
+        "label": "Card",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 4
+          },
+          {
+            "columnSpan": 6
+          }
+        ],
+        "editorSize": ""
       }
     ],
-    "useLiveEditing": true,
-    "createLabel": "Add new links section"
+    "validationLimit": {
+      "min": 1
+    },
+    "createLabel": "Add card",
+    "useLiveEditing": true
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
-  "Udi": "umb://data-type/f4585f3d873240c3a08318fb5d061063",
+  "Udi": "umb://data-type/389db651adbd477185d01cbe3a46d985",
   "Dependencies": [
     {
       "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/e68f26bd5b024e7ba3f086346793f5c5"
+      "Udi": "umb://document-type/f50886faf7f14c48aff7a85b672b23eb"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

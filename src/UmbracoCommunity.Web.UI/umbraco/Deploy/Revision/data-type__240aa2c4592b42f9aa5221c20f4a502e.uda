@@ -45,6 +45,25 @@
             "columnSpan": 12
           }
         ]
+      },
+      {
+        "contentElementTypeKey": "c735ca50-0612-4680-9525-c72449af1e75",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "0a12408a-e550-43ff-a50d-331b2df9ae84",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Cards",
+        "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
+        "editorSize": "full"
       }
     ]
   },
@@ -54,6 +73,9 @@
     {
       "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
       "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/0a12408ae55043ffa50d331b2df9ae84"
     },
     {
       "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f"
@@ -69,8 +91,17 @@
     },
     {
       "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"
+    },
+    {
+      "Udi": "umb://document-type/c735ca50061246809525c72449af1e75"
+    },
+    {
+      "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
+    },
+    {
+      "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }

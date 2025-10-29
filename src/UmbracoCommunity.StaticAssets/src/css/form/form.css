@@ -1,7 +1,3 @@
-/* ideally this would be a custom forms theme, but then it's separated from
-the rest of the front-end build, which is a little annoying. 
-Let's throw CSS at it, and not stress the small stuff */
-
 @import "./input.css";
 @import "./checkboxlist.css";
 @import "./validation.css";
