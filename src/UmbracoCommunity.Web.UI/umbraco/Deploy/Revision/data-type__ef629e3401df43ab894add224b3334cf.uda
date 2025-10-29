@@ -1,0 +1,42 @@
+{
+  "Name": "Vertical image text grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 1,
+    "blocks": [
+      {
+        "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Text"
+      },
+      {
+        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Image"
+      }
+    ],
+    "createLabel": "Add content",
+    "validationLimit": {
+      "min": 1
+    }
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/ef629e3401df43ab894add224b3334cf",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/299b4e217d6b4da68faf4f281c104dcc"
+    },
+    {
+      "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

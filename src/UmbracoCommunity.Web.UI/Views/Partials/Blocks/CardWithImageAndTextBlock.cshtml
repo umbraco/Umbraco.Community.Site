@@ -1,0 +1,59 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithImageAndTextBlock>>
+
+@{
+    var gridCols = Model.GridColumns ?? 12;
+}
+
+@if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
+{
+    var widthPercent = (Model.ColumnSpan / (double)gridCols) * 100;
+    <style asp-add-nonce="true">
+        @@media (min-width: 1216px) {
+            .dc-boxes-row__items #@(Model.Content.IdHash) {
+                width: @($"{widthPercent}%");
+                max-width: @($"{widthPercent}%");
+            }
+        }
+    </style>
+    <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+        @if (Model.Content.Link != null)
+        {
+            <a href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+                @{
+                    RenderCard(Model.Content.CardContent);
+                }
+            </a>
+        }
+        else
+        {
+            RenderCard(Model.Content.CardContent);
+        }
+
+    </div>
+}
+
+@functions {
+    void RenderCard(BlockListModel elements)
+    {
+        @foreach (var contentItem in elements)
+        {
+            switch (contentItem.Content.ContentType.Alias)
+            {
+                case ImageBlock.ModelTypeAlias:
+                    var imageItem = contentItem.Content as ImageBlock;
+                    <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
+                         sizes="(max-width: 400px) 386px, 906px"
+                         src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
+                         loading="lazy" />
+                    break;
+                case TextBlock.ModelTypeAlias:
+                    var textItem = contentItem.Content as TextBlock;
+                    <div class="dc-boxes-row__item-content">
+                        @Html.Raw(textItem.Text)
+                    </div>
+                    break;
+            }
+        }
+    }
+}

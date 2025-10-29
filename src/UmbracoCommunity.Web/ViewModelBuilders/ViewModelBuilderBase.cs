@@ -18,7 +18,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             var rows = new List<BlockGridRow>();
             if (contentBlocks != null && contentBlocks.Any())
             {
-                var columnSpan = contentBlocks?.GridColumns ?? 12;
+                var columnSpan = contentBlocks.GridColumns ?? 12;
 
                 var columnCount = 0;
                 var blockRow = new BlockGridRow();
@@ -26,7 +26,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 {
                     var newSpan = block.ColumnSpan + columnCount;
 
-                    if (newSpan == columnSpan)
+                    if (newSpan == columnSpan || contentBlocks.Last() == block)
                     {
                         blockRow.Blocks.Add(block);
                         blockRow.HasMultipleBlocks = blockRow.Blocks.Count > 1;
