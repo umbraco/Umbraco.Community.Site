@@ -10,28 +10,27 @@
 
 .dc-boxes-row__items {
     display: flex;
+    flex-direction: column;
 }
 
 .dc-boxes-row__item {
     display: flex;
+    flex-direction: column;
+    column-gap: 3rem;
     color: var(--item-font-color);
     flex: 1;
-
-    @media (--md) {
-        padding: 30px;
-    }
+    border-right: none !important;
+    margin: 2rem 0;
 }
 
 .dc-boxes-row__item:not(:last-child) {
-    border-right: 1px solid var(--color-grey);
+    border-bottom: 1px solid var(--grey);
 }
 
 .dc-boxes-row img {
-    --dc-image-width: 116px;
-    --dc-image-height: 116px;  
-    
-    margin-top: -30px;
-    margin-right: 30px;
+    border-radius: 20px;
+    max-height: fit-content;
+    max-width: 100%
 }
 
 .item-title {
@@ -47,40 +46,46 @@
 
 .dc-boxes-row a {
     --dc-link-color: var(--item-font-color);
+    text-decoration: none;
 }
 
-@media only screen and (max-width: 1370px) {
+.dc-boxes-row a:hover {
+    color: var(--color-identity-blue);
+}
+
+@media (--md) {
     .dc-boxes-row__items {
         flex-direction: column;
     }
 
     .dc-boxes-row__item {
-        border-right: none !important;
+        flex-direction: row;
+        padding: 1em 0 1em;
+        margin: 0;
     }
 
-    .dc-boxes-row__item:not(:last-child) {
-        border-bottom: 1px solid var(--grey);
-    }
-
-    .dc-boxes-row__item:not(:first-child) {
-        padding-top: 60px;
+    .dc-boxes-row__item img {
+        max-width: 50%;
+        margin-top: 1em;
     }
 }
 
-@media only screen and (max-width: 768px) {
-    .dc-boxes-row dc-title-teaser {
-        font-size: 28px;
-        font-weight: 400;
+@media (--lg) {
+    .dc-boxes-row__items {
+        flex-direction: row;
+        justify-content: center;
     }
 
     .dc-boxes-row__item {
         flex-direction: column;
+        padding: 0 30px 30px;
     }
 
-    .dc-boxes-row img {
-        margin-top: -30px;
-        margin-bottom: 30px;
-        --dc-image-width: 96px;
-        --dc-image-height: 96px;
+    .dc-boxes-row__item img {
+        max-width: 100%
+    }
+
+    .dc-boxes-row__item:not(:last-child) {
+        border-right: 1px solid var(--color-grey);
     }
 }

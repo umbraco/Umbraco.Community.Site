@@ -56,6 +56,14 @@
             "columnSpan": 12
           }
         ]
+      },
+      {
+        "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Cards",
+        "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
+        "editorSize": "full"
       }
     ]
   },
@@ -86,6 +94,12 @@
     },
     {
       "Udi": "umb://document-type/c735ca50061246809525c72449af1e75"
+    },
+    {
+      "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
+    },
+    {
+      "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

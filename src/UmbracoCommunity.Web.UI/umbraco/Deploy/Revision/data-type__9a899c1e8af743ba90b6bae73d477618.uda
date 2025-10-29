@@ -1,0 +1,35 @@
+{
+  "Name": "Image text items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1"
+      },
+      {
+        "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc"
+      }
+    ],
+    "validationLimit": {
+      "min": 1,
+      "max": 2
+    }
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/9a899c1e8af743ba90b6bae73d477618",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/299b4e217d6b4da68faf4f281c104dcc"
+    },
+    {
+      "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

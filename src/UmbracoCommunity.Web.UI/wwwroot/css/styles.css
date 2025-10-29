@@ -154,10 +154,30 @@ img {
     color: #babcd5;
 }
 
+/* forms block */
+.umbraco-forms-form {
+    justify-content: center;
+    display: flex;
+}
+
 .umbraco-forms-page {
     margin: 0 20px;
 }
 
 .umbraco-forms-page h4 {
     margin: 0;
+}
+
+/* cards block */
+.dc-boxes-row__items {
+    display: flex;
+    justify-content: center;
+}
+
+.dc-boxes-row__item {
+    padding: 0 20px;
+}
+
+.dc-boxes-row__item a {
+    text-decoration: none;
 }

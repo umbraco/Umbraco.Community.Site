@@ -1,0 +1,25 @@
+{
+  "Name": "[Settings] Card with image and text block",
+  "Alias": "settingsCardWithImageAndTextBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/b3e2087d8b9e41f0a8f5ef665c79d776",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}
