@@ -16,10 +16,10 @@
             }
         }
     </style>
-    <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+    <div id="@Model.Content.IdHash">
         @if (Model.Content.Link != null)
         {
-            <a href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+            <a class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
                 @{
                     RenderCard(Model.Content.CardContent);
                 }
@@ -27,7 +27,11 @@
         }
         else
         {
-            RenderCard(Model.Content.CardContent);
+            <div class="dc-boxes-row__item">
+                @{
+                    RenderCard(Model.Content.CardContent);
+                }
+            </div>
         }
 
     </div>

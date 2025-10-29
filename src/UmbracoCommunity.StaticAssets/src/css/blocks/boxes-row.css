@@ -20,6 +20,7 @@
     color: var(--item-font-color);
     flex: 1;
     border-right: none !important;
+    margin: 2rem 0;
 }
 
 .dc-boxes-row__item:not(:last-child) {
@@ -60,6 +61,7 @@
     .dc-boxes-row__item {
         flex-direction: row;
         padding: 1em 0 1em;
+        margin: 0;
     }
 
     .dc-boxes-row__item img {
