@@ -24,9 +24,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
     <PackageReference Include="Schema.NET" Version="13.0.0" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="16.3.3" />
-    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="16.3.3" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="16.3.3" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="16.3.4" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="16.3.4" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="16.3.4" />
   </ItemGroup>
 
   <ItemGroup>

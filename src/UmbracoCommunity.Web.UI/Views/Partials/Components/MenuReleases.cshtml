@@ -1,4 +1,5 @@
 @using UmbracoCommunity.Web.Models.ViewModels.Components
+@using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation
 @model MenuViewModel
 
 <nav class="nav-releases">
@@ -10,7 +11,7 @@
         <ul class="nav-releases__links">
             @foreach (var item in Model.TopLevelNavigationItems)
             {
-                if (item is MenuViewModel.NavigationItem navigationItem)
+                if (item is NavigationItem navigationItem)
                 {
                     <li class="nav-releases__item">
                         <a href="@navigationItem.Url" class="nav-releases__link">@navigationItem.Text</a>
@@ -31,7 +32,7 @@
     <ul class="nav-releases__mobile-links">
         @foreach (var item in Model.TopLevelNavigationItems)
         {
-            if (item is MenuViewModel.NavigationItem navigationItem)
+            if (item is NavigationItem navigationItem)
             {
                 <li class="nav-releases__mobile-item">
                     <a href="@navigationItem.Url" class="nav-releases__mobile-link">@navigationItem.Text</a>
