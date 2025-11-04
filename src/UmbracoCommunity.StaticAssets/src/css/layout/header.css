@@ -420,6 +420,15 @@ body.scroll .nav-header__placeholder {
   display: block;
 }
 
+body:not(.mobile) .nav-start {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  justify-content: space-between;
+  z-index: 2;
+}
+
 body:not(.mobile) .nav-start .logo-container {
   transition: width var(--nav-animation-duration) ease-in-out;
   overflow: hidden;
@@ -431,13 +440,15 @@ body.scroll:not(.mobile) .nav-start .logo-container {
 
 body:not(.mobile) .nav-start .logo-container svg {
   display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 body.hero-full-width:not(.scroll):not(.mobile) .nav-start .logo-link svg path {
   fill: var(--color-white);
 }
 
-body.scroll:not(.mobile) .header .nav .logo-container svg use:not(.main-logo) {
+body.scroll:not(.mobile) .header .nav .logo-container svg g:not(.main-logo) {
   transition: opacity var(--nav-animation-duration) ease-in-out;
   opacity: 0;
 }

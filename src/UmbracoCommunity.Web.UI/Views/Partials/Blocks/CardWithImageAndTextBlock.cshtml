@@ -8,33 +8,24 @@
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
     var widthPercent = (Model.ColumnSpan / (double)gridCols) * 100;
-    <style asp-add-nonce="true">
-        @@media (min-width: 1216px) {
-            .dc-boxes-row__items #@(Model.Content.IdHash) {
-                width: @($"{widthPercent}%");
-                max-width: @($"{widthPercent}%");
+    @if (Model.Content.Link != null)
+    {
+        <a id="@Model.Content.IdHash" class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+            @{
+                RenderCard(Model.Content.CardContent);
+                await RenderStyle(widthPercent, Model.Content.IdHash);
             }
-        }
-    </style>
-    <div id="@Model.Content.IdHash">
-        @if (Model.Content.Link != null)
-        {
-            <a class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
-                @{
-                    RenderCard(Model.Content.CardContent);
-                }
-            </a>
-        }
-        else
-        {
-            <div class="dc-boxes-row__item">
-                @{
-                    RenderCard(Model.Content.CardContent);
-                }
-            </div>
-        }
-
-    </div>
+        </a>
+    }
+    else
+    {
+        <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+            @{
+                RenderCard(Model.Content.CardContent);
+                await RenderStyle(widthPercent, Model.Content.IdHash);
+            }
+        </div>
+    }
 }
 
 @functions {
@@ -59,5 +50,17 @@
                     break;
             }
         }
+    }
+
+    async Task RenderStyle(double width, string idHash)
+    {
+        <style asp-add-nonce="true">
+            @@media (min-width: 1216px) {
+                .dc-boxes-row__items #@(idHash) {
+                    width: @($"{width}%");
+                    max-width: @($"{width}%");
+                }
+            }
+        </style>
     }
 }

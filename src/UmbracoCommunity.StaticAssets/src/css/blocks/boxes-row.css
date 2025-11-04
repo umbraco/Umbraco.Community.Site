@@ -19,12 +19,21 @@
     column-gap: 3rem;
     color: var(--item-font-color);
     flex: 1;
-    border-right: none !important;
+    border-right: none;
     margin: 2rem 0;
 }
 
 .dc-boxes-row__item:not(:last-child) {
-    border-bottom: 1px solid var(--grey);
+    border-right: 1px solid var(--grey);
+}
+
+.dc-boxes-row__items .dc-boxes-row__item:first-child {
+    padding-left: 0;
+}
+
+
+.dc-boxes-row__item:last-child {
+    padding-right: 0;
 }
 
 .dc-boxes-row img {

@@ -281,7 +281,7 @@ body:not(.mobile) .nav-header .nav-mobile {
     display: flex;
 }
 
-.mobile.scroll .header .nav .logo-container svg use:not(.main-logo) {
+.mobile.scroll .header .nav .logo-container svg g:not(.main-logo) {
     display: none;
 }
 
