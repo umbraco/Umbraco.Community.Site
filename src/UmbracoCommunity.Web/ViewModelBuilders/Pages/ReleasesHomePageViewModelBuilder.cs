@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
@@ -106,21 +107,21 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Sort by version (descending)
             allReleases = allReleases.OrderByDescending(r => ParseVersion(r.ReleaseLabel)).ToList();
 
-            // Find latest release (highest version number among all released versions)
+            // Find latest release (highest version number among all released stable versions, excluding pre-releases)
             viewModel.LatestRelease = allReleases
-                .Where(r => r.IsReleased)
+                .Where(r => r.IsReleased && !SemVerHelper.IsPreRelease(r.Version))
                 .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
                 .FirstOrDefault();
 
-            // Find LTS releases (all released LTS versions, sorted by version descending)
+            // Find LTS releases (all released LTS versions, sorted by version descending, excluding pre-releases)
             viewModel.LtsReleases = allReleases
-                .Where(r => r.IsReleased && r.IsLts)
+                .Where(r => r.IsReleased && r.IsLts && !SemVerHelper.IsPreRelease(r.Version))
                 .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
                 .ToList();
 
-            // Upcoming releases: not yet released, excluding the latest release
+            // Upcoming releases: not yet released, excluding pre-releases
             viewModel.UpcomingReleases = allReleases
-                .Where(r => !r.IsReleased)
+                .Where(r => !r.IsReleased && !SemVerHelper.IsPreRelease(r.Version))
                 .OrderBy(r => !r.ReleaseDate.HasValue || r.IsReleaseDateTba ? 1 : 0) // Releases without dates go last
                 .ThenBy(r => r.ReleaseDate ?? DateTime.MaxValue) // Sort by date (if they have one)
                 .ThenByDescending(r => ParseVersion(r.ReleaseLabel)) // Sort by version for releases without dates
