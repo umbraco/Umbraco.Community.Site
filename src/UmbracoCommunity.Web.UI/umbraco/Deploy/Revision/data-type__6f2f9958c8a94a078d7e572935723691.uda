@@ -1,41 +1,30 @@
 {
-  "Name": "Card block grid",
+  "Name": "Banner block grid",
   "EditorAlias": "Umbraco.BlockGrid",
   "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
   "Configuration": {
     "gridColumns": 12,
     "blocks": [
       {
-        "contentElementTypeKey": "f50886fa-f7f1-4c48-aff7-a85b672b23eb",
+        "contentElementTypeKey": "1291085c-2229-46e0-b8be-218c22a39ae4",
         "allowAtRoot": true,
-        "allowInAreas": true,
-        "label": "Card",
-        "columnSpanOptions": [
-          {
-            "columnSpan": 4
-          },
-          {
-            "columnSpan": 6
-          }
-        ],
-        "editorSize": ""
+        "allowInAreas": true
       }
     ],
     "validationLimit": {
-      "min": 1
+      "max": 1
     },
-    "createLabel": "Add card",
     "useLiveEditing": true
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
-  "Udi": "umb://data-type/389db651adbd477185d01cbe3a46d985",
+  "Udi": "umb://data-type/6f2f9958c8a94a078d7e572935723691",
   "Dependencies": [
     {
       "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/f50886faf7f14c48aff7a85b672b23eb"
+      "Udi": "umb://document-type/1291085c222946e0b8be218c22a39ae4"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

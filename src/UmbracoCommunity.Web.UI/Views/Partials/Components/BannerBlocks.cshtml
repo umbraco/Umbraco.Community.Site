@@ -1,0 +1,24 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@model BlockGridModel
+@inject ILogger<UmbracoViewPage> _logger
+
+@if (Model != null && Model.Any())
+{
+    var banner = Model.FirstOrDefault();
+    if (banner != null) {
+        <div class="dc-block-list">
+            @try
+            {
+                if (Model != null)
+                {
+                    <partial name="@($"~/Views/Partials/Blocks/{banner.Content.ContentType.Alias}.cshtml")" model="banner" />
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error rendering block row with alias {Alias}", banner.Content.ContentType.Alias);
+            }
+        </div>
+    }
+}
