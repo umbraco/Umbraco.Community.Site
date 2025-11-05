@@ -7,6 +7,7 @@ on:
 
 env:
   FRONTEND_DIR: "src/UmbracoCommunity.StaticAssets"
+  TRACKER_ENDPOINT: "https://dependencytrack.umbraco.io/api/v1/bom"
 
 jobs:
   sbom:
@@ -74,7 +75,7 @@ jobs:
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
         run: |
           curl --fail-with-body -v -i -w "\nHTTP Status: %{http_code}\n" \
-            -X POST "https://ca-dev-global-dtrack-api.whitesea-2475732e.westeurope.azurecontainerapps.io/api/v1/bom" \
+            -X POST "$TRACKER_ENDPOINT" \
             -H "X-Api-Key: $DTRACK_API_KEY" \
             -H "accept: application/json" \
             -H "Content-Type: multipart/form-data" \
@@ -90,7 +91,7 @@ jobs:
         run: |
           if [ -f ./sbom/bom-frontend.xml ]; then
             curl --fail-with-body -v -i -w "\nHTTP Status: %{http_code}\n" \
-              -X POST "https://ca-dev-global-dtrack-api.whitesea-2475732e.westeurope.azurecontainerapps.io/api/v1/bom" \
+              -X POST "$TRACKER_ENDPOINT" \
               -H "X-Api-Key: $DTRACK_API_KEY" \
               -H "accept: application/json" \
               -H "Content-Type: multipart/form-data" \
