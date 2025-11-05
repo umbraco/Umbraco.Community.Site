@@ -1,0 +1,50 @@
+{
+  "Name": "Banner block - general",
+  "Alias": "bannerBlockGeneral",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-rectangle-ellipsis color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "300bfc5c-de51-45c1-b639-b0685581e8a3",
+      "Name": "Banner",
+      "Alias": "content/banner",
+      "PropertyTypes": [
+        {
+          "Key": "c5c0e7ee-4a51-4e2b-98a0-0f5ad44c60c8",
+          "Alias": "bannerContent",
+          "DataType": "umb://data-type/6f2f9958c8a94a078d7e572935723691",
+          "Name": "Banner content"
+        }
+      ]
+    },
+    {
+      "Key": "3a90c7b0-a044-4326-870a-ed776659aa5b",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/1e62add411bb495da977fe94493278f0",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/6f2f9958c8a94a078d7e572935723691",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

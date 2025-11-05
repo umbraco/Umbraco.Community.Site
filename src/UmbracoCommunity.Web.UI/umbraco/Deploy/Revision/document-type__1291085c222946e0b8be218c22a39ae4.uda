@@ -1,53 +1,54 @@
 {
-  "Name": "Cards block",
-  "Alias": "cardsBlock",
+  "Name": "Banner",
+  "Alias": "banner",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
-  "Icon": "icon-columns-4",
+  "Icon": "icon-shape-rectangle-horizontal",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
-      "Key": "3569d5a0-b0ca-4ee7-be3b-e2de435d3835",
+      "Key": "79857b09-6ac4-4855-ae32-9075050bab12",
       "Name": "Content",
       "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
-          "Key": "9d0eb644-9ed6-4d1c-826a-1170fd232bc9",
-          "Alias": "cards",
-          "DataType": "umb://data-type/389db651adbd477185d01cbe3a46d985",
-          "Name": "Cards",
-          "SortOrder": 1
+          "Key": "8d37d7c4-28ef-4ae8-8f18-2d60d8cdb5cb",
+          "Alias": "backgroundImage",
+          "DataType": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+          "Mandatory": true,
+          "Name": "Background image"
         },
         {
-          "Key": "9fa6eba8-d4df-4891-b726-12b5465135cf",
+          "Key": "c70ceb8f-7b91-4d46-bd25-1aba628f0ee1",
           "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Description": "Optional - will display above the block",
-          "Name": "Title"
+          "Mandatory": true,
+          "Name": "Title",
+          "SortOrder": 1
         }
       ]
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2",
+  "Udi": "umb://document-type/1291085c222946e0b8be218c22a39ae4",
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/389db651adbd477185d01cbe3a46d985",
+      "Udi": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
       "Ordering": true
     }
   ],

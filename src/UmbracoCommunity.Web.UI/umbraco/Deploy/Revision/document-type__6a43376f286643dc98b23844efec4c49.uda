@@ -22,6 +22,7 @@
     {
       "Key": "dd05492d-9259-4351-b418-ab0123c3ef3e",
       "Name": "Content blocks",
+      "SortOrder": 1,
       "Alias": "content/contentBlocks",
       "PropertyTypes": [
         {
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "16.0.4"
 }
