@@ -6,12 +6,17 @@
 
 @if (Model.Content.Image is not null)
 {
-    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.ContentKey">
-        <style asp-add-nonce="true">
-            #@Model.ContentKey {
-                --block-background-color: @Model.Settings?.BackgroundColour ?? 'none';
-            }
-        </style>
+    bool hasBg = !string.IsNullOrEmpty(Model.Settings?.BackgroundColour);
+
+    <div class="dc-image-block @(hasBg ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.Content.IdHash">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                #@Model.Content.IdHash {
+                    --block-background-color: @Model.Settings.BackgroundColour;
+                }
+            </style>
+        }
         <div class="dc-image-wrapper">
             <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image" loading="lazy" />
 

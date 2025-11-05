@@ -3,6 +3,8 @@
 .dc-image-and-text-block {
   display: flex;
   flex-direction: column;
+  background: var(--block-background-color);
+  color: var(--block-text-color);
 }
 
 .dc-image-and-text-block__image-container {
@@ -37,6 +39,15 @@
 
 .dc-image-and-text-block__content .cta {
   margin-top: 1.5rem;
+}
+
+.dc-image-and-text-block.has-bg {
+  padding: var(--unit-md);
+  border-radius: 20px;
+}
+
+.dc-image-and-text-block.bg-dark h2, .dc-image-and-text-block.bg-dark p {
+  color: var(--color-white);
 }
 
 @media (--md) {

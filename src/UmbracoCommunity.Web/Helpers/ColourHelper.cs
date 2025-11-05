@@ -9,5 +9,11 @@
             !string.IsNullOrEmpty(color) && color != "#" ? CreateHtmlColor(color) : defaultColor;
 
         private static string CreateHtmlColor(string color) => color.StartsWith('#') ? color : "#" + color;
+
+        public static bool IsDark(this string? colour)
+        {
+            var darkBgs = new[] { "#3544B1", "#8E755E" }; // dark blue, brown
+            return darkBgs.Any(x => string.Equals(x, colour, StringComparison.InvariantCultureIgnoreCase));
+        }
     }
 }

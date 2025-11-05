@@ -1,8 +1,19 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TextBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TextBlock, SettingsTextBlock>>
 
 @if (Model.Content.Text != null)
 {
-    <div class="dc-text-block justify-center transparent @(Context.Request.IsBlockPreviewRequest() ? "backoffice-text-block" : "")" id="@Model.ContentKey">
+    bool hasBg = !string.IsNullOrEmpty(Model.Settings?.BackgroundColour);
+
+    <div class="dc-text-block justify-center transparent @(hasBg ? "has-bg" : string.Empty) @(Context.Request.IsBlockPreviewRequest() ? "backoffice-text-block" : "")" id="@Model.Content.IdHash">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                #@Model.Content.IdHash {
+                    --block-background-color: @Model.Settings.BackgroundColour;
+                }
+            </style>
+        }
+
         <div class="dc-text-block__content">
             @Html.Raw(Model.Content.Text.ToHtmlString())
         </div>

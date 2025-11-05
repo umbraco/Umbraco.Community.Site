@@ -7,6 +7,8 @@ namespace UmbracoCommunity.Web.Models.ViewModels.Blocks
     {
         public IList<BlockGridItem> Blocks { get; set; } = [];
         public bool HasMultipleBlocks { get; set; } = false;
+
+        public string? BackgroundColour { get; set; }
         public string Alias => GetAlias();
         public string IdHash { get; } = StringUtilities.RandomString(5);
 

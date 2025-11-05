@@ -61,6 +61,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                     }
                 }
             }
+            foreach (var row in rows)
+            {
+                var firstBlock = row.Blocks.FirstOrDefault();
+                if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings.HasProperty("backgroundColour") && firstBlock.Settings.HasValue("backgroundColour"))
+                {
+                    row.BackgroundColour = firstBlock.Settings.Value<string>("backgroundColour");
+                }
+            }
             return rows;
         }
 
@@ -78,14 +86,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
             return (contentModel as IPublishedContent)?.Name;
         }
-
-        protected static string? GetOptionalColor(string? color) =>
-            !string.IsNullOrEmpty(color) ? CreateHtmlColor(color) : null;
-
-        protected static string GetRequiredColor(string? color, string defaultColor) =>
-            !string.IsNullOrEmpty(color) && color != "#" ? CreateHtmlColor(color) : defaultColor;
-
-        private static string CreateHtmlColor(string color) => color.StartsWith('#') ? color : "#" + color;
 
         private static readonly string[] s_noWebpConversionTypes = ["webp"];
 
