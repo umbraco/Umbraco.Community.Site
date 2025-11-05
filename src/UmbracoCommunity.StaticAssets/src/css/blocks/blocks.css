@@ -34,6 +34,10 @@
   max-width: var(--max-width);
   margin: 0 auto;
 
+  &:not(:first-child) {
+    margin-top: var(--unit-xl);
+  }
+
   @media (--md) {
     gap: var(--unit-xl);
 

@@ -22,6 +22,7 @@
     {
       "Key": "92bb9aac-8a39-4911-8b7b-5d8b0f5d6a75",
       "Name": "Content blocks",
+      "SortOrder": 1,
       "Alias": "content/contentBlocks",
       "PropertyTypes": [
         {

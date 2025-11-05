@@ -1,0 +1,15 @@
+{
+  "Name": "Banner",
+  "ContainedObjectType": "a2cb7800-f571-4787-9638-bc48539a0efb",
+  "Parent": "umb://document-type-container/1be2aab16cdd4789a70d922ec4a0ae5f",
+  "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/1be2aab16cdd4789a70d922ec4a0ae5f",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContainerArtifact",
+  "__version": "16.0.4"
+}

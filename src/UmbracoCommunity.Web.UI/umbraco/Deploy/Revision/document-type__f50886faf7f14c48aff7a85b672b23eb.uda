@@ -23,13 +23,14 @@
           "Alias": "link",
           "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
           "Name": "Link",
-          "SortOrder": 1
+          "SortOrder": 2
         },
         {
           "Key": "9b0be175-5914-4572-a55e-726ba2daf1e4",
           "Alias": "cardContent",
           "DataType": "umb://data-type/9a899c1e8af743ba90b6bae73d477618",
-          "Name": "Card content"
+          "Name": "Card content",
+          "SortOrder": 1
         }
       ]
     }

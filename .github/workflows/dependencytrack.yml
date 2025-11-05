@@ -8,7 +8,7 @@ on:
 
 env:
   FRONTEND_DIR: "src/UmbracoCommunity.StaticAssets"
-  TRACKER_ENDPOINT: "https://dependencytrack.umbraco.io/api/v1/bom"
+  TRACKER_ENDPOINT: "https://ca-live-global-dtrack-api.purplemoss-6e7d841c.westeurope.azurecontainerapps.io/api/v1/bom"
 
 jobs:
   sbom:

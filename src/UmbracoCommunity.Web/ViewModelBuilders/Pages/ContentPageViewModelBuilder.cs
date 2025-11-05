@@ -14,7 +14,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             var viewModel = new ContentPageViewModel(currentPage)
             {
-                BlockContent = ParseBlockGrid(contentModel.ContentBlocks)
+                BlockContent = ParseBlockGrid(contentModel.ContentBlocks),
+                Banner = contentModel.BannerContent
             };
 
             return viewModel;
