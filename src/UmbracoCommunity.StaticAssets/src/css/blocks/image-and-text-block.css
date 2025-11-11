@@ -46,7 +46,9 @@
   border-radius: 20px;
 }
 
-.dc-image-and-text-block.bg-dark h2, .dc-image-and-text-block.bg-dark p {
+.dc-image-and-text-block.bg-dark h2,
+.dc-image-and-text-block.bg-dark p,
+.dc-image-and-text-block.bg-dark p a {
   color: var(--color-white);
 }
 

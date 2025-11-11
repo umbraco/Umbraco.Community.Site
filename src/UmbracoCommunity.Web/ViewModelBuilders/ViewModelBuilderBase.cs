@@ -67,6 +67,10 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings.HasProperty("backgroundColour") && firstBlock.Settings.HasValue("backgroundColour"))
                 {
                     row.BackgroundColour = firstBlock.Settings.Value<string>("backgroundColour");
+                    if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        row.HasBg = true;
+                    }
                 }
             }
             return rows;

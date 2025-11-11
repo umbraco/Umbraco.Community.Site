@@ -82,12 +82,16 @@
     "blocks": [
       {
         "contentElementTypeKey": "50fbd3fd-639c-47ea-bd12-5d86285bef6c",
-        "label": "{umbLink: callToActionLink}"
+        "label": "{umbLink: callToActionLink}",
+        "settingsElementTypeKey": "0291ecfb-d694-4c19-9ec2-10370ed47948"
       }
     ]
   },
   "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
   "Dependencies": [
+    {
+      "Udi": "umb://document-type/0291ecfbd6944c199ec210370ed47948"
+    },
     {
       "Udi": "umb://document-type/50fbd3fd639c47eabd125d86285bef6c"
     },

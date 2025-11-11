@@ -6,9 +6,9 @@
 
 @if (Model.Content.Image is not null)
 {
-    bool hasBg = !string.IsNullOrEmpty(Model.Settings?.BackgroundColour);
+    bool hasBg = Model.Settings.HasBg();
 
-    <div class="dc-image-block @(hasBg ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.Content.IdHash">
+    <div class="dc-image-block @(hasBg ? "has-bg" : "") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.Content.IdHash">
         @if (hasBg)
         {
             <style asp-add-nonce="true">

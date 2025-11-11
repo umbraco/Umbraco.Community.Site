@@ -1,9 +1,11 @@
 ﻿@using Umbraco.Cms.Core.Models.Blocks
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<RichTextBlockItem<CallToActionLinkBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<RichTextBlockItem<CallToActionLinkBlock, SettingsCallToActionLinkBlock>>
 
 @if (Model?.Content?.CallToActionLink != null)
 {
-    <a href="@Model?.Content.CallToActionLink?.Url" class="btn arrow cta is-blue" target="_self" title="@Model?.Content.CallToActionLink?.Name">
+    var linkColour = Model.Settings?.ButtonColour ?? "blue";
+
+    <a href="@Model?.Content.CallToActionLink?.Url" class="btn arrow cta @($"is-{linkColour}")" target="_self" title="@Model?.Content.CallToActionLink?.Name">
         @(Model?.Content.CallToActionLinkText ?? Model?.Content.CallToActionLink?.Name)
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path id="Vector" d="M6.41675 6.41663H15.5834V15.5833" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path id="Vector_2" d="M6.41675 15.5833L15.5834 6.41663" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
     </a>

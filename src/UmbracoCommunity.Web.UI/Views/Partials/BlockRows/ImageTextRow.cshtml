@@ -2,12 +2,11 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
 
 @{
-    bool hasBg = !string.IsNullOrEmpty(Model.BackgroundColour);
-    bool bgIsDark = hasBg && Model.BackgroundColour.IsDark();
+    bool bgIsDark = Model.HasBg && Model.BackgroundColour.IsDark();
 }
 
-<div class="dc-image-and-text-block vertical-text-position-center @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.IdHash">
-    @if (hasBg)
+<div class="dc-image-and-text-block vertical-text-position-center @(Model.HasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.IdHash">
+    @if (Model.HasBg)
     {
         <style asp-add-nonce="true">
             #@Model.IdHash {

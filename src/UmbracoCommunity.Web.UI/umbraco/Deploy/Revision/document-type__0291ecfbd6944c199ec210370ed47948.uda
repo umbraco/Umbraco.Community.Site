@@ -1,0 +1,31 @@
+{
+  "Name": "[Settings] Call to action link block",
+  "Alias": "settingsCallToActionLinkBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+  "CompositionContentTypes": [
+    "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/0291ecfbd6944c199ec210370ed47948",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

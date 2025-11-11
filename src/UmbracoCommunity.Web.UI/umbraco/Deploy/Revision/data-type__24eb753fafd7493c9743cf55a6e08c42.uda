@@ -1,0 +1,66 @@
+{
+  "Name": "Dropdown - button colours",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "Blue",
+              "value": "blue",
+              "icon": "icon-shapes color-blue",
+              "description": ""
+            },
+            {
+              "name": "White",
+              "value": "white",
+              "icon": "icon-shapes",
+              "description": ""
+            },
+            {
+              "name": "Pink",
+              "value": "whitepink",
+              "icon": "icon-shapes color-pink",
+              "description": ""
+            },
+            {
+              "name": "Transparent",
+              "value": "transparent",
+              "icon": "icon-shapes color-grey",
+              "description": ""
+            },
+            {
+              "name": "Transparent blue",
+              "value": "transparentblue",
+              "icon": "icon-shapes color-light-blue",
+              "description": ""
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.DropdownListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "allowEmpty": false,
+          "showDescriptions": false,
+          "showIcons": true
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+  "Udi": "umb://data-type/24eb753fafd7493c9743cf55a6e08c42",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

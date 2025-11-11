@@ -7,6 +7,11 @@
 
   &.has-bg {
     padding: var(--unit-md);
+    border-radius: 20px;
+  }
+
+  &.bg-dark {
+    color: var(--color-white);
   }
 
   a {

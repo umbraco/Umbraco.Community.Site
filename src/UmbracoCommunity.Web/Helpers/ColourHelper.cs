@@ -1,4 +1,6 @@
-﻿namespace UmbracoCommunity.Web.Helpers
+﻿using UmbracoCommunity.Web.Models.PublishedModels;
+
+namespace UmbracoCommunity.Web.Helpers
 {
     public static class ColourHelper
     {
@@ -10,7 +12,26 @@
 
         private static string CreateHtmlColor(string color) => color.StartsWith('#') ? color : "#" + color;
 
+        public static bool IsDark(this ISettingsColour? colourSettings)
+        {
+            if (colourSettings == null || string.IsNullOrWhiteSpace(colourSettings.BackgroundColour)) return false;
+            return ColourIsDark(colourSettings.BackgroundColour);
+        }
+
         public static bool IsDark(this string? colour)
+        {
+            if (string.IsNullOrWhiteSpace(colour)) return false;
+            return ColourIsDark(colour);
+        }
+
+        public static bool HasBg(this ISettingsColour? colourSettings)
+        {
+            return colourSettings != null &&
+                !string.IsNullOrEmpty(colourSettings.BackgroundColour) &&
+                !string.Equals(colourSettings.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static bool ColourIsDark(string colour)
         {
             var darkBgs = new[] { "#3544B1", "#8E755E" }; // dark blue, brown
             return darkBgs.Any(x => string.Equals(x, colour, StringComparison.InvariantCultureIgnoreCase));
