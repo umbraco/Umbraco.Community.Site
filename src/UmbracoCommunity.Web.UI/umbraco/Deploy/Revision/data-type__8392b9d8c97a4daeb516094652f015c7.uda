@@ -1,0 +1,17 @@
+{
+  "Name": "Image roundedness",
+  "EditorAlias": "Umbraco.Slider",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Slider",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "minVal": 0,
+    "maxVal": 10,
+    "initVal1": 0,
+    "initVal2": 0,
+    "step": 1
+  },
+  "Udi": "umb://data-type/8392b9d8c97a4daeb516094652f015c7",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

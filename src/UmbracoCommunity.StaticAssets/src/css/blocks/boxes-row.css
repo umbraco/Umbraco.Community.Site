@@ -2,9 +2,15 @@
     position: relative;
     max-width: var(--max-width);
     overflow: hidden;
+    background: var(--block-background-color);
 
-    dc-title-teaser {
-        margin-top: 54px;
+    &.has-bg {
+        padding: var(--unit-md);
+        border-radius: 20px;
+    }
+
+    &.bg-dark {
+        color: var(--color-white);
     }
 }
 
@@ -19,27 +25,32 @@
     column-gap: 3rem;
     color: var(--item-font-color);
     flex: 1;
-    border-right: none;
+    border-left: none;
     margin: 2rem 0;
 }
 
-.dc-boxes-row__item:not(:last-child) {
-    border-right: 1px solid var(--grey);
+.dc-boxes-row__item:not(:first-child) {
+    border-left: 1px solid var(--grey);
 }
 
 .dc-boxes-row__items .dc-boxes-row__item:first-child {
-    padding-left: 0;
+    margin-left: 0;
 }
 
 
 .dc-boxes-row__item:last-child {
-    padding-right: 0;
+    margin-right: 0;
 }
 
 .dc-boxes-row img {
     border-radius: 20px;
     max-height: fit-content;
     max-width: 100%
+}
+
+.dc-boxes-row img.is-circle {
+    clip-path: circle();
+    margin-bottom: 1rem;
 }
 
 .item-title {
@@ -62,6 +73,23 @@
     color: var(--color-identity-blue);
 }
 
+.dc-boxes-row.bg-dark a:hover {
+    color: var(--color-identity-white);
+}
+
+.dc-boxes-row__items.narrow-width {
+    flex-direction: row;
+    column-gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .dc-boxes-row__item {
+        flex-direction: column;
+        min-width: 150px;
+        max-width: 150px
+    }
+}
+
 @media (--md) {
     .dc-boxes-row__items {
         flex-direction: column;
@@ -77,6 +105,11 @@
         max-width: 50%;
         margin-top: 1em;
     }
+
+    .dc-boxes-row__items.narrow-width img {
+        max-width: 100%;
+        margin-top: inherit;
+    }
 }
 
 @media (--lg) {
@@ -87,14 +120,26 @@
 
     .dc-boxes-row__item {
         flex-direction: column;
-        padding: 0 30px 30px;
+        margin: 0 0 1rem;
+        padding-top: 0;
     }
 
     .dc-boxes-row__item img {
-        max-width: 100%
+        max-width: 100%;
+        margin-top: 0;
     }
 
-    .dc-boxes-row__item:not(:last-child) {
-        border-right: 1px solid var(--color-grey);
+    .dc-boxes-row__item:not(:first-child) {
+        border-left: 1px solid var(--color-grey);
+        padding-left: 2rem;
+        margin-left: 2rem;
+    }
+
+    .dc-boxes-row__item:first-child {
+        padding-right: 2rem;
+    }
+
+    .dc-boxes-row__item:nth-child(2) {
+        margin-left: 0;
     }
 }

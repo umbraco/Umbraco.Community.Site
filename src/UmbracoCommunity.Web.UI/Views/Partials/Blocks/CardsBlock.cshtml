@@ -1,13 +1,24 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardsBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardsBlock, SettingsCardsBlock>>
+
 @{
-    var totalColumns = Model.GridColumns ?? 12;
+    bool hasBg = Model.Settings.HasBg();
+    bool bgIsDark = hasBg && Model.Settings.IsDark();
 }
 
 @if (Model.Content.Cards != null && Model.Content.Cards.Any())
 {
-    <div class="dc-boxes-row">
+    @if (hasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.Content.IdHash {
+                --block-background-color: @Model.Settings.BackgroundColour;
+            }
+        </style>
+    }
+    <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
         @foreach (var cardGroup in Model.Content.Cards.GetRows()) {
-            <div class="dc-boxes-row__items">
+            var firstCard = cardGroup.FirstOrDefault();
+            <div class="dc-boxes-row__items @(firstCard != null && firstCard.ColumnSpan < 4 ? "narrow-width" : "")">
                 @foreach (var item in cardGroup)
                 {
                     <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />

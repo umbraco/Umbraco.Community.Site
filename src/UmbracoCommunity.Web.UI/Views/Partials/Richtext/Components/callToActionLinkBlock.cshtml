@@ -3,7 +3,7 @@
 
 @if (Model?.Content?.CallToActionLink != null)
 {
-    var linkColour = Model.Settings?.ButtonColour ?? "blue";
+    var linkColour = Context.Request.IsBlockPreviewRequest() ? "blue" : Model.Settings?.ButtonColour ?? "blue";
 
     <a href="@Model?.Content.CallToActionLink?.Url" class="btn arrow cta @($"is-{linkColour}")" target="_self" title="@Model?.Content.CallToActionLink?.Name">
         @(Model?.Content.CallToActionLinkText ?? Model?.Content.CallToActionLink?.Name)
