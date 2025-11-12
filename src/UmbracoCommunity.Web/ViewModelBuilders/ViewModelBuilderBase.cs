@@ -64,12 +64,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             foreach (var row in rows)
             {
                 var firstBlock = row.Blocks.FirstOrDefault();
-                if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings.HasProperty("backgroundColour") && firstBlock.Settings.HasValue("backgroundColour"))
+                if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings is ISettingsColour colourSettings)
                 {
-                    row.BackgroundColour = firstBlock.Settings.Value<string>("backgroundColour");
-                    if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
+                    if (colourSettings.BackgroundColour != null)
                     {
-                        row.HasBg = true;
+                        row.BackgroundColour = colourSettings.BackgroundColour.Color;
+                        if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            row.HasBg = true;
+                        }
                     }
                 }
             }

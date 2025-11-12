@@ -14,7 +14,7 @@
         {
             <style asp-add-nonce="true">
                 #@Model.Content.IdHash {
-                    --block-background-color: @Model.Settings.BackgroundColour;
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
                 }
             </style>
         }

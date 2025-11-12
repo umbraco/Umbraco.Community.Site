@@ -3,18 +3,19 @@
 
 @{
     var gridCols = Model.GridColumns ?? 12;
+    var narrowPercentThreshold = 25; // Define narrow width threshold
 }
 
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
     var widthPercent = (Model.ColumnSpan / (double)gridCols) * 100;
-    var isNarrowWidth = widthPercent <= 25;
+    var isNarrowWidth = widthPercent <= narrowPercentThreshold;
     @if (Model.Content.Link != null)
     {
         <a id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash);
+                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
             }
         </a>
     }
@@ -23,7 +24,7 @@
         <div id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash);
+                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
             }
         </div>
     }
@@ -66,9 +67,9 @@
         }
     }
 
-    async Task RenderStyle(double width, string idHash)
+    async Task RenderStyle(double width, string idHash, int narrowPercentThreshold)
     {
-        if (width > 25)
+        if (width > narrowPercentThreshold)
         {
             <style asp-add-nonce="true">
                 @@media (min-width: 1216px) {
