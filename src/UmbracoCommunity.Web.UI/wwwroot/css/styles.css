@@ -172,14 +172,20 @@ img {
 .dc-boxes-row__items {
     display: flex;
     justify-content: center;
+    overflow: hidden;
+    column-gap: 10px;
 }
 
-.dc-boxes-row__item {
-    padding: 0 20px;
+.dc-boxes-row__items.item-grid {
+    flex-wrap: wrap;
 }
 
 .dc-boxes-row__item a {
     text-decoration: none;
+}
+
+.dc-boxes-row img.is-circle {
+    clip-path: circle();
 }
 
 /* page banners */
@@ -211,8 +217,4 @@ img {
     bottom: 0;
     right: 0;
     background-color: rgba(0, 0, 0, 0.5);
-}
-
-.dc-boxes-row img.is-circle {
-    clip-path: circle();
 }
