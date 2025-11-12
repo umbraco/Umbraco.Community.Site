@@ -3,11 +3,13 @@
 @{
     bool hasBg = Model.Settings.HasBg();
     bool bgIsDark = hasBg && Model.Settings.IsDark();
+    bool displayAsGrid = Model.Settings?.DisplayAsGrid ?? false;
 }
 
 @if (Model.Content.Cards != null && Model.Content.Cards.Any())
 {
-    @if (hasBg)
+    var rows = displayAsGrid ? [Model.Content.Cards.ToList()] : Model.Content.Cards.GetRows();
+    if (hasBg)
     {
         <style asp-add-nonce="true">
             #@Model.Content.IdHash {
@@ -16,14 +18,20 @@
         </style>
     }
     <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
-        @foreach (var cardGroup in Model.Content.Cards.GetRows()) {
-            var firstCard = cardGroup.FirstOrDefault();
-            <div class="dc-boxes-row__items @(firstCard != null && firstCard.ColumnSpan < 4 ? "narrow-width" : "")">
-                @foreach (var item in cardGroup)
-                {
-                    <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
-                }
-            </div>
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2>@Model.Content.Title</h2>
+        }
+        @foreach (var cardGroup in rows)
+            if (cardGroup != null) {
+            {
+                <div class="dc-boxes-row__items @(displayAsGrid ? "item-grid" : "")">
+                    @foreach (var item in cardGroup)
+                    {
+                        <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                    }
+                </div>
+            }
         }
     </div>
 }

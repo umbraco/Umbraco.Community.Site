@@ -72,9 +72,10 @@
         {
             <style asp-add-nonce="true">
                 @@media (min-width: 1216px) {
-                .dc-boxes-row__items #@(idHash) {
-                    width: @($"{width}%");
-                    max-width: @($"{width}%");
+                    .dc-boxes-row__items #@(idHash) {
+                        flex-basis: @($"{width - 1}%");
+                        flex-grow: 0;
+                        flex-shrink: 0;
                 }
             }
             </style>
@@ -84,8 +85,9 @@
             <style asp-add-nonce="true">
                 @@media (min-width: 768px) {
                     .dc-boxes-row__items #@(idHash) {
-                        width: @($"{width}%");
-                        max-width: @($"{width}%");
+                        flex-basis: @($"{width - 1}%");
+                        flex-grow: 0;
+                        flex-shrink: 0;
                     }
                 }
             </style>

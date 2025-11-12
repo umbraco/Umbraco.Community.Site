@@ -50,6 +50,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Display as grid: Where all content items will be the same size e.g. Speakers
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
+		[ImplementPropertyType("displayAsGrid")]
+		public virtual bool DisplayAsGrid => this.Value<bool>(_publishedValueFallback, "displayAsGrid");
+
+		///<summary>
 		/// Background colour
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]

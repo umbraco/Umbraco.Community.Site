@@ -212,3 +212,7 @@ img {
     right: 0;
     background-color: rgba(0, 0, 0, 0.5);
 }
+
+.dc-boxes-row img.is-circle {
+    clip-path: circle();
+}
