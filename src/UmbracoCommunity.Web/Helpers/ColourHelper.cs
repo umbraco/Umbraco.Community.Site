@@ -14,8 +14,8 @@ namespace UmbracoCommunity.Web.Helpers
 
         public static bool IsDark(this ISettingsColour? colourSettings)
         {
-            if (colourSettings == null || string.IsNullOrWhiteSpace(colourSettings.BackgroundColour)) return false;
-            return ColourIsDark(colourSettings.BackgroundColour);
+            if (colourSettings?.BackgroundColour == null || string.IsNullOrWhiteSpace(colourSettings.BackgroundColour.Color)) return false;
+            return ColourIsDark(colourSettings.BackgroundColour.Color);
         }
 
         public static bool IsDark(this string? colour)
@@ -26,14 +26,14 @@ namespace UmbracoCommunity.Web.Helpers
 
         public static bool HasBg(this ISettingsColour? colourSettings)
         {
-            return colourSettings != null &&
-                !string.IsNullOrEmpty(colourSettings.BackgroundColour) &&
-                !string.Equals(colourSettings.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase);
+            return colourSettings?.BackgroundColour != null &&
+                !string.IsNullOrEmpty(colourSettings.BackgroundColour.Color) &&
+                !string.Equals(colourSettings.BackgroundColour.Color, "#ffffff", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private static bool ColourIsDark(string colour)
         {
-            var darkBgs = new[] { "#3544B1", "#8E755E" }; // dark blue, brown
+            var darkBgs = new[] { "#3544B1", "#1b264f" }; // dark blue, blue
             return darkBgs.Any(x => string.Equals(x, colour, StringComparison.InvariantCultureIgnoreCase));
         }
     }

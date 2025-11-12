@@ -19,13 +19,13 @@ img {
 }
 
 /* Backoffice specific block styling */
-.backoffice-img-block,
-.backoffice-text-block,
-.backoffice-cta-block {
+.dc-image-block,
+.dc-text-block,
+.dc-big-cta-block {
     padding: 20px;
 }
 
-.backoffice-cta-block {
+.dc-big-cta-block {
     text-align: center;
 }
 

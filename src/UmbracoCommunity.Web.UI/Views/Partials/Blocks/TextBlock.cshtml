@@ -5,7 +5,7 @@
     bool hasBg = Model.Settings.HasBg();
     bool bgIsDark = hasBg && Model.Settings.IsDark();
 
-    <div class="dc-text-block justify-center @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty) @(Context.Request.IsBlockPreviewRequest() ? "backoffice-text-block" : string.Empty)" id="@Model.Content.IdHash">
+    <div class="dc-text-block justify-center @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
         @if (hasBg)
         {
             <style asp-add-nonce="true">
