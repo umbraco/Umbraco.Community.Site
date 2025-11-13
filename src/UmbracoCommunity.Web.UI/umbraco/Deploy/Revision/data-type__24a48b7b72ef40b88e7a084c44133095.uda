@@ -6,7 +6,15 @@
   "Configuration": {
     "items": [
       {
-        "value": "F5C1BC",
+        "value": "f9f7f4",
+        "label": ""
+      },
+      {
+        "value": "f2ebe6",
+        "label": ""
+      },
+      {
+        "value": "f5c1bc",
         "label": ""
       },
       {
@@ -14,25 +22,19 @@
         "label": ""
       },
       {
-        "value": "DADADA",
-        "label": ""
-      },
-      {
-        "value": "F1F2F7",
-        "label": ""
-      },
-      {
-        "value": "8E755E",
-        "label": ""
-      },
-      {
-        "value": "ffffff",
+        "value": "1b264f",
         "label": ""
       }
     ]
   },
+  "Parent": "umb://data-type-container/fe196c67aa49473f831cf2d92fbcfb13",
   "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
-  "Dependencies": [],
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/fe196c67aa49473f831cf2d92fbcfb13",
+      "Ordering": true
+    }
+  ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.3"
+  "__version": "17.0.0-rc1"
 }
