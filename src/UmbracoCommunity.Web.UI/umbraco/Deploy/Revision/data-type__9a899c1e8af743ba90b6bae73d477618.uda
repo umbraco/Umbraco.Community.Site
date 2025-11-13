@@ -5,7 +5,8 @@
   "Configuration": {
     "blocks": [
       {
-        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1"
+        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
       },
       {
         "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc"
@@ -28,6 +29,9 @@
     },
     {
       "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    },
+    {
+      "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

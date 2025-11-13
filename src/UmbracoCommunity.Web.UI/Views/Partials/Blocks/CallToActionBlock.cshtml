@@ -2,7 +2,7 @@
 
 @if (!string.IsNullOrEmpty(Model.Content.CallToActionLinkText))
 {
-    <div class="dc-big-cta-block @(Context.Request.IsBlockPreviewRequest() ? "backoffice-cta-block" : "")">
+    <div class="dc-big-cta-block">
         <div class="dc-big-cta-block__content align-center">
             @if (!string.IsNullOrEmpty(Model.Content.Headline))
             {

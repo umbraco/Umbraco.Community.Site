@@ -1,0 +1,43 @@
+{
+  "Name": "Settings - buttons",
+  "Alias": "settingsButtons",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-mouse-cursor color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "05a71d41-3c0c-42c3-93ff-a6c8034d0710",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "40859138-0cae-441f-9b43-296dfa65c65e",
+          "Alias": "buttonColour",
+          "DataType": "umb://data-type/24eb753fafd7493c9743cf55a6e08c42",
+          "Name": "Button colour"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/24eb753fafd7493c9743cf55a6e08c42",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

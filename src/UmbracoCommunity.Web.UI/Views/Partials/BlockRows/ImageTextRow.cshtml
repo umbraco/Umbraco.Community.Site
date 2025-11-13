@@ -1,7 +1,19 @@
 ﻿@using UmbracoCommunity.Web.Models.ViewModels.Blocks
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
 
-<div class="dc-image-and-text-block vertical-text-position-center" id="@Model.IdHash">
+@{
+    bool bgIsDark = Model.HasBg && Model.BackgroundColour.IsDark();
+}
+
+<div class="dc-image-and-text-block vertical-text-position-center @(Model.HasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.IdHash">
+    @if (Model.HasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.IdHash {
+                --block-background-color: @Model.BackgroundColour;
+            }
+        </style>
+    }
     @foreach (var block in Model.Blocks)
     {
         if (block.Content.ContentType.Alias == ImageBlock.ModelTypeAlias)
