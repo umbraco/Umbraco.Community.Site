@@ -71,11 +71,6 @@ jobs:
           fi
           
       # Upload .NET SBOM
-      - name: Show files about to be uploaded
-        run: |
-          cat ./sbom/bom-frontend.xml
-          cat ./sbom/bom-dotnet.xml
-          
       - name: Upload .NET SBOM to Dependency-Track
         env:
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
