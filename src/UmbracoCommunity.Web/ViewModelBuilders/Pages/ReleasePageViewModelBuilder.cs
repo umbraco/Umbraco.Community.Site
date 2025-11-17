@@ -207,10 +207,25 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             var releaseStats = CalculateReleaseStats(allPrs, allIssues);
 
+            // Get NuGet package versions from all configured packages
             Dictionary<string, DateTime> nugetVersions = new();
-            if (repoConfig?.HasNuGetPackage == true)
+            var reposWithNuGet = _options.Repositories.Where(r => r.HasNuGetPackage).ToList();
+            foreach (var repo in reposWithNuGet)
             {
-                nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
+                var packageIds = repo.GetNuGetPackageIds();
+                foreach (var packageId in packageIds)
+                {
+                    var versions = _dataStore.GetNuGetPackageVersions(packageId);
+                    foreach (var versionEntry in versions)
+                    {
+                        // If version doesn't exist or the new date is earlier, update it
+                        if (!nugetVersions.TryGetValue(versionEntry.Key, out DateTime value) || versionEntry.Value < value)
+                        {
+                            value = versionEntry.Value;
+                            nugetVersions[versionEntry.Key] = value;
+                        }
+                    }
+                }
             }
 
             foreach (var discussion in discussions)
