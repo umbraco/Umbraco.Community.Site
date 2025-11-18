@@ -1,11 +1,11 @@
 {
-  "Name": "Image",
+  "Name": "Content",
   "ContainedObjectType": "a2cb7800-f571-4787-9638-bc48539a0efb",
-  "Parent": "umb://document-type-container/1be2aab16cdd4789a70d922ec4a0ae5f",
-  "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+  "Parent": "umb://document-type-container/002b15037b5c4e4a82120fb9f8acaf2b",
+  "Udi": "umb://document-type-container/6716f0185a644f5791eb8a952e12a890",
   "Dependencies": [
     {
-      "Udi": "umb://document-type-container/1be2aab16cdd4789a70d922ec4a0ae5f",
+      "Udi": "umb://document-type-container/002b15037b5c4e4a82120fb9f8acaf2b",
       "Ordering": true,
       "Mode": "Exist"
     }

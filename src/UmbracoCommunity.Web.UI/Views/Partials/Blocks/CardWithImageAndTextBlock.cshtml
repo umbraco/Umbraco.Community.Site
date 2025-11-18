@@ -42,19 +42,27 @@
                     if (imageItem?.Image == null) break;
                     var imageSettings = contentItem.Settings as SettingsImageBlock;
                     var imgIsCircle = imageSettings?.ImageIsCircular ?? false;
-                    if (imgIsCircle)
-                    {
-                        <img src="@imageItem.Image.GetCropUrl()" alt="@imageItem.AltText"
-                             class="is-circle"
-                             loading="lazy" />
-                    }
-                    else
-                    {
-                        <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
-                             sizes="(max-width: 400px) 386px, 906px"
-                             src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
-                             loading="lazy" />
-                    }
+                    <div class="row-item-image">
+                        @if (imgIsCircle)
+                        {
+                            <img src="@imageItem.Image.GetCropUrl()" alt="@imageItem.AltText"
+                                 class="is-circle"
+                                 loading="lazy" />
+
+                        }
+                        else
+                        {
+                            <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
+                                 sizes="(max-width: 400px) 386px, 906px"
+                                 src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
+                                 loading="lazy" />
+                        }
+                        @if (imageItem.ApplyOverlay)
+                        {
+                            <div class="overlay"></div>
+                            <div class="text">@Html.Raw(imageItem.OverlayText)</div>
+                        }
+                    </div>
 
                     break;
                 case TextBlock.ModelTypeAlias:
@@ -77,8 +85,8 @@
                         flex-basis: @($"{width - 1}%");
                         flex-grow: 0;
                         flex-shrink: 0;
+                    }
                 }
-            }
             </style>
         }
         else

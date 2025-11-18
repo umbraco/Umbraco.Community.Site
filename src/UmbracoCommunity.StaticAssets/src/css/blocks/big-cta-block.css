@@ -67,6 +67,10 @@
   margin: 0;
 }
 
+.dc-big-cta-block__content.align-center p {
+  text-align: center;
+}
+
 .dc-big-cta-block__content .btn {
   margin-top: 1.25rem;
 }

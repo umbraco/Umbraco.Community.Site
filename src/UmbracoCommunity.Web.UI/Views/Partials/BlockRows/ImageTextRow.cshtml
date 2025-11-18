@@ -20,11 +20,27 @@
         {
             var typedBlock = block.Content as ImageBlock;
             if (typedBlock?.Image != null) {
+                @if (!string.IsNullOrEmpty(typedBlock.Title))
+                {
+                    <h2 class="block-title">@typedBlock.Title</h2>
+                }
+                @if (typedBlock.Subtitle != null)
+                {
+                    <div class="block-subtitle">
+                        @Html.Raw(typedBlock.Subtitle?.ToHtmlString())
+                    </div>
+                }
                 <div class="dc-image-and-text-block__image-container">
                     <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
                         sizes="(max-width: 400px) 386px, 906px"
                         src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
                         loading="lazy" />
+
+                    @if (typedBlock.ApplyOverlay)
+                    {
+                        <div class="overlay"></div>
+                        <div class="text">@Html.Raw(typedBlock.OverlayText)</div>
+                    }
                 </div>
             }
         }

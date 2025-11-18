@@ -10,7 +10,9 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
   "PropertyGroups": [
     {
       "Key": "3569d5a0-b0ca-4ee7-be3b-e2de435d3835",
@@ -23,14 +25,7 @@
           "Alias": "cards",
           "DataType": "umb://data-type/389db651adbd477185d01cbe3a46d985",
           "Name": "Cards",
-          "SortOrder": 1
-        },
-        {
-          "Key": "9fa6eba8-d4df-4891-b726-12b5465135cf",
-          "Alias": "title",
-          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Description": "Optional - will display above the block",
-          "Name": "Title"
+          "SortOrder": 2
         }
       ]
     }
@@ -39,15 +34,15 @@
   "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://data-type/389db651adbd477185d01cbe3a46d985",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
       "Ordering": true
     }
   ],
