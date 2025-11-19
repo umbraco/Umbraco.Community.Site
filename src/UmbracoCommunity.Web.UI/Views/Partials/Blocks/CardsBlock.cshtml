@@ -9,27 +9,18 @@
 @if (Model.Content.Cards != null && Model.Content.Cards.Any())
 {
     var rows = displayAsGrid ? [Model.Content.Cards.ToList()] : Model.Content.Cards.GetRows();
-    @* if (hasBg)
+    if (hasBg)
     {
         <style asp-add-nonce="true">
             #@Model.Content.IdHash {
-                --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                --block-background-color: @Model.Settings?.BackgroundColour;
             }
         </style>
-    } *@
+    }
 
     <div class="dc-boxes align-center">
         <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
-            @if (!string.IsNullOrEmpty(Model.Content.Title))
-            {
-                <h2 class="block-title">@Model.Content.Title</h2>
-            }
-            @if (Model.Content.Subtitle != null)
-            {
-                <div class="block-subtitle">
-                    @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
-                </div>
-            }
+            
             @foreach (var cardGroup in rows)
                 if (cardGroup != null) {
                 {

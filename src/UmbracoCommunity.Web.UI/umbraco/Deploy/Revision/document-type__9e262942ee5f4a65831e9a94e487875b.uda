@@ -1,52 +1,53 @@
 {
-  "Name": "Image block",
-  "Alias": "imageBlock",
+  "Name": "Title block",
+  "Alias": "titleBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
-  "Icon": "icon-picture",
+  "Icon": "icon-heading-2",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+  "Parent": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
-      "Key": "00a7a67f-03f2-4b5a-ba6e-259eede6735d",
+      "Key": "558f5446-079e-435b-a8f6-8bf00d9fc0e0",
       "Name": "Content",
       "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
-          "Key": "09848d63-f589-49de-a474-e108190077d2",
-          "Alias": "altText",
+          "Key": "93c6c29b-4d25-4665-836b-7683e991f5d8",
+          "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Name": "Alt text",
-          "SortOrder": 1
+          "Mandatory": true,
+          "Name": "Title"
         },
         {
-          "Key": "d7192ea9-26ef-4f24-ab67-98bdb77c5842",
-          "Alias": "image",
-          "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
-          "Name": "Image"
+          "Key": "d925d71c-7314-4373-bad1-59003af49e54",
+          "Alias": "text",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Subtitle",
+          "SortOrder": 1
         }
       ]
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1",
+  "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b",
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+      "Udi": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
       "Ordering": true
     }
   ],

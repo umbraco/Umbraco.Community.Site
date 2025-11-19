@@ -1,6 +1,6 @@
 {
-  "Name": "Image block",
-  "Alias": "imageBlock",
+  "Name": "Image block with overlay",
+  "Alias": "imageBlockWithOverlay",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-picture",
@@ -13,20 +13,34 @@
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
-      "Key": "00a7a67f-03f2-4b5a-ba6e-259eede6735d",
+      "Key": "7387e13f-e08c-4509-bca0-9d5efb8221a6",
       "Name": "Content",
       "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
-          "Key": "09848d63-f589-49de-a474-e108190077d2",
+          "Key": "85463de3-4afd-4912-b802-6f47412c6070",
           "Alias": "altText",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
           "Name": "Alt text",
           "SortOrder": 1
         },
         {
-          "Key": "d7192ea9-26ef-4f24-ab67-98bdb77c5842",
+          "Key": "af0fd158-6d17-404b-a4b2-cd26ebbcb19e",
+          "Alias": "applyOverlay",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Name": "Apply overlay",
+          "SortOrder": 2
+        },
+        {
+          "Key": "f1ae18dc-b136-4e3b-bb6a-cc5379f59555",
+          "Alias": "overlayText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Overlay text",
+          "SortOrder": 3
+        },
+        {
+          "Key": "fe4167af-c631-4a31-b1c4-e6a20e69c7a6",
           "Alias": "image",
           "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
           "Name": "Image"
@@ -35,7 +49,7 @@
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1",
+  "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c",
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
@@ -43,6 +57,14 @@
     },
     {
       "Udi": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
       "Ordering": true
     },
     {

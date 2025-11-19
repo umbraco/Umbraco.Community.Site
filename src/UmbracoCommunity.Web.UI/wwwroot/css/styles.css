@@ -195,7 +195,9 @@ img {
     overflow: hidden;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     background-size: cover;
     background-position: center center;
     background-image: var(--page-banner-background-image);
@@ -206,7 +208,7 @@ img {
     padding: 40px 20px;
 }
 
-.dc-page-banner-block__container h1 {
+.dc-page-banner-block__container h1, .dc-page-banner-block__container .banner-content {
     z-index: 2;
 }
 

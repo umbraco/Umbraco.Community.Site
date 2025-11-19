@@ -1,0 +1,14 @@
+{
+  "Name": "Text string (max 235)",
+  "EditorAlias": "Umbraco.TextBox",
+  "EditorUiAlias": "Umb.PropertyEditorUi.TextBox",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "maxChars": 235,
+    "inputType": "text"
+  },
+  "Udi": "umb://data-type/eb6dd945c0f2428ab902162a6280d262",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

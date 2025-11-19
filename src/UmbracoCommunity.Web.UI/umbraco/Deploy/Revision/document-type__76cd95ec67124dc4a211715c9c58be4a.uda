@@ -1,0 +1,84 @@
+{
+  "Name": "[Settings] Video block",
+  "Alias": "settingsVideoBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "c74d17e5-bc35-46c5-b8e1-d13f125e8cb4",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "0d8968f8-102e-4658-ab37-bd49b4d9ef4d",
+          "Alias": "format",
+          "DataType": "umb://data-type/951f2062ebd9496b94d799397bccece0",
+          "Mandatory": true,
+          "Name": "Format",
+          "SortOrder": 1
+        },
+        {
+          "Key": "8e351b8f-b5ba-4a0e-97d6-e40da1907738",
+          "Alias": "autoplay",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Name": "Autoplay",
+          "SortOrder": 3
+        },
+        {
+          "Key": "912aa4b0-c626-4f87-a938-8ab779b2de41",
+          "Alias": "muted",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Name": "Muted",
+          "SortOrder": 4
+        },
+        {
+          "Key": "d1483bc6-0c36-4067-8b7d-e0438ebc8ff9",
+          "Alias": "thumbnail",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Name": "Thumbnail",
+          "SortOrder": 2
+        },
+        {
+          "Key": "f7509633-d7d9-45c1-bb5c-3726d368135c",
+          "Alias": "videoTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Video title"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/76cd95ec67124dc4a211715c9c58be4a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/951f2062ebd9496b94d799397bccece0",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

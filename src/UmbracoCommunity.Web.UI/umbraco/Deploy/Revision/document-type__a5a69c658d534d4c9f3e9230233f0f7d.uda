@@ -1,0 +1,55 @@
+{
+  "Name": "Quote with attribution block",
+  "Alias": "quoteWithAttributionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-user",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "8c9d344e-a8da-42e1-bcba-a64d0968f37d",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "978632cc-9f5e-4300-a25c-e2b0018e7e33",
+          "Alias": "quoteText",
+          "DataType": "umb://data-type/eb6dd945c0f2428ab902162a6280d262",
+          "Mandatory": true,
+          "Name": "Quote text"
+        },
+        {
+          "Key": "ade0dae3-9966-4410-a034-e5c786f008b2",
+          "Alias": "attribution",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Name": "Attribution",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a5a69c658d534d4c9f3e9230233f0f7d",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/eb6dd945c0f2428ab902162a6280d262",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

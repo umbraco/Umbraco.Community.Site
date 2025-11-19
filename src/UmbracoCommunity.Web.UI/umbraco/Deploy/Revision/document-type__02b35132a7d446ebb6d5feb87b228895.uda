@@ -1,52 +1,52 @@
 {
-  "Name": "Image block",
-  "Alias": "imageBlock",
+  "Name": "Accordion item block",
+  "Alias": "accordionItemBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
-  "Icon": "icon-picture",
+  "Icon": "icon-font",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+  "Parent": "umb://document-type-container/cc04323613cb4eb7826488ce0318dbb3",
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
-      "Key": "00a7a67f-03f2-4b5a-ba6e-259eede6735d",
+      "Key": "146d4878-0906-4cf3-8ef4-cf55003dcce1",
       "Name": "Content",
-      "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
-          "Key": "09848d63-f589-49de-a474-e108190077d2",
-          "Alias": "altText",
+          "Key": "5c684c95-a7b4-416a-aef3-145e6fdc7010",
+          "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Name": "Alt text",
-          "SortOrder": 1
+          "Mandatory": true,
+          "Name": "Title"
         },
         {
-          "Key": "d7192ea9-26ef-4f24-ab67-98bdb77c5842",
-          "Alias": "image",
-          "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
-          "Name": "Image"
+          "Key": "7a33b2c3-293f-4b31-9a1a-15f07b3c7885",
+          "Alias": "content",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Content",
+          "SortOrder": 1
         }
       ]
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1",
+  "Udi": "umb://document-type/02b35132a7d446ebb6d5feb87b228895",
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+      "Udi": "umb://document-type-container/cc04323613cb4eb7826488ce0318dbb3",
       "Ordering": true
     }
   ],

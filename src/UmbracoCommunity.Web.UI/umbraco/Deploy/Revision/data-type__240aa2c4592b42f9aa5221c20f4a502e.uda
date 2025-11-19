@@ -7,10 +7,9 @@
     "useLiveEditing": true,
     "blocks": [
       {
-        "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
+        "contentElementTypeKey": "595d8878-72cc-498a-a966-156a57ae5971",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "192ec43a-ea4a-42f7-a09d-48abf9c2e09f",
         "columnSpanOptions": [
           {
             "columnSpan": 6
@@ -18,23 +17,15 @@
           {
             "columnSpan": 12
           }
-        ],
-        "label": "Text block",
-        "areas": []
+        ]
       },
       {
-        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
+        "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "columnSpanOptions": [
-          {
-            "columnSpan": 12
-          },
-          {
-            "columnSpan": 6
-          }
-        ],
-        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
+        "label": "Cards",
+        "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
+        "editorSize": "full"
       },
       {
         "contentElementTypeKey": "3c15228c-4591-4313-b75a-120cee63a699",
@@ -58,12 +49,78 @@
         ]
       },
       {
-        "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
+        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "label": "Cards",
-        "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
-        "editorSize": "full"
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          },
+          {
+            "columnSpan": 6
+          }
+        ],
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
+      },
+      {
+        "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
+        "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "192ec43a-ea4a-42f7-a09d-48abf9c2e09f",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ],
+        "label": "Text block",
+        "areas": []
+      },
+      {
+        "contentElementTypeKey": "9e262942-ee5f-4a65-831e-9a94e487875b",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c39783fb-08c3-4a34-88a4-30949d342c17",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
       }
     ]
   },
@@ -90,6 +147,24 @@
       "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
     },
     {
+      "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
+    },
+    {
+      "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c"
+    },
+    {
+      "Udi": "umb://document-type/76cd95ec67124dc4a211715c9c58be4a"
+    },
+    {
+      "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"
+    },
+    {
+      "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028"
+    },
+    {
+      "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
+    },
+    {
       "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"
     },
     {
@@ -97,6 +172,9 @@
     },
     {
       "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
+    },
+    {
+      "Udi": "umb://document-type/cdca4cc35b164081906873e30005add5"
     },
     {
       "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
