@@ -6,7 +6,8 @@
         @if (Model.Content.Icon != null)
         {
             <svg-src media="@Model.Content.Icon" width="24" height="24" alt-text="@Model.Content.Link.Name"></svg-src>
-        } else
+        }
+        else
         {
             @Model.Content.Link.Name
         }

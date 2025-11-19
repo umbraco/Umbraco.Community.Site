@@ -4,48 +4,61 @@
 
 @if (Model.Content?.Video != null && !string.IsNullOrWhiteSpace(Model.Content.Video.Url))
 {
-    var linkIsExternal = Model.Content.Video.Type == LinkType.External;
-    var thumbnailUrl = Model.Settings?.Thumbnail?.GetCropUrl();
-    var autoplay = Model.Settings?.Autoplay ?? false;
-    var format = Model.Settings?.Format != null && Model.Settings.Format.Contains("4:3") ? 43 : 169;
-    var allows = @Model.Settings.GetAllow();
-
-    if (linkIsExternal)
+    @if (Context.Request.IsBlockPreviewRequest())
     {
-        if (Model.Content.Video.Url.Contains("youtu", StringComparison.InvariantCultureIgnoreCase)) {
-            var videoSrc = Model.Content.Video.Url.GetYouTubeLink(Model.Settings);
-            <dc-video-picker-youtube source="@videoSrc"
-                                     allow="@allows"
-                                     name="@Model.Settings?.VideoTitle"
-                                     thumbnail="@thumbnailUrl"
-                                     format="@format">
-                <iframe slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-            </dc-video-picker-youtube>
+        <div class="video-block-preview">
+            @if (Model.Settings?.Thumbnail != null)
+            {
+                <img src="@Model.Settings.Thumbnail.GetCropUrl()" />
+            }
+            <p>Video source: @Model.Content.Video.Url</p>
+        </div>
+    }
+    else 
+    {
+        var linkIsExternal = Model.Content.Video.Type == LinkType.External;
+        var thumbnailUrl = Model.Settings?.Thumbnail?.GetCropUrl();
+        var autoplay = Model.Settings?.Autoplay ?? false;
+        var format = Model.Settings?.Format != null && Model.Settings.Format.Contains("4:3") ? 43 : 169;
+        var allows = @Model.Settings.GetAllow();
+
+        if (linkIsExternal)
+        {
+            if (Model.Content.Video.Url.Contains("youtu", StringComparison.InvariantCultureIgnoreCase)) {
+                var videoSrc = Model.Content.Video.Url.GetYouTubeLink(Model.Settings);
+                <dc-video-picker-youtube source="@videoSrc"
+                                         allow="@allows"
+                                         name="@Model.Settings?.VideoTitle"
+                                         thumbnail="@thumbnailUrl"
+                                         format="@format">
+                    <iframe slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
+                </dc-video-picker-youtube>
+            } else
+            {
+                _logger.LogWarning("VideoBlock: External video URL not supported. URL: {VideoUrl}", Model.Content.Video.Url);
+            }
         } else
         {
-            _logger.LogWarning("VideoBlock: External video URL not supported. URL: {VideoUrl}", Model.Content.Video.Url);
+            <dc-video-picker-media source="@Model.Content.Video.Url"
+                                   name="@Model.Settings?.VideoTitle"
+                                   thumbnail="@thumbnailUrl"
+                                   format="@format"
+                                   auto-play="@autoplay">
+                <video slot="video"
+                       controls
+                       muted="@(Model.Settings?.Muted ?? false)"
+                       autoplay="@autoplay"
+                       poster="@thumbnailUrl"
+                       preload="@(autoplay ? "auto" : "none")"
+                       width="100%"
+                       height="100%">
+                    <source src="@Model.Content.Video.Url" />
+                    <p>
+                        Your browser does not support HTML5 videos.
+                        <a href="@Model.Content.Video.Url">Here is a link to the video</a> instead.
+                    </p>
+                </video>
+            </dc-video-picker-media>
         }
-    } else
-    {
-        <dc-video-picker-media source="@Model.Content.Video.Url"
-                               name="@Model.Settings?.VideoTitle"
-                               thumbnail="@thumbnailUrl"
-                               format="@format"
-                               auto-play="@autoplay">
-            <video slot="video"
-                   controls
-                   muted="@(Model.Settings?.Muted ?? false)"
-                   autoplay="@autoplay"
-                   poster="@thumbnailUrl"
-                   preload="@(autoplay ? "auto" : "none")"
-                   width="100%"
-                   height="100%">
-                <source src="@Model.Content.Video.Url" />
-                <p>
-                    Your browser does not support HTML5 videos.
-                    <a href="@Model.Content.Video.Url">Here is a link to the video</a> instead.
-                </p>
-            </video>
-        </dc-video-picker-media>
     }
 }
