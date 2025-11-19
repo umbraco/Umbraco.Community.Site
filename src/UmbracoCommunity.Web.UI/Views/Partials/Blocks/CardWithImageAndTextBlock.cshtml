@@ -57,11 +57,6 @@
                                  src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
                                  loading="lazy" />
                         }
-                        @if (imageItem.ApplyOverlay)
-                        {
-                            <div class="overlay"></div>
-                            <div class="text">@Html.Raw(imageItem.OverlayText)</div>
-                        }
                     </div>
 
                     break;

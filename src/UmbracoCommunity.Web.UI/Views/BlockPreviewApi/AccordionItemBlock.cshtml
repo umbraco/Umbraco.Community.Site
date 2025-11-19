@@ -1,0 +1,10 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<AccordionItemBlock>>
+
+<div class="dc-faq-block">
+    @if (!string.IsNullOrEmpty(Model.Content.Title)){
+        <h3>@Model.Content.Title</h3>
+    }
+    @if (Model.Content.Content != null) {
+        @Html.Raw(Model.Content.Content)
+    }
+</div>
