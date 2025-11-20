@@ -14,18 +14,13 @@
         {
             <style asp-add-nonce="true">
                 #@Model.Content.IdHash {
-                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                    --block-background-color: @Model.Settings?.BackgroundColour;
                 }
             </style>
         }
+
         <div class="dc-image-wrapper">
             <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
-
-            @if (Model.Content.ApplyOverlay)
-            {
-                <div class="overlay"></div>
-                <div class="text">@Html.Raw(Model.Content.OverlayText)</div>
-            }
         </div>
     </div>
 }

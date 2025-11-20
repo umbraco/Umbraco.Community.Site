@@ -16,7 +16,7 @@
 
             public static readonly string[] DefaultAllowConnections = [];
 
-            public static readonly string[] DefaultAllowFrames = [];
+            public static readonly string[] DefaultAllowFrames = ["*.youtube.com"];
 
             public static readonly string[] DefaultAllowScripts = [];
 

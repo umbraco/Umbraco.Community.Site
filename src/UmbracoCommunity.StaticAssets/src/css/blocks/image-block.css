@@ -24,7 +24,7 @@
   overflow: hidden;
   position: relative;
   border-radius: var(--border-radius-xl);
-
+  
   img {
     width: 100%;
   }

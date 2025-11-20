@@ -68,7 +68,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 {
                     if (colourSettings.BackgroundColour != null)
                     {
-                        row.BackgroundColour = colourSettings.BackgroundColour.Color;
+                        row.BackgroundColour = colourSettings.BackgroundColour;//colourSettings.BackgroundColour.Color;
                         if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
                         {
                             row.HasBg = true;

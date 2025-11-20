@@ -1,0 +1,13 @@
+{
+  "Name": "Text area (max 235)",
+  "EditorAlias": "Umbraco.TextArea",
+  "EditorUiAlias": "Umb.PropertyEditorUi.TextArea",
+  "Configuration": {
+    "rows": 4,
+    "maxChars": 235
+  },
+  "Udi": "umb://data-type/49a56007fd464e5f9c244386d730a4dd",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

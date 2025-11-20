@@ -14,12 +14,7 @@
     color: var(--color-white);
   }
 
-  a {
-    color: var(--block-link-color);
-  }
-
   a.btn {
-    padding: 0 var(--unit);
     line-height: var(--unit-md);
   }
 

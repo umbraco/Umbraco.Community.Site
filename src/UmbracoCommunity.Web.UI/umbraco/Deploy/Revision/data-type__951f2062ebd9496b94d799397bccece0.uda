@@ -1,0 +1,49 @@
+{
+  "Name": "Radio button list - video formats",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "16:9",
+              "value": "16:9",
+              "icon": "icon-display color-undefined",
+              "description": ""
+            },
+            {
+              "name": "4:3",
+              "value": "4:3",
+              "icon": "icon-display color-undefined",
+              "description": ""
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.RadioButtonListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "orientation": "vertical",
+          "showDescriptions": false,
+          "showIcons": true,
+          "allowClear": false
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+  "Udi": "umb://data-type/951f2062ebd9496b94d799397bccece0",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

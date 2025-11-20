@@ -1,0 +1,33 @@
+{
+  "Name": "Accordion block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 12,
+    "blocks": [
+      {
+        "contentElementTypeKey": "02b35132-a7d4-46eb-b6d5-feb87b228895",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "inlineEditing": true
+      }
+    ],
+    "validationLimit": {
+      "min": 1
+    },
+    "useLiveEditing": true
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/d38f5bd232b64a4d90b5a55d68445a0f",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/02b35132a7d446ebb6d5feb87b228895"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}
