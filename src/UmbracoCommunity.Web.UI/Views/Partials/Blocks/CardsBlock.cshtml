@@ -13,25 +13,25 @@
     {
         <style asp-add-nonce="true">
             #@Model.Content.IdHash {
-                --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                --block-background-color: @Model.Settings?.BackgroundColour;
             }
         </style>
     }
-    <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
-        {
-            <h2>@Model.Content.Title</h2>
-        }
-        @foreach (var cardGroup in rows)
-            if (cardGroup != null) {
-            {
-                <div class="dc-boxes-row__items @(displayAsGrid ? "item-grid" : "")">
-                    @foreach (var item in cardGroup)
-                    {
-                        <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
-                    }
-                </div>
+
+    <div class="dc-boxes align-center">
+        <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
+            
+            @foreach (var cardGroup in rows)
+                if (cardGroup != null) {
+                {
+                    <div class="dc-boxes-row__items @(displayAsGrid ? "item-grid" : "")">
+                        @foreach (var item in cardGroup)
+                        {
+                            <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                        }
+                    </div>
+                }
             }
-        }
+        </div>
     </div>
 }

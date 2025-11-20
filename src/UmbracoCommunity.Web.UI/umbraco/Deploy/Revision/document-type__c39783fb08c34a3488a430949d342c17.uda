@@ -1,0 +1,31 @@
+{
+  "Name": "[Settings] Title block",
+  "Alias": "settingsTitleBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
+  "CompositionContentTypes": [
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

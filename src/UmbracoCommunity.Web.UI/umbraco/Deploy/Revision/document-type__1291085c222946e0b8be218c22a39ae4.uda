@@ -10,7 +10,9 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
   "PropertyGroups": [
     {
       "Key": "79857b09-6ac4-4855-ae32-9075050bab12",
@@ -24,14 +26,6 @@
           "DataType": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
           "Mandatory": true,
           "Name": "Background image"
-        },
-        {
-          "Key": "c70ceb8f-7b91-4d46-bd25-1aba628f0ee1",
-          "Alias": "title",
-          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Mandatory": true,
-          "Name": "Title",
-          "SortOrder": 1
         }
       ]
     }
@@ -40,15 +34,15 @@
   "Udi": "umb://document-type/1291085c222946e0b8be218c22a39ae4",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
       "Ordering": true
     }
   ],

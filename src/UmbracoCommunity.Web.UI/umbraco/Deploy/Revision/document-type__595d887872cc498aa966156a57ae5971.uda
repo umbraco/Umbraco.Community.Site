@@ -1,0 +1,50 @@
+{
+  "Name": "Accordion block",
+  "Alias": "accordionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-fa-square-caret-down",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/cc04323613cb4eb7826488ce0318dbb3",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "7745ae44-c4e2-4d0f-bc5f-81f5b12728f9",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "87cd87c6-5a2b-4a8c-84df-53d7cbf5464e",
+          "Alias": "accordionItems",
+          "DataType": "umb://data-type/d38f5bd232b64a4d90b5a55d68445a0f",
+          "Name": "Accordion items"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/d38f5bd232b64a4d90b5a55d68445a0f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/cc04323613cb4eb7826488ce0318dbb3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

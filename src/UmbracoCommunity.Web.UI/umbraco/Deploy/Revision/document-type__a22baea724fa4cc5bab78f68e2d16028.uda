@@ -1,0 +1,44 @@
+{
+  "Name": "Video block",
+  "Alias": "videoBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-video",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "c6fc7ea0-b4db-4520-89bd-270ac1692118",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "876fe3ad-32d1-4c10-87f6-e01e1ad99efb",
+          "Alias": "video",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "Mandatory": true,
+          "Name": "Video"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}
