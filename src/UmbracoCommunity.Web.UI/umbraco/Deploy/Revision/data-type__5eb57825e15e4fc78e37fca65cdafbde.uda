@@ -1,12 +1,13 @@
 {
-  "Name": "Label (decimal)",
+  "Name": "Label (pixels)",
   "EditorAlias": "Umbraco.Label",
   "EditorUiAlias": "Umb.PropertyEditorUi.Label",
-  "DatabaseType": "Decimal",
+  "DatabaseType": "Integer",
   "Configuration": {
-    "umbracoDataValueType": "DECIMAL"
+    "umbracoDataValueType": "INT",
+    "labelTemplate": "{=value}px"
   },
-  "Udi": "umb://data-type/8f1ef1e19de440d3a0726673f631ca64",
+  "Udi": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
   "__version": "16.0.4"

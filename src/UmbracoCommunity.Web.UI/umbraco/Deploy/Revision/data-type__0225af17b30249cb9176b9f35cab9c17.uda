@@ -1,10 +1,10 @@
 {
-  "Name": "Checkbox list",
-  "EditorAlias": "Umbraco.CheckBoxList",
-  "EditorUiAlias": "Umb.PropertyEditorUi.CheckBoxList",
+  "Name": "Approved Color",
+  "EditorAlias": "Umbraco.ColorPicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.ColorPicker",
   "DatabaseType": "Nvarchar",
   "Configuration": {},
-  "Udi": "umb://data-type/fbaf13a8403641f293a3974f678c312a",
+  "Udi": "umb://data-type/0225af17b30249cb9176b9f35cab9c17",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
   "__version": "16.0.4"
