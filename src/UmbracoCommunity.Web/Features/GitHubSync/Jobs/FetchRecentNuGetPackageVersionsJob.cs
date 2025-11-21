@@ -50,18 +50,22 @@ public class FetchRecentNuGetPackageVersionsJob
 
             foreach (var repo in repositoriesWithNuGet)
             {
-                context?.WriteLine($"Fetching latest 20 NuGet versions for {repo.Name} (package: {repo.NuGetPackageId})...");
+                var packageIds = repo.GetNuGetPackageIds();
+                foreach (var packageId in packageIds)
+                {
+                    context?.WriteLine($"Fetching latest 20 NuGet versions for {repo.Name} (package: {packageId})...");
 
-                var versions = await _nugetClient.GetPackageVersionsAsync(repo.NuGetPackageId!, maxCount: 20);
+                    var versions = await _nugetClient.GetPackageVersionsAsync(packageId, maxCount: 20);
 
-                context?.WriteLine($"Found {versions.Count} versions");
+                    context?.WriteLine($"Found {versions.Count} versions");
 
-                var result = _dataStore.UpsertNuGetPackageVersions(repo.NuGetPackageId!, versions);
+                    var result = _dataStore.UpsertNuGetPackageVersions(packageId, versions);
 
-                totalAdded += result.Added;
-                totalUpdated += result.Updated;
+                    totalAdded += result.Added;
+                    totalUpdated += result.Updated;
 
-                context?.WriteLine($"  {result.Added} added, {result.Updated} updated");
+                    context?.WriteLine($"  {result.Added} added, {result.Updated} updated");
+                }
             }
 
             var message = $"Sync completed: {totalAdded} added, {totalUpdated} updated across all packages";

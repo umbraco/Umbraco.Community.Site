@@ -47,14 +47,24 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             if (!discussions.Any())
                 return;
 
-            // Get NuGet package versions from database (use as fallback for missing version info)
-            // Find the NuGet package ID for this repository
-            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
-
+            // Get NuGet package versions from all configured packages
             Dictionary<string, DateTime> nugetVersions = new();
-            if (repoConfig?.HasNuGetPackage == true)
+            var reposWithNuGet = _options.Repositories.Where(r => r.HasNuGetPackage).ToList();
+            foreach (var repo in reposWithNuGet)
             {
-                nugetVersions = _dataStore.GetNuGetPackageVersions(repoConfig.NuGetPackageId!);
+                var packageIds = repo.GetNuGetPackageIds();
+                foreach (var packageId in packageIds)
+                {
+                    var versions = _dataStore.GetNuGetPackageVersions(packageId);
+                    foreach (var version in versions)
+                    {
+                        // If version doesn't exist or the new date is earlier, update it
+                        if (!nugetVersions.ContainsKey(version.Key) || version.Value < nugetVersions[version.Key])
+                        {
+                            nugetVersions[version.Key] = version.Value;
+                        }
+                    }
+                }
             }
 
             // Parse discussions into release view models

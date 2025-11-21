@@ -2,24 +2,25 @@
 @{
     var cols = Model.GridColumns ?? 12;
     var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
+    var imgIsCircle = Model.Settings?.ImageIsCircular ?? false;
 }
 
 @if (Model.Content.Image is not null)
 {
-    <div class="dc-image-block @(string.IsNullOrWhiteSpace(Model.Settings?.BackgroundColour) ? "" : "has-bg") @(Context.Request.IsBlockPreviewRequest() ? "backoffice-img-block" : "")" id="@Model.ContentKey">
-        <style asp-add-nonce="true">
-            #@Model.ContentKey {
-                --block-background-color: @Model.Settings?.BackgroundColour ?? 'none';
-            }
-        </style>
-        <div class="dc-image-wrapper">
-            <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image" loading="lazy" />
+    bool hasBg = Model.Settings.HasBg();
 
-            @if (Model.Content.ApplyOverlay)
-            {
-                <div class="overlay"></div>
-                <div class="text">@Html.Raw(Model.Content.OverlayText)</div>
-            }
+    <div class="dc-image-block @(hasBg ? "has-bg" : "")" id="@Model.Content.IdHash">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                #@Model.Content.IdHash {
+                    --block-background-color: @Model.Settings?.BackgroundColour;
+                }
+            </style>
+        }
+
+        <div class="dc-image-wrapper">
+            <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
         </div>
     </div>
 }

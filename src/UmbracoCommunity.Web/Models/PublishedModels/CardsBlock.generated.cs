@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Cards block</summary>
 	[PublishedModel("cardsBlock")]
-	public partial class CardsBlock : PublishedElementModel
+	public partial class CardsBlock : PublishedElementModel, IContentBlockIntro
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -58,11 +58,19 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel Cards => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "cards");
 
 		///<summary>
-		/// Title: Optional - will display above the block
+		/// Subtitle
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("subtitle")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Subtitle => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetSubtitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// Title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("title")]
-		public virtual string Title => this.Value<string>(_publishedValueFallback, "title");
+		public virtual string Title => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetTitle(this, _publishedValueFallback);
 	}
 }

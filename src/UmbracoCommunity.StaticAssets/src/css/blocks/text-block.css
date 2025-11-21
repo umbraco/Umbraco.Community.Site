@@ -7,14 +7,14 @@
 
   &.has-bg {
     padding: var(--unit-md);
+    border-radius: 20px;
   }
 
-  a {
-    color: var(--block-link-color);
+  &.bg-dark {
+    color: var(--color-white);
   }
 
   a.btn {
-    padding: 0 var(--unit);
     line-height: var(--unit-md);
   }
 

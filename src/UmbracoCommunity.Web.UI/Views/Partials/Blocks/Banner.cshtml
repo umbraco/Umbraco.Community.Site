@@ -5,11 +5,14 @@
 }
 
 <div class="dc-page-banner-block @(hasBg ? "has-bg" : string.Empty)">
-    <style asp-add-nonce="true">
-        #@Model.Content.IdHash {
-            --page-banner-background-image: url("@Model.Content.BackgroundImage?.GetCropUrl()");
-        }
-    </style>
+    @if (hasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.Content.IdHash {
+                --page-banner-background-image: url("@Model.Content.BackgroundImage?.GetCropUrl()");
+            }
+         </style>
+    }
     <div id="@Model.Content.IdHash" class="dc-page-banner-block__container">
         @if (hasBg)
         {
@@ -17,6 +20,15 @@
             </div>
         }
 
-        <h1>@Model.Content.Title</h1>
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h1>@Model.Content.Title</h1>
+        }
+        @if (Model.Content.Subtitle != null)
+        {
+            <div class="banner-content">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
     </div>
 </div>

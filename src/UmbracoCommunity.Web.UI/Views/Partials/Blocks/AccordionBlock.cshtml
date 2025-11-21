@@ -1,0 +1,36 @@
+@using UmbracoCommunity.Common.Utilities
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<AccordionBlock>>
+
+@if (Model.Content?.AccordionItems != null && Model.Content.AccordionItems.Any())
+{
+    <dl class="dc-faqs">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (Model.Content.Subtitle != null)
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+        @foreach (var item in Model.Content.AccordionItems)
+        {
+            var typedAccordionItem = item.Content as AccordionItemBlock;
+            if (typedAccordionItem == null) continue;
+            var checkboxIdentifier = StringUtilities.RandomString(5);
+            <div class="dc-faq-block">
+                <dt>
+                    <input type="checkbox" id="cb-@checkboxIdentifier">
+                    <label for="cb-@checkboxIdentifier">
+                        <h3>@typedAccordionItem.Title</h3>
+                        <partial name="~/Views/Partials/Components/PlusSvg.cshtml" />
+                    </label>
+                </dt>
+                <div class="expand">
+                    <dd>@Html.Raw(typedAccordionItem.Content)</dd>
+                </div>
+            </div>
+        }
+    </dl>
+}

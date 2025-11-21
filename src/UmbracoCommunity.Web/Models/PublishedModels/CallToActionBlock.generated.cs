@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Call to action block</summary>
 	[PublishedModel("callToActionBlock")]
-	public partial class CallToActionBlock : PublishedElementModel
+	public partial class CallToActionBlock : PublishedElementModel, IContentBlockIntro
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -66,19 +66,19 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string CallToActionLinkText => this.Value<string>(_publishedValueFallback, "callToActionLinkText");
 
 		///<summary>
-		/// Description
+		/// Subtitle
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("description")]
-		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Description => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "description");
+		[ImplementPropertyType("subtitle")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Subtitle => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetSubtitle(this, _publishedValueFallback);
 
 		///<summary>
-		/// Headline
+		/// Title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("headline")]
-		public virtual string Headline => this.Value<string>(_publishedValueFallback, "headline");
+		[ImplementPropertyType("title")]
+		public virtual string Title => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetTitle(this, _publishedValueFallback);
 	}
 }

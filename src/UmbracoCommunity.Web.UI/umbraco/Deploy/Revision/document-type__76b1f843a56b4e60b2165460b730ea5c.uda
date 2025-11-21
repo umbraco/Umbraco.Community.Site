@@ -1,0 +1,77 @@
+{
+  "Name": "Image block with overlay",
+  "Alias": "imageBlockWithOverlay",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-picture",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "7387e13f-e08c-4509-bca0-9d5efb8221a6",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "85463de3-4afd-4912-b802-6f47412c6070",
+          "Alias": "altText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Alt text",
+          "SortOrder": 1
+        },
+        {
+          "Key": "af0fd158-6d17-404b-a4b2-cd26ebbcb19e",
+          "Alias": "applyOverlay",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Name": "Apply overlay",
+          "SortOrder": 2
+        },
+        {
+          "Key": "f1ae18dc-b136-4e3b-bb6a-cc5379f59555",
+          "Alias": "overlayText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Overlay text",
+          "SortOrder": 3
+        },
+        {
+          "Key": "fe4167af-c631-4a31-b1c4-e6a20e69c7a6",
+          "Alias": "image",
+          "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+          "Name": "Image"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

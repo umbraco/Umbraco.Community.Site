@@ -15,12 +15,29 @@ public class RepositoryConfig
 {
     public string Name { get; set; } = string.Empty;
     public string? NuGetPackageId { get; set; }
+    public List<string>? NuGetPackageIds { get; set; }
     public string? AnnouncementsPrefix { get; set; }
 
     /// <summary>
     /// Returns true if this repository has a NuGet package configured
     /// </summary>
-    public bool HasNuGetPackage => !string.IsNullOrWhiteSpace(NuGetPackageId);
+    public bool HasNuGetPackage => !string.IsNullOrWhiteSpace(NuGetPackageId) || (NuGetPackageIds?.Any() == true);
+
+    /// <summary>
+    /// Returns all configured NuGet package IDs (handles both single and multiple package IDs)
+    /// </summary>
+    public IEnumerable<string> GetNuGetPackageIds()
+    {
+        if (NuGetPackageIds?.Any() == true)
+        {
+            return NuGetPackageIds;
+        }
+        if (!string.IsNullOrWhiteSpace(NuGetPackageId))
+        {
+            return new[] { NuGetPackageId };
+        }
+        return Enumerable.Empty<string>();
+    }
 
     /// <summary>
     /// Returns true if this repository has announcements in the Announcements repo with a specific prefix

@@ -1,6 +1,7 @@
 name: Build and Upload SBOMs to Dependency-Track
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - '*'
@@ -68,7 +69,7 @@ jobs:
           else
             echo "No package-lock.json or yarn.lock found in $FRONTEND_DIR, skipping frontend SBOM."
           fi
-
+          
       # Upload .NET SBOM
       - name: Upload .NET SBOM to Dependency-Track
         env:

@@ -1,0 +1,32 @@
+{
+  "Name": "Quotes block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 12,
+    "blocks": [
+      {
+        "contentElementTypeKey": "a5a69c65-8d53-4d4c-9f3e-9230233f0f7d",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      }
+    ],
+    "validationLimit": {
+      "min": 3
+    },
+    "useLiveEditing": true
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/d19aaa9ec6ae4c81b3e89b596f8c83ff",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a5a69c658d534d4c9f3e9230233f0f7d"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

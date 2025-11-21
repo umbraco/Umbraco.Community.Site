@@ -1,0 +1,44 @@
+{
+  "Name": "Quotes block",
+  "Alias": "quotesBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-quote",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "f3762cc2-5239-4437-bef7-4afa028d66dc",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "a415fb5f-b572-41d0-957a-989312b53e6e",
+          "Alias": "quoteItems",
+          "DataType": "umb://data-type/d19aaa9ec6ae4c81b3e89b596f8c83ff",
+          "Mandatory": true,
+          "Name": "Quote items"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/cdca4cc35b164081906873e30005add5",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/d19aaa9ec6ae4c81b3e89b596f8c83ff",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "16.0.4"
+}

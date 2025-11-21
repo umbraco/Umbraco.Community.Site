@@ -16,9 +16,13 @@
           },
           {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 3
           }
         ],
-        "editorSize": ""
+        "editorSize": "",
+        "thumbnail": "/wwwroot/App_Plugins/BlockListThumbs/Cards/CardWithImageAndTextBlock.png"
       }
     ],
     "validationLimit": {

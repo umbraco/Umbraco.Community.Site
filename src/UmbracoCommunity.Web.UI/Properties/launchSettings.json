@@ -16,13 +16,22 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "UmbracoCommunity.Web.UI": {
+    "Kestrel [ENV: Development - default]": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:44383;http://localhost:65178",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      }      
+    },
+    "Kestrel [ENV: Local]": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:44383;http://localhost:65178",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Local"
       }      
     }
   }

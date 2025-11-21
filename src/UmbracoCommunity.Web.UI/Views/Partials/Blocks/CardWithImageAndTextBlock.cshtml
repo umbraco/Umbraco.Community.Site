@@ -3,26 +3,28 @@
 
 @{
     var gridCols = Model.GridColumns ?? 12;
+    var narrowPercentThreshold = 25; // Define narrow width threshold
 }
 
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
     var widthPercent = (Model.ColumnSpan / (double)gridCols) * 100;
+    var isNarrowWidth = widthPercent <= narrowPercentThreshold;
     @if (Model.Content.Link != null)
     {
-        <a id="@Model.Content.IdHash" class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        <a id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash);
+                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
             }
         </a>
     }
     else
     {
-        <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+        <div id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash);
+                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
             }
         </div>
     }
@@ -37,10 +39,26 @@
             {
                 case ImageBlock.ModelTypeAlias:
                     var imageItem = contentItem.Content as ImageBlock;
-                    <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
-                         sizes="(max-width: 400px) 386px, 906px"
-                         src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
-                         loading="lazy" />
+                    if (imageItem?.Image == null) break;
+                    var imageSettings = contentItem.Settings as SettingsImageBlock;
+                    var imgIsCircle = imageSettings?.ImageIsCircular ?? false;
+                    <div class="row-item-image">
+                        @if (imgIsCircle)
+                        {
+                            <img src="@imageItem.Image.GetCropUrl()" alt="@imageItem.AltText"
+                                 class="is-circle"
+                                 loading="lazy" />
+
+                        }
+                        else
+                        {
+                            <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
+                                 sizes="(max-width: 400px) 386px, 906px"
+                                 src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
+                                 loading="lazy" />
+                        }
+                    </div>
+
                     break;
                 case TextBlock.ModelTypeAlias:
                     var textItem = contentItem.Content as TextBlock;
@@ -52,15 +70,31 @@
         }
     }
 
-    async Task RenderStyle(double width, string idHash)
+    async Task RenderStyle(double width, string idHash, int narrowPercentThreshold)
     {
-        <style asp-add-nonce="true">
-            @@media (min-width: 1216px) {
-                .dc-boxes-row__items #@(idHash) {
-                    width: @($"{width}%");
-                    max-width: @($"{width}%");
+        if (width > narrowPercentThreshold)
+        {
+            <style asp-add-nonce="true">
+                @@media (min-width: 1216px) {
+                    .dc-boxes-row__items #@(idHash) {
+                        flex-basis: @($"{width - 1}%");
+                        flex-grow: 0;
+                        flex-shrink: 0;
+                    }
                 }
-            }
-        </style>
+            </style>
+        }
+        else
+        {
+            <style asp-add-nonce="true">
+                @@media (min-width: 768px) {
+                    .dc-boxes-row__items #@(idHash) {
+                        flex-basis: @($"{width - 1}%");
+                        flex-grow: 0;
+                        flex-shrink: 0;
+                    }
+                }
+            </style>
+        }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "Name": "Label (bytes)",
+  "EditorAlias": "Umbraco.Label",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Label",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "umbracoDataValueType": "BIGINT",
+    "labelTemplate": "{=value | bytes}"
+  },
+  "Udi": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "16.0.4"
+}

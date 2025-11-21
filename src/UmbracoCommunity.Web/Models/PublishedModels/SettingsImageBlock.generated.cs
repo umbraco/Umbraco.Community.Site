@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Image block</summary>
 	[PublishedModel("settingsImageBlock")]
-	public partial class SettingsImageBlock : PublishedElementModel, ISettingsColour
+	public partial class SettingsImageBlock : PublishedElementModel, ISettingsColour, ISettingsImage
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,5 +56,12 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("backgroundColour")]
 		public virtual string BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
+
+		///<summary>
+		/// Image is circular
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "16.3.4+0d2393d")]
+		[ImplementPropertyType("imageIsCircular")]
+		public virtual bool ImageIsCircular => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsImage.GetImageIsCircular(this, _publishedValueFallback);
 	}
 }
