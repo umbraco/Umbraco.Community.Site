@@ -9,15 +9,15 @@
 
   <ItemGroup>
     <!-- Commented out packages will be enabled when pushing to Cloud (and Deploy.OnPrem removed) -->
-    <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="17.0.0-rc2" /> -->
+    <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="17.0.0-rc3" /> -->
     
-    <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0-rc1" />
-    <PackageReference Include="Umbraco.Cms" Version="17.0.0-rc2" />
-    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.0.0-rc1" />
+    <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0-rc2" />
+    <PackageReference Include="Umbraco.Cms" Version="17.0.0-rc3" />
+    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.0.0-rc2.2" />
     <PackageReference Include="Umbraco.Community.Contentment" Version="6.0.0-alpha010" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" Version="17.0.0-rc1" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" Version="17.0.0-rc1" /> -->
-    <PackageReference Include="Umbraco.Forms" Version="17.0.0-rc1" />
+    <PackageReference Include="Umbraco.Forms" Version="17.0.0-rc3" />
     <PackageReference Include="Umbraco.Forms.Deploy" Version="17.0.0-rc1" />
 	
     <PackageReference Include="Cultiv.Hangfire" Version="4.1.3" />
