@@ -1,0 +1,51 @@
+{
+  "Name": "Columns comparison block",
+  "Alias": "columnsComparisonBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-columns",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "895ed9b6-646f-450b-ab56-5fe5dc8f26e5",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "5d423ef3-6a5f-4f28-8ef5-66496f7adf4d",
+          "Alias": "columnContentItems",
+          "DataType": "umb://data-type/dc000c295d3c46f0ab2161fbbd243d09",
+          "Mandatory": true,
+          "Name": "Column content items"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/dc000c295d3c46f0ab2161fbbd243d09",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

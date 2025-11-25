@@ -1,19 +1,20 @@
 .dc-spacing-block {
-  --spacing-small: 20px;
-  --spacing-medium: 40px;
-  --spacing-large: 60px;
-
   display: block;
+  width: 100%;
 }
 
-.dc-spacing-block.spacing-small {
-  padding: calc(var(--spacing-small)/2) 0;
+.dc-spacing-block.sm {
+  height: var(--unit-xs);
 }
 
-.dc-spacing-block.spacing-medium {
-  padding: calc(var(--spacing-medium)/2) 0;
+.dc-spacing-block.md {
+  height: var(--unit);
 }
 
-.dc-spacing-block.spacing-large {
-  padding: calc(var(--spacing-large)/2) 0;
+.dc-spacing-block.lg {
+  height: var(--unit-md);
+}
+
+.dc-spacing-block.xl {
+  height: var(--unit-xl);
 }

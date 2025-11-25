@@ -57,7 +57,7 @@ img {
 }
 
 /* Title block styles */
-.dc-title-block {
+.dc-title-block, .block-subtitle, .block-title {
     text-align: center;
 }
 
@@ -270,6 +270,7 @@ img {
 /* Quotes block */
 .carousel-items {
     display: flex;
+    overflow: hidden;
 }
 
 .carousel__item {

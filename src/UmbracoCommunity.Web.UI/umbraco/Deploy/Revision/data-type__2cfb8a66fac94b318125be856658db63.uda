@@ -1,0 +1,54 @@
+{
+  "Name": "Spacer size options",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "Small",
+              "value": "sm",
+              "icon": "icon-stop",
+              "description": "0.5 rem"
+            },
+            {
+              "name": "Medium",
+              "value": "md",
+              "icon": "icon-stop",
+              "description": "1 rem"
+            },
+            {
+              "name": "Large",
+              "value": "lg",
+              "icon": "icon-stop",
+              "description": "3 rem"
+            },
+            {
+              "name": "Extra large",
+              "value": "xl",
+              "icon": "icon-stop",
+              "description": "5 rem"
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.DropdownListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "allowEmpty": false,
+          "showDescriptions": true,
+          "showIcons": false
+        }
+      }
+    ]
+  },
+  "Udi": "umb://data-type/2cfb8a66fac94b318125be856658db63",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

@@ -1,0 +1,84 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ColumnsComparisonBlock>>
+
+@if (Model.Content.ColumnContentItems != null && Model.Content.ColumnContentItems.Any())
+{
+    <div class="dc-columns-block">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (Model.Content.Subtitle != null)
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+        <div class="plan-comparison__columns">
+            @foreach (var column in Model.Content.ColumnContentItems)
+            {
+                var typedColumn = column.Content as ColumnComparisonItem;
+                if (typedColumn == null) continue;
+                var typedColumnSettings = column.Settings as SettingsColumnComparisonItem;
+
+                var bgIsDark = typedColumnSettings?.BackgroundColour != null && typedColumnSettings.IsDark();
+                              
+                <style asp-add-nonce="true">
+                    #@typedColumn.IdHash {
+                        --column-colour: @typedColumnSettings?.BackgroundColour?.Color;
+                    }
+                </style>
+                    
+                <div class="plan-column @(bgIsDark ? "bg-dark" : string.Empty)" id="@typedColumn.IdHash">
+                    @if (!string.IsNullOrWhiteSpace(typedColumn.ColumnTag))
+                    {
+                        <span class="plan-comparison__most-popular">@typedColumn.ColumnTag</span>
+                    }
+                    <h2 class="plan-comparison__title">
+                        @typedColumn.Title
+                    </h2>
+                    @if (typedColumn.ShortDescription != null)
+                    {
+                        <div class="plan-comparison__text">@Html.Raw(typedColumn.ShortDescription.ToHtmlString())</div>
+                    }
+                    @if (!string.IsNullOrEmpty(typedColumn.PriceHeadlineFigure))
+                    {
+                        <div class="plan-comparison__price-wrapper">
+                            <div class="plan-comparison__price">
+                                @typedColumn.PriceHeadlineFigure
+                            </div>
+                            @if (!string.IsNullOrEmpty(typedColumn.PriceSubtitle))
+                            {
+                                <div class="plan-comparison__price-subtitle">
+                                    @typedColumn.PriceSubtitle
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (typedColumn.CallToActionLinks != null && typedColumn.CallToActionLinks.Any())
+                    {
+                        foreach (var link in typedColumn.CallToActionLinks)
+                        {
+                            if (link == null) continue;
+                            <div class="plan-column__purchase">
+                                @Html.RenderButtonCTA(link.Url, link.Name, link.Target)
+                            </div>
+                        }
+
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(typedColumn.DescriptionHeader))
+                    {
+                        <div class="plan-column__includes">
+                            <p>@typedColumn.DescriptionHeader</p>
+                            @if (typedColumn.FullDescription != null)
+                            {
+                                @Html.Raw(typedColumn.FullDescription.ToHtmlString())
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

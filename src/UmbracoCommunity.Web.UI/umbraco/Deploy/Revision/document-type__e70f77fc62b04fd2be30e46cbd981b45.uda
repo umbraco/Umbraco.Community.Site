@@ -1,0 +1,105 @@
+{
+  "Name": "Column comparison item",
+  "Alias": "columnComparisonItem",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-blockquote",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "103bb7d2-079c-423c-9de9-00c05915ca79",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "05d323ae-4d18-45db-99f7-614a052c749e",
+          "Alias": "shortDescription",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Short description",
+          "SortOrder": 2
+        },
+        {
+          "Key": "3c50a1ce-2438-4ac3-b557-3f9a33336e8d",
+          "Alias": "fullDescription",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Full description",
+          "SortOrder": 7
+        },
+        {
+          "Key": "8658d20b-e745-4fc0-a0c1-5a1247792db0",
+          "Alias": "priceSubtitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Price subtitle",
+          "SortOrder": 4
+        },
+        {
+          "Key": "8c924cf1-406c-4f2f-80a8-57bdb93f7235",
+          "Alias": "callToActionLinks",
+          "DataType": "umb://data-type/b4e3535a175347e28568602cf8cfee6f",
+          "Name": "Call to action links",
+          "SortOrder": 5
+        },
+        {
+          "Key": "8e66d26e-4a58-4310-b553-0598bd30333b",
+          "Alias": "descriptionHeader",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Description header",
+          "SortOrder": 6
+        },
+        {
+          "Key": "ad885667-31fc-4898-b0fd-cf97916989a4",
+          "Alias": "title",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Mandatory": true,
+          "Name": "Title",
+          "SortOrder": 1
+        },
+        {
+          "Key": "f599ae6a-4959-47f2-b8f4-27fdea1410cc",
+          "Alias": "priceHeadlineFigure",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Name": "Price headline figure",
+          "SortOrder": 3
+        },
+        {
+          "Key": "f825b297-a7b1-4ae8-b033-c1443fd079d6",
+          "Alias": "columnTag",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Name": "Column tag"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/e70f77fc62b04fd2be30e46cbd981b45",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/b4e3535a175347e28568602cf8cfee6f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

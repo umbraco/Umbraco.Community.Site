@@ -1,0 +1,44 @@
+{
+  "Name": "Card spacer block",
+  "Alias": "cardSpacerBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-height",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/7a17ad65a3be445a8cbe4d41380f283d",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "5c46b9b2-de0f-44e1-a3f7-b5591c8c8cb9",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "c8de20a7-cb2d-4c55-9bf1-82967b38d723",
+          "Alias": "size",
+          "DataType": "umb://data-type/2cfb8a66fac94b318125be856658db63",
+          "Mandatory": true,
+          "Name": "Size"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a70a1169cb27436f95c81648180cf2bf",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/2cfb8a66fac94b318125be856658db63",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/7a17ad65a3be445a8cbe4d41380f283d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

@@ -1,0 +1,32 @@
+{
+  "Name": "Column comparison items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "e70f77fc-62b0-4fd2-be30-e46cbd981b45",
+        "settingsElementTypeKey": "100126c6-7cde-4729-8aca-0dc718979051"
+      }
+    ],
+    "validationLimit": {
+      "min": 1
+    }
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/dc000c295d3c46f0ab2161fbbd243d09",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/100126c67cde47298aca0dc718979051"
+    },
+    {
+      "Udi": "umb://document-type/e70f77fc62b04fd2be30e46cbd981b45"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0-rc1"
+}
