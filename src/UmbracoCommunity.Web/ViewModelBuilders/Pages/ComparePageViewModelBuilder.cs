@@ -87,7 +87,6 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     var ver = ParseVersion(v.Version);
                     return ver > lowestVer && ver <= highestVer;
                 })
-                .Where(v => viewModel.IncludePreReleases || !v.Version.Contains('-')) // Filter pre-releases unless explicitly included
                 .Select(v => v.Version)
                 .ToList();
 
@@ -138,6 +137,10 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 {
                     var earliestVersion = prVersionsInRange.First();
                     var versionString = ReleaseLabelHelper.ExtractVersion(earliestVersion.Label);
+
+                    // Skip this PR if the version is not in our allowed list (e.g., filtered out RC versions)
+                    if (!versionsInRange.Contains(versionString))
+                        continue;
 
                     var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
                     var authorLogin = pr.Author?.Login ?? "unknown";
@@ -197,6 +200,10 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 {
                     var earliestVersion = issueVersionsInRange.First();
                     var versionString = ReleaseLabelHelper.ExtractVersion(earliestVersion.Label);
+
+                    // Skip this issue if the version is not in our allowed list (e.g., filtered out RC versions)
+                    if (!versionsInRange.Contains(versionString))
+                        continue;
 
                     var isHqMember = issue.Author != null &&
                                      _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
