@@ -461,6 +461,10 @@ public class GitHubSqlStore
 
         var member = JsonConvert.DeserializeObject<GitHubHqMember>(entity.Data)!;
 
+        // If no periods are defined, treat as always HQ member
+        if (member.Periods == null || !member.Periods.Any())
+            return true;
+
         // Check if the time falls within any of the member's HQ periods
         foreach (var period in member.Periods)
         {
