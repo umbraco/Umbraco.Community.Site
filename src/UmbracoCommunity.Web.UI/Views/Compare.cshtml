@@ -98,6 +98,15 @@
 
     @if (!string.IsNullOrEmpty(Model.LowestVersion) && !string.IsNullOrEmpty(Model.HighestVersion))
     {
+        @if (Model.CombinedContributors != null)
+        {
+            @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ContributorsSection.cshtml", new ContributorsSectionViewModel
+            {
+                ReleaseGroup = Model.CombinedContributors,
+                SelectedRepo = "Umbraco-CMS"
+            })
+        }
+
         @foreach (var versionGroup in Model.VersionGroups)
         {
             <div class="release-group">

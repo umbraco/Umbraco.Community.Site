@@ -266,6 +266,21 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             viewModel.FeatureCount = viewModel.VersionGroups.Sum(vg => vg.Features.Count);
             viewModel.BreakingChangesCount = viewModel.VersionGroups.Sum(vg => vg.BreakingChanges.Count);
             viewModel.IssuesAndTasksCount = viewModel.VersionGroups.Sum(vg => vg.IssuesAndTasks.Count);
+
+            // Create combined contributors view for all releases in the comparison
+            var allPullRequests = viewModel.VersionGroups
+                .SelectMany(vg => vg.Features.Concat(vg.BreakingChanges).Concat(vg.IssuesAndTasks))
+                .ToList();
+
+            if (allPullRequests.Any())
+            {
+                viewModel.CombinedContributors = new ReleaseGroupViewModel
+                {
+                    ReleaseLabel = $"{viewModel.LowestVersion} → {viewModel.HighestVersion}",
+                    RepositoryName = repositoryName,
+                    PullRequests = allPullRequests
+                };
+            }
         }
 
         return viewModel;

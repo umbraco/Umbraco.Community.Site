@@ -24,6 +24,7 @@ public class ComparePageViewModel : PageViewModelBase
     public int FeatureCount { get; set; }
     public int BreakingChangesCount { get; set; }
     public int IssuesAndTasksCount { get; set; }
+    public ReleaseGroupViewModel? CombinedContributors { get; set; }
 }
 
 public class VersionChangesGroup
