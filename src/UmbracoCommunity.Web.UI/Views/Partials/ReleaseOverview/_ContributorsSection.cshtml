@@ -44,7 +44,11 @@
                 <div class="contributors-grid">
                     @foreach (var contributor in communityContributors)
                     {
-                        var contributionsUrl = $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}+label:{Model.ReleaseGroup.ReleaseLabel}";
+                        // In compare view (when ReleaseLabel contains →), don't filter by label as it doesn't exist
+                        var isCompareView = Model.ReleaseGroup.ReleaseLabel.Contains("→");
+                        var contributionsUrl = isCompareView
+                            ? $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}"
+                            : $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}+label:{Model.ReleaseGroup.ReleaseLabel}";
                         <a href="@contributionsUrl" target="_blank" class="contributor-card" title="@contributor.ContributionCount @(contributor.ContributionCount == 1 ? "contribution" : "contributions") by @contributor.Name">
                             @if (!string.IsNullOrEmpty(contributor.AvatarUrl))
                             {
