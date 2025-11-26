@@ -1,3 +1,4 @@
+@using Markdig
 @using UmbracoCommunity.Web.Models.Pages
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ComparePageViewModel>
@@ -134,7 +135,7 @@
                 @if (!string.IsNullOrEmpty(versionGroup.Description))
                 {
                     <div class="release-description">
-                        @Html.Raw(Markdig.Markdown.ToHtml(versionGroup.Description))
+                        @Html.Raw(Markdig.Markdown.ToHtml(versionGroup.Description, new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()))
                     </div>
                 }
 

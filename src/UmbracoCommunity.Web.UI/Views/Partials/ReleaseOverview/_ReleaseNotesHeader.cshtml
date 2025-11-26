@@ -1,3 +1,4 @@
+@using Markdig
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @model ReleaseNotesHeaderViewModel
 
@@ -38,6 +39,6 @@
 @if (Model.ReleaseInfo != null && !string.IsNullOrEmpty(Model.ReleaseInfo.Description))
 {
     <div class="release-description">
-        @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+        @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description, new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()))
     </div>
 }
