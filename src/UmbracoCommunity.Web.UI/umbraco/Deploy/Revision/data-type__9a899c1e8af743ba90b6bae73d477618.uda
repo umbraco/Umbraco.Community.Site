@@ -9,8 +9,7 @@
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
       },
       {
-        "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
-        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
+        "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c"
       },
       {
         "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc"
@@ -42,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0-rc1"
 }

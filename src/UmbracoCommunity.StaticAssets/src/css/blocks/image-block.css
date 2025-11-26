@@ -24,9 +24,11 @@
   overflow: hidden;
   position: relative;
   border-radius: var(--border-radius-xl);
+  height: 100%;
   
   img {
     width: 100%;
+    height: 100%;
   }
 
   .overlay {
@@ -79,4 +81,8 @@
   max-height: var(--dc-image-max-height);
   aspect-ratio: var(--aspect-ratio);
   border-radius: var(--dc-image-border-radius, var(--border-radius-xl));
+}
+
+img.is-circle {
+    clip-path: circle();
 }

@@ -1,0 +1,29 @@
+.dc-speakers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--unit-md) var(--unit-lg);
+    justify-items: center;
+    margin-top: var(--unit-lg);
+}
+
+.dc-speakers-grid__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .dc-image {
+        max-width: 150px;
+    }
+
+    .speaker-name {
+        font-weight: bold;
+        font-size: var(--font-size-large);
+        margin: 1rem 0 0;
+    }
+
+    .speaker-bio {
+        font-size: var(--font-size-sm);
+        margin: 0;
+        text-align: center;
+    }
+}

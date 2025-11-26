@@ -10,12 +10,12 @@
         {
             <style asp-add-nonce="true">
                 # @Model.Content.IdHash {
-                    --block-background-color: @Model.Settings?.BackgroundColour;
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
                 }
             </style>
         }
 
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        @if (!string.IsNullOrWhiteSpace(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>
         }

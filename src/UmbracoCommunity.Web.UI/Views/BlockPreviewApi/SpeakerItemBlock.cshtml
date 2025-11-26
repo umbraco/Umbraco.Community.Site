@@ -1,0 +1,15 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<SpeakerItemBlock>>
+
+@if (Model.Content != null)
+{
+    <div class="speaker">
+        <img src="@Model.Content.SpeakerImage.GetCropUrl()" alt="@Model.Content.SpeakerName" class="dc-image is-circle" loading="lazy" />
+        <div>
+            <p class="speaker-name">@Model.Content.SpeakerName</p>
+            @if (!string.IsNullOrEmpty(Model.Content.SpeakerDescription)) 
+            {
+                <p class="speaker-bio">@Model.Content.SpeakerDescription</p>
+            }
+        </div>
+    </div>
+}

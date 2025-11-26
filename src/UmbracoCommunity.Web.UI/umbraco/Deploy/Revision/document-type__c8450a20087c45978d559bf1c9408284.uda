@@ -13,30 +13,10 @@
   "CompositionContentTypes": [
     "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
   ],
-  "PropertyGroups": [
-    {
-      "Key": "10ac37ca-1c9e-4d38-8a44-6f57e7cd8947",
-      "Name": "Settings",
-      "Alias": "settings",
-      "PropertyTypes": [
-        {
-          "Key": "b106218d-bf51-4c9c-b12f-1f2a08dbea26",
-          "Alias": "displayAsGrid",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "Description": "Where all content items will be the same size e.g. Speakers",
-          "Name": "Display as grid",
-          "SortOrder": 1
-        }
-      ]
-    }
-  ],
+  "PropertyGroups": [],
   "PropertyTypes": [],
   "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284",
   "Dependencies": [
-    {
-      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-      "Ordering": true
-    },
     {
       "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
       "Ordering": true
@@ -47,5 +27,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0-rc1"
 }

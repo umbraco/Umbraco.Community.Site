@@ -104,7 +104,7 @@ table {
   font-style: normal;
   font-weight: 400;
   line-height: 45px; /* 112.5% */
-  margin: 0;
+  margin: 0 0 var(--unit-md);
 }
 
 .block-subtitle {
@@ -114,7 +114,7 @@ table {
   font-style: normal;
   font-weight: 400;
   line-height: 21px; /* 131.25% */
-  padding: 1.25rem 0 0 0;
+  padding: 0;
   margin: 0;
 }
 
@@ -122,6 +122,7 @@ table {
   .block-title {
     font-size: 60px;
     line-height: 65px;
+    margin: 0 0 var(--unit);
   }
 
   .block-subtitle {

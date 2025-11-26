@@ -38,6 +38,11 @@
         ]
       },
       {
+        "contentElementTypeKey": "e6c6b0dc-d60d-480a-b06e-6e81febdac98",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
         "contentElementTypeKey": "c735ca50-0612-4680-9525-c72449af1e75",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -66,7 +71,7 @@
         "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
+        "settingsElementTypeKey": "a7706b68-c3a3-411d-9550-557f83a5d97d",
         "columnSpanOptions": [
           {
             "columnSpan": 6
@@ -78,6 +83,11 @@
       },
       {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
+        "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
         "allowAtRoot": true,
         "allowInAreas": true
       },
@@ -122,7 +132,8 @@
         ],
         "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
       }
-    ]
+    ],
+    "createLabel": "Add new content block"
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
   "Udi": "umb://data-type/240aa2c4592b42f9aa5221c20f4a502e",
@@ -156,10 +167,16 @@
       "Udi": "umb://document-type/76cd95ec67124dc4a211715c9c58be4a"
     },
     {
+      "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d"
+    },
+    {
       "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"
     },
     {
       "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028"
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
     },
     {
       "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
@@ -178,8 +195,11 @@
     },
     {
       "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
+    },
+    {
+      "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0-rc1"
 }

@@ -1,19 +1,23 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<FormBlock>>
+@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@model FormBlockViewModel
 
-@if (Model.Content.Form.HasValue && Model.Content.Form != Guid.Empty)
+@if (Model.FormId != Guid.Empty)
 {
-    <div class="dc-text-block">
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
+    <div class="dc-form-block">
+        @if (!string.IsNullOrEmpty(Model.Title))
         {
-            <h2 class="block-title">@Model.Content.Title</h2>
+            <h2 class="block-title">@Model.Title</h2>
         }
-        @if (Model.Content.Subtitle != null)
+        @if (Model.Subtitle != null)
         {
             <div class="block-subtitle">
-                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+                @Html.Raw(Model.Subtitle?.ToHtmlString())
             </div>
         }
 
-        <umb-forms-render form-id="@Model.Content.Form.Value" />
+        <div class="dc-text-block">
+            <umb-forms-render form-id="@Model.FormId" />
+        </div>
+
     </div>
 }

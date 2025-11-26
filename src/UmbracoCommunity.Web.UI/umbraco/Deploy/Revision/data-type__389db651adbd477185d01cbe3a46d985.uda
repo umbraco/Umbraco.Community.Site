@@ -16,13 +16,20 @@
           },
           {
             "columnSpan": 6
-          },
-          {
-            "columnSpan": 3
           }
         ],
         "editorSize": "",
         "thumbnail": "/wwwroot/App_Plugins/BlockListThumbs/Cards/CardWithImageAndTextBlock.png"
+      },
+      {
+        "contentElementTypeKey": "a70a1169-cb27-436f-95c8-1648180cf2bf",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ]
       }
     ],
     "validationLimit": {
@@ -39,9 +46,12 @@
       "Ordering": true
     },
     {
+      "Udi": "umb://document-type/a70a1169cb27436f95c81648180cf2bf"
+    },
+    {
       "Udi": "umb://document-type/f50886faf7f14c48aff7a85b672b23eb"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0-rc1"
 }

@@ -1,0 +1,31 @@
+{
+  "Name": "[Settings] Column comparison item",
+  "Alias": "settingsColumnComparisonItem",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+  "CompositionContentTypes": [
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/100126c67cde47298aca0dc718979051",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

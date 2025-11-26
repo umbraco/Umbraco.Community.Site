@@ -60,6 +60,19 @@
                     </div>
 
                     break;
+                case ImageBlockWithOverlay.ModelTypeAlias:
+                    var imageOverlayItem = contentItem.Content as ImageBlockWithOverlay;
+                    if (imageOverlayItem?.Image == null) break;
+                    <div class="dc-image-wrapper">
+                        <img src="@imageOverlayItem.Image.GetCropUrl()" alt="@imageOverlayItem.AltText" class="dc-image" loading="lazy" />
+
+                        @if (imageOverlayItem.OverlayText != null)
+                        {
+                            <div class="overlay"></div>
+                            <div class="text">@Html.Raw(imageOverlayItem.OverlayText)</div>
+                        }
+                    </div>
+                    break;
                 case TextBlock.ModelTypeAlias:
                     var textItem = contentItem.Content as TextBlock;
                     <div class="dc-boxes-row__item-content">
@@ -77,7 +90,7 @@
             <style asp-add-nonce="true">
                 @@media (min-width: 1216px) {
                     .dc-boxes-row__items #@(idHash) {
-                        flex-basis: @($"{width - 1}%");
+                        flex-basis: @($"{width - 3}%");
                         flex-grow: 0;
                         flex-shrink: 0;
                     }
@@ -89,7 +102,7 @@
             <style asp-add-nonce="true">
                 @@media (min-width: 768px) {
                     .dc-boxes-row__items #@(idHash) {
-                        flex-basis: @($"{width - 1}%");
+                        flex-basis: @($"{width - 3}%");
                         flex-grow: 0;
                         flex-shrink: 0;
                     }

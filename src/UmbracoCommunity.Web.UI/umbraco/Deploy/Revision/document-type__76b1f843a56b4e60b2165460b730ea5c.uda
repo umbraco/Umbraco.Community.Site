@@ -26,13 +26,6 @@
           "SortOrder": 1
         },
         {
-          "Key": "af0fd158-6d17-404b-a4b2-cd26ebbcb19e",
-          "Alias": "applyOverlay",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "Name": "Apply overlay",
-          "SortOrder": 2
-        },
-        {
           "Key": "f1ae18dc-b136-4e3b-bb6a-cc5379f59555",
           "Alias": "overlayText",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
@@ -64,14 +57,10 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
       "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0-rc1"
 }

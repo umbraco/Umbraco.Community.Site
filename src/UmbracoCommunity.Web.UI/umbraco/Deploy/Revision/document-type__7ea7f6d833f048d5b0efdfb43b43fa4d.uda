@@ -1,0 +1,51 @@
+{
+  "Name": "Speakers block",
+  "Alias": "speakersBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-chat",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "68d6d489-9030-473e-98b5-b72420f0d344",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "8b1f7d63-1a86-4940-9861-d6383509dd53",
+          "Alias": "speakers",
+          "DataType": "umb://data-type/ad814178052141819416058facfd591a",
+          "Mandatory": true,
+          "Name": "Speakers"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/ad814178052141819416058facfd591a",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0-rc1"
+}
