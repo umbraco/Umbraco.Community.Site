@@ -26,6 +26,7 @@
 @import "./multiple-cards.css";
 @import "./quote-block.css";
 @import "./testimonial-logos-block.css";
+@import "./speakers-grid.css";
 
 .dc-block-list {
   display: flex;

@@ -3,12 +3,11 @@
 @{
     bool hasBg = Model.Settings.HasBg();
     bool bgIsDark = hasBg && Model.Settings.IsDark();
-    bool displayAsGrid = Model.Settings?.DisplayAsGrid ?? false;
 }
 
 @if (Model.Content.Cards != null && Model.Content.Cards.Any())
 {
-    var rows = displayAsGrid ? [Model.Content.Cards.ToList()] : Model.Content.Cards.GetRows();
+    var rows = Model.Content.Cards.GetRows();
     <style asp-add-nonce="true">
         #@Model.Content.IdHash {
             --block-background-color: @Model.Settings?.BackgroundColour?.Color;
@@ -32,7 +31,7 @@
             @foreach (var cardGroup in rows)
                 if (cardGroup != null) {
                 {
-                    <div class="dc-boxes-row__items @(displayAsGrid ? "item-grid" : "")">
+                    <div class="dc-boxes-row__items">
                         @foreach (var item in cardGroup)
                         {
                             <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />

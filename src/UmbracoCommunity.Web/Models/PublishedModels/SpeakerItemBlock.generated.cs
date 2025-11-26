@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>[Settings] Cards block</summary>
-	[PublishedModel("settingsCardsBlock")]
-	public partial class SettingsCardsBlock : PublishedElementModel, ISettingsColour
+	/// <summary>Speaker item block</summary>
+	[PublishedModel("speakerItemBlock")]
+	public partial class SpeakerItemBlock : PublishedElementModel
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
-		public new const string ModelTypeAlias = "settingsCardsBlock";
+		public new const string ModelTypeAlias = "speakerItemBlock";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
@@ -34,14 +34,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsCardsBlock, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SpeakerItemBlock, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public SettingsCardsBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public SpeakerItemBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,11 +50,27 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Background colour
+		/// Speaker description: e.g. job title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("backgroundColour")]
-		public virtual global::Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter.PickedColor BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
+		[ImplementPropertyType("speakerDescription")]
+		public virtual string SpeakerDescription => this.Value<string>(_publishedValueFallback, "speakerDescription");
+
+		///<summary>
+		/// Speaker image
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("speakerImage")]
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops SpeakerImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "speakerImage");
+
+		///<summary>
+		/// Speaker name
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0-rc4+2b7efbe")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("speakerName")]
+		public virtual string SpeakerName => this.Value<string>(_publishedValueFallback, "speakerName");
 	}
 }

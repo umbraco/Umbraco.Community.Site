@@ -1,0 +1,33 @@
+{
+  "Name": "Speaker block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 4,
+    "blocks": [
+      {
+        "contentElementTypeKey": "c0409486-2693-4950-bc18-6c661d1389c3",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      }
+    ],
+    "validationLimit": {
+      "min": 1
+    },
+    "useLiveEditing": true,
+    "createLabel": "Add new speaker"
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/ad814178052141819416058facfd591a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/c040948626934950bc186c661d1389c3"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0-rc1"
+}

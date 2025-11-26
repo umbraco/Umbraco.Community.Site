@@ -1,0 +1,33 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<SpeakersBlock>>
+
+@if (Model.Content.Speakers != null && Model.Content.Speakers.Any())
+{
+    <div class="dc-speakers align-center">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (Model.Content.Subtitle != null)
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        <div class="dc-speakers-grid">
+            @foreach (var item in Model.Content.Speakers)
+            {
+                var speaker = item.Content as SpeakerItemBlock;
+                if (speaker == null) continue;
+                <div class="dc-speakers-grid__item">
+                    <img class="dc-image is-circle" src="@speaker.SpeakerImage.GetCropUrl()" alt="@speaker.SpeakerName" loading="lazy" />
+                    <p class="speaker-name">@speaker.SpeakerName</p>
+                    @if (!string.IsNullOrEmpty(speaker.SpeakerDescription))
+                    {
+                        <p class="speaker-bio">@speaker.SpeakerDescription</p>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}

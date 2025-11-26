@@ -87,6 +87,11 @@
         "allowInAreas": true
       },
       {
+        "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
         "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -160,6 +165,9 @@
     },
     {
       "Udi": "umb://document-type/76cd95ec67124dc4a211715c9c58be4a"
+    },
+    {
+      "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d"
     },
     {
       "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"
