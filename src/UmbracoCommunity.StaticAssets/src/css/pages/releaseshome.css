@@ -367,6 +367,10 @@
   padding: var(--releases-spacing);
   background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-dark) 100%);
   color: var(--color-white);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--releases-spacing);
+  align-items: start;
 
   h2 {
     font-size: clamp(1.5rem, 3vw, 2rem);
@@ -399,8 +403,90 @@
     }
   }
 
+  .release-links {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: var(--unit-md);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 280px;
+
+    h3 {
+      font-size: clamp(1rem, 1.5vw, 1.125rem);
+      font-weight: 600;
+      color: var(--color-white);
+      margin: 0 0 var(--unit-sm) 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--unit-xs);
+    }
+
+    li {
+      margin: 0;
+
+      &.has-tooltip {
+        position: relative;
+      }
+    }
+
+    a {
+      color: var(--color-white);
+      text-decoration: none;
+      font-size: clamp(0.9375rem, 1.5vw, 1rem);
+      font-weight: 500;
+      transition: opacity 0.2s ease;
+      display: inline-block;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+
+      &:hover {
+        opacity: 0.8;
+        border-bottom-color: var(--color-white);
+      }
+
+      &.dotted-link {
+        border-bottom-style: dotted;
+      }
+    }
+
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: var(--color-white);
+      border: 1px solid rgba(40, 58, 151, 0.10);
+      border-radius: var(--border-radius);
+      padding: var(--unit-sm);
+      max-width: 280px;
+      min-width: 250px;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: var(--color-dark);
+      box-shadow: var(--base-box-shadow);
+      z-index: 10;
+    }
+
+    .has-tooltip:hover .tooltip-text {
+      display: block;
+    }
+  }
+
   @media (--sm-down) {
     padding: var(--unit-md);
+    grid-template-columns: 1fr;
+    gap: var(--unit-md);
+
+    .release-links {
+      min-width: auto;
+    }
   }
 }
 

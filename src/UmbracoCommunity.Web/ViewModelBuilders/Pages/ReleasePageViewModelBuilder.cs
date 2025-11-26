@@ -48,7 +48,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             // Get repository configuration
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repository, StringComparison.OrdinalIgnoreCase));
-            viewModel.NuGetPackageId = repoConfig?.NuGetPackageId;
+            viewModel.NuGetPackageId = repoConfig?.GetNuGetPackageIds().FirstOrDefault();
 
             // Get PRs and Issues with this specific release label
             var allPrs = _dataStore.GetPullRequestsByLabelPattern(repository, viewModel.ReleaseLabel).ToList();
