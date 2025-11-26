@@ -1,6 +1,5 @@
 .dc-page-banner-block h1, .dc-page-banner-block .banner-content {
   font-weight: 500;
-  max-width: 44%;
   margin: 0;
   line-height: normal;
   z-index: 1;
@@ -15,7 +14,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--unit-lg);
+  padding: var(--unit-md);
   background-size: cover;
   background-position: center center;
   background-image: var(--page-banner-background-image);
@@ -39,4 +38,14 @@
   bottom: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (--ld){
+  .dc-page-banner-block h1, .dc-page-banner-block .banner-content {
+    max-width: 44%;
+  }
+
+  .dc-page-banner-block__container {
+    padding: var(--unit-lg);
+  }
 }

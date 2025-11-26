@@ -514,7 +514,6 @@
   gap: 2rem;
   justify-content: center;
   align-items: baseline;
-  flex-wrap: wrap;
 
   @media (--sm) {
     gap: 1rem;
