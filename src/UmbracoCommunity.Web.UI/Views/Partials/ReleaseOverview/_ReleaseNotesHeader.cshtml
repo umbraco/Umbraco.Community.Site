@@ -1,43 +1,78 @@
+@using Markdig
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @model ReleaseNotesHeaderViewModel
-
+@{
+    var version = Model.ReleaseGroup?.ReleaseLabel?.Replace("release/", "v") ?? "";
+    var isMajorRelease = false;
+    var isVersion9OrHigher = false;
+    if (Model.ReleaseInfo != null && !string.IsNullOrEmpty(Model.ReleaseInfo.Version))
+    {
+        var versionParts = Model.ReleaseInfo.Version.Split('-')[0].Split('.');
+        if (versionParts.Length >= 3)
+        {
+            isMajorRelease = versionParts[1] == "0" && versionParts[2] == "0";
+            int.TryParse(versionParts[0], out var major);
+            isVersion9OrHigher = major >= 9;
+        }
+    }
+}
 <div class="release-notes-header">
     @if (Model.ReleaseInfo != null)
     {
-        <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
-        @if (Model.ReleaseInfo.ReleaseDate.HasValue)
-        {
-            @if (Model.ReleaseInfo.IsReleased)
+        <div class="release-header-content">
+            <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
+            @if (Model.ReleaseInfo.ReleaseDate.HasValue)
             {
-                <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                @if (Model.ReleaseInfo.IsReleased)
+                {
+                    <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                }
+                else
+                {
+                    <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                }
             }
             else
             {
-                <p class="release-date"><strong>Target release date:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
+                <p class="release-date"><strong>Target release date:</strong> To be announced</p>
             }
-        }
-        else
-        {
-            <p class="release-date"><strong>Target release date:</strong> To be announced</p>
-        }
 
-        @if (Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
+            @if (Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
+            {
+                <p class="release-nuget-link">
+                    <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@Model.NuGetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@Model.NuGetPackageId v@(Model.ReleaseInfo.Version)</a>
+                </p>
+            }
+        </div>
+        
+        @if (isVersion9OrHigher && Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
         {
-            <p class="release-nuget-link">
-                <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@Model.NuGetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@Model.NuGetPackageId v@(Model.ReleaseInfo.Version)</a>
-            </p>
+            <div class="release-links">
+                <h3>Install and upgrade guidance</h3>
+                <ul>
+                    <li class="has-tooltip">
+                        <a href="https://psw.codeshare.co.uk/?TemplateName=Umbraco.Templates&TemplateVersion=@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer" class="dotted-link">Quick install instructions</a>
+                        <span class="tooltip-text">This link leads to a site made by members of the Umbraco community, it helps make the installation of Umbraco a lot easier for you.</span>
+                    </li>
+                    <li><a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading" target="_blank" rel="noopener noreferrer">Upgrade guide</a></li>
+                    @if (isMajorRelease)
+                    {
+                        <li><a href="https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading/version-specific" target="_blank" rel="noopener noreferrer">Version-specific upgrade guide</a></li>
+                    }
+                </ul>
+            </div>
         }
     }
     else if (Model.ReleaseGroup != null)
     {
         @* Comparing releases - show release label from the current group *@
-        <h2>Release notes for @Model.SelectedRepo @Model.ReleaseGroup.ReleaseLabel.Replace("release/", "v")</h2>
+        <h2>Release notes for @Model.SelectedRepo @version</h2>
     }
 </div>
 
 @if (Model.ReleaseInfo != null && !string.IsNullOrEmpty(Model.ReleaseInfo.Description))
 {
     <div class="release-description">
-        @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description))
+        @Html.Raw(Markdig.Markdown.ToHtml(Model.ReleaseInfo.Description, new MarkdownPipelineBuilder().UseAdvancedExtensions().Build()))
     </div>
 }
