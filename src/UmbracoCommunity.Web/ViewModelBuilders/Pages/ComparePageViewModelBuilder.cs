@@ -283,7 +283,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             {
                 viewModel.CombinedContributors = new ReleaseGroupViewModel
                 {
-                    ReleaseLabel = $"{viewModel.LowestVersion} → {viewModel.HighestVersion}",
+                    ReleaseLabel = $"after v{viewModel.LowestVersion}, up to (and including) {viewModel.HighestVersion}",
                     RepositoryName = repositoryName,
                     PullRequests = allPullRequests
                 };

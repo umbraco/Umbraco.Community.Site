@@ -6,12 +6,12 @@
     ViewData["PageTitle"] = $"Compare Umbraco releases";
     if(Model.FromVersion != null || Model.ToVersion != null)
     {
-        ViewData["PageTitle"] = $"Comparing v{Model.FromVersion} → v{Model.ToVersion}";
+        ViewData["PageTitle"] = $"Changes after v{Model.FromVersion}, up to (and including) v{Model.ToVersion}";
     }
     
     if(Model.FromVersion != null || Model.ToVersion != null)
     {
-        ViewData["PageDescription"] = $"Comparing change in Umbraco from v{Model.FromVersion} to v{Model.ToVersion}";
+        ViewData["PageDescription"] = $"Comparing change in Umbraco after v{Model.FromVersion}, up to (and including) v{Model.ToVersion}";
     }
 }
 
@@ -21,7 +21,7 @@
     <div class="sticky-version-content">
     <div class="sticky-version-title">
     <span class="sticky-version-label">Comparing:</span>
-    <span>v@(Model.LowestVersion)→ v@(Model.HighestVersion)</span>
+    <span>v@(Model.LowestVersion) → v@(Model.HighestVersion)</span>
             </div>
             <div class="sticky-version-label">
                 <span>@Model.FeatureCount features, @Model.BreakingChangesCount breaking changes, @Model.IssuesAndTasksCount issues & tasks</span>
