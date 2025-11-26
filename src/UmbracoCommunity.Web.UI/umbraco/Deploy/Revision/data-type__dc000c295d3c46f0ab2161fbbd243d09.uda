@@ -6,7 +6,8 @@
     "blocks": [
       {
         "contentElementTypeKey": "e70f77fc-62b0-4fd2-be30-e46cbd981b45",
-        "settingsElementTypeKey": "100126c6-7cde-4729-8aca-0dc718979051"
+        "settingsElementTypeKey": "100126c6-7cde-4729-8aca-0dc718979051",
+        "label": "{=title} ${priceHeadlineFigure.length \u003E 0 ? \u0022(\u0022 \u002B priceHeadlineFigure \u002B \u0022)\u0022 : \u0022\u0022 } "
       }
     ],
     "validationLimit": {
