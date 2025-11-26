@@ -68,6 +68,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--releases-spacing);
+  max-width: 1400px;
+  margin: 0 auto;
+  justify-items: center;
 
   @media (--sm-down) {
     grid-template-columns: 1fr;
@@ -85,6 +88,8 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
+  width: 100%;
+  max-width: 700px;
 
   &:hover {
     transform: translateY(-4px);

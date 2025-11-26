@@ -1,51 +1,54 @@
 @using UmbracoCommunity.Web.Features.ReleaseOverview.Models
 @model ContributorsSectionViewModel
 
-<div class="contributors-summary">
-    <details class="contributors-details" open>
-        <summary>
-            <h2>Contributors</h2>
-        </summary>
-        <p>Of the @Model.ReleaseGroup.TotalCount bug fixes and feature additions in @Model.ReleaseGroup.ReleaseLabel, a total of @Model.ReleaseGroup.CommunityCount of them have been contributed by the community, by @Model.ReleaseGroup.UniqueCommunityContributorsCount unique contributors.</p>
-        @if (Model.ReleaseGroup.FirstTimeContributorsCount > 0)
+@{
+    var communityContributors = Model.ReleaseGroup.PullRequests
+        .Where(pr => !pr.IsHqMember && !pr.IsIssue)
+        .GroupBy(pr => pr.AuthorLogin)
+        .Select(g => new
         {
-            <p>
-                We're welcoming @Model.ReleaseGroup.FirstTimeContributorsCount brand new @(Model.ReleaseGroup.FirstTimeContributorsCount == 1 ? "contributor" : "contributors") who @(Model.ReleaseGroup.FirstTimeContributorsCount == 1 ? "has" : "have") made their first pull request for @Model.ReleaseGroup.RepositoryName. Welcome to the contributor club:
-                @for (int i = 0; i < Model.ReleaseGroup.FirstTimeContributors.Count; i++)
-                {
-                    var contributor = Model.ReleaseGroup.FirstTimeContributors[i];
-                    <a href="https://github.com/umbraco/@Model.ReleaseGroup.RepositoryName/pulls/@contributor.Login" target="_blank">@contributor.Name</a>@(i < Model.ReleaseGroup.FirstTimeContributors.Count - 1 ? ", " : "")
-                }
-                🏆
-            </p>
-        }
+            Login = g.Key,
+            Name = g.First().AuthorName ?? g.First().AuthorLogin,
+            AvatarUrl = g.First().AvatarUrl,
+            AuthorUrl = g.First().AuthorUrl,
+            IsFirstTime = g.First().IsFirstTimeContributor,
+            ContributionCount = g.Count()
+        })
+        .OrderBy(c => c.Name)
+        .ToList();
+}
 
-        @{
-            var communityContributors = Model.ReleaseGroup.PullRequests
-                .Where(pr => !pr.IsHqMember && !pr.IsIssue)
-                .GroupBy(pr => pr.AuthorLogin)
-                .Select(g => new
-                {
-                    Login = g.Key,
-                    Name = g.First().AuthorName ?? g.First().AuthorLogin,
-                    AvatarUrl = g.First().AvatarUrl,
-                    AuthorUrl = g.First().AuthorUrl,
-                    IsFirstTime = g.First().IsFirstTimeContributor,
-                    ContributionCount = g.Count()
-                })
-                .OrderBy(c => c.Name)
-                .ToList();
-        }
+@if (communityContributors.Any())
+{
+    <div class="contributors-summary">
+        <details class="contributors-details" open>
+            <summary>
+                <h2>Contributors</h2>
+            </summary>
+            <p>Of the @Model.ReleaseGroup.TotalCount bug fixes and feature additions in @Model.ReleaseGroup.ReleaseLabel, a total of @Model.ReleaseGroup.CommunityCount of them have been contributed by the community, by @Model.ReleaseGroup.UniqueCommunityContributorsCount unique contributors.</p>
+            @if (Model.ReleaseGroup.FirstTimeContributorsCount > 0)
+            {
+                <p>
+                    We're welcoming @Model.ReleaseGroup.FirstTimeContributorsCount brand new @(Model.ReleaseGroup.FirstTimeContributorsCount == 1 ? "contributor" : "contributors") who @(Model.ReleaseGroup.FirstTimeContributorsCount == 1 ? "has" : "have") made their first pull request for @Model.ReleaseGroup.RepositoryName. Welcome to the contributor club:
+                    @for (int i = 0; i < Model.ReleaseGroup.FirstTimeContributors.Count; i++)
+                    {
+                        var contributor = Model.ReleaseGroup.FirstTimeContributors[i];
+                        <a href="https://github.com/umbraco/@Model.ReleaseGroup.RepositoryName/pulls/@contributor.Login" target="_blank">@contributor.Name</a>@(i < Model.ReleaseGroup.FirstTimeContributors.Count - 1 ? ", " : "")
+                    }
+                    🏆
+                </p>
+            }
 
-        @if (communityContributors.Any())
-        {
-            var firstTimers = 0;
             <div class="contributors-panel">
                 <h3>All community contributors to this release</h3>
                 <div class="contributors-grid">
                     @foreach (var contributor in communityContributors)
                     {
-                        var contributionsUrl = $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}+label:{Model.ReleaseGroup.ReleaseLabel}";
+                        // In compare view (when ReleaseLabel contains →), don't filter by label as it doesn't exist
+                        var isCompareView = Model.ReleaseGroup.ReleaseLabel.Contains("→");
+                        var contributionsUrl = isCompareView
+                            ? $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}"
+                            : $"https://github.com/umbraco/{Model.ReleaseGroup.RepositoryName}/pulls?q=is:pr+author:{contributor.Login}+label:{Model.ReleaseGroup.ReleaseLabel}";
                         <a href="@contributionsUrl" target="_blank" class="contributor-card" title="@contributor.ContributionCount @(contributor.ContributionCount == 1 ? "contribution" : "contributions") by @contributor.Name">
                             @if (!string.IsNullOrEmpty(contributor.AvatarUrl))
                             {
@@ -58,7 +61,6 @@
                             <span class="contributor-name">
                                 @if (contributor.IsFirstTime)
                                 {
-                                    firstTimers++;
                                     <span class="first-time-star">⭐</span>
                                 }
                                 @contributor.Name<br/><span>@contributor.ContributionCount PR@(contributor.ContributionCount == 1 ? "" : "s")</span>
@@ -68,10 +70,10 @@
 
                     }
                 </div>
-                @if (firstTimers > 0){
+                @if (communityContributors.Any(c => c.IsFirstTime)){
                     <p>⭐ = First pull request to @Model.SelectedRepo</p>
                 }
             </div>
-        }
-    </details>
-</div>
+        </details>
+    </div>
+}
