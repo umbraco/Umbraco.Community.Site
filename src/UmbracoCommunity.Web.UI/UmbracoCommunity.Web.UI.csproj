@@ -13,7 +13,7 @@
     
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0-rc4" />
     <PackageReference Include="Umbraco.Cms" Version="17.0.0-rc4" />
-    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.0.0-rc2.2" />
+    <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.0.0-rc3" />
     <PackageReference Include="Umbraco.Community.Contentment" Version="6.0.0-beta003" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" Version="17.0.0-rc3" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" Version="17.0.0-rc3" /> -->
