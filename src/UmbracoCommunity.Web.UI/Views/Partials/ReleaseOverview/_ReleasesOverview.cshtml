@@ -21,14 +21,11 @@
         <div class="current-releases-grid">
             @if (Model.LtsReleases.Any())
             {
-                @foreach (var release in Model.LtsReleases)
+                @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
                 {
-                    @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
-                    {
-                        Release = release,
-                        CardType = "lts"
-                    })
-                }
+                    Release = Model.LtsReleases.First(),
+                    CardType = "lts"
+                })
             }
 
             @if (showLatestRelease)
