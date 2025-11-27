@@ -26,9 +26,9 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.3.0" />
     <PackageReference Include="Schema.NET" Version="13.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="17.0.0-rc4" />
-    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="17.0.0-rc4" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="17.0.0-rc4" />
+    <PackageReference Include="Umbraco.Cms.Core" Version="17.0.0" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="17.0.0" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" Version="17.0.0" />
   </ItemGroup>
 
   <ItemGroup>
