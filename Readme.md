@@ -14,9 +14,9 @@ The file is ignored from source control.
 
 ### Running the Solution Locally
 
-To work on both front-end and back-end, we need two processes running - IIS to serve Umbraco, and Vite's dev server to provide the front end assets.
+We need two processes running - IIS to serve Umbraco, and Vite's dev server to provide the front end assets.
 
-To start the environment, use one of these options:
+So to start the environment:
 
 - cd to `src/UmbracoDotCom.Web.UI`
 - `dotnet run`
