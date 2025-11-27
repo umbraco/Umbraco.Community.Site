@@ -20,7 +20,10 @@
         }
 
         <div class="dc-text-block">
-            <umb-forms-render form-id="@Model.Content.Form.Value" />
+            @{
+                ViewData.TemplateInfo.HtmlFieldPrefix = "";
+            }
+            <umb-forms-render form-id="@Model.Content.Form.Value" theme="default"/>
         </div>
 
     </div>
