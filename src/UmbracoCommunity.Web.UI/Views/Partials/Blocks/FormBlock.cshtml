@@ -1,4 +1,33 @@
-@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<FormBlock, SettingsFormBlock>>
+
+@if (!Model.Content.Form.HasValue)
+{
+    return;
+}
+
+<div class="dc-form-block">
+    
+    <div class="dc-form-block">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (Model.Content.Subtitle != null)
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        <div class="dc-text-block">
+            <umb-forms-render form-id="@Model.Content.Form.Value" />
+        </div>
+
+    </div>
+
+</div>
+
+@* @using UmbracoCommunity.Web.Models.ViewModels.Blocks
 @model FormBlockViewModel
 
 @if (Model.FormId != Guid.Empty)
@@ -20,4 +49,4 @@
         </div>
 
     </div>
-}
+} *@
