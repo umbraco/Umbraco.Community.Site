@@ -5,7 +5,10 @@
 }
 
 <div class="release-card @Model.CardType">
-    <div class="release-card-badge">@(Model.CardType == "lts" ? "Recommended for most users" : "Latest features")</div>
+    @if (Model.ShowBadge)
+    {
+        <div class="release-card-badge">@(Model.CardType == "lts" ? "Recommended for most users" : "Latest features")</div>
+    }
     <h3 class="release-card-title">
         <a href="/release/umbraco/Umbraco-CMS/@Model.Release.DisplayVersion">Umbraco @majorVersion</a>
         @if (Model.CardType == "lts")
