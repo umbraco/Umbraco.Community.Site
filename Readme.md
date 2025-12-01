@@ -18,9 +18,9 @@ We need two processes running - IIS to serve Umbraco, and Vite's dev server to p
 
 So to start the environment:
 
-- cd to `src/UmbracoDotCom.Web.UI`
+- cd to `src/UmbracoCommunity.Web.UI`
 - `dotnet run`
 - open a new console
-- cd to `src/UmbracoDotCom.StaticAssets`
+- cd to `src/UmbracoCommunity.StaticAssets`
 - `npm run dev`
 - `npm ci` (if you get an error due to missing components on the previous command)
