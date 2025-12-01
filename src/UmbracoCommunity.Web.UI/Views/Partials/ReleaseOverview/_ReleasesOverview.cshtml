@@ -16,6 +16,9 @@
     // If the latest release is an LTS, only show LTS releases
     var showLatestRelease = Model.LatestRelease != null && !Model.LatestRelease.IsLts;
 
+    // Only show badges when both LTS and Latest are displayed
+    var showBadges = Model.LtsReleases.Any() && showLatestRelease;
+
     <div class="current-releases-section">
         <h2 class="releases-section-title">Current Umbraco-CMS releases</h2>
         <div class="current-releases-grid">
@@ -24,7 +27,8 @@
                 @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
                 {
                     Release = Model.LtsReleases.First(),
-                    CardType = "lts"
+                    CardType = "lts",
+                    ShowBadge = showBadges
                 })
             }
 
@@ -33,7 +37,8 @@
                 @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
                 {
                     Release = Model.LatestRelease,
-                    CardType = "latest"
+                    CardType = "latest",
+                    ShowBadge = showBadges
                 })
             }
         </div>
