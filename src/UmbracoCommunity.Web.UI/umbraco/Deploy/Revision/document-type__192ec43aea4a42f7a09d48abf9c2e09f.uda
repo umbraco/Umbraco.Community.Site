@@ -13,10 +13,30 @@
   "CompositionContentTypes": [
     "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "276ac0e0-51c1-4967-9abe-3979d271446a",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "59a5f8d1-6659-45ad-944f-752e3d31fd5c",
+          "Alias": "backgroundImage",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Description": "Will override any background colour defined",
+          "Name": "Background image",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/0cd8e3b6edf8493baf3c38f9834528a6",
       "Ordering": true
@@ -27,5 +47,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0"
 }

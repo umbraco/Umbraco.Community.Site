@@ -57,18 +57,26 @@ img {
 }
 
 /* Title block styles */
-.dc-title-block, .block-subtitle, .block-title {
-    text-align: center;
+.dc-headline__container {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    row-gap: 1.5rem;
 }
 
-.block-title {
+.dc-headline__container > span {
     color: #283A97;
-    font-size: 40px;
+    font-size: 16px;
+    letter-spacing: 1.28px;
+    flex: 1;
 }
 
-.block-subtitle {
+.dc-headline__container > h2 {
     color: #283A97;
-    font-size: 20px;
+    font-size: 60px;
+    font-weight: 400;
+    line-height: 70px;
+    flex: 2;
 }
 
 /* Call to action block styling */
@@ -327,7 +335,6 @@ img {
 }
 
 .plan-column {
-/*    width: 30%;*/
     padding: 0 20px;
 }
 
