@@ -1,5 +1,5 @@
 {
-  "Name": "Text block background image picker",
+  "Name": "Block background media picker",
   "EditorAlias": "Umbraco.MediaPicker3",
   "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
   "Configuration": {

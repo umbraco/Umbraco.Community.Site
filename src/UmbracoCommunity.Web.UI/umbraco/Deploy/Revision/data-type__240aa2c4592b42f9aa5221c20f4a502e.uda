@@ -36,7 +36,8 @@
           {
             "columnSpan": 12
           }
-        ]
+        ],
+        "settingsElementTypeKey": "a801c7a3-117e-488b-bf41-05185c16a3ba"
       },
       {
         "contentElementTypeKey": "e6c6b0dc-d60d-480a-b06e-6e81febdac98",
@@ -193,6 +194,9 @@
     },
     {
       "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+    },
+    {
+      "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
     },
     {
       "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"

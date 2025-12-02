@@ -18,6 +18,10 @@ img {
     max-width: 100%;
 }
 
+.align-center {
+    text-align: center;
+}
+
 /* Backoffice specific block styling */
 .dc-image-block,
 .dc-text-block,
@@ -80,8 +84,23 @@ img {
 }
 
 /* Call to action block styling */
-.dc-big-cta-block {
+.dc-big-cta-block.align-center {
     text-align: center;
+}
+
+.dc-big-cta-block.left {
+    text-align: left;
+    position: relative;
+}
+
+.dc-big-cta-block__content.image {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    padding: 20px;
+    width: 100%;
+    color: #ffffff;
 }
 
 .btn {
@@ -122,6 +141,16 @@ img {
 .btn.is-blue:hover {
     color: #283A97;
     background-color: #ffffff;
+}
+
+.btn.is-white {
+    color: #283A97;
+    background-color: #ffffff;
+}
+
+.btn.is-white:hover {
+    color: #ffffff;
+    background-color: #283A97;
 }
 
 .btn.arrow {

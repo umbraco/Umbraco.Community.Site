@@ -1,0 +1,50 @@
+{
+  "Name": "[Settings] Call to action block",
+  "Alias": "settingsCallToActionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "cbd4c411-75df-45b6-a3a1-fad17205389e",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "6f63fc96-96e6-4de4-8c24-93ff457b2609",
+          "Alias": "backgroundImage",
+          "DataType": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
+          "Name": "Background image",
+          "SortOrder": 101
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0"
+}
