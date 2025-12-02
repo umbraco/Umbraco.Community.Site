@@ -19,6 +19,10 @@
     flex-direction: column;
 }
 
+.dc-boxes-row.bg-dark .dc-boxes-row__item {
+    color: var(--color-white);
+}
+
 .dc-boxes-row__item {
     display: flex;
     flex-direction: column;
