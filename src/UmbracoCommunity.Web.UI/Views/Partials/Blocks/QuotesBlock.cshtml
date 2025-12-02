@@ -1,8 +1,8 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<QuotesBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<QuotesBlock, SettingsQuotesBlock>>
 
 @if (Model.Content?.QuoteItems != null && Model.Content.QuoteItems.Any())
 {
-    <dc-carousel class="dc-testimonials-carousel @(Model.Content.QuoteItems.Count == 3 ? "desktop-full-width" : "")">
+    <dc-carousel class="dc-testimonials-carousel @(Model.Content.QuoteItems.Count == 3 ? "desktop-full-width" : "")" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         <div class="carousel__nav">
             <dc-carousel-controls class="controls" count="@Model.Content.QuoteItems.Count"></dc-carousel-controls>
         </div>

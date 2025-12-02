@@ -1,8 +1,8 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TitleBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TitleBlock, SettingsTitleBlock>>
 
 @if (!string.IsNullOrWhiteSpace(Model.Content.Title))
 {
-    <div class="dc-headline__container">
+    <div class="dc-headline__container" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (!string.IsNullOrWhiteSpace(Model.Content.Text))
         {
             <span>@Model.Content.Text</span>

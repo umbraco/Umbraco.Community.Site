@@ -1,8 +1,8 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ColumnsComparisonBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ColumnsComparisonBlock, SettingsColumnComparisonBlock>>
 
 @if (Model.Content.ColumnContentItems != null && Model.Content.ColumnContentItems.Any())
 {
-    <div class="dc-columns-block">
+    <div class="dc-columns-block" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (!string.IsNullOrEmpty(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>

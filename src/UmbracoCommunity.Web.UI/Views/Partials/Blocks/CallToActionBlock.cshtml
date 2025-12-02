@@ -5,7 +5,7 @@
     bool hasImage = Model.Settings?.BackgroundImage != null;
     var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
     
-    <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty)">
+    <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (hasImage)
         {
             <picture>

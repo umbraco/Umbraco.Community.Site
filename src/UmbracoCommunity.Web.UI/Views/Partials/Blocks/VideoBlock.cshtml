@@ -30,7 +30,8 @@
                                          allow="@allows"
                                          name="@Model.Settings?.VideoTitle"
                                          thumbnail="@thumbnailUrl"
-                                         format="@format">
+                                         format="@format"
+                                         id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
                     <iframe slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
                 </dc-video-picker-youtube>
             } else
@@ -43,7 +44,8 @@
                                    name="@Model.Settings?.VideoTitle"
                                    thumbnail="@thumbnailUrl"
                                    format="@format"
-                                   auto-play="@autoplay">
+                                   auto-play="@autoplay"
+                                   id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
                 <video slot="video"
                        controls
                        muted="@(Model.Settings?.Muted ?? false)"

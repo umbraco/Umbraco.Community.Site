@@ -21,7 +21,7 @@
           "Key": "bd75a92b-f72b-4d68-8b16-d199929455f6",
           "Alias": "blockId",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
-          "Description": "A unique id for this block in order to link directly to it. Max 25 chars",
+          "Description": "A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.",
           "Name": "Block id",
           "SortOrder": 100
         }

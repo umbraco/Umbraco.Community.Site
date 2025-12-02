@@ -5,27 +5,23 @@
     return;
 }
 
-<div class="dc-form-block">
-    
-    <div class="dc-form-block">
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
-        {
-            <h2 class="block-title">@Model.Content.Title</h2>
-        }
-        @if (Model.Content.Subtitle != null)
-        {
-            <div class="block-subtitle">
-                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
-            </div>
-        }
-
-        <div class="dc-text-block">
-            @{
-                ViewData.TemplateInfo.HtmlFieldPrefix = "";
-            }
-            <umb-forms-render form-id="@Model.Content.Form.Value" />
+<div class="dc-form-block" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (Model.Content.Subtitle != null)
+    {
+        <div class="block-subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
         </div>
+    }
 
+    <div class="dc-text-block">
+        @{
+            ViewData.TemplateInfo.HtmlFieldPrefix = "";
+        }
+        <umb-forms-render form-id="@Model.Content.Form.Value" />
     </div>
 
 </div>

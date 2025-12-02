@@ -14,7 +14,7 @@
         }
     </style>
 
-    <div class="dc-boxes align-center">
+    <div class="dc-boxes align-center" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (!string.IsNullOrEmpty(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>

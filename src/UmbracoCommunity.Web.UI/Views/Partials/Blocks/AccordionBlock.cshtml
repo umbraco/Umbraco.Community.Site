@@ -1,9 +1,9 @@
 @using UmbracoCommunity.Common.Utilities
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<AccordionBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<AccordionBlock, SettingsAccordionBlock>>
 
 @if (Model.Content?.AccordionItems != null && Model.Content.AccordionItems.Any())
 {
-    <dl class="dc-faqs">
+    <dl class="dc-faqs" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (!string.IsNullOrEmpty(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>
