@@ -381,3 +381,22 @@ img {
 .main-hero__content-left h1 {
     line-height: 2rem;
 }
+
+/* Text block */
+.dc-text-block.has-image {
+    position: relative;
+}
+
+.dc-text-block.has-image img {
+    border-radius: 20px;
+}
+
+.dc-text-block.has-image .dc-text-block__content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    padding: 20px;
+    width: 100%;
+    color: #ffffff;
+}
