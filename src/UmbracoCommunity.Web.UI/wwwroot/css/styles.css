@@ -367,3 +367,17 @@ img {
     font-weight: bold;
     font-size: 18px;
 }
+
+/* Hero banner */
+.main-hero__content-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.main-hero__content-left {
+    padding: 20px;
+}
+
+.main-hero__content-left h1 {
+    line-height: 2rem;
+}

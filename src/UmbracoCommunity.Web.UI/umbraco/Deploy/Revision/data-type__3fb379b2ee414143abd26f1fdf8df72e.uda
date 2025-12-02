@@ -1,0 +1,47 @@
+{
+  "Name": "Hero banner media picker",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "filter": "cc07b313-0843-4aa8-bbda-871c8da728c8",
+    "validationLimit": {
+      "max": 1
+    },
+    "enableLocalFocalPoint": true,
+    "crops": [
+      {
+        "label": "Desktop",
+        "alias": "desktop2x50",
+        "width": 784,
+        "height": 897
+      },
+      {
+        "label": "Desktop (small)",
+        "alias": "desktop50",
+        "width": 392,
+        "height": 448
+      },
+      {
+        "label": "Mobile",
+        "alias": "mobile2x50",
+        "width": 836,
+        "height": 654
+      },
+      {
+        "label": "Mobile (small)",
+        "alias": "mobile50",
+        "width": 418,
+        "height": 327
+      }
+    ]
+  },
+  "Udi": "umb://data-type/3fb379b2ee414143abd26f1fdf8df72e",
+  "Dependencies": [
+    {
+      "Udi": "umb://media-type/cc07b31308434aa8bbda871c8da728c8",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0"
+}

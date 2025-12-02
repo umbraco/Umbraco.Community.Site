@@ -3,7 +3,7 @@
   "Alias": "settingsCallToActionLinkBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
-  "Icon": "icon-plugin",
+  "Icon": "icon-settings",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
@@ -11,7 +11,8 @@
   },
   "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
   "CompositionContentTypes": [
-    "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd"
+    "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd",
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
   ],
   "PropertyGroups": [],
   "PropertyTypes": [],
@@ -24,8 +25,12 @@
     {
       "Udi": "umb://document-type/0a4b5221060e40598bb86e4ed0e866fd",
       "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0"
 }

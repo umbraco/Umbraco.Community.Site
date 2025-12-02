@@ -1,0 +1,88 @@
+{
+  "Name": "Hero banner",
+  "Alias": "heroBanner",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-diamond",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "b5fa321d-458a-4183-801e-711af8277128",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "265f4213-739e-470e-8f53-fe6dfe1ceab4",
+          "Alias": "bodyText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Body text",
+          "SortOrder": 3
+        },
+        {
+          "Key": "b367e5b0-4294-46ae-8099-229f580fbdc5",
+          "Alias": "callToActionLinks",
+          "DataType": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+          "Description": "Max 2 items",
+          "Name": "Call to action links",
+          "SortOrder": 4
+        },
+        {
+          "Key": "e2daf431-63a3-42cf-b0d0-f3ed90ea39a2",
+          "Alias": "image",
+          "DataType": "umb://data-type/3fb379b2ee414143abd26f1fdf8df72e",
+          "Mandatory": true,
+          "Name": "Image",
+          "SortOrder": 2
+        },
+        {
+          "Key": "ec85184a-d259-413c-a5b4-44b97a75d57d",
+          "Alias": "tagline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "Name": "Tagline"
+        },
+        {
+          "Key": "f889b1bd-2c60-497d-939e-baf6bb5126f4",
+          "Alias": "headline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "Description": "Max 40 chars",
+          "Mandatory": true,
+          "Name": "Headline",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/66e0b5573bbb4ddeacea7255772c5cfd",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3fb379b2ee414143abd26f1fdf8df72e",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0"
+}

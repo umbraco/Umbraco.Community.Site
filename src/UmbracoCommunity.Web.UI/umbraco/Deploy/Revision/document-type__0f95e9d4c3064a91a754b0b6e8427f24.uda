@@ -1,6 +1,6 @@
 {
-  "Name": "[Settings] Cards block",
-  "Alias": "settingsCardsBlock",
+  "Name": "[Settings] Column comparison block",
+  "Alias": "settingsColumnComparisonBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings",
@@ -9,25 +9,20 @@
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+  "Parent": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
   "CompositionContentTypes": [
-    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
-    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
   ],
   "PropertyGroups": [],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284",
+  "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24",
   "Dependencies": [
     {
-      "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+      "Udi": "umb://document-type-container/ecbcd002e8104ebfb6f7357565071506",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
       "Ordering": true
     }
   ],

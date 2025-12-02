@@ -1,0 +1,45 @@
+{
+  "Name": "Settings - block Id",
+  "Alias": "settingsBlockId",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-frame color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "6940d483-a1bf-4928-8424-d77e0e97c838",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "bd75a92b-f72b-4d68-8b16-d199929455f6",
+          "Alias": "blockId",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "Description": "A unique id for this block in order to link directly to it. Max 25 chars",
+          "Name": "Block id",
+          "SortOrder": 100
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0"
+}
