@@ -19,11 +19,15 @@
     flex-direction: column;
 }
 
+.dc-boxes-row.bg-dark .dc-boxes-row__item {
+    color: var(--color-white);
+}
+
 .dc-boxes-row__item {
     display: flex;
     flex-direction: column;
     column-gap: 3rem;
-    color: var(--item-font-color);
+    color: var(--color-blue);
     flex: 1 1 0px;
     border-left: none;
     margin: var(--unit-sm) 0;
@@ -91,7 +95,6 @@
 }
 
 .dc-boxes-row a {
-    --dc-link-color: var(--item-font-color);
     text-decoration: none;
 }
 

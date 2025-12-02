@@ -1,0 +1,78 @@
+@using Umbraco.Cms.Core.Models
+@using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBanner>>
+@if (!string.IsNullOrWhiteSpace(Model.Content.Headline) && Model.Content.Image != null)
+{
+    var desktopImageUrl = Model.Content.Image.GetCropUrl("desktop50").AppendWebpFormatter();
+    var desktopImage2xUrl = Model.Content.Image.GetCropUrl("desktop2x50").AppendWebpFormatter();
+    var mobileImageUrl = Model.Content.Image.GetCropUrl("mobile50").AppendWebpFormatter();
+    var mobileImage2xUrl = Model.Content.Image.GetCropUrl("mobile2x50").AppendWebpFormatter();
+
+    await RenderHeroPreloads(mobileImageUrl, mobileImage2xUrl, desktopImageUrl, desktopImage2xUrl);
+
+    <div class="main-hero half-width">
+        <div class="main-hero__content">
+            <div class="main-hero__content-container">
+                <div class="main-hero__content-left">
+                    @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+                    {
+                        <small>@Model.Content.Tagline</small>
+                    }
+                    <h1>@Model.Content.Headline</h1>
+                    @if (Model.Content.BodyText != null)
+                    {
+                        @Html.Raw(Model.Content.BodyText.ToHtmlString())
+                    }
+                    @if (Model.Content.CallToActionLinks?.Any() ?? false)
+                    {
+                        <div class="main-hero__ctas">
+                            @{
+                                RenderCtaButtons(Model.Content.CallToActionLinks.ToList());
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="main-hero__content-right">
+                    @if (Model.Content.Image != null)
+                    {
+                        <picture>
+                            <source media="(min-width:1024px)" srcset="@desktopImage2xUrl">
+                            <source media="(min-width:768px)" srcset="@desktopImageUrl">
+                            <source media="(min-width:420px)" srcset="@mobileImage2xUrl">
+                            <img src="@mobileImageUrl" alt="Umbraco" sizes="100vw" width="392" height="448">
+                        </picture>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {
+
+    void RenderCtaButtons(List<Link> ctaButtons)
+    {
+        var themes = new ButtonLinkTheme[] {
+            ButtonLinkTheme.Blue,
+            ButtonLinkTheme.TransparentBlue
+        };
+
+        for (var i = 0; i < ctaButtons.Count; i++)
+        {
+            var cta = ctaButtons[i];
+
+            @Html.RenderButtonCTA(cta.Url, cta.Name, cta.Target, cta.Name, themes[i])
+        }
+    }
+
+    async Task RenderHeroPreloads(string? mobileImageUrl, string? mobileImage2xUrl, string? desktopImageUrl, string? desktopImage2xUrl)
+    {
+        <link rel="preload"
+              as="image"
+              href="@mobileImageUrl"
+              imagesrcset="@mobileImageUrl 418w, @mobileImage2xUrl 836w, @desktopImageUrl 854w, @desktopImage2xUrl 1708w"
+              imagesizes="100vw"
+              fetchpriority="high" />
+    }
+
+}

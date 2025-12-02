@@ -14,6 +14,24 @@
     color: var(--color-white);
   }
 
+  &.has-image {
+    position: relative;
+
+    img {
+      border-radius: 20px;
+    }
+
+    .dc-text-block__content {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      padding-left: var(--unit-lg);
+      width: 50%;
+      margin: auto;
+    }
+  }
+
   a.btn {
     line-height: var(--unit-md);
   }

@@ -1,10 +1,24 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CallToActionBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CallToActionBlock, SettingsCallToActionBlock>>
 
 @if (Model?.Content?.CallToActionLink != null)
 {
+    bool hasImage = Model.Settings?.BackgroundImage != null;
     var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
-    <div class="dc-big-cta-block">
-        <div class="dc-big-cta-block__content align-center">
+    
+    <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+        @if (hasImage)
+        {
+            <picture>
+                <source media="(min-width:855px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("desktop2x")">
+                <source media="(min-width:768px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("desktop")">
+                <source media="(min-width:389px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("mobile2x")">
+                <img src="@Model.Settings.BackgroundImage.GetCropUrl("mobile")"
+                     alt="@Model.Settings.BackgroundImage.Name"
+                     sizes="100vw"
+                     loading="lazy">
+            </picture>
+        }
+        <div class="dc-big-cta-block__content @(hasImage ? "image align-left" : "align-center")">
             @if (!string.IsNullOrEmpty(Model.Content.Title))
             {
                 <h2 class="block-title">@Model.Content.Title</h2>
@@ -17,7 +31,7 @@
                     </div>
                 }
 
-                <a href="@Model.Content.CallToActionLink.Url" class="btn arrow cta is-blue" target="@Model.Content.CallToActionLink.Target" title="@Model.Content.CallToActionLink.Name">
+                <a href="@Model.Content.CallToActionLink.Url" class="btn arrow cta is-@(hasImage ? "white" : "blue")" target="@Model.Content.CallToActionLink.Target" title="@Model.Content.CallToActionLink.Name">
                     @linkText
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path id="Vector" d="M6.41675 6.41663H15.5834V15.5833" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path id="Vector_2" d="M6.41675 15.5833L15.5834 6.41663" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
                 </a>

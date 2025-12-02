@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Helpers
@@ -67,17 +66,17 @@ namespace UmbracoCommunity.Web.Helpers
                 cropUrl = mediaWithCrops.LocalCrops.GetCropUrl(cropAlias, imageUrlGenerator);
             }
 
-            return CanConvertToWebp(cropUrl, mediaWithCrops, webp) ? AppendWebpFormatter(cropUrl) : cropUrl;
+            return CanConvertToWebp(cropUrl, mediaWithCrops) ? AppendWebpFormatter(cropUrl) : cropUrl;
         }
 
-        private static bool CanConvertToWebp([NotNullWhen(true)] string? cropUrl, MediaWithCrops mediaWithCrops, bool? webp = true) =>
+        public static bool CanConvertToWebp([NotNullWhen(true)] string? cropUrl, MediaWithCrops mediaWithCrops) =>
         cropUrl is not null &&
-        (webp ?? true) &&
         mediaWithCrops.Content is not UmbracoMediaVectorGraphics &&
         s_noWebpConversionTypes.Contains((mediaWithCrops.Content as Image)?.UmbracoExtension) == false;
 
-        private static string AppendWebpFormatter(string cropUrl)
+        public static string? AppendWebpFormatter(this string? cropUrl)
         {
+            if (string.IsNullOrWhiteSpace(cropUrl)) return cropUrl;
             // cropUrl is usually, but not always, relative, UriBuilder requires absolute.
             bool isRelative = cropUrl.StartsWith('/');
             UriBuilder cropUrlBuilder = new(isRelative ? $"http://example.com{cropUrl}" : cropUrl);

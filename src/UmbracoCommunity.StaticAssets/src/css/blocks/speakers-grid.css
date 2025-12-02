@@ -1,9 +1,9 @@
 .dc-speakers-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--unit-md) var(--unit-lg);
     justify-items: center;
     margin-top: var(--unit-lg);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--unit-md);
 }
 
 .dc-speakers-grid__item {
@@ -12,7 +12,9 @@
     align-items: center;
 
     .dc-image {
-        max-width: 150px;
+        width: 150px;
+        object-fit: cover;
+        height: 150px;
     }
 
     .speaker-name {
@@ -25,5 +27,12 @@
         font-size: var(--font-size-sm);
         margin: 0;
         text-align: center;
+    }
+}
+
+@media (--md) {
+    .dc-speakers-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--unit-md) var(--unit-lg);
     }
 }

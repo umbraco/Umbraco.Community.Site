@@ -23,14 +23,15 @@
           "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
           "Mandatory": true,
-          "Name": "Title"
+          "Name": "Title",
+          "SortOrder": 1
         },
         {
           "Key": "d925d71c-7314-4373-bad1-59003af49e54",
           "Alias": "text",
-          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
-          "Name": "Subtitle",
-          "SortOrder": 1
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "Small text to the left-hand side of the title",
+          "Name": "Text"
         }
       ]
     }
@@ -43,14 +44,10 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
       "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0"
 }

@@ -22,7 +22,7 @@ body:not(.mobile) .nav-header .nav-mobile {
 }
 
 .mobile.scroll .nav-header .header {
-    padding: 31px .5rem;
+    padding: 31px 18px;
 }
 
 .mobile.scroll .nav-header .nav {
@@ -278,6 +278,7 @@ body:not(.mobile) .nav-header .nav-mobile {
 
 .mobile.scroll .header .nav .logo-container {
     height: 26px;
+    margin-left: 8px;
     display: flex;
 }
 

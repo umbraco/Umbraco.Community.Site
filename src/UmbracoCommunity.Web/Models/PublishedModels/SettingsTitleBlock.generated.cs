@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Title block</summary>
 	[PublishedModel("settingsTitleBlock")]
-	public partial class SettingsTitleBlock : PublishedElementModel, ISettingsColour
+	public partial class SettingsTitleBlock : PublishedElementModel, ISettingsBlockId
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -50,11 +50,11 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Background colour
+		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("backgroundColour")]
-		public virtual global::Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter.PickedColor BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
+		[ImplementPropertyType("blockId")]
+		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
 	}
 }

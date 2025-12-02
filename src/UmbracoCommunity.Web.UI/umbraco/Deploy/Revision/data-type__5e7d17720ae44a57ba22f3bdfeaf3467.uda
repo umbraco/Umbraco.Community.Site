@@ -1,0 +1,46 @@
+{
+  "Name": "Block background media picker",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "validationLimit": {
+      "max": 1
+    },
+    "filter": "cc07b313-0843-4aa8-bbda-871c8da728c8",
+    "crops": [
+      {
+        "label": "Desktop 2x",
+        "alias": "desktop2x",
+        "width": 1708,
+        "height": 604
+      },
+      {
+        "label": "Desktop",
+        "alias": "desktop",
+        "width": 854,
+        "height": 302
+      },
+      {
+        "label": "Mobile 2x",
+        "alias": "mobile2x",
+        "width": 776,
+        "height": 888
+      },
+      {
+        "label": "Mobile",
+        "alias": "mobile",
+        "width": 388,
+        "height": 444
+      }
+    ]
+  },
+  "Udi": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
+  "Dependencies": [
+    {
+      "Udi": "umb://media-type/cc07b31308434aa8bbda871c8da728c8",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0"
+}

@@ -39,6 +39,14 @@ footer.sticky-footer .footer-bottom {
   padding: 2rem;
 }
 
+footer.sticky-footer .footer-inner {
+  padding-top: 5rem;
+}
+
+footer.sticky-footer .footer-bottom {
+  padding-bottom: 0;
+}
+
 footer.sticky-footer .footer-inner__links {
   padding: 50px 0;
   display: flex;
@@ -312,6 +320,6 @@ body.document-partnerForgotPasswordPage .sticky-footer {
   }
 
   footer.sticky-footer .footer-bottom {
-    padding: 2rem 4.75rem;
+    padding: 2rem 4.75rem 0;
   }
 }

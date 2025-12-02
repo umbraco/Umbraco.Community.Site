@@ -1,6 +1,6 @@
 {
-  "Name": "[Settings] Text block",
-  "Alias": "settingsTextBlock",
+  "Name": "[Settings] Call to action block",
+  "Alias": "settingsCallToActionBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings",
@@ -9,45 +9,39 @@
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/0cd8e3b6edf8493baf3c38f9834528a6",
+  "Parent": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
   "CompositionContentTypes": [
-    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
-    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
   ],
   "PropertyGroups": [
     {
-      "Key": "276ac0e0-51c1-4967-9abe-3979d271446a",
+      "Key": "cbd4c411-75df-45b6-a3a1-fad17205389e",
       "Name": "Settings",
       "Alias": "settings",
       "PropertyTypes": [
         {
-          "Key": "59a5f8d1-6659-45ad-944f-752e3d31fd5c",
+          "Key": "6f63fc96-96e6-4de4-8c24-93ff457b2609",
           "Alias": "backgroundImage",
           "DataType": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
-          "Description": "Will override any background colour defined",
           "Name": "Background image",
-          "SortOrder": 1
+          "SortOrder": 101
         }
       ]
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f",
+  "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba",
   "Dependencies": [
     {
       "Udi": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/0cd8e3b6edf8493baf3c38f9834528a6",
+      "Udi": "umb://document-type-container/8caff1da543c45418b9c6e7bb87f733f",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
       "Ordering": true
     }
   ],

@@ -1,6 +1,6 @@
 {
-  "Name": "[Settings] Title block",
-  "Alias": "settingsTitleBlock",
+  "Name": "[Settings] Speakers block",
+  "Alias": "settingsSpeakersBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings",
@@ -9,23 +9,23 @@
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
+  "Parent": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
   "CompositionContentTypes": [
-    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
   ],
   "PropertyGroups": [],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17",
+  "Udi": "umb://document-type/cc7a54a7a94d41c1bb134dcc6f399d3f",
   "Dependencies": [
     {
-      "Udi": "umb://document-type-container/5c5dd88be6f147bb92607ea73545279d",
+      "Udi": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
       "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0"
 }

@@ -18,17 +18,6 @@
                     var block = row.Blocks.FirstOrDefault();
                     if (block != null)
                     {
-                        @*
-                        if (block.Content is FormBlock form)
-                        {
-                            var formBlockViewModel = new FormBlockViewModel(form);
-                            <partial name="@($"~/Views/Partials/Blocks/FormBlock.cshtml")" model="formBlockViewModel" />
-                        }
-                        else
-                        {
-                            <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
-                        }
-                        *@
                         <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
                     }
                 }

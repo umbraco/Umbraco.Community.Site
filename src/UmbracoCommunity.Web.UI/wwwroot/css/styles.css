@@ -18,6 +18,10 @@ img {
     max-width: 100%;
 }
 
+.align-center {
+    text-align: center;
+}
+
 /* Backoffice specific block styling */
 .dc-image-block,
 .dc-text-block,
@@ -57,23 +61,46 @@ img {
 }
 
 /* Title block styles */
-.dc-title-block, .block-subtitle, .block-title {
-    text-align: center;
+.dc-headline__container {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    row-gap: 1.5rem;
 }
 
-.block-title {
+.dc-headline__container > span {
     color: #283A97;
-    font-size: 40px;
+    font-size: 16px;
+    letter-spacing: 1.28px;
+    flex: 1;
 }
 
-.block-subtitle {
+.dc-headline__container > h2 {
     color: #283A97;
-    font-size: 20px;
+    font-size: 60px;
+    font-weight: 400;
+    line-height: 70px;
+    flex: 2;
 }
 
 /* Call to action block styling */
-.dc-big-cta-block {
+.dc-big-cta-block.align-center {
     text-align: center;
+}
+
+.dc-big-cta-block.left {
+    text-align: left;
+    position: relative;
+}
+
+.dc-big-cta-block__content.image {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    padding: 20px;
+    width: 100%;
+    color: #ffffff;
 }
 
 .btn {
@@ -114,6 +141,16 @@ img {
 .btn.is-blue:hover {
     color: #283A97;
     background-color: #ffffff;
+}
+
+.btn.is-white {
+    color: #283A97;
+    background-color: #ffffff;
+}
+
+.btn.is-white:hover {
+    color: #ffffff;
+    background-color: #283A97;
 }
 
 .btn.arrow {
@@ -327,7 +364,6 @@ img {
 }
 
 .plan-column {
-/*    width: 30%;*/
     padding: 0 20px;
 }
 
@@ -359,4 +395,37 @@ img {
 .speaker-name {
     font-weight: bold;
     font-size: 18px;
+}
+
+/* Hero banner */
+.main-hero__content-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.main-hero__content-left {
+    padding: 20px;
+}
+
+.main-hero__content-left h1 {
+    line-height: 2rem;
+}
+
+/* Text block */
+.dc-text-block.has-image {
+    position: relative;
+}
+
+.dc-text-block.has-image img {
+    border-radius: 20px;
+}
+
+.dc-text-block.has-image .dc-text-block__content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    padding: 20px;
+    width: 100%;
+    color: #ffffff;
 }

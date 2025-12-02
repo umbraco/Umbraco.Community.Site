@@ -16,6 +16,9 @@
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
     @Html.RenderUmbracoFormDependencies(Url)
+    @{
+        await RenderPreloads();
+    }
 </head>
 
 <body class="@GetBodyClasses()">
@@ -40,5 +43,11 @@
     {
         var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
         return string.Join(" ", bodyClasses);
+    }
+
+    async Task RenderPreloads()
+    {
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     }
 }
