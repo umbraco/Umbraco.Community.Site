@@ -29,27 +29,3 @@
     </div>
 
 </div>
-
-@* @using UmbracoCommunity.Web.Models.ViewModels.Blocks
-@model FormBlockViewModel
-
-@if (Model.FormId != Guid.Empty)
-{
-    <div class="dc-form-block">
-        @if (!string.IsNullOrEmpty(Model.Title))
-        {
-            <h2 class="block-title">@Model.Title</h2>
-        }
-        @if (Model.Subtitle != null)
-        {
-            <div class="block-subtitle">
-                @Html.Raw(Model.Subtitle?.ToHtmlString())
-            </div>
-        }
-
-        <div class="dc-text-block">
-            <umb-forms-render form-id="@Model.FormId" />
-        </div>
-
-    </div>
-} *@
