@@ -28,6 +28,7 @@ app.UseUmbraco()
     .WithEndpoints(u =>
     {
         u.UseBackOfficeEndpoints();
+        u.UseApplicationEndpoints();
         u.UseWebsiteEndpoints();
     });
 

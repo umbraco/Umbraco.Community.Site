@@ -18,14 +18,23 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>[Settings] Speakers block</summary>
-	[PublishedModel("settingsSpeakersBlock")]
-	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId
+	// Mixin Content Type with alias "pageConfiguration"
+	/// <summary>Page configuration</summary>
+	public partial interface IPageConfiguration : IPublishedElement
+	{
+		/// <summary>Hide from sitemap</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
+		bool HideFromSitemap { get; }
+	}
+
+	/// <summary>Page configuration</summary>
+	[PublishedModel("pageConfiguration")]
+	public partial class PageConfiguration : PublishedElementModel, IPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		public new const string ModelTypeAlias = "settingsSpeakersBlock";
+		public new const string ModelTypeAlias = "pageConfiguration";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
@@ -34,14 +43,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsSpeakersBlock, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<PageConfiguration, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public SettingsSpeakersBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public PageConfiguration(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,11 +59,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
+		/// Hide from sitemap
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("blockId")]
-		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => GetHideFromSitemap(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Hide from sitemap</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
+		public static bool GetHideFromSitemap(IPageConfiguration that, IPublishedValueFallback publishedValueFallback) => that.Value<bool>(publishedValueFallback, "hideFromSitemap");
 	}
 }
