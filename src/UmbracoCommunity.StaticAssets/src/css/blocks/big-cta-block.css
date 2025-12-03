@@ -71,6 +71,10 @@
   text-align: center;
 }
 
+.dc-big-cta-block__content.align-left .block-title {
+  align-self: flex-start;
+}
+
 .dc-big-cta-block__content .btn {
   margin-top: 1.25rem;
 }

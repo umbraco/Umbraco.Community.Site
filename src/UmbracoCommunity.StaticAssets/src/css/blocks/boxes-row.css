@@ -139,7 +139,7 @@
 
     .dc-boxes-row__item .row-item-image {
         margin-top: 1em;
-        width: 100%
+        width: 50%
     }
 
     .dc-boxes-row__items.item-grid .row-item-image {
@@ -152,7 +152,7 @@
     .dc-boxes-row__items {
         flex-direction: row;
         column-gap: 2rem;
-        justify-content: space-between;
+        justify-content: space-evenly;
     }
 
     .dc-boxes-row__item {
@@ -171,6 +171,7 @@
 
     .dc-boxes-row__item .row-item-image {
         max-width: 100%;
+        width: 100%;
         margin-top: 0;
     }
 
