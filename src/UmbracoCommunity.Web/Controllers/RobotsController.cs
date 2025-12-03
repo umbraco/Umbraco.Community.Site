@@ -17,7 +17,7 @@ public class RobotsController : Controller
 
         builder.AppendLine("User-agent: *");
 
-        if (_webHostEnvironment.IsDevelopment())
+        if (_webHostEnvironment.IsDevelopment() || _webHostEnvironment.IsStaging())
         {
             builder.AppendLine("Disallow: /");
         }
