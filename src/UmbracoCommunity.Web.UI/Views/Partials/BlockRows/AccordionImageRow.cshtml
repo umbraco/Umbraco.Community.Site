@@ -1,0 +1,81 @@
+﻿@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
+
+<div class="dc-faqs-and-image-block @(Model.Blocks.FirstOrDefault()?.Content.ContentType.Alias == ImageBlock.ModelTypeAlias ? "image-left" : "image-right")"
+     id="@Model.IdHash">
+    @foreach (var block in Model.Blocks)
+    {
+        switch (block.Content.ContentType.Alias)
+        {
+            case ImageBlock.ModelTypeAlias:
+                var imageBlock = block.Content as ImageBlock;
+                if (imageBlock != null)
+                {
+                    RenderImageBlock(imageBlock);
+                }
+                break;
+            case AccordionBlock.ModelTypeAlias:
+                var accordionBlock = block.Content as AccordionBlock;
+                if (accordionBlock != null)
+                {
+                    RenderAccordionBlock(accordionBlock);
+                }
+                break;
+        }        
+    }
+</div>
+
+@functions {
+    void RenderImageBlock(ImageBlock? block)
+    {
+        @if (block?.Image != null)
+        {
+            var smallImage = block.Image.GetCropUrl(width: 375, height: 375);
+            var largeImage = block.Image.GetCropUrl(width: 750, height: 750);
+
+            <div class="dc-faqs-and-image-block__image-container">
+                <img srcset="@smallImage 375w, @largeImage 750w" sizes="(max-width: 400px) 375px, 750px"
+                     src="@largeImage" alt="@block.AltText"
+                     loading="lazy" />
+            </div>
+        }
+    }
+
+    void RenderAccordionBlock(AccordionBlock? block)
+    {
+        @if (block != null && block.AccordionItems != null && block.AccordionItems.Any())
+        {
+            <div class="dc-faqs-and-image-block__content-container">
+                <dl class="dc-faqs">
+                    @{
+                        var index = 0;
+                    }
+                    @foreach (var item in block.AccordionItems)
+                    {
+                        var typedItem = item.Content as AccordionItemBlock;
+                        if (typedItem == null) continue;
+                        var checkboxIdentifier = $"faq-and-image-item-{Model.IdHash}-{index}";
+                        <div class="dc-faqs__item">
+                            <input type="checkbox" id="@checkboxIdentifier" class="dc-faqs__checkbox" @(index == 0 ? "checked" : "") />
+                            <label for="@checkboxIdentifier" class="dc-faqs__question">
+                                @typedItem.Title
+                                <span class="dc-faqs__icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27" fill="none">
+                                        <path d="M7.875 7.875L19.125 7.875V19.125" stroke="currentColor" stroke-width="1.5"
+                                              stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="M7.875 19.125L19.125 7.875" stroke="currentColor" stroke-width="1.5"
+                                              stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="dc-faqs__answer">
+                                @Html.Raw(typedItem.Content?.ToHtmlString())
+                            </div>
+                        </div>
+                        index++;
+                    }
+                </dl>
+            </div>
+        }
+    }
+}

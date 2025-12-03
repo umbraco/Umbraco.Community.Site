@@ -129,9 +129,6 @@
         "allowInAreas": true,
         "columnSpanOptions": [
           {
-            "columnSpan": 6
-          },
-          {
             "columnSpan": 12
           }
         ],
