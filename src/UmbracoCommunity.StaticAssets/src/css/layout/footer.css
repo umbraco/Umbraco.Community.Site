@@ -198,6 +198,10 @@ footer.sticky-footer .footer-inner__form .umbraco-forms-form input[type=submit]:
   color: var(--color-white);
 }
 
+footer.sticky-footer .footer-inner__logo svg {
+  width: 187px;
+}
+
 footer.sticky-footer .footer-bottom {
   display: flex;
   justify-content: space-between;
