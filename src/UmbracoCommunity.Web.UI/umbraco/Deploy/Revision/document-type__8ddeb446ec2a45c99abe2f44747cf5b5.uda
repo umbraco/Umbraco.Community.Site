@@ -32,7 +32,7 @@
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
-          "Description": "The header logo that will be featured on initial load",
+          "Description": "The header logo that will be featured on initial load. Note this needs to be a specially prepared SVG to work properly.",
           "Mandatory": true,
           "Name": "Header logo",
           "SortOrder": 1
@@ -73,5 +73,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "16.0.4"
+  "__version": "17.0.0"
 }
