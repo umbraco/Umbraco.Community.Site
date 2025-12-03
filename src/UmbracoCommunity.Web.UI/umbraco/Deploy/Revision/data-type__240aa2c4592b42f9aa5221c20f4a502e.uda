@@ -105,7 +105,7 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "113ff3ac-3289-4cc7-8e95-c22c54651784"
+        "settingsElementTypeKey": "c39783fb-08c3-4a34-88a4-30949d342c17"
       },
       {
         "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
@@ -157,9 +157,6 @@
       "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24"
     },
     {
-      "Udi": "umb://document-type/113ff3ac32894cc78e95c22c54651784"
-    },
-    {
       "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f"
     },
     {
@@ -197,6 +194,9 @@
     },
     {
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
+    },
+    {
+      "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
     },
     {
       "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"
