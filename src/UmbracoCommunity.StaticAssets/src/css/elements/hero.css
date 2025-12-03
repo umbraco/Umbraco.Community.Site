@@ -104,7 +104,7 @@
   display: flex;
   position: relative;
   background-color: var(--color-page-surface);
-  padding: 0 16px 10px;
+  padding: 0;
   max-width: var(--hero-max-width);
   z-index: 1;
 }
@@ -252,16 +252,7 @@
 }
 
 @media (--md) {
-  .main-hero {
-    padding: 0 2rem;
-  }
-
-  .main-hero.half-width {
-    padding: 0 3rem;
-  }
-
   .main-hero.full-width {
-    padding: 1rem 2rem;
     margin-top: calc(-1*var(--navigation-height));
   }
 
