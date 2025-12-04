@@ -23,7 +23,7 @@ public class RobotsController : Controller
         }
         else
         {
-            builder.AppendLine("Sitemap: /sitemap/");
+            builder.AppendLine($"Sitemap: {Request.Scheme}://{Request.Host}/sitemap/");
             builder.AppendLine("Disallow: /App_Plugins/");
             builder.AppendLine("Disallow: /runtimes/");
             builder.AppendLine("Disallow: /wwwroot/");
