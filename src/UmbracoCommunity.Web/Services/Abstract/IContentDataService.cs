@@ -5,5 +5,5 @@ namespace UmbracoCommunity.Web.Abstract.Services;
 
 public interface IContentDataService
 {
-    IReadOnlyList<SitemapElement> GetSiteMap(IPublishedContent homeNode);
+    IReadOnlyList<SitemapElement> GetSitemap(IPublishedContent homeNode);
 }

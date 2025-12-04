@@ -27,27 +27,27 @@ internal class ContentDataService : IContentDataService
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
     }
-    public IReadOnlyList<SitemapElement> GetSiteMap(IPublishedContent homeNode)
+    public IReadOnlyList<SitemapElement> GetSitemap(IPublishedContent homeNode)
     {
-        var siteMapElements = new List<SitemapElement>();
+        var sitemapElements = new List<SitemapElement>();
 
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
         {
-            return siteMapElements.AsReadOnly();
+            return sitemapElements.AsReadOnly();
         }
 
-        siteMapElements.Add(new SitemapElement
+        sitemapElements.Add(new SitemapElement
         {
             Url = new Uri(homeNode.Url(_publishedUrlProvider, mode: UrlMode.Absolute)),
             LastModified = homeNode.UpdateDate
         });
 
-        AddSiteMapItems(siteMapElements, homeNode);
+        AddSitemapItems(sitemapElements, homeNode);
 
-        return siteMapElements.AsReadOnly();
+        return sitemapElements.AsReadOnly();
     }
 
-    private void AddSiteMapItems(List<SitemapElement> siteMapElements, IPublishedContent currentNode)
+    private void AddSitemapItems(List<SitemapElement> siteMapElements, IPublishedContent currentNode)
     {
         var sitemapItemsToAdd = currentNode.Children(c => c.TemplateId.HasValue && c is IPageConfiguration pageConfig && !pageConfig.HideFromSitemap);
         foreach (IPublishedContent node in sitemapItemsToAdd ?? [])
@@ -61,7 +61,7 @@ internal class ContentDataService : IContentDataService
                 });
             }
 
-            AddSiteMapItems(siteMapElements, node);
+            AddSitemapItems(siteMapElements, node);
         }
     }
 }

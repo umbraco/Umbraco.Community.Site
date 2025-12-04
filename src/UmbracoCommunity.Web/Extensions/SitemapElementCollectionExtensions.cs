@@ -4,10 +4,10 @@ using UmbracoCommunity.Web.Models.ServiceModels;
 
 namespace UmbracoCommunity.Web.Extensions;
 
-internal static class SiteMapElementCollectionExtensions
+internal static class SitemapElementCollectionExtensions
 {
     /// <summary>
-    /// Creates and XML document from the provided collection of <see cref="SiteMapElement" />.
+    /// Creates and XML document from the provided collection of <see cref="SitemapElement" />.
     /// </summary>
     /// <remarks>
     /// See https://www.sitemaps.org/protocol.html for format details.

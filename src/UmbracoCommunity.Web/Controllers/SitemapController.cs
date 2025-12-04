@@ -10,8 +10,8 @@ using UmbracoCommunity.Web.Models.ServiceModels;
 namespace UmbracoCommunity.Web.Controllers
 {
     [ResponseCache(Duration = 60)]
-    public class SiteMapController(
-        ILogger<SiteMapController> logger,
+    public class SitemapController(
+        ILogger<SitemapController> logger,
         ICompositeViewEngine compositeViewEngine,
         IUmbracoContextAccessor umbracoContextAccessor,
         IContentDataService contentDataService) : RenderController(logger, compositeViewEngine, umbracoContextAccessor)
@@ -28,7 +28,7 @@ namespace UmbracoCommunity.Web.Controllers
 
             var homeNode = context?.PublishedRequest?.PublishedContent?.Root() ?? null;
 
-            IReadOnlyList<SitemapElement> siteMap = homeNode != null ? _contentDataService.GetSiteMap(homeNode) : [];
+            IReadOnlyList<SitemapElement> siteMap = homeNode != null ? _contentDataService.GetSitemap(homeNode) : [];
 
             return new ContentResult
             {
