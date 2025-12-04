@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -11,19 +10,16 @@ namespace UmbracoCommunity.Web.Services;
 internal class ContentDataService : IContentDataService
 {
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    private readonly IPublishedContentQuery _publishedContentQuery;
+    
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IPublishedValueFallback _publishedValueFallback;
 
     public ContentDataService(
         IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedContentQuery publishedContentQuery,
         IPublishedUrlProvider publishedUrlProvider,
-        IVariationContextAccessor variationContextAccessor,
         IPublishedValueFallback publishedValueFallback)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
-        _publishedContentQuery = publishedContentQuery;
         _publishedUrlProvider = publishedUrlProvider;
         _publishedValueFallback = publishedValueFallback;
     }
@@ -31,7 +27,7 @@ internal class ContentDataService : IContentDataService
     {
         var sitemapElements = new List<SitemapElement>();
 
-        if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out _))
         {
             return sitemapElements.AsReadOnly();
         }
