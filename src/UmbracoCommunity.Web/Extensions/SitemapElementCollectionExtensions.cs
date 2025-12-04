@@ -7,7 +7,7 @@ namespace UmbracoCommunity.Web.Extensions;
 internal static class SitemapElementCollectionExtensions
 {
     /// <summary>
-    /// Creates and XML document from the provided collection of <see cref="SitemapElement" />.
+    /// Creates an XML document from the provided collection of <see cref="SitemapElement" />.
     /// </summary>
     /// <remarks>
     /// See https://www.sitemaps.org/protocol.html for format details.
