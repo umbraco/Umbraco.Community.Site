@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
 
@@ -43,6 +44,8 @@ public abstract class PageViewModelBase
     public string? PrevUrl { get; set; }
 
     public string? CanonicalUrl { get; set; }
+
+    public MediaWithCrops? Favicon { get; set; }
 
     public IReadOnlyCollection<string> SchemaMarkups => _schemaMarkups.AsReadOnly();
 

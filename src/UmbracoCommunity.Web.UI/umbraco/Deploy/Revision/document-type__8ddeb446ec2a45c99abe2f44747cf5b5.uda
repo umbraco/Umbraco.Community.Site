@@ -31,6 +31,14 @@
           "Name": "Site name"
         },
         {
+          "Key": "5ea21ec8-eb5c-480a-9ec3-c7d03ff7016f",
+          "Alias": "favicon",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Description": "Select a square image. A favicon is the tiny icon a website shows in your browser tab, bookmarks, and shortcuts; the site\u0027s miniature logo.",
+          "Name": "Favicon",
+          "SortOrder": 3
+        },
+        {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
@@ -55,6 +63,10 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
       "Ordering": true
     },
     {
