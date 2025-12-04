@@ -308,8 +308,19 @@ body:not(.mobile) .nav-header .nav-mobile {
 
 /* Hero full-width changes */
 
-body.mobile.hero-full-width:not(.scroll) .nav-mobile .logo-link svg path {
-    fill: var(--color-white);
+body.mobile.hero-full-width:not(.scroll) .nav-mobile .logo-link svg path,
+body.mobile.hero-full-width:not(.scroll) .nav-mobile .logo-link .st0,
+body.mobile.hero-full-width:not(.scroll) .nav-mobile .logo-link .st1 {
+    fill: var(--color-white) !important;
+}
+
+/* Mobile logo colors */
+.mobile .logo-container .st0 {
+    fill: #F5C1BC !important;
+}
+
+.mobile .logo-container .st1 {
+    fill: #283A97 !important;
 }
 
 body.mobile.hero-full-width:not(.scroll) .nav-mobile .icon-btn svg:not(.search-icon) path {

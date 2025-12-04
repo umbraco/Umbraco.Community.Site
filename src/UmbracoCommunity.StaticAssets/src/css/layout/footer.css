@@ -28,8 +28,10 @@ footer.sticky-footer .logo-scrolled {
   display: none;
 }
 
-footer.sticky-footer .logo path {
-  fill: var(--color-white);
+footer.sticky-footer .logo path,
+footer .st0,
+footer .st1 {
+  fill: var(--color-white) !important;
 }
 
 footer.sticky-footer .footer-inner,
