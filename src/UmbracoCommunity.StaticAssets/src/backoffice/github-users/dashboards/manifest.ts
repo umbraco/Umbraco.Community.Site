@@ -16,4 +16,21 @@ export const manifests = [
       },
     ],
   },
+  {
+    type: "dashboard",
+    name: "Umbraco Community Contribution Stats Dashboard",
+    alias: "UmbracoCommunity.GitHubUsers.ContributionStatsDashboard",
+    elementName: "contribution-stats-dashboard",
+    js: () => import("./contribution-stats-dashboard.element.js"),
+    meta: {
+      label: "Contributions & Releases",
+      pathname: "contribution-stats",
+    },
+    conditions: [
+      {
+        alias: "Umb.Condition.SectionAlias",
+        match: "Umb.Section.Content",
+      },
+    ],
+  },
 ] as const;
