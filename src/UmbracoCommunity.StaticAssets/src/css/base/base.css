@@ -57,3 +57,17 @@ video {
   color: var(--color-white);
 }
 
+/* Global SVG style tag override - high specificity */
+svg .st0,
+svg .st1,
+svg .st2,
+svg .st3,
+svg .st4,
+svg .st5,
+svg .st6,
+svg .st7,
+svg .st8,
+svg .st9 {
+  fill: inherit;
+}
+
