@@ -33,8 +33,8 @@ public class RobotsController : Controller
 
         builder.AppendLine();
         builder.Append(GetUmbracoTextLogo());
-
-        return Content(builder.ToString());
+        
+        return Content(builder.ToString(), "text/plain");
     }
 
     private static string GetUmbracoTextLogo()
