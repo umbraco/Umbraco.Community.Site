@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Social settings</summary>
 	[PublishedModel("socialSettings")]
-	public partial class SocialSettings : PublishedContentModel
+	public partial class SocialSettings : PublishedContentModel, IPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,5 +56,12 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("siteWideOgImage")]
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops SiteWideOgImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "siteWideOgImage");
+
+		///<summary>
+		/// Hide from sitemap
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.PageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 	}
 }

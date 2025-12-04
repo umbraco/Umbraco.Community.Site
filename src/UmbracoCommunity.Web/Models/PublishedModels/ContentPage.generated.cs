@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Content page</summary>
 	[PublishedModel("contentPage")]
-	public partial class ContentPage : PublishedContentModel, IBannerBlockGeneral, IContentBlocksContentPage, ISeo
+	public partial class ContentPage : PublishedContentModel, IBannerBlockGeneral, IContentBlocksContentPage, IPageConfiguration, ISeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -66,19 +66,19 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlocksContentPage.GetContentBlocks(this, _publishedValueFallback);
 
 		///<summary>
+		/// Hide from sitemap
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.PageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
+
+		///<summary>
 		/// Custom schema: Here you can provide a custom schema for specific page. The schema is used for better indexing in search engines and serving rich search results. No script tags.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("customSchema")]
 		public virtual string CustomSchema => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetCustomSchema(this, _publishedValueFallback);
-
-		///<summary>
-		/// Hide in sitemap: You can hide this page in sitemap by checking this toggle.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		[ImplementPropertyType("hideInSitemap")]
-		public virtual bool HideInSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetHideInSitemap(this, _publishedValueFallback);
 
 		///<summary>
 		/// Meta description: Here you can provide a summary of the page. The summary is read by search engines to determine what the page is all about. Ideally 130-155 character

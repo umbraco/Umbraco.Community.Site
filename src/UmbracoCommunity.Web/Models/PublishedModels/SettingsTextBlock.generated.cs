@@ -58,7 +58,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops BackgroundImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "backgroundImage");
 
 		///<summary>
-		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars
+		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]

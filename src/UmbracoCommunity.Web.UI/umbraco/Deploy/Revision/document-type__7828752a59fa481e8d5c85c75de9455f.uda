@@ -52,14 +52,6 @@
           "SortOrder": 2
         },
         {
-          "Key": "c86ce310-81d3-4d35-811d-528ee057c401",
-          "Alias": "hideInSitemap",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "Description": "You can hide this page in sitemap by checking this toggle.",
-          "Name": "Hide in sitemap",
-          "SortOrder": 5
-        },
-        {
           "Key": "d771933e-5e8c-4dad-b52c-6327e54e1bb8",
           "Alias": "metaTitle",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
@@ -87,10 +79,6 @@
     },
     {
       "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
       "Ordering": true
     },
     {

@@ -1,0 +1,24 @@
+{
+  "Name": "Sitemap",
+  "Alias": "sitemap",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-code-xml",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5dd905b68303403c85ba905f7463e3c4",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.0"
+}

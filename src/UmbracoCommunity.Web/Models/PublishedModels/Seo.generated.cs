@@ -27,10 +27,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		string CustomSchema { get; }
 
-		/// <summary>Hide in sitemap</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		bool HideInSitemap { get; }
-
 		/// <summary>Meta description</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -95,17 +91,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		public static string GetCustomSchema(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "customSchema");
-
-		///<summary>
-		/// Hide in sitemap: You can hide this page in sitemap by checking this toggle.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		[ImplementPropertyType("hideInSitemap")]
-		public virtual bool HideInSitemap => GetHideInSitemap(this, _publishedValueFallback);
-
-		/// <summary>Static getter for Hide in sitemap</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "17.0.0+da502e0")]
-		public static bool GetHideInSitemap(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<bool>(publishedValueFallback, "hideInSitemap");
 
 		///<summary>
 		/// Meta description: Here you can provide a summary of the page. The summary is read by search engines to determine what the page is all about. Ideally 130-155 character

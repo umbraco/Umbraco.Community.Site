@@ -1,7 +1,7 @@
-using System.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Web;
 using Umbraco.Cms.Core.Strings;
 
 namespace UmbracoCommunity.Web.Extensions;
@@ -63,22 +63,32 @@ public static class HtmlHelperExtensions
 
     public static IHtmlContent RenderButtonCTA(
        this IHtmlHelper htmlHelper,
-       string href,
-       string text,
+       string? href,
+       string? text,
        string? target = null,
        string? title = null,
        ButtonLinkTheme theme = ButtonLinkTheme.Blue)
-       => htmlHelper.RenderButtonLinkWithArrow(href, text, "cta", target, title, theme);
+    {
+        if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(text))
+        {
+            return HtmlString.Empty;
+        }
+        return htmlHelper.RenderButtonLinkWithArrow(href, text, "cta", target, title, theme);
+    }
 
     public static IHtmlContent RenderButtonLinkWithArrow(
        this IHtmlHelper htmlHelper,
-       string href,
-       string text,
+       string? href,
+       string? text,
        string? @class = null,
        string? target = null,
        string? title = null,
        ButtonLinkTheme theme = ButtonLinkTheme.Blue)
     {
+        if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(text))
+        {
+            return HtmlString.Empty;
+        }
         var textWithArrow = text + "<svg width=\"22\" height=\"22\" viewBox=\"0 0 22 22\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><g><path id=\"Vector\" d=\"M6.41675 6.41663H15.5834V15.5833\" stroke=\"#283A97\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /><path id=\"Vector_2\" d=\"M6.41675 15.5833L15.5834 6.41663\" stroke=\"#283A97\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" /></g></svg>";
 
         return htmlHelper.RenderButtonLink(href, textWithArrow, $"arrow {@class}", target, title, theme);
@@ -86,13 +96,17 @@ public static class HtmlHelperExtensions
 
     public static IHtmlContent RenderButtonLink(
         this IHtmlHelper htmlHelper,
-        string href,
-        string text,
+        string? href,
+        string? text,
         string? @class = null,
         string? target = null,
         string? title = null,
         ButtonLinkTheme theme = ButtonLinkTheme.Default)
     {
+        if (string.IsNullOrEmpty(href) || string.IsNullOrEmpty(text))
+        {
+            return HtmlString.Empty;
+        }
         Dictionary<string, string> attributes = [];
 
         string themeClass = theme != ButtonLinkTheme.Default ? $"is-{theme.ToString().ToLowerInvariant()}" : "";

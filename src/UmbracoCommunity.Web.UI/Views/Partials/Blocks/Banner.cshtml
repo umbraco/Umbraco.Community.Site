@@ -9,7 +9,7 @@
     {
         <style asp-add-nonce="true">
             #@Model.Content.IdHash {
-                --page-banner-background-image: url("@Model.Content.BackgroundImage?.GetCropUrl()");
+                --page-banner-background-image: url("@Model.Content.BackgroundImage?.GetCropUrl(width: 1426, height: 270)");
             }
          </style>
     }
