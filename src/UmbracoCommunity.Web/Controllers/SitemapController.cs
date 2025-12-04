@@ -26,7 +26,7 @@ namespace UmbracoCommunity.Web.Controllers
                 return Problem("No Umbraco Context");
             }
 
-            var homeNode = context?.PublishedRequest?.PublishedContent?.Root() ?? null;
+            var homeNode = context.PublishedRequest?.PublishedContent?.Root();
 
             IReadOnlyList<SitemapElement> siteMap = homeNode != null ? _contentDataService.GetSitemap(homeNode) : [];
 
