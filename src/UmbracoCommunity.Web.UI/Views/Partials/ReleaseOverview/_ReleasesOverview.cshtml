@@ -13,8 +13,27 @@
 
 @if (Model.LtsReleases.Any() || Model.LatestRelease != null)
 {
-    // If the latest release is an LTS, only show LTS releases
-    var showLatestRelease = Model.LatestRelease != null && !Model.LatestRelease.IsLts;
+    // Helper function to extract major version from version string
+    int GetMajorVersion(string version)
+    {
+        if (string.IsNullOrEmpty(version)) return 0;
+        var parts = version.Split('.');
+        return parts.Length > 0 && int.TryParse(parts[0], out var major) ? major : 0;
+    }
+
+    // Only show latest release if it's not LTS AND has a different major version than LTS
+    var showLatestRelease = false;
+    if (Model.LatestRelease != null && !Model.LatestRelease.IsLts && Model.LtsReleases.Any())
+    {
+        var ltsMajorVersion = GetMajorVersion(Model.LtsReleases.First().Version);
+        var latestMajorVersion = GetMajorVersion(Model.LatestRelease.Version);
+        showLatestRelease = latestMajorVersion != ltsMajorVersion;
+    }
+    else if (Model.LatestRelease != null && !Model.LatestRelease.IsLts && !Model.LtsReleases.Any())
+    {
+        // If there's no LTS release but there is a latest release, show it
+        showLatestRelease = true;
+    }
 
     // Only show badges when both LTS and Latest are displayed
     var showBadges = Model.LtsReleases.Any() && showLatestRelease;
