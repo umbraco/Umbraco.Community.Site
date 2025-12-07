@@ -12,15 +12,15 @@
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" Version="17.0.0" /> -->
     
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0" />
-    <PackageReference Include="Umbraco.Cms" Version="17.0.0" />
+    <PackageReference Include="Umbraco.Cms" Version="17.0.1" />
     <PackageReference Include="Umbraco.Community.BlockPreview" Version="5.0.0" />
-    <PackageReference Include="Umbraco.Community.Contentment" Version="6.0.0" />
+    <PackageReference Include="Umbraco.Community.Contentment" Version="6.0.2" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" Version="17.0.0" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" Version="17.0.0" /> -->
     <PackageReference Include="Umbraco.Forms" Version="17.0.1" />
     <PackageReference Include="Umbraco.Forms.Deploy" Version="17.0.0" />
 	
-    <PackageReference Include="Cultiv.Hangfire" Version="5.0.0" />
+    <PackageReference Include="Cultiv.Hangfire" Version="5.2.0" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageReference Include="Markdig" Version="0.44.0" />
   </ItemGroup>
