@@ -1,6 +1,7 @@
 ﻿@{
 	Layout = null;
 }
+@using Umbraco.Cms.Core.Models
 @using Umbraco.Cms.Web.Common.PublishedModels;
 @using UmbracoCommunity.Web.Models.Pages
 @using Umbraco.Forms.Web
@@ -11,6 +12,9 @@
 <head>
     <partial name="~/Views/Partials/Components/MetaTags.cshtml" />
     <partial name="~/Views/Partials/Components/Robots.cshtml" for="Robots" />
+    @{
+        await RenderFavicon();
+    }
     <link rel="stylesheet" vite-href="index" asp-add-nonce="true" />
     <link rel="stylesheet" vite-href="@Model.ContentTypeAlias" />
     @RenderSection("Links", required: false)
@@ -43,6 +47,20 @@
     {
         var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
         return string.Join(" ", bodyClasses);
+    }
+
+    async Task RenderFavicon()
+    {
+        if (Model.Favicon != null)
+        {
+            var sizes = new[] { 192, 32, 96, 16 };
+            foreach (var size in sizes)
+            {
+                var url = Model.Favicon.GetCropUrl(width: size, height: size, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
+                <link rel="icon" type="image/png" sizes="@(size)x@(size)" href="@url">
+            }
+        }
+        await Task.CompletedTask;
     }
 
     async Task RenderPreloads()

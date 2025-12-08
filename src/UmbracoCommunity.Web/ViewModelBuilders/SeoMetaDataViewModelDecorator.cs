@@ -42,6 +42,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
             var siteSettings = currentPage.GetSiteSettings();
             viewModel.SiteName = siteSettings?.SiteName;
+            viewModel.Favicon = siteSettings?.Favicon;
 
             viewModel.MetaTitle = string.IsNullOrEmpty(contentModel.MetaTitle) ? viewModel.Name : contentModel.MetaTitle;
             viewModel.MetaDescription = contentModel.MetaDescription ?? string.Empty;
