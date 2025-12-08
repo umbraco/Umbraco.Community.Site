@@ -1,6 +1,6 @@
 # Lessons Learned
 
-## Updating Versions
+## Updating Umbraco Versions
 
 As we never sync changes back from Cloud with our set-up (so we can go open source), we have to manually do all version upgrades in our codebase.
 
@@ -8,18 +8,18 @@ When updating the Umbraco (or Deploy) versions, you should:
 
 - Manually check the `.csproj` file - there are commented out packages that might need the version number manually updating too. `Deploy.OnPrem` and `Deploy.Cloud` are always at the same version number.
 
-- Settings > Deploy > use [Export schema to data files] so that .uda files record the version number change - be good to get those changes out the way in a commit where no *actual* schema changes are being done!
+- Settings > Deploy > click [Export schema to data files] so that the .uda files record the version number change. It would be good to get those changes out the way in a commit where no *actual* schema changes are being done!
 
 ## Making Urgent Changes Directly
 
-Sometimes we need to make changes to Staging or Production backoffices directly to fix an urgent issue. This will cause a commit to the associated .uda file in the appropriate Cloud repository. Note this may not get overwritten in future deployments as Cloud uses git merge to import changes: it does not do a complete overwrite. 
+Sometimes we need to make changes to Staging or Production backoffices directly to fix an urgent issue. This will cause a commit to the associated .uda file in the appropriate Cloud repository. Note this *may* not get overwritten in future deployments as Cloud uses git merge to import changes: it does not do a complete overwrite. 
 
-If you have to do manual changes like this, the safest thing would be to create an issue with a screenshot of the change you had to make. This can then either be replicated in the codebase and deployed properly through the pipeline in the next release, or the change reset manually via the backoffice directly if no longer required.
+If you have to do manual changes like this, the safest thing would be to create an issue with a screenshot of the change you had to make. This can then either be replicated in the codebase and deployed properly through the pipeline in the next release, or the change manually reset via the Staging/Production backoffice directly if no longer required.
 
 If there's an open issue about a manual change having been made then it will help someone having restore/deploy issues to understand why they are getting schema mismatch errors!
 
 ## Deleting "Schema" Items
 
-If you delete a document type or data type etc locally, there will be a corresponding commit of the `.uda` file. This should get reflected in the cloud codebases during the merge and so the item deleted in those environments too.
+If you delete a document type or data type etc locally, there will be a corresponding commit of the removal of the `.uda` file. This should get reflected in the cloud codebases during the merge and so the item will be deleted in those environments too.
 
-If you delete something that you later realise you shouldn't have deleted (and this deletion hasn't yet been deployed through the pipeline), then you should recreate the .uda file as it was as the time of deletion and use the [Update Schema from Disk Files] option to recreate it in your local backoffice. If you add it manually to your backoffice it will have a different key from other environments that will cause deployment issues.
+If you delete something that you later realise you shouldn't have deleted (and this deletion hasn't yet been deployed through the pipeline), then you should restore the previously deleted .uda file and use the [Update Schema from Disk Files] option to recreate it in your local backoffice. If you add it manually to your backoffice as a new entity, it will have a different key from other environments that will cause deployment issues.
