@@ -9,6 +9,7 @@ import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
 import { UmbracoCommunityGitHubUsers } from "../api/sdk.gen.js";
 import type { GitHubHqMember } from "../api/types.gen.js";
+import { client } from "../api/client.gen.js";
 
 @customElement("hq-members-dashboard")
 export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
@@ -24,7 +25,11 @@ export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
   @state()
   private _isCreating = false;
 
+  @state()
+  private _isImporting = false;
+
   #notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
+  readonly #API_SECURITY = [{ scheme: 'bearer', type: 'http' }] as const;
 
   constructor() {
     super();
@@ -140,6 +145,91 @@ export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
 
     this.#showNotification("positive", "Member deleted successfully");
     await this.#loadMembers();
+  }
+
+  #onClickImport() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json,.json";
+    input.onchange = (e) => this.#onFileSelected(e);
+    input.click();
+  }
+
+  async #onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if (!file.name.endsWith(".json")) {
+      this.#showNotification("warning", "Invalid file type", "Please select a JSON file");
+      return;
+    }
+
+    this._isImporting = true;
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      // Detect encoding by BOM
+      const encoding =
+        uint8Array[0] === 0xFF && uint8Array[1] === 0xFE ? 'utf-16le' :
+        uint8Array[0] === 0xFE && uint8Array[1] === 0xFF ? 'utf-16be' :
+        'utf-8';
+
+      let text = new TextDecoder(encoding).decode(arrayBuffer);
+
+      // Strip BOM character if present in decoded text
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+      }
+
+      const members = JSON.parse(text.trim()) as GitHubHqMember[];
+
+      // Validate data
+      if (!Array.isArray(members)) {
+        throw new Error("File must contain an array of HQ members");
+      }
+
+      if (members.length === 0) {
+        throw new Error("File contains no members");
+      }
+
+      // Confirm import
+      const confirmMessage = `This will replace all ${this._members.length} existing members with ${members.length} members from the file. Continue?`;
+      if (!confirm(confirmMessage)) {
+        this._isImporting = false;
+        return;
+      }
+
+      // Call import API with authentication
+      const { data: result, error } = await client.post({
+        url: "/umbraco/umbracocommunitygithubusers/api/v1/hqmembers/import",
+        body: members,
+        security: this.#API_SECURITY,
+      });
+
+      if (error) {
+        throw new Error(`Import failed: ${String(error)}`);
+      }
+
+      const importResult = result as any;
+      this.#showNotification(
+        "positive",
+        "Import successful",
+        `Cleared ${importResult?.cleared ?? 0} existing members, imported ${importResult?.imported ?? 0} new members`
+      );
+
+      await this.#loadMembers();
+
+    } catch (error) {
+      console.error("Failed to import members", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.#showNotification("danger", "Import failed", errorMessage);
+    } finally {
+      this._isImporting = false;
+    }
   }
 
   #onUpdateField(field: "login" | "name", value: string) {
@@ -364,10 +454,16 @@ export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
         <h1>GitHub HQ Members Management</h1>
         ${!this._editingMember
           ? html`
-              <uui-button look="primary" @click=${this.#onCreateNew}>
-                <uui-icon name="icon-add"></uui-icon>
-                Create New Member
-              </uui-button>
+              <div class="header-buttons">
+                <uui-button look="secondary" @click=${this.#onClickImport} ?disabled=${this._isImporting}>
+                  <uui-icon name="icon-download-alt"></uui-icon>
+                  ${this._isImporting ? "Importing..." : "Import from JSON"}
+                </uui-button>
+                <uui-button look="primary" @click=${this.#onCreateNew}>
+                  <uui-icon name="icon-add"></uui-icon>
+                  Create New Member
+                </uui-button>
+              </div>
             `
           : null}
       </div>
@@ -393,6 +489,11 @@ export class HqMembersDashboardElement extends UmbElementMixin(LitElement) {
       .dashboard-header h1 {
         margin: 0;
         font-size: var(--uui-type-h3-size);
+      }
+
+      .header-buttons {
+        display: flex;
+        gap: var(--uui-size-space-3);
       }
 
       .edit-form {
