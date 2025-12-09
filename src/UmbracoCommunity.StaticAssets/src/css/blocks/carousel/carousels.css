@@ -1,5 +1,6 @@
 @import "./testimonials-carousel.css";
 @import "./cards-carousel.css";
+@import "./case-study-carousel.css";
 
 dc-carousel {
     display: flex;

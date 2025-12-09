@@ -5,5 +5,6 @@
 @custom-media --md (min-width: 1024px);
 @custom-media --lg (min-width: 1216px);
 @custom-media --xl (min-width: 1408px);
+@custom-media --xxl (min-width: 1672px);
 
 @custom-media --sm-down (max-width:767px);

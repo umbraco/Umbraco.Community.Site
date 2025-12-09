@@ -1,0 +1,14 @@
+.navattic-demo-container {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.navattic-demo-container iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}

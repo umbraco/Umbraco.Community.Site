@@ -36,6 +36,14 @@
   }
 }
 
+.dc-box-slider-item figcaption {
+  margin: calc(var(--unit) / 2) var(--unit) calc(var(--unit) / 2);
+
+  @media (--md) {
+    margin: calc(var(--unit-md) / 2) var(--unit-md) calc(var(--unit-md) / 2);
+  }
+}
+
 .dc-box-slider-item__headline {
   font-size: var(--headline-font-size);
   line-height: var(--headline-line-height);
