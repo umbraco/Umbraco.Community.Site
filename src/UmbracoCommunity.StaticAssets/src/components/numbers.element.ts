@@ -29,7 +29,7 @@ export class NumbersElement extends LitElement {
         if (entry.intersectionRatio > 0.8 && !this.hasAnimated) {
           this.hasAnimated = true;
           this.classList.add(this.#seenClassName);
-          this.#animateNumbers();
+          this.animateNumbers();
           this.animationObserver?.disconnect();
         }
       }),
@@ -41,23 +41,23 @@ export class NumbersElement extends LitElement {
     this.animationObserver.observe(this);
   }
 
-  #animateNumbers = () => {
+  animateNumbers = () => {
     // Get all number elements
     this.numberElements = Array.from(this.querySelectorAll('.dc-numbers__item--number'));
     
     this.numberElements.forEach((element, index) => {
-      const targetNumber = this.#getTargetNumber(element);
-      const postfix = this.#getPostfix(element);
+      const targetNumber = this.getTargetNumber(element);
+      const postfix = this.getPostfix(element);
       
       if (targetNumber !== null) {
         setTimeout(() => {
-          this.#animateNumber(element, targetNumber, postfix);
+          this.animateNumber(element, targetNumber, postfix);
         }, index * this.animationDelay);
       }
     });
   }
 
-  #getTargetNumber = (element: HTMLElement): number | null => {
+  getTargetNumber = (element: HTMLElement): number | null => {
     // Try to get the target number from a data attribute first
     const dataNumber = element.getAttribute('data-target-number');
     if (dataNumber) {
@@ -70,14 +70,14 @@ export class NumbersElement extends LitElement {
     return match ? parseInt(match[1], 10) : null;
   }
 
-  #getPostfix = (element: HTMLElement): string => {
+  getPostfix = (element: HTMLElement): string => {
     // Extract postfix from the element's text content
     const text = element.textContent || '';
-    const match = text.match(/^\d+(.+)$/);
-    return match ? match[1] : '';
+    const match = text.match(/^(\d+)(.*)$/);
+    return match && match[2] ? match[2] : '';
   }
 
-  #animateNumber = (element: HTMLElement, targetNumber: number, postfix: string) => {
+  animateNumber = (element: HTMLElement, targetNumber: number, postfix: string) => {
     const startNumber = 0;
     const startTime = performance.now();
     

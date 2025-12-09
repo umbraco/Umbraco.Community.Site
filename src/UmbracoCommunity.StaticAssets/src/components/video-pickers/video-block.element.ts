@@ -20,8 +20,11 @@ export abstract class DcVideoBlockElement extends LitElement {
     @property()
     thumbnail?: string;
 
+    @property({ attribute: 'auto-play' })
+    autoPlay: boolean = false;
+
     @state()
-    videoPlayed = false;
+    videoPlayed: boolean = false;
 
     abstract playVideo()
 
@@ -51,7 +54,7 @@ export abstract class DcVideoBlockElement extends LitElement {
                 }
             </style>
             <div class="video-picker">
-                ${this.videoPlayed || (!this.thumbnail || this.thumbnail.length === 0)
+                ${(this.videoPlayed || this.autoPlay) || (!this.thumbnail || this.thumbnail.length === 0)
                 ? html`<slot name="video"></slot>`
                 : this.#renderPoster()
             }

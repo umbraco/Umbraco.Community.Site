@@ -24,16 +24,41 @@ export class StepsWrapperElement extends HTMLElement {
   }
 
   toggle = (e) => {
+    if (!e || !e.composedPath) {
+      return;
+    }
+    
     const src = e
       .composedPath()
-      .find((x) => x.classList.contains("dc-step--nav"));
+      .find((x) => x && x.classList && x.classList.contains("dc-step--nav"));
+      
+    if (!src || !src.dataset) {
+      return;
+    }
+    
     const target = src.dataset.target;
+    
+    if (!target) {
+      return;
+    }
 
-    const toggle = (elm, selector) =>
+    const toggle = (elm, selector) => {
+      if (!elm || !elm.classList) {
+        return;
+      }
       elm.classList[selector === target ? "add" : "remove"]("active");
+    };
 
-    this.navElements.forEach((x) => toggle(x, x.dataset.target));
-    this.contentElements.forEach((x) => toggle(x, x.id));
+    this.navElements.forEach((x) => {
+      if (x && x.dataset) {
+        toggle(x, x.dataset.target);
+      }
+    });
+    this.contentElements.forEach((x) => {
+      if (x && x.id) {
+        toggle(x, x.id);
+      }
+    });
   };
 }
 

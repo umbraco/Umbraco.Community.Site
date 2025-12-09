@@ -12,13 +12,19 @@ export class DcCurrencyElement extends LitElement {
   readonly #defaultCurrency = "usd";
 
   protected async firstUpdated(_changedProperties: PropertyValues) {
-    const locale = await window.localeResolver.getLocale();
+    try {
+      const locale = window.localeResolver?.getLocale ? await window.localeResolver.getLocale() : 'us';
 
-    const currency =
-      window.currencyDictionary?.find((x) => x.codes.split(',').map(c => c.trim()).includes(locale))?.currency ??
-      this.#defaultCurrency;
+      const currency =
+        window.currencyDictionary?.find((x) => x.codes.split(',').map(c => c.trim()).includes(locale))?.currency ??
+        this.#defaultCurrency;
 
-    this.price = this.attributes[currency]?.value;
+      this.price = this.attributes[currency]?.value;
+    } catch (error) {
+      console.error('Error resolving currency:', error);
+      this.price = this.attributes[this.#defaultCurrency]?.value;
+    }
+    
     super.firstUpdated(_changedProperties);
   }
 

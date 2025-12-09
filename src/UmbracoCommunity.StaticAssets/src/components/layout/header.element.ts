@@ -79,9 +79,40 @@ export class DcHeaderElement extends HTMLElement {
   }
 
   #menuBtnClickHandler = () => {
-    this.header?.classList.toggle("menu-active");
-    this.header?.classList.remove("search-active");
-    this.#disableScrolling();
+    const header = this.header;
+    if (!header) return;
+
+    const isMenuActive = header.classList.contains("menu-active");
+    
+    if (isMenuActive) {
+      // Menu is currently active, so we're closing it
+      const navMobileBg = header.querySelector(".nav-mobile-bg") as HTMLElement;
+      const navList = header.querySelector(".nav-list") as HTMLElement;
+      
+      // First, fade out the nav-list quickly
+      navList?.classList.add("closing");
+      
+      // After nav-list fades out, hide it and start the nav-mobile-bg animation
+      setTimeout(() => {
+        if (navList) navList.style.display = "none"; // Hide nav-list after fade completes
+        navMobileBg?.classList.add("closing");
+      }, 150); // Start nav-mobile-bg animation when nav-list fade completes
+      
+      // Wait for both animations to complete before removing menu-active class
+      setTimeout(() => {
+        header.classList.remove("menu-active");
+        navMobileBg?.classList.remove("closing");
+        navList?.classList.remove("closing");
+        if (navList) navList.style.display = ""; // Reset display style
+        this.#disableScrolling(); // Re-enable scrolling after menu is fully closed
+      }, 450); // Total time: 150ms (nav-list fade) + 300ms (nav-mobile-bg fly out)
+    } else {
+      // Menu is not active, so we're opening it
+      header.classList.add("menu-active");
+      this.#disableScrolling();
+    }
+    
+    header.classList.remove("search-active");
 
     this.querySelectorAll(".nav-item__dropdown.mobile-active").forEach((n) =>
       n.classList.remove("mobile-active")
@@ -95,6 +126,28 @@ export class DcHeaderElement extends HTMLElement {
 
     if (activeElement.closest(".search-btn")) {
       this.header?.classList.toggle("search-active");
+    } else if (this.header?.classList.contains("menu-active")) {
+      // Close mobile menu with sequential animation when Escape is pressed
+      const navMobileBg = this.header.querySelector(".nav-mobile-bg") as HTMLElement;
+      const navList = this.header.querySelector(".nav-list") as HTMLElement;
+      
+      // First, fade out the nav-list quickly
+      navList?.classList.add("closing");
+      
+      // After nav-list fades out, hide it and start the nav-mobile-bg animation
+      setTimeout(() => {
+        if (navList) navList.style.display = "none"; // Hide nav-list after fade completes
+        navMobileBg?.classList.add("closing");
+      }, 150); // Start nav-mobile-bg animation when nav-list fade completes
+      
+      // Wait for both animations to complete before removing menu-active class
+      setTimeout(() => {
+        this.header?.classList.remove("menu-active");
+        navMobileBg?.classList.remove("closing");
+        navList?.classList.remove("closing");
+        if (navList) navList.style.display = ""; // Reset display style
+        this.#disableScrolling(); // Re-enable scrolling after menu is fully closed
+      }, 450); // Total time: 150ms (nav-list fade) + 300ms (nav-mobile-bg fly out)
     }
   };
 
