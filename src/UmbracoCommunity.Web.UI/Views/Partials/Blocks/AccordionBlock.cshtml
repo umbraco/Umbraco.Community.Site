@@ -8,7 +8,7 @@
         {
             <h2 class="block-title">@Model.Content.Title</h2>
         }
-        @if (Model.Content.Subtitle != null)
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
         {
             <div class="block-subtitle">
                 @Html.Raw(Model.Content.Subtitle?.ToHtmlString())

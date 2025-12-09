@@ -10,8 +10,14 @@
       "noindex, nofollow"
     ]
   },
+  "Parent": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
   "Udi": "umb://data-type/5589914f74c04138aa6b8d628543fa19",
-  "Dependencies": [],
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+      "Ordering": true
+    }
+  ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
   "__version": "17.0.0"
 }

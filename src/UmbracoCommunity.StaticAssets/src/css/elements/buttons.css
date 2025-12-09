@@ -140,3 +140,11 @@
 .btn.cta.is-whitepink:hover svg path {
   stroke: var(--color-blue);
 }
+
+.cta-link {
+  text-align: center;
+
+  @media (--md) {
+    text-align: inherit;
+  }
+}

@@ -3,28 +3,25 @@
 
 @{
     var gridCols = Model.GridColumns ?? 12;
-    var narrowPercentThreshold = 25; // Define narrow width threshold
 }
 
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
-    var widthPercent = (Model.ColumnSpan / (double)gridCols) * 100;
-    var isNarrowWidth = widthPercent <= narrowPercentThreshold;
-    @if (Model.Content.Link != null)
+    if (Model.Content.Link != null)
     {
-        <a id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        <a id="@Model.Content.IdHash" class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
+                await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
             }
         </a>
     }
     else
     {
-        <div id="@Model.Content.IdHash" class="dc-boxes-row__item @(isNarrowWidth ? "narrow-width" : "")">
+        <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
             @{
                 RenderCard(Model.Content.CardContent);
-                await RenderStyle(widthPercent, Model.Content.IdHash, narrowPercentThreshold);
+                await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
             }
         </div>
     }
@@ -64,9 +61,11 @@
                     var imageOverlayItem = contentItem.Content as ImageBlockWithOverlay;
                     if (imageOverlayItem?.Image == null) break;
                     <div class="dc-image-wrapper">
-                        <img src="@imageOverlayItem.Image.GetCropUrl()" alt="@imageOverlayItem.AltText" class="dc-image" loading="lazy" />
+                        <img srcset="@imageOverlayItem.Image.GetCropUrl("mobile") 386w, @imageOverlayItem.Image.GetCropUrl("desktop") 906w"
+                             sizes="(max-width: 400px) 386px, 906px"
+                             src="@imageOverlayItem.Image.GetCropUrl("desktop")" alt="@imageOverlayItem.AltText" class="dc-image" loading="lazy" />
 
-                        @if (imageOverlayItem.OverlayText != null)
+                        @if (!imageOverlayItem.OverlayText.IsEmptyHtmlString())
                         {
                             <div class="overlay"></div>
                             <div class="text">@Html.Raw(imageOverlayItem.OverlayText)</div>
@@ -83,31 +82,18 @@
         }
     }
 
-    async Task RenderStyle(double width, string idHash, int narrowPercentThreshold)
+    async Task RenderStyle(int columnSpan, int totalColumns, string idHash)
     {
-        if (width > narrowPercentThreshold)
-        {
-            <style asp-add-nonce="true">
-                @@media (min-width: 1216px) {
-                    .dc-boxes-row__items #@(idHash) {
-                        flex-basis: @($"{width - 3}%");
-                        flex-grow: 0;
-                        flex-shrink: 0;
-                    }
+        <style asp-add-nonce="true">
+            .dc-boxes-row__items #@(idHash) {
+                grid-column-end: span @totalColumns;
+            }
+
+            @@media (min-width: 1024px) {
+                .dc-boxes-row__items #@(idHash) {
+                    grid-column-end: span @columnSpan;
                 }
-            </style>
-        }
-        else
-        {
-            <style asp-add-nonce="true">
-                @@media (min-width: 768px) {
-                    .dc-boxes-row__items #@(idHash) {
-                        flex-basis: @($"{width - 3}%");
-                        flex-grow: 0;
-                        flex-shrink: 0;
-                    }
-                }
-            </style>
-        }
+            }
+        </style>
     }
 }

@@ -30,12 +30,17 @@
         "label": "Mobile",
         "alias": "mobile",
         "width": 388,
-        "height": 444
+        "height": 600
       }
     ]
   },
+  "Parent": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
   "Udi": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
+      "Ordering": true
+    },
     {
       "Udi": "umb://media-type/cc07b31308434aa8bbda871c8da728c8",
       "Mode": "Exist"

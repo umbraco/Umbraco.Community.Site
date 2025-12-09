@@ -31,19 +31,19 @@
 .dc-block-list {
   display: flex;
   flex-direction: column;
-  gap: var(--unit-lg);
+  gap: var(--unit-md);
   max-width: var(--max-width);
   margin: 0 auto;
 
   &:not(:first-child) {
-    margin-top: var(--unit-xl);
+    margin-top: var(--unit-lg);
   }
 
   @media (--md) {
     gap: var(--unit-xl);
 
-    .dc-block-list {
-      gap: var(--unit-lg);
+    &:not(:first-child) {
+      margin-top: var(--unit-xl);
     }
   }
 
