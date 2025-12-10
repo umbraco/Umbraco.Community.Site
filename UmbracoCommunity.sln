@@ -41,6 +41,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "UmbracoCommunity.StaticAsse
 		SlnRelativePath = "src\UmbracoCommunity.StaticAssets\"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Extensions", "src\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj", "{48671099-9B63-4C81-8F63-B87866526E85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

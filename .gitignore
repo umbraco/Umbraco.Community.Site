@@ -442,4 +442,4 @@ src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
 
 Hangfire.db*
-/src/UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/
+/src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
