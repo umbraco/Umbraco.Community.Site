@@ -85,6 +85,14 @@
   align-self: flex-start;
 }
 
+.dc-big-cta-block__content .content-links {
+  margin-top: var(--unit-md);
+}
+
+.dc-big-cta-block__content .content-links:has(a):has(.block-subtitle) {
+  margin-top: 0;
+}
+
 .dc-big-cta-block__content .btn {
   margin-top: 1.25rem;
 }
