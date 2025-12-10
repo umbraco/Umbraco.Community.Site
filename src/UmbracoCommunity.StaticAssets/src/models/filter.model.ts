@@ -7,4 +7,5 @@ type FilterModel = {
   active?: boolean;
   defaultValue?: string | null;
   value?: string | Array<string>;
+  sortOrder?: Array<string>;
 };

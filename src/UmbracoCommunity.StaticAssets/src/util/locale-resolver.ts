@@ -4,7 +4,7 @@ export default class LocaleResolver {
   #promise?: Promise<string>;
 
   readonly #defaultLocale = "us";
-  readonly #apiPath = "/umbraco/api/currentLocation/getCountryCode";
+  readonly #apiPath = "/api/currentLocation/country-code";
 
   async getLocale() {
     const cookie = Cookie.getCookie("locale");
@@ -34,6 +34,18 @@ export default class LocaleResolver {
   #setLocaleCookie(locale: string) {
     Cookie.setCookie("locale", locale, 90);
     return locale;
+  }
+
+  static getCountryFromHostname(hostname: string): string {
+    // Extract country code from hostname patterns like "us.umbraco.com"
+    const match = hostname.match(/^([a-z]{2})\.umbraco\.com$/i);
+    return match ? match[1].toLowerCase() : "us";
+  }
+
+  static getLocaleFromPath(path: string): string {
+    // Extract locale from path patterns like "/en-us/products"
+    const match = path.match(/^\/([a-z]{2}(?:-[a-z]{2})?)\//i);
+    return match ? match[1].toLowerCase() : "us";
   }
 }
 

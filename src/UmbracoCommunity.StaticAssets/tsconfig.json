@@ -1,4 +1,5 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
     "target": "ESNext",
     "experimentalDecorators": true,
@@ -24,10 +25,11 @@
     "noImplicitAny": false,
 
     "paths": {
-      "@umbraco-community/types": ["types/index.js"], 
-      "@umbraco-community/util": ["src/util/index.js"],
-      "@umbraco-community/svg": ["src/svg/index.js"],
-      "@umbraco-community/services": ["src/services/index.js"],
+      "@umbraco-community/types": ["types/index.ts"],
+      "@umbraco-community/util": ["src/util/index.ts"],
+      "@umbraco-community/util/*": ["src/util/*"],
+      "@umbraco-community/svg": ["src/svg/index.ts"],
+      "@umbraco-community/services": ["src/services/index.ts"],
       "@umbraco-community/css/*": ["src/css/*"],
     }
   },

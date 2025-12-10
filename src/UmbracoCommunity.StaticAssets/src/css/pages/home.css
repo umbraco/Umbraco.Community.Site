@@ -50,11 +50,15 @@
   gap: var(--unit-md);
 
   &:not(:first-child) {
-    margin-top: 0;
+    margin-top: var(--unit-xs);
   }
 
   @media (--md) {
     gap: var(--unit-xl);
+
+    &:not(:first-child) {
+      margin-top: var(--unit-md);
+    }
   }
 }
 

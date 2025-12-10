@@ -140,9 +140,9 @@ const sourceCookie = getCookie(UTM_SOURCE);
 const mediumCookie = getCookie(UTM_MEDIUM);
 const campaignCookie = getCookie(UTM_CAMPAIGN);
 
-export const getUtmSourceValue = () => sourceCookie;
-export const getUtmMediumValue = () => mediumCookie;
-export const getUtmCampaignValue = () => campaignCookie;
+export const getUtmSourceValue = () => getCookie(UTM_SOURCE);
+export const getUtmMediumValue = () => getCookie(UTM_MEDIUM);
+export const getUtmCampaignValue = () => getCookie(UTM_CAMPAIGN);
 
 /**
  * Stores utm values in cookies.
@@ -231,9 +231,9 @@ export const utmTransfer = () => {
         utmRegExp = /(\&|\?)utm_[A-Za-z]+=[A-Za-z0-9]+/gi,
         links = querySelectorAllDeep('a'),
         utms = [
-            `utm_source=${sourceCookie}`,
-            `utm_medium=${mediumCookie}`,
-            `utm_campaign=${campaignCookie}`
+            `utm_source=${getUtmSourceValue()}`,
+            `utm_medium=${getUtmMediumValue()}`,
+            `utm_campaign=${getUtmCampaignValue()}`
         ];
 
     for (var index = 0; index < links.length; index += 1) {
@@ -262,9 +262,9 @@ export const getTransferedUtmParams = (url: String) => {
     ],
         utmRegExp = /(\&|\?)utm_[A-Za-z]+=[A-Za-z0-9]+/gi,
         utms = [
-            `utm_source=${sourceCookie}`,
-            `utm_medium=${mediumCookie}`,
-            `utm_campaign=${campaignCookie}`
+            `utm_source=${getUtmSourceValue()}`,
+            `utm_medium=${getUtmMediumValue()}`,
+            `utm_campaign=${getUtmCampaignValue()}`
         ];
 
     if (!utmInheritingDomains.some(d => url.includes(d))) {

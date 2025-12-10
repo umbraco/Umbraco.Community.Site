@@ -217,10 +217,6 @@ body:not(.mobile) .nav-header .nav-item__dropdown-item>a:hover {
   background-color: var(--color-identity-pink-20opacity);
 }
 
-.nav-header .nav-item__dropdown-item>a img {
-  filter: invert(22%) sepia(20%) saturate(5896%) hue-rotate(212deg) brightness(89%) contrast(91%);
-}
-
 body:not(.mobile) .nav-header .nav-item__dropdown-item>a:hover span>small {
   color: var(--color-light-gray-navigation);
   opacity: 40%;
