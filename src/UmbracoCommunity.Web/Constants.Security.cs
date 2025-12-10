@@ -18,7 +18,7 @@
 
             public static readonly string[] DefaultAllowFrames = ["*.youtube.com"];
 
-            public static readonly string[] DefaultAllowScripts = [];
+            public static readonly string[] DefaultAllowScripts = ["*.youtube.com"];
 
             public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "data:"];
 
