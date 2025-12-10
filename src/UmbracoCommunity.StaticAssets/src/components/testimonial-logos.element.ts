@@ -11,7 +11,7 @@ export class DcTestimonialLogosElement extends LitElement {
   @property()
   count?: number;
 
-  @property({attribute: 'animation-time'})
+  @property({attribute: 'animation-time', type: Number})
   animationTime: number = 10;
 
   @queryAssignedElements({slot: 'items'})

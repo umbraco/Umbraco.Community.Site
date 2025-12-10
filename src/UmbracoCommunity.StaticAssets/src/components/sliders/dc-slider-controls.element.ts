@@ -91,7 +91,7 @@ export class DcSliderControls extends LitElement {
         </button>
       </div>
       <div id="mobileControlDots">
-        ${[...Array(this.count)].map(
+        ${[...Array(Math.max(0, this.count))].map(
           (_, index) =>
             html`<span
               class="dot ${this.currentIndex === index ? "active" : ""}"

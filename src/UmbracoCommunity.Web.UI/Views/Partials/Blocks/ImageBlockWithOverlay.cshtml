@@ -21,10 +21,10 @@
         <div class="dc-image-wrapper">
             <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
 
-            @if (Model.Content.OverlayText != null)
+            @if (!Model.Content.OverlayText.IsEmptyHtmlString())
             {
                 <div class="overlay"></div>
-                <div class="text">@Html.Raw(Model.Content.OverlayText)</div>
+                <div class="text">@Html.Raw(Model.Content.OverlayText?.ToHtmlString())</div>
             }
         </div>
     </div>

@@ -7,7 +7,7 @@
         {
             <h2 class="block-title">@Model.Content.Title</h2>
         }
-        @if (Model.Content.Subtitle != null)
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
         {
             <div class="block-subtitle">
                 @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
@@ -36,9 +36,9 @@
                     <h2 class="plan-comparison__title">
                         @typedColumn.Title
                     </h2>
-                    @if (typedColumn.ShortDescription != null)
+                    @if (!typedColumn.ShortDescription.IsEmptyHtmlString())
                     {
-                        <div class="plan-comparison__text">@Html.Raw(typedColumn.ShortDescription.ToHtmlString())</div>
+                        <div class="plan-comparison__text">@Html.Raw(typedColumn.ShortDescription?.ToHtmlString())</div>
                     }
                     @if (!string.IsNullOrEmpty(typedColumn.PriceHeadlineFigure))
                     {
@@ -71,9 +71,9 @@
                     {
                         <div class="plan-column__includes">
                             <p class="header">@typedColumn.DescriptionHeader</p>
-                            @if (typedColumn.FullDescription != null)
+                            @if (!typedColumn.FullDescription.IsEmptyHtmlString())
                             {
-                                @Html.Raw(typedColumn.FullDescription.ToHtmlString())
+                                @Html.Raw(typedColumn.FullDescription?.ToHtmlString())
                             }
                         </div>
                     }

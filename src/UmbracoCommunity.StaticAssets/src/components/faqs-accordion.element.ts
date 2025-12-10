@@ -22,6 +22,11 @@ export class FAQsAccordion {
   private handleCheckboxChange(event: Event): void {
     const targetCheckbox = event.target as HTMLInputElement;
     
+    // Guard against null/undefined target
+    if (!targetCheckbox) {
+      return;
+    }
+    
     // If the clicked checkbox is being checked, handle sequential animation
     if (targetCheckbox.checked) {
       // Find currently open checkbox (if any)

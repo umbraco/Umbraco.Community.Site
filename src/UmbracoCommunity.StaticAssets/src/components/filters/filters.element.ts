@@ -48,15 +48,15 @@ export class FiltersElement extends LitElement {
 
     // must explicitly query for slotted slots, as the filter element may have other slotted items.
     // eg partner list also slots the map component
-    const slotItems = (
-      slot?.assignedElements()?.find((x) => x.nodeName === "SLOT") as any
-    ).assignedElements();
+    const nestedSlot = slot?.assignedElements()?.find((x) => x.nodeName === "SLOT") as HTMLSlotElement;
+    const slotItems = nestedSlot?.assignedElements() || [];
 
     this._slotItems = this.selector
       ? slotItems
-          .map((s) => Array.from(s.querySelectorAll(this.selector)))
-          .flat()
-      : slotItems;
+          .map((s) => Array.from(s.querySelectorAll(this.selector!)))
+          .flat() as HTMLElement[]
+      : slotItems as HTMLElement[];
+
 
     this.#generator = new FilterGeneratorController(this.filterType);
     this.filters = this.#generator.generate(this._slotItems, this.filters);
@@ -75,7 +75,8 @@ export class FiltersElement extends LitElement {
       FilterGeneratorController.set(n, visible);
     });
 
-    this._hasVisibleItems = this._slotItems.every(x => x.hasAttribute("filter-out")) === false;
+    this._hasVisibleItems = this._slotItems.some(x => !x.hasAttribute("filter-out"));
+
 
     // this may not be necessary - this element manages the display of the filtered
     // items, but the host may have a use for the updated filter values.
@@ -93,6 +94,7 @@ export class FiltersElement extends LitElement {
     noQueryString: boolean = false,
     suppress: boolean = false
   ) {
+
     const isArrayValue = this.#generator?.isArrayValueType(filter) ?? false;
     if (isArrayValue && noQueryString) {
       filterValue = (filterValue as string).split(",");
@@ -168,6 +170,7 @@ export class FiltersElement extends LitElement {
       case "dropdown":
         return html`<dc-checkboxlist-filter
           .filter=${filter}
+          .value=${filter.value}
           @change=${(e: any) =>
             this.#filterChanged(
               filter,
@@ -201,9 +204,8 @@ export class FiltersElement extends LitElement {
           this.#hasFilterValue(),
           () => html` <uui-button
             compact
-            look="outline"
-            color="default"
             id="clear"
+            label="Clear filters"
             @click=${this.#clearFilters}
             >Clear filters</uui-button
           >`
@@ -220,27 +222,28 @@ export class FiltersElement extends LitElement {
   static styles = [
     css`
       #filters {
-        --filter-flex: var(--filter-flex, 1);
-        --clear-flex: var(--clear-flex, 1 1 100%);
         --filter-gap: 15px;
         --uui-select-height: 44px;
         --uui-select-padding-x: 15px;
 
         display: flex;
         align-items: center;
+        justify-content: center;
         flex-wrap: wrap;
         gap: var(--filter-gap);
       }
 
       #filters > * {
-        flex: 100%;
+        //flex: 100%;
         font-size: 15px;
         font-weight: 400;
         color: var(--color-black);
       }
 
       #clear {
-        margin-left: auto;
+        --uui-button-background-color: white;
+        --uui-button-border-radius: 8px;
+        height: 44px;
         cursor: pointer;
       }
 
@@ -256,6 +259,8 @@ export class FiltersElement extends LitElement {
       uui-input {
         --uui-size-11: 44px;
         --uui-size-1: 8px 15px;
+        --uui-border-radius: 8px;
+        --uui-input-border-width: 0;
         width: 240px;
       }
 

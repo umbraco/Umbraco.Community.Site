@@ -15,7 +15,7 @@ export class FilterGeneratorController {
     config.forEach((c) => {
       if (!this.#optionTypes.includes(c.controlType)) return;
 
-      c.options = this.#generateFilterOptions(items, c.alias, c.defaultValue);
+      c.options = this.#generateFilterOptions(items, c.alias, c.defaultValue, c.sortOrder);
       const value = c.options?.filter((o) => o.selected)?.map((o) => o.value);
       c.value = this.#arrayTypes.includes(c.controlType) ? value : value?.at(0);
     });
@@ -99,7 +99,8 @@ export class FilterGeneratorController {
   #generateFilterOptions(
     slotItems: Array<HTMLElement>,
     propName: string,
-    defaultValue?: string | null
+    defaultValue?: string | null,
+    sortOrder?: Array<string>
   ): Array<Option> {
     const result: Array<Option> = defaultValue
       ? [
@@ -111,14 +112,19 @@ export class FilterGeneratorController {
         ]
       : [];
 
-    const values = [...new Set(slotItems.map((n) => {      
-      const p = n.getAttribute(propName);
-      return p?.startsWith('[') ? JSON.parse(p) : p;
-    }).flat())];
+    const values = [
+      ...new Set(
+        slotItems
+          .map((n) => {
+            const p = n.getAttribute(propName);
+            return p?.startsWith("[") ? JSON.parse(p) : p;
+          })
+          .flat()
+      ),
+    ];
 
-    const options: Array<Option> = values
-      .sort()
-      .filter((name) => name)
+    const options: Array<Option> = this.#sortValues(values, sortOrder)
+      .filter((name) => name && name !== "null" && name !== "")
       .map((name) => ({
         name: name!,
         value: FilterGeneratorController.getEncodedUrlParamValue(name!) as any,
@@ -126,6 +132,31 @@ export class FilterGeneratorController {
       }));
 
     return [...result, ...options];
+  }
+
+  #sortValues(values: Array<string | undefined>, sortOrder?: Array<string>) {
+    if (!sortOrder?.length) {
+      return [...values].sort();
+    }
+
+    const order = sortOrder.map((v) => v.toLowerCase());
+
+    return [...values].sort((a, b) => {
+      const aStr = a ?? "";
+      const bStr = b ?? "";
+
+      const aIndex = order.indexOf(aStr.toLowerCase());
+      const bIndex = order.indexOf(bStr.toLowerCase());
+
+      const aInOrder = aIndex !== -1;
+      const bInOrder = bIndex !== -1;
+
+      if (aInOrder && bInOrder) return aIndex - bIndex;
+      if (aInOrder) return -1;
+      if (bInOrder) return 1;
+
+      return aStr.localeCompare(bStr);
+    });
   }
 
   /* when encoding a query, do not replace any chars as this prevents decoding as

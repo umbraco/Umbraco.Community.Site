@@ -8,7 +8,6 @@ import {
 import { PartnerFinderFilter } from "./partner-finder.enum";
 import { grid, mapPin } from "@umbraco-community/svg";
 import { UUIButtonElement } from "@umbraco-ui/uui";
-import { GoogleMapStyles } from "../map/google-map.styles";
 import {
   FilterGeneratorController,
   FilterItemGroupElement,
@@ -18,6 +17,7 @@ import { PartnerElement } from "./partner.element";
 import {
   generatePartnerMarker,
   MapMarkerModel,
+  PartnerMapMarkerModel,
   DcGoogleMapElement,
 } from "../map/index.js";
 import { PartnershipLevels } from "@umbraco-community/util";
@@ -54,6 +54,12 @@ export class PartnerFinderElement extends LitElement {
       label: "Levels",
       defaultValue: "All Levels",
       controlType: "dropdown",
+      sortOrder: [
+        PartnershipLevels.Platinum,
+        PartnershipLevels.Gold,
+        PartnershipLevels.Silver,
+        PartnershipLevels.Registered,
+      ],
     },
   ];
 
@@ -75,8 +81,17 @@ export class PartnerFinderElement extends LitElement {
       ).label === "Map";
   }
 
-  get #styles(): Array<google.maps.MapTypeStyle> {
-    return GoogleMapStyles;
+
+  #isValidCoordinates(coordinates?: string): boolean {
+    if (!coordinates?.length) return false;
+    
+    const coords = coordinates.split(',');
+    if (coords.length !== 2) return false;
+    
+    const lat = parseFloat(coords[0]);
+    const lng = parseFloat(coords[1]);
+    
+    return !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
   }
 
   #updateMarkers() {
@@ -85,20 +100,20 @@ export class PartnerFinderElement extends LitElement {
       .map((x) => x.items ?? [])
       .flat() as Array<PartnerElement>;
 
-    this._markers = [PartnershipLevels.Gold, PartnershipLevels.Platinum]
+    this._markers = [PartnershipLevels.Gold, PartnershipLevels.Platinum, PartnershipLevels.Silver]
       .map((key) =>
         items
           ?.filter(
             (p) =>
               p.level === key &&
-              p.coordinates?.length &&
+              this.#isValidCoordinates(p.coordinates) &&
               FilterGeneratorController.isVisible(p)
           )
           ?.map((p) => generatePartnerMarker(p))
           .flat()
       )
       .flat()
-      .filter((x) => x);
+      .filter((x): x is PartnerMapMarkerModel => x !== null);
   }
 
   #onFilterChange(e?: CustomEvent, filtersElement?: FiltersElement) {
@@ -157,7 +172,6 @@ export class PartnerFinderElement extends LitElement {
         </div>
         <dc-google-map
           style="display: ${this._mapView ? "block" : "none"}"
-          .styles=${this.#styles}
           .markers=${this._markers ?? []}
         ></dc-google-map>
         <slot style="display: ${this._mapView ? "none" : "revert"}"></slot>

@@ -51,6 +51,17 @@ public static class HtmlHelperExtensions
         }
     }
 
+    public static bool IsEmptyHtmlString(this IHtmlEncodedString? html)
+    {
+        if (html == null) return true;
+
+        var htmlString = html.ToString();
+        if (string.IsNullOrWhiteSpace(htmlString)) return true;
+
+        string strippedInput = System.Text.RegularExpressions.Regex.Replace(htmlString, "<.*?>", string.Empty);
+        return string.IsNullOrWhiteSpace(strippedInput);
+    }
+
     public static IHtmlEncodedString ReplaceLineBreaks(string text)
     {
         var result = HttpUtility.HtmlEncode(text)

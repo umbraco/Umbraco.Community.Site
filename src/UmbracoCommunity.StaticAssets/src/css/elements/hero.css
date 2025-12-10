@@ -123,8 +123,16 @@
 }
 
 .main-hero.half-width .main-hero__content {
-  margin-bottom: 2rem;
+  margin: 0 0 2rem;
   color: var(--color-blue);
+
+  @media (--sm) {
+    margin: 2rem 0;
+  }
+
+  @media (--md) {
+    margin: 0 0 2rem;
+  }
 }
 
 .main-hero__content-container {
@@ -151,7 +159,11 @@
 }
 
 .main-hero.half-width .main-hero__content-left {
-  margin: 2rem 0;
+  margin: 0 0 var(--unit-md);
+
+  @media (--md) {
+    margin: 2rem 0;
+  }
 }
 
 .main-hero.full-width .main-hero__content img {

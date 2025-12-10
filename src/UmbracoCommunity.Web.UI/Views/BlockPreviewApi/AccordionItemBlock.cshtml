@@ -4,7 +4,7 @@
     @if (!string.IsNullOrEmpty(Model.Content.Title)){
         <h3>@Model.Content.Title</h3>
     }
-    @if (Model.Content.Content != null) {
+    @if (!Model.Content.Content.IsEmptyHtmlString()) {
         @Html.Raw(Model.Content.Content)
     }
 </div>

@@ -19,9 +19,9 @@
                         <small>@Model.Content.Tagline</small>
                     }
                     <h1>@Model.Content.Headline</h1>
-                    @if (Model.Content.BodyText != null)
+                    @if (!Model.Content.BodyText.IsEmptyHtmlString())
                     {
-                        @Html.Raw(Model.Content.BodyText.ToHtmlString())
+                        @Html.Raw(Model.Content.BodyText?.ToHtmlString())
                     }
                     @if (Model.Content.CallToActionLinks?.Any() ?? false)
                     {

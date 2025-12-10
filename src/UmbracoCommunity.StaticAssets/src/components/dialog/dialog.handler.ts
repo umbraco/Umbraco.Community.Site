@@ -6,6 +6,9 @@ export class DcDialogHandler {
       document.body.appendChild(dialogElement);
     }
 
+    // Clear any existing content to prevent duplication
+    dialogElement.innerHTML = "";
+
     dialogElement?.appendChild(element);
     dialogElement?.showModal();
 

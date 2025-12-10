@@ -18,10 +18,6 @@ img {
     max-width: 100%;
 }
 
-.align-center {
-    text-align: center;
-}
-
 /* Backoffice specific block styling */
 .dc-image-block,
 .dc-text-block,
@@ -84,7 +80,10 @@ img {
 }
 
 /* Call to action block styling */
-.dc-big-cta-block.align-center {
+.dc-big-cta-block__content.align-center,
+.dc-boxes.align-center .block-title,
+.dc-boxes.align-center .block-subtitle,
+.dc-columns-block {
     text-align: center;
 }
 
@@ -253,7 +252,8 @@ img {
 
 /* cards block */
 .dc-boxes-row__items {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
     justify-content: center;
     overflow: hidden;
     column-gap: 10px;
@@ -378,6 +378,12 @@ img {
 .dc-speakers-grid__item {
     max-width: 200px;
     text-align: center;
+}
+
+.dc-speakers-grid__item img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
 }
 
 .speaker {

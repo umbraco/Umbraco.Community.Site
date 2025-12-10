@@ -5,10 +5,15 @@
   flex-direction: column;
   background: var(--block-background-color);
   color: var(--block-text-color);
+  row-gap: var(--unit);
 }
 
 .dc-image-and-text-block__image-container {
-  margin-bottom: 3rem;
+  margin-bottom: var(--unit-md);
+
+  @media (--md) {
+    margin-bottom: var(--unit-lg);
+  }
 }
 
 .dc-image-and-text-block__image-container img {
@@ -18,6 +23,10 @@
 .dc-image-and-text-block__content-container {
   display: flex;
   justify-content: flex-end;
+}
+
+.dc-image-and-text-block__content {
+  width: 100%;
 }
 
 .dc-image-and-text-block__content h2{

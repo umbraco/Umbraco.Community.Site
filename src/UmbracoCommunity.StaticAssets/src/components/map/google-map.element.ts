@@ -16,16 +16,13 @@ export class DcGoogleMapElement extends LitElement {
   @property({ type: Array })
   markers: Array<MapMarkerModel> = [];
 
-  @property({ type: Array })
-  styles: Array<google.maps.MapTypeStyle> = [];
-
   @state()
-  private _markers: Array<google.maps.Marker> = [];
+  private _markers: Array<google.maps.marker.AdvancedMarkerElement> = [];
 
   #mapRef?: google.maps.Map;
   #clusterer?: MarkerClusterer;
 
-  readonly #apiKey = "AIzaSyBetZwWScNRk0KrDKJJxiWNqig1TtXMASo";
+  readonly #apiKey = "AIzaSyCfWeM7oKe9uV35obF62mzU57dsOLo8NGI";
 
   constructor() {
     super();
@@ -59,10 +56,16 @@ export class DcGoogleMapElement extends LitElement {
       return;
     }
 
+    const params = new URLSearchParams({
+      key: this.#apiKey,
+      loading: "async",
+      callback: "initMap",
+      libraries: "marker",
+      v: "weekly" // Ensure we're using the latest weekly version
+    });
+
     const googleMapsLoader = document.createElement("script");
-    googleMapsLoader.src = `https://maps.googleapis.com/maps/api/js?key=${
-      this.#apiKey
-    }&callback=initMap`;
+    googleMapsLoader.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
     googleMapsLoader.id = "google-maps-loader";
     googleMapsLoader.async = true;
     googleMapsLoader.defer = true;
@@ -75,15 +78,20 @@ export class DcGoogleMapElement extends LitElement {
       "maps"
     )) as google.maps.MapsLibrary;
 
+    // Wait for the map library to be fully loaded
+    await google.maps.importLibrary("core");
+
     this.#mapRef = new Map(
       this.shadowRoot?.getElementById("map") as HTMLElement,
       {
         center: { lat: -34.397, lng: 150.644 },
         zoom: 4,
-        styles: this.styles,
         fullscreenControl: false,
         streetViewControl: false,
         mapTypeControl: false,
+        mapId: "6b9fb9d100b5a19ae5fe7f7d", // Required for AdvancedMarkerElement
+        gestureHandling: "greedy", // Allow scrolling without ctrl
+        colorScheme: "DARK", // Set dark color scheme
       }
     );
 
@@ -96,7 +104,7 @@ export class DcGoogleMapElement extends LitElement {
   };
 
   async #removeMarkers() {
-    this._markers.forEach((m) => m.setMap(null));
+    this._markers.forEach((m) => (m.map = null));
     this._markers = [];
     this.#clusterer?.clearMarkers();
   }
@@ -105,7 +113,7 @@ export class DcGoogleMapElement extends LitElement {
     const { InfoWindow } = (await google.maps.importLibrary(
       "maps"
     )) as google.maps.MapsLibrary;
-    const { Marker } = (await google.maps.importLibrary(
+    const { AdvancedMarkerElement, PinElement } = (await google.maps.importLibrary(
       "marker"
     )) as google.maps.MarkerLibrary;
 
@@ -115,40 +123,57 @@ export class DcGoogleMapElement extends LitElement {
       const m = this.markers[i];
       const map = this.#mapRef;
 
-      const marker = new Marker({
+      // Create custom pin if icon is specified
+      let content;
+      if (m.icon) {
+        const img = document.createElement("img");
+        img.src = m.icon;
+        content = img;
+      }
+
+      const marker = new AdvancedMarkerElement({
         position: m.position,
         map,
         title: m.name(),
+        content: content,
       });
 
-      if (m.icon) {
-        marker.setIcon(m.icon);
-      }
-
-      google.maps.event.addListener(
-        marker,
-        "click",
-        (function (marker: google.maps.Marker): any {
-          return function () {
-            infoWindow.close();
-            infoWindow.setContent(m.content);
-            infoWindow.open({ map, anchor: marker });
-          };
-        })(marker)
-      );
+      marker.addListener("click", () => {
+        infoWindow.close();
+        infoWindow.setContent(m.content);
+        infoWindow.open({ map, anchor: marker });
+      });
 
       this._markers.push(marker);
     }
 
     const renderer = {
-      render: ({ count, position }: { count: number; position: any }) =>
-        new google.maps.Marker({
-          label: { text: String(count), color: "white", fontSize: "12px" },
+      render: ({ count, position }: { count: number; position: any }) => {
+        const div = document.createElement("div");
+        div.style.position = "relative";
+        
+        const img = document.createElement("img");
+        img.src = new URL("../../assets/pin-clusterer.svg", import.meta.url).href;
+        
+        const label = document.createElement("div");
+        label.textContent = String(count);
+        label.style.position = "absolute";
+        label.style.top = "50%";
+        label.style.left = "50%";
+        label.style.transform = "translate(-50%, -50%)";
+        label.style.color = "white";
+        label.style.fontSize = "12px";
+        label.style.fontWeight = "bold";
+        
+        div.appendChild(img);
+        div.appendChild(label);
+        
+        return new AdvancedMarkerElement({
           position,
-          // adjust zIndex to be above other markers
-          zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
-          icon: new URL("../../assets/pin-clusterer.svg", import.meta.url).href,
-        }),
+          content: div,
+          zIndex: 1000 + count,
+        });
+      },
     };
 
     this.#clusterer = new MarkerClusterer({

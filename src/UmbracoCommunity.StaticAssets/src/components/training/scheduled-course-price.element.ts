@@ -9,12 +9,27 @@ const elementName = "dc-scheduled-course-price";
 @customElement(elementName)
 export class DcScheduledCoursePriceElement extends HTMLElement {
   get localPrices() {
-    return JSON.parse(this.getAttribute("local-prices") ?? "");
+    const localPricesAttr = this.getAttribute("local-prices");
+    if (!localPricesAttr) {
+      return {};
+    }
+    try {
+      return JSON.parse(localPricesAttr);
+    } catch (error) {
+      console.warn(`Invalid JSON in local-prices attribute: ${localPricesAttr}`);
+      return {};
+    }
   }
 
   constructor() {
     super();
+  }
 
+  connectedCallback() {
+    this.updatePrice();
+  }
+
+  updatePrice() {
     const currency =
       CountryToCurrencyMapping[
         this.closest("dc-scheduled-courses")?.userCountry ?? "DE"
@@ -29,9 +44,9 @@ export class DcScheduledCoursePriceElement extends HTMLElement {
       }
     );
 
-    this.innerHTML = formatter.format(
-      this.localPrices[currency]
-    );
+    const prices = this.localPrices;
+    const price = prices[currency] ?? 0;
+    this.innerHTML = formatter.format(price);
   }
 }
 

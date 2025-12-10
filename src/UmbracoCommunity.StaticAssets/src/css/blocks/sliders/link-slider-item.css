@@ -25,6 +25,12 @@
         height: 117px;
     }
 
+    figcaption {
+        max-width: 117px;
+        margin-left: 0;
+        font-size: 12px;
+    }
+
     .dc-link-slider-item__text {
         color: var(--color-black);
         font-size: 20px;

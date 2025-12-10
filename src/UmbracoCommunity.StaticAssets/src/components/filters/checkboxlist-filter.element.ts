@@ -66,15 +66,12 @@ export class CheckboxListFilterElement extends LitElement {
   }
 
   label() {
-    const selection = this.filter?.options?.filter((x) => x.selected) ?? [];
-    if (!selection) return this.filter?.options?.at(0)?.name;
+    return this.filter?.options?.at(0)?.name;
+  }
 
-    const selectionName = selection.at(0)?.name;
-    if (selection.length === 1) {
-      return selectionName;
-    }
-
-    return `${selectionName} (+${selection.length - 1})`;
+  #buttonClass() {
+    const values = this.value.filter((v) => v !== "");
+    return values.length ? "has-value" : "";
   }
 
   render() {
@@ -95,9 +92,9 @@ export class CheckboxListFilterElement extends LitElement {
     }
 
     return html`<div id="dropdown">
-      <button type="button" @click=${this.#onStateChange}>
+      <button type="button" @click=${this.#onStateChange} class=${this.#buttonClass()}>
         ${this.label()}
-        <uui-symbol-expand ?open=${this.open}></uui-symbol-expand>
+        <uui-symbol-expand ?open=${!this.open}></uui-symbol-expand>
       </button>
       <div id="options">
         ${repeat(
@@ -118,21 +115,15 @@ export class CheckboxListFilterElement extends LitElement {
 
   static styles = css`
     :host {
-      --background-color: #f1f0ee;
+      --background-color: white;
       --options-display: none;
       --button-zindex: 5;
-      --button-border-bottom-color: var(--uui-border-color, #d8d7d9);
-      --button-hover-border-color: #a1a1a1;
-      --button-hover-border-bottom-color: var(--button-hover-border-color);
     }
 
     :host([open]) {
       --background-color: white;
       --options-display: block;
       --button-zindex: 10;
-      --button-border-bottom-color: white;
-      --button-hover-border-color: #d8d7d9;
-      --button-hover-border-bottom-color: var(--button-border-bottom-color);
     }
 
     #list {
@@ -157,17 +148,16 @@ export class CheckboxListFilterElement extends LitElement {
       font-size: 15px;
       font-family: inherit;
       height: var(--uui-select-height, 33px);
+      border: 0;
+      border-radius: 8px;
       box-sizing: border-box;
-      border: 1px solid var(--uui-border-color, #d8d7d9);
-      border-bottom-color: var(--button-border-bottom-color);
       transition: all 150ms ease;
       padding: 3px var(--uui-select-padding-x, 6px);
       background-color: var(--background-color);
-    }
 
-    button:hover {
-      border-color: var(--button-hover-border-color);
-      border-bottom-color: var(--button-hover-border-bottom-color);
+      &.has-value {
+        font-weight: 700;
+      }
     }
 
     #options {
@@ -176,7 +166,7 @@ export class CheckboxListFilterElement extends LitElement {
       top: calc(100% - 1px);
       padding: var(--uui-select-padding-x, 6px);
       border: 1px solid var(--uui-border-color, #d8d7d9);
-      z-index: 5;
+      z-index: 10;
       background-color: white;
       white-space: nowrap;
       max-height: 200px;

@@ -47,7 +47,15 @@
 }
 
 .dc-block-list {
-  gap: var(--unit-xl);
+  gap: var(--unit-md);
+
+  &:not(:first-child) {
+    margin-top: 0;
+  }
+
+  @media (--md) {
+    gap: var(--unit-xl);
+  }
 }
 
 .dc-text-block:first-child {
