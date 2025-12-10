@@ -36,6 +36,10 @@
     <Folder Include="wwwroot\App_Plugins\BlockListThumbs\Cards\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>

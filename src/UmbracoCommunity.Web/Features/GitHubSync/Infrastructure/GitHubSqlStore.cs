@@ -203,7 +203,9 @@ public class GitHubSqlStore
 
         foreach (var member in hqMembers)
         {
-            var entity = await context.HqMembers.FindAsync(member.Id);
+            // Look up by Login (which has a unique index) rather than Id
+            // This ensures updates work correctly when the Id doesn't match the database primary key
+            var entity = await context.HqMembers.FirstOrDefaultAsync(m => m.Login == member.Login);
             var json = JsonConvert.SerializeObject(member);
 
             if (entity == null)
@@ -220,7 +222,6 @@ public class GitHubSqlStore
             else
             {
                 entity.Data = json;
-                entity.Login = member.Login;
                 result.Updated++;
             }
         }
@@ -543,5 +544,75 @@ public class GitHubSqlStore
             .ToDictionaryAsync(e => e.Version, e => e.PublishedDate);
 
         return versions;
+    }
+
+    public void ClearAllData()
+    {
+        ClearAllDataAsync().GetAwaiter().GetResult();
+    }
+
+    private async Task ClearAllDataAsync()
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+
+        // Delete junction tables first (foreign key constraints)
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubPullRequestReleases");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubIssueReleases");
+
+        // Delete main tables
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubPullRequests");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubIssues");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubDiscussions");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubHqMembers");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM NuGetPackageVersions");
+
+        // Clear all cache
+        _memoryCache.Remove("AvailableReleases_Umbraco-CMS");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Forms");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Deploy");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Workflow");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Commerce");
+
+        // Clear NuGet cache
+        _memoryCache.Remove("NuGet_Umbraco.Cms_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Forms_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Deploy_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Workflow_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Commerce_Versions");
+    }
+
+
+    public void ClearGitHubData()
+    {
+        ClearGitHubDataAsync().GetAwaiter().GetResult();
+    }
+
+    private async Task ClearGitHubDataAsync()
+    {
+        using var context = await _contextFactory.CreateDbContextAsync();
+
+        // Delete junction tables first (foreign key constraints)
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubPullRequestReleases");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubIssueReleases");
+
+        // Delete main tables (but not HQ members)
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubPullRequests");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubIssues");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM GitHubDiscussions");
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM NuGetPackageVersions");
+
+        // Clear release cache
+        _memoryCache.Remove("AvailableReleases_Umbraco-CMS");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Forms");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Deploy");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Workflow");
+        _memoryCache.Remove("AvailableReleases_Umbraco.Commerce");
+
+        // Clear NuGet cache
+        _memoryCache.Remove("NuGet_Umbraco.Cms_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Forms_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Deploy_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Workflow_Versions");
+        _memoryCache.Remove("NuGet_Umbraco.Commerce_Versions");
     }
 }
