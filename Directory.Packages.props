@@ -1,0 +1,37 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Umbraco -->
+    <PackageVersion Include="Umbraco.Cms" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="17.0.2" />
+    <!-- Umbraco Cloud & Deploy -->
+    <PackageVersion Include="Umbraco.Cloud.Cms" Version="17.0.0" />
+    <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0" />
+    <PackageVersion Include="Umbraco.Deploy.OnPrem" Version="17.0.0" />
+    <PackageVersion Include="Umbraco.Deploy.Cloud" Version="17.0.0" />
+    <!-- Umbraco Forms -->
+    <PackageVersion Include="Umbraco.Forms" Version="17.0.2" />
+    <PackageVersion Include="Umbraco.Forms.Deploy" Version="17.0.0" />
+    <!-- Umbraco Community Packages -->
+    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.0.0" />
+    <PackageVersion Include="Umbraco.Community.Contentment" Version="6.0.2" />
+    <!-- Hangfire -->
+    <PackageVersion Include="Cultiv.Hangfire" Version="5.2.0" />
+    <!-- Microsoft -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <!-- Other -->
+    <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
+    <PackageVersion Include="Markdig" Version="0.44.0" />
+    <PackageVersion Include="Schema.NET" Version="13.0.0" />
+  </ItemGroup>
+</Project>

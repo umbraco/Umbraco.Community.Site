@@ -7,24 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cultiv.Hangfire" Version="5.2.0" />
-    <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.3.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+    <PackageReference Include="Cultiv.Hangfire" />
+    <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageReference Include="Schema.NET" Version="13.0.0" />
-    <PackageReference Include="Umbraco.Cms.Core" Version="17.0.1" />
-    <PackageReference Include="Umbraco.Cms.Infrastructure" Version="17.0.1" />
-    <PackageReference Include="Umbraco.Cms.Web.Common" Version="17.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Schema.NET" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" />
   </ItemGroup>
 
   <ItemGroup>
