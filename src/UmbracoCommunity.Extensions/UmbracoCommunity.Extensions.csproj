@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsettings-schema.Umbraco.Cms.json;umbraco-package-schema.json">
+    <Content Update="appsettings-schema*.json;umbraco-package-schema.json">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
