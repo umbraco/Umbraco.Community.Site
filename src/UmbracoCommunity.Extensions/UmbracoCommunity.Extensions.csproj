@@ -11,7 +11,11 @@
     <Product>UmbracoCommunity.Extensions</Product>
     <Title>UmbracoCommunity.Extensions</Title>
   </PropertyGroup>
-
+    
+  <PropertyGroup>
+    <GenerateAppSettingsSchema>false</GenerateAppSettingsSchema>
+    <GenerateUmbracoPackageSchema>false</GenerateUmbracoPackageSchema>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Umbraco.Cms.Web.Website" />
@@ -35,5 +39,5 @@
   <ItemGroup>
     <ProjectReference Include="..\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj" />
   </ItemGroup>
-
+    
 </Project>
