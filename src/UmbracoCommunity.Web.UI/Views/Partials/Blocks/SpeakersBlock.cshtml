@@ -20,7 +20,7 @@
                 var speaker = item.Content as SpeakerItemBlock;
                 if (speaker == null) continue;
                 <div class="dc-speakers-grid__item">
-                    <img class="dc-image is-circle" src="@speaker.SpeakerImage.GetCropUrl()" alt="@speaker.SpeakerName" loading="lazy" />
+                    <img class="dc-image is-circle" src="@speaker.SpeakerImage?.GetCropUrl(width: 200, height: 200)" alt="@speaker.SpeakerName" loading="lazy" />
                     <p class="speaker-name">@speaker.SpeakerName</p>
                     @if (!string.IsNullOrEmpty(speaker.SpeakerDescription))
                     {

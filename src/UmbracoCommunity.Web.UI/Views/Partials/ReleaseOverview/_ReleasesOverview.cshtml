@@ -51,7 +51,7 @@
                 })
             }
 
-            @if (showLatestRelease)
+            @if (showLatestRelease && Model.LatestRelease != null)
             {
                 @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleaseCard.cshtml", new ReleaseCardViewModel
                 {
