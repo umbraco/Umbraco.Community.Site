@@ -17,12 +17,12 @@ namespace UmbracoCommunity.Extensions.Controllers
     public class UmbracoCommunityExtensionsApiController : UmbracoCommunityExtensionsApiControllerBase
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-        private readonly GitHubSqlStore _dataStore;
+        private readonly IGitHubDataStore _dataStore;
         private readonly GitHubSyncOptions _syncOptions;
 
         public UmbracoCommunityExtensionsApiController(
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            GitHubSqlStore dataStore,
+            IGitHubDataStore dataStore,
             IOptions<GitHubSyncOptions> syncOptions)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

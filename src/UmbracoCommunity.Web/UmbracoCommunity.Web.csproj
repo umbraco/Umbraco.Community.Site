@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -23,6 +23,10 @@
 
   <ItemGroup>
     <Folder Include="Models\PublishedModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UmbracoCommunity.Tests" />
   </ItemGroup>
 
 </Project>

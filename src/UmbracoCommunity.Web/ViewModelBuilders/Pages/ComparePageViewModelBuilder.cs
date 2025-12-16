@@ -12,14 +12,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<ComparePageViewModel>
 {
-    private readonly GitHubSqlStore _dataStore;
+    private readonly IGitHubDataStore _dataStore;
     private readonly GitHubSyncOptions _options;
     private readonly IMemoryCache _memoryCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly Utilities.ReleaseDiscussionParser _releaseParser;
 
     public ComparePageViewModelBuilder(
-        GitHubSqlStore dataStore,
+        IGitHubDataStore dataStore,
         IOptions<GitHubSyncOptions> options,
         IMemoryCache memoryCache,
         IHttpContextAccessor httpContextAccessor,

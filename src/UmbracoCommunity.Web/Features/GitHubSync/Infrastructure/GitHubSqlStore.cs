@@ -6,7 +6,7 @@ using UmbracoCommunity.Web.Features.GitHubSync.Models;
 
 namespace UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 
-public class GitHubSqlStore
+public class GitHubSqlStore : IGitHubDataStore
 {
     private readonly IDbContextFactory<GitHubDbContext> _contextFactory;
     private readonly IMemoryCache _memoryCache;

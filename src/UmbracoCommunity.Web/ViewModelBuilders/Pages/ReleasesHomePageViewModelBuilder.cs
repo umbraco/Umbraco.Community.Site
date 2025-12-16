@@ -11,12 +11,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 {
     public class ReleasesHomePageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<ReleasesHomePageViewModel>
     {
-        private readonly GitHubSqlStore _dataStore;
+        private readonly IGitHubDataStore _dataStore;
         private readonly GitHubSyncOptions _options;
         private readonly Utilities.ReleaseDiscussionParser _releaseParser;
 
         public ReleasesHomePageViewModelBuilder(
-            GitHubSqlStore dataStore,
+            IGitHubDataStore dataStore,
             Microsoft.Extensions.Options.IOptions<GitHubSyncOptions> options,
             Utilities.ReleaseDiscussionParser releaseParser)
         {

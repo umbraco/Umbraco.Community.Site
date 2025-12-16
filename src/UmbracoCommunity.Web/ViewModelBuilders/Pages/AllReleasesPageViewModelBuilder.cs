@@ -11,7 +11,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages;
 
 internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<AllReleasesPageViewModel>
 {
-    private readonly GitHubSqlStore _dataStore;
+    private readonly IGitHubDataStore _dataStore;
     private readonly GitHubSyncOptions _options;
     private readonly IMemoryCache _memoryCache;
     private readonly ReleaseDiscussionParser _releaseParser;
@@ -19,7 +19,7 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
     public const string CacheKey = "AllReleases_VersionGroups";
 
     public AllReleasesPageViewModelBuilder(
-        GitHubSqlStore dataStore,
+        IGitHubDataStore dataStore,
         IOptions<GitHubSyncOptions> options,
         IMemoryCache memoryCache,
         ReleaseDiscussionParser releaseParser)

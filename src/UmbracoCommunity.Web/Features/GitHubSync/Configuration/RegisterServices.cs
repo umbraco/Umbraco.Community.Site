@@ -51,6 +51,7 @@ public class RegisterServices : IComposer
 
         // Register infrastructure
         builder.Services.AddSingleton<GitHubSqlStore>();
+        builder.Services.AddSingleton<IGitHubDataStore>(sp => sp.GetRequiredService<GitHubSqlStore>());
         builder.Services.AddScoped<GitHubApiClient>();
         builder.Services.AddHttpClient<NuGetApiClient>()
             .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
