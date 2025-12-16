@@ -25,8 +25,4 @@
     <Folder Include="Models\PublishedModels\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj" />
-  </ItemGroup>
-
 </Project>

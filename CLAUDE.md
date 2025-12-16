@@ -12,8 +12,8 @@ The solution consists of 4 projects:
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
-- **UmbracoCommunity.Common** - Shared utilities and common code
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
+- **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
 
 ## Development Setup
 

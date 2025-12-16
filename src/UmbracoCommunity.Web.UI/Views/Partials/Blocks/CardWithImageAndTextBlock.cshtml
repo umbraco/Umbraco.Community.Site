@@ -74,8 +74,9 @@
                     break;
                 case TextBlock.ModelTypeAlias:
                     var textItem = contentItem.Content as TextBlock;
+                    if (textItem?.Text == null || textItem.Text.IsEmptyHtmlString()) break;
                     <div class="dc-boxes-row__item-content">
-                        @Html.Raw(textItem.Text)
+                        @Html.Raw(textItem?.Text)
                     </div>
                     break;
             }
