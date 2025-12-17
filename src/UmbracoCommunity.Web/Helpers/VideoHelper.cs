@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web;
+﻿using System.Web;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Helpers
@@ -14,20 +13,16 @@ namespace UmbracoCommunity.Web.Helpers
                 "encrypted-media",
                 "fullscreen",
                 "gyroscope",
-                "picture-in-picture"
+                "picture-in-picture",
+                "autoplay"
             };
-
-            if (videoSettings != null && videoSettings.Autoplay)
-            {
-                allows.Insert(0, "autoplay");
-            }
 
             return string.Join("; ", allows);
         }
 
         public static string GetYouTubeLink(this string videoUrl, SettingsVideoBlock? settings)
         {
-            
+
             if (videoUrl.Contains("youtube.com/watch?v="))
             {
                 videoUrl = videoUrl.Replace("watch?v=", "embed/");
@@ -50,6 +45,9 @@ namespace UmbracoCommunity.Web.Helpers
                     queryString["mute"] = "1";
                 }
             }
+
+            queryString["enablejsapi"] = "1";
+
             parsedUrl.Query = queryString.ToString() ?? string.Empty;
 
             return parsedUrl.ToString();
