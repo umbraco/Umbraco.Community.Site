@@ -26,15 +26,19 @@
         {
             if (Model.Content.Video.Url.Contains("youtu", StringComparison.InvariantCultureIgnoreCase)) {
                 var videoSrc = Model.Content.Video.Url.GetYouTubeLink(Model.Settings);
-                <dc-video-picker-youtube source="@videoSrc"
-                                         allow="@allows"
-                                         name="@Model.Settings?.VideoTitle"
-                                         thumbnail="@thumbnailUrl"
-                                         format="@format"
-                                         id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
-                    <iframe slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-                </dc-video-picker-youtube>
-            } else
+                if (!string.IsNullOrWhiteSpace(videoSrc))
+                {
+                    <dc-video-picker-youtube source="@videoSrc"
+                        allow="@allows"
+                        name="@Model.Settings?.VideoTitle"
+                        thumbnail="@thumbnailUrl"
+                        format="@format"
+                        id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+                            <iframe id="player" slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0"></iframe>
+                    </dc-video-picker-youtube>
+                }
+            }
+            else
             {
                 _logger.LogWarning("VideoBlock: External video URL not supported. URL: {VideoUrl}", Model.Content.Video.Url);
             }
@@ -46,7 +50,8 @@
                                    format="@format"
                                    auto-play="@autoplay"
                                    id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
-                <video slot="video"
+                <video id="player"
+                       slot="video"
                        controls
                        muted="@(Model.Settings?.Muted ?? false)"
                        autoplay="@autoplay"
