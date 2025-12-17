@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoCommunity.Extensions",
+  "name": "UmbracoCommunity.Extensions",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Umbraco Community Extensions Bundle",
+      "alias": "UmbracoCommunity.Extensions.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoCommunityExtensions/umbraco-community-extensions.js"
+    }
+  ]
+}

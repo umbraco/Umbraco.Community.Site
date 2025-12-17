@@ -48,16 +48,16 @@ jobs:
         shell: pwsh
         run: |
           $content = Get-Content '${{ inputs.csprojFile }}' -Raw
-          
+
           # Enable Umbraco.Cloud.Cms (uncomment)
-          $content = $content -replace '(?s)<!--\s*<PackageReference\s+(?=[^>]*Include="Umbraco\.Cloud\.Cms")(?=[^>]*Version="([^"]*)")[^>]*/?>\s*-->', '<PackageReference Include="Umbraco.Cloud.Cms" Version="$1" />'
-                    
+          $content = $content -replace '<!--\s*<PackageReference\s+Include="Umbraco\.Cloud\.Cms"\s*/>\s*-->', '<PackageReference Include="Umbraco.Cloud.Cms" />'
+
           # Enable Umbraco.Deploy.Cloud (uncomment)
-          $content = $content -replace '(?s)<!--\s*<PackageReference\s+(?=[^>]*Include="Umbraco\.Deploy\.Cloud")(?=[^>]*Version="([^"]*)")[^>]*/?>\s*-->', '<PackageReference Include="Umbraco.Deploy.Cloud" Version="$1" />'
-                    
+          $content = $content -replace '<!--\s*<PackageReference\s+Include="Umbraco\.Deploy\.Cloud"\s*/>\s*-->', '<PackageReference Include="Umbraco.Deploy.Cloud" />'
+
           # Disable Umbraco.Deploy.OnPrem (comment out)
-          $content = $content -replace '(?s)<PackageReference\s+(?=[^>]*Include="Umbraco\.Deploy\.OnPrem")(?=[^>]*Version="([^"]*)")[^>]*/?>', '<!-- <PackageReference Include="Umbraco.Deploy.OnPrem" Version="$1" /> -->'
-          
+          $content = $content -replace '<PackageReference\s+Include="Umbraco\.Deploy\.OnPrem"\s*/>', '<!-- <PackageReference Include="Umbraco.Deploy.OnPrem" /> -->'
+
           echo $content
 
           Set-Content '${{ inputs.csprojFile }}' $content
@@ -89,6 +89,12 @@ jobs:
       - name: Build frontend assets
         working-directory: ${{ inputs.pathToFrontendClient }}
         run: npm ci && npm run build:for:cloud --if-present
+        shell: bash
+
+      # build the extensions client assets (backoffice dashboards)
+      - name: Build extensions client
+        working-directory: src/UmbracoCommunity.Extensions/Client
+        run: npm ci && npm run build
         shell: bash
         
       # zip everything, except what is defined in the 'cloud.zipignore'

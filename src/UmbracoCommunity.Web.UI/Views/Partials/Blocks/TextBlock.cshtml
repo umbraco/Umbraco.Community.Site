@@ -19,11 +19,11 @@
         @if (hasImage)
         {
             <picture>
-                <source media="(min-width:855px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("desktop2x")">
-                <source media="(min-width:768px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("desktop")">
-                <source media="(min-width:389px)" srcset="@Model.Settings.BackgroundImage.GetCropUrl("mobile2x")">
-                <img src="@Model.Settings.BackgroundImage.GetCropUrl("mobile")"
-                     alt="@Model.Settings.BackgroundImage.Name"
+                <source media="(min-width:855px)" srcset="@Model.Settings?.BackgroundImage?.GetCropUrl("desktop2x")">
+                <source media="(min-width:768px)" srcset="@Model.Settings?.BackgroundImage?.GetCropUrl("desktop")">
+                <source media="(min-width:389px)" srcset="@Model.Settings?.BackgroundImage?.GetCropUrl("mobile2x")">
+                <img src="@Model.Settings?.BackgroundImage?.GetCropUrl("mobile")"
+                     alt="@Model.Settings?.BackgroundImage?.Name"
                      sizes="100vw"
                      loading="lazy">
             </picture>

@@ -1,4 +1,4 @@
-﻿using UmbracoCommunity.Common.Utilities;
+﻿using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {

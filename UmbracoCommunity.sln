@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.UI", "src\UmbracoCommunity.Web.UI\UmbracoCommunity.Web.UI.csproj", "{716A5A5E-C5B2-4885-800F-56BE3C51248A}"
 EndProject
@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web", "src\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj", "{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Common", "src\UmbracoCommunity.Common\UmbracoCommunity.Common.csproj", "{8D03B535-90A2-5D0F-6192-80E6598FF380}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "UmbracoCommunity.StaticAssets", "src\UmbracoCommunity.StaticAssets\", "{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -41,6 +39,8 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "UmbracoCommunity.StaticAsse
 		SlnRelativePath = "src\UmbracoCommunity.StaticAssets\"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Extensions", "src\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj", "{48671099-9B63-4C81-8F63-B87866526E85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,13 +55,13 @@ Global
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6627047-95D0-3429-D3DD-42A5D8DFAC5E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D03B535-90A2-5D0F-6192-80E6598FF380}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D03B535-90A2-5D0F-6192-80E6598FF380}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D03B535-90A2-5D0F-6192-80E6598FF380}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D03B535-90A2-5D0F-6192-80E6598FF380}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{C2FE9FEE-F9A8-462A-8D93-65B779A1295E}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48671099-9B63-4C81-8F63-B87866526E85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
