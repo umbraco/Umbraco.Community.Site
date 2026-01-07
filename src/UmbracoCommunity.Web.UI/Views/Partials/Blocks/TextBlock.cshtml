@@ -29,7 +29,7 @@
             </picture>
         }
 
-        <div class="dc-text-block__content">
+        <div class="dc-text-block__content" id="@Model.Settings?.BlockId">
             @Html.Raw(Model.Content.Text.ToHtmlString())
         </div>
     </div>
