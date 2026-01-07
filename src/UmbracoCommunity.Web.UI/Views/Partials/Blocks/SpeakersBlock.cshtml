@@ -14,7 +14,9 @@
             </div>
         }
 
-        <div class="dc-speakers-grid">
+        <dc-sessionize-speakers></dc-sessionize-speakers>
+
+        @* <div class="dc-speakers-grid">
             @foreach (var item in Model.Content.Speakers)
             {
                 var speaker = item.Content as SpeakerItemBlock;
@@ -28,6 +30,6 @@
                     }
                 </div>
             }
-        </div>
+        </div> *@
     </div>
 }
