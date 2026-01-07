@@ -8,12 +8,26 @@ This is the Umbraco Community Website - a replacement for [community.umbraco.com
 
 ## Solution Structure
 
-The solution consists of 4 projects:
+The solution consists of 4 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
+
+### Key Directories in UmbracoCommunity.Web
+
+- **Features/** - Feature modules (GitHubSync, ReleaseOverview)
+- **Controllers/** - Route hijacking controllers
+- **Models/** - View models, blocks, and published content models
+- **ViewModelBuilders/** - Convert IPublishedContent to view models
+- **Attributes/** - Action filters (`ApplyCommonElements`, `ApplyPageMetaData`)
+- **Middleware/** - Custom middleware (CSP handling)
+- **Utilities/** - Helper classes (SemVerHelper, StringUtilities)
+- **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
+- **Migrations/** - EF Core migrations for GitHubDbContext
+- **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
+- **Vite/** - Vite integration helpers and tag helpers
 
 ## Development Setup
 
@@ -58,7 +72,30 @@ npm run build:backoffice
 
 # Build for cloud deployment
 npm run build:for:cloud
+
+# Build Extensions backoffice client (separate build)
+cd src/UmbracoCommunity.Extensions/Client
+npm run build
 ```
+
+### Testing
+
+Frontend tests use Vitest:
+
+```bash
+cd src/UmbracoCommunity.StaticAssets
+
+# Run tests
+npm run test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+Test files are colocated with components (`.test.ts` suffix).
 
 ## Architecture Patterns
 
@@ -89,14 +126,18 @@ See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **components/** - Lit web components
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
-- **css/** - PostCSS stylesheets with custom mixins (rhythm system)
-- **backoffice/** - Umbraco backoffice extensions
-- **services/** - Frontend services and utilities
-- **integrations/** - Third-party integrations (Google Maps, etc.)
+- **css/** - PostCSS stylesheets with custom rhythm mixin system
+- **services/** - Frontend services (fetch, logging, project/user services)
+- **integrations/** - Third-party integrations (Cookiebot, Intercom, Matomo, Google Maps)
+- **models/** - TypeScript data models
+- **types/** - TypeScript type definitions
+- **util/** - Utility functions
 
 Built assets go to:
 - Frontend: `dist/` → referenced in views
 - Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
+
+**PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
 ### Models Builder
 
@@ -123,6 +164,38 @@ Located in `Features/GitHubSync/`, this system:
 
 Job configuration: `Features/GitHubSync/Configuration/JobsComposer.cs`
 
+### Release Overview System
+
+Located in `Features/ReleaseOverview/`, this feature displays Umbraco CMS release information:
+
+**Controllers:**
+- `ReleaseController` - Individual release pages (implements `IVirtualPageController`)
+- `ReleasesHomeController` - Release landing page
+- `AllReleasesController` - List of all releases
+- `CompareController` - Compare releases
+
+**Virtual Page Pattern**: `ReleaseController` implements `IVirtualPageController` which allows pages to exist without Umbraco content nodes - routes are handled programmatically via custom route composers.
+
+**Views**: Located in `Views/Partials/ReleaseOverview/`
+
+### Backoffice Extensions
+
+Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice functionality:
+
+**API Controllers** (`Controllers/`):
+- HQ Members CRUD operations
+- GitHub data export/import
+- Contribution statistics
+- Release summaries
+
+**Backoffice Dashboards** (`Client/src/dashboards/`):
+- Main dashboard with contribution stats
+- CMS contribution analytics dashboard
+- Data management (import/export GitHub data)
+- HQ members management
+
+The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
+
 ### Release Management
 
 Releases are tracked via GitHub Discussions in the Umbraco CMS repository:
@@ -139,7 +212,31 @@ Custom Vite integration for Umbraco:
 - Manifest-based asset loading in development and production
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
-- Dual build modes: frontend website + backoffice extensions
+- Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
+
+### Security Headers
+
+Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
+- Custom CSP builder extensions in `CspBuilderExtensions.cs`
+- Nonce-based script security via `NonceTagHelper`
+- CSP can be disabled per-request via `DisableCspMiddleware`
+
+## Key Dependencies
+
+**Backend:**
+- Umbraco CMS 17.x on .NET 10
+- Entity Framework Core (SQLite + SQL Server providers)
+- Cultiv.Hangfire - Background job processing
+- Joonasw.AspNetCore.SecurityHeaders - Security headers middleware
+- Markdig - Markdown processing
+- Schema.NET - Structured data/schema markup
+
+**Frontend:**
+- Lit 3.x - Web components framework
+- RxJS - Reactive programming
+- Zod - TypeScript schema validation
+- Vitest - Testing framework
+- PostCSS with custom rhythm mixin system
 
 ## Important Notes
 
@@ -148,3 +245,4 @@ Custom Vite integration for Umbraco:
 - **Security**: Never commit `appsettings.Local.json` - it's gitignored for secrets
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes
+- **Action Filters**: Use `[ApplyCommonElements]` and `[ApplyPageMetaData]` attributes on controllers for consistent page rendering
