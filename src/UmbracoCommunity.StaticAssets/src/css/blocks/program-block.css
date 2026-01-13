@@ -1,0 +1,10 @@
+.dc-program {
+    margin-bottom: var(--unit-md);
+}
+
+.dc-program .sessionize-msg {
+    text-align: center;
+    padding: var(--unit-md);
+    color: var(--color-grey);
+    font-style: italic;
+}

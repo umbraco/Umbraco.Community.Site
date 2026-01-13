@@ -27,6 +27,7 @@
 @import "./quote-block.css";
 @import "./testimonial-logos-block.css";
 @import "./speakers-grid.css";
+@import "./program-block.css";
 
 .dc-block-list {
   display: flex;
