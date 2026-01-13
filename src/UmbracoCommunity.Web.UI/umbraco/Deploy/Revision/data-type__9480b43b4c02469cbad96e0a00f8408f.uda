@@ -1,0 +1,13 @@
+{
+  "Name": "Small number input",
+  "EditorAlias": "Umbraco.Community.Contentment.NumberInput",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.NumberInput",
+  "DatabaseType": "Integer",
+  "Configuration": {
+    "size": "s"
+  },
+  "Udi": "umb://data-type/9480b43b4c02469cbad96e0a00f8408f",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.0"
+}
