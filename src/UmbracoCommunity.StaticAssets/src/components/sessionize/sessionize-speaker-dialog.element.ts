@@ -1,8 +1,9 @@
 import { css, html, nothing } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { when } from "lit/directives/when.js";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { DcDialogBaseElement } from "../dialog/dialog-base.element.js";
-import { SessionizeSpeaker } from "../../services/sessionize.service.js";
+import { SessionizeSpeaker, SessionizeSchedule } from "../../services/sessionize.service.js";
 
 const elementName = "dc-sessionize-speaker-dialog";
 
@@ -10,6 +11,12 @@ const elementName = "dc-sessionize-speaker-dialog";
 export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
   @property({ type: Object })
   speaker?: SessionizeSpeaker;
+
+  @property({ type: Array })
+  schedule: SessionizeSchedule[] = [];
+
+  @property({ type: String })
+  timezone?: string;
 
   #getLinkIcon(linkType: string): string {
     const icons: Record<string, string> = {
@@ -22,6 +29,87 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       Sessionize: "S",
     };
     return icons[linkType] || "🔗";
+  }
+
+  #linkifyText(text: string): string {
+    // Escape HTML entities first to prevent XSS
+    const escaped = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+    // URL regex pattern - matches http, https, and www URLs
+    const urlPattern = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
+
+    return escaped.replace(urlPattern, (url) => {
+      const href = url.startsWith("www.") ? `https://${url}` : url;
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    });
+  }
+
+  #findSessionDetails(sessionId: number | undefined): { date: string; time: string; room: string; startsAt?: string } | null {
+    if (!sessionId || !this.schedule.length) return null;
+
+    for (const day of this.schedule) {
+      for (const slot of day.timeSlots) {
+        for (const room of slot.rooms) {
+          if (room.session && room.session.id === sessionId.toString()) {
+            const date = this.#formatDate(day.date);
+            const time = this.#formatTime(room.session.startsAt, room.session.endsAt);
+            return { date, time, room: room.name, startsAt: room.session.startsAt };
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  #parseAsUtc(timeString: string): Date {
+    let dateTimeStr = timeString;
+    if (!dateTimeStr.endsWith("Z") && !dateTimeStr.includes("+") && !dateTimeStr.includes("-", 10)) {
+      dateTimeStr += "Z";
+    }
+    return new Date(dateTimeStr);
+  }
+
+  #formatDate(dateString: string): string {
+    try {
+      const date = new Date(dateString);
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      };
+      if (this.timezone) {
+        options.timeZone = this.timezone;
+      }
+      return date.toLocaleDateString("en-GB", options);
+    } catch {
+      return "";
+    }
+  }
+
+  #formatTime(startsAt?: string, endsAt?: string): string {
+    if (!startsAt) return "";
+    try {
+      const options: Intl.DateTimeFormatOptions = {
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      if (this.timezone) {
+        options.timeZone = this.timezone;
+      }
+      const start = this.#parseAsUtc(startsAt).toLocaleTimeString("en-GB", options);
+      if (endsAt) {
+        const end = this.#parseAsUtc(endsAt).toLocaleTimeString("en-GB", options);
+        return `${start} - ${end}`;
+      }
+      return start;
+    } catch {
+      return "";
+    }
   }
 
   #renderLinks() {
@@ -50,14 +138,49 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
   #renderSessions() {
     if (!this.speaker?.sessions?.length) return nothing;
 
+    // Get sessions with their details and sort by start time
+    const sessionsWithDetails = this.speaker.sessions
+      .map((session) => ({
+        session,
+        details: this.#findSessionDetails(session.id),
+      }))
+      .sort((a, b) => {
+        // Sessions without start time go to the end
+        if (!a.details?.startsAt && !b.details?.startsAt) return 0;
+        if (!a.details?.startsAt) return 1;
+        if (!b.details?.startsAt) return -1;
+        // Sort by start time ascending (earliest first)
+        return new Date(a.details.startsAt).getTime() - new Date(b.details.startsAt).getTime();
+      });
+
     return html`
       <div class="speaker-sessions">
         <h3>Sessions</h3>
-        <ul>
-          ${this.speaker.sessions.map(
-            (session) => html`<li>${session.name}</li>`
-          )}
-        </ul>
+        <div class="sessions-list">
+          ${sessionsWithDetails.map(({ session, details }) => html`
+            <div class="session-item">
+              <div class="session-name">${session.name}</div>
+              ${details
+                ? html`
+                    <div class="session-details">
+                      <span class="session-detail">
+                        <span class="detail-icon">📅</span>
+                        ${details.date}
+                      </span>
+                      <span class="session-detail">
+                        <span class="detail-icon">🕐</span>
+                        ${details.time}
+                      </span>
+                      <span class="session-detail">
+                        <span class="detail-icon">📍</span>
+                        ${details.room}
+                      </span>
+                    </div>
+                  `
+                : nothing}
+            </div>
+          `)}
+        </div>
       </div>
     `;
   }
@@ -99,7 +222,7 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
           this.speaker.bio,
           () => html`
             <div class="speaker-bio">
-              <p>${this.speaker!.bio}</p>
+              <p>${unsafeHTML(this.#linkifyText(this.speaker!.bio!))}</p>
             </div>
           `
         )}
@@ -162,7 +285,7 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       .speaker-tagline {
         margin: 0 0 var(--unit-sm, 0.75rem);
         font-size: 1rem;
-        color: var(--color-grey, #6b7280);
+        color: var(--color-dark-grey, #6b7280);
       }
 
       .speaker-links {
@@ -207,35 +330,138 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
         white-space: pre-wrap;
       }
 
+      .speaker-bio a {
+        color: var(--color-blue, #3544b1);
+        text-decoration: underline;
+        word-break: break-word;
+      }
+
+      .speaker-bio a:hover {
+        color: var(--color-blue-dark, #2a3690);
+      }
+
       .speaker-sessions h3 {
         margin: 0 0 var(--unit-sm, 0.75rem);
         font-size: 1.125rem;
         color: var(--color-dark, #1b264f);
       }
 
-      .speaker-sessions ul {
-        margin: 0;
-        padding-left: 1.25rem;
+      .sessions-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--unit-sm, 0.75rem);
       }
 
-      .speaker-sessions li {
-        margin-bottom: var(--unit-xs, 0.5rem);
+      .session-item {
+        padding: var(--unit-sm, 0.75rem);
+        background: var(--color-grey-light, #f5f5f5);
+        border-radius: var(--border-radius, 6px);
+      }
+
+      .session-name {
+        font-weight: 600;
         color: var(--color-dark, #1b264f);
+        margin-bottom: var(--unit-xs, 0.5rem);
       }
 
-      @media (max-width: 480px) {
+      .session-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--unit-sm, 0.75rem);
+      }
+
+      .session-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.85rem;
+        color: var(--color-dark-grey, #6b7280);
+      }
+
+      .detail-icon {
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 600px) {
+        .speaker-dialog-content {
+          padding: var(--unit-sm, 0.75rem);
+        }
+
         .speaker-header {
           flex-direction: column;
           align-items: center;
           text-align: center;
+          gap: var(--unit-sm, 0.75rem);
+          margin-bottom: var(--unit-sm, 0.75rem);
+        }
+
+        .speaker-image {
+          width: 80px;
+          height: 80px;
+        }
+
+        .speaker-image-placeholder {
+          font-size: 2rem;
         }
 
         .speaker-name {
           text-align: center;
+          font-size: 1.25rem;
+          margin-bottom: var(--unit-xs, 0.5rem);
+        }
+
+        .speaker-tagline {
+          font-size: 0.9rem;
+          margin-bottom: var(--unit-xs, 0.5rem);
         }
 
         .speaker-links {
           justify-content: center;
+          gap: 0.35rem;
+        }
+
+        .speaker-links a {
+          padding: 0.2rem 0.4rem;
+          font-size: 0.8rem;
+        }
+
+        .speaker-bio {
+          margin-bottom: var(--unit-sm, 0.75rem);
+        }
+
+        .speaker-bio p {
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        .speaker-sessions h3 {
+          font-size: 1rem;
+          margin-bottom: var(--unit-xs, 0.5rem);
+        }
+
+        .sessions-list {
+          gap: var(--unit-xs, 0.5rem);
+        }
+
+        .session-item {
+          padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
+        }
+
+        .session-name {
+          font-size: 0.9rem;
+          margin-bottom: 0.25rem;
+        }
+
+        .session-details {
+          gap: var(--unit-xs, 0.5rem);
+        }
+
+        .session-detail {
+          font-size: 0.75rem;
+        }
+
+        .detail-icon {
+          font-size: 0.8rem;
         }
       }
     `,

@@ -1,5 +1,5 @@
 import { close } from "@umbraco-community/svg";
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, nothing } from "lit";
 import { property } from "lit/decorators.js";
 
 export abstract class DcDialogBaseElement extends LitElement {
@@ -20,21 +20,34 @@ export abstract class DcDialogBaseElement extends LitElement {
 
   render() {
     return html`${this.renderClose()}
-      <h2>${this.header}</h2>
+      ${this.header ? html`<h2>${this.header}</h2>` : nothing}
       ${this.renderBody()}`;
   }
 
   static styles = [
     css`
+      :host {
+        display: block;
+      }
+
       #close {
         --fill: var(--color-dark);
         border: none;
-        background: transparent;
+        background: var(--color-white, #fff);
         cursor: pointer;
-        position: absolute;
-        top: var(--unit);
-        right: var(--unit);
-        padding: 6px;
+        position: sticky;
+        top: 0;
+        float: right;
+        z-index: 10;
+        padding: 8px;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      #close:hover {
+        background: var(--color-grey-light, #f5f5f5);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
       }
 
       .lead,

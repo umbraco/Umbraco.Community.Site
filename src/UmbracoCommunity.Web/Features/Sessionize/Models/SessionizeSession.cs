@@ -47,18 +47,6 @@ public class SessionizeSession
     public List<int> CategoryItems { get; set; } = new();
 }
 
-public class SessionizeSessionGroup
-{
-    [JsonPropertyName("groupId")]
-    public int? GroupId { get; set; }
-
-    [JsonPropertyName("groupName")]
-    public string GroupName { get; set; } = string.Empty;
-
-    [JsonPropertyName("sessions")]
-    public List<SessionizeSession> Sessions { get; set; } = new();
-}
-
 public class SessionizeSessionOverview
 {
     [JsonPropertyName("id")]

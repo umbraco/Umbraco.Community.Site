@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing } from "lit";
+import { LitElement, css, html, nothing, PropertyValues } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { when } from "lit/directives/when.js";
 import {
@@ -8,29 +8,43 @@ import {
   SessionizeSpeaker,
   SessionizeTimeSlot,
   SessionizeRoom,
+  SessionizeCategory,
+  SessionizeCategoryItem,
 } from "../../services/sessionize.service.js";
 import { DcDialogHandler } from "../dialog/dialog.handler.js";
 import { SessionizeSessionDialogElement } from "./sessionize-session-dialog.element.js";
 
+interface CategoryDropdown {
+  id: number;
+  title: string;
+  items: { id: number; name: string }[];
+}
+
+interface SelectedFilter {
+  id: number;
+  name: string;
+  categoryTitle: string;
+}
+
 const elementName = "dc-sessionize-program";
 
-// Source timezone for Sessionize data (CodeGarden is in Denmark)
-const SOURCE_TIMEZONE = "Europe/Copenhagen";
+// Default timezone (Copenhagen for CodeGarden)
+const DEFAULT_TIMEZONE = "Europe/Copenhagen";
 
-// Available timezones for the dropdown
+// Available timezones for the dropdown with UTC offsets (ordered low to high)
 const TIMEZONE_OPTIONS = [
-  { value: "Europe/Copenhagen", label: "Copenhagen (CEST)" },
-  { value: "Europe/London", label: "London (BST)" },
-  { value: "Europe/Paris", label: "Paris (CEST)" },
-  { value: "Europe/Berlin", label: "Berlin (CEST)" },
-  { value: "America/New_York", label: "New York (EDT)" },
-  { value: "America/Chicago", label: "Chicago (CDT)" },
-  { value: "America/Denver", label: "Denver (MDT)" },
-  { value: "America/Los_Angeles", label: "Los Angeles (PDT)" },
-  { value: "Asia/Tokyo", label: "Tokyo (JST)" },
-  { value: "Asia/Singapore", label: "Singapore (SGT)" },
-  { value: "Australia/Sydney", label: "Sydney (AEST)" },
+  { value: "America/Los_Angeles", label: "Los Angeles (UTC-7)" },
+  { value: "America/Denver", label: "Denver (UTC-6)" },
+  { value: "America/Chicago", label: "Chicago (UTC-5)" },
+  { value: "America/New_York", label: "New York (UTC-4)" },
   { value: "UTC", label: "UTC" },
+  { value: "Europe/London", label: "London (UTC+1)" },
+  { value: "Europe/Copenhagen", label: "Copenhagen (UTC+2)" },
+  { value: "Europe/Paris", label: "Paris (UTC+2)" },
+  { value: "Europe/Berlin", label: "Berlin (UTC+2)" },
+  { value: "Asia/Singapore", label: "Singapore (UTC+8)" },
+  { value: "Asia/Tokyo", label: "Tokyo (UTC+9)" },
+  { value: "Australia/Sydney", label: "Sydney (UTC+10)" },
 ];
 
 @customElement(elementName)
@@ -39,19 +53,30 @@ export class SessionizeProgramElement extends LitElement {
   private _schedule: SessionizeSchedule[] = [];
 
   @state()
+  private _categories: SessionizeCategory[] = [];
+
+  @state()
+  private _categoryDropdowns: CategoryDropdown[] = [];
+
+  @state()
+  private _selectedFilters: SelectedFilter[] = [];
+
+  @state()
   private _selectedDayIndex = 0;
 
   @state()
-  private _selectedTimezone = SOURCE_TIMEZONE;
-
-  @state()
-  private _showServiceSessions = true;
+  private _selectedTimezone = DEFAULT_TIMEZONE;
 
   @state()
   private _loading = true;
 
   @state()
   private _error: string | null = null;
+
+  // Cached/computed values - updated in willUpdate when dependencies change
+  #filteredSessionsByRoom = new Map<number, SessionizeSession[]>();
+  #filteredSessionIds = new Set<string>();
+  #activeRooms: SessionizeRoom[] = [];
 
   #dialogHandler = new DcDialogHandler();
 
@@ -60,18 +85,78 @@ export class SessionizeProgramElement extends LitElement {
     this.#loadSchedule();
   }
 
+  protected willUpdate(changedProperties: PropertyValues): void {
+    // Recompute filtered sessions when schedule, day, or filters change
+    if (
+      changedProperties.has("_schedule") ||
+      changedProperties.has("_selectedDayIndex") ||
+      changedProperties.has("_selectedFilters")
+    ) {
+      this.#updateFilteredSessions();
+    }
+  }
+
+  #updateFilteredSessions(): void {
+    const selectedDay = this._schedule[this._selectedDayIndex];
+    if (!selectedDay) {
+      this.#filteredSessionsByRoom.clear();
+      this.#filteredSessionIds.clear();
+      this.#activeRooms = [];
+      return;
+    }
+
+    // Build map of filtered sessions by room ID and set of filtered session IDs
+    const newMap = new Map<number, SessionizeSession[]>();
+    const newIds = new Set<string>();
+
+    for (const room of selectedDay.rooms) {
+      const sessions: SessionizeSession[] = [];
+      for (const slot of selectedDay.timeSlots) {
+        const slotRoom = slot.rooms.find((r) => r.id === room.id);
+        if (slotRoom?.session && this.#sessionMatchesFilter(slotRoom.session)) {
+          sessions.push(slotRoom.session);
+          newIds.add(slotRoom.session.id);
+        }
+      }
+      newMap.set(room.id, sessions);
+    }
+
+    this.#filteredSessionsByRoom = newMap;
+    this.#filteredSessionIds = newIds;
+
+    // Build list of rooms that have at least one matching session
+    this.#activeRooms = selectedDay.rooms.filter(
+      (room) => (newMap.get(room.id)?.length ?? 0) > 0
+    );
+  }
+
   async #loadSchedule() {
     try {
       this._loading = true;
       this._error = null;
 
-      const schedule = await SessionizeService.getSchedule();
-      this._schedule = schedule;
+      // Fetch schedule and categories in parallel
+      const [schedule, categories] = await Promise.all([
+        SessionizeService.getSchedule(),
+        SessionizeService.getCategories(),
+      ]);
 
-      // Select the default day if specified
-      const defaultIndex = schedule.findIndex((day) => day.isDefault);
-      if (defaultIndex >= 0) {
-        this._selectedDayIndex = defaultIndex;
+      this._schedule = schedule;
+      this._categories = categories;
+      this._categoryDropdowns = this.#buildCategoryDropdowns(categories, schedule);
+
+      // Default to Wednesday, or fall back to Sessionize default, or first day
+      const wednesdayIndex = schedule.findIndex((day) => {
+        const date = new Date(day.date);
+        return date.getDay() === 3; // 3 = Wednesday
+      });
+      if (wednesdayIndex >= 0) {
+        this._selectedDayIndex = wednesdayIndex;
+      } else {
+        const defaultIndex = schedule.findIndex((day) => day.isDefault);
+        if (defaultIndex >= 0) {
+          this._selectedDayIndex = defaultIndex;
+        }
       }
     } catch (error) {
       this._error =
@@ -80,6 +165,93 @@ export class SessionizeProgramElement extends LitElement {
     } finally {
       this._loading = false;
     }
+  }
+
+  #buildCategoryDropdowns(categories: SessionizeCategory[], schedule: SessionizeSchedule[]): CategoryDropdown[] {
+    const dropdowns: CategoryDropdown[] = [];
+
+    // Collect all category item IDs that are actually used in sessions
+    const usedCategoryItemIds = new Set<number>();
+    for (const day of schedule) {
+      for (const slot of day.timeSlots) {
+        for (const room of slot.rooms) {
+          if (room.session?.categoryItems) {
+            for (const itemId of room.session.categoryItems) {
+              usedCategoryItemIds.add(itemId);
+            }
+          }
+        }
+      }
+    }
+
+    // Rename certain categories for clarity
+    const titleMapping: Record<string, string> = {
+      tags: "Topic",
+      track: "Track",
+      level: "Level",
+    };
+
+    // Include categories that make sense for filtering (Tags, Track, Level, etc.)
+    // Exclude session format categories (those with names like "45 (regular talks)")
+    for (const category of categories) {
+      const isSessionFormat = category.items.some(
+        (item) => item.name.toLowerCase().includes("regular talk") ||
+                  item.name.toLowerCase().includes("minute")
+      );
+
+      if (!isSessionFormat && category.items.length > 0) {
+        const lowerTitle = category.title.toLowerCase();
+        const displayTitle = titleMapping[lowerTitle] || category.title;
+
+        // Only include items that are actually used in sessions
+        const usedItems = category.items.filter((item) => usedCategoryItemIds.has(item.id));
+
+        if (usedItems.length > 0) {
+          dropdowns.push({
+            id: category.id,
+            title: displayTitle,
+            items: usedItems.map((item) => ({
+              id: item.id,
+              name: item.name,
+            })),
+          });
+        }
+      }
+    }
+
+    return dropdowns;
+  }
+
+  #addFilter(categoryId: number, itemId: number, itemName: string, categoryTitle: string) {
+    // Don't add if already selected
+    if (this._selectedFilters.some((f) => f.id === itemId)) {
+      return;
+    }
+
+    this._selectedFilters = [
+      ...this._selectedFilters,
+      { id: itemId, name: itemName, categoryTitle },
+    ];
+  }
+
+  #removeFilter(filterId: number) {
+    this._selectedFilters = this._selectedFilters.filter((f) => f.id !== filterId);
+  }
+
+  #clearAllFilters() {
+    this._selectedFilters = [];
+  }
+
+  #sessionMatchesFilter(session: SessionizeSession): boolean {
+    // No filters selected = show everything
+    if (this._selectedFilters.length === 0) {
+      return true;
+    }
+
+    // OR logic: session matches if it has ANY of the selected category items
+    return this._selectedFilters.some((filter) =>
+      session.categoryItems.includes(filter.id)
+    );
   }
 
   #formatDate(dateString: string): string {
@@ -95,45 +267,125 @@ export class SessionizeProgramElement extends LitElement {
     }
   }
 
-  #formatTime(timeString: string, dateString?: string): string {
+  #parseDateTime(timeString: string, dateString?: string): Date | null {
     try {
       let date: Date;
+      let dateTimeStr: string;
 
       // Check if timeString is already a full ISO date or just a time
       if (timeString.includes("T") || timeString.includes("-")) {
-        // Full ISO datetime string
-        date = new Date(timeString);
+        // Full ISO datetime string - ensure it's treated as UTC
+        dateTimeStr = timeString;
       } else if (dateString) {
         // Just a time string (e.g., "09:00:00"), combine with the day's date
-        date = new Date(`${dateString}T${timeString}`);
+        // Extract just the date part (YYYY-MM-DD) in case dateString has a time component
+        const datePart = dateString.split("T")[0];
+        dateTimeStr = `${datePart}T${timeString}`;
       } else {
-        // Fallback: try to parse as-is, or return the raw string
-        date = new Date(timeString);
+        // Fallback: try to parse as-is
+        dateTimeStr = timeString;
       }
+
+      // Ensure UTC interpretation by adding Z if no timezone indicator present
+      if (!dateTimeStr.endsWith("Z") && !dateTimeStr.includes("+") && !dateTimeStr.includes("-", 10)) {
+        dateTimeStr += "Z";
+      }
+
+      date = new Date(dateTimeStr);
 
       if (isNaN(date.getTime())) {
-        // If still invalid, just return the time portion
-        return timeString.substring(0, 5); // "09:00:00" -> "09:00"
+        return null;
       }
 
-      return date.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: this._selectedTimezone,
-      });
+      return date;
     } catch {
-      return timeString;
+      return null;
     }
+  }
+
+  #getDayOffset(date: Date, originalDateString: string): number {
+    // Get the date in the selected timezone
+    const localDateStr = date.toLocaleDateString("en-CA", {
+      timeZone: this._selectedTimezone,
+    }); // YYYY-MM-DD format
+
+    // Get the original UTC date (just the date part)
+    const originalDate = originalDateString.split("T")[0];
+
+    // Compare dates
+    const localDate = new Date(localDateStr);
+    const origDate = new Date(originalDate);
+
+    // Calculate difference in days
+    const diffTime = localDate.getTime() - origDate.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  }
+
+  #getTimezoneOffsetFromCopenhagen(): number {
+    // Get current time to calculate timezone offsets
+    const now = new Date();
+
+    // Get time strings in both timezones
+    const copenhagenTime = now.toLocaleString("en-US", { timeZone: DEFAULT_TIMEZONE, hour12: false });
+    const selectedTime = now.toLocaleString("en-US", { timeZone: this._selectedTimezone, hour12: false });
+
+    // Parse to get hours
+    const copenhagenDate = new Date(copenhagenTime);
+    const selectedDate = new Date(selectedTime);
+
+    // Calculate difference in hours
+    const diffMs = selectedDate.getTime() - copenhagenDate.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
+
+    return diffHours;
+  }
+
+  #isDistantTimezone(): boolean {
+    const offset = this.#getTimezoneOffsetFromCopenhagen();
+    return Math.abs(offset) > 3;
+  }
+
+  #formatTime(timeString: string, dateString?: string): string {
+    const date = this.#parseDateTime(timeString, dateString);
+
+    if (!date) {
+      // If invalid, just return the time portion
+      return timeString.substring(0, 5); // "09:00:00" -> "09:00"
+    }
+
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: this._selectedTimezone,
+    });
+  }
+
+  #formatTimeWithDayOffset(
+    timeString: string,
+    dateString: string
+  ): { time: string; dayOffset: number } {
+    const date = this.#parseDateTime(timeString, dateString);
+
+    if (!date) {
+      return { time: timeString.substring(0, 5), dayOffset: 0 };
+    }
+
+    const time = date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: this._selectedTimezone,
+    });
+
+    const dayOffset = this.#getDayOffset(date, dateString);
+
+    return { time, dayOffset };
   }
 
   #onTimezoneChange(e: Event) {
     const select = e.target as HTMLSelectElement;
     this._selectedTimezone = select.value;
-  }
-
-  #onServiceSessionsToggle(e: Event) {
-    const checkbox = e.target as HTMLInputElement;
-    this._showServiceSessions = checkbox.checked;
   }
 
   #renderTimezoneSelector() {
@@ -142,7 +394,10 @@ export class SessionizeProgramElement extends LitElement {
         <label for="timezone-select">Timezone:</label>
         <select
           id="timezone-select"
-          @change=${this.#onTimezoneChange}
+          @change=${(e: Event) => {
+            const select = e.target as HTMLSelectElement;
+            this._selectedTimezone = select.value;
+          }}
           .value=${this._selectedTimezone}
         >
           ${TIMEZONE_OPTIONS.map(
@@ -157,23 +412,110 @@ export class SessionizeProgramElement extends LitElement {
     `;
   }
 
-  #renderServiceSessionsToggle() {
+  #onDropdownChange(e: Event, dropdown: CategoryDropdown) {
+    const select = e.target as HTMLSelectElement;
+    const itemId = parseInt(select.value, 10);
+
+    if (isNaN(itemId)) return;
+
+    const item = dropdown.items.find((i) => i.id === itemId);
+    if (item) {
+      this.#addFilter(dropdown.id, item.id, item.name, dropdown.title);
+    }
+
+    // Reset dropdown to placeholder
+    select.value = "";
+  }
+
+  #renderFilters() {
+    if (this._categoryDropdowns.length === 0) return nothing;
+
     return html`
-      <label class="service-sessions-toggle">
-        <input
-          type="checkbox"
-          ?checked=${this._showServiceSessions}
-          @change=${this.#onServiceSessionsToggle}
-        />
-        <span class="toggle-label">Show breaks & service sessions</span>
-      </label>
+      <div class="session-filters">
+        <div class="filter-controls">
+          <span class="filter-label">Filter by:</span>
+          <div class="filter-dropdowns">
+            ${this._categoryDropdowns.map(
+              (dropdown) => html`
+                <select
+                  class="filter-dropdown"
+                  @change=${(e: Event) => this.#onDropdownChange(e, dropdown)}
+                  aria-label="Filter by ${dropdown.title}"
+                >
+                  <option value="">Select ${dropdown.title}...</option>
+                  ${dropdown.items
+                    .filter((item) => !this._selectedFilters.some((f) => f.id === item.id))
+                    .map(
+                      (item) => html`
+                        <option value=${item.id}>${item.name}</option>
+                      `
+                    )}
+                </select>
+              `
+            )}
+          </div>
+        </div>
+        ${when(
+          this._selectedFilters.length > 0,
+          () => html`
+            <div class="selected-filters">
+              <span class="active-filters-label">Active filters:</span>
+              ${this._selectedFilters.map(
+                (filter) => html`
+                  <span class="filter-pill">
+                    ${filter.name}
+                    <button
+                      class="filter-pill-remove"
+                      @click=${() => this.#removeFilter(filter.id)}
+                      aria-label="Remove ${filter.name} filter"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                `
+              )}
+              <button class="clear-filters-btn" @click=${() => this.#clearAllFilters()}>
+                Clear all
+              </button>
+            </div>
+          `
+        )}
+      </div>
     `;
   }
 
   #openSessionDialog(session: SessionizeSession) {
     const dialog = new SessionizeSessionDialogElement();
     dialog.session = session;
+    dialog.timezone = this._selectedTimezone;
+    dialog.categories = this._categories;
+    dialog.schedule = this._schedule;
+    dialog.addEventListener("filter-select", ((e: CustomEvent) => {
+      const { id, name } = e.detail;
+      this.#addFilterFromHashtag(id, name);
+    }) as EventListener);
     this.#dialogHandler.open(dialog);
+  }
+
+  #addFilterFromHashtag(itemId: number, itemName: string) {
+    // Don't add if already selected
+    if (this._selectedFilters.some((f) => f.id === itemId)) {
+      return;
+    }
+
+    // Find the category title for this item
+    let categoryTitle = "";
+    for (const category of this._categories) {
+      if (category.items.some((i) => i.id === itemId)) {
+        categoryTitle = category.title;
+        break;
+      }
+    }
+
+    this._selectedFilters = [
+      ...this._selectedFilters,
+      { id: itemId, name: itemName, categoryTitle },
+    ];
   }
 
   #selectDay(index: number) {
@@ -219,55 +561,148 @@ export class SessionizeProgramElement extends LitElement {
     `;
   }
 
-  #renderSessionCard(session: SessionizeSession | undefined, room: SessionizeRoom) {
-    if (!session) {
-      return html`<div class="session-card empty"></div>`;
-    }
+  #renderDayOffsetBadge(dayOffset: number) {
+    if (dayOffset === 0) return nothing;
 
-    // Hide service sessions if toggle is off (but keep empty cell for grid layout)
-    if (session.isServiceSession && !this._showServiceSessions) {
-      return html`<div class="session-card empty"></div>`;
-    }
+    const label = dayOffset > 0 ? `+${dayOffset}` : `${dayOffset}`;
+    const title =
+      dayOffset > 0
+        ? `${dayOffset} day${dayOffset > 1 ? "s" : ""} later in selected timezone`
+        : `${Math.abs(dayOffset)} day${Math.abs(dayOffset) > 1 ? "s" : ""} earlier in selected timezone`;
 
-    const speakerNames = session.speakers?.map((s) => s.fullName).join(", ") || "";
-
-    return html`
-      <div
-        class="session-card ${session.isServiceSession ? "service-session" : ""}"
-        @click=${() => this.#openSessionDialog(session)}
-        role="button"
-        tabindex="0"
-        @keydown=${(e: KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            this.#openSessionDialog(session);
-          }
-        }}
-      >
-        <h4 class="session-title">${session.title}</h4>
-        ${when(
-          speakerNames,
-          () => html`<p class="session-speakers">${speakerNames}</p>`
-        )}
-        <p class="session-room">${room.name}</p>
-      </div>
-    `;
+    return html`<span class="day-offset-badge" title=${title}>${label}</span>`;
   }
 
-  #renderTimeSlot(timeSlot: SessionizeTimeSlot, rooms: SessionizeRoom[], dayDate: string) {
-    return html`
-      <div class="time-slot">
-        <div class="time-slot-time">
-          ${this.#formatTime(timeSlot.slotStart, dayDate)}
-        </div>
-        <div class="time-slot-sessions">
-          ${rooms.map((headerRoom) => {
-            const slotRoom = timeSlot.rooms.find((r) => r.id === headerRoom.id);
-            return this.#renderSessionCard(slotRoom?.session, headerRoom);
-          })}
-        </div>
-      </div>
-    `;
+  #getAllSessionsForDay(day: SessionizeSchedule): SessionizeSession[] {
+    const sessions: SessionizeSession[] = [];
+    for (const slot of day.timeSlots) {
+      for (const room of slot.rooms) {
+        if (room.session) {
+          sessions.push(room.session);
+        }
+      }
+    }
+    return sessions;
+  }
+
+  #getSessionsForRoom(roomId: number): SessionizeSession[] {
+    return this.#filteredSessionsByRoom.get(roomId) ?? [];
+  }
+
+  #getRoomsWithSessions(): SessionizeRoom[] {
+    return this.#activeRooms;
+  }
+
+  #getTimeRange(day: SessionizeSchedule): { startHour: number; endHour: number } {
+    const sessions = this.#getAllSessionsForDay(day);
+    if (sessions.length === 0) {
+      return { startHour: 8, endHour: 18 };
+    }
+
+    let minTime = Infinity;
+    let maxTime = -Infinity;
+
+    for (const session of sessions) {
+      if (session.startsAt) {
+        const date = this.#parseDateTime(session.startsAt);
+        if (date) {
+          const hours = this.#getHoursInTimezone(date);
+          minTime = Math.min(minTime, hours);
+        }
+      }
+      if (session.endsAt) {
+        const date = this.#parseDateTime(session.endsAt);
+        if (date) {
+          const hours = this.#getHoursInTimezone(date);
+          maxTime = Math.max(maxTime, hours);
+        }
+      }
+    }
+
+    // Round to full hours with padding
+    const startHour = Math.floor(minTime);
+    const endHour = Math.ceil(maxTime);
+
+    return { startHour, endHour };
+  }
+
+  #getHoursInTimezone(date: Date): number {
+    const timeStr = date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: this._selectedTimezone,
+    });
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return hours + minutes / 60;
+  }
+
+  #getSessionPositionVariable(
+    session: SessionizeSession,
+    startHour: number,
+    hours: { hour: number; height: number }[],
+    totalHeight: number
+  ): { top: number; height: number } | null {
+    if (!session.startsAt || !session.endsAt) {
+      return null;
+    }
+
+    const startDate = this.#parseDateTime(session.startsAt);
+    const endDate = this.#parseDateTime(session.endsAt);
+
+    if (!startDate || !endDate) {
+      return null;
+    }
+
+    const sessionStartHours = this.#getHoursInTimezone(startDate);
+    const sessionEndHours = this.#getHoursInTimezone(endDate);
+
+    // Calculate pixel position by summing up heights for each hour
+    let topPixels = 0;
+    let heightPixels = 0;
+
+    for (const { hour, height } of hours) {
+      const hourEnd = hour + 1;
+
+      // Calculate top position (before session starts)
+      if (hourEnd <= sessionStartHours) {
+        topPixels += height;
+      } else if (hour < sessionStartHours) {
+        // Partial hour at the start
+        topPixels += height * (sessionStartHours - hour);
+      }
+
+      // Calculate height (session duration)
+      if (hour >= sessionStartHours && hourEnd <= sessionEndHours) {
+        // Full hour within session
+        heightPixels += height;
+      } else if (hour < sessionStartHours && hourEnd > sessionStartHours && hourEnd <= sessionEndHours) {
+        // Session starts mid-hour
+        heightPixels += height * (hourEnd - sessionStartHours);
+      } else if (hour >= sessionStartHours && hour < sessionEndHours && hourEnd > sessionEndHours) {
+        // Session ends mid-hour
+        heightPixels += height * (sessionEndHours - hour);
+      } else if (hour < sessionStartHours && hourEnd > sessionEndHours) {
+        // Session entirely within this hour
+        heightPixels += height * (sessionEndHours - sessionStartHours);
+      }
+    }
+
+    const top = (topPixels / totalHeight) * 100;
+    const heightPercent = (heightPixels / totalHeight) * 100;
+
+    return { top, height: heightPercent };
+  }
+
+  #formatSessionTime(dateString: string): string {
+    const date = this.#parseDateTime(dateString);
+    if (!date) return "";
+
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: this._selectedTimezone,
+    });
   }
 
   #renderScheduleGrid() {
@@ -276,23 +711,120 @@ export class SessionizeProgramElement extends LitElement {
       return html`<div class="empty-state">No schedule available.</div>`;
     }
 
-    const rooms = selectedDay.rooms;
+    // Only show rooms that have sessions matching current filters (pre-computed in willUpdate)
+    const rooms = this.#getRoomsWithSessions();
+    if (rooms.length === 0) {
+      return html`<div class="empty-state">No sessions match the current filters.</div>`;
+    }
+
+    const { startHour, endHour } = this.#getTimeRange(selectedDay);
+    const isDistant = this.#isDistantTimezone();
+
+    // Use uniform height for distant timezones, variable for local
+    const hourHeight = 180; // pixels per hour
+    const earlyHourHeight = isDistant ? hourHeight : 90; // half-height for hours before 9am (Copenhagen time only)
+    const earlyHourCutoff = 9;
+
+    // Generate hour markers with their heights
+    const hours: { hour: number; height: number }[] = [];
+    let totalHeight = 0;
+
+    for (let h = startHour; h <= endHour; h++) {
+      const height = (h < earlyHourCutoff && !isDistant) ? earlyHourHeight : hourHeight;
+      hours.push({ hour: h, height });
+      totalHeight += height;
+    }
 
     return html`
-      <div class="schedule-grid">
-        <div class="schedule-header">
-          <div class="header-time">Time</div>
-          <div class="header-rooms">
+      <div class="schedule-timeline">
+        <div class="timeline-header">
+          <div class="timeline-time-column"></div>
+          <div class="timeline-rooms-header">
             ${rooms.map(
-              (room) => html`<div class="header-room">${room.name}</div>`
+              (room) => html`<div class="timeline-room-header">${room.name}</div>`
             )}
           </div>
         </div>
-        <div class="schedule-body">
-          ${selectedDay.timeSlots.map((slot) =>
-            this.#renderTimeSlot(slot, rooms, selectedDay.date)
-          )}
+        <div class="timeline-body" style="height: ${totalHeight}px;">
+          <div class="timeline-time-column">
+            ${hours.map(
+              ({ hour, height }) => {
+                const displayHour = hour >= 24 ? hour - 24 : (hour < 0 ? hour + 24 : hour);
+                return html`
+                  <div class="timeline-hour ${(hour < earlyHourCutoff && !isDistant) ? "early-hour" : ""}" style="height: ${height}px;">
+                    <span class="timeline-hour-label">${displayHour.toString().padStart(2, "0")}:00</span>
+                  </div>
+                `;
+              }
+            )}
+          </div>
+          <div class="timeline-rooms">
+            ${rooms.map((room) => this.#renderTimelineRoom(room, startHour, hours, totalHeight))}
+          </div>
         </div>
+      </div>
+    `;
+  }
+
+  #renderTimelineRoom(
+    room: SessionizeRoom,
+    startHour: number,
+    hours: { hour: number; height: number }[],
+    totalHeight: number
+  ) {
+    // Sessions are pre-filtered in willUpdate
+    const sessions = this.#getSessionsForRoom(room.id);
+
+    return html`
+      <div class="timeline-room-column">
+        ${sessions.map((session) => {
+          const position = this.#getSessionPositionVariable(session, startHour, hours, totalHeight);
+          if (!position) return nothing;
+
+          const speakerNames = session.speakers?.map((s) => s.fullName).join(", ") || "";
+          const isBreakOrActivity = session.isServiceSession || session.categoryItems.length === 0;
+          const startTime = session.startsAt ? this.#formatSessionTime(session.startsAt) : "";
+          const endTime = session.endsAt ? this.#formatSessionTime(session.endsAt) : "";
+
+          // Calculate duration in minutes for short break detection
+          let durationMinutes = 0;
+          if (session.startsAt && session.endsAt) {
+            const start = this.#parseDateTime(session.startsAt);
+            const end = this.#parseDateTime(session.endsAt);
+            if (start && end) {
+              durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+            }
+          }
+          const isShortBreak = isBreakOrActivity && durationMinutes <= 15;
+
+          return html`
+            <div
+              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""}"
+              style="top: ${position.top}%; height: ${position.height}%;"
+              @click=${() => this.#openSessionDialog(session)}
+              role="button"
+              tabindex="0"
+              @keydown=${(e: KeyboardEvent) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  this.#openSessionDialog(session);
+                }
+              }}
+            >
+              ${isShortBreak
+                ? html`<span class="session-title-inline" title=${session.title}>${session.title}</span><span class="session-time-inline">${startTime} - ${endTime}</span>`
+                : html`
+                    <h4 class="session-title" title=${session.title}>${session.title}</h4>
+                    ${when(
+                      speakerNames,
+                      () => html`<p class="session-speakers" title=${speakerNames}>${speakerNames}</p>`
+                    )}
+                    <p class="session-time">${startTime} - ${endTime}</p>
+                  `
+              }
+            </div>
+          `;
+        })}
       </div>
     `;
   }
@@ -305,17 +837,22 @@ export class SessionizeProgramElement extends LitElement {
 
     return html`
       <div class="schedule-mobile">
-        ${selectedDay.timeSlots.map(
-          (slot) => html`
-            <div class="mobile-time-slot">
-              <div class="mobile-time">${this.#formatTime(slot.slotStart, selectedDay.date)}</div>
+        ${selectedDay.timeSlots.map((slot) => {
+          const { time, dayOffset } = this.#formatTimeWithDayOffset(slot.slotStart, selectedDay.date);
+          return html`
+            <div class="mobile-time-slot ${dayOffset !== 0 ? "different-day" : ""}">
+              <div class="mobile-time">
+                ${time}
+                ${this.#renderDayOffsetBadge(dayOffset)}
+              </div>
               <div class="mobile-sessions">
                 ${slot.rooms
-                  .filter((room) => room.session && (this._showServiceSessions || !room.session.isServiceSession))
-                  .map(
-                    (room) => html`
+                  .filter((room) => room.session && this.#filteredSessionIds.has(room.session.id))
+                  .map((room) => {
+                    const isBreakOrActivity = room.session?.isServiceSession || room.session?.categoryItems.length === 0;
+                    return html`
                       <div
-                        class="mobile-session-card ${room.session?.isServiceSession ? "service-session" : ""}"
+                        class="mobile-session-card ${isBreakOrActivity ? "service-session" : ""}"
                         @click=${() => room.session && this.#openSessionDialog(room.session)}
                         role="button"
                         tabindex="0"
@@ -336,13 +873,21 @@ export class SessionizeProgramElement extends LitElement {
                             </p>
                           `
                         )}
+                        ${when(
+                          room.session?.startsAt && room.session?.endsAt,
+                          () => html`
+                            <p class="session-time">
+                              ${this.#formatSessionTime(room.session!.startsAt!)} - ${this.#formatSessionTime(room.session!.endsAt!)}
+                            </p>
+                          `
+                        )}
                       </div>
-                    `
-                  )}
+                    `;
+                  })}
               </div>
             </div>
-          `
-        )}
+          `;
+        })}
       </div>
     `;
   }
@@ -358,12 +903,10 @@ export class SessionizeProgramElement extends LitElement {
     return html`
       <div class="program-container">
         <div class="program-controls">
-          ${this.#renderTabs()}
-          <div class="program-filters">
-            ${this.#renderServiceSessionsToggle()}
-            ${this.#renderTimezoneSelector()}
-          </div>
+          ${this.#renderFilters()}
+          ${this.#renderTimezoneSelector()}
         </div>
+        ${this.#renderTabs()}
         <div class="schedule-desktop">${this.#renderScheduleGrid()}</div>
         <div class="schedule-mobile-view">${this.#renderMobileSchedule()}</div>
       </div>
@@ -379,58 +922,134 @@ export class SessionizeProgramElement extends LitElement {
       margin-top: var(--unit-md, 2rem);
     }
 
-    /* Controls (tabs + filters) */
+    /* Controls container (filters + timezone) */
     .program-controls {
       display: flex;
       flex-direction: column;
       gap: var(--unit, 1rem);
-      margin-bottom: var(--unit-md, 2rem);
+      margin-bottom: var(--unit, 1rem);
     }
 
     @media (min-width: 768px) {
       .program-controls {
         flex-direction: row;
+        align-items: center;
         justify-content: space-between;
-        align-items: center;
-      }
-    }
-
-    /* Filters container */
-    .program-filters {
-      display: flex;
-      flex-direction: column;
-      gap: var(--unit-sm, 0.75rem);
-      align-items: flex-start;
-    }
-
-    @media (min-width: 768px) {
-      .program-filters {
-        flex-direction: row;
-        align-items: center;
         gap: var(--unit-md, 1.5rem);
       }
     }
 
-    /* Service sessions toggle */
-    .service-sessions-toggle {
+    /* Session filters */
+    .session-filters {
       display: flex;
+      flex-direction: column;
+      gap: var(--unit-sm, 0.75rem);
+    }
+
+    .filter-controls {
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--unit-xs, 0.5rem);
-      cursor: pointer;
-      user-select: none;
     }
 
-    .service-sessions-toggle input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--color-blue, #3544b1);
-      cursor: pointer;
-    }
-
-    .service-sessions-toggle .toggle-label {
+    .filter-label {
       font-size: 0.9rem;
+      font-weight: 500;
       color: var(--color-dark, #1b264f);
       white-space: nowrap;
+    }
+
+    .filter-dropdowns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--unit-xs, 0.5rem);
+    }
+
+    .filter-dropdown {
+      padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
+      font-size: 0.9rem;
+      border: 1px solid var(--color-grey, #d1d5db);
+      border-radius: var(--border-radius, 6px);
+      background: var(--color-white, #fff);
+      color: var(--color-dark, #1b264f);
+      cursor: pointer;
+      min-width: 140px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-dropdown:hover {
+      border-color: var(--color-blue, #3544b1);
+    }
+
+    .filter-dropdown:focus {
+      outline: none;
+      border-color: var(--color-blue, #3544b1);
+      box-shadow: 0 0 0 3px rgba(53, 68, 177, 0.15);
+    }
+
+    .selected-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--unit-xs, 0.5rem);
+    }
+
+    .active-filters-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-grey-dark, #6b7280);
+      white-space: nowrap;
+    }
+
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+      background: var(--color-blue, #3544b1);
+      color: var(--color-white, #fff);
+      border-radius: var(--border-radius-lg, 20px);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .filter-pill-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 50%;
+      color: var(--color-white, #fff);
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .filter-pill-remove:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .clear-filters-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--color-grey, #d1d5db);
+      border-radius: var(--border-radius, 6px);
+      background: var(--color-white, #fff);
+      color: var(--color-grey-dark, #6b7280);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-filters-btn:hover {
+      border-color: var(--color-red, #dc2626);
+      color: var(--color-red, #dc2626);
     }
 
     /* Timezone selector */
@@ -476,8 +1095,8 @@ export class SessionizeProgramElement extends LitElement {
       gap: var(--unit-xs, 0.5rem);
       overflow-x: auto;
       padding-bottom: var(--unit-xs, 0.5rem);
+      margin-bottom: var(--unit-md, 1.5rem);
       -webkit-overflow-scrolling: touch;
-      flex: 1;
     }
 
     .program-tab {
@@ -517,109 +1136,190 @@ export class SessionizeProgramElement extends LitElement {
       }
     }
 
-    .schedule-grid {
+    /* Timeline Layout */
+    .schedule-timeline {
       border: 1px solid var(--color-grey-light, #e5e7eb);
       border-radius: var(--border-radius-lg, 8px);
       overflow: hidden;
+      background: var(--color-white, #fff);
     }
 
-    .schedule-header {
+    .timeline-header {
       display: flex;
       background: var(--color-blue, #3544b1);
       color: var(--color-white, #fff);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
-    .header-time {
-      width: 100px;
+    .timeline-time-column {
+      width: 70px;
       flex-shrink: 0;
-      padding: var(--unit, 1rem);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .timeline-header .timeline-time-column {
       border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .header-rooms {
+    .timeline-body .timeline-time-column {
+      background: var(--color-grey-light, #f9f9f9);
+      border-right: 1px solid var(--color-grey-light, #e5e7eb);
+    }
+
+    .timeline-rooms-header {
       display: flex;
       flex: 1;
     }
 
-    .header-room {
+    .timeline-room-header {
       flex: 1;
       padding: var(--unit, 1rem);
       font-weight: 600;
       text-align: center;
       border-right: 1px solid rgba(255, 255, 255, 0.2);
+      min-width: 150px;
     }
 
-    .header-room:last-child {
+    .timeline-room-header:last-child {
       border-right: none;
     }
 
-    .schedule-body {
-      background: var(--color-white, #fff);
-    }
-
-    .time-slot {
+    .timeline-body {
       display: flex;
-      border-bottom: 1px solid var(--color-grey-light, #e5e7eb);
+      position: relative;
     }
 
-    .time-slot:last-child {
+    .timeline-hour {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0.25rem;
+      border-bottom: 1px solid var(--color-grey-light, #e5e7eb);
+      box-sizing: border-box;
+    }
+
+    .timeline-hour:last-child {
       border-bottom: none;
     }
 
-    .time-slot-time {
-      width: 100px;
-      flex-shrink: 0;
-      padding: var(--unit, 1rem);
+    .timeline-hour-label {
+      font-size: 0.8rem;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--color-grey-light, #f9f9f9);
-      border-right: 1px solid var(--color-grey-light, #e5e7eb);
       color: var(--color-dark, #1b264f);
     }
 
-    .time-slot-sessions {
+    .timeline-rooms {
       display: flex;
       flex: 1;
+      position: relative;
     }
 
-    .session-card {
+    .timeline-room-column {
       flex: 1;
-      padding: var(--unit, 1rem);
+      position: relative;
       border-right: 1px solid var(--color-grey-light, #e5e7eb);
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      min-height: 80px;
+      min-width: 150px;
     }
 
-    .session-card:last-child {
+    .timeline-room-column:last-child {
       border-right: none;
     }
 
-    .session-card:hover {
-      background: var(--color-grey-light, #f5f5f5);
+    .timeline-session {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      padding: 0.5rem;
+      background: var(--color-white, #fff);
+      border: 1px solid var(--color-blue, #3544b1);
+      border-left: 4px solid var(--color-blue, #3544b1);
+      border-radius: var(--border-radius, 6px);
+      cursor: pointer;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, transform 0.1s ease;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
     }
 
-    .session-card.empty {
-      cursor: default;
+    .timeline-session:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 5;
     }
 
-    .session-card.empty:hover {
-      background: transparent;
-    }
-
-    .session-card.service-session {
+    .timeline-session.service-session {
       background: var(--color-grey-light, #f9f9f9);
-      cursor: default;
+      border-color: var(--color-grey, #d1d5db);
+      border-left-color: var(--color-grey, #d1d5db);
     }
 
-    .session-card.service-session:hover {
-      background: var(--color-grey-light, #f9f9f9);
+    .timeline-session.short-break {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .session-title-inline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-dark, #1b264f);
+      white-space: nowrap;
+    }
+
+    .session-time-inline {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--color-grey-dark, #6b7280);
+      white-space: nowrap;
+    }
+
+    .timeline-session .session-title {
+      margin: 0 0 0.25rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-dark, #1b264f);
+      line-height: 1.2;
+      /* Allow title to grow and shrink based on available space */
+      flex: 1 1 auto;
+      overflow: hidden;
+      /* Fade out overflow text */
+      mask-image: linear-gradient(to bottom, black calc(100% - 0.5rem), transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 0.5rem), transparent 100%);
+    }
+
+    .timeline-session .session-speakers {
+      margin: 0 0 0.25rem;
+      font-size: 0.75rem;
+      color: var(--color-blue, #3544b1);
+      flex-shrink: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .timeline-session .session-time {
+      margin: 0;
+      margin-top: auto;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--color-grey-dark, #6b7280);
+    }
+
+    .day-offset-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.1rem 0.4rem;
+      background: var(--color-orange, #f59e0b);
+      color: var(--color-white, #fff);
+      border-radius: var(--border-radius, 4px);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1;
     }
 
     .session-title {
@@ -665,11 +1365,22 @@ export class SessionizeProgramElement extends LitElement {
       padding-left: var(--unit, 1rem);
     }
 
+    .mobile-time-slot.different-day {
+      border-left-color: var(--color-orange, #f59e0b);
+    }
+
     .mobile-time {
+      display: flex;
+      align-items: center;
+      gap: var(--unit-xs, 0.5rem);
       font-size: 1.1rem;
       font-weight: 700;
       color: var(--color-blue, #3544b1);
       margin-bottom: var(--unit-sm, 0.75rem);
+    }
+
+    .mobile-time-slot.different-day .mobile-time {
+      color: var(--color-orange, #f59e0b);
     }
 
     .mobile-sessions {
@@ -718,6 +1429,13 @@ export class SessionizeProgramElement extends LitElement {
 
     .mobile-session-card .session-speakers {
       font-size: 0.9rem;
+    }
+
+    .mobile-session-card .session-time {
+      margin: var(--unit-xs, 0.5rem) 0 0;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--color-grey-dark, #6b7280);
     }
 
     /* Loading & Error */
@@ -778,6 +1496,136 @@ export class SessionizeProgramElement extends LitElement {
       text-align: center;
       padding: var(--unit-xl, 3rem);
       color: var(--color-grey, #6b7280);
+    }
+
+    /* Mobile styles */
+    @media (max-width: 600px) {
+      .program-container {
+        margin-top: var(--unit, 1rem);
+      }
+
+      .program-controls {
+        gap: var(--unit-sm, 0.75rem);
+        margin-bottom: var(--unit-sm, 0.75rem);
+      }
+
+      .filter-label,
+      .active-filters-label {
+        font-size: 0.8rem;
+      }
+
+      .filter-dropdown {
+        padding: var(--unit-xs, 0.5rem);
+        font-size: 0.85rem;
+        min-width: 120px;
+      }
+
+      .filter-pill {
+        padding: 0.25rem 0.4rem 0.25rem 0.6rem;
+        font-size: 0.8rem;
+      }
+
+      .timezone-selector label {
+        font-size: 0.8rem;
+      }
+
+      .timezone-selector select {
+        padding: var(--unit-xs, 0.5rem);
+        font-size: 0.85rem;
+        min-width: 150px;
+      }
+
+      /* Day tabs - stack vertically on mobile */
+      .program-tabs {
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: var(--unit, 1rem);
+        padding: 0.25rem;
+        background: var(--color-grey-light, #f5f5f5);
+        border-radius: var(--border-radius-lg, 8px);
+        overflow-x: visible;
+      }
+
+      .program-tab {
+        width: 100%;
+        padding: var(--unit-sm, 0.75rem);
+        font-size: 0.9rem;
+        text-align: center;
+        border-radius: var(--border-radius, 6px);
+      }
+
+      /* Filter controls - stack on mobile */
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-dropdowns {
+        flex-direction: column;
+      }
+
+      .filter-dropdown {
+        width: 100%;
+        min-width: unset;
+      }
+
+      .selected-filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-pill {
+        justify-content: space-between;
+      }
+
+      .clear-filters-btn {
+        align-self: flex-start;
+      }
+
+      /* Mobile schedule */
+      .mobile-time-slot {
+        padding-left: var(--unit-sm, 0.75rem);
+      }
+
+      .mobile-time {
+        font-size: 1rem;
+        margin-bottom: var(--unit-xs, 0.5rem);
+      }
+
+      .mobile-sessions {
+        gap: var(--unit-xs, 0.5rem);
+      }
+
+      .mobile-session-card {
+        padding: var(--unit-sm, 0.75rem);
+      }
+
+      .mobile-room-badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .mobile-session-card .session-title {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .mobile-session-card .session-speakers {
+        font-size: 0.8rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .mobile-session-card .session-time {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+      }
+
+      .loading,
+      .error,
+      .empty-state {
+        padding: var(--unit-md, 1.5rem);
+      }
     }
   `;
 }

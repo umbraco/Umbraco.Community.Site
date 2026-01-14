@@ -42,12 +42,6 @@ export interface SessionizeSession {
   categoryItems: number[];
 }
 
-export interface SessionizeSessionGroup {
-  groupId?: number;
-  groupName: string;
-  sessions: SessionizeSession[];
-}
-
 export interface SessionizeSchedule {
   date: string;
   isDefault: boolean;
@@ -66,13 +60,27 @@ export interface SessionizeTimeSlot {
   rooms: SessionizeRoom[];
 }
 
+export interface SessionizeCategory {
+  id: number;
+  title: string;
+  items: SessionizeCategoryItem[];
+  sort: number;
+  type: string;
+}
+
+export interface SessionizeCategoryItem {
+  id: number;
+  name: string;
+  sort: number;
+}
+
 export class SessionizeService extends ServiceBase {
   private static readonly BASE_URL = "/api/sessionize";
 
   /**
-   * Gets all sessions grouped by category
+   * Gets all sessions
    */
-  static async getSessions(): Promise<SessionizeSessionGroup[]> {
+  static async getSessions(): Promise<SessionizeSession[]> {
     const response = await ServiceBase.get(`${this.BASE_URL}/sessions`);
     if (!response.ok) {
       throw new Error(`Failed to fetch sessions: ${response.statusText}`);
@@ -130,6 +138,17 @@ export class SessionizeService extends ServiceBase {
     const response = await ServiceBase.get(`${this.BASE_URL}/schedule`);
     if (!response.ok) {
       throw new Error(`Failed to fetch schedule: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Gets all categories
+   */
+  static async getCategories(): Promise<SessionizeCategory[]> {
+    const response = await ServiceBase.get(`${this.BASE_URL}/categories`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch categories: ${response.statusText}`);
     }
     return response.json();
   }

@@ -17,10 +17,10 @@ public class SessionizeApiController : ControllerBase
     }
 
     /// <summary>
-    /// Gets all sessions grouped by category
+    /// Gets all sessions
     /// </summary>
     [HttpGet("sessions")]
-    [ProducesResponseType(typeof(List<SessionizeSessionGroup>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<SessionizeSession>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
     public async Task<IActionResult> GetSessions(CancellationToken cancellationToken)
@@ -128,6 +128,27 @@ public class SessionizeApiController : ControllerBase
         {
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
                 new { error = "Unable to fetch schedule from Sessionize" });
+        }
+    }
+
+    /// <summary>
+    /// Gets all categories
+    /// </summary>
+    [HttpGet("categories")]
+    [ProducesResponseType(typeof(List<SessionizeCategory>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var categories = await _sessionizeClient.GetCategoriesAsync(cancellationToken);
+            return Ok(categories);
+        }
+        catch (HttpRequestException)
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = "Unable to fetch categories from Sessionize" });
         }
     }
 }

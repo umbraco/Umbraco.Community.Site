@@ -12,11 +12,32 @@ export class DcDialogHandler {
     dialogElement?.appendChild(element);
     dialogElement?.showModal();
 
+    // Lock body scroll
+    document.body.classList.add("dialog-open");
+
     const close = () => {
       dialogElement?.close();
       dialogElement?.removeChild(element);
+      // Unlock body scroll
+      document.body.classList.remove("dialog-open");
     };
 
-    document.addEventListener("dialog-close", close, { once: true });
+    // Close on backdrop click (clicking the dialog element itself, not its contents)
+    const onBackdropClick = (e: MouseEvent) => {
+      if (e.target === dialogElement) {
+        close();
+        dialogElement?.removeEventListener("click", onBackdropClick);
+      }
+    };
+    dialogElement?.addEventListener("click", onBackdropClick);
+
+    // Close on Escape key (native dialog behavior) or custom close event
+    const onClose = () => {
+      close();
+      dialogElement?.removeEventListener("click", onBackdropClick);
+    };
+
+    document.addEventListener("dialog-close", onClose, { once: true });
+    dialogElement?.addEventListener("close", onClose, { once: true });
   }
 }

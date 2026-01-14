@@ -33,6 +33,9 @@ public class SessionizeSpeaker
 
     [JsonPropertyName("sessions")]
     public List<SessionizeSessionOverview> Sessions { get; set; } = new();
+
+    [JsonPropertyName("categoryItems")]
+    public List<int> CategoryItems { get; set; } = new();
 }
 
 public class SessionizeLink
