@@ -12,8 +12,6 @@ When updating the Umbraco (or Deploy) versions you should:
 
 - Settings > Deploy > click [Export schema to data files] so that the .uda files record the version number change. It would be good to get those changes out the way in a commit where no *actual* schema changes are being done!
 
-- Settings > Models Builder > click [Generate Models] - again, be good to get these changes committed where no *actual* changes being done
-
 ## Making Urgent Changes Directly
 
 Sometimes we need to make changes to Staging or Production backoffices directly to fix an urgent issue. This will cause a commit to the associated .uda file in the appropriate Cloud repository. Note this *may* not get overwritten in future deployments as Cloud uses git merge to import changes: it does not do a complete overwrite. 
