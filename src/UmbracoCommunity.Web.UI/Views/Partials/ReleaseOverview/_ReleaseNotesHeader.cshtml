@@ -22,6 +22,8 @@
         }
     }
     var nugetPackageId = isLegacyUmbraco ? "UmbracoCms" : Model.NuGetPackageId;
+    // Legacy versions (8.18.5 and lower) are always considered released
+    var isReleased = isLegacyUmbraco || Model.ReleaseInfo?.IsReleased == true;
 }
 <div class="release-notes-header">
     @if (Model.ReleaseInfo != null)
@@ -30,7 +32,7 @@
             <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
             @if (Model.ReleaseInfo.ReleaseDate.HasValue)
             {
-                @if (Model.ReleaseInfo.IsReleased)
+                @if (isReleased)
                 {
                     <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
                 }
@@ -44,13 +46,13 @@
                 <p class="release-date"><strong>Target release date:</strong> To be announced</p>
             }
 
-            @if (Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(nugetPackageId))
+            @if (isReleased && !string.IsNullOrEmpty(nugetPackageId))
             {
                 <p class="release-nuget-link">
                     <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@nugetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@nugetPackageId v@(Model.ReleaseInfo.Version)</a>
                 </p>
             }
-            @if (Model.ReleaseInfo.IsReleased && isLegacyUmbraco)
+            @if (isReleased && isLegacyUmbraco)
             {
                 <p class="release-nuget-link">
                     <strong>ZIP Download:</strong> <a href="https://umbracoreleases.blob.core.windows.net/download/UmbracoCms.@(Model.ReleaseInfo.Version).zip" target="_blank" rel="noopener noreferrer">UmbracoCms.@(Model.ReleaseInfo.Version).zip</a>
@@ -58,7 +60,7 @@
             }
         </div>
         
-        @if (isVersion9OrHigher && Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(nugetPackageId))
+        @if (isVersion9OrHigher && isReleased && !string.IsNullOrEmpty(nugetPackageId))
         {
             <div class="release-links">
                 <h3>Install and upgrade guidance</h3>
