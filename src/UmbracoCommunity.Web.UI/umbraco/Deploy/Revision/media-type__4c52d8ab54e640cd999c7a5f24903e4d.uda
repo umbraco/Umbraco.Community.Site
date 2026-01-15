@@ -16,25 +16,24 @@
       "Alias": "file",
       "PropertyTypes": [
         {
-          "Key": "00000018-0000-0000-0000-000000000000",
+          "Key": "3531c0a3-4e0a-4324-a621-b9d3822b071f",
+          "Alias": "umbracoExtension",
+          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+          "Name": "File extension",
+          "SortOrder": 1
+        },
+        {
+          "Key": "a0fb68f3-f427-47a6-afce-536ffa5b64e9",
           "Alias": "umbracoFile",
           "DataType": "umb://data-type/84c6b44131df4ffeb67e67d5bc3ae65a",
           "Mandatory": true,
           "Name": "File"
         },
         {
-          "Key": "00000019-0000-0000-0000-000000000000",
-          "Alias": "umbracoExtension",
-          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "Name": "Type",
-          "SortOrder": 1
-        },
-        {
-          "Key": "0000001a-0000-0000-0000-000000000000",
+          "Key": "f9527050-59bc-43e4-8fa8-1658d1319ff5",
           "Alias": "umbracoBytes",
-          "DataType": "umb://data-type/930861bfe2624eada704f99453565708",
-          "Description": "in bytes",
-          "Name": "Size",
+          "DataType": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
+          "Name": "File size",
           "SortOrder": 2
         }
       ]
@@ -48,7 +47,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/930861bfe2624eada704f99453565708",
+      "Udi": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
       "Ordering": true
     },
     {
@@ -57,5 +56,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MediaTypeArtifact",
-  "__version": "17.0.0"
+  "__version": "17.0.1"
 }

@@ -27,30 +27,17 @@
       {
         "alias": "updateDate",
         "header": "Last edited",
-        "nameTemplate": null,
         "isSystem": true
       },
       {
         "alias": "creator",
         "header": "Updated by",
-        "nameTemplate": null,
         "isSystem": true
       }
-    ],
-    "bulkActionPermissions": {
-      "allowBulkPublish": true,
-      "allowBulkUnpublish": true,
-      "allowBulkCopy": true,
-      "allowBulkMove": true,
-      "allowBulkDelete": true
-    },
-    "icon": "icon-badge color-black",
-    "showContentFirst": false,
-    "useInfiniteEditor": false,
-    "umbMigrationV14": "2025-08-05T16:24:15.8072129\u002B00:00"
+    ]
   },
   "Udi": "umb://data-type/c0808dd381334e4b8ce8e2bea84a96a4",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.0"
+  "__version": "17.0.1"
 }

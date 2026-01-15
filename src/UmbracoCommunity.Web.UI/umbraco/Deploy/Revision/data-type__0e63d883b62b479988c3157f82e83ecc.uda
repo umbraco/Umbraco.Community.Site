@@ -4,8 +4,7 @@
   "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
   "Configuration": {
     "filter": "cc07b313-0843-4aa8-bbda-871c8da728c8",
-    "multiple": true,
-    "umbMigrationV14": "2025-08-05T16:24:15.821814\u002B00:00"
+    "multiple": true
   },
   "Udi": "umb://data-type/0e63d883b62b479988c3157f82e83ecc",
   "Dependencies": [
@@ -15,5 +14,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.0"
+  "__version": "17.0.1"
 }
