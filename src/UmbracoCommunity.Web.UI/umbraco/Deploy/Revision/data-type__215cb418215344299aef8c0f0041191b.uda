@@ -6,7 +6,8 @@
   "Configuration": {
     "fileExtensions": [
       "svg"
-    ]
+    ],
+    "umbMigrationV14": "2025-08-05T16:24:15.7703884\u002B00:00"
   },
   "Udi": "umb://data-type/215cb418215344299aef8c0f0041191b",
   "Dependencies": [],

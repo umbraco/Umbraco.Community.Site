@@ -16,38 +16,41 @@
       "Alias": "image",
       "PropertyTypes": [
         {
-          "Key": "854087f6-648b-40ed-bc98-b8a9789e80b9",
-          "Alias": "umbracoHeight",
-          "DataType": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
-          "Name": "Height",
-          "SortOrder": 2
-        },
-        {
-          "Key": "a68d453b-1f62-44f4-9f71-0b6bbd43c355",
-          "Alias": "umbracoWidth",
-          "DataType": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
-          "Name": "Width",
-          "SortOrder": 1
-        },
-        {
-          "Key": "b646ca8f-e469-4fc2-a48a-d4dc1aa64a53",
+          "Key": "00000006-0000-0000-0000-000000000000",
           "Alias": "umbracoFile",
           "DataType": "umb://data-type/1df9f033e6d4451fb8d2e0cbc50a836f",
           "Mandatory": true,
           "Name": "Image"
         },
         {
-          "Key": "bd4c5ace-26e3-4a8b-af1a-e8206a35fa07",
+          "Key": "00000007-0000-0000-0000-000000000000",
+          "Alias": "umbracoWidth",
+          "DataType": "umb://data-type/8e7f995cbd8146279932c40e568ec788",
+          "Description": "in pixels",
+          "Name": "Width",
+          "SortOrder": 1
+        },
+        {
+          "Key": "00000008-0000-0000-0000-000000000000",
+          "Alias": "umbracoHeight",
+          "DataType": "umb://data-type/8e7f995cbd8146279932c40e568ec788",
+          "Description": "in pixels",
+          "Name": "Height",
+          "SortOrder": 2
+        },
+        {
+          "Key": "00000009-0000-0000-0000-000000000000",
           "Alias": "umbracoBytes",
-          "DataType": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
-          "Name": "File size",
+          "DataType": "umb://data-type/930861bfe2624eada704f99453565708",
+          "Description": "in bytes",
+          "Name": "Size",
           "SortOrder": 3
         },
         {
-          "Key": "f7786fe8-724a-4ed0-b244-72546db32a92",
+          "Key": "0000000a-0000-0000-0000-000000000000",
           "Alias": "umbracoExtension",
           "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "Name": "File extension",
+          "Name": "Type",
           "SortOrder": 4
         }
       ]
@@ -61,11 +64,11 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
+      "Udi": "umb://data-type/8e7f995cbd8146279932c40e568ec788",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
+      "Udi": "umb://data-type/930861bfe2624eada704f99453565708",
       "Ordering": true
     },
     {

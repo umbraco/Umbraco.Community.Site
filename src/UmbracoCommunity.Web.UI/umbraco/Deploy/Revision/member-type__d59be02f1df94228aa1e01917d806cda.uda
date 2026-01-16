@@ -15,7 +15,7 @@
       "Alias": "membership",
       "PropertyTypes": [
         {
-          "Key": "70f24c26-1c0e-4053-bd8e-e9e6e4ec4c01",
+          "Key": "0000001c-0000-0000-0000-000000000000",
           "Alias": "umbracoMemberComments",
           "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
           "Name": "Comments"

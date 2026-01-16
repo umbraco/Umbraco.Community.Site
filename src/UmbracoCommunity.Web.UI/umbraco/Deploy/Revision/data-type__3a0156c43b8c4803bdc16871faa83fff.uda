@@ -27,14 +27,27 @@
       {
         "alias": "updateDate",
         "header": "Last edited",
+        "nameTemplate": null,
         "isSystem": true
       },
       {
         "alias": "creator",
         "header": "Updated by",
+        "nameTemplate": null,
         "isSystem": true
       }
-    ]
+    ],
+    "bulkActionPermissions": {
+      "allowBulkPublish": true,
+      "allowBulkUnpublish": true,
+      "allowBulkCopy": true,
+      "allowBulkMove": true,
+      "allowBulkDelete": true
+    },
+    "icon": "icon-badge color-black",
+    "showContentFirst": false,
+    "useInfiniteEditor": false,
+    "umbMigrationV14": "2025-08-05T16:24:15.8059593\u002B00:00"
   },
   "Udi": "umb://data-type/3a0156c43b8c4803bdc16871faa83fff",
   "Dependencies": [],

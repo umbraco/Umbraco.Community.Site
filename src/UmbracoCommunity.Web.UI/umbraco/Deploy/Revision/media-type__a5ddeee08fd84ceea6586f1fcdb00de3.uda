@@ -1,8 +1,8 @@
 {
   "Name": "Audio",
   "Alias": "umbracoMediaAudio",
-  "Icon": "icon-audio-lines",
-  "Thumbnail": "icon-audio-lines",
+  "Icon": "icon-sound-waves",
+  "Thumbnail": "icon-sound-waves",
   "Permissions": {
     "AllowedAtRoot": true,
     "AllowedChildContentTypes": []
@@ -16,24 +16,25 @@
       "Alias": "audio",
       "PropertyTypes": [
         {
-          "Key": "1bee433f-a21a-4031-8e03-af01bb8d2de9",
-          "Alias": "umbracoExtension",
-          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "Name": "File extension",
-          "SortOrder": 1
-        },
-        {
-          "Key": "1f48d730-f174-4684-afad-a335e59d84a0",
+          "Key": "0000002b-0000-0000-0000-000000000000",
           "Alias": "umbracoFile",
           "DataType": "umb://data-type/8f430dd64e96447e9dc0cb552c8cd1f3",
           "Mandatory": true,
           "Name": "Audio"
         },
         {
-          "Key": "3cbf538a-29ab-4317-a9eb-bbcdf1a54260",
+          "Key": "0000002c-0000-0000-0000-000000000000",
+          "Alias": "umbracoExtension",
+          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+          "Name": "Type",
+          "SortOrder": 1
+        },
+        {
+          "Key": "0000002d-0000-0000-0000-000000000000",
           "Alias": "umbracoBytes",
-          "DataType": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
-          "Name": "File size",
+          "DataType": "umb://data-type/930861bfe2624eada704f99453565708",
+          "Description": "in bytes",
+          "Name": "Size",
           "SortOrder": 2
         }
       ]
@@ -47,7 +48,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
+      "Udi": "umb://data-type/930861bfe2624eada704f99453565708",
       "Ordering": true
     },
     {

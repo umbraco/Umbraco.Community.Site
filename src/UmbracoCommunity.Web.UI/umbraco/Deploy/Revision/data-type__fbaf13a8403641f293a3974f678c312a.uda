@@ -2,6 +2,7 @@
   "Name": "Checkbox list",
   "EditorAlias": "Umbraco.CheckBoxList",
   "EditorUiAlias": "Umb.PropertyEditorUi.CheckBoxList",
+  "DatabaseType": "Nvarchar",
   "Configuration": {},
   "Udi": "umb://data-type/fbaf13a8403641f293a3974f678c312a",
   "Dependencies": [],

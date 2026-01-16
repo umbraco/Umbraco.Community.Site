@@ -1,8 +1,8 @@
 {
   "Name": "Vector Graphics (SVG)",
   "Alias": "umbracoMediaVectorGraphics",
-  "Icon": "icon-origami",
-  "Thumbnail": "icon-origami",
+  "Icon": "icon-picture",
+  "Thumbnail": "icon-picture",
   "Permissions": {
     "AllowedAtRoot": true,
     "AllowedChildContentTypes": []
@@ -16,25 +16,26 @@
       "Alias": "vectorGraphics",
       "PropertyTypes": [
         {
-          "Key": "09a07aff-861d-4769-a2b0-c165ebd43d39",
-          "Alias": "umbracoBytes",
-          "DataType": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
-          "Name": "File size",
-          "SortOrder": 2
-        },
-        {
-          "Key": "0f25a89e-2eb7-49bc-a7b4-759a7e4c69f2",
-          "Alias": "umbracoExtension",
-          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "Name": "File extension",
-          "SortOrder": 1
-        },
-        {
-          "Key": "e2a2bdf2-971b-483e-95a1-4104cc06af26",
+          "Key": "00000031-0000-0000-0000-000000000000",
           "Alias": "umbracoFile",
           "DataType": "umb://data-type/215cb418215344299aef8c0f0041191b",
           "Mandatory": true,
           "Name": "Vector Graphics"
+        },
+        {
+          "Key": "00000032-0000-0000-0000-000000000000",
+          "Alias": "umbracoExtension",
+          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+          "Name": "Type",
+          "SortOrder": 1
+        },
+        {
+          "Key": "00000033-0000-0000-0000-000000000000",
+          "Alias": "umbracoBytes",
+          "DataType": "umb://data-type/930861bfe2624eada704f99453565708",
+          "Description": "in bytes",
+          "Name": "Size",
+          "SortOrder": 2
         }
       ]
     }
@@ -47,7 +48,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/ba5bdbe6ab3e46a882b32c45f10bc47f",
+      "Udi": "umb://data-type/930861bfe2624eada704f99453565708",
       "Ordering": true
     },
     {
