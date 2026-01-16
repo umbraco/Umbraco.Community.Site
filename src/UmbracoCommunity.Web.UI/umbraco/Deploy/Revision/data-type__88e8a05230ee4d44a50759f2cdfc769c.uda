@@ -1,0 +1,15 @@
+{
+  "Name": "Date Time Picker (with time zone)",
+  "EditorAlias": "Umbraco.DateTimeWithTimeZone",
+  "EditorUiAlias": "Umb.PropertyEditorUi.DateTimeWithTimeZonePicker",
+  "Configuration": {
+    "timeFormat": "HH:mm",
+    "timeZones": {
+      "mode": "all"
+    }
+  },
+  "Udi": "umb://data-type/88e8a05230ee4d44a50759f2cdfc769c",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}
