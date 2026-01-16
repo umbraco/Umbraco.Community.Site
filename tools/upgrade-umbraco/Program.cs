@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
@@ -215,14 +216,31 @@ async Task<int> ExportSchemaAsync(Dictionary<string, string?> options)
     }
 
     Console.WriteLine($"Project directory: {projectDir}");
-    Console.WriteLine("Starting the site...");
+
+    // Get available launch profiles and let user choose
+    var profiles = GetLaunchProfiles(projectDir);
+    if (profiles.Count == 0)
+    {
+        Console.Error.WriteLine("No launch profiles found in launchSettings.json");
+        return 1;
+    }
+
+    var selectedProfile = PromptForProfile(profiles);
+    if (selectedProfile == null)
+    {
+        Console.Error.WriteLine("No profile selected");
+        return 1;
+    }
+
+    Console.WriteLine();
+    Console.WriteLine($"Starting the site with profile: {selectedProfile}");
     Console.WriteLine();
 
-    // Start the dotnet process
+    // Start the dotnet process with selected profile
     var psi = new ProcessStartInfo
     {
         FileName = "dotnet",
-        Arguments = "run --no-build",
+        Arguments = $"run --no-build --launch-profile \"{selectedProfile}\"",
         WorkingDirectory = projectDir,
         UseShellExecute = false,
         RedirectStandardOutput = true,
@@ -386,6 +404,57 @@ string? FindUmbracoProjectDir()
 
         dir = Directory.GetParent(dir)?.FullName;
     }
+    return null;
+}
+
+List<string> GetLaunchProfiles(string projectDir)
+{
+    var launchSettingsPath = Path.Combine(projectDir, "Properties", "launchSettings.json");
+    if (!File.Exists(launchSettingsPath))
+        return [];
+
+    try
+    {
+        var json = File.ReadAllText(launchSettingsPath);
+        using var doc = JsonDocument.Parse(json);
+
+        if (!doc.RootElement.TryGetProperty("profiles", out var profiles))
+            return [];
+
+        var result = new List<string>();
+        foreach (var profile in profiles.EnumerateObject())
+        {
+            // Only include profiles that use "Project" command (not IISExpress)
+            if (profile.Value.TryGetProperty("commandName", out var commandName) &&
+                commandName.GetString() == "Project")
+            {
+                result.Add(profile.Name);
+            }
+        }
+        return result;
+    }
+    catch
+    {
+        return [];
+    }
+}
+
+string? PromptForProfile(List<string> profiles)
+{
+    Console.WriteLine("Available launch profiles:");
+    for (var i = 0; i < profiles.Count; i++)
+    {
+        Console.WriteLine($"  [{i + 1}] {profiles[i]}");
+    }
+    Console.WriteLine();
+    Console.Write("Select a profile (1-{0}): ", profiles.Count);
+
+    var input = Console.ReadLine();
+    if (int.TryParse(input, out var selection) && selection >= 1 && selection <= profiles.Count)
+    {
+        return profiles[selection - 1];
+    }
+
     return null;
 }
 
