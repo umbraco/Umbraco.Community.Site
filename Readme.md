@@ -24,3 +24,20 @@ So to start the environment:
 - cd to `src/UmbracoCommunity.StaticAssets`
 - `npm run dev`
 - `npm ci` (if you get an error due to missing components on the previous command)
+
+### Upgrading Packages
+
+A CLI tool is provided to update all NuGet packages and regenerate Umbraco Deploy schema files.
+
+```bash
+# Build the tool
+dotnet build tools/upgrade-umbraco
+
+# Preview what would be updated (recommended first step)
+tools\upgrade-umbraco\bin\Debug\net10.0\upgrade-umbraco.exe update-packages --dry-run
+
+# Update packages and regenerate Deploy schema in one step
+tools\upgrade-umbraco\bin\Debug\net10.0\upgrade-umbraco.exe all
+```
+
+See [tools/upgrade-umbraco/README.md](tools/upgrade-umbraco/README.md) for full documentation.

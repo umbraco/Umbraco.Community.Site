@@ -3,6 +3,7 @@
 public class ReleaseGroupViewModel
 {
     public string ReleaseLabel { get; set; } = string.Empty;
+    public string GitHubLabel { get; set; } = string.Empty;
     public string RepositoryName { get; set; } = string.Empty;
     public List<ReleasePullRequestViewModel> PullRequests { get; set; } = new();
     public List<ReleaseCategoryViewModel> Categories { get; set; } = new();

@@ -63,6 +63,21 @@ namespace UmbracoCommunity.Extensions.Controllers
             return Ok(members);
         }
 
+        [HttpGet("download-hqmembers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult DownloadHqMembers()
+        {
+            var members = _dataStore.GetAllHqMembers();
+            var json = System.Text.Json.JsonSerializer.Serialize(members, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var filename = $"hq-members-export-{DateTime.UtcNow:yyyy-MM-dd}.json";
+            return File(bytes, "application/json", filename);
+        }
+
         [HttpGet("hqmembers/{id}")]
         [ProducesResponseType<GitHubHqMember>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -200,6 +215,26 @@ namespace UmbracoCommunity.Extensions.Controllers
         [ProducesResponseType<GitHubDataExport>(StatusCodes.Status200OK)]
         public IActionResult ExportGitHubData()
         {
+            return Ok(GetGitHubDataExport());
+        }
+
+        [HttpGet("download-github-data")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult DownloadGitHubData()
+        {
+            var export = GetGitHubDataExport();
+            var json = System.Text.Json.JsonSerializer.Serialize(export, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+            var filename = $"github-data-export-{DateTime.UtcNow:yyyy-MM-dd}.json";
+            return File(bytes, "application/json", filename);
+        }
+
+        private GitHubDataExport GetGitHubDataExport()
+        {
             const string repositoryName = "Umbraco-CMS";
 
             var export = new GitHubDataExport
@@ -221,7 +256,7 @@ namespace UmbracoCommunity.Extensions.Controllers
                 }
             }
 
-            return Ok(export);
+            return export;
         }
 
 

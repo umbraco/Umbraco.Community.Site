@@ -6,13 +6,9 @@ As we never sync changes back from Cloud with our set-up (so we can go open sour
 
 To make PR reviews easier, ideally this upgrade would be in a standalone PR, ie not mixed in with doing other changes.
 
-When updating the Umbraco (or Deploy) versions you should:
+You can use the upgrade tool to do a full upgrade of everything, including regenerating the Umbraco Deploy `.uda` files, see [tools/upgrade-umbraco/README.md](../tools/upgrade-umbraco/README.md) for full documentation.
 
-- Manually check the `.csproj` file - there are commented out packages that might need the version number manually updating too. `Deploy.OnPrem` and `Deploy.Cloud` are always at the same version number.
-
-- Settings > Deploy > click [Export schema to data files] so that the .uda files record the version number change. It would be good to get those changes out the way in a commit where no *actual* schema changes are being done!
-
-- Settings > Models Builder > click [Generate Models] - again, be good to get these changes committed where no *actual* changes being done
+**Note:** It would be good to get those changes out of the way in a commit where no *actual* schema changes are being done so the only updates in the `.uda` files are version number changes.
 
 ## Making Urgent Changes Directly
 

@@ -23,11 +23,6 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
   @state()
   private _isImportingJson = false;
 
-  @state()
-  private _isExportingHq = false;
-
-  @state()
-  private _isExportingGithub = false;
 
   @state()
   private _isImportingGithubJson = false;
@@ -61,6 +56,7 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
       });
     }
   }
+
 
   async #onImportHqMembers() {
     if (!confirm("This will DELETE ALL existing HQ Members and import 150 sample HQ members.\n\nContinue?")) {
@@ -200,71 +196,49 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
   }
 
   async #onExportHqMembers() {
-    this._isExportingHq = true;
-
     try {
       const { data, error } = await UmbracoCommunityExtensionsService.getHqMembers();
-
       if (error) {
         throw new Error(`Export failed: ${String(error)}`);
       }
-
-      // Create a blob and download
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `hq-members-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      this.#showNotification(
-        "positive",
-        "HQ Members exported successfully",
-        `Exported ${data?.length ?? 0} members`
-      );
+      const filename = `hq-members-export-${new Date().toISOString().split('T')[0]}.json`;
+      this.#triggerDownload(JSON.stringify(data, null, 2), filename);
+      this.#showNotification("positive", "HQ Members exported", `Exported ${data?.length ?? 0} members`);
     } catch (error) {
       console.error("Failed to export HQ members", error);
-      this.#showNotification("danger", "Failed to export HQ members", String(error));
-    } finally {
-      this._isExportingHq = false;
+      this.#showNotification("danger", "Export failed", String(error));
     }
   }
 
   async #onExportGithubData() {
-    this._isExportingGithub = true;
-
     try {
       const { data, error } = await UmbracoCommunityExtensionsService.exportGitHubData();
-
       if (error) {
         throw new Error(`Export failed: ${String(error)}`);
       }
-
-      // Create a blob and download
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `github-data-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      this.#showNotification(
-        "positive",
-        "GitHub data exported successfully",
-        `Exported issues, pull requests, discussions, and NuGet packages`
-      );
+      const filename = `github-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      this.#triggerDownload(JSON.stringify(data, null, 2), filename);
+      this.#showNotification("positive", "GitHub data exported", "Exported issues, PRs, discussions, and NuGet packages");
     } catch (error) {
       console.error("Failed to export GitHub data", error);
-      this.#showNotification("danger", "Failed to export GitHub data", String(error));
-    } finally {
-      this._isExportingGithub = false;
+      this.#showNotification("danger", "Export failed", String(error));
     }
+  }
+
+  #triggerDownload(content: string, filename: string) {
+    const blob = new Blob([content], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    // Use non-bubbling event to bypass SPA router interception
+    const event = new MouseEvent("click", {
+      view: window,
+      bubbles: false,
+      cancelable: false
+    });
+    a.dispatchEvent(event);
+    URL.revokeObjectURL(url);
   }
 
   #onClickImportGithubJson() {
@@ -436,7 +410,7 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
                 look="primary"
                 color="positive"
                 @click=${this.#onClickImportJson}
-                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingJson || this._isExportingHq}
+                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingJson}
               >
                 <uui-icon name="icon-page-up"></uui-icon>
                 ${this._isImportingJson ? "Importing..." : "Import from JSON"}
@@ -444,10 +418,9 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
               <uui-button
                 look="secondary"
                 @click=${this.#onExportHqMembers}
-                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingJson || this._isExportingHq}
               >
                 <uui-icon name="icon-download-alt"></uui-icon>
-                ${this._isExportingHq ? "Exporting..." : "Export to JSON"}
+                Export to JSON
               </uui-button>
             </div>
           </div>
@@ -467,7 +440,7 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
                 look="primary"
                 color="positive"
                 @click=${this.#onClickImportGithubJson}
-                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingGithubJson || this._isExportingGithub}
+                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingGithubJson}
               >
                 <uui-icon name="icon-page-up"></uui-icon>
                 ${this._isImportingGithubJson ? "Importing..." : "Import from JSON"}
@@ -475,10 +448,9 @@ export class DataManagementDashboardElement extends UmbElementMixin(LitElement) 
               <uui-button
                 look="secondary"
                 @click=${this.#onExportGithubData}
-                ?disabled=${this._isImportingHq || this._isImportingOther || this._isImportingGithubJson || this._isExportingGithub}
               >
                 <uui-icon name="icon-download-alt"></uui-icon>
-                ${this._isExportingGithub ? "Exporting..." : "Export to JSON"}
+                Export to JSON
               </uui-button>
             </div>
           </div>

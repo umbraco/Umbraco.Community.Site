@@ -5,6 +5,7 @@
     var version = Model.ReleaseGroup?.ReleaseLabel?.Replace("release/", "v") ?? "";
     var isMajorRelease = false;
     var isVersion9OrHigher = false;
+    var isLegacyUmbraco = false; // 8.18.5 and lower - uses UmbracoCms package name and has ZIP download
     if (Model.ReleaseInfo != null && !string.IsNullOrEmpty(Model.ReleaseInfo.Version))
     {
         var versionParts = Model.ReleaseInfo.Version.Split('-')[0].Split('.');
@@ -12,9 +13,17 @@
         {
             isMajorRelease = versionParts[1] == "0" && versionParts[2] == "0";
             int.TryParse(versionParts[0], out var major);
+            int.TryParse(versionParts[1], out var minor);
+            int.TryParse(versionParts[2], out var patch);
             isVersion9OrHigher = major >= 9;
+            isLegacyUmbraco = major < 8 ||
+                              (major == 8 && minor < 18) ||
+                              (major == 8 && minor == 18 && patch <= 15);
         }
     }
+    var nugetPackageId = isLegacyUmbraco ? "UmbracoCms" : Model.NuGetPackageId;
+    // Legacy versions (8.18.5 and lower) are always considered released
+    var isReleased = isLegacyUmbraco || Model.ReleaseInfo?.IsReleased == true;
 }
 <div class="release-notes-header">
     @if (Model.ReleaseInfo != null)
@@ -23,7 +32,7 @@
             <h2>Release notes for @Model.SelectedRepo v@(Model.ReleaseInfo.Version)</h2>
             @if (Model.ReleaseInfo.ReleaseDate.HasValue)
             {
-                @if (Model.ReleaseInfo.IsReleased)
+                @if (isReleased)
                 {
                     <p class="release-date"><strong>Released on:</strong> @Model.ReleaseInfo.FormattedReleaseDate</p>
                 }
@@ -37,15 +46,21 @@
                 <p class="release-date"><strong>Target release date:</strong> To be announced</p>
             }
 
-            @if (Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
+            @if (isReleased && !string.IsNullOrEmpty(nugetPackageId))
             {
                 <p class="release-nuget-link">
-                    <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@Model.NuGetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@Model.NuGetPackageId v@(Model.ReleaseInfo.Version)</a>
+                    <strong>NuGet Package:</strong> <a href="https://www.nuget.org/packages/@nugetPackageId/@Model.ReleaseInfo.Version" target="_blank" rel="noopener noreferrer">@nugetPackageId v@(Model.ReleaseInfo.Version)</a>
+                </p>
+            }
+            @if (isReleased && isLegacyUmbraco)
+            {
+                <p class="release-nuget-link">
+                    <strong>ZIP Download:</strong> <a href="https://umbracoreleases.blob.core.windows.net/download/UmbracoCms.@(Model.ReleaseInfo.Version).zip" target="_blank" rel="noopener noreferrer">UmbracoCms.@(Model.ReleaseInfo.Version).zip</a>
                 </p>
             }
         </div>
         
-        @if (isVersion9OrHigher && Model.ReleaseInfo.IsReleased && !string.IsNullOrEmpty(Model.NuGetPackageId))
+        @if (isVersion9OrHigher && isReleased && !string.IsNullOrEmpty(nugetPackageId))
         {
             <div class="release-links">
                 <h3>Install and upgrade guidance</h3>

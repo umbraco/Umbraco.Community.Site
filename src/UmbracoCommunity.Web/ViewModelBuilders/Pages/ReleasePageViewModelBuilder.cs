@@ -177,6 +177,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 viewModel.Release = new ReleaseGroupViewModel
                 {
                     ReleaseLabel = $"in v{viewModel.Version}",
+                    GitHubLabel = viewModel.ReleaseLabel,
                     RepositoryName = repository,
                     PullRequests = orderedPrs,
                     Categories = categories
