@@ -66,6 +66,9 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             // Get first-time contributor PR numbers
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repository);
 
+            // Load all HQ members once to avoid N+1 queries in loops
+            var hqMembers = _dataStore.GetAllHqMembers().ToList();
+
             // Group by release labels
             var releaseGroups = new Dictionary<string, List<ReleasePullRequestViewModel>>();
 
@@ -92,7 +95,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
-                    var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
+                    var isHqMember = pr.Author != null && GitHubSqlStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt, hqMembers);
                     var authorLogin = pr.Author?.Login ?? "unknown";
                     var isFirstTimeContributor = !isHqMember &&
                                                  pr.Author != null &&
@@ -143,7 +146,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                         releaseGroups[normalizedLabel] = new List<ReleasePullRequestViewModel>();
                     }
 
-                    var isHqMember = issue.Author != null && _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
+                    var isHqMember = issue.Author != null && GitHubSqlStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt, hqMembers);
                     var authorLogin = issue.Author?.Login ?? "unknown";
 
                     releaseGroups[normalizedLabel].Add(new ReleasePullRequestViewModel
