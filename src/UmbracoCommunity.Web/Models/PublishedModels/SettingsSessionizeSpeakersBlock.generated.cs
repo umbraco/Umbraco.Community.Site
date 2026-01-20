@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>[Settings] Program block</summary>
-	[PublishedModel("settingsProgramBlock")]
-	public partial class SettingsProgramBlock : PublishedElementModel, ISettingsBlockId
+	/// <summary>[Settings] Sessionize speakers block</summary>
+	[PublishedModel("settingsSessionizeSpeakersBlock")]
+	public partial class SettingsSessionizeSpeakersBlock : PublishedElementModel, ISettingsBlockId
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "settingsProgramBlock";
+		public new const string ModelTypeAlias = "settingsSessionizeSpeakersBlock";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -34,20 +34,34 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsProgramBlock, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsSessionizeSpeakersBlock, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public SettingsProgramBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public SettingsSessionizeSpeakersBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
 		}
 
 		// properties
+
+		///<summary>
+		/// Max number of speakers: Cap the returned speakers at a specific amount. If left blank will return all speakers.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("maxNumberOfSpeakers")]
+		public virtual int MaxNumberOfSpeakers => this.Value<int>(_publishedValueFallback, "maxNumberOfSpeakers");
+
+		///<summary>
+		/// Top speakers only: In sessionize it is possible to flag a speaker as a "top speaker". Toggle this property to only display these headline names.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("topSpeakersOnly")]
+		public virtual bool TopSpeakersOnly => this.Value<bool>(_publishedValueFallback, "topSpeakersOnly");
 
 		///<summary>
 		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.

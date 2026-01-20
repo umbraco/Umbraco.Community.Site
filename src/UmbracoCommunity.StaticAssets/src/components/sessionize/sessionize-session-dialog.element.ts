@@ -11,6 +11,7 @@ import {
   SessionizeSchedule,
 } from "../../services/sessionize.service.js";
 import { SessionizeSpeakerDialogElement } from "./sessionize-speaker-dialog.element.js";
+import { iconClock, iconMapPin } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-sessionize-session-dialog";
 
@@ -193,7 +194,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
                 this.session?.startsAt,
                 () => html`
                   <div class="meta-row">
-                    <span class="meta-icon">&#128337;</span>
+                    <span class="meta-icon">${iconClock}</span>
                     <span>${this.#formatDateRange()}</span>
                   </div>
                 `
@@ -202,7 +203,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
                 this.session?.room,
                 () => html`
                   <div class="meta-row">
-                    <span class="meta-icon">&#128205;</span>
+                    <span class="meta-icon">${iconMapPin}</span>
                     <span>${this.session!.room}</span>
                   </div>
                 `
@@ -521,7 +522,13 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
 
       .meta-icon {
         flex-shrink: 0;
-        font-size: 1rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .meta-icon .lucide-icon {
+        width: 18px;
+        height: 18px;
       }
 
       /* Tags in sidebar */

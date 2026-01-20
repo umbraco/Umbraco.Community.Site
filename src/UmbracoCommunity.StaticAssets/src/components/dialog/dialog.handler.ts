@@ -15,9 +15,16 @@ export class DcDialogHandler {
     // Lock body scroll
     document.body.classList.add("dialog-open");
 
+    let isClosed = false;
     const close = () => {
+      if (isClosed) return;
+      isClosed = true;
+
       dialogElement?.close();
-      dialogElement?.removeChild(element);
+      // Only remove if element is still a child of the dialog
+      if (element.parentNode === dialogElement) {
+        dialogElement?.removeChild(element);
+      }
       // Unlock body scroll
       document.body.classList.remove("dialog-open");
     };

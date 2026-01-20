@@ -1,9 +1,22 @@
-import { css, html, nothing } from "lit";
+import { css, html, nothing, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { when } from "lit/directives/when.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { DcDialogBaseElement } from "../dialog/dialog-base.element.js";
 import { SessionizeSpeaker, SessionizeSchedule } from "../../services/sessionize.service.js";
+import {
+  iconTwitterX,
+  iconLinkedin,
+  iconFacebook,
+  iconInstagram,
+  iconGlobe,
+  iconPenLine,
+  iconLink,
+  iconMic,
+  iconCalendar,
+  iconClock,
+  iconMapPin,
+} from "../../svg/lucide-icons.js";
 
 const elementName = "dc-sessionize-speaker-dialog";
 
@@ -18,17 +31,42 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
   @property({ type: String })
   timezone?: string;
 
-  #getLinkIcon(linkType: string): string {
-    const icons: Record<string, string> = {
-      Twitter: "𝕏",
-      LinkedIn: "in",
-      Blog: "📝",
-      Company_Website: "🌐",
-      Facebook: "f",
-      Instagram: "📷",
-      Sessionize: "S",
+  #getLinkIcon(linkType: string): TemplateResult {
+    const icons: Record<string, TemplateResult> = {
+      Twitter: iconTwitterX,
+      LinkedIn: iconLinkedin,
+      Blog: iconPenLine,
+      Company_Website: iconGlobe,
+      Facebook: iconFacebook,
+      Instagram: iconInstagram,
+      Sessionize: iconMic,
     };
-    return icons[linkType] || "🔗";
+    return icons[linkType] || iconLink;
+  }
+
+  #getLinkDisplayText(linkType: string, url: string, title: string): string {
+    // Extract Twitter/X handle from URL
+    const lowerTitle = title.toLowerCase();
+    const lowerUrl = url.toLowerCase();
+    const isTwitterLink = lowerTitle.includes("twitter") ||
+                          lowerTitle.includes("x (") ||
+                          lowerUrl.includes("twitter.com") ||
+                          lowerUrl.includes("x.com");
+
+    if (isTwitterLink) {
+      try {
+        const urlObj = new URL(url);
+        // Handle twitter.com/username or x.com/username
+        const pathname = urlObj.pathname;
+        const handle = pathname.split("/").filter(Boolean)[0];
+        if (handle) {
+          return `@${handle}`;
+        }
+      } catch {
+        // Fall back to title if URL parsing fails
+      }
+    }
+    return title;
   }
 
   #linkifyText(text: string): string {
@@ -127,7 +165,7 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
               class="link-icon"
             >
               ${this.#getLinkIcon(link.linkType)}
-              <span>${link.title}</span>
+              <span>${this.#getLinkDisplayText(link.linkType, link.url, link.title)}</span>
             </a>
           `
         )}
@@ -164,15 +202,15 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
                 ? html`
                     <div class="session-details">
                       <span class="session-detail">
-                        <span class="detail-icon">📅</span>
+                        <span class="detail-icon">${iconCalendar}</span>
                         ${details.date}
                       </span>
                       <span class="session-detail">
-                        <span class="detail-icon">🕐</span>
+                        <span class="detail-icon">${iconClock}</span>
                         ${details.time}
                       </span>
                       <span class="session-detail">
-                        <span class="detail-icon">📍</span>
+                        <span class="detail-icon">${iconMapPin}</span>
                         ${details.room}
                       </span>
                     </div>
@@ -361,13 +399,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       .session-name {
         font-weight: 600;
         color: var(--color-dark, #1b264f);
-        margin-bottom: var(--unit-xs, 0.5rem);
       }
 
       .session-details {
         display: flex;
         flex-wrap: wrap;
         gap: var(--unit-sm, 0.75rem);
+        margin-top: var(--unit-xs, 0.5rem);
       }
 
       .session-detail {
@@ -379,7 +417,19 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       }
 
       .detail-icon {
-        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .detail-icon .lucide-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      .speaker-links .lucide-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
       }
 
       @media (max-width: 600px) {
@@ -449,11 +499,11 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
 
         .session-name {
           font-size: 0.9rem;
-          margin-bottom: 0.25rem;
         }
 
         .session-details {
           gap: var(--unit-xs, 0.5rem);
+          margin-top: var(--unit-xs, 0.25rem);
         }
 
         .session-detail {

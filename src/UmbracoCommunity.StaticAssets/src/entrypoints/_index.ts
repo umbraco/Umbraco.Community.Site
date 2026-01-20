@@ -16,7 +16,6 @@ import {
 
 import '@umbraco-ui/uui-loader';
 import '@ungap/custom-elements';
-import {retry} from "rxjs";
 
 // must be available globally for dc-currency elements to reference
 window.localeResolver = new LocaleResolver();

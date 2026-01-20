@@ -85,19 +85,6 @@ export class SessionizeSpeakersElement extends LitElement {
     `;
   }
 
-  #getLinkIcon(linkType: string): string {
-    const icons: Record<string, string> = {
-      Twitter: "𝕏",
-      LinkedIn: "in",
-      Blog: "📝",
-      Company_Website: "🌐",
-      Facebook: "f",
-      Instagram: "📷",
-      Sessionize: "S",
-    };
-    return icons[linkType] || "🔗";
-  }
-
   #openSpeakerDialog(speaker: SessionizeSpeaker) {
     const dialog = new SessionizeSpeakerDialogElement();
     dialog.speaker = speaker;

@@ -14,13 +14,20 @@
             </div>
         }
 
-        <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != default || Model.Settings?.MaxNumberOfSpeakers != 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
-
-        @if (Context.Request.IsBlockPreviewRequest())
-        {
-            <div class="sessionize-msg">
-                <p>-- Speakers list will load from Sessionize --</p>
-            </div>
-        }
+        <div class="dc-speakers-grid">
+            @foreach (var item in Model.Content.Speakers)
+            {
+                var speaker = item.Content as SpeakerItemBlock;
+                if (speaker == null) continue;
+                <div class="dc-speakers-grid__item">
+                    <img class="dc-image is-circle" src="@speaker.SpeakerImage?.GetCropUrl(width: 150, height: 150)" alt="@speaker.SpeakerName" loading="lazy" />
+                    <p class="speaker-name">@speaker.SpeakerName</p>
+                    @if (!string.IsNullOrEmpty(speaker.SpeakerDescription))
+                    {
+                        <p class="speaker-bio">@speaker.SpeakerDescription</p>
+                    }
+                </div>
+            }
+        </div>
     </div>
 }

@@ -97,6 +97,12 @@
         "settingsElementTypeKey": "471d5207-9004-4bd5-98c9-db2351678562"
       },
       {
+        "contentElementTypeKey": "6f689d5b-3cd6-4b03-87f2-720f626cf50a",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850"
+      },
+      {
         "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -181,6 +187,9 @@
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
     },
     {
+      "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
+    },
+    {
       "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c"
     },
     {
@@ -212,6 +221,9 @@
     },
     {
       "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
+    },
+    {
+      "Udi": "umb://document-type/c8f5ee8c32014c389b2d8fdd93a91850"
     },
     {
       "Udi": "umb://document-type/cc7a54a7a94d41c1bb134dcc6f399d3f"

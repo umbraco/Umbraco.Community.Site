@@ -80,9 +80,57 @@ export class SessionizeProgramElement extends LitElement {
 
   #dialogHandler = new DcDialogHandler();
 
+  // Sticky bar visibility
+  @state()
+  private _showStickyBar = false;
+
+  @state()
+  private _isProgramInView = true;
+
+  #controlsObserver?: IntersectionObserver;
+  #programEndObserver?: IntersectionObserver;
+  #controlsRef?: HTMLElement;
+  #programContainerRef?: HTMLElement;
+
   connectedCallback() {
     super.connectedCallback();
     this.#loadSchedule();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.#controlsObserver?.disconnect();
+    this.#programEndObserver?.disconnect();
+  }
+
+  #setupControlsObserver() {
+    // Don't set up twice
+    if (this.#controlsObserver) return;
+
+    this.#controlsRef = this.renderRoot.querySelector('.program-controls') as HTMLElement;
+    this.#programContainerRef = this.renderRoot.querySelector('.program-container') as HTMLElement;
+
+    if (this.#controlsRef) {
+      this.#controlsObserver = new IntersectionObserver(
+        (entries) => {
+          // Show sticky bar when controls are not visible
+          this._showStickyBar = !entries[0].isIntersecting;
+        },
+        { threshold: 0, rootMargin: '-1px 0px 0px 0px' }
+      );
+      this.#controlsObserver.observe(this.#controlsRef);
+    }
+
+    // Observe when program container goes out of view (scrolled past)
+    if (this.#programContainerRef) {
+      this.#programEndObserver = new IntersectionObserver(
+        (entries) => {
+          this._isProgramInView = entries[0].isIntersecting;
+        },
+        { threshold: 0 }
+      );
+      this.#programEndObserver.observe(this.#programContainerRef);
+    }
   }
 
   protected willUpdate(changedProperties: PropertyValues): void {
@@ -93,6 +141,14 @@ export class SessionizeProgramElement extends LitElement {
       changedProperties.has("_selectedFilters")
     ) {
       this.#updateFilteredSessions();
+    }
+  }
+
+  protected updated(changedProperties: PropertyValues): void {
+    // Set up observer after loading completes and controls are rendered
+    if (changedProperties.has("_loading") && !this._loading) {
+      // Wait for next frame to ensure DOM is fully rendered
+      requestAnimationFrame(() => this.#setupControlsObserver());
     }
   }
 
@@ -145,17 +201,29 @@ export class SessionizeProgramElement extends LitElement {
       this._categories = categories;
       this._categoryDropdowns = this.#buildCategoryDropdowns(categories, schedule);
 
-      // Default to Wednesday, or fall back to Sessionize default, or first day
-      const wednesdayIndex = schedule.findIndex((day) => {
-        const date = new Date(day.date);
-        return date.getDay() === 3; // 3 = Wednesday
+      // Default to today if it's a conference day, otherwise Wednesday, then Sessionize default, then first day
+      const today = new Date();
+      const todayDateStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
+
+      const todayIndex = schedule.findIndex((day) => {
+        const dayDateStr = day.date.split("T")[0];
+        return dayDateStr === todayDateStr;
       });
-      if (wednesdayIndex >= 0) {
-        this._selectedDayIndex = wednesdayIndex;
+
+      if (todayIndex >= 0) {
+        this._selectedDayIndex = todayIndex;
       } else {
-        const defaultIndex = schedule.findIndex((day) => day.isDefault);
-        if (defaultIndex >= 0) {
-          this._selectedDayIndex = defaultIndex;
+        const wednesdayIndex = schedule.findIndex((day) => {
+          const date = new Date(day.date);
+          return date.getDay() === 3; // 3 = Wednesday
+        });
+        if (wednesdayIndex >= 0) {
+          this._selectedDayIndex = wednesdayIndex;
+        } else {
+          const defaultIndex = schedule.findIndex((day) => day.isDefault);
+          if (defaultIndex >= 0) {
+            this._selectedDayIndex = defaultIndex;
+          }
         }
       }
     } catch (error) {
@@ -425,6 +493,66 @@ export class SessionizeProgramElement extends LitElement {
 
     // Reset dropdown to placeholder
     select.value = "";
+  }
+
+  #hasActiveFiltersOrCustomTimezone(): boolean {
+    return this._selectedFilters.length > 0 || this._selectedTimezone !== DEFAULT_TIMEZONE;
+  }
+
+  #getSelectedTimezoneLabel(): string {
+    const option = TIMEZONE_OPTIONS.find(tz => tz.value === this._selectedTimezone);
+    return option?.label || this._selectedTimezone;
+  }
+
+  #renderStickyBar() {
+    // Only show if:
+    // - Scrolled past controls AND
+    // - Program is still in view AND
+    // - Has active filters or custom timezone
+    if (!this._showStickyBar || !this._isProgramInView || !this.#hasActiveFiltersOrCustomTimezone()) {
+      return nothing;
+    }
+
+    return html`
+      <div class="sticky-filter-bar">
+        <div class="sticky-bar-content">
+          ${when(
+            this._selectedTimezone !== DEFAULT_TIMEZONE,
+            () => html`
+              <span class="sticky-timezone">
+                <span class="sticky-label">Timezone:</span>
+                ${this.#getSelectedTimezoneLabel()}
+              </span>
+            `
+          )}
+          ${when(
+            this._selectedFilters.length > 0,
+            () => html`
+              <div class="sticky-filters">
+                <span class="sticky-label">Filters:</span>
+                ${this._selectedFilters.map(
+                  (filter) => html`
+                    <span class="filter-pill filter-pill-small">
+                      ${filter.name}
+                      <button
+                        class="filter-pill-remove"
+                        @click=${() => this.#removeFilter(filter.id)}
+                        aria-label="Remove ${filter.name} filter"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  `
+                )}
+                <button class="clear-filters-btn clear-filters-btn-small" @click=${() => this.#clearAllFilters()}>
+                  Clear all
+                </button>
+              </div>
+            `
+          )}
+        </div>
+      </div>
+    `;
   }
 
   #renderFilters() {
@@ -721,7 +849,7 @@ export class SessionizeProgramElement extends LitElement {
     const isDistant = this.#isDistantTimezone();
 
     // Use uniform height for distant timezones, variable for local
-    const hourHeight = 180; // pixels per hour
+    const hourHeight = 200; // pixels per hour
     const earlyHourHeight = isDistant ? hourHeight : 90; // half-height for hours before 9am (Copenhagen time only)
     const earlyHourCutoff = 9;
 
@@ -901,6 +1029,7 @@ export class SessionizeProgramElement extends LitElement {
     }
 
     return html`
+      ${this.#renderStickyBar()}
       <div class="program-container">
         <div class="program-controls">
           ${this.#renderFilters()}
@@ -920,6 +1049,203 @@ export class SessionizeProgramElement extends LitElement {
 
     .program-container {
       margin-top: var(--unit-md, 2rem);
+    }
+
+    /* Sticky filter bar - matches header's centering and sizing behavior */
+    .sticky-filter-bar {
+      position: fixed;
+      top: 125px; /* Below the main header */
+      left: 86px; /* Match header's 86px margin */
+      right: 86px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 1360px; /* Match the actual header nav bar width */
+      z-index: 50; /* Below header (z-index 2) but above content */
+      background: linear-gradient(to right, var(--color-blue, #3544b1), var(--color-blue-dark, #2a3690));
+      color: var(--color-white, #fff);
+      box-shadow: 0 4px 12px rgba(53, 68, 177, 0.3);
+      padding: var(--unit-xs, 0.5rem) var(--unit, 1rem);
+      border-radius: var(--border-radius-xl);
+      animation: slideDown 0.25s ease-out forwards;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .sticky-bar-content {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--unit-sm, 0.75rem);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .sticky-bar-content::before {
+      content: "Program";
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+      padding-right: var(--unit-xs, 0.5rem);
+      border-right: 1px solid rgba(255, 255, 255, 0.3);
+      margin-right: var(--unit-xs, 0.5rem);
+    }
+
+    .sticky-timezone {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--color-white, #fff);
+      padding: 0.25rem 0.5rem;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--border-radius, 6px);
+    }
+
+    .sticky-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--unit-xs, 0.5rem);
+    }
+
+    .sticky-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .sticky-filter-bar .filter-pill {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--color-white, #fff);
+    }
+
+    .sticky-filter-bar .filter-pill-remove {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sticky-filter-bar .filter-pill-remove:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .filter-pill-small {
+      padding: 0.25rem 0.4rem 0.25rem 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .filter-pill-small .filter-pill-remove {
+      width: 1.1rem;
+      height: 1.1rem;
+      font-size: 0.9rem;
+    }
+
+    .sticky-filter-bar .clear-filters-btn {
+      background: transparent;
+      border-color: rgba(255, 255, 255, 0.5);
+      color: var(--color-white, #fff);
+    }
+
+    .sticky-filter-bar .clear-filters-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--color-white, #fff);
+      color: var(--color-white, #fff);
+    }
+
+    .clear-filters-btn-small {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    /* --xl breakpoint (1408px+): match underlying content width */
+    @media (min-width: 1408px) {
+      .sticky-filter-bar {
+        left: 0;
+        right: 0;
+        max-width: 1322px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    /* --lg breakpoint (1216px - 1407px): match header's margin behavior */
+    @media (min-width: 1216px) and (max-width: 1407px) {
+      .sticky-filter-bar {
+        left: 2rem;
+        right: 2rem;
+      }
+    }
+
+    /* --md breakpoint (1024px - 1215px): tablet screens */
+    @media (min-width: 1024px) and (max-width: 1215px) {
+      .sticky-filter-bar {
+        top: 115px;
+        left: 2rem;
+        right: 2rem;
+      }
+    }
+
+    /* --sm breakpoint (768px - 1023px): small tablets */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .sticky-filter-bar {
+        top: 65px;
+        left: 2rem;
+        right: 2rem;
+      }
+    }
+
+    /* Below --sm (< 768px): mobile screens */
+    @media (max-width: 767px) {
+      .sticky-filter-bar {
+        top: 80px;
+        left: 1rem;
+        right: 1rem;
+        padding: var(--unit-xs, 0.5rem) var(--unit, 1rem);
+      }
+
+      .sticky-bar-content {
+        gap: var(--unit-xs, 0.5rem);
+      }
+
+      .sticky-bar-content::before {
+        font-size: 0.65rem;
+        padding-right: 0.35rem;
+        margin-right: 0.35rem;
+      }
+
+      .sticky-timezone {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+      }
+
+      .sticky-label {
+        font-size: 0.7rem;
+      }
+
+      .filter-pill-small {
+        padding: 0.2rem 0.35rem 0.2rem 0.5rem;
+        font-size: 0.75rem;
+      }
+
+      .filter-pill-small .filter-pill-remove {
+        width: 1rem;
+        height: 1rem;
+        font-size: 0.8rem;
+      }
+
+      .clear-filters-btn-small {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+      }
     }
 
     /* Controls container (filters + timezone) */
@@ -1092,11 +1418,11 @@ export class SessionizeProgramElement extends LitElement {
     /* Tabs */
     .program-tabs {
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: var(--unit-xs, 0.5rem);
-      overflow-x: auto;
       padding-bottom: var(--unit-xs, 0.5rem);
       margin-bottom: var(--unit-md, 1.5rem);
-      -webkit-overflow-scrolling: touch;
     }
 
     .program-tab {
@@ -1543,7 +1869,6 @@ export class SessionizeProgramElement extends LitElement {
         padding: 0.25rem;
         background: var(--color-grey-light, #f5f5f5);
         border-radius: var(--border-radius-lg, 8px);
-        overflow-x: visible;
       }
 
       .program-tab {
