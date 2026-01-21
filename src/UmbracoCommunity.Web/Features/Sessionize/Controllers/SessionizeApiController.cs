@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Features.Sessionize.Models;
 
@@ -10,10 +12,12 @@ namespace UmbracoCommunity.Web.Features.Sessionize.Controllers;
 public class SessionizeApiController : ControllerBase
 {
     private readonly SessionizeApiClient _sessionizeClient;
+    private readonly ILogger<SessionizeApiController> _logger;
 
-    public SessionizeApiController(SessionizeApiClient sessionizeClient)
+    public SessionizeApiController(SessionizeApiClient sessionizeClient, ILogger<SessionizeApiController> logger)
     {
         _sessionizeClient = sessionizeClient;
+        _logger = logger;
     }
 
     /// <summary>
@@ -30,10 +34,29 @@ public class SessionizeApiController : ControllerBase
             var sessions = await _sessionizeClient.GetSessionsAsync(cancellationToken);
             return Ok(sessions);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching sessions from Sessionize");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch sessions from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for sessions");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching sessions from Sessionize");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 
@@ -56,10 +79,29 @@ public class SessionizeApiController : ControllerBase
             }
             return Ok(session);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching session {SessionId} from Sessionize", sessionId);
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch session from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for session {SessionId}", sessionId);
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching session {SessionId} from Sessionize", sessionId);
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 
@@ -77,10 +119,29 @@ public class SessionizeApiController : ControllerBase
             var speakers = await _sessionizeClient.GetSpeakersAsync(cancellationToken);
             return Ok(speakers);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching speakers from Sessionize");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch speakers from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for speakers");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching speakers from Sessionize");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 
@@ -103,10 +164,29 @@ public class SessionizeApiController : ControllerBase
             }
             return Ok(speaker);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching speaker {SpeakerId} from Sessionize", speakerId);
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch speaker from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for speaker {SpeakerId}", speakerId);
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching speaker {SpeakerId} from Sessionize", speakerId);
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 
@@ -124,10 +204,29 @@ public class SessionizeApiController : ControllerBase
             var schedule = await _sessionizeClient.GetScheduleAsync(cancellationToken);
             return Ok(schedule);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching schedule from Sessionize");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch schedule from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for schedule");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching schedule from Sessionize");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 
@@ -145,10 +244,29 @@ public class SessionizeApiController : ControllerBase
             var categories = await _sessionizeClient.GetCategoriesAsync(cancellationToken);
             return Ok(categories);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
+            _logger.LogWarning(ex, "HTTP error fetching categories from Sessionize");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
-                new { error = "Unable to fetch categories from Sessionize" });
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for categories");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching categories from Sessionize");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
         }
     }
 }

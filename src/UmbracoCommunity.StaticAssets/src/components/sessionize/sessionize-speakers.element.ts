@@ -119,7 +119,7 @@ export class SessionizeSpeakersElement extends LitElement {
             speaker.tagLine,
             () => html`<p class="speaker-tagline">${speaker.tagLine}</p>`
           )}
-      </button>
+      </div>
     `;
   }
 

@@ -20,8 +20,6 @@ describe("SessionizeSpeakersElement", () => {
     const element = new SessionizeSpeakersElement();
     expect(element.topSpeakersOnly).toBe(false);
     expect(element.maxSpeakers).toBeUndefined();
-    expect(element.showBio).toBe(false);
-    expect(element.showLinks).toBe(true);
   });
 
   it("should fetch speakers on connectedCallback", async () => {

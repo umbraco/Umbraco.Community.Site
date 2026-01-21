@@ -17,7 +17,7 @@ public class SessionizeOptions
     /// <summary>
     /// Cache duration in minutes for session data (default: 15 minutes)
     /// </summary>
-    public int CacheDurationMinutes { get; set; } = 15;
+    public int CacheDurationInMinutes { get; set; } = 15;
 
     /// <summary>
     /// Returns true if the Sessionize integration is properly configured

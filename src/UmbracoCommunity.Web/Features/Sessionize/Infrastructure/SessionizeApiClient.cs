@@ -46,8 +46,8 @@ public class SessionizeApiClient
 
         if (!_options.IsConfigured)
         {
-            _logger.LogWarning("Sessionize is not configured. Please set the EventId in configuration.");
-            return new SessionizeAllData();
+            _logger.LogError("Sessionize is not configured. Please set the EventId in appsettings.");
+            throw new InvalidOperationException("Sessionize is not configured. Please set the EventId in appsettings.");
         }
 
         try
@@ -59,10 +59,14 @@ public class SessionizeApiClient
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
-            var allData = JsonSerializer.Deserialize<SessionizeAllData>(json, JsonOptions)
-                ?? new SessionizeAllData();
+            var allData = JsonSerializer.Deserialize<SessionizeAllData>(json, JsonOptions);
+            if (allData == null)
+            {
+                _logger.LogError("Failed to deserialize Sessionize API response. Response was empty or invalid.");
+                throw new InvalidOperationException("Sessionize API returned an unexpected response format.");
+            }
 
-            _cache.Set(cacheKey, allData, TimeSpan.FromMinutes(_options.CacheDurationMinutes));
+            _cache.Set(cacheKey, allData, TimeSpan.FromMinutes(_options.CacheDurationInMinutes));
 
             _logger.LogInformation(
                 "Fetched Sessionize data: {SessionCount} sessions, {SpeakerCount} speakers, {CategoryCount} categories",
