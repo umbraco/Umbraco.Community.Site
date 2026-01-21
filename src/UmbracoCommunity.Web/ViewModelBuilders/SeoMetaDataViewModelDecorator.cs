@@ -37,7 +37,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             _sessionizeApiClient = sessionizeApiClient;
         }
 
-        public void Decorate(PageViewModelBase viewModel, IPublishedContent? currentPage)
+        public async Task DecorateAsync(PageViewModelBase viewModel, IPublishedContent? currentPage)
         {
             if (currentPage is not ISeo contentModel)
             {
@@ -61,14 +61,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             AddBaseSchema(viewModel, contentModel);
 
             // Override OG tags if a session parameter is present (for social sharing)
-            ApplySessionOpenGraphOverrides(viewModel);
+            await ApplySessionOpenGraphOverridesAsync(viewModel);
         }
 
         /// <summary>
         /// Checks for a ?session= query parameter and overrides OG tags with session-specific data
         /// for better social media previews when sharing session links.
         /// </summary>
-        private void ApplySessionOpenGraphOverrides(PageViewModelBase viewModel)
+        private async Task ApplySessionOpenGraphOverridesAsync(PageViewModelBase viewModel)
         {
             if (_httpContextAccessor.HttpContext is null)
             {
@@ -83,7 +83,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
             try
             {
-                var session = _sessionizeApiClient.GetSessionByIdAsync(sessionId).GetAwaiter().GetResult();
+                var session = await _sessionizeApiClient.GetSessionByIdAsync(sessionId);
                 if (session is null)
                 {
                     return;

@@ -11,8 +11,8 @@
             @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
         </div>
     }
-
-    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != default || Model.Settings?.MaxNumberOfSpeakers != 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
+    
+    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
 
     @if (Context.Request.IsBlockPreviewRequest())
     {

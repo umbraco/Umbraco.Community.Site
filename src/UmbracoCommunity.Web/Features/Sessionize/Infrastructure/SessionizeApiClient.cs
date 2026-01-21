@@ -24,7 +24,7 @@ public class SessionizeApiClient
         IMemoryCache cache,
         ILogger<SessionizeApiClient> logger)
     {
-        _httpClient = httpClientFactory.CreateClient();
+        _httpClient = httpClientFactory.CreateClient("Sessionize");
         _options = options.Value;
         _cache = cache;
         _logger = logger;

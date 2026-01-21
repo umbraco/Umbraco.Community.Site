@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 
@@ -14,5 +15,12 @@ public class RegisterSessionize : IComposer
 
         // Register the Sessionize API client as scoped (one per request)
         builder.Services.AddScoped<SessionizeApiClient>();
+        
+        builder.Services.AddHttpClient("Sessionize", (sp, client) => 
+        {
+            var options = sp.GetRequiredService<IOptions<SessionizeOptions>>().Value;
+            client.BaseAddress = new Uri(options.BaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
     }
 }
