@@ -1,4 +1,4 @@
-namespace UmbracoCommunity.Extensions.Models;
+namespace UmbracoCommunity.Extensions.Features.GitHub.Models;
 
 public class ContributorDetail
 {

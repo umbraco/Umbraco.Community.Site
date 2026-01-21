@@ -131,7 +131,7 @@ export type ReadOnlyUserGroupModel = {
 
 export type ReleaseInfo = {
     version: string;
-    releaseDate?: string | null;
+    releaseDate: string;
     isLts: boolean;
     isMajor: boolean;
     isPreRelease: boolean;
@@ -161,6 +161,12 @@ export type SampleDataImportResult = {
     nuGetPackagesUpdated: number;
     readonly totalAdded: number;
     readonly totalUpdated: number;
+};
+
+export type SessionizeCacheRefreshResult = {
+    success: boolean;
+    message: string;
+    refreshedAt: string;
 };
 
 export type UnknownTypeGranularPermissionModel = {
@@ -300,7 +306,7 @@ export type UserModelWritable = {
     kind: UserKindModel;
 };
 
-export type GetContributionStatsData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsData = {
     body?: never;
     path?: never;
     query?: {
@@ -310,76 +316,118 @@ export type GetContributionStatsData = {
     url: '/umbraco/umbracocommunityextensions/api/v1/contributions';
 };
 
-export type GetContributionStatsErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type GetContributionStatsResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses = {
     /**
      * OK
      */
     200: ContributionStats;
 };
 
-export type GetContributionStatsResponse = GetContributionStatsResponses[keyof GetContributionStatsResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponse = GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses];
 
-export type ExportGitHubDataData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data';
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers';
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/export-github-data';
 };
 
-export type ExportGitHubDataErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type ExportGitHubDataResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses = {
     /**
      * OK
      */
     200: GitHubDataExport;
 };
 
-export type ExportGitHubDataResponse = ExportGitHubDataResponses[keyof ExportGitHubDataResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponse = GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses];
 
-export type GetHqMembersData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers';
 };
 
-export type GetHqMembersErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type GetHqMembersResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses = {
     /**
      * OK
      */
     200: Array<GitHubHqMember>;
 };
 
-export type GetHqMembersResponse = GetHqMembersResponses[keyof GetHqMembersResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponse = GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses];
 
-export type CreateHqMemberData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersData = {
     body?: GitHubHqMember;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers';
 };
 
-export type CreateHqMemberErrors = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersErrors = {
     /**
      * Bad Request
      */
@@ -390,16 +438,16 @@ export type CreateHqMemberErrors = {
     401: unknown;
 };
 
-export type CreateHqMemberResponses = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses = {
     /**
      * Created
      */
     201: GitHubHqMember;
 };
 
-export type CreateHqMemberResponse = CreateHqMemberResponses[keyof CreateHqMemberResponses];
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponse = PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses];
 
-export type DeleteHqMemberData = {
+export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
     body?: never;
     path: {
         id: string;
@@ -408,7 +456,7 @@ export type DeleteHqMemberData = {
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
 };
 
-export type DeleteHqMemberErrors = {
+export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
@@ -419,16 +467,16 @@ export type DeleteHqMemberErrors = {
     404: unknown;
 };
 
-export type DeleteHqMemberResponses = {
+export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
     /**
      * No Content
      */
     204: void;
 };
 
-export type DeleteHqMemberResponse = DeleteHqMemberResponses[keyof DeleteHqMemberResponses];
+export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
 
-export type GetHqMemberData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
     body?: never;
     path: {
         id: string;
@@ -437,7 +485,7 @@ export type GetHqMemberData = {
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
 };
 
-export type GetHqMemberErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
@@ -448,16 +496,16 @@ export type GetHqMemberErrors = {
     404: unknown;
 };
 
-export type GetHqMemberResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
     /**
      * OK
      */
     200: GitHubHqMember;
 };
 
-export type GetHqMemberResponse = GetHqMemberResponses[keyof GetHqMemberResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
 
-export type UpdateHqMemberData = {
+export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
     body?: GitHubHqMember;
     path: {
         id: string;
@@ -466,7 +514,7 @@ export type UpdateHqMemberData = {
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
 };
 
-export type UpdateHqMemberErrors = {
+export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
     /**
      * Bad Request
      */
@@ -481,23 +529,23 @@ export type UpdateHqMemberErrors = {
     404: unknown;
 };
 
-export type UpdateHqMemberResponses = {
+export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
     /**
      * OK
      */
     200: GitHubHqMember;
 };
 
-export type UpdateHqMemberResponse = UpdateHqMemberResponses[keyof UpdateHqMemberResponses];
+export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
 
-export type ImportHqMembersData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportData = {
     body?: Array<GitHubHqMember>;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/import';
 };
 
-export type ImportHqMembersErrors = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportErrors = {
     /**
      * Bad Request
      */
@@ -508,21 +556,21 @@ export type ImportHqMembersErrors = {
     401: unknown;
 };
 
-export type ImportHqMembersResponses = {
+export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportResponses = {
     /**
      * OK
      */
     200: unknown;
 };
 
-export type ImportGitHubDataData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataData = {
     body?: GitHubDataExport;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/import-github-data';
 };
 
-export type ImportGitHubDataErrors = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataErrors = {
     /**
      * Bad Request
      */
@@ -537,83 +585,83 @@ export type ImportGitHubDataErrors = {
     500: unknown;
 };
 
-export type ImportGitHubDataResponses = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses = {
     /**
      * OK
      */
     200: SampleDataImportResult;
 };
 
-export type ImportGitHubDataResponse = ImportGitHubDataResponses[keyof ImportGitHubDataResponses];
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponse = PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses];
 
-export type ImportSampleGitHubDataData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-github-data';
 };
 
-export type ImportSampleGitHubDataErrors = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataErrors = {
     /**
      * Internal Server Error
      */
     500: unknown;
 };
 
-export type ImportSampleGitHubDataResponses = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses = {
     /**
      * OK
      */
     200: SampleDataImportResult;
 };
 
-export type ImportSampleGitHubDataResponse = ImportSampleGitHubDataResponses[keyof ImportSampleGitHubDataResponses];
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponse = PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses];
 
-export type ImportSampleHqMembersData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-hq-members';
 };
 
-export type ImportSampleHqMembersErrors = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersErrors = {
     /**
      * Internal Server Error
      */
     500: unknown;
 };
 
-export type ImportSampleHqMembersResponses = {
+export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersResponses = {
     /**
      * OK
      */
     200: unknown;
 };
 
-export type PingData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1PingData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/ping';
 };
 
-export type PingErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1PingErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type PingResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1PingResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PingResponse = PingResponses[keyof PingResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1PingResponse = GetUmbracoUmbracocommunityextensionsApiV1PingResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1PingResponses];
 
-export type GetReleasesData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesData = {
     body?: never;
     path?: never;
     query?: {
@@ -623,87 +671,110 @@ export type GetReleasesData = {
     url: '/umbraco/umbracocommunityextensions/api/v1/releases';
 };
 
-export type GetReleasesErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type GetReleasesResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses = {
     /**
      * OK
      */
     200: ReleaseSummary;
 };
 
-export type GetReleasesResponse = GetReleasesResponses[keyof GetReleasesResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponse = GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses];
 
-export type WhatsMyNameData = {
+export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache';
+};
+
+export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses = {
+    /**
+     * OK
+     */
+    200: SessionizeCacheRefreshResult;
+};
+
+export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponse = PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses];
+
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/whatsMyName';
 };
 
-export type WhatsMyNameErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type WhatsMyNameResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type WhatsMyNameResponse = WhatsMyNameResponses[keyof WhatsMyNameResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponse = GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses];
 
-export type WhatsTheTimeMrWolfData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/whatsTheTimeMrWolf';
 };
 
-export type WhatsTheTimeMrWolfErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type WhatsTheTimeMrWolfResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type WhatsTheTimeMrWolfResponse = WhatsTheTimeMrWolfResponses[keyof WhatsTheTimeMrWolfResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponse = GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses];
 
-export type WhoAmIData = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracocommunityextensions/api/v1/whoAmI';
 };
 
-export type WhoAmIErrors = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type WhoAmIResponses = {
+export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses = {
     /**
      * OK
      */
     200: UserModel;
 };
 
-export type WhoAmIResponse = WhoAmIResponses[keyof WhoAmIResponses];
+export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponse = GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses];

@@ -231,6 +231,69 @@ public class SessionizeApiController : ControllerBase
     }
 
     /// <summary>
+    /// Gets sessions in a format suitable for Contentment data sources.
+    /// Returns only talk sessions (excludes service sessions like breaks/lunch).
+    /// </summary>
+    [HttpGet("sessions.json")]
+    [ProducesResponseType(typeof(List<ContentmentDataItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    public async Task<IActionResult> GetSessionsForContentment(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var sessions = await _sessionizeClient.GetSessionsAsync(cancellationToken);
+
+            // Filter to only talk sessions and format for Contentment
+            var contentmentData = sessions
+                .Where(s => !s.IsServiceSession)
+                .OrderBy(s => s.StartsAt)
+                .ThenBy(s => s.Title)
+                .Select(s => new ContentmentDataItem
+                {
+                    Name = FormatSessionName(s),
+                    Value = s.Id
+                })
+                .ToList();
+
+            return Ok(contentmentData);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "HTTP error fetching sessions from Sessionize for Contentment");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = "Unable to connect to Sessionize. Please try again later." });
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to parse Sessionize API response for Contentment sessions");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new { error = "Received invalid data from Sessionize." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Sessionize configuration error");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error fetching sessions from Sessionize for Contentment");
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { error = "An unexpected error occurred. Please try again." });
+        }
+    }
+
+    private static string FormatSessionName(SessionizeSession session)
+    {
+        var speakers = session.Speakers?.Count > 0
+            ? $" — {string.Join(", ", session.Speakers.Select(s => s.FullName))}"
+            : string.Empty;
+
+        return $"{session.Title}{speakers}";
+    }
+
+    /// <summary>
     /// Gets all categories
     /// </summary>
     [HttpGet("categories")]

@@ -1,9 +1,9 @@
-namespace UmbracoCommunity.Extensions.Models;
+namespace UmbracoCommunity.Extensions.Features.GitHub.Models;
 
 public class ReleaseInfo
 {
     public string Version { get; set; } = string.Empty;
-    public DateTime? ReleaseDate { get; set; }
+    public DateTime ReleaseDate { get; set; }
     public bool IsLts { get; set; }
     public bool IsMajor { get; set; }
     public bool IsPreRelease { get; set; }

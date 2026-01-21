@@ -1,0 +1,37 @@
+{
+  "Name": "Program configuration item",
+  "EditorAlias": "Umbraco.SingleBlock",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockSingle",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "5993d4bf-9828-4c34-a432-78deeeb0e254"
+      },
+      {
+        "contentElementTypeKey": "9a38fcb0-7ed0-4428-825e-536bc7cbfb01"
+      },
+      {
+        "contentElementTypeKey": "2468f521-e27e-4d41-a432-8b37f1cf4b6f"
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/3513fc1153854c69b99748599b80c561",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/2468f521e27e4d41a4328b37f1cf4b6f"
+    },
+    {
+      "Udi": "umb://document-type/5993d4bf98284c34a43278deeeb0e254"
+    },
+    {
+      "Udi": "umb://document-type/9a38fcb07ed04428825e536bc7cbfb01"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

@@ -1,0 +1,25 @@
+{
+  "Name": "Sessions config",
+  "Alias": "sessionsConfig",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/2468f521e27e4d41a4328b37f1cf4b6f",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}

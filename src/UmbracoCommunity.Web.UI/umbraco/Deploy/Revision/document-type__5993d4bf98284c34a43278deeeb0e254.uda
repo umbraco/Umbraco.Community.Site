@@ -1,0 +1,45 @@
+{
+  "Name": "Highlighted sessions config",
+  "Alias": "highlightedSessionsConfig",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "67821c79-29df-4a09-bf2b-c68253f3dec5",
+      "Name": "Settings",
+      "Type": 1,
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "a4a0e51e-625c-4e39-a6b1-d07c096feacd",
+          "Alias": "sessions",
+          "DataType": "umb://data-type/3a70b6348c1b41249b8fc6875922afa4",
+          "Description": "Choose which sessions to display",
+          "Name": "Sessions"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5993d4bf98284c34a43278deeeb0e254",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/3a70b6348c1b41249b8fc6875922afa4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}
