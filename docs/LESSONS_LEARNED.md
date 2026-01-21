@@ -23,3 +23,7 @@ If there's an open issue about a manual change having been made then it will hel
 If you delete a document type or data type etc locally, there will be a corresponding commit of the removal of the `.uda` file. This should get reflected in the cloud codebases during the merge and so the item will be deleted in those environments too.
 
 If you delete something that you later realise you shouldn't have deleted (and this deletion hasn't yet been deployed through the pipeline), then you should restore the previously deleted .uda file and use the [Update Schema from Disk Files] option to recreate it in your local backoffice. If you add it manually to your backoffice as a new entity, it will have a different key from other environments that will cause deployment issues.
+
+## Adding secrets
+
+In order to add a secret that is being read from the appsettings.json file, add it in the Cloud Portal. This is using the default .NET secrets naming convention, [as documented](https://docs.umbraco.com/umbraco-cloud/begin-your-cloud-journey/project-features/secrets-management).
