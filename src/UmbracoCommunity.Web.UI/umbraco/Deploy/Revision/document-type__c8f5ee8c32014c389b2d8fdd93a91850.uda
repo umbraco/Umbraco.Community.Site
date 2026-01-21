@@ -1,0 +1,62 @@
+{
+  "Name": "[Settings] Sessionize speakers block",
+  "Alias": "settingsSessionizeSpeakersBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "fe07f549-5c64-4c1a-97be-720a761874bf",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "b80e1d2e-d1ca-4e03-80aa-b2fda60cbde1",
+          "Alias": "maxNumberOfSpeakers",
+          "DataType": "umb://data-type/9480b43b4c02469cbad96e0a00f8408f",
+          "Description": "Cap the returned speakers at a specific amount. If left blank will return all speakers.",
+          "Name": "Max number of speakers"
+        },
+        {
+          "Key": "ff426714-942f-4381-9d8e-4ddfc6cdf1e6",
+          "Alias": "topSpeakersOnly",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Description": "In sessionize it is possible to flag a speaker as a \u0022top speaker\u0022. Toggle this property to only display these headline names.",
+          "Name": "Top speakers only",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/c8f5ee8c32014c389b2d8fdd93a91850",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/9480b43b4c02469cbad96e0a00f8408f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}

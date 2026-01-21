@@ -3,6 +3,7 @@ const elementName = "dc-footer";
 export class DcFooterElement extends HTMLElement {
   placeholderTop: number = 0;
   ticking: boolean = false;
+  #scrollListenerActive: boolean = false;
 
   get footer() {
     return this.querySelector('footer');
@@ -28,11 +29,17 @@ export class DcFooterElement extends HTMLElement {
 
   #checkFooterHeight() {
     if (this.footer!.offsetHeight > window.innerHeight) { // Check if footer is taller than window height
-      window.addEventListener('scroll', this.#onScroll.bind(this))
+      if (!this.#scrollListenerActive) {
+        window.addEventListener('scroll', this.#onScroll);
+        this.#scrollListenerActive = true;
+      }
       this.footer!.style.bottom = 'unset'
       this.footer!.style.top = '0px'
-    } else { // If footer height is not greater than window height, bottom is 0 for normal parllax 
-      window.removeEventListener('scroll', this.#onScroll.bind(this))
+    } else { // If footer height is not greater than window height, bottom is 0 for normal parllax
+      if (this.#scrollListenerActive) {
+        window.removeEventListener('scroll', this.#onScroll);
+        this.#scrollListenerActive = false;
+      }
       this.footer!.style.top = 'unset'
       this.footer!.style.bottom = '0px'
     }
@@ -49,15 +56,15 @@ export class DcFooterElement extends HTMLElement {
   }
 
   #requestTick() {
-    if (!this.ticking) requestAnimationFrame(this.#updateBasedOnScroll.bind(this))
+    if (!this.ticking) requestAnimationFrame(this.#updateBasedOnScroll)
     this.ticking = true;
   }
 
-  #updateBasedOnScroll() {
+  #updateBasedOnScroll = () => {
     // Reset the tick so we can capture the next onScroll
     this.ticking = false
 
-    // When main content disappears from view, start to move footer up 
+    // When main content disappears from view, start to move footer up
     // in conjunction with placeholder top value (in relation to viewport)
     if (this.placeholderTop <= 0) {
       this.footer!.style.top = `${this.placeholderTop}px` // match footer top value with placeholder's top value
@@ -68,6 +75,14 @@ export class DcFooterElement extends HTMLElement {
     window.addEventListener("resize", this.#onResize);
     this.#updateHolderHeight()
     this.#checkFooterHeight()
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("resize", this.#onResize);
+    if (this.#scrollListenerActive) {
+      window.removeEventListener("scroll", this.#onScroll);
+      this.#scrollListenerActive = false;
+    }
   }
 }
 

@@ -3,6 +3,7 @@ const elementName = "dc-header";
 export class DcHeaderElement extends HTMLElement {
   readonly #mobileClassName = "mobile";
   readonly #mobileWidth = 1023;
+  #menuBtn: Element | null = null;
 
   get header() {
     return this.querySelector('header');
@@ -13,10 +14,8 @@ export class DcHeaderElement extends HTMLElement {
     window.addEventListener("resize", this.#setIsMobile);
     document.addEventListener("keydown", this.#handleKeydown);
 
-    this.querySelector("#menuBtn")?.addEventListener(
-      "click",
-      this.#menuBtnClickHandler
-    );
+    this.#menuBtn = this.querySelector("#menuBtn");
+    this.#menuBtn?.addEventListener("click", this.#menuBtnClickHandler);
 
     this.querySelectorAll(".search-btn .icon-btn")?.forEach(btn => {
       btn.addEventListener(
@@ -66,6 +65,12 @@ export class DcHeaderElement extends HTMLElement {
         });
       }
     );
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener("resize", this.#setIsMobile);
+    document.removeEventListener("keydown", this.#handleKeydown);
+    this.#menuBtn?.removeEventListener("click", this.#menuBtnClickHandler);
   }
 
   #disableScrolling() {

@@ -1,0 +1,23 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<SessionizeSpeakersBlock, SettingsSessionizeSpeakersBlock>>
+
+<div class="dc-speakers align-center" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
+    }
+    
+    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
+
+    @if (Context.Request.IsBlockPreviewRequest())
+    {
+        <div class="sessionize-msg">
+            <p>-- Speakers list will load from Sessionize --</p>
+        </div>
+    }
+</div>

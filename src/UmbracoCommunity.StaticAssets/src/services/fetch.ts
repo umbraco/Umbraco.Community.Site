@@ -15,7 +15,7 @@ export async function fetch(request: Promise<Response>) {
     }
   } catch (err) {
     console.error("Promise rejected", err);
-    error = error;
+    error = err;
   }
 
   return { data, error };

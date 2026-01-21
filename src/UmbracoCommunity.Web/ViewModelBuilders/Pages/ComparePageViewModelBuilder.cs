@@ -106,6 +106,9 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             // Get first-time contributor PR numbers
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repositoryName);
 
+            // Load all HQ members once to avoid N+1 queries in loops
+            var hqMembers = _dataStore.GetAllHqMembers().ToList();
+
             // Initialize version groups with all versions in range
             var versionGroups = new Dictionary<string, List<ReleasePullRequestViewModel>>();
             foreach (var version in versionsInRange)
@@ -142,7 +145,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                     if (!versionsInRange.Contains(versionString))
                         continue;
 
-                    var isHqMember = pr.Author != null && _dataStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt);
+                    var isHqMember = pr.Author != null && GitHubSqlStore.IsHqMemberAtTime(pr.Author.Login, pr.CreatedAt, hqMembers);
                     var authorLogin = pr.Author?.Login ?? "unknown";
                     var isFirstTimeContributor = !isHqMember &&
                                                  pr.Author != null &&
@@ -206,7 +209,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                         continue;
 
                     var isHqMember = issue.Author != null &&
-                                     _dataStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt);
+                                     GitHubSqlStore.IsHqMemberAtTime(issue.Author.Login, issue.CreatedAt, hqMembers);
                     var authorLogin = issue.Author?.Login ?? "unknown";
 
                     if (!versionGroups.ContainsKey(versionString))

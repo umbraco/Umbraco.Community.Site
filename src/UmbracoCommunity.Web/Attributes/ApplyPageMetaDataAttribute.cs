@@ -14,30 +14,24 @@ namespace UmbracoCommunity.Web.Attributes
         {
         }
 
-        private class ApplyPageMetaDataFilter : ApplyFilterBase, IResultFilter
+        private class ApplyPageMetaDataFilter : ApplyFilterBase, IAsyncResultFilter
         {
             private readonly IPageViewModelDecorator<Seo> _viewModelDecorator;
 
-            public ApplyPageMetaDataFilter(IUmbracoContextAccessor umbracoContextAccessor, IPageViewModelDecorator<Seo> viewModelDecorator)
+            public ApplyPageMetaDataFilter(IUmbracoContextAccessor umbracoContextAccessor,
+                IPageViewModelDecorator<Seo> viewModelDecorator)
                 : base(umbracoContextAccessor) => _viewModelDecorator = viewModelDecorator;
 
-            public void OnResultExecuting(ResultExecutingContext context)
+            public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
             {
-                if (!TryGetPageAndUmbracoContext(context, out PageViewModelBase? viewModel, out IUmbracoContext? umbracoContext))
+                if (TryGetPageAndUmbracoContext(context, out PageViewModelBase? viewModel, 
+                        out IUmbracoContext? umbracoContext)
+                    && TryGetPublishedContent(umbracoContext, out IPublishedContent? publishedContent))
                 {
-                    return;
+                    await _viewModelDecorator.DecorateAsync(viewModel, publishedContent);
                 }
 
-                if (!TryGetPublishedContent(umbracoContext, out IPublishedContent? publishedContent))
-                {
-                    return;
-                }
-
-                _viewModelDecorator.Decorate(viewModel, publishedContent);
-            }
-
-            public void OnResultExecuted(ResultExecutedContext context)
-            {
+                await next();
             }
         }
     }

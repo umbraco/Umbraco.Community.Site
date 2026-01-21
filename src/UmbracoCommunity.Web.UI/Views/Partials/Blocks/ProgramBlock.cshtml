@@ -1,0 +1,23 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ProgramBlock, SettingsProgramBlock>>
+
+<div class="dc-program" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
+    }
+
+    <dc-sessionize-program></dc-sessionize-program>
+
+    @if (Context.Request.IsBlockPreviewRequest())
+    {
+        <div class="sessionize-msg">
+            <p>-- Program schedule will load from Sessionize --</p>
+        </div>
+    }
+</div>

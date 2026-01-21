@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using UmbracoCommunity.Web.Extensions;
+using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
@@ -18,22 +19,25 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
         private readonly IPublishedValueFallback _publishedValueFallback;
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly SessionizeApiClient _sessionizeApiClient;
 
         public SeoMetaDataViewModelDecorator(
             IPublishedUrlProvider publishedUrlProvider,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedValueFallback publishedValueFallback,
             IPublishedContentQuery publishedContentQuery,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            SessionizeApiClient sessionizeApiClient)
         {
             _publishedUrlProvider = publishedUrlProvider;
             _imageUrlGenerator = imageUrlGenerator;
             _publishedValueFallback = publishedValueFallback;
             _publishedContentQuery = publishedContentQuery;
             _httpContextAccessor = httpContextAccessor;
+            _sessionizeApiClient = sessionizeApiClient;
         }
 
-        public void Decorate(PageViewModelBase viewModel, IPublishedContent? currentPage)
+        public async Task DecorateAsync(PageViewModelBase viewModel, IPublishedContent? currentPage)
         {
             if (currentPage is not ISeo contentModel)
             {
@@ -55,6 +59,62 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
             AddPageQuery(viewModel);
             AddBaseSchema(viewModel, contentModel);
+
+            // Override OG tags if a session parameter is present (for social sharing)
+            await ApplySessionOpenGraphOverridesAsync(viewModel);
+        }
+
+        /// <summary>
+        /// Checks for a ?session= query parameter and overrides OG tags with session-specific data
+        /// for better social media previews when sharing session links.
+        /// </summary>
+        private async Task ApplySessionOpenGraphOverridesAsync(PageViewModelBase viewModel)
+        {
+            if (_httpContextAccessor.HttpContext is null)
+            {
+                return;
+            }
+
+            var sessionId = _httpContextAccessor.HttpContext.Request.Query["session"].ToString();
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return;
+            }
+
+            try
+            {
+                var session = await _sessionizeApiClient.GetSessionByIdAsync(sessionId);
+                if (session is null)
+                {
+                    return;
+                }
+
+                // Build session-specific title
+                var speakers = session.Speakers?.Count > 0
+                    ? $" by {string.Join(", ", session.Speakers.Select(s => s.FullName))}"
+                    : string.Empty;
+                viewModel.MetaTitle = $"{session.Title}{speakers}";
+
+                // Use session description for meta description (truncate if too long)
+                if (!string.IsNullOrEmpty(session.Description))
+                {
+                    var description = session.Description.Length > 200
+                        ? session.Description[..197] + "..."
+                        : session.Description;
+                    viewModel.MetaDescription = description;
+                }
+
+                // Update canonical URL to include session parameter
+                if (!string.IsNullOrEmpty(viewModel.CanonicalUrl))
+                {
+                    var separator = viewModel.CanonicalUrl.Contains('?') ? "&" : "?";
+                    viewModel.CanonicalUrl = $"{viewModel.CanonicalUrl}{separator}session={sessionId}";
+                }
+            }
+            catch
+            {
+                // If fetching session fails, just use the default OG tags
+            }
         }
 
         private string? GetCanonicalUrl(ISeo contentModel)

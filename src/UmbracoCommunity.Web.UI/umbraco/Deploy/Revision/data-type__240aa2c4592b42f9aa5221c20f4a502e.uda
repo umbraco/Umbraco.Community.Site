@@ -85,10 +85,22 @@
         ]
       },
       {
+        "contentElementTypeKey": "ed42a0f1-1bf2-48ae-af07-c2227369aadf",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466"
+      },
+      {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
         "allowAtRoot": true,
         "allowInAreas": true,
         "settingsElementTypeKey": "471d5207-9004-4bd5-98c9-db2351678562"
+      },
+      {
+        "contentElementTypeKey": "6f689d5b-3cd6-4b03-87f2-720f626cf50a",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850"
       },
       {
         "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
@@ -157,6 +169,9 @@
       "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f"
     },
     {
+      "Udi": "umb://document-type/1e173c4bebc94aa89753bad29a376466"
+    },
+    {
       "Udi": "umb://document-type/299b4e217d6b4da68faf4f281c104dcc"
     },
     {
@@ -170,6 +185,9 @@
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
+    },
+    {
+      "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
     },
     {
       "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c"
@@ -205,6 +223,9 @@
       "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
     },
     {
+      "Udi": "umb://document-type/c8f5ee8c32014c389b2d8fdd93a91850"
+    },
+    {
       "Udi": "umb://document-type/cc7a54a7a94d41c1bb134dcc6f399d3f"
     },
     {
@@ -215,6 +236,9 @@
     },
     {
       "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
+    },
+    {
+      "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

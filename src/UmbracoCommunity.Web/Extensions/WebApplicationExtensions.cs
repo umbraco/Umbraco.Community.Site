@@ -34,9 +34,9 @@ namespace UmbracoCommunity.Web.Extensions
 
                 // The following was generated at https://www.permissionspolicy.com/:
                 // - no permissions were selected for all features
-                // - apart from the following found to be in use: unload
+                // - apart from the following found to be in use: unload, clipboard-write (for share functionality)
                 // - removed references to the following features that throw unrecognised warnings in the browser console: ambient-light-sensor, battery, document-domain, execution-while-not-rendered, execution-while-out-of-viewport, navigation-override, speaker-selection, conversion-measurement, focus-without-user-activation, sync-script, trust-token-redemption, window-placement, vertical-scroll
-                const string PermissionsPolicyValue = "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=(self)";
+                const string PermissionsPolicyValue = "accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(self), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=(self)";
                 context.Response.Headers.Append("Permissions-Policy", PermissionsPolicyValue);
 
                 await next();

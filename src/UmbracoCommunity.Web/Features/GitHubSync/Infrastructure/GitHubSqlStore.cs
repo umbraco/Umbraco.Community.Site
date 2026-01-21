@@ -239,6 +239,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entities = await context.PullRequests
+            .AsNoTracking()
             .Where(pr => pr.RepositoryName == repositoryName)
             .OrderByDescending(pr => pr.CreatedAt)
             .ToListAsync();
@@ -256,6 +257,7 @@ public class GitHubSqlStore
         using var context = await _contextFactory.CreateDbContextAsync();
 
         var entities = await context.PullRequestReleases
+            .AsNoTracking()
             .Where(prl => prl.ReleaseLabel == releaseLabel)
             .Join(context.PullRequests,
                 prl => prl.PullRequestId,
@@ -278,6 +280,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entities = await context.Issues
+            .AsNoTracking()
             .Where(i => i.RepositoryName == repositoryName)
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync();
@@ -295,6 +298,7 @@ public class GitHubSqlStore
         using var context = await _contextFactory.CreateDbContextAsync();
 
         var entities = await context.IssueReleases
+            .AsNoTracking()
             .Where(irl => irl.ReleaseLabel == releaseLabel)
             .Join(context.Issues,
                 irl => irl.IssueId,
@@ -317,6 +321,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entities = await context.Discussions
+            .AsNoTracking()
             .Where(d => d.RepositoryName == repositoryName)
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync();
@@ -332,7 +337,7 @@ public class GitHubSqlStore
     private async Task<IEnumerable<GitHubHqMember>> GetAllHqMembersAsync()
     {
         using var context = await _contextFactory.CreateDbContextAsync();
-        var entities = await context.HqMembers.ToListAsync();
+        var entities = await context.HqMembers.AsNoTracking().ToListAsync();
 
         return entities.Select(e => JsonConvert.DeserializeObject<GitHubHqMember>(e.Data)!);
     }
@@ -349,6 +354,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entity = await context.HqMembers
+            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Login == login);
 
         return entity != null ? JsonConvert.DeserializeObject<GitHubHqMember>(entity.Data) : null;
@@ -405,6 +411,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entities = await context.Discussions
+            .AsNoTracking()
             .Where(d => d.RepositoryName == repositoryName)
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync();
@@ -424,6 +431,7 @@ public class GitHubSqlStore
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entities = await context.PullRequests
+            .AsNoTracking()
             .Where(pr => pr.RepositoryName == repositoryName)
             .OrderBy(pr => pr.CreatedAt)
             .ToListAsync();
@@ -451,10 +459,48 @@ public class GitHubSqlStore
         return IsHqMemberAtTimeAsync(login, time).GetAwaiter().GetResult();
     }
 
+    /// <summary>
+    /// Checks if a login was an HQ member at a given time using a pre-loaded list of HQ members.
+    /// Use this method in loops to avoid N+1 database queries.
+    /// </summary>
+    /// <param name="login">The GitHub login to check</param>
+    /// <param name="time">The time to check membership at</param>
+    /// <param name="hqMembers">Pre-loaded list of HQ members (call GetAllHqMembers() once and pass here)</param>
+    /// <returns>True if the login was an HQ member at the given time</returns>
+    public static bool IsHqMemberAtTime(string login, DateTime time, IEnumerable<GitHubHqMember> hqMembers)
+    {
+        var member = hqMembers.FirstOrDefault(m =>
+            m.Login.Equals(login, StringComparison.OrdinalIgnoreCase));
+
+        if (member == null)
+            return false;
+
+        // If no periods are defined, treat as always HQ member
+        if (member.Periods == null || !member.Periods.Any())
+            return true;
+
+        // Check if the time falls within any of the member's HQ periods
+        foreach (var period in member.Periods)
+        {
+            // If Start is null, it means they've been HQ from the beginning
+            var startCheck = !period.Start.HasValue || time >= period.Start.Value;
+            // If End is null, it means they're still HQ
+            var endCheck = !period.End.HasValue || time <= period.End.Value;
+
+            if (startCheck && endCheck)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private async Task<bool> IsHqMemberAtTimeAsync(string login, DateTime time)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         var entity = await context.HqMembers
+            .AsNoTracking()
             .FirstOrDefaultAsync(m => m.Login == login);
 
         if (entity == null)
@@ -540,6 +586,7 @@ public class GitHubSqlStore
         using var context = await _contextFactory.CreateDbContextAsync();
 
         var versions = await context.NuGetPackageVersions
+            .AsNoTracking()
             .Where(e => e.PackageId == packageId)
             .ToDictionaryAsync(e => e.Version, e => e.PublishedDate);
 

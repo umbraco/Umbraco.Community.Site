@@ -71,3 +71,6 @@ svg .st9 {
   fill: inherit;
 }
 
+dialog {
+  border-radius: var(--border-radius-lg);
+}

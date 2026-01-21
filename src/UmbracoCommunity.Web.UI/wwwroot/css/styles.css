@@ -367,7 +367,17 @@ img {
     padding: 0 20px;
 }
 
-/* Speakers block */
+/* Sessionize blocks */
+.dc-speakers, .dc-program {
+    text-align: center;
+    padding: 20px;
+}
+
+.sessionize-msg {
+    text-transform: uppercase;
+    color: grey;
+}
+
 .dc-speakers-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
