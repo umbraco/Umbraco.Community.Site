@@ -135,6 +135,7 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions
 - **assets/** - Static assets (images, SVGs)
+- **svg/** - Reusable SVG icons as Lit templates (`lucide-icons.ts`)
 - **plugins/** - Vite plugins
 - **test/** - Test utilities
 
@@ -143,6 +144,10 @@ Built assets go to:
 - Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
+
+**Dialog System** (`src/components/dialog/`):
+- `dialog-base.element.ts` - Base class for modal dialogs
+- `dialog.handler.ts` - Opens/closes dialogs, manages body scroll lock with scrollbar width compensation to prevent content jump
 
 ### Models Builder
 
@@ -202,10 +207,17 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - `GET /categories` - Event categories
 
 **Frontend Components** (`src/UmbracoCommunity.StaticAssets/src/components/sessionize/`):
-- `sessionize-program.element.ts` - Program grid display
+- `sessionize-program.element.ts` - Program grid display with deep linking support
 - `sessionize-speakers.element.ts` - Speakers grid with filtering
-- `sessionize-session-dialog.element.ts` - Session details modal
+- `sessionize-session-dialog.element.ts` - Session details modal with social sharing
 - `sessionize-speaker-dialog.element.ts` - Speaker details modal
+
+**Session Sharing & Deep Linking:**
+- URLs support `?session={sessionId}` parameter for direct session linking
+- When visiting a URL with session parameter, page scrolls to program and opens session dialog
+- Session dialog includes share buttons for LinkedIn, Bluesky, Mastodon, and copy link
+- Server-side Open Graph tags are generated for shared session URLs via `SeoMetaDataViewModelDecorator`
+- Social platforms receive session-specific `og:title`, `og:description`, and `og:url` meta tags
 
 **Configuration** (in `appsettings.json`):
 ```json
@@ -259,6 +271,7 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Nonce-based script security via `NonceTagHelper`
 - CSP can be disabled per-request via `DisableCspMiddleware`
 - HSTS enabled with preload and 1-year max age
+- Permissions-Policy configured in `Extensions/WebApplicationExtensions.cs` (includes `clipboard-write=(self)` for share functionality)
 
 ## Key Dependencies
 
