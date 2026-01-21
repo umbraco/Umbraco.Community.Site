@@ -12,7 +12,9 @@ export class DcDialogHandler {
     dialogElement?.appendChild(element);
     dialogElement?.showModal();
 
-    // Lock body scroll
+    // Lock body scroll and compensate for scrollbar width to prevent content jump
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
     document.body.classList.add("dialog-open");
 
     let isClosed = false;
@@ -25,7 +27,8 @@ export class DcDialogHandler {
       if (element.parentNode === dialogElement) {
         dialogElement?.removeChild(element);
       }
-      // Unlock body scroll
+      // Unlock body scroll and remove scrollbar compensation
+      document.body.style.paddingRight = "";
       document.body.classList.remove("dialog-open");
     };
 

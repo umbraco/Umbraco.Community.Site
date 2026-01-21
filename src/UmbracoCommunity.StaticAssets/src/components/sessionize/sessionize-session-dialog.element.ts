@@ -1,5 +1,5 @@
 import { css, html, nothing } from "lit";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { when } from "lit/directives/when.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { DcDialogBaseElement } from "../dialog/dialog-base.element.js";
@@ -11,7 +11,7 @@ import {
   SessionizeSchedule,
 } from "../../services/sessionize.service.js";
 import { SessionizeSpeakerDialogElement } from "./sessionize-speaker-dialog.element.js";
-import { iconClock, iconMapPin } from "../../svg/lucide-icons.js";
+import { iconClock, iconMapPin, iconShare, iconCheck, iconCopy, iconLinkedin, iconBluesky, iconMastodon } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-sessionize-session-dialog";
 
@@ -29,7 +29,11 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
   @property({ type: Array })
   schedule: SessionizeSchedule[] = [];
 
+  @state()
+  private _showCopiedFeedback = false;
+
   #dialogHandler = new DcDialogHandler();
+  #copiedTimeout?: ReturnType<typeof setTimeout>;
 
   #getCategoryItemName(itemId: number): { name: string; categoryTitle: string } | null {
     for (const category of this.categories) {
@@ -137,6 +141,112 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       dialog.timezone = this.timezone;
       this.#dialogHandler.open(dialog);
     }, 100);
+  }
+
+  #getShareUrl(): string {
+    const url = new URL(window.location.href);
+    if (this.session) {
+      url.searchParams.set("session", this.session.id);
+    }
+    return url.toString();
+  }
+
+  #isMobileOrTablet(): boolean {
+    // Check for touch capability and mobile user agent
+    const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    return hasTouch && mobileRegex.test(navigator.userAgent);
+  }
+
+  async #shareSession() {
+    if (!this.session) return;
+
+    const shareUrl = this.#getShareUrl();
+
+    // Only use Web Share API on mobile/tablet devices where it provides a good UX
+    if (this.#isMobileOrTablet() && navigator.share) {
+      const shareData = {
+        title: this.session.title,
+        text: this.session.speakers?.length
+          ? `${this.session.title} by ${this.session.speakers.map(s => s.fullName).join(", ")}`
+          : this.session.title,
+        url: shareUrl,
+      };
+
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled or share failed, fall through to clipboard
+        if ((err as Error).name === "AbortError") {
+          return; // User cancelled, don't show copied feedback
+        }
+      }
+    }
+
+    // Copy to clipboard (desktop default and mobile fallback)
+    await this.#copyToClipboard(shareUrl);
+  }
+
+  async #copyToClipboard(text: string) {
+    // Try Clipboard API first (need to check if it's allowed)
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.#showCopied();
+        return;
+      } catch (err) {
+        // Clipboard API failed, fall through to execCommand
+        console.log("Clipboard API failed, trying execCommand:", err);
+      }
+    }
+
+    // Fallback to execCommand
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+    textArea.style.opacity = "0";
+    textArea.setAttribute("readonly", "");
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, text.length);
+
+    const success = document.execCommand("copy");
+    document.body.removeChild(textArea);
+
+    if (success) {
+      this.#showCopied();
+    } else {
+      console.error("execCommand copy also failed");
+    }
+  }
+
+  #showCopied() {
+    this._showCopiedFeedback = true;
+    if (this.#copiedTimeout) {
+      clearTimeout(this.#copiedTimeout);
+    }
+    this.#copiedTimeout = setTimeout(() => {
+      this._showCopiedFeedback = false;
+    }, 2000);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    if (this.#copiedTimeout) {
+      clearTimeout(this.#copiedTimeout);
+    }
   }
 
   #renderSidebar() {
@@ -284,6 +394,81 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
     `;
   }
 
+  #getShareText(): string {
+    if (!this.session) return "";
+    const speakers = this.session.speakers?.length
+      ? ` by ${this.session.speakers.map(s => s.fullName).join(", ")}`
+      : "";
+    return `${this.session.title}${speakers}`;
+  }
+
+  #shareToLinkedIn() {
+    const url = encodeURIComponent(this.#getShareUrl());
+    const title = encodeURIComponent(this.session?.title ?? "");
+    const summary = encodeURIComponent(this.#getShareText());
+    window.open(
+      `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${summary}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
+
+  #shareToBluesky() {
+    const text = encodeURIComponent(`${this.#getShareText()}\n\n${this.#getShareUrl()}`);
+    window.open(`https://bsky.app/intent/compose?text=${text}`, "_blank", "noopener,noreferrer");
+  }
+
+  #shareToMastodon() {
+    const text = encodeURIComponent(`${this.#getShareText()}\n\n${this.#getShareUrl()}`);
+    window.open(`https://mastodonshare.com/?text=${text}`, "_blank", "noopener,noreferrer");
+  }
+
+  #renderShareSection() {
+    return html`
+      <div class="share-section">
+        <span class="share-label">Share this session:</span>
+        <div class="share-buttons">
+          <button
+            class="share-btn share-btn-linkedin"
+            @click=${this.#shareToLinkedIn}
+            title="Share on LinkedIn"
+            aria-label="Share on LinkedIn"
+          >
+            ${iconLinkedin}
+            <span>LinkedIn</span>
+          </button>
+          <button
+            class="share-btn share-btn-bluesky"
+            @click=${this.#shareToBluesky}
+            title="Share on Bluesky"
+            aria-label="Share on Bluesky"
+          >
+            ${iconBluesky}
+            <span>Bluesky</span>
+          </button>
+          <button
+            class="share-btn share-btn-mastodon"
+            @click=${this.#shareToMastodon}
+            title="Share on Mastodon"
+            aria-label="Share on Mastodon"
+          >
+            ${iconMastodon}
+            <span>Mastodon</span>
+          </button>
+          <button
+            class="share-btn share-btn-copy ${this._showCopiedFeedback ? 'copied' : ''}"
+            @click=${this.#shareSession}
+            title="${this._showCopiedFeedback ? 'Link copied!' : 'Copy link'}"
+            aria-label="${this._showCopiedFeedback ? 'Link copied to clipboard' : 'Copy link to clipboard'}"
+          >
+            ${this._showCopiedFeedback ? iconCheck : iconCopy}
+            <span>${this._showCopiedFeedback ? 'Copied!' : 'Copy link'}</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
   renderBody() {
     if (!this.session) {
       return html`<p>No session data available.</p>`;
@@ -302,6 +487,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
           <h2 class="session-title">${this.session.title}</h2>
           ${this.#renderLinks()}
           ${this.#renderSidebar()}
+          ${this.#renderShareSection()}
         </div>
       `;
     }
@@ -319,6 +505,8 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
           <div class="session-description">
             <p>${unsafeHTML(this.#linkifyText(this.session.description ?? ""))}</p>
           </div>
+
+          ${this.#renderShareSection()}
         </main>
       </div>
     `;
@@ -377,6 +565,82 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
         color: var(--color-dark, #1b264f);
         text-align: left;
         line-height: 1.3;
+      }
+
+      /* Share section */
+      .share-section {
+        margin-top: var(--unit-md, 1.5rem);
+        padding-top: var(--unit, 1rem);
+        border-top: 1px solid var(--color-grey-light, #e5e7eb);
+      }
+
+      .share-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--color-dark-grey, #6b7280);
+        margin-bottom: var(--unit-sm, 0.75rem);
+      }
+
+      .share-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--unit-xs, 0.5rem);
+      }
+
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 0.85rem;
+        background: var(--color-grey-light, #f5f5f5);
+        border: 1px solid var(--color-grey, #d1d5db);
+        border-radius: var(--border-radius, 6px);
+        color: var(--color-dark, #1b264f);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .share-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .share-btn .lucide-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      .share-btn-linkedin:hover {
+        background: #0077b5;
+        border-color: #0077b5;
+        color: var(--color-white, #fff);
+      }
+
+      .share-btn-bluesky:hover {
+        background: #0085ff;
+        border-color: #0085ff;
+        color: var(--color-white, #fff);
+      }
+
+      .share-btn-mastodon:hover {
+        background: #6364ff;
+        border-color: #6364ff;
+        color: var(--color-white, #fff);
+      }
+
+      .share-btn-copy:hover {
+        background: var(--color-blue, #3544b1);
+        border-color: var(--color-blue, #3544b1);
+        color: var(--color-white, #fff);
+      }
+
+      .share-btn-copy.copied {
+        background: var(--color-green, #10b981);
+        border-color: var(--color-green, #10b981);
+        color: var(--color-white, #fff);
       }
 
       .session-links {
@@ -557,6 +821,31 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       }
 
       @media (max-width: 600px) {
+        .share-section {
+          margin-top: var(--unit, 1rem);
+          padding-top: var(--unit-sm, 0.75rem);
+        }
+
+        .share-label {
+          font-size: 0.8rem;
+          margin-bottom: var(--unit-xs, 0.5rem);
+        }
+
+        .share-buttons {
+          gap: 0.35rem;
+        }
+
+        .share-btn {
+          padding: 0.4rem 0.6rem;
+          font-size: 0.8rem;
+          gap: 0.3rem;
+        }
+
+        .share-btn .lucide-icon {
+          width: 14px;
+          height: 14px;
+        }
+
         .session-dialog-content {
           padding: var(--unit-sm, 0.75rem);
         }

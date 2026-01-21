@@ -95,13 +95,28 @@ export class SessionizeProgramElement extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.#loadSchedule();
+
+    // Listen for browser back/forward navigation
+    window.addEventListener("popstate", this.#onPopState);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.#controlsObserver?.disconnect();
     this.#programEndObserver?.disconnect();
+    window.removeEventListener("popstate", this.#onPopState);
   }
+
+  #onPopState = () => {
+    // Check if there's a session ID in the URL after navigation
+    const sessionId = this.#getSessionIdFromUrl();
+    if (sessionId) {
+      const session = this.#findSessionById(sessionId);
+      if (session) {
+        this.#openSessionDialogWithoutUrlUpdate(session);
+      }
+    }
+  };
 
   #setupControlsObserver() {
     // Don't set up twice
@@ -232,6 +247,57 @@ export class SessionizeProgramElement extends LitElement {
       console.error("Error loading program:", error);
     } finally {
       this._loading = false;
+
+      // Check for session ID in URL after loading completes
+      this.#openSessionFromUrl();
+    }
+  }
+
+  #getSessionIdFromUrl(): string | null {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("session");
+  }
+
+  #updateUrlWithSession(sessionId: string) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("session", sessionId);
+    window.history.pushState({ sessionId }, "", url.toString());
+  }
+
+  #clearSessionFromUrl() {
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("session")) {
+      url.searchParams.delete("session");
+      window.history.pushState({}, "", url.toString());
+    }
+  }
+
+  #findSessionById(sessionId: string): SessionizeSession | null {
+    for (const day of this._schedule) {
+      for (const slot of day.timeSlots) {
+        for (const room of slot.rooms) {
+          if (room.session?.id === sessionId) {
+            return room.session;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  #openSessionFromUrl() {
+    const sessionId = this.#getSessionIdFromUrl();
+    if (sessionId) {
+      const session = this.#findSessionById(sessionId);
+      if (session) {
+        // Scroll the program component into view first
+        this.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // Use a small delay to ensure scrolling completes and UI is ready
+        setTimeout(() => {
+          this.#openSessionDialogWithoutUrlUpdate(session);
+        }, 300);
+      }
     }
   }
 
@@ -613,6 +679,11 @@ export class SessionizeProgramElement extends LitElement {
   }
 
   #openSessionDialog(session: SessionizeSession) {
+    this.#updateUrlWithSession(session.id);
+    this.#openSessionDialogWithoutUrlUpdate(session);
+  }
+
+  #openSessionDialogWithoutUrlUpdate(session: SessionizeSession) {
     const dialog = new SessionizeSessionDialogElement();
     dialog.session = session;
     dialog.timezone = this._selectedTimezone;
@@ -622,6 +693,14 @@ export class SessionizeProgramElement extends LitElement {
       const { id, name } = e.detail;
       this.#addFilterFromHashtag(id, name);
     }) as EventListener);
+
+    // Clear URL when dialog closes
+    const clearUrl = () => {
+      this.#clearSessionFromUrl();
+      document.removeEventListener("dialog-close", clearUrl);
+    };
+    document.addEventListener("dialog-close", clearUrl, { once: true });
+
     this.#dialogHandler.open(dialog);
   }
 
