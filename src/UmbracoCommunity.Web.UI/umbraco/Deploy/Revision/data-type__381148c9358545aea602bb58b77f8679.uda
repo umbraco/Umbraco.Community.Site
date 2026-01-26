@@ -5,15 +5,8 @@
   "Configuration": {
     "dataSource": [
       {
-        "key": "Umbraco.Community.Contentment.DataEditors.JsonDataListSource, Umbraco.Community.Contentment",
-        "value": {
-          "url": "/api/sessionize/sessions.json",
-          "itemsJsonPath": "$[*]",
-          "nameJsonPath": "$.name",
-          "valueJsonPath": "$.value",
-          "iconJsonPath": "$.icon",
-          "descriptionJsonPath": "$.description"
-        }
+        "key": "UmbracoCommunity.Web.Features.Sessionize.DataSources.SessionizeSessionsDataSource, UmbracoCommunity.Web",
+        "value": {}
       }
     ],
     "listEditor": [
@@ -24,7 +17,7 @@
           "defaultIcon": "icon-document",
           "enableFilter": true,
           "maxItems": 0,
-          "allowClear": false,
+          "allowClear": true,
           "allowDuplicates": false,
           "enableMultiple": true,
           "disableSorting": false,
@@ -33,11 +26,11 @@
       }
     ]
   },
-  "Parent": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
-  "Udi": "umb://data-type/3a70b6348c1b41249b8fc6875922afa4",
+  "Parent": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+  "Udi": "umb://data-type/381148c9358545aea602bb58b77f8679",
   "Dependencies": [
     {
-      "Udi": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+      "Udi": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
       "Ordering": true
     }
   ],

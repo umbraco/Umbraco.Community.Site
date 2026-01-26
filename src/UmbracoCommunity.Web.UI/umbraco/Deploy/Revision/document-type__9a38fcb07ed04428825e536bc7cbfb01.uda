@@ -11,10 +11,29 @@
   },
   "Parent": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
   "CompositionContentTypes": [],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "56b70389-043f-48fa-a3d0-0122ac47dae7",
+      "Name": "Config",
+      "Type": 1,
+      "Alias": "config",
+      "PropertyTypes": [
+        {
+          "Key": "eb34396e-f47e-46ce-a8f2-6ecd117745da",
+          "Alias": "rooms",
+          "DataType": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+          "Name": "Rooms"
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/9a38fcb07ed04428825e536bc7cbfb01",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
       "Ordering": true

@@ -50,6 +50,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Program configuration: If no configuration is entered then nothing will display in the block
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("programConfiguration")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListItem ProgramConfiguration => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListItem>(_publishedValueFallback, "programConfiguration");
+
+		///<summary>
 		/// Subtitle
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

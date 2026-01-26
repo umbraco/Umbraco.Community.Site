@@ -48,13 +48,5 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
-
-		///<summary>
-		/// Sessions: Choose which sessions to display
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("sessions")]
-		public virtual global::System.Collections.Generic.List<string> Sessions => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "sessions");
 	}
 }

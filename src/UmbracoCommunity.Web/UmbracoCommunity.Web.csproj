@@ -19,6 +19,7 @@
     <PackageReference Include="Umbraco.Cms.Core" />
     <PackageReference Include="Umbraco.Cms.Infrastructure" />
     <PackageReference Include="Umbraco.Cms.Web.Common" />
+    <PackageReference Include="Umbraco.Community.Contentment" />
   </ItemGroup>
 
   <ItemGroup>

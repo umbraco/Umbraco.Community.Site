@@ -13,29 +13,10 @@
   "CompositionContentTypes": [
     "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
   ],
-  "PropertyGroups": [
-    {
-      "Key": "f3d02bb0-3ce4-4edb-bc51-f4dc2d1ac80e",
-      "Name": "Settings",
-      "Alias": "settings",
-      "PropertyTypes": [
-        {
-          "Key": "151f15a4-d357-493a-a4b7-19e9e0250b4a",
-          "Alias": "programConfiguration",
-          "DataType": "umb://data-type/3513fc1153854c69b99748599b80c561",
-          "Mandatory": true,
-          "Name": "Program configuration"
-        }
-      ]
-    }
-  ],
+  "PropertyGroups": [],
   "PropertyTypes": [],
   "Udi": "umb://document-type/5b6a23c2f36346849ebcfa49d0001aed",
   "Dependencies": [
-    {
-      "Udi": "umb://data-type/3513fc1153854c69b99748599b80c561",
-      "Ordering": true
-    },
     {
       "Udi": "umb://document-type-container/9cee9b328522476097fb6bb755722a95",
       "Ordering": true

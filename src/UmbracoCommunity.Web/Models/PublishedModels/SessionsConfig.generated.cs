@@ -48,5 +48,29 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Days
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("days")]
+		public virtual global::System.Collections.Generic.List<string> Days => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "days");
+
+		///<summary>
+		/// Rooms
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("rooms")]
+		public virtual global::System.Collections.Generic.List<string> Rooms => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "rooms");
+
+		///<summary>
+		/// Tags
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("tags")]
+		public virtual global::System.Collections.Generic.List<string> Tags => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "tags");
 	}
 }

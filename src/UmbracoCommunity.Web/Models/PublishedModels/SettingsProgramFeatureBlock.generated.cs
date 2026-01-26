@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Program feature block</summary>
 	[PublishedModel("settingsProgramFeatureBlock")]
-	public partial class SettingsProgramFeatureBlock : PublishedElementModel
+	public partial class SettingsProgramFeatureBlock : PublishedElementModel, ISettingsBlockId
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -48,5 +48,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("blockId")]
+		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
 	}
 }

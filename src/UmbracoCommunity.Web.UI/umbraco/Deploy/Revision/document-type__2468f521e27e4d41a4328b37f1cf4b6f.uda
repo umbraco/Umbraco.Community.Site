@@ -11,10 +11,51 @@
   },
   "Parent": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
   "CompositionContentTypes": [],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "44403100-0bb9-4cd6-a5ec-9aad52649891",
+      "Name": "Config",
+      "Type": 1,
+      "Alias": "config",
+      "PropertyTypes": [
+        {
+          "Key": "39ee3016-da1d-4968-9660-6ccca2b0ca6c",
+          "Alias": "rooms",
+          "DataType": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+          "Name": "Rooms",
+          "SortOrder": 2
+        },
+        {
+          "Key": "66806de6-465d-4f13-bf8f-5e173fc595c8",
+          "Alias": "days",
+          "DataType": "umb://data-type/e431b1e550dd46c8b6f3199ee74130df",
+          "Name": "Days",
+          "SortOrder": 1
+        },
+        {
+          "Key": "b077e32d-8468-49bc-abc3-dc250474a7d7",
+          "Alias": "tags",
+          "DataType": "umb://data-type/d4918285888d4dbc9e47f8c020496959",
+          "Name": "Tags"
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/2468f521e27e4d41a4328b37f1cf4b6f",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d4918285888d4dbc9e47f8c020496959",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/e431b1e550dd46c8b6f3199ee74130df",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/ccd3b121ace840ab8c5a60fd3ca2f089",
       "Ordering": true

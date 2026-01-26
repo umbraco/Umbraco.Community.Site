@@ -13,10 +13,30 @@
   "CompositionContentTypes": [
     "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "87f20bcd-9db6-4941-b9c9-e6d561ab3390",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "d6dc05b6-607b-4b07-a816-a51596dcda8c",
+          "Alias": "programConfiguration",
+          "DataType": "umb://data-type/3513fc1153854c69b99748599b80c561",
+          "Description": "If no configuration is entered then nothing will display in the block",
+          "Name": "Program configuration"
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/81482d2a227945ca87302d91f65e0835",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/3513fc1153854c69b99748599b80c561",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/9cee9b328522476097fb6bb755722a95",
       "Ordering": true

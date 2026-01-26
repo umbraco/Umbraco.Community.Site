@@ -1,0 +1,36 @@
+{
+  "Name": "Sessionize tags data list",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "UmbracoCommunity.Web.Features.Sessionize.DataSources.SessionizeTagsDataSource, UmbracoCommunity.Web",
+        "value": {}
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.ButtonsDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "defaultIcon": "icon-document",
+          "labelStyle": "both",
+          "look": "secondary",
+          "size": "m",
+          "allowClear": true,
+          "enableMultiple": true
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+  "Udi": "umb://data-type/d4918285888d4dbc9e47f8c020496959",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

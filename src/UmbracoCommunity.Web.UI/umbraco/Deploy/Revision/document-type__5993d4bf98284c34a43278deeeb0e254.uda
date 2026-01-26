@@ -14,16 +14,15 @@
   "PropertyGroups": [
     {
       "Key": "67821c79-29df-4a09-bf2b-c68253f3dec5",
-      "Name": "Settings",
+      "Name": "Config",
       "Type": 1,
-      "Alias": "settings",
+      "Alias": "config",
       "PropertyTypes": [
         {
-          "Key": "a4a0e51e-625c-4e39-a6b1-d07c096feacd",
-          "Alias": "sessions",
-          "DataType": "umb://data-type/3a70b6348c1b41249b8fc6875922afa4",
-          "Description": "Choose which sessions to display",
-          "Name": "Sessions"
+          "Key": "625a454b-ef67-4b91-8688-edea2e6a97c8",
+          "Alias": "sessionsToHighlight",
+          "DataType": "umb://data-type/381148c9358545aea602bb58b77f8679",
+          "Name": "Sessions to highlight"
         }
       ]
     }
@@ -32,7 +31,7 @@
   "Udi": "umb://document-type/5993d4bf98284c34a43278deeeb0e254",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/3a70b6348c1b41249b8fc6875922afa4",
+      "Udi": "umb://data-type/381148c9358545aea602bb58b77f8679",
       "Ordering": true
     },
     {
