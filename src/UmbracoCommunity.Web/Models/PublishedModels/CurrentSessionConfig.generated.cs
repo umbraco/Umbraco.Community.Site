@@ -55,6 +55,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("rooms")]
-		public virtual string Rooms => this.Value<string>(_publishedValueFallback, "rooms");
+		public virtual global::System.Collections.Generic.List<string> Rooms => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "rooms");
 	}
 }

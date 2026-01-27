@@ -48,5 +48,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Sessions to highlight
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("sessionsToHighlight")]
+		public virtual global::System.Collections.Generic.List<string> SessionsToHighlight => this.Value<global::System.Collections.Generic.List<string>>(_publishedValueFallback, "sessionsToHighlight");
 	}
 }
