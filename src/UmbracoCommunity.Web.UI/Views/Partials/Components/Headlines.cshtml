@@ -1,0 +1,35 @@
+@* @model HeadlinesViewModel
+@{
+    string backgroundImageClass = Model.HasBackgroundImage ? "has-background" : string.Empty;
+    string isEmptyClass = string.IsNullOrEmpty(Model.Headline) && string.IsNullOrEmpty(Model.Subheadline) ? "empty" : string.Empty;
+}
+
+<header class="hero @backgroundImageClass @isEmptyClass" id="@Model.IdHash">
+    <style asp-add-nonce>
+        #@Model.IdHash {
+            --background-color: @(Model.BackgroundColor ?? "var(--color-white)");
+            --text-color: @(Model.TextColor ?? "var(--color-darkest)");
+        }
+    </style>
+    @if (Model.HasBackgroundImage)
+    {
+        <div class="hero-overlay"></div>
+        <img src="@Model.BackgroundImageUrl" class="hero-image" alt="" />
+    }
+
+    <div class="hero-content">
+        <div class="hero-header">
+            @if (Model.HasSuperHeadline)
+            {
+                <small>@Model.SuperHeadline</small>
+            }
+
+            <h1>@Model.Headline</h1>
+            <h2>@Model.Subheadline</h2>
+
+            @if (Model.HasFootnote) {
+                <p class="hero-footnote">@Model.Footnote</p>
+            }
+        </div>
+    </div>
+</header> *@

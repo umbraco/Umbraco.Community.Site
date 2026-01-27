@@ -4,3 +4,53 @@
 @{
     Layout = "Layout.cshtml";
 }
+
+@section JS {
+    <script vite-src="blog" asp-add-nonce="true"></script>
+}
+
+@section CSS {
+    <link rel="stylesheet" vite-href="blog" />
+}
+
+@* <partial name="~/Views/Partials/Components/Headlines.cshtml" for="Headlines" /> *@
+
+<section>
+    <div class="blog-main">
+@*         @if (Model.HasAuthor)
+        {
+            <partial name="~/Views/Partials/Components/Avatar.cshtml" for="Author" />
+        } *@
+
+        <div class="teaser">@Html.Raw(Model.Teaser)</div>
+
+        <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" for="BlockContent" />
+    </div>
+    <div class="blog-sidebar">
+        <div class="sidebar-card">
+            <ul class="list-unstyled sidebar-list">
+                <li><strong>Published:</strong> @Model.PublishDate</li>
+
+                <li><strong>Read time:</strong> @Model.ReadTime min. read</li>
+
+                @* @if (Model.HasCategory)
+                {
+                    <li><strong>Category:</strong> <a href="@Model.Category!.Url">@Model.Category!.Name</a></li>
+                }
+
+                @if (Model.Tags.Any())
+                {
+                    <li>
+
+                        <ul class="tag-list">
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <li><a href="../?tag=@tag">@tag</a></li>
+                            }
+                        </ul>
+                    </li>
+                } *@
+            </ul>
+        </div>
+    </div>
+</section>

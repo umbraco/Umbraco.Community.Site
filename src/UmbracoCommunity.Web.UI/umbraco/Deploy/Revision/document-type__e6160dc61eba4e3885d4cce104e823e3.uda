@@ -13,15 +13,68 @@
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
   "CompositionContentTypes": [
+    "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
     "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "7a0dd83b-6bd2-47d5-8365-d81132920a0d",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
+    },
+    {
+      "Key": "81afe415-d198-479b-a4fe-06c9d8dd7ca3",
+      "Name": "Article details",
+      "Alias": "content/articleDetails",
+      "PropertyTypes": [
+        {
+          "Key": "0f55f9a5-90a0-41c8-89ec-b658b88fc93c",
+          "Alias": "readTime",
+          "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+          "Description": "In minutes",
+          "Name": "Read time",
+          "SortOrder": 2
+        },
+        {
+          "Key": "16c35df0-f125-430e-8a42-7707eca15385",
+          "Alias": "teaser",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Teaser"
+        },
+        {
+          "Key": "2bbd15e5-c7c7-4c07-a15a-67c4cfc8d693",
+          "Alias": "publishDate",
+          "DataType": "umb://data-type/5046194e4237453ca54715db3a07c4e1",
+          "Name": "Publish date",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/e6160dc61eba4e3885d4cce104e823e3",
   "Dependencies": [
     {
+      "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/5046194e4237453ca54715db3a07c4e1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
       "Ordering": true
     },
     {

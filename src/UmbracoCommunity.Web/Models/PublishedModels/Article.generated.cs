@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Article</summary>
 	[PublishedModel("article")]
-	public partial class Article : PublishedContentModel, IPageConfiguration, ISeo
+	public partial class Article : PublishedContentModel, IContentBlocksContentPage, IPageConfiguration, ISeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -48,6 +48,36 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Publish date
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("publishDate")]
+		public virtual global::System.DateTime PublishDate => this.Value<global::System.DateTime>(_publishedValueFallback, "publishDate");
+
+		///<summary>
+		/// Read time: In minutes
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("readTime")]
+		public virtual int ReadTime => this.Value<int>(_publishedValueFallback, "readTime");
+
+		///<summary>
+		/// Teaser
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("teaser")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Teaser => this.Value<global::Umbraco.Cms.Core.Strings.IHtmlEncodedString>(_publishedValueFallback, "teaser");
+
+		///<summary>
+		/// Content blocks
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("contentBlocks")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlocksContentPage.GetContentBlocks(this, _publishedValueFallback);
 
 		///<summary>
 		/// Hide from sitemap

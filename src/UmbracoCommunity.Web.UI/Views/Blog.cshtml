@@ -4,3 +4,47 @@
 @{
     Layout = "Layout.cshtml";
 }
+
+@section Links {
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="@Model.RssPath">
+}
+
+<section class="has-sidebar">
+    <div>
+        <div class="card-set">
+            @if (Model.HasFeaturedBlogPost)
+            {
+                ViewData["Featured"] = true;
+                <partial name="~/Views/Partials/Blog/Card.cshtml" for="FeaturedBlogPost" view-data="ViewData" />
+            }
+
+            @foreach (var post in Model.BlogPosts)
+            {
+                ViewData["Featured"] = false;
+                <partial name="~/Views/Partials/Blog/Card.cshtml" model="post" view-data="ViewData" />
+            }
+        </div>
+
+        @* <partial name="~/Views/Partials/Components/Paging.cshtml" for="Paging" /> *@
+    </div>
+    <div>
+        <div class="sidebar-card">
+            <h2>Categories</h2>
+            <ul class="list-unstyled sidebar-list">
+                @foreach (var category in Model.Categories)
+                {
+                    <li><a href="@category.Url">@category.Name</a></li>
+                }
+            </ul>
+        </div>
+        <div class="sidebar-card">
+            <h2>Tags</h2>
+            <ul class="tag-list">
+                @foreach (var tag in Model.Tags)
+                {
+                    <li><a href="?tag=@tag">@tag</a></li>
+                }
+            </ul>
+        </div>
+    </div>
+</section>
