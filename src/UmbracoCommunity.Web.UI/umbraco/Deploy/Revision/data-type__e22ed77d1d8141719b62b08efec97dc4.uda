@@ -22,13 +22,8 @@
     },
     "filter": "23dd4b5d-f15a-4c03-90a6-8cb50a6beb00"
   },
-  "Parent": "umb://data-type-container/08ed7e586e6743d389520ca5c663e32b",
   "Udi": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
   "Dependencies": [
-    {
-      "Udi": "umb://data-type-container/08ed7e586e6743d389520ca5c663e32b",
-      "Ordering": true
-    },
     {
       "Udi": "umb://document-type/23dd4b5df15a4c0390a68cb50a6beb00",
       "Mode": "Exist"

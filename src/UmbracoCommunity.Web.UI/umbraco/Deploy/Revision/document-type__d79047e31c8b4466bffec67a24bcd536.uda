@@ -7,8 +7,7 @@
   "Thumbnail": "folder.png",
   "Permissions": {
     "AllowedChildContentTypes": [
-      "umb://document-type/23f25b01e427405d8aced3e729d15318",
-      "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e"
+      "umb://document-type/23f25b01e427405d8aced3e729d15318"
     ]
   },
   "Parent": "umb://document-type-container/0f5ed781046548c0b4f8089cd8a7bd59",
@@ -23,10 +22,6 @@
     },
     {
       "Udi": "umb://document-type/23f25b01e427405d8aced3e729d15318",
-      "Mode": "Exist"
-    },
-    {
-      "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
       "Mode": "Exist"
     }
   ],

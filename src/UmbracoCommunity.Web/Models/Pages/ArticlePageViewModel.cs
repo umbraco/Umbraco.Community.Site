@@ -16,12 +16,8 @@ namespace UmbracoCommunity.Web.Models.Pages
 
         public List<string> Tags { get; set; } = [];
 
-        public string? BlogUrl { get; set; }
-
         public List<IPublishedContent> Categories { get; set; } = [];
 
         public BlockGridModel? Banner { get; internal set; }
-
-        public ArticleAuthorViewModel? Author { get; set; }
     }
 }
