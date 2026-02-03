@@ -1,0 +1,13 @@
+{
+  "Name": "Article tags",
+  "EditorAlias": "Umbraco.Tags",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Tags",
+  "Configuration": {
+    "group": "article",
+    "storageType": "Json"
+  },
+  "Udi": "umb://data-type/e351950048d7422c8b6e9e8c8297c628",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

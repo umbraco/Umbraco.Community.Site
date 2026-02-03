@@ -1,0 +1,32 @@
+{
+  "Name": "Headlines banner grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 12,
+    "blocks": [
+      {
+        "contentElementTypeKey": "0cbc344a-cad8-4b82-853f-eb65ed0b7082",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      }
+    ],
+    "validationLimit": {
+      "max": 1
+    },
+    "useLiveEditing": true
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/497b903292f24bbaba9f5fbcb218fcad",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/0cbc344acad84b82853feb65ed0b7082"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

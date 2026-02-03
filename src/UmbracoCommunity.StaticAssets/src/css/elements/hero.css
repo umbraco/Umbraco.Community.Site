@@ -105,7 +105,8 @@
   position: relative;
   background-color: var(--color-page-surface);
   padding: 0;
-  max-width: var(--hero-max-width);
+  max-width: var(--max-width);
+  margin: 0 auto;
   z-index: 1;
 }
 
@@ -292,7 +293,6 @@
 @media (--xl) {
   .main-hero {
     width: 100%;
-    max-width: unset;
   }
 
   .main-hero.full-width {

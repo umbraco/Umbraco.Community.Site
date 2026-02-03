@@ -13,7 +13,7 @@ namespace UmbracoCommunity.Web.Models.Pages
 
         public IList<BlogPostCardViewModel> BlogPosts { get; set; } = [];
 
-        public PagingViewModel Paging { get; set; } = new();
+        public PagingViewModel? Paging { get; set; }
 
         public IList<CategoryViewModel> Categories { get; set; } = [];
 

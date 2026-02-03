@@ -1,3 +1,8 @@
+.dc-page-banner-block {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
 .dc-page-banner-block h1, .dc-page-banner-block .banner-content {
   font-weight: 500;
   margin: 0;

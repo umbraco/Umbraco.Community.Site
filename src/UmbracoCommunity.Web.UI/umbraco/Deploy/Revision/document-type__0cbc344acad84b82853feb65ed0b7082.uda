@@ -1,0 +1,78 @@
+{
+  "Name": "Headlines banner",
+  "Alias": "headlinesBanner",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-megaphone",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "f5d31567-cfd7-4ca2-b528-8fe36227cf41",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "11e164b3-3349-49ba-8059-95beee247943",
+          "Alias": "footnote",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Footnote",
+          "SortOrder": 4
+        },
+        {
+          "Key": "5d193d9d-48a9-4d51-8fb0-a560f777f219",
+          "Alias": "superHeadline",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "Appears first at the top (small)",
+          "Name": "Super headline",
+          "SortOrder": 1
+        },
+        {
+          "Key": "9176276d-2724-4c08-b828-4d42613e601d",
+          "Alias": "subheadline",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Subheadline",
+          "SortOrder": 3
+        },
+        {
+          "Key": "c8a060ee-308e-4756-ae6c-90fc38571ab0",
+          "Alias": "backgroundImage",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Name": "Background image"
+        },
+        {
+          "Key": "f254b99f-ffd3-4a16-9571-33105a9688fe",
+          "Alias": "headline",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Mandatory": true,
+          "Name": "Headline",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/0cbc344acad84b82853feb65ed0b7082",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}

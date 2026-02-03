@@ -17,7 +17,10 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 Teaser = contentModel.Teaser?.ToHtmlString(),
                 BlockContent = ParseBlockGrid(contentModel.ContentBlocks),
                 PublishDate = contentModel.PublishDate != default ? contentModel.PublishDate : currentPage.CreateDate,
-                ReadTime = contentModel.ReadTime
+                ReadTime = contentModel.ReadTime,
+                Categories = contentModel.Categories?.ToList() ?? new List<IPublishedContent>(0),
+                Tags = contentModel.Tags?.ToList() ?? new List<string>(0),
+                Banner = contentModel.BannerContent
             };
         }
     }

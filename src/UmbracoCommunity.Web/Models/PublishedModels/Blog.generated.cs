@@ -58,6 +58,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent FeaturedBlogPost => this.Value<global::Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent>(_publishedValueFallback, "featuredBlogPost");
 
 		///<summary>
+		/// Number of blog articles per page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("numberOfBlogArticlesPerPage")]
+		public virtual int NumberOfBlogArticlesPerPage => this.Value<int>(_publishedValueFallback, "numberOfBlogArticlesPerPage");
+
+		///<summary>
 		/// RSS path
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

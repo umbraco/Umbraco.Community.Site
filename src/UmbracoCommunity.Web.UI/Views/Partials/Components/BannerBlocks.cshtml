@@ -7,18 +7,16 @@
 {
     var banner = Model.FirstOrDefault();
     if (banner != null) {
-        <div class="dc-block-list">
-            @try
+        @try
+        {
+            if (Model != null)
             {
-                if (Model != null)
-                {
-                    <partial name="@($"~/Views/Partials/Blocks/{banner.Content.ContentType.Alias}.cshtml")" model="banner" />
-                }
+                <partial name="@($"~/Views/Partials/Blocks/{banner.Content.ContentType.Alias}.cshtml")" model="banner" />
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error rendering block row with alias {Alias}", banner.Content.ContentType.Alias);
-            }
-        </div>
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error rendering block row with alias {Alias}", banner.Content.ContentType.Alias);
+        }
     }
 }

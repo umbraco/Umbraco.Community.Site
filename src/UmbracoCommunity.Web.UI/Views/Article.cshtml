@@ -1,5 +1,4 @@
-﻿@using UmbracoCommunity.Web.Models.Pages
-@inherits UmbracoViewPage<ArticlePageViewModel>
+﻿@inherits UmbracoViewPage<ArticlePageViewModel>
 
 @{
     Layout = "Layout.cshtml";
@@ -13,8 +12,7 @@
     <link rel="stylesheet" vite-href="blog" />
 }
 
-@* <partial name="~/Views/Partials/Components/Headlines.cshtml" for="Headlines" /> *@
-
+<partial name="~/Views/Partials/Components/BannerBlocks.cshtml" for="Banner" />
 <section>
     <div class="blog-main">
 @*         @if (Model.HasAuthor)
@@ -33,9 +31,15 @@
 
                 <li><strong>Read time:</strong> @Model.ReadTime min. read</li>
 
-                @* @if (Model.HasCategory)
+                @if (Model.Categories.Any())
                 {
-                    <li><strong>Category:</strong> <a href="@Model.Category!.Url">@Model.Category!.Name</a></li>
+                    <li>
+                        <strong>Category:</strong>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <a href="@category.Url()">@category.Name</a>
+                    }
+                    </li>
                 }
 
                 @if (Model.Tags.Any())
@@ -49,7 +53,7 @@
                             }
                         </ul>
                     </li>
-                } *@
+                }
             </ul>
         </div>
     </div>

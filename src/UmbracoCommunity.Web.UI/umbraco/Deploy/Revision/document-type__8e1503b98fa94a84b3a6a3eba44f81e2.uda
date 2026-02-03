@@ -20,6 +20,14 @@
   ],
   "PropertyGroups": [
     {
+      "Key": "6dcda17b-67ba-422b-801c-65eb3f5705f0",
+      "Name": "Settings",
+      "SortOrder": 1000,
+      "Type": 1,
+      "Alias": "settings",
+      "PropertyTypes": []
+    },
+    {
       "Key": "767c9c37-13c3-4b41-84ce-1299902b1fef",
       "Name": "Content",
       "SortOrder": 1,
@@ -40,6 +48,19 @@
           "Name": "Featured blog post"
         }
       ]
+    },
+    {
+      "Key": "a9e16379-0475-4b33-af3f-18726c8eb719",
+      "Name": "Paging",
+      "Alias": "settings/paging",
+      "PropertyTypes": [
+        {
+          "Key": "c038649e-3694-4e7b-ac9a-79056538d49b",
+          "Alias": "numberOfBlogArticlesPerPage",
+          "DataType": "umb://data-type/16475fdf08f14127be207dfad649583e",
+          "Name": "Number of blog articles per page"
+        }
+      ]
     }
   ],
   "PropertyTypes": [],
@@ -47,6 +68,10 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/16475fdf08f14127be207dfad649583e",
       "Ordering": true
     },
     {

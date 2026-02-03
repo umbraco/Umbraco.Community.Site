@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
@@ -12,5 +13,11 @@ namespace UmbracoCommunity.Web.Models.Pages
         public DateTime PublishDate { get; set; }
 
         public int ReadTime { get; set; }
+
+        public List<string> Tags { get; set; } = [];
+
+        public List<IPublishedContent> Categories { get; set; } = [];
+
+        public BlockGridModel? Banner { get; internal set; }
     }
 }
