@@ -7,6 +7,7 @@ public class PagingViewModel
         CurrentPage = pageNumber;
         PageSize = pageSize;
         TotalItems = totalItemCount;
+        TotalPages = (int)Math.Ceiling((double)totalItemCount / pageSize);
     }
 
     public PagingViewModel(int pageNumber, int pageSize, int totalItemCount, string additionalQueryString)
@@ -22,7 +23,7 @@ public class PagingViewModel
 
     public bool HasPrevious => CurrentPage > 1;
 
-    public bool HasNext => CurrentPage < CurrentPage;
+    public bool HasNext => CurrentPage < TotalPages;
 
     public string AdditionalQueryString { get; } = string.Empty;
 }

@@ -6,6 +6,7 @@ builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
     .AddComposers()
+    .AddOutputCaching()
     .AddSecurityPolicies()
     .AddViewModelBuildersAndDecorators()
     .AddPipelineFilters()
@@ -18,6 +19,8 @@ await app.BootUmbracoAsync();
 app.UseHttpsRedirection();
 
 app.UseSecurityHeaders();
+
+app.UseOutputCache();
 
 app.UseUmbraco()
     .WithMiddleware(u =>

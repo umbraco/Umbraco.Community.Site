@@ -1,0 +1,43 @@
+{
+  "Name": "Author",
+  "Alias": "author",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-glasses",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "f5388ea1-f32f-4421-8a6e-8980af4d5c46",
+      "Name": "Detail",
+      "Type": 1,
+      "Alias": "detail",
+      "PropertyTypes": [
+        {
+          "Key": "7576226d-c7da-4d99-9fea-ce33cfefcab0",
+          "Alias": "avatar",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Name": "Avatar"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/ef7bed66053d407abc31715e5464aa38",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}
