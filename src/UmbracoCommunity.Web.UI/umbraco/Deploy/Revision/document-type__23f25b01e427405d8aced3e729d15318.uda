@@ -1,0 +1,30 @@
+{
+  "Name": "Blog categories",
+  "Alias": "blogCategories",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-lightbulb-active",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": [
+      "umb://document-type/23dd4b5df15a4c0390a68cb50a6beb00"
+    ]
+  },
+  "Parent": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/23f25b01e427405d8aced3e729d15318",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/23dd4b5df15a4c0390a68cb50a6beb00",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}

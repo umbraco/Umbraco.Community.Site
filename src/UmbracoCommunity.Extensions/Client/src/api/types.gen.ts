@@ -18,6 +18,11 @@ export type ContributorDetail = {
     pullRequestCount: number;
 };
 
+export type CreateBlogArticleResponse = {
+    articleKey: string;
+    articleName: string;
+};
+
 export type DocumentGranularPermissionModel = {
     key: string;
     readonly context: string;
@@ -300,6 +305,64 @@ export type UserModelWritable = {
     kind: UserKindModel;
 };
 
+export type CreateBlogArticleData = {
+    body?: never;
+    path: {
+        blogNodeKey: string;
+    };
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/blog/{blogNodeKey}/create-article';
+};
+
+export type CreateBlogArticleErrors = {
+    /**
+     * Bad Request
+     */
+    400: unknown;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type CreateBlogArticleResponses = {
+    /**
+     * Created
+     */
+    201: CreateBlogArticleResponse;
+};
+
+export type CreateBlogArticleResponse2 = CreateBlogArticleResponses[keyof CreateBlogArticleResponses];
+
+export type IsBlogNodeData = {
+    body?: never;
+    path: {
+        nodeKey: string;
+    };
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/blog/{nodeKey}/is-blog';
+};
+
+export type IsBlogNodeErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type IsBlogNodeResponses = {
+    /**
+     * OK
+     */
+    200: boolean;
+};
+
+export type IsBlogNodeResponse = IsBlogNodeResponses[keyof IsBlogNodeResponses];
+
 export type GetContributionStatsData = {
     body?: never;
     path?: never;
@@ -325,6 +388,48 @@ export type GetContributionStatsResponses = {
 };
 
 export type GetContributionStatsResponse = GetContributionStatsResponses[keyof GetContributionStatsResponses];
+
+export type DownloadGitHubDataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data';
+};
+
+export type DownloadGitHubDataErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type DownloadGitHubDataResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DownloadHqMembersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers';
+};
+
+export type DownloadHqMembersErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type DownloadHqMembersResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type ExportGitHubDataData = {
     body?: never;

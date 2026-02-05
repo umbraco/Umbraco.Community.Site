@@ -1,6 +1,69 @@
-﻿@using UmbracoCommunity.Web.Models.Pages
-@inherits UmbracoViewPage<ArticlePageViewModel>
+﻿@inherits UmbracoViewPage<ArticlePageViewModel>
 
 @{
     Layout = "Layout.cshtml";
 }
+
+@section JS {
+    <script vite-src="blog" asp-add-nonce="true"></script>
+}
+
+@section CSS {
+    <link rel="stylesheet" vite-href="blog" />
+}
+
+<partial name="~/Views/Partials/Components/BannerBlocks.cshtml" for="Banner" />
+<section>
+    <div class="article-main">
+        <div class="teaser">@Html.Raw(Model.Teaser)</div>
+
+        <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" for="BlockContent" />
+
+        @if (!string.IsNullOrEmpty(Model.BlogUrl))
+        {
+            <a href="@Model.BlogUrl" class="back-link">&larr; Back to blog</a>
+        }
+    </div>
+    <div class="blog-sidebar">
+        <div class="sidebar-card">
+            @if (Model.Author != null)
+            {
+                <div class="article-author">
+                    @if (!string.IsNullOrEmpty(Model.Author.AvatarUrl))
+                    {
+                        <img src="@Model.Author.AvatarUrl" alt="" class="author-avatar" />
+                    }
+                    <span class="author-name">@Model.Author.Name</span>
+                </div>
+            }
+            <ul class="list-unstyled sidebar-list">
+                <li><strong>Published:</strong> @Model.PublishDate.ToString("d MMMM yyyy")</li>
+
+                <li><strong>Read time:</strong> @Model.ReadTime min. read</li>
+
+                @if (Model.Categories.Any())
+                {
+                    <li>
+                        <strong>Category:</strong>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <a href="@(Model.BlogUrl)?category=@category.Name.ToLowerInvariant()">@category.Name</a>
+                        }
+                    </li>
+                }
+
+                @if (Model.Tags.Any() && !string.IsNullOrEmpty(Model.BlogUrl))
+                {
+                    <li>
+                        <ul class="tag-list">
+                            @foreach (var tag in Model.Tags)
+                            {
+                                <li><a href="@(Model.BlogUrl)?tag=@tag.ToLowerInvariant()">@tag</a></li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</section>

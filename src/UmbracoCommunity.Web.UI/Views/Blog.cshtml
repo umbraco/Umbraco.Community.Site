@@ -1,6 +1,18 @@
-﻿@using UmbracoCommunity.Web.Models.Pages
-@inherits UmbracoViewPage<BlogPageViewModel>
+﻿@inherits UmbracoViewPage<BlogPageViewModel>
 
 @{
     Layout = "Layout.cshtml";
 }
+
+@if (!Model.RssPath.IsNullOrWhiteSpace()) {
+    @section Links {
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="@Model.RssPath">
+    }
+}
+
+<section class="blog-main">
+    <dc-blog-posts-list
+        blog-key="@Model.Key"
+        page-size="@Model.PageSize"
+    ></dc-blog-posts-list>
+</section>

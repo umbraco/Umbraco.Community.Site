@@ -1,6 +1,7 @@
 @using Umbraco.Cms.Core.Models
 @using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBanner>>
+
 @if (!string.IsNullOrWhiteSpace(Model.Content.Headline) && Model.Content.Image != null)
 {
     var desktopImageUrl = Model.Content.Image.GetCropUrl("desktop50").AppendWebpFormatter();

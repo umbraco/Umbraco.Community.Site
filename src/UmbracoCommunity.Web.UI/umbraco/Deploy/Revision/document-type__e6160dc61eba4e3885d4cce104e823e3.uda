@@ -13,15 +13,121 @@
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
   "CompositionContentTypes": [
+    "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-    "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
+    "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
+    "umb://document-type/b457b927e4b44afabc7234d15c15f60b"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "7a0dd83b-6bd2-47d5-8365-d81132920a0d",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
+    },
+    {
+      "Key": "81afe415-d198-479b-a4fe-06c9d8dd7ca3",
+      "Name": "Content",
+      "Alias": "content/content",
+      "PropertyTypes": [
+        {
+          "Key": "16c35df0-f125-430e-8a42-7707eca15385",
+          "Alias": "teaser",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Teaser"
+        }
+      ]
+    },
+    {
+      "Key": "dc49948d-1ec7-45b4-aa12-f2509b5f58f6",
+      "Name": "Meta data",
+      "SortOrder": 1,
+      "Type": 1,
+      "Alias": "metaData",
+      "PropertyTypes": [
+        {
+          "Key": "00f961ee-87ef-49a6-bad8-96df35256f55",
+          "Alias": "categories",
+          "DataType": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+          "Name": "Categories",
+          "SortOrder": 3
+        },
+        {
+          "Key": "0f55f9a5-90a0-41c8-89ec-b658b88fc93c",
+          "Alias": "readTime",
+          "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+          "Description": "In minutes",
+          "Name": "Read time",
+          "SortOrder": 5
+        },
+        {
+          "Key": "2bbd15e5-c7c7-4c07-a15a-67c4cfc8d693",
+          "Alias": "publishDate",
+          "DataType": "umb://data-type/5046194e4237453ca54715db3a07c4e1",
+          "Name": "Publish date",
+          "SortOrder": 2
+        },
+        {
+          "Key": "8df798e1-1449-4fd9-8ea6-a120661b548d",
+          "Alias": "tags",
+          "DataType": "umb://data-type/e351950048d7422c8b6e9e8c8297c628",
+          "Name": "Tags",
+          "SortOrder": 4
+        },
+        {
+          "Key": "a5e9c820-7ec6-4e4a-a0b8-35f0bfb1a13a",
+          "Alias": "author",
+          "DataType": "umb://data-type/0ebf9c6de56b464a9715676aebb61a4f",
+          "Name": "Author",
+          "SortOrder": 1
+        },
+        {
+          "Key": "cdf4dbdb-f839-47e0-82a3-8c60b763a409",
+          "Alias": "thumbnailImage",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Name": "Thumbnail image"
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/e6160dc61eba4e3885d4cce104e823e3",
   "Dependencies": [
     {
+      "Udi": "umb://data-type/0ebf9c6de56b464a9715676aebb61a4f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/5046194e4237453ca54715db3a07c4e1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/e351950048d7422c8b6e9e8c8297c628",
+      "Ordering": true
+    },
+    {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
       "Ordering": true
     },
     {
@@ -30,6 +136,10 @@
     },
     {
       "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/b457b927e4b44afabc7234d15c15f60b",
       "Ordering": true
     },
     {

@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, PingData, PingErrors, PingResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses, WhatsMyNameData, WhatsMyNameErrors, WhatsMyNameResponses, WhatsTheTimeMrWolfData, WhatsTheTimeMrWolfErrors, WhatsTheTimeMrWolfResponses, WhoAmIData, WhoAmIErrors, WhoAmIResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, PingData, PingErrors, PingResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses, WhatsMyNameData, WhatsMyNameErrors, WhatsMyNameResponses, WhatsTheTimeMrWolfData, WhatsTheTimeMrWolfErrors, WhatsTheTimeMrWolfResponses, WhoAmIData, WhoAmIErrors, WhoAmIResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,6 +19,32 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 export class UmbracoCommunityExtensionsService {
+    public static createBlogArticle<ThrowOnError extends boolean = false>(options: Options<CreateBlogArticleData, ThrowOnError>) {
+        return (options.client ?? client).post<CreateBlogArticleResponses, CreateBlogArticleErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/blog/{blogNodeKey}/create-article',
+            ...options
+        });
+    }
+    
+    public static isBlogNode<ThrowOnError extends boolean = false>(options: Options<IsBlogNodeData, ThrowOnError>) {
+        return (options.client ?? client).get<IsBlogNodeResponses, IsBlogNodeErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/blog/{nodeKey}/is-blog',
+            ...options
+        });
+    }
+    
     public static getContributionStats<ThrowOnError extends boolean = false>(options?: Options<GetContributionStatsData, ThrowOnError>) {
         return (options?.client ?? client).get<GetContributionStatsResponses, GetContributionStatsErrors, ThrowOnError>({
             security: [
@@ -28,6 +54,32 @@ export class UmbracoCommunityExtensionsService {
                 }
             ],
             url: '/umbraco/umbracocommunityextensions/api/v1/contributions',
+            ...options
+        });
+    }
+    
+    public static downloadGitHubData<ThrowOnError extends boolean = false>(options?: Options<DownloadGitHubDataData, ThrowOnError>) {
+        return (options?.client ?? client).get<DownloadGitHubDataResponses, DownloadGitHubDataErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data',
+            ...options
+        });
+    }
+    
+    public static downloadHqMembers<ThrowOnError extends boolean = false>(options?: Options<DownloadHqMembersData, ThrowOnError>) {
+        return (options?.client ?? client).get<DownloadHqMembersResponses, DownloadHqMembersErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers',
             ...options
         });
     }
@@ -150,7 +202,8 @@ export class UmbracoCommunityExtensionsService {
                 ...options?.headers
             }
         });
-    }    
+    }
+    
     public static importSampleGitHubData<ThrowOnError extends boolean = false>(options?: Options<ImportSampleGitHubDataData, ThrowOnError>) {
         return (options?.client ?? client).post<ImportSampleGitHubDataResponses, ImportSampleGitHubDataErrors, ThrowOnError>({
             url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-github-data',
