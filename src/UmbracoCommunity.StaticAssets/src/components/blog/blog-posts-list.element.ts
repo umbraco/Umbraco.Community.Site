@@ -195,7 +195,7 @@ export class BlogPostsListElement extends LitElement {
 
   #formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
+    return date.toLocaleDateString(undefined, {
       day: "numeric",
       month: "long",
       year: "numeric",
