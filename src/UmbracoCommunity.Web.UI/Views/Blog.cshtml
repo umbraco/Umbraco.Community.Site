@@ -4,10 +4,8 @@
     Layout = "Layout.cshtml";
 }
 
-@if (!Model.RssPath.IsNullOrWhiteSpace()) {
-    @section Links {
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="@Model.RssPath">
-    }
+@section Links {
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="@(Context.Request.Path.Value?.TrimEnd('/'))/rss">
 }
 
 <section class="blog-main">
