@@ -36,7 +36,7 @@ public class BlogRssMiddleware
         var blogPage = publishedContentQuery.ContentAtRoot()
             .SelectMany(r => r.DescendantsOrSelf<Blog>())
             .FirstOrDefault(b =>
-                (b.Url()?.TrimEnd('/') ?? "").Equals(parentPath, StringComparison.OrdinalIgnoreCase));
+                (b.Url(mode: UrlMode.Relative)?.TrimEnd('/') ?? "").Equals(parentPath, StringComparison.OrdinalIgnoreCase));
 
         if (blogPage == null)
         {
