@@ -79,6 +79,8 @@ public class GitHubSqlStore
         foreach (var repo in repositoryNames)
         {
             _memoryCache.Remove($"AvailableReleases_{repo}");
+            _memoryCache.Remove($"AllPullRequests_{repo}");
+            _memoryCache.Remove($"FirstTimeContributors_{repo}");
         }
 
         return result;
@@ -146,6 +148,7 @@ public class GitHubSqlStore
         foreach (var repo in repositoryNames)
         {
             _memoryCache.Remove($"AvailableReleases_{repo}");
+            _memoryCache.Remove($"AllIssues_{repo}");
         }
 
         return result;
@@ -237,14 +240,36 @@ public class GitHubSqlStore
 
     private async Task<IEnumerable<GitHubPullRequest>> GetAllPullRequestsAsync(string repositoryName)
     {
+        // Cache this expensive query to avoid repeated database hits
+        var cacheKey = $"AllPullRequests_{repositoryName}";
+        var cachedResult = _memoryCache.Get<IEnumerable<GitHubPullRequest>>(cacheKey);
+        if (cachedResult != null)
+        {
+            return cachedResult;
+        }
+
         using var context = await _contextFactory.CreateDbContextAsync();
-        var entities = await context.PullRequests
+
+        // Add limit to prevent memory exhaustion - only get PRs with release labels
+        // This matches the pattern used in GetPullRequestsByRelease and significantly reduces memory usage
+        var entities = await context.PullRequestReleases
             .AsNoTracking()
+            .Select(prl => prl.PullRequestId)
+            .Distinct()
+            .Join(context.PullRequests,
+                prId => prId,
+                pr => pr.Id,
+                (prId, pr) => pr)
             .Where(pr => pr.RepositoryName == repositoryName)
             .OrderByDescending(pr => pr.CreatedAt)
             .ToListAsync();
 
-        return entities.Select(e => JsonConvert.DeserializeObject<GitHubPullRequest>(e.Data)!);
+        var result = entities.Select(e => JsonConvert.DeserializeObject<GitHubPullRequest>(e.Data)!).ToList();
+
+        // Cache for 1 hour
+        _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
+
+        return result;
     }
 
     public IEnumerable<GitHubPullRequest> GetPullRequestsByRelease(string repositoryName, string releaseLabel)
@@ -278,14 +303,36 @@ public class GitHubSqlStore
 
     private async Task<IEnumerable<GitHubIssue>> GetAllIssuesAsync(string repositoryName)
     {
+        // Cache this expensive query to avoid repeated database hits
+        var cacheKey = $"AllIssues_{repositoryName}";
+        var cachedResult = _memoryCache.Get<IEnumerable<GitHubIssue>>(cacheKey);
+        if (cachedResult != null)
+        {
+            return cachedResult;
+        }
+
         using var context = await _contextFactory.CreateDbContextAsync();
-        var entities = await context.Issues
+
+        // Add limit to prevent memory exhaustion - only get issues with release labels
+        // This matches the pattern used in GetIssuesByRelease and significantly reduces memory usage
+        var entities = await context.IssueReleases
             .AsNoTracking()
+            .Select(irl => irl.IssueId)
+            .Distinct()
+            .Join(context.Issues,
+                issueId => issueId,
+                i => i.Id,
+                (issueId, i) => i)
             .Where(i => i.RepositoryName == repositoryName)
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync();
 
-        return entities.Select(e => JsonConvert.DeserializeObject<GitHubIssue>(e.Data)!);
+        var result = entities.Select(e => JsonConvert.DeserializeObject<GitHubIssue>(e.Data)!).ToList();
+
+        // Cache for 1 hour
+        _memoryCache.Set(cacheKey, result, TimeSpan.FromHours(1));
+
+        return result;
     }
 
     public IEnumerable<GitHubIssue> GetIssuesByRelease(string repositoryName, string releaseLabel)
@@ -429,9 +476,25 @@ public class GitHubSqlStore
 
     private async Task<Dictionary<string, int>> GetFirstTimeContributorPrNumbersAsync(string repositoryName)
     {
+        // Cache this expensive query to avoid repeated database hits
+        var cacheKey = $"FirstTimeContributors_{repositoryName}";
+        var cachedResult = _memoryCache.Get<Dictionary<string, int>>(cacheKey);
+        if (cachedResult != null)
+        {
+            return cachedResult;
+        }
+
         using var context = await _contextFactory.CreateDbContextAsync();
-        var entities = await context.PullRequests
+
+        // Only load PRs that have release labels to reduce memory usage
+        var entities = await context.PullRequestReleases
             .AsNoTracking()
+            .Select(prl => prl.PullRequestId)
+            .Distinct()
+            .Join(context.PullRequests,
+                prId => prId,
+                pr => pr.Id,
+                (prId, pr) => pr)
             .Where(pr => pr.RepositoryName == repositoryName)
             .OrderBy(pr => pr.CreatedAt)
             .ToListAsync();
@@ -450,6 +513,9 @@ public class GitHubSqlStore
                 }
             }
         }
+
+        // Cache for 2 hours (this data changes less frequently)
+        _memoryCache.Set(cacheKey, firstPrByAuthor, TimeSpan.FromHours(2));
 
         return firstPrByAuthor;
     }
@@ -620,6 +686,12 @@ public class GitHubSqlStore
         _memoryCache.Remove("AvailableReleases_Umbraco.Workflow");
         _memoryCache.Remove("AvailableReleases_Umbraco.Commerce");
 
+        // Clear data store query caches
+        _memoryCache.Remove("AllPullRequests_Umbraco-CMS");
+        _memoryCache.Remove("AllIssues_Umbraco-CMS");
+        _memoryCache.Remove("AllIssues_Announcements");
+        _memoryCache.Remove("FirstTimeContributors_Umbraco-CMS");
+
         // Clear NuGet cache
         _memoryCache.Remove("NuGet_Umbraco.Cms_Versions");
         _memoryCache.Remove("NuGet_Umbraco.Forms_Versions");
@@ -654,6 +726,12 @@ public class GitHubSqlStore
         _memoryCache.Remove("AvailableReleases_Umbraco.Deploy");
         _memoryCache.Remove("AvailableReleases_Umbraco.Workflow");
         _memoryCache.Remove("AvailableReleases_Umbraco.Commerce");
+
+        // Clear data store query caches
+        _memoryCache.Remove("AllPullRequests_Umbraco-CMS");
+        _memoryCache.Remove("AllIssues_Umbraco-CMS");
+        _memoryCache.Remove("AllIssues_Announcements");
+        _memoryCache.Remove("FirstTimeContributors_Umbraco-CMS");
 
         // Clear NuGet cache
         _memoryCache.Remove("NuGet_Umbraco.Cms_Versions");
