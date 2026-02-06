@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
@@ -8,7 +9,7 @@ using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Middleware;
 
-public class BlogRssMiddleware
+public partial class BlogRssMiddleware
 {
     private readonly RequestDelegate _next;
 
@@ -80,7 +81,13 @@ public class BlogRssMiddleware
 
             if (article.Teaser is not null)
             {
-                item.Add(new XElement("description", article.Teaser.ToHtmlString()));
+                var teaserHtml = article.Teaser.ToHtmlString();
+                item.Add(new XElement("description", StripHtmlTags(teaserHtml)));
+            }
+
+            if (article.ReadTime > 0)
+            {
+                item.Add(new XElement("readTime", $"{article.ReadTime} min read"));
             }
 
             var author = article.Author as Author;
@@ -123,11 +130,26 @@ public class BlogRssMiddleware
                     new XAttribute("type", "application/rss+xml")),
                 items));
 
-        var doc = new XDocument(new XDeclaration("1.0", "utf-8", null), rss);
+        var doc = new XDocument(
+            new XDeclaration("1.0", "utf-8", null),
+            new XProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"/rss.xsl\""),
+            rss);
 
-        context.Response.ContentType = "application/rss+xml";
+        context.Response.ContentType = "application/xml; charset=utf-8";
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.StatusCode = 200;
-        await context.Response.WriteAsync(doc.ToString());
+
+        using var writer = new StringWriter();
+        doc.Save(writer);
+        await context.Response.WriteAsync(writer.ToString());
     }
+
+    private static partial class HtmlTagPattern
+    {
+        [GeneratedRegex("<[^>]+>")]
+        internal static partial Regex Instance();
+    }
+
+    private static string StripHtmlTags(string html) =>
+        HtmlTagPattern.Instance().Replace(html, "").Trim();
 }
