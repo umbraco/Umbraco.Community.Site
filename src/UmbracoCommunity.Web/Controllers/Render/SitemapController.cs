@@ -7,7 +7,7 @@ using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.ServiceModels;
 
-namespace UmbracoCommunity.Web.Controllers
+namespace UmbracoCommunity.Web.Controllers.Render
 {
     [ResponseCache(Duration = 60)]
     public class SitemapController(

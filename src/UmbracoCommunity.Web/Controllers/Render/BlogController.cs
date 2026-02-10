@@ -7,17 +7,17 @@ using UmbracoCommunity.Web.Attributes;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.ViewModelBuilders;
 
-namespace UmbracoCommunity.Web.Controllers
+namespace UmbracoCommunity.Web.Controllers.Render
 {
-    public class ArticleController : RenderController
+    public class BlogController : RenderController
     {
-        private readonly IViewModelBuilder<ArticlePageViewModel> _viewModelBuilder;
+        private readonly IViewModelBuilder<BlogPageViewModel> _viewModelBuilder;
 
-        public ArticleController(
-            ILogger<ArticleController> logger,
+        public BlogController(
+            ILogger<BlogController> logger,
             ICompositeViewEngine compositeViewEngine,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IViewModelBuilder<ArticlePageViewModel> viewModelBuilder)
+            IViewModelBuilder<BlogPageViewModel> viewModelBuilder)
             : base(logger, compositeViewEngine, umbracoContextAccessor) => _viewModelBuilder = viewModelBuilder;
 
         [NonAction]
@@ -27,7 +27,7 @@ namespace UmbracoCommunity.Web.Controllers
         [ApplyPageMetaData]
         public IActionResult Index(CancellationToken cancellationToken)
         {
-            ArticlePageViewModel viewModel = _viewModelBuilder.Build(
+            BlogPageViewModel viewModel = _viewModelBuilder.Build(
                 CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null."),
                 UmbracoContext);
             return CurrentTemplate(viewModel);
