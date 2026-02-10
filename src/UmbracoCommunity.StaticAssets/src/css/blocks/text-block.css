@@ -1,7 +1,7 @@
 .dc-text-block {
   position: relative;
-  background: var(--block-background-color);
-  color: var(--block-text-color);
+  background: transparent;
+  color: inherit;
   display: flex;
   justify-content: center;
 

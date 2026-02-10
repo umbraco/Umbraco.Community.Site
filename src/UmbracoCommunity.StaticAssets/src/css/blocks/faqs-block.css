@@ -21,6 +21,15 @@
         color: var(--color-blue);
     }
 
+    /* Focus styles for keyboard navigation */
+    label:has(+ input:focus-visible),
+    input:focus-visible + label {
+        outline: var(--focus-outline);
+        outline-offset: var(--focus-outline-offset);
+        border-radius: var(--border-radius);
+        color: var(--color-blue);
+    }
+
     dt {
         padding: var(--unit-xxs) 0;
         border-bottom: 2px solid #e7e7e7;

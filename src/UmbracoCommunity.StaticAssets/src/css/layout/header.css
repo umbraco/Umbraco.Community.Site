@@ -145,6 +145,19 @@ body:not(.mobile) .nav-header .nav-list__list {
   padding: 0 10px;
 }
 
+/* Focus styles for navigation items */
+.nav-header .nav-item a:focus-visible,
+.nav-header .nav-item button:focus-visible,
+.nav-header .nav-item .dropdown-button:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.nav-header .nav-item a:focus:not(:focus-visible),
+.nav-header .nav-item button:focus:not(:focus-visible) {
+  outline: none;
+}
+
 body:not(.mobile) .nav-header .search-btn:hover {
   border-radius: 50%;
 }
@@ -373,6 +386,29 @@ body.scroll .nav-header .search-btn form {
   border: none;
   background: transparent;
   cursor: pointer;
+}
+
+.nav-header .icon-btn:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: 50%;
+}
+
+.nav-header .search-btn:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: 50%;
+}
+
+.nav-header .search-btn form input[type="text"]:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.nav-header .search-btn form button:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 0;
+  border-radius: var(--border-radius);
 }
 
 body.scroll .nav-header {

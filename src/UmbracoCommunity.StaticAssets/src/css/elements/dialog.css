@@ -60,3 +60,20 @@ dialog::-webkit-scrollbar-thumb:hover {
 dialog > * {
   pointer-events: auto;
 }
+
+/* Focus styles for dialog elements */
+dialog:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(-1 * var(--focus-outline-offset));
+}
+
+dialog button:focus-visible,
+dialog a:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+dialog button:focus:not(:focus-visible),
+dialog a:focus:not(:focus-visible) {
+  outline: none;
+}

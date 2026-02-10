@@ -2,7 +2,7 @@
     position: relative;
     max-width: var(--max-width);
     overflow: hidden;
-    background: var(--block-background-color);
+    background: transparent;
 
     &.has-bg {
         padding: var(--unit-md);

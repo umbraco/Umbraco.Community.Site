@@ -19,7 +19,7 @@
                     </a>
                 }
             </div>
-            <nav class="nav-list">
+            <nav class="nav-list" id="mobileNavMenu">
                 <ul class="nav-list__list">
                     @foreach (var item in Model.TopLevelNavigationItems)
                     {
@@ -31,14 +31,15 @@
                 @if (Model.HasSearchPage)
                 {
                     <div class="nav-end__item search-btn">
-                        <button type="button" class="icon-btn" aria-label="Search">
+                        <button type="button" class="icon-btn" aria-label="Open search">
                             @{
                                 RenderSearchIcon();
                             }
                         </button>
-                        <form method="GET" action="@Model.SearchPageUrl">
-                            <input type="text" name="q" placeholder="What are you looking for?" autofocus />
-                            <button type="button" class="icon-btn" aria-label="Search">
+                        <form method="GET" action="@Model.SearchPageUrl" role="search">
+                            <label for="desktop-search" class="sr-only">Search the site</label>
+                            <input type="text" id="desktop-search" name="q" placeholder="What are you looking for?" autofocus />
+                            <button type="button" class="icon-btn" aria-label="Close search">
                                 @{
                                     RenderSearchCloseIcon();
                                 }
@@ -61,14 +62,15 @@
                     @if (Model.HasSearchPage)
                     {
                         <div class="nav-end__item search-btn">
-                            <button type="button" class="icon-btn" aria-label="Search">
+                            <button type="button" class="icon-btn" aria-label="Open search">
                                 @{
                                     RenderSearchIcon();
                                 }
                             </button>
-                            <form method="GET" action="@Model.SearchPageUrl">
-                                <input type="text" name="q" placeholder="What are you looking for?" autofocus />
-                                <button type="button" class="icon-btn" aria-label="Search">
+                            <form method="GET" action="@Model.SearchPageUrl" role="search">
+                                <label for="mobile-search" class="sr-only">Search the site</label>
+                                <input type="text" id="mobile-search" name="q" placeholder="What are you looking for?" autofocus />
+                                <button type="button" class="icon-btn" aria-label="Close search">
                                     @{
                                         RenderSearchCloseIcon();
                                     }
@@ -76,7 +78,13 @@
                             </form>
                         </div>
                     }
-                    <button type="button" class="nav-mobile__item menu-btn" id="menuBtn" title="Menu">
+                    <button type="button"
+                            class="nav-mobile__item menu-btn"
+                            id="menuBtn"
+                            title="Menu"
+                            aria-label="Toggle navigation menu"
+                            aria-expanded="false"
+                            aria-controls="mobileNavMenu">
                         <div class="icon-btn">
                             @{
                                 RenderHamburgerIcon();
@@ -108,7 +116,7 @@
     private void RenderSearchIcon()
     {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-             class="icon-search">
+             class="icon-search" aria-hidden="true">
             <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
                   stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             <path d="M21 21L16.7 16.7" stroke="#283A97" stroke-width="1.5" stroke-linecap="round"
@@ -119,7 +127,7 @@
     private void RenderCloseIcon()
     {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-             class="icon-close">
+             class="icon-close" aria-hidden="true">
             <path d="M18 6L6 18" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             <path d="M6 6L18 18" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -127,7 +135,8 @@
 
     private void RenderSearchCloseIcon()
     {
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="search-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+             class="search-icon" aria-hidden="true">
             <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
                   stroke="#333333" stroke-opacity="0.5" stroke-width="1.5" stroke-linecap="round"
                   stroke-linejoin="round" />
@@ -140,7 +149,7 @@
     private void RenderHamburgerIcon()
     {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-             class="icon-menu">
+             class="icon-menu" aria-hidden="true">
             <g id="menu 1">
                 <path id="Vector" d="M4 12H20" stroke="#283A97" stroke-width="1.5" stroke-linecap="round"
                       stroke-linejoin="round" />
@@ -167,24 +176,31 @@
 
     private void RenderNavigationItem(NavigationItem item)
     {
-        <li class="nav-item" tabindex="0">
+        <li class="nav-item">
             <a href="@item.Url" title="@item.Text">@item.Text</a>
         </li>
     }
 
     private void RenderNavigationSection(NavigationMenuItem item)
     {
-        <li class="nav-item nav-item__has-dropdown" tabindex="0">
-            <button type="button" class="dropdown-button" aria-label="@item.LinkTitle" title="@item.LinkTitle">
+        var dropdownId = $"dropdown-{item.LinkTitle?.ToLowerInvariant().Replace(" ", "-")}";
+        <li class="nav-item nav-item__has-dropdown">
+            <button type="button"
+                    class="dropdown-button"
+                    aria-label="@item.LinkTitle"
+                    title="@item.LinkTitle"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    aria-controls="@dropdownId">
                 @item.LinkTitle
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M1 1L5 5L9 1" stroke="#283A97" stroke-width="1.5" stroke-linecap="round"
                           stroke-linejoin="round" />
                 </svg>
             </button>
             @if (item.Links != null && item.Links.Any())
             {
-                <div class="nav-item__dropdown">
+                <div class="nav-item__dropdown" id="@dropdownId">
 
                     <ul class="nav-list__list nav-item__dropdown-list" style="@GetGridColumnsTemplate(item)">
                         @foreach (var section in item.Links)

@@ -52,5 +52,9 @@ if (navBurger && navMobileMenu) {
     navBurger.addEventListener('click', () => {
         navBurger.classList.toggle('active');
         navMobileMenu.classList.toggle('active');
+
+        // Update aria-expanded for accessibility
+        const isExpanded = navBurger.classList.contains('active');
+        navBurger.setAttribute('aria-expanded', String(isExpanded));
     });
 }

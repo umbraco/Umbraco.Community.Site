@@ -67,6 +67,13 @@
   color: var(--color-blue);
 }
 
+/* Focus styles for keyboard navigation */
+.dc-faqs__checkbox:focus-visible + .dc-faqs__question {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  color: var(--color-blue);
+}
+
 .dc-faqs__icon {
   position: relative;
   width: 40px;
