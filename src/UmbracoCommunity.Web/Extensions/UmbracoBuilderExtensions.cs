@@ -11,6 +11,7 @@ using UmbracoCommunity.Web.Services;
 using UmbracoCommunity.Web.ViewModelBuilders;
 using UmbracoCommunity.Web.ViewModelBuilders.Components;
 using UmbracoCommunity.Web.ViewModelBuilders.Pages;
+using UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 namespace UmbracoCommunity.Web.Extensions
 {

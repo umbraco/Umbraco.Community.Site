@@ -27,7 +27,7 @@ internal class ArticleSchemaBuilder
     /// </summary>
     public SchemaNet.Article? Build(IPublishedContent content, SocialSettings? socialSettings)
     {
-        if (content is not Article articleContent)
+        if (content is not Models.PublishedModels.Article articleContent)
         {
             return null;
         }

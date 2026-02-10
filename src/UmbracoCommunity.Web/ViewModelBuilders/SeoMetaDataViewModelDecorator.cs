@@ -9,6 +9,7 @@ using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Utilities;
+using UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders
 {

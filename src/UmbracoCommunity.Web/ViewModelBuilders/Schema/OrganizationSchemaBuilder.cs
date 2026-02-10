@@ -1,4 +1,5 @@
 using Schema.NET;
+using Umbraco.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders.Schema;
