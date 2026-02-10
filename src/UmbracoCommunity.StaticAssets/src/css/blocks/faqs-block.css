@@ -5,15 +5,7 @@
     }
 
     input {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border: 0;
+        display: none;
     }
 
     label {
@@ -30,6 +22,7 @@
     }
 
     /* Focus styles for keyboard navigation */
+    label:has(+ input:focus-visible),
     input:focus-visible + label {
         outline: var(--focus-outline);
         outline-offset: var(--focus-outline-offset);

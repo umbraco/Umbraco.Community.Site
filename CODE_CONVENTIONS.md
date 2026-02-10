@@ -21,9 +21,8 @@ This document describes the coding standards used in this project. Items marked 
 | View Model Builder | `{DocumentTypeAlias}PageViewModelBuilder` | `BlogPageViewModelBuilder` | [Project] |
 | Block Partial | `{ElementTypeAlias}.cshtml` | `TextBlock.cshtml` | [Umbraco] |
 | API Controller | `{Feature}ApiController` | `BlogApiController` | [Project] |
-| Schema Builder | `{SchemaType}SchemaBuilder` | `ArticleSchemaBuilder` (in `ViewModelBuilders/Schema/`) | [Project] |
 | TypeScript Component | `{name}.element.ts` | `blog-posts-list.element.ts` | [Project] |
-| Web Component Tag (website) | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] — public site only, not backoffice extensions |
+| Web Component Tag | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] |
 
 ## Controller Organization [Project]
 
@@ -130,19 +129,6 @@ Per [Umbraco docs](https://docs.umbraco.com/umbraco-cms/reference/templating/mod
 - Use **Nothing** mode in production appsettings
 - Models are generated as **partial classes** - extend them in separate files, don't modify generated code
 - Keep extensions stateless and local to the model - don't add request-dependent logic
-
-## Implicit Usings and Global Namespaces [Project]
-
-Both `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI` have `<ImplicitUsings>enable</ImplicitUsings>`. The Umbraco SDK automatically generates global usings (in `obj/Debug/net10.0/*.GlobalUsings.g.cs`) that include:
-
-```csharp
-global using Umbraco.Cms.Core.DependencyInjection;
-global using Umbraco.Extensions;
-```
-
-This means extension methods from `Umbraco.Extensions` (e.g., `.MediaUrl()`, `.Value()`) are available everywhere without an explicit `using` directive. **Do not add `using Umbraco.Extensions;` to hand-written files** — it is redundant.
-
-Note: Auto-generated Models Builder files include explicit `using Umbraco.Extensions;` by design to be self-contained. This does not apply to hand-written code.
 
 ## View Conventions
 
@@ -299,46 +285,10 @@ To add cache invalidation for new content types:
 
 **Important:** Don't use `[ResponseCache]` with `VaryByQueryKeys` or `VaryByHeader` on API controllers - these require Response Caching middleware which isn't configured. Use `[OutputCache]` instead.
 
-## Utility Consolidation [Project]
-
-Avoid duplicating helper logic across classes. Consolidate common patterns into shared utilities:
-
-**URL Utilities** (`Utilities/UrlUtilities.cs`):
-```csharp
-// Converting relative URLs to absolute
-var absoluteUrl = _urlUtilities.GetAbsoluteUrl(content);
-var absoluteUrl = _urlUtilities.MakeAbsoluteUrl(relativeUrl);
-var baseUri = _urlUtilities.GetCurrentBaseUri();
-```
-
-**SemVer Utilities** (`Utilities/SemVerHelper.cs`):
-```csharp
-// Parsing version strings
-var version = SemVerHelper.ParseToVersion("14.0.0-rc1");           // Returns Version(14,0,0)
-var (version, preRelease) = SemVerHelper.ParseToVersionWithPreRelease("14.0.0-rc1"); // Returns (Version, "rc1")
-var version = SemVerHelper.ParseReleaseLabel("release/14.0.0");    // Handles "release/" prefix
-
-// Validation and extraction
-bool isValid = SemVerHelper.IsValidSemVer("14.0.0");
-bool isPreRelease = SemVerHelper.IsPreRelease("14.0.0-rc1");
-string stable = SemVerHelper.GetStableVersion("14.0.0-rc1");       // Returns "14.0.0"
-```
-
-**When to Create Utilities**:
-- When the same logic appears in 2+ files
-- When the logic is self-contained and reusable
-- When the logic involves parsing, formatting, or transformation
-
-**Registration**: Register utilities in `Extensions/UmbracoBuilderExtensions.cs`:
-```csharp
-// Utilities (scoped because they may use IHttpContextAccessor)
-builder.Services.AddScoped<Utilities.UrlUtilities>();
-```
-
 ## Frontend (TypeScript/Lit) [Project]
 
 - **Web Components**: Use Lit framework, file suffix `.element.ts`
-- **Tag Naming**: Prefix with `dc-` (e.g., `<dc-blog-posts-list>`). This applies to **public website** components in `UmbracoCommunity.StaticAssets` only. Backoffice extensions (`UmbracoCommunity.Extensions`, `UmbracoCommunity.BlockRestrictions`) follow Umbraco's own element naming conventions and should **not** use the `dc-` prefix.
+- **Tag Naming**: Prefix with `dc-` (e.g., `<dc-blog-posts-list>`)
 - **Services**: Located in `services/`, use `ServiceBase` for HTTP calls
 - **Entry Points**: Files starting with `_` in `entrypoints/` folder
 - **Tests**: Colocated with components using `.test.ts` suffix

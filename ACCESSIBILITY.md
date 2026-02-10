@@ -17,8 +17,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 ### Keyboard Navigation
 
 - **All interactive elements are keyboard accessible**: Buttons, links, and custom controls can be operated with keyboard
-- **Header navigation dropdowns**: Dropdown menus can be opened with Enter/Space keys; focus moves to first link when opened; menu closes when focus leaves the dropdown area
-- **Accordion components**: Use visually-hidden checkboxes (sr-only technique) with `aria-expanded`, `aria-controls`, and `role="region"` for screen reader support. Arrow keys navigate between items (with wrapping), Home/End jump to first/last. Enter/Space toggles open/close.
+- **Accordion components**: Use checkbox-based approach with proper focus styles and keyboard support via `tabindex`
 - **Video playback**: Poster images are keyboard-accessible with `role="button"`, `tabindex="0"`, and Enter/Space key handlers
 - **Dialog components**: Trap focus within dialogs when open and return focus when closed
 
@@ -33,13 +32,6 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 - **Decorative elements**: All decorative SVGs and icons have `aria-hidden="true"` to hide from assistive technology
 - **Interactive icons**: Icons within buttons/links are hidden from screen readers; the parent element provides the accessible name
 - **Dialog components**: Dialogs use appropriate ARIA roles and labels
-
-### Icons
-
-- **Lucide Icons**: The site uses Lucide icons for consistent iconography (`src/UmbracoCommunity.StaticAssets/src/svg/lucide-icons.ts`)
-- **Icon accessibility**: All icons include `aria-hidden="true"` and use consistent sizing (18x18 default)
-- **Razor partials**: Common icons have Razor partials (e.g., `ArrowLeftSvg.cshtml`) for use in server-rendered views
-- **Avoid HTML entities**: Use Lucide icons instead of HTML entities like `&larr;` or `&rarr;` for better visual consistency and accessibility
 
 ### Color and Contrast
 
@@ -106,7 +98,7 @@ li::marker {
 
 ### Accessible Hidden Content
 
-Visually hidden content for screen readers uses the `.sr-only` utility class defined in `utilities.css`.
+Visually hidden content for screen readers uses the `.visually-hidden` utility class defined in `utilities.css`.
 
 ## Testing
 
