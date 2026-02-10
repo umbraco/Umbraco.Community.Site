@@ -89,6 +89,9 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<Utilities.ReleaseDiscussionParser>();
             builder.Services.AddScoped<IContentDataService, ContentDataService>();
 
+            // Schema builders
+            builder.Services.AddScoped<OrganizationSchemaBuilder>();
+
             builder.Services.AddScoped<IPageViewModelDecorator<Seo>, SeoMetaDataViewModelDecorator>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();

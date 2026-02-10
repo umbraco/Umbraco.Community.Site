@@ -44,3 +44,11 @@
 }
 
 <title>@Model.SiteName | @Model.Name</title>
+
+@if (Model.SchemaMarkups.Any())
+{
+    foreach (var schemaMarkup in Model.SchemaMarkups)
+    {
+        <script type="application/ld+json" asp-add-nonce="true">@Html.Raw(schemaMarkup)</script>
+    }
+}

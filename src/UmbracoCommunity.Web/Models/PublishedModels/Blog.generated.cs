@@ -65,14 +65,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual int NumberOfBlogArticlesPerPage => this.Value<int>(_publishedValueFallback, "numberOfBlogArticlesPerPage");
 
 		///<summary>
-		/// Feed title: Title shown in the RSS feed channel. Defaults to the page name if empty.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("rssTitle")]
-		public virtual string RssTitle => this.Value<string>(_publishedValueFallback, "rssTitle");
-
-		///<summary>
 		/// Feed description: Description shown in the RSS feed channel.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -86,6 +78,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("rssItemCount")]
 		public virtual int RssItemCount => this.Value<int>(_publishedValueFallback, "rssItemCount");
+
+		///<summary>
+		/// Feed title: Title shown in the RSS feed channel. Defaults to the page name if empty.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("rssTitle")]
+		public virtual string RssTitle => this.Value<string>(_publishedValueFallback, "rssTitle");
 
 		///<summary>
 		/// Hide from sitemap

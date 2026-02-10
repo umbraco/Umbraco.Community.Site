@@ -20,6 +20,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SessionizeApiClient _sessionizeApiClient;
+        private readonly OrganizationSchemaBuilder _organizationSchemaBuilder;
 
         public SeoMetaDataViewModelDecorator(
             IPublishedUrlProvider publishedUrlProvider,
@@ -27,7 +28,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             IPublishedValueFallback publishedValueFallback,
             IPublishedContentQuery publishedContentQuery,
             IHttpContextAccessor httpContextAccessor,
-            SessionizeApiClient sessionizeApiClient)
+            SessionizeApiClient sessionizeApiClient,
+            OrganizationSchemaBuilder organizationSchemaBuilder)
         {
             _publishedUrlProvider = publishedUrlProvider;
             _imageUrlGenerator = imageUrlGenerator;
@@ -35,6 +37,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             _publishedContentQuery = publishedContentQuery;
             _httpContextAccessor = httpContextAccessor;
             _sessionizeApiClient = sessionizeApiClient;
+            _organizationSchemaBuilder = organizationSchemaBuilder;
         }
 
         public async Task DecorateAsync(PageViewModelBase viewModel, IPublishedContent? currentPage)
@@ -58,7 +61,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             viewModel.CanonicalUrl = GetCanonicalUrl(contentModel);
 
             AddPageQuery(viewModel);
-            AddBaseSchema(viewModel, contentModel);
+            AddBaseSchema(viewModel, contentModel, socialSettings);
 
             // Override OG tags if a session parameter is present (for social sharing)
             await ApplySessionOpenGraphOverridesAsync(viewModel);
@@ -169,14 +172,14 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 UrlMode.Absolute,
                 webp: false) ?? string.Empty;
 
-        private static void AddBaseSchema(PageViewModelBase viewModel, ISeo contentModel)
+        private void AddBaseSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings)
         {
             if (!string.IsNullOrEmpty(contentModel.CustomSchema))
             {
                 viewModel.AddSchemaMarkup(contentModel.CustomSchema);
             }
 
-            WebPage? webPageSchema = GetWebPageSchema(contentModel);
+            WebPage? webPageSchema = GetWebPageSchema(viewModel, contentModel, socialSettings);
 
             if (webPageSchema is not null)
             {
@@ -184,7 +187,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             }
         }
 
-        private static WebPage? GetWebPageSchema(ISeo contentModel)
+        private WebPage? GetWebPageSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings)
         {
             var webPageName = GetWebPageName(contentModel);
 
@@ -193,11 +196,27 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 return null;
             }
 
-            return new WebPage
+            var webPage = new WebPage
             {
                 Name = new OneOrMany<string>(webPageName),
-                AlternateName = "Umbraco"
             };
+
+            // Add description if available
+            if (!string.IsNullOrEmpty(viewModel.MetaDescription))
+            {
+                webPage.Description = viewModel.MetaDescription;
+            }
+
+            // Add URL if canonical is set
+            if (!string.IsNullOrEmpty(viewModel.CanonicalUrl))
+            {
+                webPage.Url = new OneOrMany<Uri>(new Uri(viewModel.CanonicalUrl));
+            }
+
+            // Add Organization as publisher (uses site settings or Umbraco defaults)
+            webPage.Publisher = _organizationSchemaBuilder.Build(socialSettings);
+
+            return webPage;
         }
 
         /// <summary>
