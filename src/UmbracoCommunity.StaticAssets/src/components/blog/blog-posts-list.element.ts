@@ -8,6 +8,7 @@ import {
   BlogPostsResponse,
   BlogCategory,
 } from "../../services/blog.service.js";
+import { iconArrowLeft } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-blog-posts-list";
 
@@ -363,7 +364,7 @@ export class BlogPostsListElement extends LitElement {
           @click=${this.#clearCategory}
           aria-label="View all posts"
         >
-          &larr; All articles
+          ${iconArrowLeft} All articles
         </button>
       </header>
     `;
@@ -536,6 +537,7 @@ export class BlogPostsListElement extends LitElement {
     .header-back-btn {
       display: inline-flex;
       align-items: center;
+      gap: 0.5rem;
       min-height: 40px;
       padding: 0 20px;
       background: transparent;
@@ -548,6 +550,12 @@ export class BlogPostsListElement extends LitElement {
       transition: all ease-out 0.2s;
       white-space: nowrap;
       text-decoration: none;
+    }
+
+    .header-back-btn .lucide-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
     .header-back-btn:hover {

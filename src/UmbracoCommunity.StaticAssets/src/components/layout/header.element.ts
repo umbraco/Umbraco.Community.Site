@@ -42,6 +42,21 @@ export class DcHeaderElement extends HTMLElement {
     const dropdownItems = this.querySelectorAll(".nav-item.nav-item__has-dropdown");
     const openedClassName = "opened";
     let lastContextMenuTarget: Element | null = null;
+
+    const toggleDropdown = (dropdownItem: Element, dropdownButton: Element | null) => {
+      dropdownItem.classList.toggle(openedClassName);
+
+      // Update aria-expanded on the button
+      const isExpanded = dropdownItem.classList.contains(openedClassName);
+      dropdownButton?.setAttribute("aria-expanded", String(isExpanded));
+
+      // Close other dropdowns and update their aria-expanded
+      [...dropdownItems].filter(n => n !== dropdownItem).forEach(n => {
+        n.classList.remove(openedClassName);
+        n.querySelector(".dropdown-button")?.setAttribute("aria-expanded", "false");
+      });
+    };
+
     dropdownItems.forEach(
       (dropdownItem) => {
         const dropdownButton = dropdownItem.querySelector(".dropdown-button");
@@ -49,17 +64,22 @@ export class DcHeaderElement extends HTMLElement {
         dropdownItem.addEventListener("mouseup", (event) => {
           const mouseEvent = event as MouseEvent;
           if (mouseEvent.button !== 0) return; // Only respond to left-click
-          dropdownItem.classList.toggle(openedClassName);
+          toggleDropdown(dropdownItem, dropdownButton);
+        });
 
-          // Update aria-expanded on the button
-          const isExpanded = dropdownItem.classList.contains(openedClassName);
-          dropdownButton?.setAttribute("aria-expanded", String(isExpanded));
+        // Keyboard support for dropdown button
+        dropdownButton?.addEventListener("keydown", (event) => {
+          const keyEvent = event as KeyboardEvent;
+          if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+            keyEvent.preventDefault();
+            toggleDropdown(dropdownItem, dropdownButton);
 
-          // Close other dropdowns and update their aria-expanded
-          [...dropdownItems].filter(n => n !== dropdownItem).forEach(n => {
-            n.classList.remove(openedClassName);
-            n.querySelector(".dropdown-button")?.setAttribute("aria-expanded", "false");
-          });
+            // If opening, focus first link in dropdown
+            if (dropdownItem.classList.contains(openedClassName)) {
+              const firstLink = dropdownItem.querySelector(".nav-item__dropdown a") as HTMLElement;
+              firstLink?.focus();
+            }
+          }
         });
 
         dropdownItem.addEventListener("contextmenu", () => {
@@ -67,14 +87,24 @@ export class DcHeaderElement extends HTMLElement {
           setTimeout(() => { lastContextMenuTarget = null; }, 1000); // Reset after 1s
         });
 
-        dropdownItem.addEventListener("focusout", () => {
+        dropdownItem.addEventListener("focusout", (event) => {
           // If the last event was a contextmenu on this dropdown, don't close
           if (lastContextMenuTarget === dropdownItem) return;
+
+          // Check if focus is moving to another element within the dropdown
+          const relatedTarget = (event as FocusEvent).relatedTarget as Element | null;
+          if (relatedTarget && dropdownItem.contains(relatedTarget)) {
+            return; // Don't close if focus stays within dropdown
+          }
+
           if (dropdownItem.classList.contains(openedClassName)) {
             setTimeout(() => {
-              dropdownItem.classList.remove(openedClassName);
-              dropdownButton?.setAttribute("aria-expanded", "false");
-            }, 500);
+              // Double-check focus hasn't returned to the dropdown
+              if (!dropdownItem.contains(document.activeElement)) {
+                dropdownItem.classList.remove(openedClassName);
+                dropdownButton?.setAttribute("aria-expanded", "false");
+              }
+            }, 150);
           }
         });
       }

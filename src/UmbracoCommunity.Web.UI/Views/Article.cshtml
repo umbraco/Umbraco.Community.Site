@@ -21,7 +21,7 @@
 
         @if (!string.IsNullOrEmpty(Model.BlogUrl))
         {
-            <a href="@Model.BlogUrl" class="back-link">&larr; Back to blog</a>
+            <a href="@Model.BlogUrl" class="back-link"><partial name="~/Views/Partials/Components/ArrowLeftSvg.cshtml" /> Back to blog</a>
         }
     </div>
     <div class="blog-sidebar">
