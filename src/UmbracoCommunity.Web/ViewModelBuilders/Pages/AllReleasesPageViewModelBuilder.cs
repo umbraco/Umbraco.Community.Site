@@ -130,12 +130,12 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         // Filter to only released versions (those already released on NuGet)
         var releasedVersions = allReleases.Values
             .Where(r => r.IsReleased)
-            .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
+            .OrderByDescending(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel))
             .ToList();
 
         // Group by major version
         return releasedVersions
-            .GroupBy(r => ParseVersion(r.ReleaseLabel).Major)
+            .GroupBy(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel).Major)
             .OrderByDescending(g => g.Key)
             .Select(g =>
             {
@@ -209,22 +209,4 @@ internal class AllReleasesPageViewModelBuilder : ViewModelBuilderBase, IViewMode
         }
     }
 
-    private static Version ParseVersion(string releaseLabel)
-    {
-        var versionString = releaseLabel.Replace("release/", "").Trim();
-
-        // Handle pre-release versions (e.g., "14.0.0-rc1" -> "14.0.0")
-        var dashIndex = versionString.IndexOf('-');
-        if (dashIndex > 0)
-        {
-            versionString = versionString.Substring(0, dashIndex);
-        }
-
-        if (Version.TryParse(versionString, out var version))
-        {
-            return version;
-        }
-
-        return new Version(0, 0, 0);
-    }
 }

@@ -2,6 +2,8 @@ namespace UmbracoCommunity.Web.Utilities;
 
 public static class SemVerHelper
 {
+    private static readonly Version DefaultVersion = new(0, 0, 0);
+
     /// <summary>
     /// Checks if a version string is a valid SemVer version.
     /// Valid versions must have at least a major version number (e.g., "1.0", "1.0.0", "1.0.0-rc1").
@@ -87,5 +89,48 @@ public static class SemVerHelper
         }
 
         return (stableVersion, preRelease, buildMetadata);
+    }
+
+    /// <summary>
+    /// Parses a version string into a Version object, stripping any pre-release or build metadata.
+    /// Returns Version(0,0,0) if parsing fails.
+    /// </summary>
+    public static Version ParseToVersion(string versionString)
+    {
+        if (string.IsNullOrWhiteSpace(versionString))
+            return DefaultVersion;
+
+        var stableVersion = GetStableVersion(versionString.Trim());
+        return Version.TryParse(stableVersion, out var version) ? version : DefaultVersion;
+    }
+
+    /// <summary>
+    /// Parses a version string into a Version object and pre-release identifier.
+    /// Returns (Version(0,0,0), "") if parsing fails.
+    /// </summary>
+    public static (Version Version, string PreRelease) ParseToVersionWithPreRelease(string versionString)
+    {
+        if (string.IsNullOrWhiteSpace(versionString))
+            return (DefaultVersion, string.Empty);
+
+        versionString = versionString.Trim();
+        var (stableVersion, preRelease, _) = Parse(versionString);
+
+        var version = Version.TryParse(stableVersion, out var v) ? v : DefaultVersion;
+        return (version, preRelease ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Parses a release label (e.g., "release/14.0.0" or "release/14.0.0-rc1") into a Version object.
+    /// Strips the "release/" prefix and any pre-release suffix.
+    /// Returns Version(0,0,0) if parsing fails.
+    /// </summary>
+    public static Version ParseReleaseLabel(string releaseLabel)
+    {
+        if (string.IsNullOrWhiteSpace(releaseLabel))
+            return DefaultVersion;
+
+        var versionString = releaseLabel.Replace("release/", "").Trim();
+        return ParseToVersion(versionString);
     }
 }

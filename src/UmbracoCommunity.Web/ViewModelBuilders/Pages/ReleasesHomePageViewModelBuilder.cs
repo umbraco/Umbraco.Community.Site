@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
-using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.ReleaseOverview.Models;
@@ -93,17 +91,17 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             var now = DateTime.UtcNow;
             foreach (var release in allReleases)
             {
-                var majorVersion = ParseVersion(release.ReleaseLabel).Major;
+                var majorVersion = SemVerHelper.ParseReleaseLabel(release.ReleaseLabel).Major;
 
                 // Get all stable (non-pre-release) NuGet versions for this major that have been released (date <= now)
                 var latestNuGetVersion = nugetVersions
                     .Where(kvp => kvp.Value <= now)
-                    .Select(kvp => new { VersionString = kvp.Key, SemVer = ParseSemVer(kvp.Key), PublishedDate = kvp.Value })
+                    .Select(kvp => new { VersionString = kvp.Key, SemVer = SemVerHelper.ParseToVersionWithPreRelease(kvp.Key), PublishedDate = kvp.Value })
                     .Where(x => x.SemVer.Version.Major == majorVersion && string.IsNullOrEmpty(x.SemVer.PreRelease))
                     .OrderByDescending(x => x.SemVer.Version)
                     .FirstOrDefault();
 
-                if (latestNuGetVersion != null && latestNuGetVersion.SemVer.Version > ParseVersion(release.ReleaseLabel))
+                if (latestNuGetVersion != null && latestNuGetVersion.SemVer.Version > SemVerHelper.ParseReleaseLabel(release.ReleaseLabel))
                 {
                     // There's a newer stable version in NuGet - update the discussion VM to point to it
                     release.ActualLatestVersion = latestNuGetVersion.VersionString;
@@ -115,18 +113,18 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
 
             // Sort by version (descending)
-            allReleases = allReleases.OrderByDescending(r => ParseVersion(r.ReleaseLabel)).ToList();
+            allReleases = allReleases.OrderByDescending(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel)).ToList();
 
             // Find latest release (highest version number among all released stable versions, excluding pre-releases)
             viewModel.LatestRelease = allReleases
                 .Where(r => r.IsReleased && !SemVerHelper.IsPreRelease(r.Version))
-                .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
+                .OrderByDescending(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel))
                 .FirstOrDefault();
 
             // Find LTS releases (all released LTS versions, sorted by version descending, excluding pre-releases)
             viewModel.LtsReleases = allReleases
                 .Where(r => r.IsReleased && r.IsLts && !SemVerHelper.IsPreRelease(r.Version))
-                .OrderByDescending(r => ParseVersion(r.ReleaseLabel))
+                .OrderByDescending(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel))
                 .ToList();
 
             // Upcoming releases: not yet released, excluding pre-releases
@@ -134,18 +132,18 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
                 .Where(r => !r.IsReleased && !SemVerHelper.IsPreRelease(r.Version))
                 .OrderBy(r => !r.ReleaseDate.HasValue || r.IsReleaseDateTba ? 1 : 0) // Releases without dates go last
                 .ThenBy(r => r.ReleaseDate ?? DateTime.MaxValue) // Sort by date (if they have one)
-                .ThenByDescending(r => ParseVersion(r.ReleaseLabel)) // Sort by version for releases without dates
+                .ThenByDescending(r => SemVerHelper.ParseReleaseLabel(r.ReleaseLabel)) // Sort by version for releases without dates
                 .ToList();
 
             // Check for pre-release versions for upcoming releases
             foreach (var upcomingRelease in viewModel.UpcomingReleases)
             {
-                var upcomingVersion = ParseSemVer(upcomingRelease.Version);
+                var upcomingVersion = SemVerHelper.ParseToVersionWithPreRelease(upcomingRelease.Version);
 
                 // Find pre-release versions that match this major.minor.patch version
                 var preReleaseVersion = nugetVersions
                     .Where(kvp => kvp.Value <= now)
-                    .Select(kvp => new { VersionString = kvp.Key, SemVer = ParseSemVer(kvp.Key), PublishedDate = kvp.Value })
+                    .Select(kvp => new { VersionString = kvp.Key, SemVer = SemVerHelper.ParseToVersionWithPreRelease(kvp.Key), PublishedDate = kvp.Value })
                     .Where(x => x.SemVer.Version.Major == upcomingVersion.Version.Major &&
                                 x.SemVer.Version.Minor == upcomingVersion.Version.Minor &&
                                 x.SemVer.Version.Build == upcomingVersion.Version.Build &&
@@ -161,26 +159,5 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             }
         }
 
-        private static (Version Version, string PreRelease) ParseSemVer(string versionString)
-        {
-            var dashIndex = versionString.IndexOf('-');
-            if (dashIndex > 0)
-            {
-                var version = versionString.Substring(0, dashIndex);
-                var preRelease = versionString.Substring(dashIndex + 1);
-                return (Version.TryParse(version, out var v) ? v : new Version(0, 0, 0), preRelease);
-            }
-
-            return (Version.TryParse(versionString, out var ver) ? ver : new Version(0, 0, 0), string.Empty);
-        }
-
-        private static Version ParseVersion(string releaseLabel)
-        {
-            // Extract version from "release/X.Y.Z" format
-            var versionString = releaseLabel.Replace("release/", "").Trim();
-
-            // Use ParseSemVer to handle pre-release versions properly
-            return ParseSemVer(versionString).Version;
-        }
     }
 }

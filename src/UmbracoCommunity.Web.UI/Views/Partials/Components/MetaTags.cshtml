@@ -16,6 +16,8 @@
 <meta name="twitter:description" content="@Model.MetaDescription">
 
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="@Model.SiteName">
+<meta property="og:locale" content="@System.Globalization.CultureInfo.CurrentCulture.Name.Replace("-", "_")">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@("@umbraco")">
 
@@ -43,7 +45,7 @@
     <link rel="next" href="@Model.NextUrl" />
 }
 
-<title>@Model.SiteName | @Model.Name</title>
+<title>@Model.Name | @Model.SiteName</title>
 
 @if (Model.SchemaMarkups.Any())
 {

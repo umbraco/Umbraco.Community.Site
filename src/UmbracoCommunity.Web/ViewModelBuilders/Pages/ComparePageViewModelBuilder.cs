@@ -64,8 +64,8 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             viewModel.ToVersion = toVersion;
 
             // Parse versions to determine lowest and highest
-            var fromVer = ParseVersion(fromVersion);
-            var toVer = ParseVersion(toVersion);
+            var fromVer = SemVerHelper.ParseToVersion(fromVersion);
+            var toVer = SemVerHelper.ParseToVersion(toVersion);
 
             // Determine lowest and highest
             Version lowestVer, highestVer;
@@ -105,15 +105,15 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         if (!string.IsNullOrEmpty(fromVersion) && !string.IsNullOrEmpty(toVersion) && allPrs != null && allIssues != null)
         {
             // Get all available versions in the selected range
-            var fromVer = ParseVersion(viewModel.FromVersion!);
-            var toVer = ParseVersion(viewModel.ToVersion!);
+            var fromVer = SemVerHelper.ParseToVersion(viewModel.FromVersion!);
+            var toVer = SemVerHelper.ParseToVersion(viewModel.ToVersion!);
             var lowestVer = fromVer <= toVer ? fromVer : toVer;
             var highestVer = fromVer <= toVer ? toVer : fromVer;
 
             var versionsInRange = viewModel.AvailableVersions
                 .Where(v =>
                 {
-                    var ver = ParseVersion(v.Version);
+                    var ver = SemVerHelper.ParseToVersion(v.Version);
                     return ver > lowestVer && ver <= highestVer;
                 })
                 .Select(v => v.Version)
@@ -150,7 +150,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
                 // Find the earliest version in our range
                 var prVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(ReleaseLabelHelper.ExtractVersion(label)) })
+                    .Select(label => new { Label = label, Version = SemVerHelper.ParseToVersion(ReleaseLabelHelper.ExtractVersion(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -213,7 +213,7 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
                 // Find the earliest version in our range
                 var issueVersionsInRange = releaseLabels
-                    .Select(label => new { Label = label, Version = ParseVersion(ReleaseLabelHelper.ExtractVersion(label)) })
+                    .Select(label => new { Label = label, Version = SemVerHelper.ParseToVersion(ReleaseLabelHelper.ExtractVersion(label)) })
                     .Where(v => v.Version > lowestVer && v.Version <= highestVer)
                     .OrderBy(v => v.Version)
                     .ToList();
@@ -586,25 +586,6 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         }
 
         return stats;
-    }
-
-    private static Version ParseVersion(string versionString)
-    {
-        versionString = versionString.Trim();
-
-        // Handle pre-release versions (e.g., "14.0.0-rc1" -> "14.0.0")
-        var dashIndex = versionString.IndexOf('-');
-        if (dashIndex > 0)
-        {
-            versionString = versionString.Substring(0, dashIndex);
-        }
-
-        if (Version.TryParse(versionString, out var version))
-        {
-            return version;
-        }
-
-        return new Version(0, 0, 0);
     }
 
 }
