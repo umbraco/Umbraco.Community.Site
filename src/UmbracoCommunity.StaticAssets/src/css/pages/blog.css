@@ -105,13 +105,21 @@
 }
 
 .back-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: var(--unit-lg);
   color: var(--color-blue);
   text-decoration: none;
 
   &:hover {
     color: var(--color-identity-blue);
+  }
+
+  .lucide-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 }
 
