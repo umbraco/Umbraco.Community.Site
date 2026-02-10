@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Schema.NET;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -9,6 +8,7 @@ using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders
 {
@@ -17,27 +17,33 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IPublishedValueFallback _publishedValueFallback;
-        private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SessionizeApiClient _sessionizeApiClient;
         private readonly OrganizationSchemaBuilder _organizationSchemaBuilder;
+        private readonly ArticleSchemaBuilder _articleSchemaBuilder;
+        private readonly BreadcrumbSchemaBuilder _breadcrumbSchemaBuilder;
+        private readonly UrlUtilities _urlUtilities;
 
         public SeoMetaDataViewModelDecorator(
             IPublishedUrlProvider publishedUrlProvider,
             IImageUrlGenerator imageUrlGenerator,
             IPublishedValueFallback publishedValueFallback,
-            IPublishedContentQuery publishedContentQuery,
             IHttpContextAccessor httpContextAccessor,
             SessionizeApiClient sessionizeApiClient,
-            OrganizationSchemaBuilder organizationSchemaBuilder)
+            OrganizationSchemaBuilder organizationSchemaBuilder,
+            ArticleSchemaBuilder articleSchemaBuilder,
+            BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
+            UrlUtilities urlUtilities)
         {
             _publishedUrlProvider = publishedUrlProvider;
             _imageUrlGenerator = imageUrlGenerator;
             _publishedValueFallback = publishedValueFallback;
-            _publishedContentQuery = publishedContentQuery;
             _httpContextAccessor = httpContextAccessor;
             _sessionizeApiClient = sessionizeApiClient;
             _organizationSchemaBuilder = organizationSchemaBuilder;
+            _articleSchemaBuilder = articleSchemaBuilder;
+            _breadcrumbSchemaBuilder = breadcrumbSchemaBuilder;
+            _urlUtilities = urlUtilities;
         }
 
         public async Task DecorateAsync(PageViewModelBase viewModel, IPublishedContent? currentPage)
@@ -61,7 +67,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             viewModel.CanonicalUrl = GetCanonicalUrl(contentModel);
 
             AddPageQuery(viewModel);
-            AddBaseSchema(viewModel, contentModel, socialSettings);
+            AddBaseSchema(viewModel, contentModel, socialSettings, currentPage);
 
             // Override OG tags if a session parameter is present (for social sharing)
             await ApplySessionOpenGraphOverridesAsync(viewModel);
@@ -122,24 +128,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
         private string? GetCanonicalUrl(ISeo contentModel)
         {
-            string? contentRelativeUrl = contentModel is IPublishedContent content ? content.Url(_publishedUrlProvider, null, UrlMode.Relative) : null;
-
-            if (string.IsNullOrEmpty(contentRelativeUrl))
+            if (contentModel is not IPublishedContent content)
             {
                 return null;
             }
 
-            var baseUri = new Uri("https://community.umbraco.com");
-            if (_httpContextAccessor.HttpContext is not null)
-            {
-                var hostname = _httpContextAccessor.HttpContext.Request.Host.Host;
-                if (!string.IsNullOrEmpty(hostname))
-                {
-                    baseUri = new Uri($"{_httpContextAccessor.HttpContext.Request.Scheme}://{hostname}");
-                }
-            }
-
-            return new Uri(baseUri, contentRelativeUrl).ToString();
+            return _urlUtilities.GetAbsoluteUrl(content);
         }
 
         private string GetOpenGraphImageUrl(MediaWithCrops? mediaWithCrops, SocialSettings? socialSettings)
@@ -172,18 +166,37 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 UrlMode.Absolute,
                 webp: false) ?? string.Empty;
 
-        private void AddBaseSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings)
+        private void AddBaseSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings, IPublishedContent? currentPage)
         {
             if (!string.IsNullOrEmpty(contentModel.CustomSchema))
             {
                 viewModel.AddSchemaMarkup(contentModel.CustomSchema);
             }
 
-            WebPage? webPageSchema = GetWebPageSchema(viewModel, contentModel, socialSettings);
-
-            if (webPageSchema is not null)
+            // Add Article schema for blog articles (instead of WebPage)
+            if (currentPage is not null)
             {
-                viewModel.AddSchemaMarkup(webPageSchema.ToHtmlEscapedString());
+                var articleSchema = _articleSchemaBuilder.Build(currentPage, socialSettings);
+                if (articleSchema is not null)
+                {
+                    viewModel.AddSchemaMarkup(articleSchema.ToHtmlEscapedString());
+                }
+                else
+                {
+                    // Fall back to WebPage schema for non-article pages
+                    WebPage? webPageSchema = GetWebPageSchema(viewModel, contentModel, socialSettings);
+                    if (webPageSchema is not null)
+                    {
+                        viewModel.AddSchemaMarkup(webPageSchema.ToHtmlEscapedString());
+                    }
+                }
+
+                // Add breadcrumb schema for all pages with ancestors
+                var breadcrumbSchema = _breadcrumbSchemaBuilder.Build(currentPage);
+                if (breadcrumbSchema is not null)
+                {
+                    viewModel.AddSchemaMarkup(breadcrumbSchema.ToHtmlEscapedString());
+                }
             }
         }
 
