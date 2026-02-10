@@ -17,11 +17,11 @@
     <PackageVersion Include="Umbraco.Deploy.OnPrem" Version="17.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Cloud" Version="17.0.1" />
     <!-- Umbraco Forms -->
-    <PackageVersion Include="Umbraco.Forms" Version="17.1.0" />
+    <PackageVersion Include="Umbraco.Forms" Version="17.1.2" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="17.0.0" />
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.2.1" />
-    <PackageVersion Include="Umbraco.Community.Contentment" Version="6.1.0" />
+    <PackageVersion Include="Umbraco.Community.Contentment" Version="6.1.1" />
     <!-- Hangfire -->
     <PackageVersion Include="Cultiv.Hangfire" Version="5.2.0" />
     <!-- Microsoft -->

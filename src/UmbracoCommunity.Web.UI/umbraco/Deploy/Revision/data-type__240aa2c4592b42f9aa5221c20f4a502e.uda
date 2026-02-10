@@ -74,7 +74,7 @@
         "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "a7706b68-c3a3-411d-9550-557f83a5d97d",
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
         "columnSpanOptions": [
           {
             "columnSpan": 6
@@ -203,9 +203,6 @@
     },
     {
       "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028"
-    },
-    {
-      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
     },
     {
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"

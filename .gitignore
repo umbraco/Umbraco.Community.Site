@@ -370,9 +370,10 @@ healthchecksdb
 # Customize langguage files in /config/lang/{language}.user.xml
 **/umbraco/config/lang/
 
-# JSON Schema file for appsettings
-# This is auto generated from the build
-**/appsettings-schema.json
+# JSON Schema files for appsettings
+# These are auto generated from the build
+**/appsettings-schema*.json
+**/umbraco-package-schema.json
 
 # This is the no-nodes, installer & upgrader pages from Umbraco
 # Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
@@ -444,3 +445,4 @@ App_Data/
 Hangfire.db*
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
 .claude
+.mcp.json

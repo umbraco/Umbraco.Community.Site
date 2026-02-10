@@ -14,7 +14,6 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             return new BlogPageViewModel(currentPage)
             {
-                RssPath = contentModel.RssPath,
                 PageSize = contentModel.NumberOfBlogArticlesPerPage
             };
         }

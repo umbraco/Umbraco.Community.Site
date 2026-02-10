@@ -51,7 +51,11 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
 
         // Get all available versions
         const string repositoryName = "Umbraco-CMS";
-        viewModel.AvailableVersions = GetAvailableVersions(repositoryName, viewModel.IncludePreReleases);
+
+        // Load PRs and Issues once for both comparison and version list building
+        // This prevents redundant database queries
+        List<Features.GitHubSync.Models.GitHubPullRequest>? allPrs = null;
+        List<Features.GitHubSync.Models.GitHubIssue>? allIssues = null;
 
         // If both versions are selected, perform the comparison
         if (!string.IsNullOrEmpty(fromVersion) && !string.IsNullOrEmpty(toVersion))
@@ -80,19 +84,9 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 viewModel.HighestVersion = fromVersion;
             }
 
-            // Get all available versions in the selected range
-            var versionsInRange = viewModel.AvailableVersions
-                .Where(v =>
-                {
-                    var ver = ParseVersion(v.Version);
-                    return ver > lowestVer && ver <= highestVer;
-                })
-                .Select(v => v.Version)
-                .ToList();
-
-            // Get all PRs and Issues with release labels
-            var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
-            var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
+            // Get all PRs and Issues with release labels (load once)
+            allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
+            allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
 
             // If this repository has announcements with a prefix, include Announcements repo issues
             var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
@@ -102,12 +96,37 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
                 var announcementsIssues = _dataStore.GetIssuesByLabelPattern("Announcements", prefixedReleaseLabelPattern).ToList();
                 allIssues.AddRange(announcementsIssues);
             }
+        }
+
+        // Get available versions, passing already-loaded data to avoid redundant queries
+        viewModel.AvailableVersions = GetAvailableVersions(repositoryName, viewModel.IncludePreReleases, allPrs, allIssues);
+
+        // Continue with comparison if versions are selected
+        if (!string.IsNullOrEmpty(fromVersion) && !string.IsNullOrEmpty(toVersion) && allPrs != null && allIssues != null)
+        {
+            // Get all available versions in the selected range
+            var fromVer = ParseVersion(viewModel.FromVersion!);
+            var toVer = ParseVersion(viewModel.ToVersion!);
+            var lowestVer = fromVer <= toVer ? fromVer : toVer;
+            var highestVer = fromVer <= toVer ? toVer : fromVer;
+
+            var versionsInRange = viewModel.AvailableVersions
+                .Where(v =>
+                {
+                    var ver = ParseVersion(v.Version);
+                    return ver > lowestVer && ver <= highestVer;
+                })
+                .Select(v => v.Version)
+                .ToList();
 
             // Get first-time contributor PR numbers
             var firstTimeContributorPrNumbers = _dataStore.GetFirstTimeContributorPrNumbers(repositoryName);
 
             // Load all HQ members once to avoid N+1 queries in loops
             var hqMembers = _dataStore.GetAllHqMembers().ToList();
+
+            // Get repository config for label checking
+            var repoConfig = _options.Repositories.FirstOrDefault(r => r.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
 
             // Initialize version groups with all versions in range
             var versionGroups = new Dictionary<string, List<ReleasePullRequestViewModel>>();
@@ -296,7 +315,11 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
         return viewModel;
     }
 
-    private List<ReleaseDiscussionViewModel> GetAvailableVersions(string repositoryName, bool includePreReleases)
+    private List<ReleaseDiscussionViewModel> GetAvailableVersions(
+        string repositoryName,
+        bool includePreReleases,
+        List<Features.GitHubSync.Models.GitHubPullRequest>? allPrs = null,
+        List<Features.GitHubSync.Models.GitHubIssue>? allIssues = null)
     {
         // Cache the version list with pre-releases included
         var cacheKey = $"CompareVersions_{repositoryName}_All";
@@ -308,9 +331,15 @@ internal class ComparePageViewModelBuilder : ViewModelBuilderBase, IViewModelBui
             // Get all release discussions
             var discussions = _dataStore.GetDiscussionsByCategory(repositoryName, "releases").ToList();
 
-            // Get all PRs and issues to calculate stats
-            var allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
-            var allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
+            // Get all PRs and issues to calculate stats (only if not already provided)
+            if (allPrs == null)
+            {
+                allPrs = _dataStore.GetPullRequestsByLabelPattern(repositoryName, "release/").ToList();
+            }
+            if (allIssues == null)
+            {
+                allIssues = _dataStore.GetIssuesByLabelPattern(repositoryName, "release/").ToList();
+            }
 
             // Get repository configuration
             var repoConfig = _options.Repositories.FirstOrDefault(r =>
