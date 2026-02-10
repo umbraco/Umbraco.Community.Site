@@ -28,15 +28,11 @@ The solution consists of 4 projects (uses Central Package Management via `Direct
   - `Models/Blocks/` - Block view models
   - `Models/ViewModels/Components/` - Reusable component view models
 - **ViewModelBuilders/** - Convert IPublishedContent to view models
-  - `ViewModelBuilders/Pages/` - Page-specific view model builders
-  - `ViewModelBuilders/Blocks/` - Block view model builders
-  - `ViewModelBuilders/Components/` - Component view model builders
-  - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Attributes/** - Action filters (`ApplyCommonElements`, `ApplyPageMetaData`)
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
+- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
 - **Migrations/** - EF Core migrations for GitHubDbContext
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
@@ -164,6 +160,36 @@ Models are generated in **SourceCodeManual** mode (development) / **Nothing** mo
 
 ## Key Features
 
+### GitHub Sync System
+
+Located in `Features/GitHubSync/`, this system:
+- Uses Entity Framework Core with dual database support (SQLite/SQL Server)
+- Syncs GitHub issues, PRs, discussions, and NuGet package data via Hangfire jobs
+- Runs on scheduled intervals (hourly for recent data, weekly for full sync)
+
+**Background Jobs:**
+- `FetchRecentPullRequestsJob` / `FetchAllPullRequestsJob`
+- `FetchRecentIssuesJob` / `FetchAllIssuesJob`
+- `FetchReleaseDiscussionsJob`
+- `FetchRecentNuGetPackageVersionsJob`
+- `FetchHqMembersJob`
+
+Job configuration: `Features/GitHubSync/Configuration/JobsComposer.cs`
+
+### Release Overview System
+
+Located in `Features/ReleaseOverview/`, this feature displays Umbraco CMS release information:
+
+**Controllers:**
+- `ReleaseController` - Individual release pages (implements `IVirtualPageController`)
+- `ReleasesHomeController` - Release landing page
+- `AllReleasesController` - List of all releases
+- `CompareController` - Compare releases
+
+**Virtual Page Pattern**: `ReleaseController` implements `IVirtualPageController` which allows pages to exist without Umbraco content nodes - routes are handled programmatically via custom route composers.
+
+**Views**: Located in `Views/Partials/ReleaseOverview/`
+
 ### Sessionize Integration
 
 Located in `Features/Sessionize/`, this feature integrates with the Sessionize platform for event management:
@@ -172,9 +198,7 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - **Configuration**: `RegisterSessionize.cs` - Composer that registers options and API client
 - **API Client**: `SessionizeApiClient.cs` - Service with caching for fetching sessions, speakers, schedules
 - **API Controller**: `SessionizeApiController.cs` - REST endpoints at `/api/sessionize`
-- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`, `SessionizeQuestion`, `SessionizeQuestionAnswer`
-
-**Speaker Pronouns**: Pronouns are extracted from Sessionize's `questionAnswers` data. The top-level `questions` array is used to find the "Pronouns" question ID (resolved once and cached on `SessionizeAllData.PronounsQuestionId`), then each speaker's `questionAnswers` is checked for a matching answer. Pronouns are displayed in the speakers grid, speaker dialog, and session dialog.
+- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`
 
 **API Endpoints** (`/api/sessionize`):
 - `GET /sessions` - All sessions
@@ -204,12 +228,28 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice functionality:
 
 **API Controllers** (`Controllers/`):
-- Blog article creation
+- HQ Members CRUD operations
+- GitHub data export/import
+- Contribution statistics
+- Release summaries
 
 **Backoffice Dashboards** (`Client/src/dashboards/`):
-- Sessionize dashboard
+- Main dashboard with contribution stats
+- CMS contribution analytics dashboard
+- Data management (import/export GitHub data)
+- HQ members management
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
+
+### Release Management
+
+Releases are tracked via GitHub Discussions in the Umbraco CMS repository:
+- Created automatically by GitHub Actions when `release/*` labels are added
+- Release managers update discussion body with release date and LTS status
+- Community site syncs every hour
+- Release pages display aggregated issues/PRs/discussions by version
+
+See `docs/RELEASES_MANAGEMENT.md` for details.
 
 ### Vite Integration
 
@@ -218,24 +258,6 @@ Custom Vite integration for Umbraco:
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
 - Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
-
-### SEO and Schema Markup
-
-The site implements structured data using Schema.NET for better search engine visibility:
-
-**Schema Builders** (`ViewModelBuilders/Schema/`):
-- `OrganizationSchemaBuilder` - Builds Organization schema from site settings (multi-tenant configurable, falls back to Umbraco defaults)
-- `ArticleSchemaBuilder` - Builds Article schema for blog posts with headline, datePublished, dateModified, author, image, publisher
-- `BreadcrumbSchemaBuilder` - Builds BreadcrumbList schema from content hierarchy
-
-**Meta Tags** (`Views/Partials/Components/MetaTags.cshtml`):
-- Title format: `Page Title | Site Name` (page-first for better SERP visibility)
-- Open Graph tags: og:title, og:description, og:type, og:site_name, og:locale, og:image, og:url
-- Twitter Cards: summary_large_image format
-- Canonical URLs with pagination support (prev/next links)
-- Robots meta tag with configurable directives per page
-
-**Configuration**: Organization data is tenant-configurable via `SocialSettings` document type (OrganisationName, OrganisationUrl, OrganisationLogo). Falls back to Umbraco defaults if not configured.
 
 ### Security Headers
 
@@ -248,13 +270,14 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.2.0 on .NET 10
-- Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
+- Umbraco CMS 17.1.0 on .NET 10
+- Entity Framework Core 10.0.2 (SQLite + SQL Server providers)
+- Cultiv.Hangfire 5.2.0 - Background job processing
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
-- Markdig 1.0.0 - Markdown processing
+- Markdig 0.44.0 - Markdown processing
 - Schema.NET 13.0.0 - Structured data/schema markup
-- Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.1.1 - Extended content editors
+- Umbraco.Community.BlockPreview 5.1.0 - Block preview in backoffice
+- Umbraco.Community.Contentment 6.0.2 - Extended content editors
 
 **Frontend:**
 - Lit 3.3.0 - Web components framework
@@ -266,16 +289,326 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 
 ## Code Conventions
 
-See [CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md) for detailed coding standards, naming conventions, and architectural patterns used in this project.
+This section documents coding standards used in this project. Items marked with **[Umbraco]** are official Umbraco best practices from the [Umbraco documentation](https://docs.umbraco.com). Items marked with **[Project]** are conventions specific to this codebase.
 
-## Accessibility
+### File Organization [Project]
 
-See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implementation details, and WCAG conformance information.
+1. **One class per file**: Each class, record, or interface should have its own file. Never nest public classes inside other files (e.g., DTOs should not be defined at the bottom of controller files).
+
+2. **Namespaces match folders**: Namespace should reflect the folder structure. For example:
+   - `Controllers/Api/BlogApiController.cs` → `namespace UmbracoCommunity.Web.Controllers.Api`
+   - `Models/Api/BlogPostDto.cs` → `namespace UmbracoCommunity.Web.Models.Api`
+
+### Naming Conventions
+
+| Component | Pattern | Example | Source |
+|-----------|---------|---------|--------|
+| Document Type Alias | PascalCase | `Blog`, `Article` | [Umbraco] |
+| Render Controller | `{DocumentTypeAlias}Controller` | `BlogController` | [Umbraco] - Required for route hijacking |
+| View | `{DocumentTypeAlias}.cshtml` | `Blog.cshtml` | [Umbraco] - Required for route hijacking |
+| Page View Model | `{DocumentTypeAlias}PageViewModel` | `BlogPageViewModel` | [Project] |
+| View Model Builder | `{DocumentTypeAlias}PageViewModelBuilder` | `BlogPageViewModelBuilder` | [Project] |
+| Block Partial | `{ElementTypeAlias}.cshtml` | `TextBlock.cshtml` | [Umbraco] |
+| API Controller | `{Feature}ApiController` | `BlogApiController` | [Project] |
+| TypeScript Component | `{name}.element.ts` | `blog-posts-list.element.ts` | [Project] |
+| Web Component Tag | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] |
+
+### Controller Organization [Project]
+
+Controllers are organized by type in subfolders (this is a project convention, not an Umbraco requirement):
+
+- **API Controllers** (`Controllers/Api/`):
+  - Inherit from `ControllerBase` (standard ASP.NET Core)
+  - Have the `[ApiController]` and `[Route("api/...")]` attributes
+  - Return JSON responses via `Ok()`, `NotFound()`, etc.
+  - Use `IUmbracoContextFactory` for content access
+  - Use `[OutputCache]` for server-side caching (see Output Caching section below)
+  - Note: `UmbracoApiController` was removed in Umbraco 14+; use standard ASP.NET Core controllers
+
+- **Render Controllers** (`Controllers/Render/`):
+  - Inherit from Umbraco's `RenderController`
+  - **Controller name must match document type alias** [Umbraco] - required for route hijacking
+  - Return views via `CurrentTemplate(viewModel)`
+  - Use `[ApplyCommonElements]` and `[ApplyPageMetaData]` attributes [Project]
+
+- **Plain MVC Controllers** (root `Controllers/`):
+  - Inherit from `Controller`
+  - Handle non-Umbraco routes (e.g., `RobotsController`)
+
+### Route Hijacking [Umbraco]
+
+Route hijacking is an official Umbraco pattern. Key requirements from [Umbraco docs](https://docs.umbraco.com/umbraco-cms/reference/routing/custom-controllers):
+
+1. **Controller name MUST match document type alias** - e.g., `BlogController` for document type `Blog`
+2. **Inherit from `RenderController`** - provides access to `CurrentPage` and `UmbracoContext`
+3. **Template = Action name** - if no matching action, falls back to `Index()`
+4. **For async controllers**: Mark sync `Index()` as `[NonAction]` and `sealed override`
+
+```csharp
+public class BlogController : RenderController
+{
+    private readonly IViewModelBuilder<BlogPageViewModel> _viewModelBuilder;
+
+    public BlogController(
+        ILogger<BlogController> logger,
+        ICompositeViewEngine compositeViewEngine,
+        IUmbracoContextAccessor umbracoContextAccessor,
+        IViewModelBuilder<BlogPageViewModel> viewModelBuilder)
+        : base(logger, compositeViewEngine, umbracoContextAccessor)
+        => _viewModelBuilder = viewModelBuilder;
+
+    [NonAction]
+    public sealed override IActionResult Index() => throw new NotImplementedException();
+
+    [ApplyCommonElements]
+    [ApplyPageMetaData]
+    public IActionResult Index(CancellationToken cancellationToken)
+    {
+        var viewModel = _viewModelBuilder.Build(
+            CurrentPage ?? throw new InvalidOperationException(),
+            UmbracoContext);
+        return CurrentTemplate(viewModel);
+    }
+}
+```
+
+### ViewModelBuilder Pattern [Project]
+
+This project uses a custom `IViewModelBuilder<T>` pattern to convert `IPublishedContent` to view models. This is a **project-specific pattern**, not an official Umbraco recommendation.
+
+The official Umbraco approach suggests view models can:
+- Inherit from `PublishedContentWrapped`
+- Inherit from ModelsBuilder-generated types (e.g., `class MyViewModel : BlogPage`)
+- Be plain POCOs populated in the controller
+
+Our builder pattern provides separation of concerns:
+
+```csharp
+internal class BlogPageViewModelBuilder : ViewModelBuilderBase, IViewModelBuilder<BlogPageViewModel>
+{
+    public BlogPageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
+    {
+        var contentModel = currentPage.As<Blog>();
+        return new BlogPageViewModel(currentPage)
+        {
+            // Map properties from contentModel to view model
+        };
+    }
+}
+```
+
+Register builders in `Extensions/UmbracoBuilderExtensions.cs`:
+```csharp
+builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
+```
+
+### Model Organization [Project]
+
+- **API DTOs** (`Models/Api/`): Data transfer objects for API requests/responses
+- **Page View Models** (`Models/Pages/`): View models for Umbraco pages, inherit from `PageViewModelBase`
+- **Block View Models** (`Models/Blocks/`): View models for block list items
+- **Component View Models** (`Models/ViewModels/Components/`): Reusable view model components
+- **Published Models** (`Models/PublishedModels/`): Auto-generated by Models Builder (do not edit directly)
+
+### Models Builder [Umbraco]
+
+Per [Umbraco docs](https://docs.umbraco.com/umbraco-cms/reference/templating/modelsbuilder):
+
+- Use **SourceCodeManual** mode for development (generates `.cs` files on demand)
+- Use **Nothing** mode in production appsettings
+- Models are generated as **partial classes** - extend them in separate files, don't modify generated code
+- Keep extensions stateless and local to the model - don't add request-dependent logic
+
+### View Conventions
+
+- **Page views** [Umbraco]: Use `@inherits UmbracoViewPage<TViewModel>` for strongly-typed access
+- **Block partials** [Umbraco]: Located in `Views/Partials/Blocks/`, named after element type alias
+- **Component partials** [Project]: Located in `Views/Partials/Components/`
+- **Layouts** [Project]: Use `Layout.cshtml` for main site, `LayoutReleases.cshtml` for release pages
+
+### Content Access Patterns [Umbraco]
+
+From [Umbraco docs](https://docs.umbraco.com/umbraco-cms/implementation/services):
+
+| Context | Use | Why |
+|---------|-----|-----|
+| Render Controllers | `IUmbracoContextAccessor` | Context exists on HTTP request thread |
+| API Controllers | `IUmbracoContextFactory` | May not have existing context; creates one if needed |
+| Action Filters | `IUmbracoContextAccessor` | Running within HTTP request |
+| Background Jobs | `IUmbracoContextFactory` | No HTTP request; must create context explicitly |
+| Singleton Services | `IUmbracoContextFactory` | Enables use outside request scope |
+
+**Important**: Never inject `UmbracoContext` directly into constructors. Always use the accessor or factory.
+
+```csharp
+// In API controller or background service
+using var cref = _umbracoContextFactory.EnsureUmbracoContext();
+var cache = cref.UmbracoContext.Content;
+var node = cache?.GetById(1234);
+```
+
+### Dependency Injection [Umbraco]
+
+From [Umbraco docs](https://docs.umbraco.com/umbraco-cms/reference/using-ioc):
+
+- Use `IUmbracoBuilder` extension methods for registering services
+- Register services with appropriate lifetimes:
+  - **Scoped**: Services using `IUmbracoContextAccessor`, ViewModelBuilders
+  - **Singleton**: Stateless utilities, `IUmbracoContextFactory`-based services
+  - **Transient**: Lightweight, stateless services
+
+### Composers [Umbraco]
+
+From [Umbraco docs](https://docs.umbraco.com/umbraco-cms/implementation/composing):
+
+Use Composers for Umbraco-specific startup customization:
+
+```csharp
+public class MyComposer : IComposer
+{
+    public void Compose(IUmbracoBuilder builder)
+    {
+        builder.Services.AddScoped<IMyService, MyService>();
+    }
+}
+```
+
+Best practices:
+- **Don't use type scanning** if avoidable - it increases boot time
+- Use `[ComposeBefore]` and `[ComposeAfter]` attributes for ordering
+- Don't put business logic in composers - only registration code
+- Use `[Disable]` attribute to disable composers from packages if needed
+
+### Feature Modules [Project]
+
+Self-contained features are organized in `Features/` with their own subfolders:
+- `Controllers/` - Feature-specific controllers (follow same conventions)
+- `Models/` - Feature-specific models
+- `Infrastructure/` - Services, clients, configuration
+- `Configuration/` - Composers and DI registration
+
+This keeps related code together while maintaining the same conventions within each feature.
+
+### Feature-Scoped Constants [Project]
+
+Avoid magic strings by using feature-scoped constants. Keep constants close to the feature that owns them:
+
+**GitHub Sync Constants** (`Features/GitHubSync/GitHubConstants.cs`):
+```csharp
+// Release label patterns
+GitHubConstants.ReleaseLabels.Prefix  // "release/"
+GitHubConstants.ReleaseLabels.Infix   // "/release/"
+
+// Cache key generation
+GitHubConstants.CacheKeys.AvailableReleases("Umbraco-CMS")
+GitHubConstants.CacheKeys.NuGetVersions("Umbraco.Cms")
+```
+
+**Release Overview Routes** (`Features/ReleaseOverview/ReleaseRoutes.cs`):
+```csharp
+ReleaseRoutes.ReleasePattern      // "release/{org}/{repo}/{version}"
+ReleaseRoutes.ComparePattern      // "compare"
+ReleaseRoutes.AllReleasesPattern  // "all-releases"
+ReleaseRoutes.Names.Release       // Route names for URL generation
+ReleaseRoutes.Controllers.Release // Controller names
+```
+
+**Content Type Aliases**: Use Models Builder's `ModelTypeAlias` constants:
+```csharp
+// Good - compile-time checked
+Article.ModelTypeAlias
+Blog.ModelTypeAlias
+
+// Bad - magic string
+"article"
+```
+
+**Cross-cutting Constants**: Use partial `Constants` class for security/infrastructure:
+- `Constants.Security` - CSP domains, allowed image types
+
+### Output Caching for APIs [Project]
+
+API endpoints use .NET Output Caching for server-side response caching. This is more powerful than Response Caching and properly handles route parameters.
+
+**Available Policies** (defined in `OutputCachePolicies` class):
+
+| Policy | Default Duration | Use For | Invalidation |
+|--------|------------------|---------|--------------|
+| `ContentDriven` | 24 hours | Blog posts, Umbraco content-driven APIs | Umbraco notifications (on publish/unpublish) |
+| `ExternalApi` | 300 seconds (5 min) | External integrations (Sessionize), third-party APIs | Time-based expiration only |
+
+**Configuration** (in `appsettings.json`):
+```json
+"OutputCache": {
+  "ContentDrivenDurationSeconds": 86400,
+  "ExternalApiDurationSeconds": 300
+}
+```
+
+Development uses shorter durations - see `appsettings.Development.json`.
+
+**Usage:**
+```csharp
+// For Umbraco content-driven APIs (cache invalidated when content changes)
+[HttpGet("posts/{blogKey:guid}")]
+[OutputCache(PolicyName = OutputCachePolicies.ContentDriven)]
+public IActionResult GetPosts(Guid blogKey, [FromQuery] int page = 1)
+
+// For external integrations (time-based expiration only)
+[HttpGet("sessions")]
+[OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
+public async Task<IActionResult> GetSessions()
+```
+
+**Cache Invalidation via Umbraco Notifications** [Umbraco]:
+
+Content-driven caches are automatically invalidated when relevant content is published or unpublished. This uses Umbraco's `ContentCacheRefresherNotification`:
+
+- `BlogContentCacheInvalidationHandler` listens for content cache refresh events
+- When `Article` or `Blog` content types change, it evicts the `OutputCacheTags.BlogContent` tag
+- This allows long cache durations while ensuring content updates appear immediately
+
+To add cache invalidation for new content types:
+1. Add the content type alias to the handler's `BlogContentTypeAliases` set
+2. Or create a new handler for different cache tags
+
+**Important:** Don't use `[ResponseCache]` with `VaryByQueryKeys` or `VaryByHeader` on API controllers - these require Response Caching middleware which isn't configured. Use `[OutputCache]` instead.
+
+### Frontend (TypeScript/Lit) [Project]
+
+- **Web Components**: Use Lit framework, file suffix `.element.ts`
+- **Tag Naming**: Prefix with `dc-` (e.g., `<dc-blog-posts-list>`)
+- **Services**: Located in `services/`, use `ServiceBase` for HTTP calls
+- **Entry Points**: Files starting with `_` in `entrypoints/` folder
+- **Tests**: Colocated with components using `.test.ts` suffix
+
+### Action Filters [Project]
+
+Use custom action filters for cross-cutting concerns:
+- `[ApplyCommonElements]` - Injects menu and footer into `PageViewModelBase`
+- `[ApplyPageMetaData]` - Populates SEO metadata from content
+- `[ApplyCommonElementsReleases]` - Variant for release pages
+
+### Middleware [Project]
+
+Custom middleware goes in `Middleware/` folder:
+- Register in `WebApplicationExtensions.cs` using `UmbracoPipelineFilter`
+- Middleware that needs Umbraco context should run after Umbraco's routing
+
+### References
+
+- [Umbraco Route Hijacking Documentation](https://docs.umbraco.com/umbraco-cms/reference/routing/custom-controllers)
+- [Umbraco API Controllers](https://docs.umbraco.com/umbraco-cms/reference/routing/umbraco-api-controllers)
+- [Umbraco Services and Helpers](https://docs.umbraco.com/umbraco-cms/implementation/services)
+- [Umbraco Dependency Injection](https://docs.umbraco.com/umbraco-cms/reference/using-ioc)
+- [Umbraco Composers](https://docs.umbraco.com/umbraco-cms/implementation/composing)
+- [Umbraco Models Builder](https://docs.umbraco.com/umbraco-cms/reference/templating/modelsbuilder)
+- [Umbraco Cache Notifications](https://docs.umbraco.com/umbraco-cms/reference/notifications/cacherefresher-notifications)
 
 ## Important Notes
 
 - **Git branch**: Main branch is `develop` (not main/master)
-- **Database**: Uses Entity Framework Core with SQLite/SQL Server support
+- **Database migrations**: Run automatically on startup via `DatabaseMigrationHostedService`
 - **Security**: Never commit `appsettings.Local.json` - it's gitignored for secrets
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes
