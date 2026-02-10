@@ -749,7 +749,7 @@ export class BlogPostsListElement extends LitElement {
       align-items: center;
       gap: var(--unit-xs, 0.5rem);
       min-height: 40px;
-      padding: 0 16px;
+      padding: 0 5px 0 16px;
       background: var(--color-identity-blue, #283a97);
       color: var(--color-white, #fff);
       border-radius: 20px;
