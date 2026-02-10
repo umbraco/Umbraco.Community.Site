@@ -2,7 +2,7 @@ using Schema.NET;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using UmbracoCommunity.Web.Utilities;
 
-namespace UmbracoCommunity.Web.ViewModelBuilders;
+namespace UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 /// <summary>
 /// Builds BreadcrumbList schema from content hierarchy.

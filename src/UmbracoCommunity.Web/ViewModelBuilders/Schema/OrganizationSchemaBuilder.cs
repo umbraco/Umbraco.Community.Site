@@ -2,7 +2,7 @@ using Schema.NET;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
-namespace UmbracoCommunity.Web.ViewModelBuilders;
+namespace UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 /// <summary>
 /// Builds Organization schema from site settings for multi-tenant support.

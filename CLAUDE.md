@@ -28,11 +28,15 @@ The solution consists of 4 projects (uses Central Package Management via `Direct
   - `Models/Blocks/` - Block view models
   - `Models/ViewModels/Components/` - Reusable component view models
 - **ViewModelBuilders/** - Convert IPublishedContent to view models
+  - `ViewModelBuilders/Pages/` - Page-specific view model builders
+  - `ViewModelBuilders/Blocks/` - Block view model builders
+  - `ViewModelBuilders/Components/` - Component view model builders
+  - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Attributes/** - Action filters (`ApplyCommonElements`, `ApplyPageMetaData`)
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`)
+- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
 - **Migrations/** - EF Core migrations for GitHubDbContext
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
@@ -258,6 +262,24 @@ Custom Vite integration for Umbraco:
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
 - Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
+
+### SEO and Schema Markup
+
+The site implements structured data using Schema.NET for better search engine visibility:
+
+**Schema Builders** (`ViewModelBuilders/Schema/`):
+- `OrganizationSchemaBuilder` - Builds Organization schema from site settings (multi-tenant configurable, falls back to Umbraco defaults)
+- `ArticleSchemaBuilder` - Builds Article schema for blog posts with headline, datePublished, dateModified, author, image, publisher
+- `BreadcrumbSchemaBuilder` - Builds BreadcrumbList schema from content hierarchy
+
+**Meta Tags** (`Views/Partials/Components/MetaTags.cshtml`):
+- Title format: `Page Title | Site Name` (page-first for better SERP visibility)
+- Open Graph tags: og:title, og:description, og:type, og:site_name, og:locale, og:image, og:url
+- Twitter Cards: summary_large_image format
+- Canonical URLs with pagination support (prev/next links)
+- Robots meta tag with configurable directives per page
+
+**Configuration**: Organization data is tenant-configurable via `SocialSettings` document type (OrganisationName, OrganisationUrl, OrganisationLogo). Falls back to Umbraco defaults if not configured.
 
 ### Security Headers
 

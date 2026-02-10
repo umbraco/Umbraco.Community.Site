@@ -21,6 +21,7 @@ This document describes the coding standards used in this project. Items marked 
 | View Model Builder | `{DocumentTypeAlias}PageViewModelBuilder` | `BlogPageViewModelBuilder` | [Project] |
 | Block Partial | `{ElementTypeAlias}.cshtml` | `TextBlock.cshtml` | [Umbraco] |
 | API Controller | `{Feature}ApiController` | `BlogApiController` | [Project] |
+| Schema Builder | `{SchemaType}SchemaBuilder` | `ArticleSchemaBuilder` (in `ViewModelBuilders/Schema/`) | [Project] |
 | TypeScript Component | `{name}.element.ts` | `blog-posts-list.element.ts` | [Project] |
 | Web Component Tag | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] |
 
@@ -284,6 +285,42 @@ To add cache invalidation for new content types:
 2. Or create a new handler for different cache tags
 
 **Important:** Don't use `[ResponseCache]` with `VaryByQueryKeys` or `VaryByHeader` on API controllers - these require Response Caching middleware which isn't configured. Use `[OutputCache]` instead.
+
+## Utility Consolidation [Project]
+
+Avoid duplicating helper logic across classes. Consolidate common patterns into shared utilities:
+
+**URL Utilities** (`Utilities/UrlUtilities.cs`):
+```csharp
+// Converting relative URLs to absolute
+var absoluteUrl = _urlUtilities.GetAbsoluteUrl(content);
+var absoluteUrl = _urlUtilities.MakeAbsoluteUrl(relativeUrl);
+var baseUri = _urlUtilities.GetCurrentBaseUri();
+```
+
+**SemVer Utilities** (`Utilities/SemVerHelper.cs`):
+```csharp
+// Parsing version strings
+var version = SemVerHelper.ParseToVersion("14.0.0-rc1");           // Returns Version(14,0,0)
+var (version, preRelease) = SemVerHelper.ParseToVersionWithPreRelease("14.0.0-rc1"); // Returns (Version, "rc1")
+var version = SemVerHelper.ParseReleaseLabel("release/14.0.0");    // Handles "release/" prefix
+
+// Validation and extraction
+bool isValid = SemVerHelper.IsValidSemVer("14.0.0");
+bool isPreRelease = SemVerHelper.IsPreRelease("14.0.0-rc1");
+string stable = SemVerHelper.GetStableVersion("14.0.0-rc1");       // Returns "14.0.0"
+```
+
+**When to Create Utilities**:
+- When the same logic appears in 2+ files
+- When the logic is self-contained and reusable
+- When the logic involves parsing, formatting, or transformation
+
+**Registration**: Register utilities in `Extensions/UmbracoBuilderExtensions.cs`:
+```csharp
+// Utilities (scoped because they may use IHttpContextAccessor)
+builder.Services.AddScoped<Utilities.UrlUtilities>();
+```
 
 ## Frontend (TypeScript/Lit) [Project]
 

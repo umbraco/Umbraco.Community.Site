@@ -1,9 +1,9 @@
-using Schema.NET;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Utilities;
+using SchemaNet = Schema.NET;
 
-namespace UmbracoCommunity.Web.ViewModelBuilders;
+namespace UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 /// <summary>
 /// Builds Article schema for blog article pages.
@@ -25,14 +25,14 @@ internal class ArticleSchemaBuilder
     /// Builds an Article schema from the article content.
     /// Returns null if the content is not an Article.
     /// </summary>
-    public Schema.NET.Article? Build(IPublishedContent content, SocialSettings? socialSettings)
+    public SchemaNet.Article? Build(IPublishedContent content, SocialSettings? socialSettings)
     {
         if (content is not Models.PublishedModels.Article articleContent)
         {
             return null;
         }
 
-        var article = new Schema.NET.Article
+        var article = new SchemaNet.Article
         {
             Headline = articleContent.Name,
             DatePublished = articleContent.PublishDate != default
@@ -62,7 +62,7 @@ internal class ArticleSchemaBuilder
         // Add author
         if (articleContent.Author is not null)
         {
-            article.Author = new Person
+            article.Author = new SchemaNet.Person
             {
                 Name = articleContent.Author.Name
             };
