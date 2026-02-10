@@ -379,8 +379,10 @@ export class SessionizeProgramElement extends LitElement {
       { id: itemId, name: itemName, categoryTitle },
     ];
 
-    // Announce filter addition
-    this._statusMessage = `Filter added: ${itemName}. ${this.#filteredSessionIds.size} sessions shown.`;
+    // Announce filter addition (defer to after willUpdate recalculates filtered sessions)
+    setTimeout(() => {
+      this._statusMessage = `Filter added: ${itemName}. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
   }
 
   #removeFilter(filterId: number) {
