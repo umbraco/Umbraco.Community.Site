@@ -18,7 +18,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 
 - **All interactive elements are keyboard accessible**: Buttons, links, and custom controls can be operated with keyboard
 - **Header navigation dropdowns**: Dropdown menus can be opened with Enter/Space keys; focus moves to first link when opened; menu closes when focus leaves the dropdown area
-- **Accordion components**: Use checkbox-based approach with proper focus styles and keyboard support via `tabindex`
+- **Accordion components**: Use visually-hidden checkboxes (sr-only technique) with `aria-expanded`, `aria-controls`, and `role="region"` for screen reader support. Arrow keys navigate between items (with wrapping), Home/End jump to first/last. Enter/Space toggles open/close.
 - **Video playback**: Poster images are keyboard-accessible with `role="button"`, `tabindex="0"`, and Enter/Space key handlers
 - **Dialog components**: Trap focus within dialogs when open and return focus when closed
 
@@ -106,7 +106,7 @@ li::marker {
 
 ### Accessible Hidden Content
 
-Visually hidden content for screen readers uses the `.visually-hidden` utility class defined in `utilities.css`.
+Visually hidden content for screen readers uses the `.sr-only` utility class defined in `utilities.css`.
 
 ## Testing
 

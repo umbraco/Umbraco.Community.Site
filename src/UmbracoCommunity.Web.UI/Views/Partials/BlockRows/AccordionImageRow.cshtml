@@ -55,8 +55,12 @@
                         var typedItem = item.Content as AccordionItemBlock;
                         if (typedItem == null) continue;
                         var checkboxIdentifier = $"faq-and-image-item-{Model.IdHash}-{index}";
+                        var panelId = $"panel-{checkboxIdentifier}";
                         <div class="dc-faqs__item">
-                            <input type="checkbox" id="@checkboxIdentifier" class="dc-faqs__checkbox" @(index == 0 ? "checked" : "") />
+                            <input type="checkbox" id="@checkboxIdentifier" class="dc-faqs__checkbox"
+                                   @(index == 0 ? "checked" : "")
+                                   aria-expanded="@(index == 0 ? "true" : "false")"
+                                   aria-controls="@panelId" />
                             <label for="@checkboxIdentifier" class="dc-faqs__question">
                                 @typedItem.Title
                                 <span class="dc-faqs__icon" aria-hidden="true">
@@ -68,7 +72,8 @@
                                     </svg>
                                 </span>
                             </label>
-                            <div class="dc-faqs__answer">
+                            <div class="dc-faqs__answer" id="@panelId" role="region"
+                                 aria-labelledby="@checkboxIdentifier">
                                 @Html.Raw(typedItem.Content?.ToHtmlString())
                             </div>
                         </div>
