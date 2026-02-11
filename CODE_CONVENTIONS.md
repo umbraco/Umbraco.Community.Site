@@ -131,6 +131,19 @@ Per [Umbraco docs](https://docs.umbraco.com/umbraco-cms/reference/templating/mod
 - Models are generated as **partial classes** - extend them in separate files, don't modify generated code
 - Keep extensions stateless and local to the model - don't add request-dependent logic
 
+## Implicit Usings and Global Namespaces [Project]
+
+Both `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI` have `<ImplicitUsings>enable</ImplicitUsings>`. The Umbraco SDK automatically generates global usings (in `obj/Debug/net10.0/*.GlobalUsings.g.cs`) that include:
+
+```csharp
+global using Umbraco.Cms.Core.DependencyInjection;
+global using Umbraco.Extensions;
+```
+
+This means extension methods from `Umbraco.Extensions` (e.g., `.MediaUrl()`, `.Value()`) are available everywhere without an explicit `using` directive. **Do not add `using Umbraco.Extensions;` to hand-written files** — it is redundant.
+
+Note: Auto-generated Models Builder files include explicit `using Umbraco.Extensions;` by design to be self-contained. This does not apply to hand-written code.
+
 ## View Conventions
 
 - **Page views** [Umbraco]: Use `@inherits UmbracoViewPage<TViewModel>` for strongly-typed access
