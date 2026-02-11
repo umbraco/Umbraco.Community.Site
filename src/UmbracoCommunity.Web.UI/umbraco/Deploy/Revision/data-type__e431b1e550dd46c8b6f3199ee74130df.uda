@@ -1,0 +1,33 @@
+{
+  "Name": "Sessionize days data list",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "UmbracoCommunity.Web.Features.Sessionize.DataSources.SessionizeDaysDataSource, UmbracoCommunity.Web",
+        "value": {}
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.CheckboxListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "checkAll": true,
+          "showDescriptions": true,
+          "showIcons": true
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+  "Udi": "umb://data-type/e431b1e550dd46c8b6f3199ee74130df",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}
