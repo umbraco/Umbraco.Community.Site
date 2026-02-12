@@ -28,11 +28,43 @@
           "Name": "Site wide OG image"
         }
       ]
+    },
+    {
+      "Key": "ffa36566-d3ce-4e6a-99d8-62fd39c07f9e",
+      "Name": "Site schema",
+      "Alias": "sEO/siteSchema",
+      "PropertyTypes": [
+        {
+          "Key": "34a36415-200b-4457-a7f0-286fd2b261d2",
+          "Alias": "organisationName",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Organisation name"
+        },
+        {
+          "Key": "8c75041f-b35f-4cfe-84ab-4c45ae35f299",
+          "Alias": "organisationLogo",
+          "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "Description": "Min 112x112px, recommended 1200x630px",
+          "Name": "Organisation logo",
+          "SortOrder": 1
+        },
+        {
+          "Key": "d99707ed-febd-4115-8096-ec078a2975d8",
+          "Alias": "organisationUrl",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Name": "Organisation url",
+          "SortOrder": 2
+        }
+      ]
     }
   ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/0587e80766d04c9390116e361a741dd4",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
       "Ordering": true

@@ -73,6 +73,9 @@ export class SessionizeProgramElement extends LitElement {
   @state()
   private _error: string | null = null;
 
+  @state()
+  private _statusMessage = "";
+
   // Cached/computed values - updated in willUpdate when dependencies change
   #filteredSessionsByRoom = new Map<number, SessionizeSession[]>();
   #filteredSessionIds = new Set<string>();
@@ -205,6 +208,7 @@ export class SessionizeProgramElement extends LitElement {
     try {
       this._loading = true;
       this._error = null;
+      this._statusMessage = "Loading program schedule...";
 
       // Fetch schedule and categories in parallel
       const [schedule, categories] = await Promise.all([
@@ -241,9 +245,17 @@ export class SessionizeProgramElement extends LitElement {
           }
         }
       }
+
+      // Count total sessions across all days
+      const totalSessions = schedule.reduce((total, day) =>
+        total + day.timeSlots.reduce((slotTotal, slot) =>
+          slotTotal + slot.rooms.filter(r => r.session).length, 0), 0);
+      const dayCount = schedule.length;
+      this._statusMessage = `Program loaded: ${totalSessions} session${totalSessions !== 1 ? "s" : ""} across ${dayCount} day${dayCount !== 1 ? "s" : ""}`;
     } catch (error) {
       this._error =
         error instanceof Error ? error.message : "Failed to load program";
+      this._statusMessage = `Error: ${this._error}`;
       console.error("Error loading program:", error);
     } finally {
       this._loading = false;
@@ -366,14 +378,33 @@ export class SessionizeProgramElement extends LitElement {
       ...this._selectedFilters,
       { id: itemId, name: itemName, categoryTitle },
     ];
+
+    // Announce filter addition (defer to after willUpdate recalculates filtered sessions)
+    setTimeout(() => {
+      this._statusMessage = `Filter added: ${itemName}. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
   }
 
   #removeFilter(filterId: number) {
+    const filter = this._selectedFilters.find((f) => f.id === filterId);
     this._selectedFilters = this._selectedFilters.filter((f) => f.id !== filterId);
+
+    // Announce filter removal
+    if (filter) {
+      // Use setTimeout to announce after the filtered count updates
+      setTimeout(() => {
+        this._statusMessage = `Filter removed: ${filter.name}. ${this.#filteredSessionIds.size} sessions shown.`;
+      }, 0);
+    }
   }
 
   #clearAllFilters() {
     this._selectedFilters = [];
+
+    // Announce filters cleared
+    setTimeout(() => {
+      this._statusMessage = `All filters cleared. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
   }
 
   #sessionMatchesFilter(session: SessionizeSession): boolean {
@@ -1099,31 +1130,57 @@ export class SessionizeProgramElement extends LitElement {
     `;
   }
 
-  render() {
-    if (this._loading) return this.#renderLoading();
-    if (this._error) return this.#renderError();
-
-    if (!this._schedule.length) {
-      return html`<div class="empty-state">No program available.</div>`;
-    }
-
+  #renderStatusAnnouncer() {
     return html`
-      ${this.#renderStickyBar()}
-      <div class="program-container">
-        <div class="program-controls">
-          ${this.#renderFilters()}
-          ${this.#renderTimezoneSelector()}
-        </div>
-        ${this.#renderTabs()}
-        <div class="schedule-desktop">${this.#renderScheduleGrid()}</div>
-        <div class="schedule-mobile-view">${this.#renderMobileSchedule()}</div>
-      </div>
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${this._statusMessage}</div>
+    `;
+  }
+
+  render() {
+    return html`
+      ${this.#renderStatusAnnouncer()}
+      ${this._loading
+        ? this.#renderLoading()
+        : this._error
+          ? this.#renderError()
+          : !this._schedule.length
+            ? html`<div class="empty-state">No program available.</div>`
+            : html`
+                ${this.#renderStickyBar()}
+                <div class="program-container">
+                  <div class="program-controls">
+                    ${this.#renderFilters()}
+                    ${this.#renderTimezoneSelector()}
+                  </div>
+                  ${this.#renderTabs()}
+                  <div class="schedule-desktop">${this.#renderScheduleGrid()}</div>
+                  <div class="schedule-mobile-view">${this.#renderMobileSchedule()}</div>
+                </div>
+              `}
     `;
   }
 
   static styles = css`
     :host {
       display: block;
+    }
+
+    /* Screen reader only - visually hidden but accessible */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .program-container {

@@ -59,4 +59,10 @@
     --navigation-height: 122px;
     --navigation-max-width: 1708px;
     --color-light-gray-navigation: #33333399;
+
+    /* Focus styles - accessibility */
+    --focus-outline-width: 2px;
+    --focus-outline-offset: 2px;
+    --focus-outline-color: var(--color-identity-blue);
+    --focus-outline: var(--focus-outline-width) solid var(--focus-outline-color);
 }

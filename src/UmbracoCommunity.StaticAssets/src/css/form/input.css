@@ -10,9 +10,19 @@
     border: 2px solid var(--color-light-grey);
     border-radius: var(--border-radius);
     font-size: var(--unit);
-    outline-color: var(--color-blue);
     transition: all ease-in-out 0.1s;
     margin: 0;
+
+    &:focus-visible {
+      outline: var(--focus-outline);
+      outline-offset: var(--focus-outline-offset);
+      border-color: var(--color-blue);
+    }
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+      border-color: var(--color-blue);
+    }
 
     &.is-large {
       height: 55px;

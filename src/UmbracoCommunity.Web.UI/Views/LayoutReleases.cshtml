@@ -44,9 +44,10 @@
 </head>
 
 <body class="@GetBodyClasses()">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <partial name="~/Views/Partials/Components/MenuReleases.cshtml" for="Menu" />
 
-    <main>
+    <main id="main-content">
         @RenderBody()
     </main>
 

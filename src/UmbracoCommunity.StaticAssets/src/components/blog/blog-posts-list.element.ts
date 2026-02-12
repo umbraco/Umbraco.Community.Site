@@ -8,6 +8,7 @@ import {
   BlogPostsResponse,
   BlogCategory,
 } from "../../services/blog.service.js";
+import { iconArrowLeft } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-blog-posts-list";
 
@@ -45,6 +46,9 @@ export class BlogPostsListElement extends LitElement {
 
   @state()
   private _error: string | null = null;
+
+  @state()
+  private _statusMessage = "";
 
   #boundHandlePopState = this.#handlePopState.bind(this);
   #originalTitle = "";
@@ -108,6 +112,7 @@ export class BlogPostsListElement extends LitElement {
     try {
       this._loading = true;
       this._error = null;
+      this._statusMessage = "Loading articles...";
 
       const response: BlogPostsResponse = await BlogService.getPosts({
         blogKey: this.blogKey,
@@ -127,12 +132,31 @@ export class BlogPostsListElement extends LitElement {
 
       // Update browser title based on active filter
       this.#updateBrowserTitle();
+
+      // Announce results to screen readers
+      this.#announceResults();
     } catch (error) {
       this._error =
         error instanceof Error ? error.message : "Failed to load blog posts";
+      this._statusMessage = `Error: ${this._error}`;
       console.error("Error loading blog posts:", error);
     } finally {
       this._loading = false;
+    }
+  }
+
+  #announceResults() {
+    const count = this._posts.length;
+    const pageInfo = this._totalPages > 1 ? `, page ${this._currentPage} of ${this._totalPages}` : "";
+
+    if (this._activeCategory) {
+      this._statusMessage = `Showing ${count} article${count !== 1 ? "s" : ""} in ${this._activeCategory}${pageInfo}`;
+    } else if (this._activeTag) {
+      this._statusMessage = `Showing ${count} article${count !== 1 ? "s" : ""} tagged "${this._activeTag}"${pageInfo}`;
+    } else if (count === 0) {
+      this._statusMessage = "No articles found";
+    } else {
+      this._statusMessage = `Showing ${count} article${count !== 1 ? "s" : ""}${pageInfo}`;
     }
   }
 
@@ -262,37 +286,47 @@ export class BlogPostsListElement extends LitElement {
     if (this._totalPages <= 1) return null;
 
     return html`
-      <ul class="pagination">
-        ${when(
-          this._currentPage > 1,
-          () => html`<li><a @click=${() => this.#goToPage(1)}>First</a></li>`,
-          () => html`<li class="disabled">First</li>`
-        )}
-        ${when(
-          this._currentPage > 1,
-          () => html`<li>
-            <a @click=${() => this.#goToPage(this._currentPage - 1)}>Previous</a>
-          </li>`,
-          () => html`<li class="disabled">Previous</li>`
-        )}
+      <nav class="pagination" aria-label="Pagination">
+        <ul>
+          <li>
+            <button
+              type="button"
+              @click=${() => this.#goToPage(1)}
+              ?disabled=${this._currentPage <= 1}
+              aria-label="Go to first page"
+            >First</button>
+          </li>
+          <li>
+            <button
+              type="button"
+              @click=${() => this.#goToPage(this._currentPage - 1)}
+              ?disabled=${this._currentPage <= 1}
+              aria-label="Go to previous page"
+            >Previous</button>
+          </li>
 
-        <li>${this._currentPage}</li>
+          <li aria-current="page">
+            <span class="current-page">Page ${this._currentPage} of ${this._totalPages}</span>
+          </li>
 
-        ${when(
-          this._currentPage < this._totalPages,
-          () => html`<li>
-            <a @click=${() => this.#goToPage(this._currentPage + 1)}>Next</a>
-          </li>`,
-          () => html`<li class="disabled">Next</li>`
-        )}
-        ${when(
-          this._currentPage < this._totalPages,
-          () => html`<li>
-            <a @click=${() => this.#goToPage(this._totalPages)}>Last</a>
-          </li>`,
-          () => html`<li class="disabled">Last</li>`
-        )}
-      </ul>
+          <li>
+            <button
+              type="button"
+              @click=${() => this.#goToPage(this._currentPage + 1)}
+              ?disabled=${this._currentPage >= this._totalPages}
+              aria-label="Go to next page"
+            >Next</button>
+          </li>
+          <li>
+            <button
+              type="button"
+              @click=${() => this.#goToPage(this._totalPages)}
+              ?disabled=${this._currentPage >= this._totalPages}
+              aria-label="Go to last page"
+            >Last</button>
+          </li>
+        </ul>
+      </nav>
     `;
   }
 
@@ -330,7 +364,7 @@ export class BlogPostsListElement extends LitElement {
           @click=${this.#clearCategory}
           aria-label="View all posts"
         >
-          &larr; All articles
+          ${iconArrowLeft} All articles
         </button>
       </header>
     `;
@@ -431,15 +465,44 @@ export class BlogPostsListElement extends LitElement {
     `;
   }
 
+  #renderStatusAnnouncer() {
+    return html`
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${this._statusMessage}</div>
+    `;
+  }
+
   render() {
-    if (this._loading) return this.#renderLoading();
-    if (this._error) return this.#renderError();
-    return this.#renderContent();
+    return html`
+      ${this.#renderStatusAnnouncer()}
+      ${this._loading
+        ? this.#renderLoading()
+        : this._error
+          ? this.#renderError()
+          : this.#renderContent()}
+    `;
   }
 
   static styles = css`
     :host {
       display: block;
+    }
+
+    /* Screen reader only - visually hidden but accessible */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     /* Page Header - Full Width */
@@ -474,6 +537,7 @@ export class BlogPostsListElement extends LitElement {
     .header-back-btn {
       display: inline-flex;
       align-items: center;
+      gap: 0.5rem;
       min-height: 40px;
       padding: 0 20px;
       background: transparent;
@@ -486,6 +550,12 @@ export class BlogPostsListElement extends LitElement {
       transition: all ease-out 0.2s;
       white-space: nowrap;
       text-decoration: none;
+    }
+
+    .header-back-btn .lucide-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
     .header-back-btn:hover {
@@ -679,7 +749,7 @@ export class BlogPostsListElement extends LitElement {
       align-items: center;
       gap: var(--unit-xs, 0.5rem);
       min-height: 40px;
-      padding: 0 16px;
+      padding: 0 5px 0 16px;
       background: var(--color-identity-blue, #283a97);
       color: var(--color-white, #fff);
       border-radius: 20px;
@@ -711,30 +781,57 @@ export class BlogPostsListElement extends LitElement {
 
     /* Pagination */
     .pagination {
-      display: flex;
-      justify-content: center;
-      gap: var(--unit-xs, 0.5rem);
-      list-style: none;
-      padding: 0;
       margin: var(--unit-lg, 2rem) 0 0;
     }
 
+    .pagination ul {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--unit-xs, 0.5rem);
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
     .pagination li {
+      display: flex;
+      align-items: center;
+    }
+
+    .pagination button {
       padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
-    }
-
-    .pagination li a {
-      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--color-blue, #3544b1);
+      border-radius: var(--border-radius, 4px);
       color: var(--color-blue, #3544b1);
-      text-decoration: none;
+      cursor: pointer;
+      font-size: inherit;
+      font-family: inherit;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    .pagination li a:hover {
-      text-decoration: underline;
+    .pagination button:hover:not(:disabled) {
+      background: var(--color-blue, #3544b1);
+      color: var(--color-white, #fff);
     }
 
-    .pagination li.disabled {
+    .pagination button:focus-visible {
+      outline: 2px solid var(--color-blue, #3544b1);
+      outline-offset: 2px;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: var(--color-grey-light, #9ca3af);
       color: var(--color-grey-light, #9ca3af);
+    }
+
+    .pagination .current-page {
+      padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
+      font-weight: 600;
+      color: var(--color-dark-grey, #707070);
     }
 
     /* States */

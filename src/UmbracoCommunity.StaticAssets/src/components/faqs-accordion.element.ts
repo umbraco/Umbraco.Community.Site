@@ -1,49 +1,103 @@
 /**
  * FAQ Accordion Component
- * Ensures only one FAQ item can be open at a time
+ * Manages accordion expand/collapse with keyboard navigation and ARIA state sync.
  */
+
+export interface FAQsAccordionOptions {
+  singleOpenOnly: boolean;
+}
+
+const defaultOptions: FAQsAccordionOptions = {
+  singleOpenOnly: false,
+};
+
 export class FAQsAccordion {
   private container: HTMLElement;
-  private checkboxes: NodeListOf<HTMLInputElement>;
+  private checkboxes: HTMLInputElement[];
+  private options: FAQsAccordionOptions;
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, options?: Partial<FAQsAccordionOptions>) {
     this.container = container;
-    this.checkboxes = container.querySelectorAll('.dc-faqs__checkbox');
+    this.options = { ...defaultOptions, ...options };
+    this.checkboxes = Array.from(container.querySelectorAll('.dc-faqs__checkbox'));
     this.init();
   }
 
   private init(): void {
-    // Add event listeners to all checkboxes
+    this.syncAllAriaStates();
+
     this.checkboxes.forEach(checkbox => {
       checkbox.addEventListener('change', (e) => this.handleCheckboxChange(e));
+      checkbox.addEventListener('keydown', (e) => this.handleKeydown(e));
     });
+  }
+
+  private syncAriaState(checkbox: HTMLInputElement): void {
+    checkbox.setAttribute('aria-expanded', String(checkbox.checked));
+  }
+
+  private syncAllAriaStates(): void {
+    this.checkboxes.forEach(checkbox => this.syncAriaState(checkbox));
   }
 
   private handleCheckboxChange(event: Event): void {
     const targetCheckbox = event.target as HTMLInputElement;
-    
-    // Guard against null/undefined target
+
     if (!targetCheckbox) {
       return;
     }
-    
-    // If the clicked checkbox is being checked, handle sequential animation
-    if (targetCheckbox.checked) {
-      // Find currently open checkbox (if any)
-      const currentlyOpenCheckbox = Array.from(this.checkboxes).find(checkbox => 
+
+    if (this.options.singleOpenOnly && targetCheckbox.checked) {
+      const currentlyOpenCheckbox = this.checkboxes.find(checkbox =>
         checkbox !== targetCheckbox && checkbox.checked
       );
-      
+
       if (currentlyOpenCheckbox) {
-        // First close the currently open item
         currentlyOpenCheckbox.checked = false;
-        
-        // Then open the selected item after the close animation completes
+        this.syncAriaState(currentlyOpenCheckbox);
+
         setTimeout(() => {
           targetCheckbox.checked = true;
-        }, 300); // Match the CSS transition duration
+          this.syncAriaState(targetCheckbox);
+        }, 300);
+
+        return;
       }
-      // If no item was open, the target checkbox is already checked
     }
+
+    this.syncAriaState(targetCheckbox);
   }
-} 
+
+  private handleKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLInputElement;
+    const index = this.checkboxes.indexOf(target);
+    if (index === -1) return;
+
+    let nextIndex: number | null = null;
+
+    switch (event.key) {
+      case 'Enter':
+        event.preventDefault();
+        target.checked = !target.checked;
+        target.dispatchEvent(new Event('change'));
+        return;
+      case 'ArrowDown':
+        nextIndex = (index + 1) % this.checkboxes.length;
+        break;
+      case 'ArrowUp':
+        nextIndex = (index - 1 + this.checkboxes.length) % this.checkboxes.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = this.checkboxes.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    this.checkboxes[nextIndex].focus();
+  }
+}

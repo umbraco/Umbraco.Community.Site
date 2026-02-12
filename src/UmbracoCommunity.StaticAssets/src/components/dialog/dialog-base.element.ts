@@ -13,14 +13,20 @@ export abstract class DcDialogBaseElement extends LitElement {
   }
 
   renderClose() {
-    return html`<button id="close" @click=${this.close}>${close}</button>`;
+    return html`<button
+      id="close"
+      class="close-button"
+      @click=${this.close}
+      aria-label="Close dialog"
+      type="button"
+    >${close}</button>`;
   }
 
   abstract renderBody();
 
   render() {
     return html`${this.renderClose()}
-      ${this.header ? html`<h2>${this.header}</h2>` : nothing}
+      ${this.header ? html`<h2 id="dialog-title">${this.header}</h2>` : nothing}
       ${this.renderBody()}`;
   }
 
@@ -48,6 +54,15 @@ export abstract class DcDialogBaseElement extends LitElement {
       #close:hover {
         background: var(--color-grey-light, #f5f5f5);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      #close:focus-visible {
+        outline: 2px solid var(--color-blue, #283a97);
+        outline-offset: 2px;
+      }
+
+      #close:focus:not(:focus-visible) {
+        outline: none;
       }
 
       .lead,

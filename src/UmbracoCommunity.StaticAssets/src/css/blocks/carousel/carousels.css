@@ -32,6 +32,16 @@ a.carousel__item:hover {
     transform: scale(1.05);
 }
 
+a.carousel__item:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+    border-radius: var(--border-radius);
+}
+
+a.carousel__item:focus:not(:focus-visible) {
+    outline: none;
+}
+
 a.carousel__item .link-arrow {
     position: absolute;
     bottom: .75rem;

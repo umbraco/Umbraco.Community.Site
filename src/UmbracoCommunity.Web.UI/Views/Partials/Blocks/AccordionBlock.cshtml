@@ -19,15 +19,17 @@
             var typedAccordionItem = item.Content as AccordionItemBlock;
             if (typedAccordionItem == null) continue;
             var checkboxIdentifier = StringUtilities.RandomString(5);
+            var panelId = $"panel-{checkboxIdentifier}";
             <div class="dc-faq-block">
                 <dt>
-                    <input type="checkbox" id="cb-@checkboxIdentifier">
+                    <input type="checkbox" id="cb-@checkboxIdentifier" class="dc-faqs__checkbox"
+                           aria-expanded="false" aria-controls="@panelId">
                     <label for="cb-@checkboxIdentifier">
                         <h3>@typedAccordionItem.Title</h3>
                         <partial name="~/Views/Partials/Components/PlusSvg.cshtml" />
                     </label>
                 </dt>
-                <div class="expand">
+                <div class="expand" id="@panelId" role="region" aria-labelledby="cb-@checkboxIdentifier">
                     <dd>@Html.Raw(typedAccordionItem.Content)</dd>
                 </div>
             </div>

@@ -95,6 +95,18 @@ footer.sticky-footer .footer-links__column-section ul a:hover {
   color: var(--color-pink);
 }
 
+/* Focus styles for footer links - use white outline on dark background */
+footer.sticky-footer .footer-links__column-section ul a:focus-visible,
+footer.sticky-footer .footer-bottom ul a:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-white);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: var(--border-radius);
+}
+
+footer.sticky-footer a:focus:not(:focus-visible) {
+  outline: none;
+}
+
 footer.sticky-footer .footer-inner__form {
   color: var(--color-white);
 }

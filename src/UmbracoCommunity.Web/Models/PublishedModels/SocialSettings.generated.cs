@@ -50,6 +50,30 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Organisation logo: Min 112x112px, recommended 1200x630px
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("organisationLogo")]
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops OrganisationLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "organisationLogo");
+
+		///<summary>
+		/// Organisation name
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("organisationName")]
+		public virtual string OrganisationName => this.Value<string>(_publishedValueFallback, "organisationName");
+
+		///<summary>
+		/// Organisation url
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("organisationUrl")]
+		public virtual string OrganisationUrl => this.Value<string>(_publishedValueFallback, "organisationUrl");
+
+		///<summary>
 		/// Site wide OG image: Base image which is used when a page is shared on a social platform in the case that there is no image defined on the page
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

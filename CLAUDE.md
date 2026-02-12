@@ -18,14 +18,25 @@ The solution consists of 4 projects (uses Central Package Management via `Direct
 ### Key Directories in UmbracoCommunity.Web
 
 - **Features/** - Feature modules (GitHubSync, ReleaseOverview, Sessionize)
-- **Controllers/** - Route hijacking controllers
+- **Controllers/** - MVC controllers organized by type:
+  - `Controllers/Api/` - API controllers (inherit from `ControllerBase`, have `[ApiController]` attribute)
+  - `Controllers/Render/` - Umbraco render controllers (inherit from `RenderController`)
+  - Root folder - Plain MVC controllers (inherit from `Controller`)
 - **Models/** - View models, blocks, and published content models
+  - `Models/Api/` - DTOs for API request/response objects
+  - `Models/Pages/` - Page view models
+  - `Models/Blocks/` - Block view models
+  - `Models/ViewModels/Components/` - Reusable component view models
 - **ViewModelBuilders/** - Convert IPublishedContent to view models
+  - `ViewModelBuilders/Pages/` - Page-specific view model builders
+  - `ViewModelBuilders/Blocks/` - Block view model builders
+  - `ViewModelBuilders/Components/` - Component view model builders
+  - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Attributes/** - Action filters (`ApplyCommonElements`, `ApplyPageMetaData`)
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`)
+- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
 - **Migrations/** - EF Core migrations for GitHubDbContext
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
@@ -252,6 +263,24 @@ Custom Vite integration for Umbraco:
 - PostCSS with custom rhythm mixin for consistent spacing
 - Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
 
+### SEO and Schema Markup
+
+The site implements structured data using Schema.NET for better search engine visibility:
+
+**Schema Builders** (`ViewModelBuilders/Schema/`):
+- `OrganizationSchemaBuilder` - Builds Organization schema from site settings (multi-tenant configurable, falls back to Umbraco defaults)
+- `ArticleSchemaBuilder` - Builds Article schema for blog posts with headline, datePublished, dateModified, author, image, publisher
+- `BreadcrumbSchemaBuilder` - Builds BreadcrumbList schema from content hierarchy
+
+**Meta Tags** (`Views/Partials/Components/MetaTags.cshtml`):
+- Title format: `Page Title | Site Name` (page-first for better SERP visibility)
+- Open Graph tags: og:title, og:description, og:type, og:site_name, og:locale, og:image, og:url
+- Twitter Cards: summary_large_image format
+- Canonical URLs with pagination support (prev/next links)
+- Robots meta tag with configurable directives per page
+
+**Configuration**: Organization data is tenant-configurable via `SocialSettings` document type (OrganisationName, OrganisationUrl, OrganisationLogo). Falls back to Umbraco defaults if not configured.
+
 ### Security Headers
 
 Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
@@ -280,6 +309,14 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Vitest - Testing framework
 - PostCSS with custom rhythm mixin system
 
+## Code Conventions
+
+See [CODE_CONVENTIONS.md](./CODE_CONVENTIONS.md) for detailed coding standards, naming conventions, and architectural patterns used in this project.
+
+## Accessibility
+
+See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implementation details, and WCAG conformance information.
+
 ## Important Notes
 
 - **Git branch**: Main branch is `develop` (not main/master)
@@ -288,5 +325,5 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes
 - **Action Filters**: Use `[ApplyCommonElements]` and `[ApplyPageMetaData]` attributes on controllers for consistent page rendering
-- **Response Caching**: Sessionize API endpoints use `[ResponseCache]` for performance
+- **Output Caching**: API endpoints use `[OutputCache]` with policy names from `OutputCachePolicies` class
 - **Upgrade Tool**: Use `tools/upgrade-umbraco/` for package version upgrades

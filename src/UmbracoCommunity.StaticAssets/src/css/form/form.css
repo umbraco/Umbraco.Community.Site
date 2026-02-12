@@ -8,10 +8,10 @@
   max-width: 400px;
   margin: 0 auto;
 
-  color: var(--block-text-color);
+  color: inherit;
 
   a {
-    color: var(--block-link-color);
+    color: inherit;
   }
 }
 

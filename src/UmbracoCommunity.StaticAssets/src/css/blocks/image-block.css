@@ -7,7 +7,7 @@
   max-width: none;
   margin-left: 0;
   margin-right: 0;
-  background-color: var(--block-background-color);
+  background-color: transparent;
 }
 
 .dc-image-block {

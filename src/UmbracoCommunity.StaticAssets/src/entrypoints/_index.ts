@@ -139,10 +139,16 @@ function initializePostponed() {
   utmTransfer();
   initatilzePlanComparisionTable();
   
-  // Initialize FAQ accordions
-  const faqContainers = document.querySelectorAll('.dc-faqs-and-image-block');
-  faqContainers.forEach(container => {
-    new FAQsAccordion(container as HTMLElement);
+  // Initialize FAQ accordions (image variant - single open)
+  const imageAccordions = document.querySelectorAll('.dc-faqs-and-image-block');
+  imageAccordions.forEach(container => {
+    new FAQsAccordion(container as HTMLElement, { singleOpenOnly: true });
+  });
+
+  // Initialize FAQ accordions (standalone variant - multi open)
+  const standaloneAccordions = document.querySelectorAll('.dc-faqs:not(.dc-faqs-and-image-block .dc-faqs)');
+  standaloneAccordions.forEach(container => {
+    new FAQsAccordion(container as HTMLElement, { singleOpenOnly: false });
   });
 }
 

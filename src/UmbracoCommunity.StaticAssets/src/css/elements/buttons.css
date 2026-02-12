@@ -28,6 +28,15 @@
   color: var(--color-white);
 }
 
+.btn:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .btn.is-blue,
 .btn.is-white:hover {
   color: var(--color-white);

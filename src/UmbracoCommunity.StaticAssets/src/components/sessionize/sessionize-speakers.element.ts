@@ -33,6 +33,9 @@ export class SessionizeSpeakersElement extends LitElement {
   @state()
   private _error: string | null = null;
 
+  @state()
+  private _statusMessage = "";
+
   #dialogHandler = new DcDialogHandler();
 
   connectedCallback() {
@@ -44,6 +47,7 @@ export class SessionizeSpeakersElement extends LitElement {
     try {
       this._loading = true;
       this._error = null;
+      this._statusMessage = "Loading speakers...";
 
       let speakers = await SessionizeService.getSpeakers();
 
@@ -58,9 +62,16 @@ export class SessionizeSpeakersElement extends LitElement {
       }
 
       this._speakers = speakers;
+
+      // Announce results to screen readers
+      const count = this._speakers.length;
+      this._statusMessage = count === 0
+        ? "No speakers found"
+        : `Loaded ${count} speaker${count !== 1 ? "s" : ""}`;
     } catch (error) {
       this._error =
         error instanceof Error ? error.message : "Failed to load speakers";
+      this._statusMessage = `Error: ${this._error}`;
       console.error("Error loading speakers:", error);
     } finally {
       this._loading = false;
@@ -135,15 +146,44 @@ export class SessionizeSpeakersElement extends LitElement {
     `;
   }
 
+  #renderStatusAnnouncer() {
+    return html`
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${this._statusMessage}</div>
+    `;
+  }
+
   render() {
-    if (this._loading) return this.#renderLoading();
-    if (this._error) return this.#renderError();
-    return this.#renderSpeakers();
+    return html`
+      ${this.#renderStatusAnnouncer()}
+      ${this._loading
+        ? this.#renderLoading()
+        : this._error
+          ? this.#renderError()
+          : this.#renderSpeakers()}
+    `;
   }
 
   static styles = css`
     :host {
       display: block;
+    }
+
+    /* Screen reader only - visually hidden but accessible */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .dc-speakers-grid {
