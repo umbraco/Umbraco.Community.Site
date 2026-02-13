@@ -12,7 +12,11 @@
         </div>
     }
     
-    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
+    @{
+        var columns = Model.Settings?.Value<int>("columnsPerRow");
+        var columnsAttr = columns > 0 ? $"columns={columns}" : "";
+    }
+    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "") @columnsAttr></dc-sessionize-speakers>
 
     @if (Context.Request.IsBlockPreviewRequest())
     {
