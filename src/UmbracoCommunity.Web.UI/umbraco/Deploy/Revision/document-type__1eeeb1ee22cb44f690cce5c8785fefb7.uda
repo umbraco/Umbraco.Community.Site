@@ -29,8 +29,8 @@
           "Key": "d88a9713-4990-4906-8e78-b19a9f15f032",
           "Alias": "columnsPerRow",
           "DataType": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
-          "Description": "The maximum number of speakers to show in a column, default is 4.  \nThis only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.",
-          "Name": "Columns per row",
+          "Description": "The maximum number of speakers to show in a row next to each other, default is 4.  \nThis only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.",
+          "Name": "Speakers per row",
           "SortOrder": 101
         }
       ]
