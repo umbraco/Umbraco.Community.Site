@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses } from './types.gen';
+import type { ClearSessionizeCacheData, ClearSessionizeCacheErrors, ClearSessionizeCacheResponses, CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -41,6 +41,19 @@ export class UmbracoCommunityExtensionsService {
                 }
             ],
             url: '/umbraco/umbracocommunityextensions/api/v1/blog/{nodeKey}/is-blog',
+            ...options
+        });
+    }
+    
+    public static clearSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<ClearSessionizeCacheData, ThrowOnError>) {
+        return (options?.client ?? client).post<ClearSessionizeCacheResponses, ClearSessionizeCacheErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache',
             ...options
         });
     }
