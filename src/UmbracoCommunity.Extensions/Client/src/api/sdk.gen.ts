@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, PingData, PingErrors, PingResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses, WhatsMyNameData, WhatsMyNameErrors, WhatsMyNameResponses, WhatsTheTimeMrWolfData, WhatsTheTimeMrWolfErrors, WhatsTheTimeMrWolfResponses, WhoAmIData, WhoAmIErrors, WhoAmIResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -218,19 +218,6 @@ export class UmbracoCommunityExtensionsService {
         });
     }
     
-    public static ping<ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) {
-        return (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/ping',
-            ...options
-        });
-    }
-    
     public static getReleases<ThrowOnError extends boolean = false>(options?: Options<GetReleasesData, ThrowOnError>) {
         return (options?.client ?? client).get<GetReleasesResponses, GetReleasesErrors, ThrowOnError>({
             security: [
@@ -240,45 +227,6 @@ export class UmbracoCommunityExtensionsService {
                 }
             ],
             url: '/umbraco/umbracocommunityextensions/api/v1/releases',
-            ...options
-        });
-    }
-    
-    public static whatsMyName<ThrowOnError extends boolean = false>(options?: Options<WhatsMyNameData, ThrowOnError>) {
-        return (options?.client ?? client).get<WhatsMyNameResponses, WhatsMyNameErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whatsMyName',
-            ...options
-        });
-    }
-    
-    public static whatsTheTimeMrWolf<ThrowOnError extends boolean = false>(options?: Options<WhatsTheTimeMrWolfData, ThrowOnError>) {
-        return (options?.client ?? client).get<WhatsTheTimeMrWolfResponses, WhatsTheTimeMrWolfErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whatsTheTimeMrWolf',
-            ...options
-        });
-    }
-    
-    public static whoAmI<ThrowOnError extends boolean = false>(options?: Options<WhoAmIData, ThrowOnError>) {
-        return (options?.client ?? client).get<WhoAmIResponses, WhoAmIErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whoAmI',
             ...options
         });
     }
