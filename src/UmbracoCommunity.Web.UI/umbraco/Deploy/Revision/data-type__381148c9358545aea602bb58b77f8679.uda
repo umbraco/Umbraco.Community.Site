@@ -1,0 +1,39 @@
+{
+  "Name": "Sessionize sessions data list",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "UmbracoCommunity.Web.Features.Sessionize.DataSources.SessionizeSessionsDataSource, UmbracoCommunity.Web",
+        "value": {}
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.ItemPickerDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "listType": "list",
+          "defaultIcon": "icon-document",
+          "enableFilter": true,
+          "maxItems": 0,
+          "allowClear": true,
+          "allowDuplicates": false,
+          "enableMultiple": true,
+          "disableSorting": false,
+          "confirmRemoval": false
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+  "Udi": "umb://data-type/381148c9358545aea602bb58b77f8679",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/5e37c38d970b45b79c2f4b4a3eb33f9c",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

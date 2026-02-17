@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Security;
 using UmbracoCommunity.Extensions.Infrastructure;
 using UmbracoCommunity.Extensions.Models;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.GitHubSync.Models;
+using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 
 namespace UmbracoCommunity.Extensions.Controllers
 {
@@ -16,42 +15,19 @@ namespace UmbracoCommunity.Extensions.Controllers
     [ApiExplorerSettings(GroupName = "UmbracoCommunity.Extensions")]
     public class UmbracoCommunityExtensionsApiController : UmbracoCommunityExtensionsApiControllerBase
     {
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly GitHubSqlStore _dataStore;
         private readonly GitHubSyncOptions _syncOptions;
+        private readonly SessionizeApiClient _sessionizeApiClient;
 
         public UmbracoCommunityExtensionsApiController(
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             GitHubSqlStore dataStore,
-            IOptions<GitHubSyncOptions> syncOptions)
+            IOptions<GitHubSyncOptions> syncOptions,
+            SessionizeApiClient sessionizeApiClient)
         {
-            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _dataStore = dataStore;
             _syncOptions = syncOptions.Value;
+            _sessionizeApiClient = sessionizeApiClient;
         }
-
-        [HttpGet("ping")]
-        [ProducesResponseType<string>(StatusCodes.Status200OK)]
-        public string Ping() => "Pong";
-
-        [HttpGet("whatsTheTimeMrWolf")]
-        [ProducesResponseType(typeof(DateTime), 200)]
-        public DateTime WhatsTheTimeMrWolf() => DateTime.Now;
-
-        [HttpGet("whatsMyName")]
-        [ProducesResponseType<string>(StatusCodes.Status200OK)]
-        public string WhatsMyName()
-        {
-            // So we can see a long request in the dashboard with a spinning progress wheel
-            Thread.Sleep(2000);
-
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
-            return currentUser?.Name ?? "I have no idea who you are";
-        }
-
-        [HttpGet("whoAmI")]
-        [ProducesResponseType<IUser>(StatusCodes.Status200OK)]
-        public IUser? WhoAmI() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
 
         #region HQ Members
 
@@ -550,6 +526,18 @@ namespace UmbracoCommunity.Extensions.Controllers
         private static bool IsPreReleaseVersion(string version)
         {
             return version.Contains('-');
+        }
+
+        #endregion
+
+        #region Sessionize
+
+        [HttpPost("clear-sessionize-cache")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
+        public IActionResult ClearSessionizeCache()
+        {
+            _sessionizeApiClient.ClearCache();
+            return Ok("Sessionize cache cleared successfully");
         }
 
         #endregion

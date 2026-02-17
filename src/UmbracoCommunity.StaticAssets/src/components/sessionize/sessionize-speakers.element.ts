@@ -24,6 +24,12 @@ export class SessionizeSpeakersElement extends LitElement {
   @property({ type: Number, attribute: "max-speakers" })
   maxSpeakers?: number;
 
+  /**
+   * Optional: Number of columns on desktop (default: 4, max: 5)
+   */
+  @property({ type: Number, attribute: "columns" })
+  columns = 4;
+
   @state()
   private _speakers: SessionizeSpeaker[] = [];
 
@@ -139,8 +145,9 @@ export class SessionizeSpeakersElement extends LitElement {
       return html`<div class="dc-speakers-grid empty">No speakers found.</div>`;
     }
 
+    const cols = Math.min(Math.max(this.columns, 1), 5);
     return html`
-      <div class="dc-speakers-grid">
+      <div class="dc-speakers-grid" data-columns="${cols}">
         ${this._speakers.map((speaker) => this.#renderSpeaker(speaker))}
       </div>
     `;
@@ -204,6 +211,14 @@ export class SessionizeSpeakersElement extends LitElement {
         .dc-speakers-grid {
             grid-template-columns: repeat(4, 1fr);
             gap: var(--unit-md) var(--unit-lg);
+        }
+
+        .dc-speakers-grid[data-columns="3"] {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .dc-speakers-grid[data-columns="5"] {
+            grid-template-columns: repeat(5, 1fr);
         }
     }
 
