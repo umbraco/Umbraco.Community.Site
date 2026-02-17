@@ -379,15 +379,24 @@ img {
 }
 
 .dc-speakers-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
-    justify-items: center;
 }
 
 .dc-speakers-grid__item {
-    max-width: 200px;
+    width: calc(25% - 20px);
     text-align: center;
+    box-sizing: border-box;
+}
+
+.dc-speakers-grid[data-columns="3"] .dc-speakers-grid__item {
+    width: calc(33.333% - 20px);
+}
+
+.dc-speakers-grid[data-columns="5"] .dc-speakers-grid__item {
+    width: calc(20% - 20px);
 }
 
 .dc-speakers-grid__item img {
