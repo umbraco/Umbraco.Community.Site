@@ -212,6 +212,29 @@ export type IsBlogNodeResponses = {
 
 export type IsBlogNodeResponse = IsBlogNodeResponses[keyof IsBlogNodeResponses];
 
+export type ClearSessionizeCacheData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache';
+};
+
+export type ClearSessionizeCacheErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type ClearSessionizeCacheResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ClearSessionizeCacheResponse = ClearSessionizeCacheResponses[keyof ClearSessionizeCacheResponses];
+
 export type GetContributionStatsData = {
     body?: never;
     path?: never;

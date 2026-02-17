@@ -7,6 +7,7 @@ using UmbracoCommunity.Extensions.Infrastructure;
 using UmbracoCommunity.Extensions.Models;
 using UmbracoCommunity.Web.Features.GitHubSync.Infrastructure;
 using UmbracoCommunity.Web.Features.GitHubSync.Models;
+using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 
 namespace UmbracoCommunity.Extensions.Controllers
 {
@@ -16,13 +17,16 @@ namespace UmbracoCommunity.Extensions.Controllers
     {
         private readonly GitHubSqlStore _dataStore;
         private readonly GitHubSyncOptions _syncOptions;
+        private readonly SessionizeApiClient _sessionizeApiClient;
 
         public UmbracoCommunityExtensionsApiController(
             GitHubSqlStore dataStore,
-            IOptions<GitHubSyncOptions> syncOptions)
+            IOptions<GitHubSyncOptions> syncOptions,
+            SessionizeApiClient sessionizeApiClient)
         {
             _dataStore = dataStore;
             _syncOptions = syncOptions.Value;
+            _sessionizeApiClient = sessionizeApiClient;
         }
 
         #region HQ Members
@@ -522,6 +526,18 @@ namespace UmbracoCommunity.Extensions.Controllers
         private static bool IsPreReleaseVersion(string version)
         {
             return version.Contains('-');
+        }
+
+        #endregion
+
+        #region Sessionize
+
+        [HttpPost("clear-sessionize-cache")]
+        [ProducesResponseType<string>(StatusCodes.Status200OK)]
+        public IActionResult ClearSessionizeCache()
+        {
+            _sessionizeApiClient.ClearCache();
+            return Ok("Sessionize cache cleared successfully");
         }
 
         #endregion
