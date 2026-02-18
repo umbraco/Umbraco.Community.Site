@@ -42,11 +42,18 @@ UmbracoCommunity.BlockRestrictions/
 │       │   └── block-restrictions/
 │       │       └── block-restrictions.element.ts  # Configuration UI
 │       └── property-editors/
-│           ├── manifest.ts           # Property editor + context + action manifests
+│           ├── manifest.ts           # Property editor + context + action + translator manifests
 │           ├── block-grid-restricted/
 │           │   └── block-grid-restricted.element.ts  # Block Grid wrapper
-│           └── block-list-restricted/
-│               └── block-list-restricted.element.ts  # Block List wrapper
+│           ├── block-list-restricted/
+│           │   └── block-list-restricted.element.ts  # Block List wrapper
+│           └── translators/          # Clipboard value translators (copy/paste support)
+│               ├── block-grid-to-block-copy.ts       # Block Grid → generic block (copy)
+│               ├── block-to-block-grid-paste.ts      # Generic block → Block Grid (paste)
+│               ├── block-grid-to-grid-block-copy.ts  # Block Grid → grid block (copy)
+│               ├── grid-block-to-block-grid-paste.ts # Grid block → Block Grid (paste)
+│               ├── block-list-to-block-copy.ts       # Block List → generic block (copy)
+│               └── block-to-block-list-paste.ts      # Generic block → Block List (paste)
 └── wwwroot/
     └── App_Plugins/UmbracoCommunityBlockRestrictions/  # Built frontend output
 ```
@@ -98,6 +105,14 @@ The core restriction resolution logic used by the property editors at content ed
 
 **Cache invalidation**: A static `_ruleVersion` counter is included in cache keys. When any rule is saved or deleted, the counter is incremented via `Interlocked.Increment`, which naturally invalidates all cached resolved results without needing prefix-based cache eviction. Old entries expire via TTL.
 
+#### `ResolveForNewContentAsync(Guid? contentTypeKey, Guid? parentKey)`
+
+Fallback resolution for new content nodes that don't yet exist in the database. Called by the `allowed-blocks` endpoint when the primary tree-walk returns no result and fallback query parameters are provided.
+
+1. If `contentTypeKey` is provided, checks for a restriction rule directly on that document type. If found, resolves the aliases and returns the result with `InheritedFromAncestor = false`.
+2. If no rule found on the content type (or `contentTypeKey` is null) and `parentKey` is provided, delegates to `ResolveAllowedBlocksForNodeAsync(parentKey)` to walk up from the parent node.
+3. Returns `null` if neither fallback produces a result.
+
 #### `ResolveContentElementTypeKeys(List<string> aliases)`
 
 Resolves element type aliases to GUIDs using a single `IContentTypeService.GetAll()` call, filtering to matching element types and building a dictionary for O(1) lookup per alias. Logs a warning for any alias that doesn't resolve.
@@ -118,7 +133,7 @@ Secured with `[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]`.
 
 | Method | Route | Response cache | Purpose |
 |---|---|---|---|
-| `GET` | `allowed-blocks/{nodeKey:guid}` | 60s (client) | Resolve effective restrictions for a content node (walks up tree). Returns 404 if node not found. |
+| `GET` | `allowed-blocks/{nodeKey:guid}` | 60s (client) | Resolve effective restrictions for a content node (walks up tree). Optional query params `contentTypeKey` and `parentKey` for new content fallback. Returns 404 if node not found and no fallback resolves. |
 | `GET` | `rules/{docTypeKey:guid}` | — | Get restriction rule for a specific document type. Returns empty body if no rule exists. |
 | `PUT` | `rules/{docTypeKey:guid}` | — | Create or update a restriction rule. Body: `{ "allowedBlockAliases": ["alias1", "alias2"] }` |
 | `DELETE` | `rules/{docTypeKey:guid}` | — | Delete a restriction rule (returns to inheritance). 404 if no rule existed. |
@@ -148,6 +163,8 @@ A lightweight authenticated fetch wrapper. Auth is configured per-session by con
 
 All API functions return typed responses and throw on non-OK status codes (except explicit 404 handling).
 
+The `getAllowedBlocks()` function accepts optional `contentTypeKey` and `parentKey` parameters for new content fallback. These are appended as query parameters when provided, allowing the server to resolve restrictions for content that hasn't been saved yet.
+
 ### Extension manifests
 
 #### Workspace view (`workspace-views/manifest.ts`)
@@ -169,10 +186,17 @@ Each editor also registers supporting extension manifests required by the native
 
 - **`propertyContext` (clipboard)** — enables clipboard context for copy/paste
 - **`propertyContext` (sortMode)** — enables sort mode context for drag/drop reordering
-- **`propertyAction` (copyToClipboard)** — copy action (conditional on property having a value)
-- **`propertyAction` (pasteFromClipboard)** — paste action (Block List only, conditional on writable property)
+- **`propertyAction` (copyToClipboard)** — copy action in the three-dot menu (conditional on `Umb.Condition.Property.HasValue`)
+- **`propertyAction` (pasteFromClipboard)** — paste action in the three-dot menu (conditional on `Umb.Condition.Property.Writable`)
+- **`propertyAction` (sortMode)** — enter sort mode action in the three-dot menu (conditional on `Umb.Condition.Property.HasValue`)
 
-These are necessary because the native block editors' contexts are filtered by `forPropertyEditorUis` — without registering our own aliases, clipboard and sort mode contexts wouldn't load, and the "add content" modal routing would fail silently.
+These are necessary because the native block editors' contexts and actions are filtered by `forPropertyEditorUis` — without registering our own aliases, clipboard and sort mode contexts wouldn't load, and the three-dot context menu actions wouldn't appear.
+
+**Clipboard value translators** — in addition to the above, each editor registers `clipboardCopyPropertyValueTranslator` and `clipboardPastePropertyValueTranslator` manifests. These tell the clipboard system how to convert between the property editor's block value format and the clipboard entry format. Without them, the copy/paste actions appear in the menu but can't function.
+
+Block Grid (Restricted) registers 4 translators (copy/paste for both `block` and `gridBlock` clipboard entry types). Block List (Restricted) registers 2 translators (copy/paste for the `block` type only).
+
+The translator implementations live in `translators/` as separate files (not inline in the manifest) because Vite's `external` config externalises all `@umbraco-cms` imports. The native translator classes live at internal `dist-cms/` paths that aren't in Umbraco's runtime import map, so they can't be imported directly. Our implementations replicate the same transformation logic using only public API imports (`@umbraco-cms/backoffice/class-api`), which ARE in the import map.
 
 The `meta.settings` for each editor mirror the native editor's configuration properties (live editing, editor width, grid columns, layout stylesheet, etc.).
 
@@ -189,25 +213,29 @@ block-grid-restricted (our element, light DOM)
 
 1. **Light DOM** — `createRenderRoot()` returns `this` to avoid an extra shadow DOM boundary that would interfere with Umbraco context propagation.
 
-2. **Imperative creation** — the inner native element is created via `document.createElement()` after `customElements.whenDefined()` resolves. This ensures the native element class is fully defined before instantiation, avoiding property shadowing issues during custom element upgrade.
+2. **Imperative creation with extension registry loading** — the inner native element is created via `document.createElement()` after ensuring the native element class is registered. Umbraco lazy-loads property editor UI elements — the native block grid/list modules are only loaded when a property uses the native UI alias. Since our restricted editors use different aliases, the native modules might never be loaded by the extension system, causing `customElements.whenDefined()` to hang indefinitely (particularly on hard page reloads). To work around this, the elements use `umbExtensionsRegistry.getByAlias()` to find the native manifest and call its `element()` lazy import function to trigger the module load before falling back to `whenDefined`.
 
 3. **Auth context** — consumes `UMB_AUTH_CONTEXT` to configure the API client. Guards against `undefined` callback (context unprovided) to prevent clobbering the auth token stored by the module-level singleton.
 
 4. **Entity context** — consumes `UMB_ENTITY_CONTEXT` to get the current content node's unique key.
 
-5. **Restriction lifecycle**:
+5. **Document workspace context** — consumes `UMB_DOCUMENT_WORKSPACE_CONTEXT` to get the content type key. Used as a fallback for new content that doesn't yet exist in the database. If the initial restriction load returned null (new content with no entity in the tree), the arrival of the content type key triggers a retry with fallback parameters.
+
+6. **Parent entity context** — consumes `UMB_PARENT_ENTITY_CONTEXT` to get the parent node's unique key. Used alongside the content type key for new content fallback — the server can walk up from the parent node to find inherited restriction rules.
+
+7. **Restriction lifecycle**:
    - On load, creates the inner element immediately with the full (unmodified) config so the editor is always functional
-   - In parallel, fetches `allowed-blocks/{nodeKey}` from the API
+   - In parallel, fetches `allowed-blocks/{nodeKey}` from the API (with optional `contentTypeKey` and `parentKey` fallback params for new content)
    - When restrictions arrive, computes the effective config and **recreates the inner element** so the block manager initialises fresh with the restricted config
    - Recreation is necessary because the native block manager caches block types from its first config and doesn't re-read on subsequent property updates
 
-6. **Block Grid restriction mechanism** — keeps ALL block type definitions in the config (so existing blocks render correctly) but sets `allowAtRoot: false` and `allowInAreas: false` on non-allowed types. The native block grid entries context uses these flags to filter the "add content" picker.
+8. **Block Grid restriction mechanism** — keeps ALL block type definitions in the config (so existing blocks render correctly) but sets `allowAtRoot: false` and `allowInAreas: false` on non-allowed types. The native block grid entries context uses these flags to filter the "add content" picker.
 
-7. **Block List restriction mechanism** — filters non-allowed block types from the `blocks` config array entirely. Block List has no `allowAtRoot`/`allowInAreas` mechanism, so this is the only option.
+9. **Block List restriction mechanism** — filters non-allowed block types from the `blocks` config array entirely. Block List has no `allowAtRoot`/`allowInAreas` mechanism, so this is the only option.
 
-8. **Value forwarding** — listens for `property-value-change` events from the inner element and re-dispatches them with `bubbles: true, composed: true` so the Umbraco property system receives the updates.
+10. **Value forwarding** — listens for `property-value-change` events from the inner element and re-dispatches them with `bubbles: true, composed: true` so the Umbraco property system receives the updates.
 
-9. **Restriction info banner** — when restrictions are active, renders an accessible status banner (`role="status"`) above the block editor showing "Block types are restricted" with optional inheritance source. The decorative filter icon uses `aria-hidden="true"`.
+11. **Restriction info banner** — when restrictions are active, renders an accessible status banner (`role="status"`) above the block editor showing "Block types are restricted" with optional inheritance source. The decorative filter icon uses `aria-hidden="true"`.
 
 ### Workspace view element (`block-restrictions.element.ts`)
 
@@ -221,6 +249,24 @@ The configuration UI rendered on the **Blocks** tab of each document type. Featu
 - **Select/Deselect all** — scoped to the current filter (data type + text search).
 - **Visibility toggles** — "Show settings types" and "Show composition types" to show/hide element types prefixed with "settings" or "composition" (hidden by default).
 - **Save** — persists the rule via `PUT /rules/{docTypeKey}` or removes it via `DELETE /rules/{docTypeKey}` when toggled off.
+
+### Clipboard value translators (`property-editors/translators/`)
+
+The clipboard system requires `clipboardCopyPropertyValueTranslator` and `clipboardPastePropertyValueTranslator` manifest entries that convert between the property editor's block value format and the clipboard entry format. Each translator class extends `UmbControllerBase` (from `@umbraco-cms/backoffice/class-api`) and exports itself as `api`.
+
+**Why custom implementations?** Umbraco's native translators live at internal `dist-cms/` paths (e.g. `@umbraco-cms/backoffice/dist-cms/packages/block/block-grid/clipboard/...`). Vite's `external: [/^@umbraco/]` config leaves these as bare module specifiers in the built output. At runtime, only public API subpaths (like `@umbraco-cms/backoffice/class-api`) are in Umbraco's import map — the internal paths can't resolve. Our implementations replicate the same transformation logic using only public imports.
+
+**Copy translators** convert the property editor's value to a generic clipboard entry:
+- **Block Grid → block**: Strips grid-specific layout (columnSpan, rowSpan, areas), keeps only contentKey/settingsKey. Collects only referenced contentData/settingsData entries.
+- **Block Grid → gridBlock**: Preserves full grid layout structure for grid-to-grid paste. Strips `$type` properties from layout items.
+- **Block List → block**: Extracts layout from under the schema alias key. Strips `$type` properties.
+
+**Paste translators** convert a clipboard entry back to the property editor's value format:
+- **block → Block Grid**: Wraps layout under the Block Grid schema alias, adds grid defaults (columnSpan: 12, rowSpan: 1, areas: []). Validates content type compatibility.
+- **gridBlock → Block Grid**: Wraps layout under the schema alias without adding defaults (preserves original grid positioning). Supports an optional filter function for compatibility checks.
+- **block → Block List**: Wraps layout under the Block List schema alias. Validates content type compatibility.
+
+All translators use `structuredClone()` to deep-copy values before transformation, preventing mutation of the source data.
 
 ## Performance
 
@@ -281,8 +327,29 @@ If the restriction API is unavailable (auth failure, network error, etc.), the p
 
 The native block grid/list managers cache their block type configuration on first initialisation and don't respond to subsequent config property updates. Rather than trying to force the manager to re-read config (which would require reaching into internal APIs), the restricted property editors recreate the inner element when restrictions load. This causes a brief visual refresh but is reliable across all timing scenarios.
 
+### Extension registry-based native element loading
+
+Umbraco lazy-loads property editor UI elements — the native block grid/list element modules are only loaded when a property uses the native UI alias (e.g. `Umb.PropertyEditorUi.BlockGrid`). Since our restricted editors use different aliases, the native modules wouldn't be loaded by the extension system, causing `customElements.whenDefined()` to hang indefinitely on hard page reloads.
+
+The fix uses `umbExtensionsRegistry.getByAlias()` (from `@umbraco-cms/backoffice/extension-registry`, a public API path) to find the native manifest and call its `element()` lazy import function to trigger the module load. This is more reliable than `whenDefined` alone because it actively triggers the load rather than passively waiting for it.
+
+### New content fallback via workspace contexts
+
+New content nodes don't exist in the database until first save, so the primary restriction resolution (which walks the content tree by node key) returns 404. The property editors consume two additional Umbraco contexts to provide fallback information:
+
+- **`UMB_DOCUMENT_WORKSPACE_CONTEXT`** — provides the content type key for direct rule lookup
+- **`UMB_PARENT_ENTITY_CONTEXT`** — provides the parent node key for tree-walk inheritance
+
+These are passed as optional query parameters (`contentTypeKey`, `parentKey`) to the `allowed-blocks` endpoint. The server tries direct rule lookup first, then falls back to walking up from the parent node.
+
+### Clipboard translators as local implementations
+
+The native Umbraco clipboard translator classes can't be imported from custom extensions because they live at internal `dist-cms/` module paths that aren't in the runtime import map. The `external: [/^@umbraco/]` Vite config leaves all `@umbraco-cms` imports as bare specifiers — public subpaths resolve via the import map, but internal paths don't.
+
+Rather than modifying the Vite config (which risks bundling Umbraco internals via the translator classes' own relative imports), the translators are reimplemented locally using only public API imports. They perform identical transformations to the native implementations.
+
 ## Dependencies
 
 **Backend**: Umbraco CMS 17+ (uses `IContentService`, `IContentTypeService`, `IDataTypeService`, `BackOfficeSecurityRequirementsOperationFilterBase`), Entity Framework Core, `IMemoryCache`.
 
-**Frontend**: `@umbraco-cms/backoffice` (context API, element mixin, auth, entity, notification, property editor types), Lit 3.x, Vite 7.x.
+**Frontend**: `@umbraco-cms/backoffice` (context API, element mixin, auth, entity, document workspace, parent entity, extension registry, class-api, notification, property editor types), Lit 3.x, Vite 7.x.

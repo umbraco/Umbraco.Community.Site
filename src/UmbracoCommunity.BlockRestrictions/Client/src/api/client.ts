@@ -114,10 +114,24 @@ async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Re
 /**
  * Resolves the effective block restrictions for a content node.
  * Called by property editors when they load in the content editor.
- * Returns null for 404 (node not found).
+ *
+ * For existing content, only nodeKey is needed — the server walks the content tree.
+ * For new content (node doesn't exist yet), contentTypeKey and parentKey provide
+ * fallback context so the server can check the document type's rule directly
+ * and/or walk up from the parent node.
+ *
+ * Returns null for 404 (node not found and no fallback available).
  */
-export async function getAllowedBlocks(nodeKey: string): Promise<AllowedBlocksResponse | null> {
-  const response = await fetchWithAuth(`${API_BASE}/allowed-blocks/${nodeKey}`);
+export async function getAllowedBlocks(
+  nodeKey: string,
+  contentTypeKey?: string,
+  parentKey?: string,
+): Promise<AllowedBlocksResponse | null> {
+  const params = new URLSearchParams();
+  if (contentTypeKey) params.set("contentTypeKey", contentTypeKey);
+  if (parentKey) params.set("parentKey", parentKey);
+  const query = params.toString() ? `?${params.toString()}` : "";
+  const response = await fetchWithAuth(`${API_BASE}/allowed-blocks/${nodeKey}${query}`);
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Failed to fetch allowed blocks: ${response.status} ${response.statusText}`);
   return response.json();

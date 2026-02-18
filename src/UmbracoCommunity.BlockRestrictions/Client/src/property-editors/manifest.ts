@@ -7,8 +7,9 @@
  * 1. propertyEditorUi — the main registration (element, schema, settings)
  * 2. propertyContext (clipboard) — enables clipboard context for copy/paste
  * 3. propertyContext (sortMode) — enables sort mode context for drag/drop reordering
- * 4. propertyAction (copyToClipboard) — the "copy" action button
- * 5. propertyAction (pasteFromClipboard) — the "paste" action button (Block List only)
+ * 4. propertyAction (copyToClipboard) — the "copy" action in the three-dot menu
+ * 5. propertyAction (pasteFromClipboard) — the "paste" action in the three-dot menu
+ * 6. propertyAction (sortMode) — the "enter sort mode" action in the three-dot menu
  *
  * Why are the contexts and actions needed?
  * The native block editors' contexts are filtered by `forPropertyEditorUis`.
@@ -116,7 +117,7 @@ export const manifests: Array<UmbExtensionManifest> = [
     ],
   },
 
-  // Copy action — "Copy to clipboard" button, shown when the property has a value
+  // Copy action — "Copy to clipboard" in the three-dot menu, shown when the property has a value
   {
     type: "propertyAction",
     kind: "copyToClipboard",
@@ -126,7 +127,32 @@ export const manifests: Array<UmbExtensionManifest> = [
     forPropertyEditorUis: [
       "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
     ],
-    conditions: [{ alias: "Umb.Condition.PropertyHasValue" }],
+    conditions: [{ alias: "Umb.Condition.Property.HasValue" }],
+  },
+
+  // Paste action — "Paste from clipboard" in the three-dot menu, shown when writable
+  {
+    type: "propertyAction",
+    kind: "pasteFromClipboard",
+    alias:
+      "UmbracoCommunity.PropertyAction.BlockGridRestricted.Clipboard.Paste",
+    name: "Block Grid (Restricted) Paste From Clipboard Property Action",
+    forPropertyEditorUis: [
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+    ],
+    conditions: [{ alias: "Umb.Condition.Property.Writable" }],
+  },
+
+  // Sort mode action — "Enter sort mode" in the three-dot menu, enables drag/drop reordering
+  {
+    type: "propertyAction",
+    kind: "sortMode",
+    alias: "UmbracoCommunity.PropertyAction.BlockGridRestricted.SortMode",
+    name: "Block Grid (Restricted) Sort Mode Property Action",
+    forPropertyEditorUis: [
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+    ],
+    conditions: [{ alias: "Umb.Condition.Property.HasValue" }],
   },
 
   // ─── Block List (Restricted) ──────────────────────────────────────────────
@@ -212,11 +238,10 @@ export const manifests: Array<UmbExtensionManifest> = [
     forPropertyEditorUis: [
       "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
     ],
-    conditions: [{ alias: "Umb.Condition.PropertyHasValue" }],
+    conditions: [{ alias: "Umb.Condition.Property.HasValue" }],
   },
 
-  // Paste action — shown when the property is writable (Block List only;
-  // Block Grid doesn't support paste from clipboard in the native editor)
+  // Paste action — "Paste from clipboard" in the three-dot menu, shown when writable
   {
     type: "propertyAction",
     kind: "pasteFromClipboard",
@@ -226,6 +251,109 @@ export const manifests: Array<UmbExtensionManifest> = [
     forPropertyEditorUis: [
       "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
     ],
-    conditions: [{ alias: "Umb.Condition.WritableProperty" }],
+    conditions: [{ alias: "Umb.Condition.Property.Writable" }],
   },
+
+  // Sort mode action — "Enter sort mode" in the three-dot menu, enables drag/drop reordering
+  {
+    type: "propertyAction",
+    kind: "sortMode",
+    alias: "UmbracoCommunity.PropertyAction.BlockListRestricted.SortMode",
+    name: "Block List (Restricted) Sort Mode Property Action",
+    forPropertyEditorUis: [
+      "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
+    ],
+    conditions: [{ alias: "Umb.Condition.Property.HasValue" }],
+  },
+
+  // ─── Clipboard Value Translators ──────────────────────────────────────────
+  //
+  // These translators tell the clipboard system how to convert between the
+  // property editor's block value format and the clipboard entry format.
+  // Without them, the copy/paste actions appear in the menu but can't function.
+  //
+  // Since our restricted editors use the exact same value format as the native
+  // editors (same schema, same JSON structure), our translators perform the
+  // same transformations as the native ones.
+  //
+  // We use our own implementations (in ./translators/) rather than importing
+  // the native translator classes because Vite's `external` config externalises
+  // all @umbraco-cms imports. The native translators live at internal dist-cms
+  // paths that aren't in Umbraco's runtime import map, so they can't resolve
+  // at runtime. Our implementations import only from public API paths
+  // (@umbraco-cms/backoffice/class-api) which ARE in the import map.
+
+  // Block Grid (Restricted) → block clipboard format (copy)
+  {
+    type: "clipboardCopyPropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardCopyTranslator.BlockGridRestrictedToBlock",
+    name: "Block Grid (Restricted) to Block Copy Translator",
+    api: () => import("./translators/block-grid-to-block-copy.js"),
+    fromPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+    toClipboardEntryValueType: "block",
+  } as unknown as UmbExtensionManifest,
+
+  // block clipboard format → Block Grid (Restricted) (paste)
+  {
+    type: "clipboardPastePropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardPasteTranslator.BlockToBlockGridRestricted",
+    name: "Block to Block Grid (Restricted) Paste Translator",
+    weight: 900,
+    api: () => import("./translators/block-to-block-grid-paste.js"),
+    fromClipboardEntryValueType: "block",
+    toPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+  } as unknown as UmbExtensionManifest,
+
+  // Block Grid (Restricted) → grid-block clipboard format (copy)
+  {
+    type: "clipboardCopyPropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardCopyTranslator.BlockGridRestrictedToGridBlock",
+    name: "Block Grid (Restricted) to Grid Block Copy Translator",
+    api: () => import("./translators/block-grid-to-grid-block-copy.js"),
+    fromPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+    toClipboardEntryValueType: "gridBlock",
+  } as unknown as UmbExtensionManifest,
+
+  // grid-block clipboard format → Block Grid (Restricted) (paste)
+  {
+    type: "clipboardPastePropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardPasteTranslator.GridBlockToBlockGridRestricted",
+    name: "Grid Block to Block Grid (Restricted) Paste Translator",
+    weight: 1000,
+    api: () => import("./translators/grid-block-to-block-grid-paste.js"),
+    fromClipboardEntryValueType: "gridBlock",
+    toPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+  } as unknown as UmbExtensionManifest,
+
+  // Block List (Restricted) → block clipboard format (copy)
+  {
+    type: "clipboardCopyPropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardCopyTranslator.BlockListRestrictedToBlock",
+    name: "Block List (Restricted) to Block Copy Translator",
+    api: () => import("./translators/block-list-to-block-copy.js"),
+    fromPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
+    toClipboardEntryValueType: "block",
+  } as unknown as UmbExtensionManifest,
+
+  // block clipboard format → Block List (Restricted) (paste)
+  {
+    type: "clipboardPastePropertyValueTranslator",
+    alias:
+      "UmbracoCommunity.ClipboardPasteTranslator.BlockToBlockListRestricted",
+    name: "Block to Block List (Restricted) Paste Translator",
+    api: () => import("./translators/block-to-block-list-paste.js"),
+    fromClipboardEntryValueType: "block",
+    toPropertyEditorUi:
+      "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
+  } as unknown as UmbExtensionManifest,
 ];

@@ -94,6 +94,49 @@ public class BlockRestrictionService
     }
 
     /// <summary>
+    /// Resolves block restrictions for new content that doesn't exist in the tree yet.
+    /// Called as a fallback when the node key doesn't match an existing content node.
+    ///
+    /// Algorithm:
+    ///   1. If contentTypeKey is provided, check for a direct rule on that document type
+    ///   2. If no direct rule and parentKey is provided, walk up from the parent node
+    ///   3. If neither yields a result, return fail-open (all blocks allowed)
+    ///
+    /// This enables restrictions to work during content creation, not just editing.
+    /// </summary>
+    public async Task<AllowedBlocksResponse?> ResolveForNewContentAsync(Guid? contentTypeKey, Guid? parentKey)
+    {
+        // Check the new content's document type for a direct rule.
+        if (contentTypeKey.HasValue)
+        {
+            var rule = await _store.GetByDocumentTypeKeyAsync(contentTypeKey.Value);
+            if (rule != null)
+            {
+                var contentType = _contentTypeService.Get(contentTypeKey.Value);
+                var aliases = JsonSerializer.Deserialize<List<string>>(rule.AllowedBlockAliasesJson) ?? [];
+                var elementTypeKeys = ResolveContentElementTypeKeys(aliases);
+
+                return new AllowedBlocksResponse
+                {
+                    DocumentTypeAlias = contentType?.Alias ?? "",
+                    AllowedBlocks = aliases,
+                    AllowedContentElementTypeKeys = elementTypeKeys,
+                    HasRestrictions = true,
+                    InheritedFromAncestor = false
+                };
+            }
+        }
+
+        // No direct rule — walk up from the parent node to check for inherited restrictions.
+        if (parentKey.HasValue)
+        {
+            return await ResolveAllowedBlocksForNodeAsync(parentKey.Value);
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// The actual tree-walk logic, called on cache miss.
     ///
     /// Algorithm:

@@ -74,12 +74,12 @@ This leverages the alias-based storage design and makes it more robust.
 
 ## Caching improvements
 
-**Current behaviour**: The store uses `IMemoryCache` with a 30-minute sliding expiration per document type key. The `allowed-blocks` endpoint walks the content tree on every request, querying each ancestor's document type.
+**Current behaviour**: Two-tier caching is in place: store-level (30-minute sliding per document type key) and service-level (60-second absolute per content node key with version-based invalidation). Browser response caching provides a third tier (60 seconds on `allowed-blocks`).
 
 **Potential improvements**:
-- Cache the full resolved result for a content node key (not just individual rules), with invalidation when any rule in the ancestor chain changes
-- Add output caching on the `allowed-blocks` endpoint with a short TTL, since the same content node will be queried repeatedly during an editing session
+- Add output caching on the `allowed-blocks` endpoint using Umbraco's `[OutputCache]` for server-side caching, complementing the existing client-side response caching
 - Consider a distributed cache (`IDistributedCache`) for load-balanced environments
+- Pre-warm the cache for frequently accessed content nodes during backoffice startup
 
 ---
 

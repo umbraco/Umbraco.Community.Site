@@ -27,7 +27,12 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     /// up the content tree. This is the primary endpoint called by the restricted
     /// property editors when they load in the content editor.
     ///
-    /// Returns 404 if the content node doesn't exist.
+    /// For existing content: resolves by walking up from the node in the content tree.
+    /// For new content (node doesn't exist yet): falls back to checking the document
+    /// type directly, then walking up from the parent node. The contentTypeKey and
+    /// parentKey query parameters enable this fallback.
+    ///
+    /// Returns 404 only if resolution fails entirely (no node, no fallback params).
     /// Returns HasRestrictions=false if no rules are found at any level (fail-open).
     ///
     /// Cached for 60s in the browser (same node won't re-fetch during an editing session).
@@ -35,9 +40,20 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     /// </summary>
     [HttpGet("allowed-blocks/{nodeKey:guid}")]
     [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
-    public async Task<IActionResult> GetAllowedBlocks(Guid nodeKey)
+    public async Task<IActionResult> GetAllowedBlocks(
+        Guid nodeKey,
+        [FromQuery] Guid? contentTypeKey = null,
+        [FromQuery] Guid? parentKey = null)
     {
+        // Try the standard resolution path (existing content node).
         var result = await _service.ResolveAllowedBlocksForNodeAsync(nodeKey);
+
+        // If the node wasn't found (new content), fall back to content type + parent.
+        if (result == null && (contentTypeKey.HasValue || parentKey.HasValue))
+        {
+            result = await _service.ResolveForNewContentAsync(contentTypeKey, parentKey);
+        }
+
         if (result == null)
         {
             return NotFound();

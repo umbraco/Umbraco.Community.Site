@@ -56,7 +56,9 @@ import {
 } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
-import { UMB_ENTITY_CONTEXT } from "@umbraco-cms/backoffice/entity";
+import { UMB_ENTITY_CONTEXT, UMB_PARENT_ENTITY_CONTEXT } from "@umbraco-cms/backoffice/entity";
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from "@umbraco-cms/backoffice/document";
+import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 import type {
   UmbPropertyEditorUiElement,
   UmbPropertyEditorConfigCollection,
@@ -102,6 +104,21 @@ export default class BlockGridRestrictedElement
 
   /** The content node's unique key (GUID), obtained from UMB_ENTITY_CONTEXT. */
   private _entityKey: string | undefined;
+
+  /**
+   * The document type key for the content being edited. Obtained from
+   * UMB_DOCUMENT_WORKSPACE_CONTEXT. Used as a fallback for new content
+   * (where the node doesn't exist in the content tree yet) so the server
+   * can check for a direct restriction rule on this document type.
+   */
+  private _contentTypeKey: string | undefined;
+
+  /**
+   * The parent node key when creating new content. Obtained from
+   * UMB_PARENT_ENTITY_CONTEXT. Used as a fallback for new content so the
+   * server can walk up the content tree from the parent to find inherited rules.
+   */
+  private _parentKey: string | undefined;
 
   /** Whether the auth context has been consumed and the API client configured. */
   private _authReady = false;
@@ -189,23 +206,72 @@ export default class BlockGridRestrictedElement
         }
       });
     });
+
+    // Consume the document workspace context to get the content type key.
+    // This is needed for new content: the node doesn't exist yet in the database,
+    // so we send the content type key as a fallback for the server to check for
+    // a direct restriction rule on this document type.
+    this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
+      if (!context) return;
+      this._contentTypeKey = context.getContentTypeUnique() ?? undefined;
+      // If restrictions already failed to load (new content scenario), retry
+      // now that we have the content type key as fallback context.
+      if (this._restrictionInfo === null && this._authReady && this._entityKey) {
+        this._loadRestrictions();
+      }
+    });
+
+    // Consume the parent entity context to get the parent node key.
+    // For new content, the server uses this to walk up from the parent node
+    // and find inherited restriction rules.
+    this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (parentContext) => {
+      if (!parentContext) return;
+      const parent = parentContext.getParent();
+      this._parentKey = parent?.unique ?? undefined;
+    });
   }
 
   /**
    * Lifecycle: element connected to the DOM.
    *
-   * Waits for the native block grid element to be defined in the custom element
-   * registry before creating our instance. This ensures the element class is
-   * available when we call `document.createElement()`.
+   * Ensures the native block grid element is defined in the custom element
+   * registry before creating our instance. This is non-trivial because Umbraco
+   * lazy-loads property editor UI elements — the native block grid module is
+   * only loaded when a property uses the native UI alias. Since our restricted
+   * editor uses a different alias, the native module might never be loaded by
+   * the extension system, causing `customElements.whenDefined()` to hang
+   * indefinitely (particularly visible on hard page reloads).
+   *
+   * To work around this, we explicitly trigger the native module load via the
+   * extension registry before falling back to `whenDefined`.
    */
   async connectedCallback() {
     super.connectedCallback();
 
-    // Wait for Umbraco's native block grid element to be registered.
-    // This is an async operation because Umbraco lazy-loads its elements.
-    await customElements.whenDefined("umb-property-editor-ui-block-grid");
+    const tagName = "umb-property-editor-ui-block-grid";
 
-    this._createInnerElement();
+    if (!customElements.get(tagName)) {
+      // Native element not defined yet. Trigger loading of its module via the
+      // extension registry. The manifest's `element` field is a lazy import
+      // function that loads and registers the native custom element.
+      try {
+        const manifest = umbExtensionsRegistry.getByAlias(
+          "Umb.PropertyEditorUi.BlockGrid",
+        ) as any;
+        if (manifest?.element) {
+          await manifest.element();
+        }
+      } catch {
+        // Ignore — fall through to whenDefined as a fallback.
+      }
+
+      // Ensure the element is actually registered before proceeding.
+      await customElements.whenDefined(tagName);
+    }
+
+    if (this.isConnected) {
+      this._createInnerElement();
+    }
   }
 
   /**
@@ -309,7 +375,13 @@ export default class BlockGridRestrictedElement
     if (!this._entityKey) return;
 
     try {
-      this._restrictionInfo = await getAllowedBlocks(this._entityKey);
+      // Pass content type key and parent key as fallback context for new content.
+      // For existing content, the server resolves by node key and ignores these.
+      this._restrictionInfo = await getAllowedBlocks(
+        this._entityKey,
+        this._contentTypeKey,
+        this._parentKey,
+      );
     } catch (error) {
       console.error("Failed to load block restrictions, showing all blocks:", error);
       this._restrictionInfo = null;
