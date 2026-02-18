@@ -1,0 +1,7 @@
+{
+  "Name": "Prerelease",
+  "Udi": "umb://member-group/1e967c1505cb401e88a0b11fb59ef2dd",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.MemberGroupArtifact",
+  "__version": "17.0.1"
+}
