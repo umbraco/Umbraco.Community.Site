@@ -1,6 +1,6 @@
 {
-  "Name": "Events home",
-  "Alias": "eventsHome",
+  "Name": "Home (copy)",
+  "Alias": "home1",
   "DefaultTemplate": "umb://template/b65faffaeb5340c2a4cf72764cdf160d",
   "AllowedTemplates": [
     "umb://template/b65faffaeb5340c2a4cf72764cdf160d"
@@ -14,8 +14,7 @@
       "umb://document-type/8e1503b98fa94a84b3a6a3eba44f81e2",
       "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
       "umb://document-type/5dd905b68303403c85ba905f7463e3c4",
-      "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5",
-      "umb://document-type/47d5651bf5bb45c785fcb4bad22cb13d"
+      "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5"
     ]
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
@@ -25,10 +24,36 @@
     "umb://document-type/6a43376f286643dc98b23844efec4c49",
     "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "4efdd646-09fe-4e3a-a00c-be622a279af4",
+      "Name": "Content block restricted",
+      "SortOrder": 2,
+      "Alias": "content/contentBlockRestricted",
+      "PropertyTypes": [
+        {
+          "Key": "fd2f53d8-500c-40e8-9400-4b0a2ba80923",
+          "Alias": "restrictedBlocksTest",
+          "DataType": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
+          "Name": "Restricted blocks test"
+        }
+      ]
+    },
+    {
+      "Key": "9f697973-ff76-4092-8354-dbc7a53c6695",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/a1b98af9e853404a99a81412236bc9ad",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
       "Ordering": true
@@ -39,10 +64,6 @@
     },
     {
       "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
-      "Mode": "Exist"
-    },
-    {
-      "Udi": "umb://document-type/47d5651bf5bb45c785fcb4bad22cb13d",
       "Mode": "Exist"
     },
     {
