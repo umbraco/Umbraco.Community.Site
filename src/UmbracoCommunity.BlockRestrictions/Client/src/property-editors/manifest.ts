@@ -1,5 +1,32 @@
+/**
+ * Property editor manifests — registers the restricted Block Grid and Block List
+ * property editor UIs with the Umbraco backoffice extension system.
+ *
+ * Each editor needs several supporting manifests:
+ *
+ * 1. propertyEditorUi — the main registration (element, schema, settings)
+ * 2. propertyContext (clipboard) — enables clipboard context for copy/paste
+ * 3. propertyContext (sortMode) — enables sort mode context for drag/drop reordering
+ * 4. propertyAction (copyToClipboard) — the "copy" action button
+ * 5. propertyAction (pasteFromClipboard) — the "paste" action button (Block List only)
+ *
+ * Why are the contexts and actions needed?
+ * The native block editors' contexts are filtered by `forPropertyEditorUis`.
+ * Without registering our own aliases, clipboard/sort mode contexts wouldn't load
+ * for our custom editor UIs, and the "add content" modal routing would fail silently.
+ *
+ * Both editors use the same underlying Umbraco property editor SCHEMA as the native
+ * editors (Umbraco.BlockGrid / Umbraco.BlockList), so they share storage format,
+ * configuration, and rendering. Only the UI wrapper is different.
+ *
+ * The meta.settings for each editor mirror the native editor's configuration
+ * properties (live editing, editor width, grid columns, etc.) so they appear
+ * in the data type configuration screen.
+ */
 export const manifests: Array<UmbExtensionManifest> = [
-  // Block Grid (Restricted) property editor UI
+  // ─── Block Grid (Restricted) ──────────────────────────────────────────────
+
+  // Main property editor UI registration
   {
     type: "propertyEditorUi",
     alias: "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
@@ -11,6 +38,7 @@ export const manifests: Array<UmbExtensionManifest> = [
       label: "Block Grid (Restricted)",
       icon: "icon-layout",
       group: "lists",
+      // Use the native Block Grid schema — same storage format and config structure.
       propertyEditorSchemaAlias: "Umbraco.BlockGrid",
       supportsReadOnly: true,
       settings: {
@@ -66,7 +94,7 @@ export const manifests: Array<UmbExtensionManifest> = [
     },
   },
 
-  // Block Grid (Restricted) — clipboard and sort mode contexts
+  // Clipboard context — enables copy/paste for Block Grid (Restricted)
   {
     type: "propertyContext",
     kind: "clipboard",
@@ -76,6 +104,8 @@ export const manifests: Array<UmbExtensionManifest> = [
       "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
     ],
   },
+
+  // Sort mode context — enables drag/drop reordering for Block Grid (Restricted)
   {
     type: "propertyContext",
     kind: "sortMode",
@@ -85,6 +115,8 @@ export const manifests: Array<UmbExtensionManifest> = [
       "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
     ],
   },
+
+  // Copy action — "Copy to clipboard" button, shown when the property has a value
   {
     type: "propertyAction",
     kind: "copyToClipboard",
@@ -97,7 +129,9 @@ export const manifests: Array<UmbExtensionManifest> = [
     conditions: [{ alias: "Umb.Condition.PropertyHasValue" }],
   },
 
-  // Block List (Restricted) property editor UI
+  // ─── Block List (Restricted) ──────────────────────────────────────────────
+
+  // Main property editor UI registration
   {
     type: "propertyEditorUi",
     alias: "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
@@ -109,6 +143,7 @@ export const manifests: Array<UmbExtensionManifest> = [
       label: "Block List (Restricted)",
       icon: "icon-thumbnail-list",
       group: "lists",
+      // Use the native Block List schema — same storage format and config structure.
       propertyEditorSchemaAlias: "Umbraco.BlockList",
       supportsReadOnly: true,
       settings: {
@@ -145,7 +180,7 @@ export const manifests: Array<UmbExtensionManifest> = [
     },
   },
 
-  // Block List (Restricted) — clipboard and sort mode contexts
+  // Clipboard context — enables copy/paste for Block List (Restricted)
   {
     type: "propertyContext",
     kind: "clipboard",
@@ -155,6 +190,8 @@ export const manifests: Array<UmbExtensionManifest> = [
       "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
     ],
   },
+
+  // Sort mode context — enables drag/drop reordering for Block List (Restricted)
   {
     type: "propertyContext",
     kind: "sortMode",
@@ -164,6 +201,8 @@ export const manifests: Array<UmbExtensionManifest> = [
       "UmbracoCommunity.PropertyEditorUi.BlockListRestricted",
     ],
   },
+
+  // Copy action — shown when the property has a value
   {
     type: "propertyAction",
     kind: "copyToClipboard",
@@ -175,6 +214,9 @@ export const manifests: Array<UmbExtensionManifest> = [
     ],
     conditions: [{ alias: "Umb.Condition.PropertyHasValue" }],
   },
+
+  // Paste action — shown when the property is writable (Block List only;
+  // Block Grid doesn't support paste from clipboard in the native editor)
   {
     type: "propertyAction",
     kind: "pasteFromClipboard",

@@ -4,11 +4,23 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace UmbracoCommunity.BlockRestrictions.Infrastructure;
 
+/// <summary>
+/// Data access layer for block restriction rules.
+/// Wraps EF Core operations with an in-memory cache to reduce database round-trips
+/// during content tree walks (where each ancestor's document type is checked for a rule).
+///
+/// Cache strategy: 30-minute sliding expiration per document type key.
+/// Invalidated on upsert and delete — the service layer also maintains a separate
+/// generation counter for its own resolved-result cache.
+/// </summary>
 public class BlockRestrictionStore
 {
     private readonly IDbContextFactory<BlockRestrictionDbContext> _contextFactory;
     private readonly IMemoryCache _cache;
+
+    /// <summary>Prefix for cache keys to avoid collisions with other IMemoryCache consumers.</summary>
     private const string CachePrefix = "BlockRestriction_";
+
     private static readonly MemoryCacheEntryOptions CacheOptions = new()
     {
         SlidingExpiration = TimeSpan.FromMinutes(30)
@@ -22,6 +34,10 @@ public class BlockRestrictionStore
         _cache = cache;
     }
 
+    /// <summary>
+    /// Gets the restriction rule for a specific document type, using the cache first.
+    /// Returns null if no rule exists (meaning this document type has no direct restriction).
+    /// </summary>
     public async Task<BlockRestrictionEntity?> GetByDocumentTypeKeyAsync(Guid documentTypeKey)
     {
         var cacheKey = $"{CachePrefix}{documentTypeKey}";
@@ -42,6 +58,11 @@ public class BlockRestrictionStore
         return entity;
     }
 
+    /// <summary>
+    /// Creates or updates a restriction rule for a document type.
+    /// If a rule already exists, updates the allowed aliases and timestamp.
+    /// Invalidates the cache entry for this document type.
+    /// </summary>
     public async Task UpsertAsync(Guid documentTypeKey, List<string> allowedAliases)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
@@ -72,6 +93,11 @@ public class BlockRestrictionStore
         InvalidateCache(documentTypeKey);
     }
 
+    /// <summary>
+    /// Deletes the restriction rule for a document type.
+    /// Returns true if a rule was found and deleted, false if no rule existed.
+    /// Invalidates the cache entry for this document type.
+    /// </summary>
     public async Task<bool> DeleteAsync(Guid documentTypeKey)
     {
         using var context = await _contextFactory.CreateDbContextAsync();
@@ -86,12 +112,17 @@ public class BlockRestrictionStore
         return true;
     }
 
+    /// <summary>
+    /// Gets all restriction rules. Used for potential future audit/dashboard features.
+    /// Not cached — intended for infrequent administrative use.
+    /// </summary>
     public async Task<List<BlockRestrictionEntity>> GetAllAsync()
     {
         using var context = await _contextFactory.CreateDbContextAsync();
         return await context.BlockRestrictionRules.ToListAsync();
     }
 
+    /// <summary>Removes the cached rule for a document type after a write operation.</summary>
     private void InvalidateCache(Guid documentTypeKey)
     {
         _cache.Remove($"{CachePrefix}{documentTypeKey}");

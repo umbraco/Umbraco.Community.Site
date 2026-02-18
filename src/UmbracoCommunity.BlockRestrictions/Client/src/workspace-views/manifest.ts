@@ -1,3 +1,12 @@
+/**
+ * Workspace view manifest — registers the "Blocks" tab on the Document Type workspace.
+ *
+ * This tab appears alongside the native tabs (Design, Composition, etc.) when editing
+ * a document type in Settings. It provides the UI for configuring block restrictions.
+ *
+ * The condition ensures this view only appears on Document Type workspaces
+ * (not Media Type, Member Type, etc.).
+ */
 export const manifests: Array<UmbExtensionManifest> = [
   {
     type: "workspaceView",
