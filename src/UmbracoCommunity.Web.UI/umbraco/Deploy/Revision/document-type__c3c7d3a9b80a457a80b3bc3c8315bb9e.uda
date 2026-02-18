@@ -1,0 +1,40 @@
+{
+  "Name": "[Composition] Content blocks - article",
+  "Alias": "compositionContentBlocksArticle",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-shape-square color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "63751d9d-11f4-4065-b814-71d2a765b82e",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
+    },
+    {
+      "Key": "73abd112-b3c9-4d6e-8a14-8ab40628f320",
+      "Name": "Content blocks",
+      "SortOrder": 1,
+      "Alias": "content/contentBlocks",
+      "PropertyTypes": []
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/c3c7d3a9b80a457a80b3bc3c8315bb9e",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/fe113ad3b54c4bb2b7ebc59d5ce1b23d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}

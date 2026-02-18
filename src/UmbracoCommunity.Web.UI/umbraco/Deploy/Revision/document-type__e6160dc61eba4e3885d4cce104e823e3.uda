@@ -13,19 +13,12 @@
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
   "CompositionContentTypes": [
-    "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
     "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
-    "umb://document-type/b457b927e4b44afabc7234d15c15f60b"
+    "umb://document-type/b457b927e4b44afabc7234d15c15f60b",
+    "umb://document-type/c3c7d3a9b80a457a80b3bc3c8315bb9e"
   ],
   "PropertyGroups": [
-    {
-      "Key": "7a0dd83b-6bd2-47d5-8365-d81132920a0d",
-      "Name": "Content",
-      "Type": 1,
-      "Alias": "content",
-      "PropertyTypes": []
-    },
     {
       "Key": "81afe415-d198-479b-a4fe-06c9d8dd7ca3",
       "Name": "Content",
@@ -36,6 +29,20 @@
           "Alias": "teaser",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
           "Name": "Teaser"
+        }
+      ]
+    },
+    {
+      "Key": "ace751fe-3ba7-4bcf-8295-df881778d4c0",
+      "Name": "Content blocks",
+      "SortOrder": 1,
+      "Alias": "content/contentBlocks",
+      "PropertyTypes": [
+        {
+          "Key": "9a99e25a-9b22-406a-a7d1-7b8759c407f9",
+          "Alias": "restrictedBlocks",
+          "DataType": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
+          "Name": "Restricted blocks"
         }
       ]
     },
@@ -89,6 +96,13 @@
           "Name": "Thumbnail image"
         }
       ]
+    },
+    {
+      "Key": "e795ea81-7d1b-489c-93a3-0ea172e1d6ec",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
     }
   ],
   "PropertyTypes": [],
@@ -96,6 +110,10 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0ebf9c6de56b464a9715676aebb61a4f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
       "Ordering": true
     },
     {
@@ -127,10 +145,6 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
       "Ordering": true
     },
@@ -140,6 +154,10 @@
     },
     {
       "Udi": "umb://document-type/b457b927e4b44afabc7234d15c15f60b",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/c3c7d3a9b80a457a80b3bc3c8315bb9e",
       "Ordering": true
     },
     {
