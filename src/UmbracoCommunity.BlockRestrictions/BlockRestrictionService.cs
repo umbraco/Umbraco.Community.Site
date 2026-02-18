@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
 using UmbracoCommunity.BlockRestrictions.Infrastructure;
@@ -12,23 +13,53 @@ public class BlockRestrictionService
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
+    private readonly IMemoryCache _cache;
     private readonly ILogger<BlockRestrictionService> _logger;
+
+    private const string ResolvedCachePrefix = "BlockRestriction_Resolved_";
+    private static long _ruleVersion;
+    private static readonly MemoryCacheEntryOptions ResolvedCacheOptions = new()
+    {
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(60)
+    };
 
     public BlockRestrictionService(
         BlockRestrictionStore store,
         IContentService contentService,
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
+        IMemoryCache cache,
         ILogger<BlockRestrictionService> logger)
     {
         _store = store;
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
+        _cache = cache;
         _logger = logger;
     }
 
     public async Task<AllowedBlocksResponse?> ResolveAllowedBlocksForNodeAsync(Guid nodeKey)
+    {
+        var version = Interlocked.Read(ref _ruleVersion);
+        var cacheKey = $"{ResolvedCachePrefix}{version}_{nodeKey}";
+
+        if (_cache.TryGetValue(cacheKey, out AllowedBlocksResponse? cached))
+        {
+            return cached;
+        }
+
+        var result = await ResolveAllowedBlocksForNodeCoreAsync(nodeKey);
+
+        if (result != null)
+        {
+            _cache.Set(cacheKey, result, ResolvedCacheOptions);
+        }
+
+        return result;
+    }
+
+    private async Task<AllowedBlocksResponse?> ResolveAllowedBlocksForNodeCoreAsync(Guid nodeKey)
     {
         var content = _contentService.GetById(nodeKey);
         if (content == null)
@@ -95,13 +126,17 @@ public class BlockRestrictionService
 
     public List<Guid> ResolveContentElementTypeKeys(List<string> aliases)
     {
-        var keys = new List<Guid>();
+        var aliasSet = new HashSet<string>(aliases, StringComparer.OrdinalIgnoreCase);
+        var lookup = _contentTypeService.GetAll()
+            .Where(ct => ct.IsElement && aliasSet.Contains(ct.Alias))
+            .ToDictionary(ct => ct.Alias, ct => ct.Key, StringComparer.OrdinalIgnoreCase);
+
+        var keys = new List<Guid>(aliases.Count);
         foreach (var alias in aliases)
         {
-            var contentType = _contentTypeService.Get(alias);
-            if (contentType != null)
+            if (lookup.TryGetValue(alias, out var key))
             {
-                keys.Add(contentType.Key);
+                keys.Add(key);
             }
             else
             {
@@ -114,11 +149,17 @@ public class BlockRestrictionService
     public async Task SaveConfigAsync(Guid documentTypeKey, List<string> allowedAliases)
     {
         await _store.UpsertAsync(documentTypeKey, allowedAliases);
+        Interlocked.Increment(ref _ruleVersion);
     }
 
     public async Task<bool> DeleteConfigAsync(Guid documentTypeKey)
     {
-        return await _store.DeleteAsync(documentTypeKey);
+        var deleted = await _store.DeleteAsync(documentTypeKey);
+        if (deleted)
+        {
+            Interlocked.Increment(ref _ruleVersion);
+        }
+        return deleted;
     }
 
     public List<ElementTypeInfo> GetAllElementTypes()

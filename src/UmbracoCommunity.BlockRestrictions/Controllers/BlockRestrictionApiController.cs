@@ -13,6 +13,7 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     }
 
     [HttpGet("allowed-blocks/{nodeKey:guid}")]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> GetAllowedBlocks(Guid nodeKey)
     {
         var result = await _service.ResolveAllowedBlocksForNodeAsync(nodeKey);
@@ -49,6 +50,7 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     }
 
     [HttpGet("element-types")]
+    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
     public IActionResult GetElementTypes()
     {
         var result = _service.GetAllElementTypes();
@@ -56,6 +58,7 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     }
 
     [HttpGet("block-data-types")]
+    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Client)]
     public async Task<IActionResult> GetBlockDataTypes()
     {
         var result = await _service.GetBlockDataTypes();

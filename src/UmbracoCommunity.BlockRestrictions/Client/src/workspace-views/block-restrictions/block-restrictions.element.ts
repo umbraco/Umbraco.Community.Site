@@ -304,7 +304,7 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
             </div>`
           : nothing}
         <div class="block-list-header">
-          <span class="count">${selectedCount} of ${filtered.length} block types selected</span>
+          <span class="count" role="status" aria-live="polite">${selectedCount} of ${filtered.length} block types selected</span>
           <div class="filter-bar">
             <uui-input
               label="Filter block types"
@@ -327,7 +327,7 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
             >Deselect all</uui-button>
           </div>
         </div>
-        <div class="block-list">
+        <div class="block-list" tabindex="0" aria-label="Block types">
           ${filtered.map(
             (et) => html`
               <uui-checkbox
@@ -341,7 +341,7 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
                   )}
               >
                 <span class="block-item-content">
-                  <umb-icon name=${et.icon}></umb-icon>
+                  <umb-icon name=${et.icon} aria-hidden="true"></umb-icon>
                   <span class="block-name">${et.name}</span>
                   <span class="block-alias">${et.alias}</span>
                 </span>

@@ -86,13 +86,21 @@ Key methods:
 
 The core restriction resolution logic used by the property editors at content editing time:
 
-1. Looks up the content node by key via `IContentService`
-2. Gets the node's content type and checks for a restriction rule
-3. If no rule found, walks up the content tree via `ParentId` (setting `InheritedFromAncestor = true`)
-4. At each ancestor, checks the document type key against stored rules
-5. When a rule is found, resolves the allowed aliases to content element type GUIDs via `IContentTypeService`
-6. Returns `AllowedBlocksResponse` with `HasRestrictions = true`, the allowed keys, and inheritance info
-7. If no rule found at any level, returns `HasRestrictions = false` (fail-open)
+1. Checks `IMemoryCache` for a previously resolved result (keyed by node key + rule version)
+2. On cache miss, looks up the content node by key via `IContentService`
+3. Gets the node's content type and checks for a restriction rule
+4. If no rule found, walks up the content tree via `ParentId` (setting `InheritedFromAncestor = true`)
+5. At each ancestor, checks the document type key against stored rules
+6. When a rule is found, resolves the allowed aliases to content element type GUIDs via a single batched `IContentTypeService.GetAll()` call with dictionary lookup
+7. Returns `AllowedBlocksResponse` with `HasRestrictions = true`, the allowed keys, and inheritance info
+8. If no rule found at any level, returns `HasRestrictions = false` (fail-open)
+9. Caches the result with a 60-second absolute expiration
+
+**Cache invalidation**: A static `_ruleVersion` counter is included in cache keys. When any rule is saved or deleted, the counter is incremented via `Interlocked.Increment`, which naturally invalidates all cached resolved results without needing prefix-based cache eviction. Old entries expire via TTL.
+
+#### `ResolveContentElementTypeKeys(List<string> aliases)`
+
+Resolves element type aliases to GUIDs using a single `IContentTypeService.GetAll()` call, filtering to matching element types and building a dictionary for O(1) lookup per alias. Logs a warning for any alias that doesn't resolve.
 
 #### `GetBlockDataTypes()`
 
@@ -108,14 +116,16 @@ Base URL: `/umbraco/umbracocommunityblockrestrictions/api/v1`
 
 Secured with `[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]`.
 
-| Method | Route | Purpose |
-|---|---|---|
-| `GET` | `allowed-blocks/{nodeKey:guid}` | Resolve effective restrictions for a content node (walks up tree). Returns 404 if node not found. |
-| `GET` | `rules/{docTypeKey:guid}` | Get restriction rule for a specific document type. Returns empty body if no rule exists. |
-| `PUT` | `rules/{docTypeKey:guid}` | Create or update a restriction rule. Body: `{ "allowedBlockAliases": ["alias1", "alias2"] }` |
-| `DELETE` | `rules/{docTypeKey:guid}` | Delete a restriction rule (returns to inheritance). 404 if no rule existed. |
-| `GET` | `element-types` | List all element types (for the workspace view checklist). |
-| `GET` | `block-data-types` | List restricted block data types with their configured content element type keys. |
+| Method | Route | Response cache | Purpose |
+|---|---|---|---|
+| `GET` | `allowed-blocks/{nodeKey:guid}` | 60s (client) | Resolve effective restrictions for a content node (walks up tree). Returns 404 if node not found. |
+| `GET` | `rules/{docTypeKey:guid}` | — | Get restriction rule for a specific document type. Returns empty body if no rule exists. |
+| `PUT` | `rules/{docTypeKey:guid}` | — | Create or update a restriction rule. Body: `{ "allowedBlockAliases": ["alias1", "alias2"] }` |
+| `DELETE` | `rules/{docTypeKey:guid}` | — | Delete a restriction rule (returns to inheritance). 404 if no rule existed. |
+| `GET` | `element-types` | 300s (client) | List all element types (for the workspace view checklist). |
+| `GET` | `block-data-types` | 300s (client) | List restricted block data types with their configured content element type keys. |
+
+Read-only endpoints use `[ResponseCache(Location = ResponseCacheLocation.Client)]` to set `Cache-Control: private, max-age=N` headers, allowing the browser to serve cached responses for the same backoffice user without re-fetching. Write endpoints (`PUT`, `DELETE`) have no response caching.
 
 ## Frontend
 
@@ -197,17 +207,61 @@ block-grid-restricted (our element, light DOM)
 
 8. **Value forwarding** — listens for `property-value-change` events from the inner element and re-dispatches them with `bubbles: true, composed: true` so the Umbraco property system receives the updates.
 
+9. **Restriction info banner** — when restrictions are active, renders an accessible status banner (`role="status"`) above the block editor showing "Block types are restricted" with optional inheritance source. The decorative filter icon uses `aria-hidden="true"`.
+
 ### Workspace view element (`block-restrictions.element.ts`)
 
 The configuration UI rendered on the **Blocks** tab of each document type. Features:
 
 - **Restrictions toggle** — enable/disable restrictions for this document type. When off, shows messaging about inheritance.
-- **Block type checklist** — scrollable list of all element types with checkbox selection, icons, names, and aliases.
+- **Block type checklist** — scrollable, keyboard-focusable list (`tabindex="0"`, `aria-label="Block types"`) of all element types with checkbox selection, icons, names, and aliases. Decorative icons use `aria-hidden="true"`.
+- **Live selection count** — "X of Y block types selected" uses `role="status"` and `aria-live="polite"` so screen readers announce changes when filters or checkboxes are updated.
 - **Filter by data type dropdown** — shows only restricted Block Grid/List data types. Selecting one narrows the checklist to only show element types configured on that data type.
 - **Text search** — filters the checklist by name or alias.
 - **Select/Deselect all** — scoped to the current filter (data type + text search).
 - **Visibility toggles** — "Show settings types" and "Show composition types" to show/hide element types prefixed with "settings" or "composition" (hidden by default).
 - **Save** — persists the rule via `PUT /rules/{docTypeKey}` or removes it via `DELETE /rules/{docTypeKey}` when toggled off.
+
+## Performance
+
+### Two-tier caching
+
+Restriction resolution uses two layers of caching to minimise database and service calls:
+
+1. **Store-level cache** (`BlockRestrictionStore`) — individual rules are cached in `IMemoryCache` with a 30-minute sliding expiration per document type key. Invalidated on upsert/delete.
+
+2. **Service-level cache** (`BlockRestrictionService`) — fully resolved `AllowedBlocksResponse` objects are cached with a 60-second absolute expiration per content node key. Cache keys include a static rule version counter, so any rule change (save or delete) instantly invalidates all resolved results via `Interlocked.Increment`.
+
+This means a page with multiple restricted block editors makes the full tree walk only once per minute, and subsequent property editors on the same page serve from cache.
+
+### Batched alias resolution
+
+`ResolveContentElementTypeKeys` loads all element types in a single `IContentTypeService.GetAll()` call and builds a dictionary for O(1) lookup per alias. This replaces the previous N individual `Get(alias)` calls, reducing service calls from N to 1 regardless of how many aliases a rule contains.
+
+### Browser response caching
+
+Read-only endpoints set `Cache-Control: private, max-age=N` via `[ResponseCache]`:
+
+- `allowed-blocks`: 60 seconds — prevents re-fetching when navigating back to the same content node
+- `element-types` and `block-data-types`: 300 seconds — these change infrequently (only when document types or data types are added/removed)
+
+Write endpoints (`PUT /rules`, `DELETE /rules`) have no response caching.
+
+## Accessibility
+
+The package targets **WCAG 2.1 Level AA** to align with the main site's accessibility standards.
+
+### Property editor info banners
+
+- The "Block types are restricted" banner uses `role="status"` so screen readers announce it when the editor loads
+- The decorative filter icon uses `aria-hidden="true"` to prevent screen readers from announcing it, following the project's icon accessibility convention
+
+### Workspace view
+
+- **Keyboard-scrollable block list** — the scrollable checklist has `tabindex="0"` and `aria-label="Block types"` so keyboard users can focus and scroll it (WCAG 2.1.1)
+- **Live region for selection count** — the "X of Y block types selected" counter uses `role="status"` and `aria-live="polite"` so screen readers announce changes when filters or checkboxes are updated (WCAG 4.1.3)
+- **Decorative icons hidden** — all `<umb-icon>` elements in the block type checklist use `aria-hidden="true"` (WCAG 1.1.1)
+- **Form controls labelled** — all inputs, selects, toggles, and buttons have explicit `label` attributes via UUI component properties
 
 ## Key design decisions
 
