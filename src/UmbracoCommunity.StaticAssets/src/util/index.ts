@@ -1,10 +1,4 @@
-export * from "./colors.js";
 export { default as Cookie } from "./cookie.js";
-export * from "./prepare-heading-html.js";
-export * from "./get-partnership-color.js";
-export * from "./partnership-levels.enum.js";
 export * from "./utm-helper.js";
 export { default as UtmParams } from "./utm-helper.js";
-export * from "./country-currency-mapping.enum.js";
-export * from "./currency-locale-mapping.enum.js";
 export { default as LocaleResolver } from "./locale-resolver.js";
