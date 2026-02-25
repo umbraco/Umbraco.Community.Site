@@ -1034,10 +1034,11 @@ export class SessionizeProgramElement extends LitElement {
             }
           }
           const isShortBreak = isBreakOrActivity && durationMinutes <= 15;
+          const isShortSession = !isShortBreak && durationMinutes <= 30;
 
           return html`
             <div
-              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""}"
+              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""} ${isShortSession ? "short-session" : ""}"
               style="top: ${position.top}%; height: ${position.height}%;"
               @click=${() => this.#openSessionDialog(session)}
               role="button"
@@ -1693,6 +1694,7 @@ export class SessionizeProgramElement extends LitElement {
       position: absolute;
       left: 4px;
       right: 4px;
+      min-height: 100px;
       padding: 0.5rem;
       background: var(--color-white, #fff);
       border: 1px solid var(--color-blue, #3544b1);
@@ -1704,6 +1706,7 @@ export class SessionizeProgramElement extends LitElement {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      z-index: 1;
     }
 
     .timeline-session:hover {
@@ -1717,7 +1720,27 @@ export class SessionizeProgramElement extends LitElement {
       border-left-color: var(--color-grey, #d1d5db);
     }
 
+    .timeline-session.short-session {
+      min-height: 95px;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .timeline-session.short-session .session-title {
+      font-size: 0.73rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-speakers {
+      font-size: 0.65rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-time {
+      font-size: 0.65rem;
+    }
+
     .timeline-session.short-break {
+      min-height: 0;
       flex-direction: row;
       align-items: center;
       justify-content: center;
