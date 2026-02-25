@@ -66,6 +66,10 @@ public class SessionizeApiClient
                 throw new InvalidOperationException("Sessionize API returned an unexpected response format.");
             }
 
+            allData.PronounsQuestionId = allData.Questions
+                .FirstOrDefault(q => q.Question.Contains("Pronouns", StringComparison.OrdinalIgnoreCase))
+                ?.Id;
+
             _cache.Set(cacheKey, allData, TimeSpan.FromMinutes(_options.CacheDurationInMinutes));
 
             _logger.LogInformation(
@@ -89,10 +93,9 @@ public class SessionizeApiClient
         var allData = await GetAllDataAsync(cancellationToken);
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        var pronounsQuestionId = FindPronounsQuestionId(allData.Questions);
 
         return allData.Sessions
-            .Select(raw => MapToSession(raw, speakerLookup, sessionLookup, pronounsQuestionId))
+            .Select(raw => MapToSession(raw, speakerLookup, sessionLookup, allData.PronounsQuestionId))
             .ToList();
     }
 
@@ -103,9 +106,8 @@ public class SessionizeApiClient
     {
         var allData = await GetAllDataAsync(cancellationToken);
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        var pronounsQuestionId = FindPronounsQuestionId(allData.Questions);
 
-        return allData.Speakers.Select(raw => MapToSpeaker(raw, sessionLookup, pronounsQuestionId)).ToList();
+        return allData.Speakers.Select(raw => MapToSpeaker(raw, sessionLookup, allData.PronounsQuestionId)).ToList();
     }
 
     /// <summary>
@@ -134,7 +136,6 @@ public class SessionizeApiClient
         var allData = await GetAllDataAsync(cancellationToken);
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var rawSessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        var pronounsQuestionId = FindPronounsQuestionId(allData.Questions);
 
         // Sort rooms once and cache the list
         var sortedRooms = allData.Rooms.OrderBy(r => r.Sort).ToList();
@@ -142,7 +143,7 @@ public class SessionizeApiClient
         // Pre-map all sessions to avoid repeated mapping
         var sessionLookup = allData.Sessions.ToDictionary(
             s => s.Id,
-            s => MapToSession(s, speakerLookup, rawSessionLookup, pronounsQuestionId));
+            s => MapToSession(s, speakerLookup, rawSessionLookup, allData.PronounsQuestionId));
 
         // Group sessions by date, then by time slot
         var sessionsByDate = allData.Sessions
@@ -231,8 +232,7 @@ public class SessionizeApiClient
         if (rawSpeaker == null) return null;
 
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        var pronounsQuestionId = FindPronounsQuestionId(allData.Questions);
-        return MapToSpeaker(rawSpeaker, sessionLookup, pronounsQuestionId);
+        return MapToSpeaker(rawSpeaker, sessionLookup, allData.PronounsQuestionId);
     }
 
     /// <summary>
@@ -246,8 +246,7 @@ public class SessionizeApiClient
 
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        var pronounsQuestionId = FindPronounsQuestionId(allData.Questions);
-        return MapToSession(rawSession, speakerLookup, sessionLookup, pronounsQuestionId);
+        return MapToSession(rawSession, speakerLookup, sessionLookup, allData.PronounsQuestionId);
     }
 
     /// <summary>
@@ -268,13 +267,6 @@ public class SessionizeApiClient
     {
         _cache.Remove($"sessionize_all_{_options.EventId}");
         _logger.LogInformation("Cleared Sessionize cache for event {EventId}", _options.EventId);
-    }
-
-    private static int? FindPronounsQuestionId(List<SessionizeQuestion> questions)
-    {
-        return questions
-            .FirstOrDefault(q => q.Question.Contains("Pronouns", StringComparison.OrdinalIgnoreCase))
-            ?.Id;
     }
 
     private static SessionizeSpeaker MapToSpeaker(SessionizeSpeakerRaw raw, Dictionary<string, SessionizeSessionRaw> sessionLookup, int? pronounsQuestionId)

@@ -21,6 +21,12 @@ public class SessionizeAllData
 
     [JsonPropertyName("rooms")]
     public List<SessionizeRoomInfo> Rooms { get; set; } = new();
+
+    /// <summary>
+    /// Cached question ID for the "Pronouns" question, resolved once after deserialization.
+    /// </summary>
+    [JsonIgnore]
+    public int? PronounsQuestionId { get; set; }
 }
 
 /// <summary>
