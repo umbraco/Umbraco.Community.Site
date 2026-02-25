@@ -519,6 +519,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
         display: block;
         max-width: 850px;
         width: 100%;
+        text-align: left;
       }
 
       .session-dialog-content {
@@ -799,20 +800,26 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       .sidebar-tags {
         display: flex;
         flex-wrap: wrap;
+        justify-content: flex-start;
         gap: var(--unit-xs, 0.5rem);
       }
 
       .hashtag {
         display: inline-block;
+        text-align: left;
         padding: 0.2rem 0.5rem;
         background: transparent;
         border: 1px solid var(--color-blue, #3544b1);
         border-radius: var(--border-radius, 4px);
         color: var(--color-blue, #3544b1);
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 500;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .hashtag:hover {
