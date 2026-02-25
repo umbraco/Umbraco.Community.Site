@@ -247,7 +247,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
             `
           )}
           <div class="speaker-info">
-            <h2 class="speaker-name">${this.speaker.fullName}</h2>
+            <h2 class="speaker-name">
+              ${this.speaker.fullName}
+              ${when(
+                this.speaker.pronouns,
+                () => html`<span class="speaker-pronouns">${this.speaker!.pronouns}</span>`
+              )}
+            </h2>
             ${when(
               this.speaker.tagLine,
               () => html`<p class="speaker-tagline">${this.speaker!.tagLine}</p>`
@@ -318,6 +324,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
         font-size: 1.5rem;
         color: var(--color-dark, #1b264f);
         text-align: left;
+      }
+
+      .speaker-pronouns {
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--color-dark-grey, #6b7280);
+        margin-left: 0.35rem;
       }
 
       .speaker-tagline {

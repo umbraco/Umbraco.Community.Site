@@ -133,6 +133,10 @@ export class SessionizeSpeakersElement extends LitElement {
         )}
         <p class="speaker-name">${speaker.fullName}</p>
         ${when(
+            speaker.pronouns,
+            () => html`<p class="speaker-pronouns">${speaker.pronouns}</p>`
+          )}
+        ${when(
             speaker.tagLine,
             () => html`<p class="speaker-tagline">${speaker.tagLine}</p>`
           )}
@@ -243,6 +247,13 @@ export class SessionizeSpeakersElement extends LitElement {
             font-weight: bold;
             font-size: var(--font-size-large);
             margin: 1rem 0 0;
+            text-align: center;
+        }
+
+        .speaker-pronouns {
+            font-size: var(--font-size-sm);
+            color: var(--color-dark-grey, #6b7280);
+            margin: 0.25rem 0 0;
             text-align: center;
         }
 

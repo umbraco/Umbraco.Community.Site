@@ -25,6 +25,9 @@ public class SessionizeSpeaker
     [JsonPropertyName("profilePicture")]
     public string? ProfilePicture { get; set; }
 
+    [JsonPropertyName("pronouns")]
+    public string? Pronouns { get; set; }
+
     [JsonPropertyName("isTopSpeaker")]
     public bool IsTopSpeaker { get; set; }
 
