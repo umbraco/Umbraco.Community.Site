@@ -332,8 +332,38 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
     `;
   }
 
+  #getAudienceCategoryId(): number | null {
+    const cat = this.categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    return cat?.id ?? null;
+  }
+
+  #getSessionAudienceLabel(): "Business" | "Technical" | null {
+    if (!this.session) return null;
+    const audienceCategory = this.categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    if (!audienceCategory) return null;
+
+    const businessItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "business"
+    );
+    const technicalItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "technical"
+    );
+
+    const hasBusiness = businessItem && this.session.categoryItems.includes(businessItem.id);
+    const hasTechnical = technicalItem && this.session.categoryItems.includes(technicalItem.id);
+
+    if (hasBusiness === hasTechnical) return null;
+    return hasBusiness ? "Business" : "Technical";
+  }
+
   #renderSidebarHashtags() {
     if (!this.session?.categoryItems?.length || !this.categories.length) return nothing;
+
+    const audienceCategoryId = this.#getAudienceCategoryId();
 
     const tags = this.session.categoryItems
       .map((id) => {
@@ -343,29 +373,53 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
             info.name.toLowerCase().includes("regular talk")) {
           return null;
         }
+        // Exclude audience filter items from topic hashtags
+        if (audienceCategoryId !== null) {
+          const cat = this.categories.find((c) => c.id === audienceCategoryId);
+          if (cat?.items.some((i) => i.id === id)) return null;
+        }
         return { id, name: info.name };
       })
       .filter((t): t is { id: number; name: string } => t !== null);
 
-    if (!tags.length) return nothing;
+    const audienceLabel = this.#getSessionAudienceLabel();
+
+    if (!tags.length && !audienceLabel) return nothing;
 
     return html`
-      <div class="sidebar-section tags-section">
-        <h3>Topics</h3>
-        <div class="sidebar-tags">
-          ${tags.map(
-            (tag) => html`
-              <button
-                class="hashtag"
-                @click=${(e: Event) => this.#onHashtagClick(tag.id, tag.name, e)}
-                title="Filter by ${tag.name}"
-              >
-                #${tag.name}
-              </button>
-            `
-          )}
-        </div>
-      </div>
+      ${when(
+        tags.length,
+        () => html`
+          <div class="sidebar-section tags-section">
+            <h3>Topics</h3>
+            <div class="sidebar-tags">
+              ${tags.map(
+                (tag) => html`
+                  <button
+                    class="hashtag"
+                    @click=${(e: Event) => this.#onHashtagClick(tag.id, tag.name, e)}
+                    title="Filter by ${tag.name}"
+                  >
+                    #${tag.name}
+                  </button>
+                `
+              )}
+            </div>
+          </div>
+        `
+      )}
+      ${when(
+        audienceLabel,
+        () => html`
+          <div class="sidebar-section audience-section">
+            <h3>Audience</h3>
+            <p class="audience-description">${audienceLabel === "Business"
+              ? "Business sessions focus on strategy, growth, leadership, marketing, client relations, and real-world case stories. Perfect for decision-makers, project managers, digital strategists, and anyone interested in the business side of working with Umbraco."
+              : "Technical sessions are designed for developers and technical profiles who want hands-on insights, practical solutions, and deep dives into tools, features, and best practices within Umbraco."
+            }</p>
+          </div>
+        `
+      )}
     `;
   }
 
@@ -836,6 +890,13 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       .hashtag:hover {
         background: var(--color-blue, #3544b1);
         color: var(--color-white, #fff);
+      }
+
+      .audience-description {
+        margin: 0;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--color-dark-grey, #707070);
       }
 
       @media (max-width: 600px) {
