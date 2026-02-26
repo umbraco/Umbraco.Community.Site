@@ -12,7 +12,8 @@ import type {
   EventScheduleEvent,
 } from "./types.js";
 
-const HOUR_HEIGHT = 60;
+const HOUR_HEIGHT = 40;
+const EVENT_GAP = 2;
 
 /**
  * Parses a hex color string (e.g. "#ff8800" or "#f80") into [r, g, b].
@@ -69,16 +70,36 @@ interface LayoutedEvent {
 function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
   if (events.length === 0) return [];
 
-  const sorted = [...events].sort(
-    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
-  );
+  // Sort by start time, then by columnIndex so preferred column is tried first
+  const sorted = [...events].sort((a, b) => {
+    const timeDiff = timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+    if (timeDiff !== 0) return timeDiff;
+    return (a.columnIndex ?? 0) - (b.columnIndex ?? 0);
+  });
 
-  // Assign each event to the first available column
+  // Assign each event to its preferred column, or first available
   const columns: { endMinutes: number; events: EventScheduleEvent[] }[] = [];
   const eventColumnMap = new Map<string, number>();
 
   for (const event of sorted) {
     const startMin = timeToMinutes(event.startTime);
+    const preferred = event.columnIndex ?? -1;
+
+    // Try preferred column first
+    if (preferred >= 0) {
+      // Ensure columns array is large enough
+      while (columns.length <= preferred) {
+        columns.push({ endMinutes: 0, events: [] });
+      }
+      if (columns[preferred].endMinutes <= startMin) {
+        columns[preferred].endMinutes = timeToMinutes(event.endTime);
+        columns[preferred].events.push(event);
+        eventColumnMap.set(event.id, preferred);
+        continue;
+      }
+    }
+
+    // Fall back to first available column
     let placed = false;
     for (let col = 0; col < columns.length; col++) {
       if (columns[col].endMinutes <= startMin) {
@@ -103,7 +124,6 @@ function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
   for (const event of sorted) {
     const startMin = timeToMinutes(event.startTime);
     const endMin = timeToMinutes(event.endTime);
-    // Count columns that have at least one event overlapping this event's time
     let overlappingColumns = 0;
     for (const col of columns) {
       const hasOverlap = col.events.some((e) => {
@@ -130,6 +150,9 @@ export class EventSchedulePreviewElement extends LitElement {
 
   @property({ type: Array })
   venues: EventScheduleVenue[] = [];
+
+  @property({ type: Number })
+  selectedDayIndex = -1;
 
   #getVenueColor(venueAlias: string): string {
     const venue = this.venues.find((v) => v.alias === venueAlias);
@@ -171,10 +194,10 @@ export class EventSchedulePreviewElement extends LitElement {
     const scheduleStartMinutes = this.schedule.settings.startHour * 60;
     const startMinutes = timeToMinutes(event.startTime);
     const endMinutes = timeToMinutes(event.endTime);
-    const topPx = ((startMinutes - scheduleStartMinutes) / 60) * HOUR_HEIGHT;
-    const heightPx = ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT;
+    const topPx = ((startMinutes - scheduleStartMinutes) / 60) * HOUR_HEIGHT + EVENT_GAP;
+    const heightPx = ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT - EVENT_GAP * 2;
     const bgColor = this.#getVenueColor(event.venueAlias);
-    const textColor = isLightColor(bgColor) ? "#1b264f" : "#ffffff";
+    const textColor = isLightColor(bgColor) ? "#283a97" : "#ffffff";
 
     const widthPct = 100 / totalColumns;
     const leftPct = column * widthPct;
@@ -204,8 +227,14 @@ export class EventSchedulePreviewElement extends LitElement {
     if (!this.schedule) return nothing;
 
     const hours = this.#getHours();
-    const days = this.schedule.days;
+    const allDays = this.schedule.days;
     const gridHeight = hours.length * HOUR_HEIGHT;
+
+    // Show single day or all days
+    const hasSingleDay = this.selectedDayIndex >= 0 && this.selectedDayIndex < allDays.length;
+    const days = hasSingleDay
+      ? [{ day: allDays[this.selectedDayIndex], dayIndex: this.selectedDayIndex }]
+      : allDays.map((day, dayIndex) => ({ day, dayIndex }));
 
     return html`
       <div class="grid">
@@ -220,7 +249,7 @@ export class EventSchedulePreviewElement extends LitElement {
         </div>
 
         ${days.map(
-          (day, dayIndex) => html`
+          ({ day, dayIndex }) => html`
             <div class="day-column">
               <div class="day-header">${day.label}</div>
               <div class="day-body" style="height: ${gridHeight}px">
@@ -351,7 +380,7 @@ export class EventSchedulePreviewElement extends LitElement {
 
       .event {
         position: absolute;
-        border-radius: 3px;
+        border-radius: 8px;
         padding: 4px 6px;
         overflow: hidden;
         box-sizing: border-box;
@@ -365,15 +394,15 @@ export class EventSchedulePreviewElement extends LitElement {
 
       .event-title {
         font-weight: 600;
-        white-space: nowrap;
+        font-size: 12px;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .event-subtitle {
         font-weight: 400;
+        font-style: italic;
         opacity: 0.85;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }

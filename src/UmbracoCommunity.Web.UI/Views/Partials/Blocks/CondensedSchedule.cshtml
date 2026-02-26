@@ -1,0 +1,16 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UmbracoCommunity.Web.Models.PublishedModels.CondensedSchedule>>
+@{
+    var scheduleJson = Model?.Content?.EventSchedule?.RootElement.GetRawText() ?? "";
+}
+
+@if (!string.IsNullOrWhiteSpace(scheduleJson))
+{
+    <dc-event-schedule data="@Html.Raw(System.Web.HttpUtility.HtmlAttributeEncode(scheduleJson))"></dc-event-schedule>
+}
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <div class="sessionize-msg">
+        <p>-- Condensed schedule will render on the frontend --</p>
+    </div>
+}

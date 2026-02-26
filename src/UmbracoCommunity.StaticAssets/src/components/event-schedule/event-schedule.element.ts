@@ -23,6 +23,7 @@ interface EventScheduleEvent {
   endTime: string; // HH:mm
   venueAlias: string;
   notIncludedInTicket: boolean;
+  columnIndex?: number;
 }
 
 interface EventScheduleSettings {
@@ -121,15 +122,32 @@ interface LayoutedEvent {
 function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
   if (events.length === 0) return [];
 
-  const sorted = [...events].sort(
-    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
-  );
+  // Sort by start time, then by columnIndex so preferred column is tried first
+  const sorted = [...events].sort((a, b) => {
+    const timeDiff = timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+    if (timeDiff !== 0) return timeDiff;
+    return (a.columnIndex ?? 0) - (b.columnIndex ?? 0);
+  });
 
   const columns: { endMinutes: number; events: EventScheduleEvent[] }[] = [];
   const eventColumnMap = new Map<string, number>();
 
   for (const event of sorted) {
     const startMin = timeToMinutes(event.startTime);
+    const preferred = event.columnIndex ?? -1;
+
+    if (preferred >= 0) {
+      while (columns.length <= preferred) {
+        columns.push({ endMinutes: 0, events: [] });
+      }
+      if (columns[preferred].endMinutes <= startMin) {
+        columns[preferred].endMinutes = timeToMinutes(event.endTime);
+        columns[preferred].events.push(event);
+        eventColumnMap.set(event.id, preferred);
+        continue;
+      }
+    }
+
     let placed = false;
     for (let col = 0; col < columns.length; col++) {
       if (columns[col].endMinutes <= startMin) {
@@ -174,7 +192,8 @@ function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
 
 // ── Constants ──
 
-const HOUR_HEIGHT = 90; // px per hour on desktop grid
+const HOUR_HEIGHT = 45; // px per hour on desktop grid
+const EVENT_GAP = 3; // px gap between adjacent events
 const TIME_GUTTER_WIDTH = 70; // px
 
 const elementName = "dc-event-schedule";
@@ -247,7 +266,7 @@ export class EventScheduleElement extends LitElement {
   }
 
   #getTextColor(bgHex: string): string {
-    return isLightColor(bgHex) ? "#1b264f" : "#ffffff";
+    return isLightColor(bgHex) ? "#283a97" : "#ffffff";
   }
 
   #getHours(): number[] {
@@ -326,15 +345,13 @@ export class EventScheduleElement extends LitElement {
     const scheduleStartMinutes = this._schedule.settings.startHour * 60;
     const startMinutes = timeToMinutes(event.startTime);
     const endMinutes = timeToMinutes(event.endTime);
-    const topPx = ((startMinutes - scheduleStartMinutes) / 60) * HOUR_HEIGHT;
-    const heightPx = Math.max(((endMinutes - startMinutes) / 60) * HOUR_HEIGHT, 0);
+    const topPx = ((startMinutes - scheduleStartMinutes) / 60) * HOUR_HEIGHT + EVENT_GAP;
+    const heightPx = Math.max(((endMinutes - startMinutes) / 60) * HOUR_HEIGHT - EVENT_GAP * 2, 0);
     const bgColor = this.#getVenueColor(event.venueAlias);
     const textColor = this.#getTextColor(bgColor);
 
     const widthPct = 100 / totalColumns;
     const leftPct = column * widthPct;
-
-    const timeRange = `${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`;
 
     return html`
       <div
@@ -353,66 +370,50 @@ export class EventScheduleElement extends LitElement {
         ${event.subtitle
           ? html`<span class="grid-event-subtitle">${event.subtitle}</span>`
           : nothing}
-        <span class="grid-event-time">${timeRange}</span>
       </div>
     `;
   }
 
   // ── Mobile rendering ──
 
-  #renderMobileTabs() {
-    if (!this._schedule || this._schedule.days.length <= 1) return nothing;
-
-    return html`
-      <div class="mobile-tabs" role="tablist">
-        ${this._schedule.days.map(
-          (day, index) => html`
-            <button
-              role="tab"
-              class="mobile-tab ${index === this._selectedDayIndex ? "active" : ""}"
-              aria-selected=${index === this._selectedDayIndex}
-              @click=${() => this.#selectDay(index)}
-            >
-              ${formatDayLabel(day.date)}
-            </button>
-          `
-        )}
-      </div>
-    `;
-  }
-
-  #renderMobileList() {
+  #renderMobileStacked() {
     if (!this._schedule) return nothing;
 
-    const events = this.#getEventsForDay(this._selectedDayIndex);
-    if (events.length === 0) {
-      return html`<div class="empty-state">No events scheduled for this day.</div>`;
-    }
-
-    // Sort events by start time
-    const sorted = [...events].sort(
-      (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
-    );
-
     return html`
-      <div class="mobile-list">
-        ${sorted.map((event) => {
-          const bgColor = this.#getVenueColor(event.venueAlias);
-          const venueName = this.#getVenueName(event.venueAlias);
-          const timeRange = `${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`;
+      ${this._schedule.days.map((day, dayIndex) => {
+        const events = this.#getEventsForDay(dayIndex);
+        const sorted = [...events].sort(
+          (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+        );
 
-          return html`
-            <div class="mobile-event" style="border-left-color: ${bgColor}">
-              <span class="mobile-event-time">${timeRange}</span>
-              <span class="mobile-event-title">${event.title}${event.notIncludedInTicket ? " *" : ""}</span>
-              ${event.subtitle
-                ? html`<span class="mobile-event-subtitle">${event.subtitle}</span>`
-                : nothing}
-              <span class="mobile-event-venue">${venueName}</span>
-            </div>
-          `;
-        })}
-      </div>
+        return html`
+          <div class="mobile-day">
+            <h3 class="mobile-day-header">${formatDayLabel(day.date)}</h3>
+            ${sorted.length === 0
+              ? html`<p class="mobile-day-empty">No events scheduled.</p>`
+              : html`
+                <div class="mobile-list">
+                  ${sorted.map((event) => {
+                    const bgColor = this.#getVenueColor(event.venueAlias);
+                    const venueName = this.#getVenueName(event.venueAlias);
+                    const timeRange = `${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`;
+
+                    return html`
+                      <div class="mobile-event" style="border-left-color: ${bgColor}">
+                        <span class="mobile-event-time">${timeRange}</span>
+                        <span class="mobile-event-title">${event.title}${event.notIncludedInTicket ? " *" : ""}</span>
+                        ${event.subtitle
+                          ? html`<span class="mobile-event-subtitle">${event.subtitle}</span>`
+                          : nothing}
+                        <span class="mobile-event-venue">${venueName}</span>
+                      </div>
+                    `;
+                  })}
+                </div>
+              `}
+          </div>
+        `;
+      })}
     `;
   }
 
@@ -452,8 +453,7 @@ export class EventScheduleElement extends LitElement {
 
     if (this._isMobile) {
       return html`
-        ${this.#renderMobileTabs()}
-        ${this.#renderMobileList()}
+        ${this.#renderMobileStacked()}
         ${this.#renderLegend()}
       `;
     }
@@ -485,7 +485,7 @@ export class EventScheduleElement extends LitElement {
       flex-shrink: 0;
       width: ${TIME_GUTTER_WIDTH}px;
       border-right: 1px solid var(--color-grey-light, #e5e7eb);
-      background: var(--color-grey-light, #f9f9f9);
+      background: transparent;
     }
 
     .time-label {
@@ -495,7 +495,7 @@ export class EventScheduleElement extends LitElement {
       gap: 2px;
       padding: 4px 8px 0 0;
       box-sizing: border-box;
-      transform: translateY(-9px);
+      transform: translateY(2px);
     }
 
     .time-num {
@@ -509,7 +509,7 @@ export class EventScheduleElement extends LitElement {
       font-size: 0.6rem;
       font-weight: 500;
       line-height: 1;
-      color: var(--color-grey-dark, #6b7280);
+      color: var(--color-identity-dark, #1b264f);
       margin-top: 1px;
     }
 
@@ -539,8 +539,8 @@ export class EventScheduleElement extends LitElement {
       justify-content: center;
       font-weight: 600;
       font-size: 0.9rem;
-      color: var(--color-white, #fff);
-      background: var(--color-identity-blue, #283a97);
+      color: var(--color-identity-dark, #1b264f);
+      background: transparent;
       border-bottom: 1px solid var(--color-grey-light, #e5e7eb);
     }
 
@@ -561,7 +561,7 @@ export class EventScheduleElement extends LitElement {
 
     .grid-event {
       position: absolute;
-      border-radius: var(--border-radius, 6px);
+      border-radius: 10px;
       padding: 6px 8px;
       overflow: hidden;
       box-sizing: border-box;
@@ -578,68 +578,45 @@ export class EventScheduleElement extends LitElement {
     }
 
     .grid-event-title {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 600;
       line-height: 1.3;
       overflow: hidden;
-      /* Allow title to grow and shrink based on available space */
-      flex: 1 1 auto;
-      mask-image: linear-gradient(to bottom, black calc(100% - 0.5rem), transparent 100%);
-      -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 0.5rem), transparent 100%);
     }
 
     .grid-event-subtitle {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 400;
+      font-style: italic;
       opacity: 0.85;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      flex-shrink: 0;
     }
 
-    .grid-event-time {
-      font-size: 0.65rem;
-      font-weight: 500;
-      opacity: 0.75;
-      flex-shrink: 0;
-      margin-top: auto;
+    /* ── Mobile Stacked Days ── */
+
+    .mobile-day {
+      margin-bottom: var(--unit-md, 1.5rem);
     }
 
-    /* ── Mobile Tabs ── */
-
-    .mobile-tabs {
-      display: flex;
-      gap: var(--unit-xs, 0.5rem);
-      overflow-x: auto;
-      padding-bottom: var(--unit-xs, 0.5rem);
-      margin-bottom: var(--unit, 1rem);
-      scrollbar-width: thin;
-      -webkit-overflow-scrolling: touch;
+    .mobile-day:last-child {
+      margin-bottom: 0;
     }
 
-    .mobile-tab {
-      flex-shrink: 0;
-      padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
-      background: transparent;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      white-space: nowrap;
-      color: var(--color-grey-dark, #6b7280);
-      transition: color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .mobile-tab:hover {
-      color: var(--color-identity-dark, #1b264f);
-    }
-
-    .mobile-tab.active {
-      color: var(--color-identity-blue, #283a97);
-      border-bottom-color: var(--color-identity-blue, #283a97);
+    .mobile-day-header {
+      font-size: 1.1rem;
       font-weight: 600;
+      color: var(--color-identity-dark, #1b264f);
+      margin: 0 0 var(--unit-sm, 0.75rem);
+      padding-bottom: var(--unit-xs, 0.5rem);
+      border-bottom: 2px solid var(--color-identity-blue, #283a97);
+    }
+
+    .mobile-day-empty {
+      font-size: 0.9rem;
+      color: var(--color-grey-dark, #6b7280);
+      font-style: italic;
+      margin: 0;
     }
 
     /* ── Mobile Event List ── */

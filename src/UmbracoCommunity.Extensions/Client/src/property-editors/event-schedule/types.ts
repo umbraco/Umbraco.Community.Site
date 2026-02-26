@@ -18,6 +18,7 @@ export interface EventScheduleEvent {
   endTime: string; // HH:mm
   venueAlias: string;
   notIncludedInTicket: boolean;
+  columnIndex?: number; // 0 = left (default), 1 = right
 }
 
 export interface EventScheduleSettings {

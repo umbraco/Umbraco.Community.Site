@@ -60,6 +60,9 @@ export class EventScheduleEditorElement
   @state()
   private _editingDayIndex: number | null = null;
 
+  @state()
+  private _activeDayIndex = 0;
+
   // Form fields for event editing
   @state()
   private _formTitle = "";
@@ -78,6 +81,9 @@ export class EventScheduleEditorElement
 
   @state()
   private _formNotIncludedInTicket = false;
+
+  @state()
+  private _formColumnIndex = 0;
 
   public set config(value: UmbPropertyEditorConfigCollection | undefined) {
     if (!value) return;
@@ -202,6 +208,7 @@ export class EventScheduleEditorElement
     this._formVenueAlias =
       this._venues.length > 0 ? this._venues[0].alias : "";
     this._formNotIncludedInTicket = false;
+    this._formColumnIndex = 0;
   }
 
   #openEditEventForm(event: EventScheduleEvent) {
@@ -213,6 +220,7 @@ export class EventScheduleEditorElement
     this._formEndTime = event.endTime;
     this._formVenueAlias = event.venueAlias;
     this._formNotIncludedInTicket = event.notIncludedInTicket;
+    this._formColumnIndex = event.columnIndex ?? 0;
   }
 
   #cancelForm() {
@@ -235,6 +243,7 @@ export class EventScheduleEditorElement
       endTime: this._formEndTime,
       venueAlias: this._formVenueAlias,
       notIncludedInTicket: this._formNotIncludedInTicket,
+      columnIndex: this._formColumnIndex,
     };
 
     let updatedEvents: EventScheduleEvent[];
@@ -386,6 +395,18 @@ export class EventScheduleEditorElement
               </label>
             `
           : nothing}
+        <label class="form-field">
+          <span class="form-label">Column</span>
+          <select
+            .value=${String(this._formColumnIndex)}
+            @change=${(e: Event) => {
+              this._formColumnIndex = parseInt((e.target as HTMLSelectElement).value, 10);
+            }}
+          >
+            <option value="0" ?selected=${this._formColumnIndex === 0}>Left</option>
+            <option value="1" ?selected=${this._formColumnIndex === 1}>Right</option>
+          </select>
+        </label>
         <label class="form-field-inline">
           <input
             type="checkbox"
@@ -463,44 +484,60 @@ export class EventScheduleEditorElement
     const events = this.#getEventsForDay(dayIndex);
     const isFormOpenForThisDay = this._editingDayIndex === dayIndex;
 
+    const isOpen = dayIndex === this._activeDayIndex;
+
     return html`
-      <div class="day-section">
-        <div class="day-header">
+      <div class="day-section ${isOpen ? "active" : ""}">
+        <div class="day-header" @click=${() => { this._activeDayIndex = isOpen ? -1 : dayIndex; }}>
+          <uui-icon name=${isOpen ? "icon-navigation-down" : "icon-navigation-right"} class="day-toggle"></uui-icon>
           <span class="day-label">${day.label}</span>
+          <span class="day-event-count">${events.length} event${events.length !== 1 ? "s" : ""}</span>
           <input
             type="date"
             .value=${day.date}
             @change=${(e: Event) => this.#changeDayDate(dayIndex, e)}
+            @click=${(e: Event) => e.stopPropagation()}
             class="day-date-input"
           />
           <uui-button
             compact
             look="outline"
-            @click=${() => this.#removeDay(dayIndex)}
+            @click=${(e: Event) => { e.stopPropagation(); this.#removeDay(dayIndex); }}
           >
             <uui-icon name="icon-trash"></uui-icon>
           </uui-button>
         </div>
 
-        ${events.length > 0
+        ${isOpen
           ? html`
-              <div class="event-list">
-                ${events.map((evt) => this.#renderEventItem(evt))}
+              <div class="day-body-content">
+                ${events.length > 0
+                  ? html`
+                      <div class="event-list">
+                        ${events.map((evt) => html`
+                          ${this.#renderEventItem(evt)}
+                          ${this._editingEventId === evt.id ? this.#renderEventForm() : nothing}
+                        `)}
+                      </div>
+                    `
+                  : nothing}
+
+                ${isFormOpenForThisDay && !this._editingEventId
+                  ? this.#renderEventForm()
+                  : !isFormOpenForThisDay
+                    ? html`
+                        <uui-button
+                          compact
+                          look="outline"
+                          @click=${() => this.#openAddEventForm(dayIndex)}
+                        >
+                          <uui-icon name="icon-add"></uui-icon> Add Event
+                        </uui-button>
+                      `
+                    : nothing}
               </div>
             `
           : nothing}
-
-        ${isFormOpenForThisDay
-          ? this.#renderEventForm()
-          : html`
-              <uui-button
-                compact
-                look="outline"
-                @click=${() => this.#openAddEventForm(dayIndex)}
-              >
-                <uui-icon name="icon-add"></uui-icon> Add Event
-              </uui-button>
-            `}
       </div>
     `;
   }
@@ -530,6 +567,7 @@ export class EventScheduleEditorElement
           <event-schedule-preview
             .schedule=${schedule}
             .venues=${this._venues}
+            .selectedDayIndex=${this._activeDayIndex}
           ></event-schedule-preview>
         </div>
       </div>
@@ -630,13 +668,31 @@ export class EventScheduleEditorElement
         display: flex;
         align-items: center;
         gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .day-section.active .day-header {
         margin-bottom: 10px;
+      }
+
+      .day-toggle {
+        font-size: 12px;
+        color: var(--uui-color-text-alt, #888);
+        flex-shrink: 0;
       }
 
       .day-label {
         font-weight: 600;
         font-size: 15px;
         min-width: 60px;
+      }
+
+      .day-event-count {
+        font-size: 12px;
+        color: var(--uui-color-text-alt, #888);
+        margin-right: auto;
+        white-space: nowrap;
       }
 
       .day-date-input {
