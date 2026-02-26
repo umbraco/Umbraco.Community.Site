@@ -286,6 +286,10 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
                     )}
                     <span class="speaker-name">${speaker.fullName}</span>
                     ${when(
+                      speaker.pronouns,
+                      () => html`<span class="speaker-pronouns">${speaker.pronouns}</span>`
+                    )}
+                    ${when(
                       speaker.tagLine,
                       () => html`<span class="speaker-tagline">${speaker.tagLine}</span>`
                     )}
@@ -757,6 +761,12 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
         color: var(--color-dark, #1b264f);
         font-weight: 600;
         line-height: 1.2;
+      }
+
+      .speaker-card .speaker-pronouns {
+        font-size: 0.75rem;
+        color: var(--color-dark-grey, #6b7280);
+        line-height: 1.3;
       }
 
       .speaker-card .speaker-tagline {

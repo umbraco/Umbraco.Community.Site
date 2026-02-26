@@ -7,6 +7,7 @@ export interface SessionizeSpeaker {
   fullName: string;
   bio?: string;
   tagLine?: string;
+  pronouns?: string;
   profilePicture?: string;
   isTopSpeaker: boolean;
   links: SessionizeLink[];
