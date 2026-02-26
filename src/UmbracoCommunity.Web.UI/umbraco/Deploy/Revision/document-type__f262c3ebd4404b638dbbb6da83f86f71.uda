@@ -1,0 +1,37 @@
+{
+  "Name": "Condensed schedule block",
+  "Alias": "condensedSchedule",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-calendar-alt",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/9cee9b328522476097fb6bb755722a95",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "138e0675-c350-47ff-9f58-2a7c463d10a7",
+      "Alias": "eventSchedule",
+      "DataType": "umb://data-type/0bb279e64e3f4779bd39ec9f59a071bb",
+      "Name": "Condensed Schedule",
+      "LabelOnTop": true
+    }
+  ],
+  "Udi": "umb://document-type/f262c3ebd4404b638dbbb6da83f86f71",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0bb279e64e3f4779bd39ec9f59a071bb",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/9cee9b328522476097fb6bb755722a95",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.1"
+}
