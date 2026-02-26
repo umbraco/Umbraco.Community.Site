@@ -56,6 +56,73 @@ function formatHour(hour: number): string {
   return `${display.toString().padStart(2, "0")} ${period}`;
 }
 
+interface LayoutedEvent {
+  event: EventScheduleEvent;
+  column: number;
+  totalColumns: number;
+}
+
+/**
+ * Assigns overlapping events to side-by-side columns within a day.
+ * Returns each event with its column index and the total columns in its group.
+ */
+function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
+  if (events.length === 0) return [];
+
+  const sorted = [...events].sort(
+    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+  );
+
+  // Assign each event to the first available column
+  const columns: { endMinutes: number; events: EventScheduleEvent[] }[] = [];
+  const eventColumnMap = new Map<string, number>();
+
+  for (const event of sorted) {
+    const startMin = timeToMinutes(event.startTime);
+    let placed = false;
+    for (let col = 0; col < columns.length; col++) {
+      if (columns[col].endMinutes <= startMin) {
+        columns[col].endMinutes = timeToMinutes(event.endTime);
+        columns[col].events.push(event);
+        eventColumnMap.set(event.id, col);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      eventColumnMap.set(event.id, columns.length);
+      columns.push({
+        endMinutes: timeToMinutes(event.endTime),
+        events: [event],
+      });
+    }
+  }
+
+  // For each event, find how many columns overlap at its time range
+  const result: LayoutedEvent[] = [];
+  for (const event of sorted) {
+    const startMin = timeToMinutes(event.startTime);
+    const endMin = timeToMinutes(event.endTime);
+    // Count columns that have at least one event overlapping this event's time
+    let overlappingColumns = 0;
+    for (const col of columns) {
+      const hasOverlap = col.events.some((e) => {
+        const eStart = timeToMinutes(e.startTime);
+        const eEnd = timeToMinutes(e.endTime);
+        return eStart < endMin && eEnd > startMin;
+      });
+      if (hasOverlap) overlappingColumns++;
+    }
+    result.push({
+      event,
+      column: eventColumnMap.get(event.id)!,
+      totalColumns: overlappingColumns,
+    });
+  }
+
+  return result;
+}
+
 @customElement("event-schedule-preview")
 export class EventSchedulePreviewElement extends LitElement {
   @property({ type: Object })
@@ -97,9 +164,10 @@ export class EventSchedulePreviewElement extends LitElement {
     `;
   }
 
-  #renderEvent(event: EventScheduleEvent) {
+  #renderEvent(layouted: LayoutedEvent) {
     if (!this.schedule) return nothing;
 
+    const { event, column, totalColumns } = layouted;
     const scheduleStartMinutes = this.schedule.settings.startHour * 60;
     const startMinutes = timeToMinutes(event.startTime);
     const endMinutes = timeToMinutes(event.endTime);
@@ -108,12 +176,17 @@ export class EventSchedulePreviewElement extends LitElement {
     const bgColor = this.#getVenueColor(event.venueAlias);
     const textColor = isLightColor(bgColor) ? "#1b264f" : "#ffffff";
 
+    const widthPct = 100 / totalColumns;
+    const leftPct = column * widthPct;
+
     return html`
       <div
         class="event"
         style="
           top: ${topPx}px;
           height: ${heightPx}px;
+          left: calc(${leftPct}% + 2px);
+          width: calc(${widthPct}% - 4px);
           background-color: ${bgColor};
           color: ${textColor};
         "
@@ -154,8 +227,8 @@ export class EventSchedulePreviewElement extends LitElement {
                 ${hours.map(
                   () => html`<div class="hour-row" style="height: ${HOUR_HEIGHT}px"></div>`
                 )}
-                ${this.#getEventsForDay(dayIndex).map((event) =>
-                  this.#renderEvent(event)
+                ${layoutEvents(this.#getEventsForDay(dayIndex)).map(
+                  (layouted) => this.#renderEvent(layouted)
                 )}
               </div>
             </div>
@@ -278,8 +351,6 @@ export class EventSchedulePreviewElement extends LitElement {
 
       .event {
         position: absolute;
-        left: 2px;
-        right: 2px;
         border-radius: 3px;
         padding: 4px 6px;
         overflow: hidden;

@@ -110,6 +110,68 @@ function formatDayLabel(dateStr: string): string {
   }
 }
 
+// ── Overlap layout ──
+
+interface LayoutedEvent {
+  event: EventScheduleEvent;
+  column: number;
+  totalColumns: number;
+}
+
+function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
+  if (events.length === 0) return [];
+
+  const sorted = [...events].sort(
+    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+  );
+
+  const columns: { endMinutes: number; events: EventScheduleEvent[] }[] = [];
+  const eventColumnMap = new Map<string, number>();
+
+  for (const event of sorted) {
+    const startMin = timeToMinutes(event.startTime);
+    let placed = false;
+    for (let col = 0; col < columns.length; col++) {
+      if (columns[col].endMinutes <= startMin) {
+        columns[col].endMinutes = timeToMinutes(event.endTime);
+        columns[col].events.push(event);
+        eventColumnMap.set(event.id, col);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      eventColumnMap.set(event.id, columns.length);
+      columns.push({
+        endMinutes: timeToMinutes(event.endTime),
+        events: [event],
+      });
+    }
+  }
+
+  const result: LayoutedEvent[] = [];
+  for (const event of sorted) {
+    const startMin = timeToMinutes(event.startTime);
+    const endMin = timeToMinutes(event.endTime);
+    let overlappingColumns = 0;
+    for (const col of columns) {
+      const hasOverlap = col.events.some((e) => {
+        const eStart = timeToMinutes(e.startTime);
+        const eEnd = timeToMinutes(e.endTime);
+        return eStart < endMin && eEnd > startMin;
+      });
+      if (hasOverlap) overlappingColumns++;
+    }
+    result.push({
+      event,
+      column: eventColumnMap.get(event.id)!,
+      totalColumns: overlappingColumns,
+    });
+  }
+
+  return result;
+}
+
 // ── Constants ──
 
 const HOUR_HEIGHT = 90; // px per hour on desktop grid
@@ -245,8 +307,8 @@ export class EventScheduleElement extends LitElement {
                   ${hours.map(
                     () => html`<div class="hour-row" style="height: ${HOUR_HEIGHT}px"></div>`
                   )}
-                  ${this.#getEventsForDay(dayIndex).map((event) =>
-                    this.#renderGridEvent(event)
+                  ${layoutEvents(this.#getEventsForDay(dayIndex)).map(
+                    (layouted) => this.#renderGridEvent(layouted)
                   )}
                 </div>
               </div>
@@ -257,9 +319,10 @@ export class EventScheduleElement extends LitElement {
     `;
   }
 
-  #renderGridEvent(event: EventScheduleEvent) {
+  #renderGridEvent(layouted: LayoutedEvent) {
     if (!this._schedule) return nothing;
 
+    const { event, column, totalColumns } = layouted;
     const scheduleStartMinutes = this._schedule.settings.startHour * 60;
     const startMinutes = timeToMinutes(event.startTime);
     const endMinutes = timeToMinutes(event.endTime);
@@ -267,6 +330,9 @@ export class EventScheduleElement extends LitElement {
     const heightPx = Math.max(((endMinutes - startMinutes) / 60) * HOUR_HEIGHT, 0);
     const bgColor = this.#getVenueColor(event.venueAlias);
     const textColor = this.#getTextColor(bgColor);
+
+    const widthPct = 100 / totalColumns;
+    const leftPct = column * widthPct;
 
     const timeRange = `${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`;
 
@@ -276,6 +342,8 @@ export class EventScheduleElement extends LitElement {
         style="
           top: ${topPx}px;
           height: ${heightPx}px;
+          left: calc(${leftPct}% + 3px);
+          width: calc(${widthPct}% - 6px);
           background-color: ${bgColor};
           color: ${textColor};
         "
@@ -493,8 +561,6 @@ export class EventScheduleElement extends LitElement {
 
     .grid-event {
       position: absolute;
-      left: 3px;
-      right: 3px;
       border-radius: var(--border-radius, 6px);
       padding: 6px 8px;
       overflow: hidden;
