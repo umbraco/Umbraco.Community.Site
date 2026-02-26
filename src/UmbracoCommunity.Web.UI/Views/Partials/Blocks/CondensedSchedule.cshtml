@@ -109,6 +109,7 @@
                                 var et = evt.GetProperty("endTime").GetString() ?? "00:00";
                                 var eParts = et.Split(':');
                                 var endMin = int.Parse(eParts[0]) * 60 + int.Parse(eParts[1]);
+                                if (endMin <= startMin) endMin = endHour * 60;
                                 var preferred = evt.TryGetProperty("columnIndex", out var ci) ? ci.GetInt32() : -1;
 
                                 var placed = false;
@@ -159,6 +160,8 @@
                                 var et2 = evt.GetProperty("endTime").GetString() ?? "00:00";
                                 var eParts2 = et2.Split(':');
                                 var eMin = int.Parse(eParts2[0]) * 60 + int.Parse(eParts2[1]);
+                                var crossesBoundary = eMin <= sMin;
+                                if (crossesBoundary) eMin = endHour * 60;
 
                                 var bgColor = venueColors.GetValueOrDefault(venueAlias, "#ccc");
                                 var txtColor = IsLight(bgColor) ? "#283a97" : "#ffffff";
@@ -176,6 +179,7 @@
                                         var ee = e.GetProperty("endTime").GetString() ?? "00:00";
                                         var eep = ee.Split(':');
                                         var eem = int.Parse(eep[0]) * 60 + int.Parse(eep[1]);
+                                        if (eem <= esm) eem = endHour * 60;
                                         return esm < eMin && eem > sMin;
                                     });
                                     if (hasOverlap) overlapCols++;
@@ -186,7 +190,7 @@
                                 var widthPct = 100.0 / overlapCols;
                                 var leftPct = col * widthPct;
 
-                                <div style="position:absolute; top:@(topPx.ToString("F1"))px; height:@(heightPx.ToString("F1"))px; left:calc(@(leftPct.ToString("F1"))% + 2px); width:calc(@(widthPct.ToString("F1"))% - 4px); background:@bgColor; color:@txtColor; border-radius:8px; padding:3px 5px; overflow:hidden; box-sizing:border-box; line-height:1.3;"
+                                <div style="position:absolute; top:@(topPx.ToString("F1"))px; height:@(heightPx.ToString("F1"))px; left:calc(@(leftPct.ToString("F1"))% + 2px); width:calc(@(widthPct.ToString("F1"))% - 4px); background:@bgColor; color:@txtColor; border-radius:@(crossesBoundary ? "8px 8px 0 0" : "8px"); padding:3px 5px; overflow:hidden; box-sizing:border-box; line-height:1.3;"
                                     title="@title@(string.IsNullOrEmpty(subtitle) ? "" : $" - {subtitle}")">
                                     <div style="font-weight:600; font-size:11px; overflow:hidden;">@title@(notIncluded ? " *" : "")</div>
                                     @if (!string.IsNullOrEmpty(subtitle))

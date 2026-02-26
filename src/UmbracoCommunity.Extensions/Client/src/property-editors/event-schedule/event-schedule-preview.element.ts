@@ -67,8 +67,14 @@ interface LayoutedEvent {
  * Assigns overlapping events to side-by-side columns within a day.
  * Returns each event with its column index and the total columns in its group.
  */
-function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
+function layoutEvents(events: EventScheduleEvent[], endHour: number): LayoutedEvent[] {
   if (events.length === 0) return [];
+
+  const endHourMin = endHour * 60;
+  const clampEnd = (e: EventScheduleEvent): number => {
+    const end = timeToMinutes(e.endTime);
+    return end <= timeToMinutes(e.startTime) ? endHourMin : end;
+  };
 
   // Sort by start time, then by columnIndex so preferred column is tried first
   const sorted = [...events].sort((a, b) => {
@@ -77,7 +83,6 @@ function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
     return (a.columnIndex ?? 0) - (b.columnIndex ?? 0);
   });
 
-  // Assign each event to its preferred column, or first available
   const columns: { endMinutes: number; events: EventScheduleEvent[] }[] = [];
   const eventColumnMap = new Map<string, number>();
 
@@ -85,25 +90,22 @@ function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
     const startMin = timeToMinutes(event.startTime);
     const preferred = event.columnIndex ?? -1;
 
-    // Try preferred column first
     if (preferred >= 0) {
-      // Ensure columns array is large enough
       while (columns.length <= preferred) {
         columns.push({ endMinutes: 0, events: [] });
       }
       if (columns[preferred].endMinutes <= startMin) {
-        columns[preferred].endMinutes = timeToMinutes(event.endTime);
+        columns[preferred].endMinutes = clampEnd(event);
         columns[preferred].events.push(event);
         eventColumnMap.set(event.id, preferred);
         continue;
       }
     }
 
-    // Fall back to first available column
     let placed = false;
     for (let col = 0; col < columns.length; col++) {
       if (columns[col].endMinutes <= startMin) {
-        columns[col].endMinutes = timeToMinutes(event.endTime);
+        columns[col].endMinutes = clampEnd(event);
         columns[col].events.push(event);
         eventColumnMap.set(event.id, col);
         placed = true;
@@ -113,22 +115,21 @@ function layoutEvents(events: EventScheduleEvent[]): LayoutedEvent[] {
     if (!placed) {
       eventColumnMap.set(event.id, columns.length);
       columns.push({
-        endMinutes: timeToMinutes(event.endTime),
+        endMinutes: clampEnd(event),
         events: [event],
       });
     }
   }
 
-  // For each event, find how many columns overlap at its time range
   const result: LayoutedEvent[] = [];
   for (const event of sorted) {
     const startMin = timeToMinutes(event.startTime);
-    const endMin = timeToMinutes(event.endTime);
+    const endMin = clampEnd(event);
     let overlappingColumns = 0;
     for (const col of columns) {
       const hasOverlap = col.events.some((e) => {
         const eStart = timeToMinutes(e.startTime);
-        const eEnd = timeToMinutes(e.endTime);
+        const eEnd = clampEnd(e);
         return eStart < endMin && eEnd > startMin;
       });
       if (hasOverlap) overlappingColumns++;
@@ -192,12 +193,16 @@ export class EventSchedulePreviewElement extends LitElement {
 
     const { event, column, totalColumns } = layouted;
     const scheduleStartMinutes = this.schedule.settings.startHour * 60;
+    const scheduleEndMinutes = this.schedule.settings.endHour * 60;
     const startMinutes = timeToMinutes(event.startTime);
-    const endMinutes = timeToMinutes(event.endTime);
+    const rawEndMinutes = timeToMinutes(event.endTime);
+    const crossesBoundary = rawEndMinutes <= startMinutes;
+    const endMinutes = crossesBoundary ? scheduleEndMinutes : rawEndMinutes;
     const topPx = ((startMinutes - scheduleStartMinutes) / 60) * HOUR_HEIGHT + EVENT_GAP;
     const heightPx = ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT - EVENT_GAP * 2;
     const bgColor = this.#getVenueColor(event.venueAlias);
     const textColor = isLightColor(bgColor) ? "#283a97" : "#ffffff";
+    const borderRadius = crossesBoundary ? "8px 8px 0 0" : "8px";
 
     const widthPct = 100 / totalColumns;
     const leftPct = column * widthPct;
@@ -212,6 +217,7 @@ export class EventSchedulePreviewElement extends LitElement {
           width: calc(${widthPct}% - 4px);
           background-color: ${bgColor};
           color: ${textColor};
+          border-radius: ${borderRadius};
         "
         title="${event.title}${event.subtitle ? ` - ${event.subtitle}` : ""} (${this.#getVenueName(event.venueAlias)})"
       >
@@ -256,7 +262,7 @@ export class EventSchedulePreviewElement extends LitElement {
                 ${hours.map(
                   () => html`<div class="hour-row" style="height: ${HOUR_HEIGHT}px"></div>`
                 )}
-                ${layoutEvents(this.#getEventsForDay(dayIndex)).map(
+                ${layoutEvents(this.#getEventsForDay(dayIndex), this.schedule!.settings.endHour).map(
                   (layouted) => this.#renderEvent(layouted)
                 )}
               </div>
