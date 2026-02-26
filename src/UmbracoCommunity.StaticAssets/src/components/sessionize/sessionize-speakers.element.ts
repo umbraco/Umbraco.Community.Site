@@ -30,6 +30,12 @@ export class SessionizeSpeakersElement extends LitElement {
   @property({ type: Number, attribute: "columns" })
   columns = 4;
 
+  /**
+   * Optional: URL of the program page, used to link session titles
+   */
+  @property({ type: String, attribute: "program-url" })
+  programUrl?: string;
+
   @state()
   private _speakers: SessionizeSpeaker[] = [];
 
@@ -105,6 +111,7 @@ export class SessionizeSpeakersElement extends LitElement {
   #openSpeakerDialog(speaker: SessionizeSpeaker) {
     const dialog = new SessionizeSpeakerDialogElement();
     dialog.speaker = speaker;
+    dialog.programUrl = this.programUrl;
     this.#dialogHandler.open(dialog);
   }
 

@@ -139,6 +139,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       dialog.speaker = speaker;
       dialog.schedule = this.schedule;
       dialog.timezone = this.timezone;
+      dialog.programUrl = window.location.pathname;
       this.#dialogHandler.open(dialog);
     }, 100);
   }
