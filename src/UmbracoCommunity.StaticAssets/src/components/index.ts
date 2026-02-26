@@ -20,3 +20,4 @@ export * from "./carousel/dc-carousel.element.js";
 export * from "./carousel/dc-carousel-controls.element.js";
 export * from "./testimonial-logos.element.js";
 export * from "./sessionize/index.js";
+export * from "./event-schedule/index.js";
