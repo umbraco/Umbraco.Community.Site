@@ -1,0 +1,18 @@
+{
+  "Name": "Event Schedule",
+  "EditorAlias": "Umbraco.Plain.Json",
+  "EditorUiAlias": "UmbracoCommunity.PropertyEditorUi.EventSchedule",
+  "Configuration": {
+    "venues": "[{\u0022alias\u0022: \u0022cph-conference\u0022, \u0022name\u0022: \u0022CPH Conference\u0022, \u0022color\u0022: \u0022#f5c1bc\u0022}, {\u0022alias\u0022: \u0022oksnehallen\u0022, \u0022name\u0022: \u0022\u00D8ksnehallen\u0022, \u0022color\u0022: \u0022#283a97\u0022}, {\u0022alias\u0022: \u0022cph-meatpacking\u0022, \u0022name\u0022: \u0022Copenhagen Meatpacking District\u0022, \u0022color\u0022: \u0022#1b264f\u0022}]"
+  },
+  "Parent": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+  "Udi": "umb://data-type/0bb279e64e3f4779bd39ec9f59a071bb",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}
