@@ -123,6 +123,14 @@ export default class BlockGridRestrictedElement
   /** Whether the auth context has been consumed and the API client configured. */
   private _authReady = false;
 
+  /**
+   * Whether this element is in a content editing context (Content section).
+   * Set to true when UMB_DOCUMENT_WORKSPACE_CONTEXT resolves, which only
+   * happens in the Content section. Prevents API calls when the property
+   * editor is instantiated in Settings (e.g. document type previews).
+   */
+  private _isContentContext = false;
+
   /** Reference to the imperatively-created native block grid element. */
   private _innerElement: HTMLElement | null = null;
 
@@ -208,17 +216,14 @@ export default class BlockGridRestrictedElement
     });
 
     // Consume the document workspace context to get the content type key.
-    // This is needed for new content: the node doesn't exist yet in the database,
-    // so we send the content type key as a fallback for the server to check for
-    // a direct restriction rule on this document type.
+    // This context only exists in the Content section (not in Settings), so its
+    // presence confirms we're editing actual content and should load restrictions.
+    // Also provides the content type key as a fallback for new content nodes.
     this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
       if (!context) return;
+      this._isContentContext = true;
       this._contentTypeKey = context.getContentTypeUnique() ?? undefined;
-      // If restrictions already failed to load (new content scenario), retry
-      // now that we have the content type key as fallback context.
-      if (this._restrictionInfo === null && this._authReady && this._entityKey) {
-        this._loadRestrictions();
-      }
+      this._tryLoad();
     });
 
     // Consume the parent entity context to get the parent node key.
@@ -355,11 +360,12 @@ export default class BlockGridRestrictedElement
   }
 
   /**
-   * Guards the API call until both auth context and entity key are available.
-   * Called by each context consumer — whichever resolves second triggers the load.
+   * Guards the API call until auth, entity key, and content context are all available.
+   * The content context check ensures we only call the API when editing content
+   * (Content section), not when the property editor is instantiated in Settings.
    */
   private _tryLoad() {
-    if (this._authReady && this._entityKey) {
+    if (this._authReady && this._entityKey && this._isContentContext) {
       this._loadRestrictions();
     }
   }

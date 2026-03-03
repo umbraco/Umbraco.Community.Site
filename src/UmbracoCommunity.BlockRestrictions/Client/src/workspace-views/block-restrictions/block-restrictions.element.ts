@@ -164,8 +164,11 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
     });
 
     // Configure the API client with the auth token from Umbraco's auth context.
+    // Guard against null/undefined to prevent clobbering the module-level auth
+    // singleton during workspace transitions (which would cause 401s).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-      const config = authContext?.getOpenApiConfiguration();
+      if (!authContext) return;
+      const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
         token: config?.token ?? undefined,
         baseUrl: config?.base ?? "",

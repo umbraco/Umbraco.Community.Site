@@ -85,6 +85,14 @@ export default class BlockListRestrictedElement
   /** Whether the auth context has been consumed and the API client configured. */
   private _authReady = false;
 
+  /**
+   * Whether this element is in a content editing context (Content section).
+   * Set to true when UMB_DOCUMENT_WORKSPACE_CONTEXT resolves, which only
+   * happens in the Content section. Prevents API calls when the property
+   * editor is instantiated in Settings (e.g. document type previews).
+   */
+  private _isContentContext = false;
+
   /** Reference to the imperatively-created native block list element. */
   private _innerElement: HTMLElement | null = null;
 
@@ -148,14 +156,15 @@ export default class BlockListRestrictedElement
       });
     });
 
-    // Consume document workspace context for content type key (new content fallback).
+    // Consume the document workspace context to get the content type key.
+    // This context only exists in the Content section (not in Settings), so its
+    // presence confirms we're editing actual content and should load restrictions.
+    // Also provides the content type key as a fallback for new content nodes.
     this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
       if (!context) return;
+      this._isContentContext = true;
       this._contentTypeKey = context.getContentTypeUnique() ?? undefined;
-      // Retry if initial load returned null (new content with no fallback context).
-      if (this._restrictionInfo === null && this._authReady && this._entityKey) {
-        this._loadRestrictions();
-      }
+      this._tryLoad();
     });
 
     // Consume parent entity context for parent node key (new content fallback).
@@ -261,9 +270,13 @@ export default class BlockListRestrictedElement
     (this._innerElement as any).value = this.value;
   }
 
-  /** Guards the API call until both auth and entity contexts are ready. */
+  /**
+   * Guards the API call until auth, entity key, and content context are all available.
+   * The content context check ensures we only call the API when editing content
+   * (Content section), not when the property editor is instantiated in Settings.
+   */
   private _tryLoad() {
-    if (this._authReady && this._entityKey) {
+    if (this._authReady && this._entityKey && this._isContentContext) {
       this._loadRestrictions();
     }
   }
