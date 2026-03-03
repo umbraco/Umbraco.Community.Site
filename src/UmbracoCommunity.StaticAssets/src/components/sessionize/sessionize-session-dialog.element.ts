@@ -139,6 +139,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       dialog.speaker = speaker;
       dialog.schedule = this.schedule;
       dialog.timezone = this.timezone;
+      dialog.programUrl = window.location.pathname;
       this.#dialogHandler.open(dialog);
     }, 100);
   }
@@ -286,6 +287,10 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
                     )}
                     <span class="speaker-name">${speaker.fullName}</span>
                     ${when(
+                      speaker.pronouns,
+                      () => html`<span class="speaker-pronouns">${speaker.pronouns}</span>`
+                    )}
+                    ${when(
                       speaker.tagLine,
                       () => html`<span class="speaker-tagline">${speaker.tagLine}</span>`
                     )}
@@ -327,8 +332,38 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
     `;
   }
 
+  #getAudienceCategoryId(): number | null {
+    const cat = this.categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    return cat?.id ?? null;
+  }
+
+  #getSessionAudienceLabel(): "Business" | "Technical" | null {
+    if (!this.session) return null;
+    const audienceCategory = this.categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    if (!audienceCategory) return null;
+
+    const businessItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "business"
+    );
+    const technicalItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "technical"
+    );
+
+    const hasBusiness = businessItem && this.session.categoryItems.includes(businessItem.id);
+    const hasTechnical = technicalItem && this.session.categoryItems.includes(technicalItem.id);
+
+    if (hasBusiness === hasTechnical) return null;
+    return hasBusiness ? "Business" : "Technical";
+  }
+
   #renderSidebarHashtags() {
     if (!this.session?.categoryItems?.length || !this.categories.length) return nothing;
+
+    const audienceCategoryId = this.#getAudienceCategoryId();
 
     const tags = this.session.categoryItems
       .map((id) => {
@@ -338,29 +373,53 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
             info.name.toLowerCase().includes("regular talk")) {
           return null;
         }
+        // Exclude audience filter items from topic hashtags
+        if (audienceCategoryId !== null) {
+          const cat = this.categories.find((c) => c.id === audienceCategoryId);
+          if (cat?.items.some((i) => i.id === id)) return null;
+        }
         return { id, name: info.name };
       })
       .filter((t): t is { id: number; name: string } => t !== null);
 
-    if (!tags.length) return nothing;
+    const audienceLabel = this.#getSessionAudienceLabel();
+
+    if (!tags.length && !audienceLabel) return nothing;
 
     return html`
-      <div class="sidebar-section tags-section">
-        <h3>Topics</h3>
-        <div class="sidebar-tags">
-          ${tags.map(
-            (tag) => html`
-              <button
-                class="hashtag"
-                @click=${(e: Event) => this.#onHashtagClick(tag.id, tag.name, e)}
-                title="Filter by ${tag.name}"
-              >
-                #${tag.name}
-              </button>
-            `
-          )}
-        </div>
-      </div>
+      ${when(
+        tags.length,
+        () => html`
+          <div class="sidebar-section tags-section">
+            <h3>Topics</h3>
+            <div class="sidebar-tags">
+              ${tags.map(
+                (tag) => html`
+                  <button
+                    class="hashtag"
+                    @click=${(e: Event) => this.#onHashtagClick(tag.id, tag.name, e)}
+                    title="Filter by ${tag.name}"
+                  >
+                    #${tag.name}
+                  </button>
+                `
+              )}
+            </div>
+          </div>
+        `
+      )}
+      ${when(
+        audienceLabel,
+        () => html`
+          <div class="sidebar-section audience-section">
+            <h3>Audience</h3>
+            <p class="audience-description">${audienceLabel === "Business"
+              ? "Business sessions focus on strategy, growth, leadership, marketing, client relations, and real-world case stories. Perfect for decision-makers, project managers, digital strategists, and anyone interested in the business side of working with Umbraco."
+              : "Technical sessions are designed for developers and technical profiles who want hands-on insights, practical solutions, and deep dives into tools, features, and best practices within Umbraco."
+            }</p>
+          </div>
+        `
+      )}
     `;
   }
 
@@ -519,6 +578,7 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
         display: block;
         max-width: 850px;
         width: 100%;
+        text-align: left;
       }
 
       .session-dialog-content {
@@ -758,6 +818,12 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
         line-height: 1.2;
       }
 
+      .speaker-card .speaker-pronouns {
+        font-size: 0.75rem;
+        color: var(--color-dark-grey, #6b7280);
+        line-height: 1.3;
+      }
+
       .speaker-card .speaker-tagline {
         font-size: 0.75rem;
         color: var(--color-dark-grey, #6b7280);
@@ -799,25 +865,38 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       .sidebar-tags {
         display: flex;
         flex-wrap: wrap;
+        justify-content: flex-start;
         gap: var(--unit-xs, 0.5rem);
       }
 
       .hashtag {
         display: inline-block;
+        text-align: left;
         padding: 0.2rem 0.5rem;
         background: transparent;
         border: 1px solid var(--color-blue, #3544b1);
         border-radius: var(--border-radius, 4px);
         color: var(--color-blue, #3544b1);
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 500;
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .hashtag:hover {
         background: var(--color-blue, #3544b1);
         color: var(--color-white, #fff);
+      }
+
+      .audience-description {
+        margin: 0;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--color-dark-grey, #707070);
       }
 
       @media (max-width: 600px) {

@@ -413,10 +413,39 @@ export class SessionizeProgramElement extends LitElement {
       return true;
     }
 
-    // OR logic: session matches if it has ANY of the selected category items
-    return this._selectedFilters.some((filter) =>
-      session.categoryItems.includes(filter.id)
+    // Group filters by category: OR within a category, AND across categories
+    const filtersByCategory = new Map<string, SelectedFilter[]>();
+    for (const filter of this._selectedFilters) {
+      const group = filtersByCategory.get(filter.categoryTitle) || [];
+      group.push(filter);
+      filtersByCategory.set(filter.categoryTitle, group);
+    }
+
+    return Array.from(filtersByCategory.values()).every((group) =>
+      group.some((filter) => session.categoryItems.includes(filter.id))
     );
+  }
+
+  #getSessionAudienceLabel(session: SessionizeSession): "Business" | "Technical" | null {
+    const audienceCategory = this._categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    if (!audienceCategory) return null;
+
+    const businessItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "business"
+    );
+    const technicalItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "technical"
+    );
+
+    const hasBusiness = businessItem && session.categoryItems.includes(businessItem.id);
+    const hasTechnical = technicalItem && session.categoryItems.includes(technicalItem.id);
+
+    // Both or neither = all audiences, don't show a label
+    if (hasBusiness === hasTechnical) return null;
+
+    return hasBusiness ? "Business" : "Technical";
   }
 
   #formatDate(dateString: string): string {
@@ -959,7 +988,7 @@ export class SessionizeProgramElement extends LitElement {
     const isDistant = this.#isDistantTimezone();
 
     // Use uniform height for distant timezones, variable for local
-    const hourHeight = 200; // pixels per hour
+    const hourHeight = 260; // pixels per hour
     const earlyHourHeight = isDistant ? hourHeight : 90; // half-height for hours before 9am (Copenhagen time only)
     const earlyHourCutoff = 9;
 
@@ -1034,10 +1063,12 @@ export class SessionizeProgramElement extends LitElement {
             }
           }
           const isShortBreak = isBreakOrActivity && durationMinutes <= 15;
+          const isShortSession = !isShortBreak && durationMinutes <= 30;
+          const audienceLabel = isBreakOrActivity ? null : this.#getSessionAudienceLabel(session);
 
           return html`
             <div
-              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""}"
+              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""} ${isShortSession ? "short-session" : ""}"
               style="top: ${position.top}%; height: ${position.height}%;"
               @click=${() => this.#openSessionDialog(session)}
               role="button"
@@ -1057,7 +1088,13 @@ export class SessionizeProgramElement extends LitElement {
                       speakerNames,
                       () => html`<p class="session-speakers" title=${speakerNames}>${speakerNames}</p>`
                     )}
-                    <p class="session-time">${startTime} - ${endTime}</p>
+                    <div class="session-footer">
+                      <p class="session-time">${startTime} - ${endTime}</p>
+                      ${when(
+                        audienceLabel,
+                        () => html`<span class="audience-badge">${audienceLabel!.toLowerCase()}</span>`
+                      )}
+                    </div>
                   `
               }
             </div>
@@ -1088,6 +1125,7 @@ export class SessionizeProgramElement extends LitElement {
                   .filter((room) => room.session && this.#filteredSessionIds.has(room.session.id))
                   .map((room) => {
                     const isBreakOrActivity = room.session?.isServiceSession || room.session?.categoryItems.length === 0;
+                    const audienceLabel = isBreakOrActivity ? null : this.#getSessionAudienceLabel(room.session!);
                     return html`
                       <div
                         class="mobile-session-card ${isBreakOrActivity ? "service-session" : ""}"
@@ -1111,14 +1149,20 @@ export class SessionizeProgramElement extends LitElement {
                             </p>
                           `
                         )}
-                        ${when(
-                          room.session?.startsAt && room.session?.endsAt,
-                          () => html`
-                            <p class="session-time">
-                              ${this.#formatSessionTime(room.session!.startsAt!)} - ${this.#formatSessionTime(room.session!.endsAt!)}
-                            </p>
-                          `
-                        )}
+                        <div class="session-footer">
+                          ${when(
+                            room.session?.startsAt && room.session?.endsAt,
+                            () => html`
+                              <p class="session-time">
+                                ${this.#formatSessionTime(room.session!.startsAt!)} - ${this.#formatSessionTime(room.session!.endsAt!)}
+                              </p>
+                            `
+                          )}
+                          ${when(
+                            audienceLabel,
+                            () => html`<span class="audience-badge">${audienceLabel!.toLowerCase()}</span>`
+                          )}
+                        </div>
                       </div>
                     `;
                   })}
@@ -1693,6 +1737,7 @@ export class SessionizeProgramElement extends LitElement {
       position: absolute;
       left: 4px;
       right: 4px;
+      min-height: 100px;
       padding: 0.5rem;
       background: var(--color-white, #fff);
       border: 1px solid var(--color-blue, #3544b1);
@@ -1704,6 +1749,7 @@ export class SessionizeProgramElement extends LitElement {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      z-index: 1;
     }
 
     .timeline-session:hover {
@@ -1717,7 +1763,27 @@ export class SessionizeProgramElement extends LitElement {
       border-left-color: var(--color-grey, #d1d5db);
     }
 
+    .timeline-session.short-session {
+      min-height: 95px;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .timeline-session.short-session .session-title {
+      font-size: 0.73rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-speakers {
+      font-size: 0.65rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-time {
+      font-size: 0.65rem;
+    }
+
     .timeline-session.short-break {
+      min-height: 0;
       flex-direction: row;
       align-items: center;
       justify-content: center;
@@ -1765,7 +1831,6 @@ export class SessionizeProgramElement extends LitElement {
 
     .timeline-session .session-time {
       margin: 0;
-      margin-top: auto;
       font-size: 0.7rem;
       font-weight: 500;
       color: var(--color-grey-dark, #6b7280);
@@ -1883,6 +1948,36 @@ export class SessionizeProgramElement extends LitElement {
       font-size: 0.75rem;
       font-weight: 600;
       margin-bottom: var(--unit-xs, 0.5rem);
+    }
+
+    /* Session footer (time + audience badge) */
+    .session-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      gap: 0.25rem;
+    }
+
+    .session-footer > .session-time {
+      margin: 0;
+    }
+
+    .audience-badge {
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--border-radius-xl, 22px);
+      font-size: 0.6rem;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      border: 1px solid var(--color-grey, #d9d9d9);
+      color: var(--color-dark-grey, #707070);
+      text-transform: lowercase;
+    }
+
+    .timeline-session.short-session .audience-badge {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.3rem;
     }
 
     .mobile-session-card .session-title {

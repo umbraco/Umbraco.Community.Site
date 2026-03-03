@@ -30,6 +30,12 @@ export class SessionizeSpeakersElement extends LitElement {
   @property({ type: Number, attribute: "columns" })
   columns = 4;
 
+  /**
+   * Optional: URL of the program page, used to link session titles
+   */
+  @property({ type: String, attribute: "program-url" })
+  programUrl?: string;
+
   @state()
   private _speakers: SessionizeSpeaker[] = [];
 
@@ -105,6 +111,7 @@ export class SessionizeSpeakersElement extends LitElement {
   #openSpeakerDialog(speaker: SessionizeSpeaker) {
     const dialog = new SessionizeSpeakerDialogElement();
     dialog.speaker = speaker;
+    dialog.programUrl = this.programUrl;
     this.#dialogHandler.open(dialog);
   }
 
@@ -132,6 +139,10 @@ export class SessionizeSpeakersElement extends LitElement {
           `
         )}
         <p class="speaker-name">${speaker.fullName}</p>
+        ${when(
+            speaker.pronouns,
+            () => html`<p class="speaker-pronouns">${speaker.pronouns}</p>`
+          )}
         ${when(
             speaker.tagLine,
             () => html`<p class="speaker-tagline">${speaker.tagLine}</p>`
@@ -243,6 +254,13 @@ export class SessionizeSpeakersElement extends LitElement {
             font-weight: bold;
             font-size: var(--font-size-large);
             margin: 1rem 0 0;
+            text-align: center;
+        }
+
+        .speaker-pronouns {
+            font-size: var(--font-size-sm);
+            color: var(--color-dark-grey, #6b7280);
+            margin: 0.25rem 0 0;
             text-align: center;
         }
 

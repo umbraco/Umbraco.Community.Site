@@ -1,7 +1,9 @@
 import { UmbEntityActionBase } from "@umbraco-cms/backoffice/entity-action";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
+import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
 import { UMB_DOCUMENT_WORKSPACE_PATH } from "@umbraco-cms/backoffice/document";
 import { UmbracoCommunityExtensionsService } from "../../api/index.js";
+import { client } from "../../api/client.gen.js";
 
 export class CreateBlogArticleAction extends UmbEntityActionBase<never> {
   #notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
@@ -10,6 +12,14 @@ export class CreateBlogArticleAction extends UmbEntityActionBase<never> {
     super(host, args);
     this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
       this.#notificationContext = instance;
+    });
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      const config = authContext?.getOpenApiConfiguration();
+      client.setConfig({
+        auth: config?.token ?? undefined,
+        baseUrl: config?.base ?? "",
+        credentials: config?.credentials ?? "same-origin",
+      });
     });
   }
 

@@ -45,6 +45,7 @@ namespace UmbracoCommunity.Web.Attributes
                     return;
                 }
 
+                viewModel.Culture = umbracoContext.PublishedRequest?.Culture ?? Constants.Culture.Default;
                 viewModel.Menu = _menuViewModelBuilder.Build(publishedContent, umbracoContext);
                 viewModel.Footer = _footerViewModelBuilder.Build(publishedContent, umbracoContext);
             }
