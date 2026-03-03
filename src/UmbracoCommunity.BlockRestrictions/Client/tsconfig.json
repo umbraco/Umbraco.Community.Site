@@ -15,7 +15,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["@umbraco-cms/backoffice/extension-types"]
+    "types": ["@umbraco-cms/backoffice/extension-types", "vitest/globals"]
   },
   "include": ["src"]
 }
