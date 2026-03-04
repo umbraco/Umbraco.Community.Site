@@ -9,10 +9,10 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
     {
         public HomePageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
         {
-            var bannerContent = currentPage as IBannerBlockGeneral
-                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(IBannerBlockGeneral)}.");
-            var contentBlocks = currentPage as IContentBlocksHomepage
-                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(IContentBlocksHomepage)}.");
+            var bannerContent = currentPage as ICompositionBannerBlock
+                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(ICompositionBannerBlock)}.");
+            var contentBlocks = currentPage as ICompositionContentBlocks
+                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(ICompositionContentBlocks)}.");
 
             var viewModel = new HomePageViewModel(currentPage)
             {
