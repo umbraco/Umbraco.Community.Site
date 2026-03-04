@@ -1,6 +1,6 @@
 {
-  "Name": "Banner block - general",
-  "Alias": "bannerBlockGeneral",
+  "Name": "[Composition] Banner block",
+  "Alias": "compositionBannerBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-rectangle-ellipsis color-green",

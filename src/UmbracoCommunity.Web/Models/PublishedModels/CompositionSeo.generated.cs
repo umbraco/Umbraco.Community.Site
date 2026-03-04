@@ -18,9 +18,9 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	// Mixin Content Type with alias "seo"
-	/// <summary>SEO</summary>
-	public partial interface ISeo : IPublishedElement
+	// Mixin Content Type with alias "compositionSeo"
+	/// <summary>[Composition] SEO</summary>
+	public partial interface ICompositionSeo : IPublishedElement
 	{
 		/// <summary>Custom schema</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -48,14 +48,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		string Robots { get; }
 	}
 
-	/// <summary>SEO</summary>
-	[PublishedModel("seo")]
-	public partial class Seo : PublishedElementModel, ISeo
+	/// <summary>[Composition] SEO</summary>
+	[PublishedModel("compositionSeo")]
+	public partial class CompositionSeo : PublishedElementModel, ICompositionSeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "seo";
+		public new const string ModelTypeAlias = "compositionSeo";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -64,14 +64,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<Seo, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<CompositionSeo, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public Seo(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public CompositionSeo(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -90,7 +90,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		/// <summary>Static getter for Custom schema</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static string GetCustomSchema(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "customSchema");
+		public static string GetCustomSchema(ICompositionSeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "customSchema");
 
 		///<summary>
 		/// Meta description: Here you can provide a summary of the page. The summary is read by search engines to determine what the page is all about. Ideally 130-155 character
@@ -103,7 +103,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		/// <summary>Static getter for Meta description</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static string GetMetaDescription(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "metaDescription");
+		public static string GetMetaDescription(ICompositionSeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "metaDescription");
 
 		///<summary>
 		/// Meta title: Here you can provide a title that will be used in the browser tab. The page name will be used as a fallback, in case you do not provide a title. Ideally 50-60 characters.
@@ -116,7 +116,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		/// <summary>Static getter for Meta title</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static string GetMetaTitle(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "metaTitle");
+		public static string GetMetaTitle(ICompositionSeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "metaTitle");
 
 		///<summary>
 		/// OG Image: Here you can select an image that will be shown when the page is shared on social via open graph
@@ -129,7 +129,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		/// <summary>Static getter for OG Image</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static global::Umbraco.Cms.Core.Models.MediaWithCrops GetOgImage(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(publishedValueFallback, "ogImage");
+		public static global::Umbraco.Cms.Core.Models.MediaWithCrops GetOgImage(ICompositionSeo that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(publishedValueFallback, "ogImage");
 
 		///<summary>
 		/// Robots: Here you can override the robots meta tag on the current page to affect how search engines will crawl and index it.
@@ -142,6 +142,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		/// <summary>Static getter for Robots</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static string GetRobots(ISeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "robots");
+		public static string GetRobots(ICompositionSeo that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "robots");
 	}
 }

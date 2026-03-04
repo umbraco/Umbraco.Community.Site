@@ -15,8 +15,8 @@
   "CompositionContentTypes": [
     "umb://document-type/1e62add411bb495da977fe94493278f0",
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-    "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
-    "umb://document-type/c3c7d3a9b80a457a80b3bc3c8315bb9e"
+    "umb://document-type/6a43376f286643dc98b23844efec4c49",
+    "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
   "PropertyGroups": [
     {
@@ -29,20 +29,6 @@
           "Alias": "teaser",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
           "Name": "Teaser"
-        }
-      ]
-    },
-    {
-      "Key": "ace751fe-3ba7-4bcf-8295-df881778d4c0",
-      "Name": "Content blocks",
-      "SortOrder": 1,
-      "Alias": "content/contentBlocks",
-      "PropertyTypes": [
-        {
-          "Key": "9a99e25a-9b22-406a-a7d1-7b8759c407f9",
-          "Alias": "contentBlocks",
-          "DataType": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
-          "Name": "Content blocks"
         }
       ]
     },
@@ -113,10 +99,6 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "Ordering": true
     },
@@ -153,11 +135,11 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
+      "Udi": "umb://document-type/6a43376f286643dc98b23844efec4c49",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/c3c7d3a9b80a457a80b3bc3c8315bb9e",
+      "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
       "Ordering": true
     },
     {

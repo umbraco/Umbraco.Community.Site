@@ -25,36 +25,10 @@
     "umb://document-type/6a43376f286643dc98b23844efec4c49",
     "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
-  "PropertyGroups": [
-    {
-      "Key": "eac673d2-97dc-4a5c-bf2c-0834cac50c7b",
-      "Name": "Content",
-      "Type": 1,
-      "Alias": "content",
-      "PropertyTypes": []
-    },
-    {
-      "Key": "fb7486af-8079-4446-ad64-f280a7c2531d",
-      "Name": "Content block restricted",
-      "SortOrder": 2,
-      "Alias": "content/contentBlockRestricted",
-      "PropertyTypes": [
-        {
-          "Key": "4c79b36c-1b02-4092-b5f7-1554d875de00",
-          "Alias": "restrictedBlocksTest",
-          "DataType": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
-          "Name": "Restricted blocks test"
-        }
-      ]
-    }
-  ],
+  "PropertyGroups": [],
   "PropertyTypes": [],
   "Udi": "umb://document-type/8d47f6ba456d4ba8845c7e59be152d36",
   "Dependencies": [
-    {
-      "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
-      "Ordering": true
-    },
     {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
       "Ordering": true

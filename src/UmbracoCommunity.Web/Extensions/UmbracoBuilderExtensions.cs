@@ -98,7 +98,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<ArticleSchemaBuilder>();
             builder.Services.AddScoped<BreadcrumbSchemaBuilder>();
 
-            builder.Services.AddScoped<IPageViewModelDecorator<Seo>, SeoMetaDataViewModelDecorator>();
+            builder.Services.AddScoped<IPageViewModelDecorator<CompositionSeo>, SeoMetaDataViewModelDecorator>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();

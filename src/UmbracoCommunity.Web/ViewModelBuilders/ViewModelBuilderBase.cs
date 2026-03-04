@@ -79,7 +79,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             return rows;
         }
 
-        public static string? GetWebPageName(ISeo contentModel)
+        public static string? GetWebPageName(ICompositionSeo contentModel)
         {
             if (contentModel is Home or EventsHome)
             {
