@@ -81,7 +81,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
         public static string? GetWebPageName(ISeo contentModel)
         {
-            if (contentModel is Home)
+            if (contentModel is Home or EventsHome)
             {
                 return contentModel.MetaTitle;
             }

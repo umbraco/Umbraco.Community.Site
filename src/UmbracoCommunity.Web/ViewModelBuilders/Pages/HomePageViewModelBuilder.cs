@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
@@ -10,12 +9,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
     {
         public HomePageViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
         {
-            Home contentModel = currentPage.As<Home>();
+            var bannerContent = currentPage as IBannerBlockGeneral
+                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(IBannerBlockGeneral)}.");
+            var contentBlocks = currentPage as IContentBlocksHomepage
+                ?? throw new InvalidOperationException($"Content type '{currentPage.ContentType.Alias}' does not implement {nameof(IContentBlocksHomepage)}.");
 
             var viewModel = new HomePageViewModel(currentPage)
             {
-                BlockContent = ParseBlockGrid(contentModel.ContentBlocks),
-                Banner = contentModel.BannerContent
+                BlockContent = ParseBlockGrid(contentBlocks.ContentBlocks),
+                Banner = bannerContent.BannerContent
             };
 
             return viewModel;
