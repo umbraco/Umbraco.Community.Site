@@ -235,8 +235,6 @@ block-grid-restricted (our element, light DOM)
 
 10. **Value forwarding** — listens for `property-value-change` events from the inner element and re-dispatches them with `bubbles: true, composed: true` so the Umbraco property system receives the updates.
 
-11. **Restriction info banner** — when restrictions are active, renders an accessible status banner (`role="status"`) above the block editor showing "Block types are restricted" with optional inheritance source. The decorative filter icon uses `aria-hidden="true"`.
-
 ### Workspace view element (`block-restrictions.element.ts`)
 
 The configuration UI rendered on the **Blocks** tab of each document type. Features:
@@ -296,11 +294,6 @@ Write endpoints (`PUT /rules`, `DELETE /rules`) have no response caching.
 ## Accessibility
 
 The package targets **WCAG 2.1 Level AA** to align with the main site's accessibility standards.
-
-### Property editor info banners
-
-- The "Block types are restricted" banner uses `role="status"` so screen readers announce it when the editor loads
-- The decorative filter icon uses `aria-hidden="true"` to prevent screen readers from announcing it, following the project's icon accessibility convention
 
 ### Workspace view
 

@@ -41,7 +41,6 @@ Block Restrictions lets you control which block types are available on a per-doc
 
 When editing a page that has block restrictions (directly or inherited):
 
-- **An info banner appears** above the block editor: *"Block types are restricted"* — with the source document type shown if inherited (e.g. *"inherited from homePage"*)
 - **The "Add content" picker** only shows the allowed block types — editors can't accidentally add blocks that don't belong
 - **Existing blocks are preserved** — if a page already has blocks that are later excluded by a restriction, they remain visible and editable. The restriction only limits new additions.
 - **Copy, paste, and sort mode** — the restricted editors support the same three-dot context menu actions as the native block editors (copy to clipboard, paste from clipboard, enter sort mode)

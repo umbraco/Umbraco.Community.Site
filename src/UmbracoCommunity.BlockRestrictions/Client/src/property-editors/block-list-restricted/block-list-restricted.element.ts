@@ -379,21 +379,10 @@ export default class BlockListRestrictedElement
   }
 
   /**
-   * Renders the info banner (when restrictions are active) and the inner element.
-   * The banner uses `role="status"` for screen reader accessibility and shows
-   * whether the restriction is inherited from an ancestor document type.
+   * Renders the inner block list element (or a loading spinner while it's being created).
    */
   render() {
     return html`
-      ${this._restrictionInfo?.hasRestrictions
-        ? html`<div role="status" style="display:flex;align-items:center;gap:6px;padding:6px 9px;background-color:var(--uui-color-surface-emphasis);border:1px solid var(--uui-color-border);border-radius:var(--uui-border-radius);margin-bottom:9px;font-size:0.85em;color:var(--uui-color-text-alt);">
-            <umb-icon name="icon-filter" style="font-size:1em;" aria-hidden="true"></umb-icon>
-            Block types are restricted
-            ${this._restrictionInfo.inheritedFromAncestor
-              ? html` (inherited from <strong>${this._restrictionInfo.documentTypeAlias}</strong>)`
-              : nothing}
-          </div>`
-        : nothing}
       ${this._innerElement ?? html`<uui-loader></uui-loader>`}
     `;
   }

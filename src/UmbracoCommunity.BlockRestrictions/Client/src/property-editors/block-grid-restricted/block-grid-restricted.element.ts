@@ -487,27 +487,12 @@ export default class BlockGridRestrictedElement
   }
 
   /**
-   * Renders the component template.
-   *
-   * Two parts:
-   * 1. An optional info banner showing "Block types are restricted" with inheritance
-   *    details (only shown when restrictions are active). Uses `role="status"` for
-   *    screen reader announcements.
-   * 2. The inner block grid element (or a loading spinner while it's being created).
-   *    The `${this._innerElement}` expression inserts the DOM node directly into
-   *    the template — Lit supports rendering actual DOM elements, not just strings.
+   * Renders the inner block grid element (or a loading spinner while it's being created).
+   * The `${this._innerElement}` expression inserts the DOM node directly into
+   * the template — Lit supports rendering actual DOM elements, not just strings.
    */
   render() {
     return html`
-      ${this._restrictionInfo?.hasRestrictions
-        ? html`<div role="status" style="display:flex;align-items:center;gap:6px;padding:6px 9px;background-color:var(--uui-color-surface-emphasis);border:1px solid var(--uui-color-border);border-radius:var(--uui-border-radius);margin-bottom:9px;font-size:0.85em;color:var(--uui-color-text-alt);">
-            <umb-icon name="icon-filter" style="font-size:1em;" aria-hidden="true"></umb-icon>
-            Block types are restricted
-            ${this._restrictionInfo.inheritedFromAncestor
-              ? html` (inherited from <strong>${this._restrictionInfo.documentTypeAlias}</strong>)`
-              : nothing}
-          </div>`
-        : nothing}
       ${this._innerElement ?? html`<uui-loader></uui-loader>`}
     `;
   }
