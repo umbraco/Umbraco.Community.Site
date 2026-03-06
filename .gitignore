@@ -442,7 +442,6 @@ ood.flag
 src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
 
-Hangfire.db*
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
 .claude
 .mcp.json
