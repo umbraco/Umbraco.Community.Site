@@ -34,7 +34,6 @@
 import {
   LitElement,
   html,
-  nothing,
   customElement,
   state,
   property,
