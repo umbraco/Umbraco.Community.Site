@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Umbraco -->
+    <PackageVersion Include="Flip.Umbraco" Version="17.0.1" />
     <PackageVersion Include="Umbraco.Cms" Version="17.2.0" />
     <PackageVersion Include="Umbraco.Cms.Core" Version="17.2.0" />
     <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.2.0" />
