@@ -20,21 +20,16 @@ namespace UmbracoCommunity.BlockRestrictions.Migrations
             modelBuilder.Entity("UmbracoCommunity.BlockRestrictions.Infrastructure.BlockRestrictionEntity", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AllowedBlockAliasesJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedAt");
 
-                    b.Property<Guid>("DocumentTypeKey")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("DocumentTypeKey");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("UpdatedAt");
 
                     b.HasKey("Id");
 
