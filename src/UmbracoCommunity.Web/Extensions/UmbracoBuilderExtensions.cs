@@ -98,7 +98,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<ArticleSchemaBuilder>();
             builder.Services.AddScoped<BreadcrumbSchemaBuilder>();
 
-            builder.Services.AddScoped<IPageViewModelDecorator<Seo>, SeoMetaDataViewModelDecorator>();
+            builder.Services.AddScoped<IPageViewModelDecorator<CompositionSeo>, SeoMetaDataViewModelDecorator>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
@@ -115,11 +115,6 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<MenuReleasesViewModel>, MenuReleasesViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<FooterViewModel>, FooterViewModelBuilder>();
-
-            builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
 
             return builder;
         }

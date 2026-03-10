@@ -1,6 +1,6 @@
 {
-  "Name": "SEO",
-  "Alias": "seo",
+  "Name": "[Composition] SEO",
+  "Alias": "compositionSeo",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-code-xml color-green",

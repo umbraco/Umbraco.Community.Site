@@ -45,7 +45,7 @@ internal class ContentDataService : IContentDataService
 
     private void AddSitemapItems(List<SitemapElement> siteMapElements, IPublishedContent currentNode)
     {
-        var sitemapItemsToAdd = currentNode.Children(c => c.TemplateId.HasValue && c is IPageConfiguration pageConfig && !pageConfig.HideFromSitemap);
+        var sitemapItemsToAdd = currentNode.Children(c => c.TemplateId.HasValue && c is ICompositionPageConfiguration pageConfig && !pageConfig.HideFromSitemap);
         foreach (IPublishedContent node in sitemapItemsToAdd ?? [])
         {
             if (node.IsVisible(_publishedValueFallback))

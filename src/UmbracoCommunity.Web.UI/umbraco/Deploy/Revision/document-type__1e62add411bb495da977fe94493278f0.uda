@@ -1,6 +1,6 @@
 {
-  "Name": "Banner block - general",
-  "Alias": "bannerBlockGeneral",
+  "Name": "[Composition] Banner block",
+  "Alias": "compositionBannerBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-rectangle-ellipsis color-green",
@@ -20,7 +20,7 @@
         {
           "Key": "c5c0e7ee-4a51-4e2b-98a0-0f5ad44c60c8",
           "Alias": "bannerContent",
-          "DataType": "umb://data-type/6f2f9958c8a94a078d7e572935723691",
+          "DataType": "umb://data-type/dbe265a26f0541e3b07ce9d9ab34992f",
           "Name": "Banner content"
         }
       ]
@@ -37,7 +37,7 @@
   "Udi": "umb://document-type/1e62add411bb495da977fe94493278f0",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/6f2f9958c8a94a078d7e572935723691",
+      "Udi": "umb://data-type/dbe265a26f0541e3b07ce9d9ab34992f",
       "Ordering": true
     },
     {

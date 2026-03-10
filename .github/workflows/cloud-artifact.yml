@@ -96,6 +96,12 @@ jobs:
         working-directory: src/UmbracoCommunity.Extensions/Client
         run: npm ci && npm run build
         shell: bash
+
+      # build the block restrictions client assets
+      - name: Build block restrictions client
+        working-directory: src/UmbracoCommunity.BlockRestrictions/Client
+        run: npm ci && npm run build
+        shell: bash
         
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code

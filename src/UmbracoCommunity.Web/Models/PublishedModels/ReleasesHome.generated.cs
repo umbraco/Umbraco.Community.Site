@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Releases Home</summary>
 	[PublishedModel("releasesHome")]
-	public partial class ReleasesHome : PublishedContentModel, IContentBlocksHomepage
+	public partial class ReleasesHome : PublishedContentModel, ICompositionContentBlocks
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -55,6 +55,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("contentBlocks")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlocksHomepage.GetContentBlocks(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionContentBlocks.GetContentBlocks(this, _publishedValueFallback);
 	}
 }

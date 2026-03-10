@@ -11,6 +11,8 @@
     <!-- Commented out packages will be enabled when pushing to Cloud (and Deploy.OnPrem removed) -->
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" /> -->
 
+    <PackageReference Include="Flip.Umbraco" />
+
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" />
     <PackageReference Include="Umbraco.Cms" />
     <PackageReference Include="Umbraco.Community.BlockPreview" />
@@ -38,6 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.BlockRestrictions\UmbracoCommunity.BlockRestrictions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
