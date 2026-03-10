@@ -61,6 +61,11 @@ function runProcess(name, cmd, args, cwd) {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
       shell: process.platform === "win32",
+      env: {
+        ...process.env,
+        FORCE_COLOR: "1",        // chalk, Vite, most Node tools
+        DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: "1", // dotnet
+      },
     });
 
     runningProcesses.push(proc);
