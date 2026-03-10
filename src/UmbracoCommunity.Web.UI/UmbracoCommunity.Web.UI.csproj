@@ -22,9 +22,7 @@
     <PackageReference Include="Umbraco.Forms" />
     <PackageReference Include="Umbraco.Forms.Deploy" />
 
-    <PackageReference Include="Cultiv.Hangfire" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
-    <PackageReference Include="Markdig" />
   </ItemGroup>
 
   <ItemGroup>

@@ -164,36 +164,6 @@ Models are generated in **SourceCodeManual** mode (development) / **Nothing** mo
 
 ## Key Features
 
-### GitHub Sync System
-
-Located in `Features/GitHubSync/`, this system:
-- Uses Entity Framework Core with dual database support (SQLite/SQL Server)
-- Syncs GitHub issues, PRs, discussions, and NuGet package data via Hangfire jobs
-- Runs on scheduled intervals (hourly for recent data, weekly for full sync)
-
-**Background Jobs:**
-- `FetchRecentPullRequestsJob` / `FetchAllPullRequestsJob`
-- `FetchRecentIssuesJob` / `FetchAllIssuesJob`
-- `FetchReleaseDiscussionsJob`
-- `FetchNuGetPackageVersionsJob` / `FetchRecentNuGetPackageVersionsJob`
-- `FetchHqMembersJob`
-
-Job configuration: `Features/GitHubSync/Configuration/JobsComposer.cs`
-
-### Release Overview System
-
-Located in `Features/ReleaseOverview/`, this feature displays Umbraco CMS release information:
-
-**Controllers:**
-- `ReleaseController` - Individual release pages (implements `IVirtualPageController`)
-- `ReleasesHomeController` - Release landing page
-- `AllReleasesController` - List of all releases
-- `CompareController` - Compare releases
-
-**Virtual Page Pattern**: `ReleaseController` implements `IVirtualPageController` which allows pages to exist without Umbraco content nodes - routes are handled programmatically via custom route composers.
-
-**Views**: Located in `Views/Partials/ReleaseOverview/`
-
 ### Sessionize Integration
 
 Located in `Features/Sessionize/`, this feature integrates with the Sessionize platform for event management:
@@ -234,28 +204,12 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice functionality:
 
 **API Controllers** (`Controllers/`):
-- HQ Members CRUD operations
-- GitHub data export/import
-- Contribution statistics
-- Release summaries
+- Blog article creation
 
 **Backoffice Dashboards** (`Client/src/dashboards/`):
-- Main dashboard with contribution stats
-- CMS contribution analytics dashboard
-- Data management (import/export GitHub data)
-- HQ members management
+- Sessionize dashboard
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
-
-### Release Management
-
-Releases are tracked via GitHub Discussions in the Umbraco CMS repository:
-- Created automatically by GitHub Actions when `release/*` labels are added
-- Release managers update discussion body with release date and LTS status
-- Community site syncs every hour
-- Release pages display aggregated issues/PRs/discussions by version
-
-See `docs/RELEASES_MANAGEMENT.md` for details.
 
 ### Vite Integration
 
@@ -296,7 +250,6 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 **Backend:**
 - Umbraco CMS 17.2.0 on .NET 10
 - Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
-- Cultiv.Hangfire 5.2.0 - Background job processing
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
 - Markdig 1.0.0 - Markdown processing
 - Schema.NET 13.0.0 - Structured data/schema markup
@@ -322,7 +275,7 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 ## Important Notes
 
 - **Git branch**: Main branch is `develop` (not main/master)
-- **Database migrations**: Run automatically on startup via `DatabaseMigrationHostedService`
+- **Database**: Uses Entity Framework Core with SQLite/SQL Server support
 - **Security**: Never commit `appsettings.Local.json` - it's gitignored for secrets
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes

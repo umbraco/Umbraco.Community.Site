@@ -24,8 +24,6 @@
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.3.2" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="6.1.1" />
-    <!-- Hangfire -->
-    <PackageVersion Include="Cultiv.Hangfire" Version="5.2.0" />
     <!-- Microsoft -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.3" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
@@ -33,7 +31,6 @@
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <!-- Other -->
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
-    <PackageVersion Include="Markdig" Version="1.1.1" />
     <PackageVersion Include="Schema.NET" Version="13.0.0" />
   </ItemGroup>
 </Project>
