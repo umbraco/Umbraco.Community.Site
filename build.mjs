@@ -21,12 +21,18 @@ const projects = {
     path: resolve(ROOT, "src/UmbracoCommunity.StaticAssets"),
     color: "\x1b[33m", // yellow
   },
+  "Web.UI": {
+    path: resolve(ROOT, "src/UmbracoCommunity.Web.UI"),
+    color: "\x1b[34m", // blue
+  },
 };
 
 const RESET = "\x1b[0m";
 const BOLD = "\x1b[1m";
 const RED = "\x1b[31m";
 const GREEN = "\x1b[32m";
+
+const MODES = ["dev", "dev:dotnet", "local", "local:dotnet"];
 
 function log(msg) {
   console.log(`${BOLD}${msg}${RESET}`);
@@ -39,37 +45,41 @@ function logError(msg) {
 function ensureNodeModules(name, projectPath) {
   if (!existsSync(resolve(projectPath, "node_modules"))) {
     log(`[${name}] node_modules missing, running npm ci...`);
-    return runProcess(name, "npm", ["ci"], projectPath, true);
+    return runProcess(name, "npm", ["ci"], projectPath);
   }
   return Promise.resolve();
 }
 
-function runProcess(name, cmd, args, cwd, pipe = true) {
+const runningProcesses = [];
+
+function runProcess(name, cmd, args, cwd) {
   return new Promise((resolve, reject) => {
     const project = projects[name];
     const prefix = project ? `${project.color}[${name}]${RESET} ` : "";
 
     const proc = spawn(cmd, args, {
       cwd,
-      stdio: pipe ? ["ignore", "pipe", "pipe"] : "inherit",
+      stdio: ["ignore", "pipe", "pipe"],
       shell: process.platform === "win32",
     });
 
-    if (pipe) {
-      proc.stdout.on("data", (data) => {
-        for (const line of data.toString().split("\n")) {
-          if (line) process.stdout.write(`${prefix}${line}\n`);
-        }
-      });
-      proc.stderr.on("data", (data) => {
-        for (const line of data.toString().split("\n")) {
-          if (line) process.stderr.write(`${prefix}${line}\n`);
-        }
-      });
-    }
+    runningProcesses.push(proc);
+
+    proc.stdout.on("data", (data) => {
+      for (const line of data.toString().split("\n")) {
+        if (line) process.stdout.write(`${prefix}${line}\n`);
+      }
+    });
+    proc.stderr.on("data", (data) => {
+      for (const line of data.toString().split("\n")) {
+        if (line) process.stderr.write(`${prefix}${line}\n`);
+      }
+    });
 
     proc.on("close", (code) => {
-      if (code !== 0) {
+      const idx = runningProcesses.indexOf(proc);
+      if (idx !== -1) runningProcesses.splice(idx, 1);
+      if (code !== 0 && code !== null) {
         reject(new Error(`[${name}] exited with code ${code}`));
       } else {
         resolve();
@@ -80,25 +90,20 @@ function runProcess(name, cmd, args, cwd, pipe = true) {
   });
 }
 
-function runForeground(name, cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
-    const proc = spawn(cmd, args, {
-      cwd,
-      stdio: "inherit",
-      shell: process.platform === "win32",
-    });
-
-    proc.on("close", (code) => {
-      if (code !== null && code !== 0) {
-        reject(new Error(`[${name}] exited with code ${code}`));
-      } else {
-        resolve();
-      }
-    });
-
-    proc.on("error", reject);
-  });
+function killAll() {
+  for (const proc of runningProcesses) {
+    proc.kill("SIGTERM");
+  }
 }
+
+process.on("SIGINT", () => {
+  killAll();
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  killAll();
+  process.exit(0);
+});
 
 async function buildProject(name, script) {
   const project = projects[name];
@@ -108,8 +113,9 @@ async function buildProject(name, script) {
   console.log(`${GREEN}[${name}] Done.${RESET}`);
 }
 
-async function runLocal() {
-  log("Mode: local (building all projects for cloud deployment)\n");
+async function runLocal(withDotnet) {
+  const label = withDotnet ? "local:dotnet" : "local";
+  log(`Mode: ${label} (building all projects for cloud deployment${withDotnet ? " + dotnet run" : ""})\n`);
 
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
@@ -118,33 +124,51 @@ async function runLocal() {
   ]);
 
   console.log(`\n${GREEN}${BOLD}All builds completed successfully.${RESET}`);
+
+  if (withDotnet) {
+    console.log(`\n${BOLD}Starting dotnet run...${RESET}\n`);
+    await runProcess("Web.UI", "dotnet", ["run"], projects["Web.UI"].path);
+  }
 }
 
-async function runDev() {
-  log("Mode: dev (building backoffice extensions, then starting Vite dev server)\n");
+async function runDev(withDotnet) {
+  const label = withDotnet ? "dev:dotnet" : "dev";
+  log(`Mode: ${label} (building backoffice extensions, then starting dev servers)\n`);
 
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
     buildProject("Extensions", "build"),
   ]);
 
-  console.log(`\n${GREEN}${BOLD}Backoffice builds complete. Starting Vite dev server...${RESET}\n`);
+  const servers = withDotnet ? "Vite dev server + dotnet run" : "Vite dev server";
+  console.log(`\n${GREEN}${BOLD}Backoffice builds complete. Starting ${servers}...${RESET}\n`);
 
   const sa = projects.StaticAssets;
   await ensureNodeModules("StaticAssets", sa.path);
-  await runForeground("StaticAssets", "npm", ["run", "dev"], sa.path);
+
+  const tasks = [runProcess("StaticAssets", "npm", ["run", "dev"], sa.path)];
+  if (withDotnet) {
+    tasks.push(runProcess("Web.UI", "dotnet", ["run"], projects["Web.UI"].path));
+  }
+
+  await Promise.all(tasks);
 }
 
 async function promptMode() {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
     rl.question(
-      `${BOLD}Select build mode:${RESET}\n  1) dev   - Build backoffice + start Vite dev server\n  2) local - Build all projects for cloud deployment\n\nChoice [1/2]: `,
+      `${BOLD}Select build mode:${RESET}\n` +
+        `  1) dev          - Build backoffice + start Vite dev server\n` +
+        `  2) dev:dotnet   - Build backoffice + start Vite dev server + dotnet run\n` +
+        `  3) local        - Build all projects for cloud deployment\n` +
+        `  4) local:dotnet - Build all projects for cloud + dotnet run\n` +
+        `\nChoice [1-4]: `,
       (answer) => {
         rl.close();
         const trimmed = answer.trim().toLowerCase();
-        if (trimmed === "2" || trimmed === "local") resolve("local");
-        else resolve("dev");
+        const map = { "1": "dev", "2": "dev:dotnet", "3": "local", "4": "local:dotnet" };
+        resolve(map[trimmed] || (MODES.includes(trimmed) ? trimmed : "dev"));
       }
     );
   });
@@ -154,20 +178,22 @@ async function main() {
   const arg = process.argv[2]?.toLowerCase();
   let mode;
 
-  if (arg === "local" || arg === "dev") {
+  if (MODES.includes(arg)) {
     mode = arg;
   } else if (arg) {
     logError(`Unknown mode: ${arg}`);
-    console.log(`Usage: node build.mjs [dev|local]\n`);
+    console.log(`Usage: node build.mjs [${MODES.join("|")}]\n`);
     process.exit(1);
   } else {
     mode = await promptMode();
   }
 
-  if (mode === "local") {
-    await runLocal();
+  const withDotnet = mode.endsWith(":dotnet");
+
+  if (mode.startsWith("local")) {
+    await runLocal(withDotnet);
   } else {
-    await runDev();
+    await runDev(withDotnet);
   }
 }
 
