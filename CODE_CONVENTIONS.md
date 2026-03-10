@@ -23,7 +23,7 @@ This document describes the coding standards used in this project. Items marked 
 | API Controller | `{Feature}ApiController` | `BlogApiController` | [Project] |
 | Schema Builder | `{SchemaType}SchemaBuilder` | `ArticleSchemaBuilder` (in `ViewModelBuilders/Schema/`) | [Project] |
 | TypeScript Component | `{name}.element.ts` | `blog-posts-list.element.ts` | [Project] |
-| Web Component Tag | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] |
+| Web Component Tag (website) | `dc-{kebab-case-name}` | `<dc-blog-posts-list>` | [Project] — public site only, not backoffice extensions |
 
 ## Controller Organization [Project]
 
@@ -338,7 +338,7 @@ builder.Services.AddScoped<Utilities.UrlUtilities>();
 ## Frontend (TypeScript/Lit) [Project]
 
 - **Web Components**: Use Lit framework, file suffix `.element.ts`
-- **Tag Naming**: Prefix with `dc-` (e.g., `<dc-blog-posts-list>`)
+- **Tag Naming**: Prefix with `dc-` (e.g., `<dc-blog-posts-list>`). This applies to **public website** components in `UmbracoCommunity.StaticAssets` only. Backoffice extensions (`UmbracoCommunity.Extensions`, `UmbracoCommunity.BlockRestrictions`) follow Umbraco's own element naming conventions and should **not** use the `dc-` prefix.
 - **Services**: Located in `services/`, use `ServiceBase` for HTTP calls
 - **Entry Points**: Files starting with `_` in `entrypoints/` folder
 - **Tests**: Colocated with components using `.test.ts` suffix

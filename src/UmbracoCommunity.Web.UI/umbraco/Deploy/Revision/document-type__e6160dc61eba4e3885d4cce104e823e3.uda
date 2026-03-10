@@ -13,19 +13,12 @@
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
   "CompositionContentTypes": [
-    "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
+    "umb://document-type/1e62add411bb495da977fe94493278f0",
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-    "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
-    "umb://document-type/b457b927e4b44afabc7234d15c15f60b"
+    "umb://document-type/6a43376f286643dc98b23844efec4c49",
+    "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
   "PropertyGroups": [
-    {
-      "Key": "7a0dd83b-6bd2-47d5-8365-d81132920a0d",
-      "Name": "Content",
-      "Type": 1,
-      "Alias": "content",
-      "PropertyTypes": []
-    },
     {
       "Key": "81afe415-d198-479b-a4fe-06c9d8dd7ca3",
       "Name": "Content",
@@ -89,6 +82,13 @@
           "Name": "Thumbnail image"
         }
       ]
+    },
+    {
+      "Key": "e795ea81-7d1b-489c-93a3-0ea172e1d6ec",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": []
     }
   ],
   "PropertyTypes": [],
@@ -127,7 +127,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/35be1f994f024bb7ab4e7bd0370d07bb",
+      "Udi": "umb://document-type/1e62add411bb495da977fe94493278f0",
       "Ordering": true
     },
     {
@@ -135,11 +135,11 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
+      "Udi": "umb://document-type/6a43376f286643dc98b23844efec4c49",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/b457b927e4b44afabc7234d15c15f60b",
+      "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
       "Ordering": true
     },
     {

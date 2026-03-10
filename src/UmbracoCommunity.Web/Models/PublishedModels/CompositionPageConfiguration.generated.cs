@@ -18,24 +18,23 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	// Mixin Content Type with alias "bannerBlockGeneral"
-	/// <summary>Banner block - general</summary>
-	public partial interface IBannerBlockGeneral : IPublishedElement
+	// Mixin Content Type with alias "compositionPageConfiguration"
+	/// <summary>[Composition] Page configuration</summary>
+	public partial interface ICompositionPageConfiguration : IPublishedElement
 	{
-		/// <summary>Banner content</summary>
+		/// <summary>Hide from sitemap</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BannerContent { get; }
+		bool HideFromSitemap { get; }
 	}
 
-	/// <summary>Banner block - general</summary>
-	[PublishedModel("bannerBlockGeneral")]
-	public partial class BannerBlockGeneral : PublishedElementModel, IBannerBlockGeneral
+	/// <summary>[Composition] Page configuration</summary>
+	[PublishedModel("compositionPageConfiguration")]
+	public partial class CompositionPageConfiguration : PublishedElementModel, ICompositionPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "bannerBlockGeneral";
+		public new const string ModelTypeAlias = "compositionPageConfiguration";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -44,14 +43,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<BannerBlockGeneral, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<CompositionPageConfiguration, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public BannerBlockGeneral(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public CompositionPageConfiguration(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -60,16 +59,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Banner content
+		/// Hide from sitemap
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("bannerContent")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BannerContent => GetBannerContent(this, _publishedValueFallback);
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => GetHideFromSitemap(this, _publishedValueFallback);
 
-		/// <summary>Static getter for Banner content</summary>
+		/// <summary>Static getter for Hide from sitemap</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel GetBannerContent(IBannerBlockGeneral that, IPublishedValueFallback publishedValueFallback) => that.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(publishedValueFallback, "bannerContent");
+		public static bool GetHideFromSitemap(ICompositionPageConfiguration that, IPublishedValueFallback publishedValueFallback) => that.Value<bool>(publishedValueFallback, "hideFromSitemap");
 	}
 }

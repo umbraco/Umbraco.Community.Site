@@ -443,5 +443,7 @@ src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
 
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
+/src/UmbracoCommunity.BlockRestrictions/wwwroot/App_Plugins/
 .claude
 .mcp.json
+src/UmbracoCommunity.Web.UI/Hangfire.db*

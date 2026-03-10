@@ -172,7 +172,9 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - **Configuration**: `RegisterSessionize.cs` - Composer that registers options and API client
 - **API Client**: `SessionizeApiClient.cs` - Service with caching for fetching sessions, speakers, schedules
 - **API Controller**: `SessionizeApiController.cs` - REST endpoints at `/api/sessionize`
-- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`
+- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`, `SessionizeQuestion`, `SessionizeQuestionAnswer`
+
+**Speaker Pronouns**: Pronouns are extracted from Sessionize's `questionAnswers` data. The top-level `questions` array is used to find the "Pronouns" question ID (resolved once and cached on `SessionizeAllData.PronounsQuestionId`), then each speaker's `questionAnswers` is checked for a matching answer. Pronouns are displayed in the speakers grid, speaker dialog, and session dialog.
 
 **API Endpoints** (`/api/sessionize`):
 - `GET /sessions` - All sessions
@@ -249,6 +251,7 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Umbraco CMS 17.2.0 on .NET 10
 - Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
+- Markdig 1.0.0 - Markdown processing
 - Schema.NET 13.0.0 - Structured data/schema markup
 - Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
 - Umbraco.Community.Contentment 6.1.1 - Extended content editors

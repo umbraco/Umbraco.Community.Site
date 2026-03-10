@@ -1,6 +1,6 @@
 {
-  "Name": "Page configuration",
-  "Alias": "pageConfiguration",
+  "Name": "[Composition] Page configuration",
+  "Alias": "compositionPageConfiguration",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings color-green",
