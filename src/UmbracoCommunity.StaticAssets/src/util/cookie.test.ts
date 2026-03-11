@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import Cookie from './cookie'
 
+const FIXED_DATE = '2024-01-01T00:00:00Z'
+
 describe('Cookie Utility', () => {
   beforeEach(() => {
     // Clear all cookies before each test
@@ -11,7 +13,7 @@ describe('Cookie Utility', () => {
   })
 
   afterEach(() => {
-    // Clean up after each test
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -86,8 +88,8 @@ describe('Cookie Utility', () => {
 
   describe('setCookie', () => {
     it('should set a cookie with the correct format', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', 'testValue', 1)
       
@@ -97,39 +99,39 @@ describe('Cookie Utility', () => {
     })
 
     it('should set cookie with correct expiration', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', 'testValue', 7)
       
       // The expiration should be 7 days from the mock date
-      const expectedExpiration = new Date(mockDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      const expectedExpiration = new Date(new Date(FIXED_DATE).getTime() + 7 * 24 * 60 * 60 * 1000)
       expect(document.cookie).toContain(`expires=${expectedExpiration.toUTCString()}`)
     })
 
     it('should handle zero expiration days', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', 'testValue', 0)
       
-      const expectedExpiration = new Date(mockDate.getTime())
+      const expectedExpiration = new Date(new Date(FIXED_DATE).getTime())
       expect(document.cookie).toContain(`expires=${expectedExpiration.toUTCString()}`)
     })
 
     it('should handle negative expiration days', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', 'testValue', -1)
       
-      const expectedExpiration = new Date(mockDate.getTime() - 24 * 60 * 60 * 1000)
+      const expectedExpiration = new Date(new Date(FIXED_DATE).getTime() - 24 * 60 * 60 * 1000)
       expect(document.cookie).toContain(`expires=${expectedExpiration.toUTCString()}`)
     })
 
     it('should handle empty string values', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', '', 1)
       
@@ -137,8 +139,8 @@ describe('Cookie Utility', () => {
     })
 
     it('should handle special characters in values', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       Cookie.setCookie('testKey', 'value with spaces & symbols', 1)
       
@@ -146,8 +148,8 @@ describe('Cookie Utility', () => {
     })
 
     it('should overwrite existing cookies with same name', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       // Set initial cookie
       Cookie.setCookie('testKey', 'oldValue', 1)
@@ -161,8 +163,8 @@ describe('Cookie Utility', () => {
 
   describe('integration tests', () => {
     it('should work together for full cookie lifecycle', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       // Set a cookie
       Cookie.setCookie('lifecycleTest', 'testValue', 1)
@@ -177,8 +179,8 @@ describe('Cookie Utility', () => {
     })
 
     it('should handle multiple cookie operations', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       // Test with a single cookie to avoid JSDOM limitations
       document.cookie = 'multi1=value1; path=/'
@@ -192,8 +194,8 @@ describe('Cookie Utility', () => {
     })
 
     it('should handle edge cases', () => {
-      const mockDate = new Date('2024-01-01T00:00:00Z')
-      vi.spyOn(global, 'Date').mockImplementation(() => mockDate)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(FIXED_DATE))
       
       // Test with very long values
       const longValue = 'a'.repeat(1000)

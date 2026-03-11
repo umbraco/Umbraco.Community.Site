@@ -1,0 +1,7 @@
+{
+  "DocumentTypeAlias": "article",
+  "AllowedBlocks": [
+    "headlinesBanner",
+	"accordionBlock"
+  ]
+}

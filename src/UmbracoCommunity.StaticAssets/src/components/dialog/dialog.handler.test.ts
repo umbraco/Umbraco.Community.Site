@@ -6,19 +6,11 @@ describe("DcDialogHandler", () => {
   let mockElement: HTMLElement;
   let existingDialog: HTMLDialogElement | null;
 
-  // Mock HTMLDialogElement if not available
+  // Mock HTMLDialogElement methods not fully supported in jsdom
   beforeEach(() => {
-    // Mock the dialog element's methods
-    const originalCreateElement = document.createElement.bind(document);
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const element = originalCreateElement(tagName);
-      if (tagName === 'dialog') {
-        (element as any).showModal = vi.fn();
-        (element as any).close = vi.fn();
-      }
-      return element;
-    });
-    
+    HTMLDialogElement.prototype.showModal = vi.fn();
+    HTMLDialogElement.prototype.close = vi.fn();
+
     handler = new DcDialogHandler();
     mockElement = document.createElement("div");
     mockElement.textContent = "Test Content";
