@@ -31,6 +31,9 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
   @property({ type: String })
   timezone?: string;
 
+  @property({ type: String, attribute: "program-url" })
+  programUrl?: string;
+
   #getLinkIcon(linkType: string): TemplateResult {
     const icons: Record<string, TemplateResult> = {
       Twitter: iconTwitterX,
@@ -173,6 +176,11 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
     `;
   }
 
+  #getSessionUrl(sessionId: number | undefined): string | null {
+    if (!sessionId || !this.programUrl) return null;
+    return `${this.programUrl}?session=${sessionId}`;
+  }
+
   #renderSessions() {
     if (!this.speaker?.sessions?.length) return nothing;
 
@@ -195,9 +203,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       <div class="speaker-sessions">
         <h3>Sessions</h3>
         <div class="sessions-list">
-          ${sessionsWithDetails.map(({ session, details }) => html`
+          ${sessionsWithDetails.map(({ session, details }) => {
+            const sessionUrl = this.#getSessionUrl(session.id);
+            return html`
             <div class="session-item">
-              <div class="session-name">${session.name}</div>
+              ${sessionUrl
+                ? html`<a class="session-name" href=${sessionUrl}>${session.name}</a>`
+                : html`<div class="session-name">${session.name}</div>`}
               ${details
                 ? html`
                     <div class="session-details">
@@ -217,7 +229,7 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
                   `
                 : nothing}
             </div>
-          `)}
+          `;})}
         </div>
       </div>
     `;
@@ -247,7 +259,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
             `
           )}
           <div class="speaker-info">
-            <h2 class="speaker-name">${this.speaker.fullName}</h2>
+            <h2 class="speaker-name">
+              ${this.speaker.fullName}
+              ${when(
+                this.speaker.pronouns,
+                () => html`<span class="speaker-pronouns">${this.speaker!.pronouns}</span>`
+              )}
+            </h2>
             ${when(
               this.speaker.tagLine,
               () => html`<p class="speaker-tagline">${this.speaker!.tagLine}</p>`
@@ -318,6 +336,13 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
         font-size: 1.5rem;
         color: var(--color-dark, #1b264f);
         text-align: left;
+      }
+
+      .speaker-pronouns {
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--color-dark-grey, #6b7280);
+        margin-left: 0.35rem;
       }
 
       .speaker-tagline {
@@ -399,6 +424,15 @@ export class SessionizeSpeakerDialogElement extends DcDialogBaseElement {
       .session-name {
         font-weight: 600;
         color: var(--color-dark, #1b264f);
+      }
+
+      a.session-name {
+        color: var(--color-blue, #3544b1);
+        text-decoration: none;
+      }
+
+      a.session-name:hover {
+        text-decoration: underline;
       }
 
       .session-details {

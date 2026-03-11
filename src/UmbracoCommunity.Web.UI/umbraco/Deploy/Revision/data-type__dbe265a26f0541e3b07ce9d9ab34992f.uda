@@ -1,0 +1,48 @@
+{
+  "Name": "ROOT banner block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "1291085c-2229-46e0-b8be-218c22a39ae4",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
+        "contentElementTypeKey": "66e0b557-3bbb-4dde-acea-7255772c5cfd",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
+        "contentElementTypeKey": "0cbc344a-cad8-4b82-853f-eb65ed0b7082",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      }
+    ],
+    "validationLimit": {
+      "max": 1
+    },
+    "useLiveEditing": true,
+    "gridColumns": 12
+  },
+  "Parent": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
+  "Udi": "umb://data-type/dbe265a26f0541e3b07ce9d9ab34992f",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/0cbc344acad84b82853feb65ed0b7082"
+    },
+    {
+      "Udi": "umb://document-type/1291085c222946e0b8be218c22a39ae4"
+    },
+    {
+      "Udi": "umb://document-type/66e0b5573bbb4ddeacea7255772c5cfd"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.1"
+}

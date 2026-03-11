@@ -2,16 +2,10 @@
   "Name": "Member login / logout",
   "Alias": "MemberLoginLogout",
   "File": "umb://template-file/MemberLoginLogout.cshtml",
-  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/019c6fe3b9d274d99c2e7292da657b37",
   "Dependencies": [
     {
       "Udi": "umb://template-file/MemberLoginLogout.cshtml",
-      "Ordering": true,
-      "Mode": "Exist"
-    },
-    {
-      "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
       "Ordering": true,
       "Mode": "Exist"
     }

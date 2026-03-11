@@ -164,36 +164,6 @@ Models are generated in **SourceCodeManual** mode (development) / **Nothing** mo
 
 ## Key Features
 
-### GitHub Sync System
-
-Located in `Features/GitHubSync/`, this system:
-- Uses Entity Framework Core with dual database support (SQLite/SQL Server)
-- Syncs GitHub issues, PRs, discussions, and NuGet package data via Hangfire jobs
-- Runs on scheduled intervals (hourly for recent data, weekly for full sync)
-
-**Background Jobs:**
-- `FetchRecentPullRequestsJob` / `FetchAllPullRequestsJob`
-- `FetchRecentIssuesJob` / `FetchAllIssuesJob`
-- `FetchReleaseDiscussionsJob`
-- `FetchRecentNuGetPackageVersionsJob`
-- `FetchHqMembersJob`
-
-Job configuration: `Features/GitHubSync/Configuration/JobsComposer.cs`
-
-### Release Overview System
-
-Located in `Features/ReleaseOverview/`, this feature displays Umbraco CMS release information:
-
-**Controllers:**
-- `ReleaseController` - Individual release pages (implements `IVirtualPageController`)
-- `ReleasesHomeController` - Release landing page
-- `AllReleasesController` - List of all releases
-- `CompareController` - Compare releases
-
-**Virtual Page Pattern**: `ReleaseController` implements `IVirtualPageController` which allows pages to exist without Umbraco content nodes - routes are handled programmatically via custom route composers.
-
-**Views**: Located in `Views/Partials/ReleaseOverview/`
-
 ### Sessionize Integration
 
 Located in `Features/Sessionize/`, this feature integrates with the Sessionize platform for event management:
@@ -202,7 +172,9 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - **Configuration**: `RegisterSessionize.cs` - Composer that registers options and API client
 - **API Client**: `SessionizeApiClient.cs` - Service with caching for fetching sessions, speakers, schedules
 - **API Controller**: `SessionizeApiController.cs` - REST endpoints at `/api/sessionize`
-- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`
+- **Models**: `SessionizeAllData`, `SessionizeSchedule`, `SessionizeSession`, `SessionizeSpeaker`, `SessionizeQuestion`, `SessionizeQuestionAnswer`
+
+**Speaker Pronouns**: Pronouns are extracted from Sessionize's `questionAnswers` data. The top-level `questions` array is used to find the "Pronouns" question ID (resolved once and cached on `SessionizeAllData.PronounsQuestionId`), then each speaker's `questionAnswers` is checked for a matching answer. Pronouns are displayed in the speakers grid, speaker dialog, and session dialog.
 
 **API Endpoints** (`/api/sessionize`):
 - `GET /sessions` - All sessions
@@ -232,28 +204,12 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice functionality:
 
 **API Controllers** (`Controllers/`):
-- HQ Members CRUD operations
-- GitHub data export/import
-- Contribution statistics
-- Release summaries
+- Blog article creation
 
 **Backoffice Dashboards** (`Client/src/dashboards/`):
-- Main dashboard with contribution stats
-- CMS contribution analytics dashboard
-- Data management (import/export GitHub data)
-- HQ members management
+- Sessionize dashboard
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
-
-### Release Management
-
-Releases are tracked via GitHub Discussions in the Umbraco CMS repository:
-- Created automatically by GitHub Actions when `release/*` labels are added
-- Release managers update discussion body with release date and LTS status
-- Community site syncs every hour
-- Release pages display aggregated issues/PRs/discussions by version
-
-See `docs/RELEASES_MANAGEMENT.md` for details.
 
 ### Vite Integration
 
@@ -292,14 +248,13 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.1.0 on .NET 10
-- Entity Framework Core 10.0.2 (SQLite + SQL Server providers)
-- Cultiv.Hangfire 5.2.0 - Background job processing
+- Umbraco CMS 17.2.0 on .NET 10
+- Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
-- Markdig 0.44.0 - Markdown processing
+- Markdig 1.0.0 - Markdown processing
 - Schema.NET 13.0.0 - Structured data/schema markup
-- Umbraco.Community.BlockPreview 5.1.0 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.0.2 - Extended content editors
+- Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
+- Umbraco.Community.Contentment 6.1.1 - Extended content editors
 
 **Frontend:**
 - Lit 3.3.0 - Web components framework
@@ -320,7 +275,7 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 ## Important Notes
 
 - **Git branch**: Main branch is `develop` (not main/master)
-- **Database migrations**: Run automatically on startup via `DatabaseMigrationHostedService`
+- **Database**: Uses Entity Framework Core with SQLite/SQL Server support
 - **Security**: Never commit `appsettings.Local.json` - it's gitignored for secrets
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes

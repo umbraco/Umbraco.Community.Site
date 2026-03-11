@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Social settings</summary>
 	[PublishedModel("socialSettings")]
-	public partial class SocialSettings : PublishedContentModel, IPageConfiguration
+	public partial class SocialSettings : PublishedContentModel, ICompositionPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -86,6 +86,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("hideFromSitemap")]
-		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.PageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 	}
 }

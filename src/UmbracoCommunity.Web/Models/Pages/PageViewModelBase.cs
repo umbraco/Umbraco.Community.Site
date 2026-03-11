@@ -23,6 +23,8 @@ public abstract class PageViewModelBase
 
     public string ContentTypeAlias { get; init; }
 
+    public string Culture { get; set; } = Constants.Culture.Default;
+
     public MenuViewModel Menu { get; set; } = new();
 
     public FooterViewModel Footer { get; set; } = new();

@@ -13,7 +13,7 @@ using UmbracoCommunity.Web.ViewModelBuilders.Schema;
 
 namespace UmbracoCommunity.Web.ViewModelBuilders
 {
-    internal class SeoMetaDataViewModelDecorator : ViewModelBuilderBase, IPageViewModelDecorator<Seo>
+    internal class SeoMetaDataViewModelDecorator : ViewModelBuilderBase, IPageViewModelDecorator<CompositionSeo>
     {
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -49,7 +49,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
 
         public async Task DecorateAsync(PageViewModelBase viewModel, IPublishedContent? currentPage)
         {
-            if (currentPage is not ISeo contentModel)
+            if (currentPage is not ICompositionSeo contentModel)
             {
                 return;
             }
@@ -127,7 +127,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             }
         }
 
-        private string? GetCanonicalUrl(ISeo contentModel)
+        private string? GetCanonicalUrl(ICompositionSeo contentModel)
         {
             if (contentModel is not IPublishedContent content)
             {
@@ -167,7 +167,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 UrlMode.Absolute,
                 webp: false) ?? string.Empty;
 
-        private void AddBaseSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings, IPublishedContent? currentPage)
+        private void AddBaseSchema(PageViewModelBase viewModel, ICompositionSeo contentModel, SocialSettings? socialSettings, IPublishedContent? currentPage)
         {
             if (!string.IsNullOrEmpty(contentModel.CustomSchema))
             {
@@ -201,7 +201,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             }
         }
 
-        private WebPage? GetWebPageSchema(PageViewModelBase viewModel, ISeo contentModel, SocialSettings? socialSettings)
+        private WebPage? GetWebPageSchema(PageViewModelBase viewModel, ICompositionSeo contentModel, SocialSettings? socialSettings)
         {
             var webPageName = GetWebPageName(contentModel);
 

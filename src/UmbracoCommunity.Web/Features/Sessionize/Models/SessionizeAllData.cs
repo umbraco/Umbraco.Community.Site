@@ -16,8 +16,17 @@ public class SessionizeAllData
     [JsonPropertyName("categories")]
     public List<SessionizeCategory> Categories { get; set; } = new();
 
+    [JsonPropertyName("questions")]
+    public List<SessionizeQuestion> Questions { get; set; } = new();
+
     [JsonPropertyName("rooms")]
     public List<SessionizeRoomInfo> Rooms { get; set; } = new();
+
+    /// <summary>
+    /// Cached question ID for the "Pronouns" question, resolved once after deserialization.
+    /// </summary>
+    [JsonIgnore]
+    public int? PronounsQuestionId { get; set; }
 }
 
 /// <summary>
@@ -105,6 +114,9 @@ public class SessionizeSpeakerRaw
 
     [JsonPropertyName("categoryItems")]
     public List<int> CategoryItems { get; set; } = new();
+
+    [JsonPropertyName("questionAnswers")]
+    public List<SessionizeQuestionAnswer> QuestionAnswers { get; set; } = new();
 }
 
 /// <summary>

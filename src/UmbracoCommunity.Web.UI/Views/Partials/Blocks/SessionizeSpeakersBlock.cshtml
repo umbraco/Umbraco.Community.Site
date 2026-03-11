@@ -15,8 +15,11 @@
     @{
         var columns = Model.Settings?.Value<int>("columnsPerRow");
         var columnsAttr = columns > 0 ? $"columns={columns}" : "";
+        var programPage = Umbraco.AssignedContentItem?.Parent?.Children?
+            .FirstOrDefault(c => c.UrlSegment == "program");
+        var programUrl = programPage?.Url() ?? "/program/";
     }
-    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "") @columnsAttr></dc-sessionize-speakers>
+    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "") @columnsAttr program-url="@programUrl"></dc-sessionize-speakers>
 
     @if (Context.Request.IsBlockPreviewRequest())
     {

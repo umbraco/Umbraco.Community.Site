@@ -1,0 +1,252 @@
+{
+  "Name": "ROOT content block grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "UmbracoCommunity.PropertyEditorUi.BlockGridRestricted",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "595d8878-72cc-498a-a966-156a57ae5971",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "03989c3a-65f3-4bc5-bfdf-3d6e1bd35193"
+      },
+      {
+        "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Cards",
+        "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
+        "editorSize": "full"
+      },
+      {
+        "contentElementTypeKey": "3c15228c-4591-4313-b75a-120cee63a699",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "a801c7a3-117e-488b-bf41-05185c16a3ba"
+      },
+      {
+        "contentElementTypeKey": "e6c6b0dc-d60d-480a-b06e-6e81febdac98",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "0f95e9d4-c306-4a91-a754-b0b6e8427f24"
+      },
+      {
+        "contentElementTypeKey": "c735ca50-0612-4680-9525-c72449af1e75",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "0a12408a-e550-43ff-a50d-331b2df9ae84",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          },
+          {
+            "columnSpan": 6
+          }
+        ],
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
+      },
+      {
+        "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "ed42a0f1-1bf2-48ae-af07-c2227369aadf",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466"
+      },
+      {
+        "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "471d5207-9004-4bd5-98c9-db2351678562"
+      },
+      {
+        "contentElementTypeKey": "6f689d5b-3cd6-4b03-87f2-720f626cf50a",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850"
+      },
+      {
+        "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cc7a54a7-a94d-41c1-bb13-4dcc6f399d3f"
+      },
+      {
+        "contentElementTypeKey": "9e262942-ee5f-4a65-831e-9a94e487875b",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "c39783fb-08c3-4a34-88a4-30949d342c17"
+      },
+      {
+        "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "192ec43a-ea4a-42f7-a09d-48abf9c2e09f",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 6
+          },
+          {
+            "columnSpan": 12
+          }
+        ],
+        "label": "Text block",
+        "areas": []
+      },
+      {
+        "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+      },
+      {
+        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "editorSize": "full"
+      }
+    ],
+    "useLiveEditing": true,
+    "createLabel": "Add new content block",
+    "gridColumns": 12
+  },
+  "Parent": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
+  "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/03989c3a65f34bc5bfdf3d6e1bd35193"
+    },
+    {
+      "Udi": "umb://document-type/0a12408ae55043ffa50d331b2df9ae84"
+    },
+    {
+      "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24"
+    },
+    {
+      "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f"
+    },
+    {
+      "Udi": "umb://document-type/1e173c4bebc94aa89753bad29a376466"
+    },
+    {
+      "Udi": "umb://document-type/299b4e217d6b4da68faf4f281c104dcc"
+    },
+    {
+      "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    },
+    {
+      "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
+    },
+    {
+      "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
+    },
+    {
+      "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
+    },
+    {
+      "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
+    },
+    {
+      "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c"
+    },
+    {
+      "Udi": "umb://document-type/76cd95ec67124dc4a211715c9c58be4a"
+    },
+    {
+      "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d"
+    },
+    {
+      "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"
+    },
+    {
+      "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028"
+    },
+    {
+      "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
+    },
+    {
+      "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
+    },
+    {
+      "Udi": "umb://document-type/c4e6e203244c4cf4864aeec650508a40"
+    },
+    {
+      "Udi": "umb://document-type/c735ca50061246809525c72449af1e75"
+    },
+    {
+      "Udi": "umb://document-type/c8450a20087c45978d559bf1c9408284"
+    },
+    {
+      "Udi": "umb://document-type/c8f5ee8c32014c389b2d8fdd93a91850"
+    },
+    {
+      "Udi": "umb://document-type/cc7a54a7a94d41c1bb134dcc6f399d3f"
+    },
+    {
+      "Udi": "umb://document-type/cdca4cc35b164081906873e30005add5"
+    },
+    {
+      "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
+    },
+    {
+      "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
+    },
+    {
+      "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
+    },
+    {
+      "Udi": "umb://document-type/f262c3ebd4404b638dbbb6da83f86f71"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.2"
+}

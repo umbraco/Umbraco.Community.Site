@@ -16,10 +16,10 @@ namespace UmbracoCommunity.Web.Attributes
 
         private class ApplyPageMetaDataFilter : ApplyFilterBase, IAsyncResultFilter
         {
-            private readonly IPageViewModelDecorator<Seo> _viewModelDecorator;
+            private readonly IPageViewModelDecorator<CompositionSeo> _viewModelDecorator;
 
             public ApplyPageMetaDataFilter(IUmbracoContextAccessor umbracoContextAccessor,
-                IPageViewModelDecorator<Seo> viewModelDecorator)
+                IPageViewModelDecorator<CompositionSeo> viewModelDecorator)
                 : base(umbracoContextAccessor) => _viewModelDecorator = viewModelDecorator;
 
             public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)

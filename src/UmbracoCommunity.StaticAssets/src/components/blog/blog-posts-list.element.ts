@@ -20,6 +20,9 @@ export class BlogPostsListElement extends LitElement {
   @property({ type: Number, attribute: "page-size" })
   pageSize = 10;
 
+  @property({ type: String })
+  culture = "en-GB";
+
   @state()
   private _posts: BlogPost[] = [];
 
@@ -217,13 +220,21 @@ export class BlogPostsListElement extends LitElement {
     this.#loadPosts();
   }
 
+  #dateFormatter: Intl.DateTimeFormat | null = null;
+
+  #getDateFormatter(): Intl.DateTimeFormat {
+    if (!this.#dateFormatter) {
+      this.#dateFormatter = new Intl.DateTimeFormat(this.culture, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return this.#dateFormatter;
+  }
+
   #formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    return this.#getDateFormatter().format(new Date(dateString));
   }
 
   #renderLoading() {

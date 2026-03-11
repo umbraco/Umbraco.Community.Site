@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoCommunity.BlockRestrictions",
+  "name": "Block Restrictions",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "UmbracoCommunity.BlockRestrictions.Bundle",
+      "name": "Block Restrictions Bundle",
+      "js": "/App_Plugins/UmbracoCommunityBlockRestrictions/block-restrictions.js"
+    }
+  ]
+}
