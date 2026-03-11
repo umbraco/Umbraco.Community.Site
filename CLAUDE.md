@@ -8,12 +8,13 @@ This is the Umbraco Community Website - a replacement for [community.umbraco.com
 
 ## Solution Structure
 
-The solution consists of 4 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 5 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
+- **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 
 ### Key Directories in UmbracoCommunity.Web
 
@@ -25,11 +26,13 @@ The solution consists of 4 projects (uses Central Package Management via `Direct
 - **Models/** - View models, blocks, and published content models
   - `Models/Api/` - DTOs for API request/response objects
   - `Models/Pages/` - Page view models
-  - `Models/Blocks/` - Block view models
+  - `Models/ContentModels/` - Content models
+  - `Models/ServiceModels/` - Service layer models
+  - `Models/ViewModels/Blocks/` - Block view models
   - `Models/ViewModels/Components/` - Reusable component view models
+  - `Models/ViewModels/Properties/` - Property view models
 - **ViewModelBuilders/** - Convert IPublishedContent to view models
   - `ViewModelBuilders/Pages/` - Page-specific view model builders
-  - `ViewModelBuilders/Blocks/` - Block view model builders
   - `ViewModelBuilders/Components/` - Component view model builders
   - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`)
@@ -128,9 +131,8 @@ See `docs/BUILDING_PAGES.md` for detailed instructions.
 Reusable components using Umbraco's Block List editor:
 1. **Element Type** - Umbraco content structure
 2. **Settings Type** - optional configuration
-3. **View Model** - strongly-typed model (in `Models/Blocks/`)
-4. **View Model Builder** - converts content to view model (in `ViewModelBuilders/Blocks/`)
-5. **View** - Razor partial (in `Views/Partials/Blocks/`)
+3. **View Model** - strongly-typed model (in `Models/ViewModels/Blocks/`)
+4. **View** - Razor partial (in `Views/Partials/Blocks/`)
 
 See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 
@@ -145,7 +147,8 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **models/** - TypeScript data models
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions
-- **assets/** - Static assets (images, SVGs)
+- **assets/** - Static assets (images, map pins)
+- **svg/** - SVG icon modules (arrows, close, grid, lucide icons)
 - **plugins/** - Vite plugins
 - **test/** - Test utilities
 
@@ -198,6 +201,43 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
   "CacheDurationInMinutes": 60
 }
 ```
+
+### Block Restrictions
+
+Located in `UmbracoCommunity.BlockRestrictions/`, this package restricts which block types are available per document type, with content tree inheritance. See [`src/UmbracoCommunity.BlockRestrictions/README.md`](src/UmbracoCommunity.BlockRestrictions/README.md) for full documentation.
+
+**Backend:**
+- **Composer**: `BlockRestrictionComposer.cs` - Registers EF Core DbContext, Swagger docs, migration hosted service, and scoped services
+- **Service**: `BlockRestrictionService.cs` - Core business logic: resolves restrictions by walking the content tree (ancestor inheritance), caches results, syncs rules to JSON files for version control, zip export/import
+- **Infrastructure**: EF Core DbContext (`BlockRestrictionDbContext`), data store (`BlockRestrictionStore`), migration hosted service, file service (`BlockRestrictionFileService`)
+- **Controllers**: `BlockRestrictionApiController.cs` — Backoffice Management API endpoints (secured with Umbraco backoffice auth via `[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]`)
+- **Models**: Response/request DTOs in `Models/` — `AllowedBlocksResponse`, `BlockRestrictionFileModel`, `FileImportModels`, etc.
+
+**Frontend (`Client/`):**
+- **Property editors**: `BlockGridRestricted` and `BlockListRestricted` — custom property editor UIs that wrap the native Umbraco block editors with restriction filtering
+- **Workspace view**: "Blocks" tab on Document Type workspace for configuring restrictions per document type
+- **Dashboard**: "Block Restrictions" section under Settings > Advanced for file import/export, zip export/import, and DB sync
+- **Clipboard translators**: Copy/paste support between restricted and native block editors
+- **API client**: Typed fetch wrapper with Umbraco backoffice auth integration
+
+**Key concepts:**
+- Rules are set per document type and inherited by descendant content nodes in the tree
+- Fail-open design: no restrictions = all blocks allowed
+- Rules are persisted to both database and JSON files (for version control portability)
+- Zip export/import enables portable rule bundles for cloud-hosted environments without direct filesystem access
+- Custom property editor UIs: `BlockGridRestricted` and `BlockListRestricted`
+
+**API endpoints** (base: `/umbraco/umbracocommunityblockrestrictions/api/v1`):
+- `GET allowed-blocks/{nodeKey}` — resolve effective restrictions for a content node
+- `GET/PUT/DELETE rules/{docTypeKey}` — CRUD for restriction rules
+- `GET element-types` — list all element types
+- `GET block-data-types` — list restricted block data types
+- `GET file-import/preview` — preview file-to-DB diff
+- `POST file-import/apply` — apply file import to DB
+- `POST file-import/export-rule/{docTypeKey}` — export single DB rule to disk
+- `GET file-import/export-db` — download all DB rules as zip
+- `GET file-import/export-files` — download all disk files as zip
+- `POST file-import/upload` — upload zip of rule files to disk
 
 ### Backoffice Extensions
 
