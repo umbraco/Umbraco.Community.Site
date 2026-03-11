@@ -955,10 +955,7 @@ export class SessionizeProgramElement extends LitElement {
       }
     }
 
-    const top = (topPixels / totalHeight) * 100;
-    const heightPercent = (heightPixels / totalHeight) * 100;
-
-    return { top, height: heightPercent };
+    return { top: topPixels, height: heightPixels };
   }
 
   #formatSessionTime(dateString: string): string {
@@ -1069,7 +1066,7 @@ export class SessionizeProgramElement extends LitElement {
           return html`
             <div
               class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""} ${isShortSession ? "short-session" : ""}"
-              style="top: ${position.top}%; height: ${position.height}%;"
+              style="top: ${position.top}px; height: ${position.height}px;"
               @click=${() => this.#openSessionDialog(session)}
               role="button"
               tabindex="0"

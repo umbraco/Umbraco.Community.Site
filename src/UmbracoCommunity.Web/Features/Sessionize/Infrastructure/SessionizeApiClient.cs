@@ -93,9 +93,10 @@ public class SessionizeApiClient
         var allData = await GetAllDataAsync(cancellationToken);
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
+        var roomLookup = allData.Rooms.ToDictionary(r => r.Id, r => r.Name);
 
         return allData.Sessions
-            .Select(raw => MapToSession(raw, speakerLookup, sessionLookup, allData.PronounsQuestionId))
+            .Select(raw => MapToSession(raw, speakerLookup, sessionLookup, roomLookup, allData.PronounsQuestionId))
             .ToList();
     }
 
@@ -136,6 +137,7 @@ public class SessionizeApiClient
         var allData = await GetAllDataAsync(cancellationToken);
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var rawSessionLookup = allData.Sessions.ToDictionary(s => s.Id);
+        var roomLookup = allData.Rooms.ToDictionary(r => r.Id, r => r.Name);
 
         // Sort rooms once and cache the list
         var sortedRooms = allData.Rooms.OrderBy(r => r.Sort).ToList();
@@ -143,7 +145,7 @@ public class SessionizeApiClient
         // Pre-map all sessions to avoid repeated mapping
         var sessionLookup = allData.Sessions.ToDictionary(
             s => s.Id,
-            s => MapToSession(s, speakerLookup, rawSessionLookup, allData.PronounsQuestionId));
+            s => MapToSession(s, speakerLookup, rawSessionLookup, roomLookup, allData.PronounsQuestionId));
 
         // Group sessions by date, then by time slot
         var sessionsByDate = allData.Sessions
@@ -198,7 +200,7 @@ public class SessionizeApiClient
         return schedule;
     }
 
-    private static SessionizeSession MapToSession(SessionizeSessionRaw raw, Dictionary<string, SessionizeSpeakerRaw> speakerLookup, Dictionary<string, SessionizeSessionRaw> sessionLookup, int? pronounsQuestionId)
+    private static SessionizeSession MapToSession(SessionizeSessionRaw raw, Dictionary<string, SessionizeSpeakerRaw> speakerLookup, Dictionary<string, SessionizeSessionRaw> sessionLookup, Dictionary<int, string> roomLookup, int? pronounsQuestionId)
     {
         return new SessionizeSession
         {
@@ -210,7 +212,7 @@ public class SessionizeApiClient
             IsServiceSession = raw.IsServiceSession,
             IsPlenumSession = raw.IsPlenumSession,
             RoomId = raw.RoomId,
-            Room = raw.Room,
+            Room = raw.Room ?? (raw.RoomId.HasValue && roomLookup.TryGetValue(raw.RoomId.Value, out var roomName) ? roomName : null),
             LiveUrl = raw.LiveUrl,
             RecordingUrl = raw.RecordingUrl,
             Status = raw.Status,
@@ -246,7 +248,8 @@ public class SessionizeApiClient
 
         var speakerLookup = allData.Speakers.ToDictionary(s => s.Id);
         var sessionLookup = allData.Sessions.ToDictionary(s => s.Id);
-        return MapToSession(rawSession, speakerLookup, sessionLookup, allData.PronounsQuestionId);
+        var roomLookup = allData.Rooms.ToDictionary(r => r.Id, r => r.Name);
+        return MapToSession(rawSession, speakerLookup, sessionLookup, roomLookup, allData.PronounsQuestionId);
     }
 
     /// <summary>
