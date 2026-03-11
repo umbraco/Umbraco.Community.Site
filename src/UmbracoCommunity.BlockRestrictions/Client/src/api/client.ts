@@ -183,3 +183,78 @@ export async function getBlockDataTypes(): Promise<BlockDataTypeInfo[]> {
   if (!response.ok) throw new Error(`Failed to fetch block data types: ${response.statusText}`);
   return response.json();
 }
+
+// ─── File import types ─────────────────────────────────────────────────────
+
+/** A rule diff showing file vs database state. */
+export interface FileImportRuleChange {
+  alias: string;
+  documentTypeKey: string;
+  fileBlocks: string[];
+  dbBlocks: string[];
+  blocksAdded: string[];
+  blocksRemoved: string[];
+}
+
+/** A database rule with no corresponding JSON file. */
+export interface FileImportOrphanedRule {
+  documentTypeKey: string;
+  alias: string;
+  currentBlocks: string[];
+}
+
+/** A JSON file referencing an unknown document type alias. */
+export interface FileImportUnknownAlias {
+  alias: string;
+}
+
+/** Preview response categorising all rules. */
+export interface FileImportPreviewResponse {
+  toAdd: FileImportRuleChange[];
+  toUpdate: FileImportRuleChange[];
+  unchanged: FileImportRuleChange[];
+  toDelete: FileImportOrphanedRule[];
+  unknownAliases: FileImportUnknownAlias[];
+  hasChanges: boolean;
+}
+
+/** An error that occurred while applying a specific rule. */
+export interface FileImportApplyError {
+  alias: string;
+  error: string;
+}
+
+/** Apply response with operation counts. */
+export interface FileImportApplyResponse {
+  added: number;
+  updated: number;
+  deleted: number;
+  skipped: number;
+  errors: FileImportApplyError[];
+}
+
+// ─── File import API functions ─────────────────────────────────────────────
+
+/** Previews what a file import would do without making changes. */
+export async function previewFileImport(): Promise<FileImportPreviewResponse> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/preview`);
+  if (!response.ok) throw new Error(`Failed to preview file import: ${response.statusText}`);
+  return response.json();
+}
+
+/** Applies the file import: upserts from files and deletes orphaned DB rules. */
+export async function applyFileImport(): Promise<FileImportApplyResponse> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/apply`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error(`Failed to apply file import: ${response.statusText}`);
+  return response.json();
+}
+
+/** Exports an existing DB rule to a JSON file on disk. */
+export async function exportRuleToFile(docTypeKey: string): Promise<void> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-rule/${docTypeKey}`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error(`Failed to export rule: ${response.statusText}`);
+}
