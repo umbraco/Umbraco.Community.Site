@@ -27,6 +27,9 @@ import {
   applyFileImport,
   deleteRule,
   exportRuleToFile,
+  exportDbRulesZip,
+  exportDiskFilesZip,
+  uploadZip,
   type FileImportPreviewResponse,
   type FileImportApplyResponse,
   type FileImportRuleChange,
@@ -45,6 +48,9 @@ export class FileImportDashboardElement extends UmbElementMixin(LitElement) {
   @state() private _showUnchanged = false;
   /** Tracks orphaned rule keys that have a pending action (to disable buttons). */
   @state() private _busyOrphanKeys = new Set<string>();
+  @state() private _exportingDb = false;
+  @state() private _exportingFiles = false;
+  @state() private _uploading = false;
 
   private _notificationContext?: UmbNotificationContext;
 
@@ -136,6 +142,83 @@ export class FileImportDashboardElement extends UmbElementMixin(LitElement) {
     }
   }
 
+  private _downloadBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    a.addEventListener("click", (e) => e.stopPropagation(), { once: true });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  private async _exportDb() {
+    this._exportingDb = true;
+    try {
+      const blob = await exportDbRulesZip();
+      const date = new Date().toISOString().slice(0, 10);
+      this._downloadBlob(blob, `block-restrictions-db-${date}.zip`);
+    } catch (e) {
+      this._notificationContext?.peek("danger", {
+        data: { message: `Failed to export DB rules: ${e}` },
+      });
+    } finally {
+      this._exportingDb = false;
+    }
+  }
+
+  private async _exportFiles() {
+    this._exportingFiles = true;
+    try {
+      const blob = await exportDiskFilesZip();
+      const date = new Date().toISOString().slice(0, 10);
+      this._downloadBlob(blob, `block-restrictions-files-${date}.zip`);
+    } catch (e) {
+      this._notificationContext?.peek("danger", {
+        data: { message: `Failed to export disk files: ${e}` },
+      });
+    } finally {
+      this._exportingFiles = false;
+    }
+  }
+
+  private async _handleUpload(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    // Reset the input so the same file can be re-uploaded.
+    input.value = "";
+
+    this._uploading = true;
+    try {
+      const result = await uploadZip(file);
+      if (result.errors.length > 0) {
+        this._notificationContext?.peek("warning", {
+          data: {
+            message: `Uploaded with ${result.errors.length} error(s). ${result.filesWritten} file(s) written.`,
+          },
+        });
+      } else {
+        this._notificationContext?.peek("positive", {
+          data: {
+            message: `${result.filesWritten} file(s) written.`,
+          },
+        });
+      }
+      // Refresh the preview to reflect the newly imported files.
+      await this._loadPreview();
+    } catch (e) {
+      this._notificationContext?.peek("danger", {
+        data: { message: `Failed to upload zip: ${e}` },
+      });
+    } finally {
+      this._uploading = false;
+    }
+  }
+
   private _reset() {
     this._viewState = "initial";
     this._preview = null;
@@ -146,7 +229,7 @@ export class FileImportDashboardElement extends UmbElementMixin(LitElement) {
 
   render() {
     return html`
-      <uui-box headline="Block Restrictions File Import">
+      <uui-box headline="Block Restrictions">
         <p class="description">
           Compare block restriction rules in <code>umbraco/BlockRestrictions/</code>
           JSON files against the database. Preview the differences, then apply to
@@ -155,6 +238,57 @@ export class FileImportDashboardElement extends UmbElementMixin(LitElement) {
         ${this._viewState === "initial" ? this._renderInitial() : nothing}
         ${this._viewState === "preview" ? this._renderPreview() : nothing}
         ${this._viewState === "applied" ? this._renderApplied() : nothing}
+      </uui-box>
+
+      <uui-box headline="Export &amp; Import" class="zip-box">
+        <p class="description">
+          Download rules as a portable zip bundle or upload a zip to populate the
+          disk files. Useful for cloud-hosted environments without direct filesystem access.
+        </p>
+
+        <div class="zip-section">
+          <h4>Export</h4>
+          <div class="zip-actions">
+            <uui-button
+              look="secondary"
+              label="Export from Database"
+              ?disabled=${this._exportingDb}
+              @click=${this._exportDb}
+            >
+              ${this._exportingDb ? "Exporting..." : "Export from Database"}
+            </uui-button>
+            <uui-button
+              look="secondary"
+              label="Export from Disk"
+              ?disabled=${this._exportingFiles}
+              @click=${this._exportFiles}
+            >
+              ${this._exportingFiles ? "Exporting..." : "Export from Disk"}
+            </uui-button>
+          </div>
+        </div>
+
+        <div class="zip-section">
+          <h4>Import</h4>
+          <input
+            type="file"
+            accept=".zip"
+            class="hidden-input"
+            @change=${this._handleUpload}
+          />
+          <uui-button
+            look="primary"
+            label="Upload ZIP"
+            ?disabled=${this._uploading}
+            @click=${(e: Event) => {
+              const btn = e.currentTarget as HTMLElement;
+              const input = btn.parentElement?.querySelector<HTMLInputElement>('input[type="file"]');
+              input?.click();
+            }}
+          >
+            ${this._uploading ? "Uploading..." : "Upload ZIP"}
+          </uui-button>
+        </div>
       </uui-box>
     `;
   }
@@ -543,8 +677,33 @@ export class FileImportDashboardElement extends UmbElementMixin(LitElement) {
       margin-bottom: var(--uui-size-space-1);
     }
 
+    uui-badge {
+      position: static;
+    }
+
     uui-table {
       width: 100%;
+    }
+
+    .zip-box {
+      margin-top: var(--uui-size-space-5);
+    }
+
+    .zip-section {
+      margin-bottom: var(--uui-size-space-5);
+    }
+
+    .zip-section h4 {
+      margin-bottom: var(--uui-size-space-3);
+    }
+
+    .zip-actions {
+      display: flex;
+      gap: var(--uui-size-space-3);
+    }
+
+    .hidden-input {
+      display: none;
     }
   `;
 }

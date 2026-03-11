@@ -7,6 +7,9 @@ import {
   deleteRule,
   getElementTypes,
   getBlockDataTypes,
+  exportDbRulesZip,
+  exportDiskFilesZip,
+  uploadZip,
 } from "./client.js";
 
 const API_BASE = "/umbraco/umbracocommunityblockrestrictions/api/v1";
@@ -307,5 +310,122 @@ describe("getBlockDataTypes", () => {
     await expect(getBlockDataTypes()).rejects.toThrow(
       "Failed to fetch block data types",
     );
+  });
+});
+
+// ─── exportDbRulesZip ─────────────────────────────────────────────────────
+
+describe("exportDbRulesZip", () => {
+  it("calls the correct endpoint and returns a Blob", async () => {
+    fetchMock.mockResolvedValue(new Response("zip-bytes", { status: 200 }));
+
+    const result = await exportDbRulesZip();
+
+    const [url] = fetchMock.mock.calls[0];
+    expect(url).toContain(`${API_BASE}/file-import/export-db`);
+    expect(result.size).toBeGreaterThan(0);
+  });
+
+  it("throws on HTTP error", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: 500, statusText: "Internal Server Error" }),
+    );
+
+    await expect(exportDbRulesZip()).rejects.toThrow(
+      "Failed to export DB rules",
+    );
+  });
+});
+
+// ─── exportDiskFilesZip ───────────────────────────────────────────────────
+
+describe("exportDiskFilesZip", () => {
+  it("calls the correct endpoint and returns a Blob", async () => {
+    fetchMock.mockResolvedValue(new Response("zip-bytes", { status: 200 }));
+
+    const result = await exportDiskFilesZip();
+
+    const [url] = fetchMock.mock.calls[0];
+    expect(url).toContain(`${API_BASE}/file-import/export-files`);
+    expect(result.size).toBeGreaterThan(0);
+  });
+
+  it("throws on HTTP error", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: 500, statusText: "Internal Server Error" }),
+    );
+
+    await expect(exportDiskFilesZip()).rejects.toThrow(
+      "Failed to export disk files",
+    );
+  });
+});
+
+// ─── uploadZip ────────────────────────────────────────────────────────────
+
+describe("uploadZip", () => {
+  it("sends a POST with FormData containing the file", async () => {
+    const responseBody = { filesWritten: 3, errors: [] };
+    fetchMock.mockResolvedValue(mockResponse(responseBody));
+
+    const file = new File(["zip-data"], "rules.zip", {
+      type: "application/zip",
+    });
+    const result = await uploadZip(file);
+
+    expect(result).toEqual(responseBody);
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toContain(`${API_BASE}/file-import/upload`);
+    expect(options.method).toBe("POST");
+    expect(options.body).toBeInstanceOf(FormData);
+    expect((options.body as FormData).get("file")).toBeInstanceOf(File);
+  });
+
+  it("does not set Content-Type header (browser sets multipart boundary)", async () => {
+    fetchMock.mockResolvedValue(
+      mockResponse({ filesWritten: 0, errors: [] }),
+    );
+
+    const file = new File(["zip-data"], "rules.zip");
+    await uploadZip(file);
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["Content-Type"]).toBeUndefined();
+  });
+
+  it("includes Authorization header when token is configured", async () => {
+    setAuthConfig({ token: "my-token" });
+    fetchMock.mockResolvedValue(
+      mockResponse({ filesWritten: 1, errors: [] }),
+    );
+
+    const file = new File(["zip-data"], "rules.zip");
+    await uploadZip(file);
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers["Authorization"]).toBe("Bearer my-token");
+  });
+
+  it("returns errors from the response", async () => {
+    const responseBody = {
+      filesWritten: 1,
+      errors: [{ alias: "bad.json", error: "Invalid JSON" }],
+    };
+    fetchMock.mockResolvedValue(mockResponse(responseBody));
+
+    const file = new File(["zip-data"], "rules.zip");
+    const result = await uploadZip(file);
+
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].alias).toBe("bad.json");
+  });
+
+  it("throws on HTTP error", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(null, { status: 500, statusText: "Internal Server Error" }),
+    );
+
+    const file = new File(["zip-data"], "rules.zip");
+    await expect(uploadZip(file)).rejects.toThrow("Failed to upload zip");
   });
 });

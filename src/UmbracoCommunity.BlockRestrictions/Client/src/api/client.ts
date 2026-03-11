@@ -258,3 +258,49 @@ export async function exportRuleToFile(docTypeKey: string): Promise<void> {
   });
   if (!response.ok) throw new Error(`Failed to export rule: ${response.statusText}`);
 }
+
+// ─── Zip export/import types ───────────────────────────────────────────────
+
+/** Response from the zip upload endpoint. */
+export interface FileUploadResponse {
+  filesWritten: number;
+  errors: FileImportApplyError[];
+}
+
+// ─── Zip export/import API functions ───────────────────────────────────────
+
+/** Downloads all database rules as a zip archive. */
+export async function exportDbRulesZip(): Promise<Blob> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-db`);
+  if (!response.ok) throw new Error(`Failed to export DB rules: ${response.statusText}`);
+  return response.blob();
+}
+
+/** Downloads all disk JSON files as a zip archive. */
+export async function exportDiskFilesZip(): Promise<Blob> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-files`);
+  if (!response.ok) throw new Error(`Failed to export disk files: ${response.statusText}`);
+  return response.blob();
+}
+
+/** Uploads a zip archive of block restriction JSON files. */
+export async function uploadZip(file: File): Promise<FileUploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const token = await resolveToken();
+  const baseUrl = _authConfig.baseUrl ?? "";
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  // Do not set Content-Type — the browser sets the multipart boundary automatically.
+  const response = await fetch(`${baseUrl}${API_BASE}/file-import/upload`, {
+    method: "POST",
+    headers,
+    body: formData,
+    credentials: _authConfig.credentials ?? "same-origin",
+  });
+  if (!response.ok) throw new Error(`Failed to upload zip: ${response.statusText}`);
+  return response.json();
+}
