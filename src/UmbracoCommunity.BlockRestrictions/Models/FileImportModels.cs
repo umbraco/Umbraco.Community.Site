@@ -66,3 +66,12 @@ public class FileImportApplyError
     public string Alias { get; set; } = string.Empty;
     public string Error { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Response from the zip upload endpoint with count of files written and any errors.
+/// </summary>
+public class FileUploadResponse
+{
+    public int FilesWritten { get; set; }
+    public List<FileImportApplyError> Errors { get; set; } = [];
+}

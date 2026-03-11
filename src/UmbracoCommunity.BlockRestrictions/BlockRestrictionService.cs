@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -634,6 +635,118 @@ public class BlockRestrictionService
 
         // Invalidate all cached resolved results.
         Interlocked.Increment(ref _ruleVersion);
+
+        return response;
+    }
+
+    /// <summary>
+    /// Exports all database rules as a zip archive containing one JSON file per rule.
+    /// Each file is named {alias}.json and contains a <see cref="BlockRestrictionFileModel"/>.
+    /// </summary>
+    public async Task<byte[]> ExportDbRulesAsZipAsync()
+    {
+        var allRules = await _store.GetAllAsync();
+        var keyToAlias = _contentTypeService.GetAll()
+            .ToDictionary(ct => ct.Key, ct => ct.Alias);
+
+        using var memoryStream = new MemoryStream();
+        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach (var rule in allRules)
+            {
+                if (!keyToAlias.TryGetValue(rule.DocumentTypeKey, out var alias))
+                {
+                    _logger.LogWarning(
+                        "Could not resolve alias for document type {Key} — skipping zip entry",
+                        rule.DocumentTypeKey);
+                    continue;
+                }
+
+                var aliases = JsonSerializer.Deserialize<List<string>>(rule.AllowedBlockAliasesJson) ?? [];
+                var fileModel = new BlockRestrictionFileModel
+                {
+                    DocumentTypeAlias = alias,
+                    AllowedBlocks = aliases.OrderBy(a => a, StringComparer.OrdinalIgnoreCase).ToList()
+                };
+
+                var json = JsonSerializer.Serialize(fileModel, new JsonSerializerOptions { WriteIndented = true });
+                var entry = archive.CreateEntry($"{alias}.json", CompressionLevel.Optimal);
+                await using var entryStream = entry.Open();
+                await using var writer = new StreamWriter(entryStream);
+                await writer.WriteAsync(json);
+            }
+        }
+
+        return memoryStream.ToArray();
+    }
+
+    /// <summary>
+    /// Exports all JSON files currently on disk as a zip archive.
+    /// </summary>
+    public byte[] ExportDiskFilesAsZip()
+    {
+        var files = _fileService.ReadAllRuleFiles();
+
+        using var memoryStream = new MemoryStream();
+        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            foreach (var file in files)
+            {
+                var json = JsonSerializer.Serialize(file, new JsonSerializerOptions { WriteIndented = true });
+                var entry = archive.CreateEntry($"{file.DocumentTypeAlias}.json", CompressionLevel.Optimal);
+                using var entryStream = entry.Open();
+                using var writer = new StreamWriter(entryStream);
+                writer.Write(json);
+            }
+        }
+
+        return memoryStream.ToArray();
+    }
+
+    /// <summary>
+    /// Imports a zip archive containing block restriction JSON files to disk.
+    /// Each .json entry is validated and written via <see cref="BlockRestrictionFileService.SaveRuleFile"/>.
+    /// </summary>
+    public FileUploadResponse ImportZipToFiles(Stream zipStream)
+    {
+        var response = new FileUploadResponse();
+
+        using var archive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+        foreach (var entry in archive.Entries)
+        {
+            if (!entry.FullName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            try
+            {
+                using var entryStream = entry.Open();
+                using var reader = new StreamReader(entryStream);
+                var json = reader.ReadToEnd();
+
+                var model = JsonSerializer.Deserialize<BlockRestrictionFileModel>(json);
+                if (model == null || string.IsNullOrWhiteSpace(model.DocumentTypeAlias))
+                {
+                    response.Errors.Add(new FileImportApplyError
+                    {
+                        Alias = entry.FullName,
+                        Error = "Invalid or empty JSON file"
+                    });
+                    continue;
+                }
+
+                _fileService.SaveRuleFile(model.DocumentTypeAlias, model.AllowedBlocks);
+                response.FilesWritten++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to import zip entry {EntryName}", entry.FullName);
+                response.Errors.Add(new FileImportApplyError
+                {
+                    Alias = entry.FullName,
+                    Error = ex.Message
+                });
+            }
+        }
 
         return response;
     }

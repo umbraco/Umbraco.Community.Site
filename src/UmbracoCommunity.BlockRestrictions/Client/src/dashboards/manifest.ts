@@ -17,9 +17,9 @@ export const manifests: Array<UmbExtensionManifest> = [
     name: "Block Restrictions Import Menu Item",
     weight: 50,
     meta: {
-      label: "Block Restrictions Import",
+      label: "Block Restrictions",
       icon: "icon-filter",
-      entityType: "block-restrictions-import",
+      entityType: "block-restrictions",
       menus: ["Umb.Menu.AdvancedSettings"],
     },
   },
@@ -30,8 +30,8 @@ export const manifests: Array<UmbExtensionManifest> = [
     alias: WORKSPACE_ALIAS,
     name: "Block Restrictions Import Workspace",
     meta: {
-      entityType: "block-restrictions-import",
-      headline: "Block Restrictions Import",
+      entityType: "block-restrictions",
+      headline: "Block Restrictions",
     },
   },
   // Single workspace view with the import UI
