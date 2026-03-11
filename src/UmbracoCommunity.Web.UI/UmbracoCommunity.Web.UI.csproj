@@ -10,9 +10,7 @@
   <ItemGroup>
     <!-- Commented out packages will be enabled when pushing to Cloud (and Deploy.OnPrem removed) -->
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" /> -->
-
     <PackageReference Include="Flip.Umbraco" />
-
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" />
     <PackageReference Include="Umbraco.Cms" />
     <PackageReference Include="Umbraco.Community.BlockPreview" />
@@ -21,10 +19,16 @@
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" /> -->
     <PackageReference Include="Umbraco.Forms" />
     <PackageReference Include="Umbraco.Forms.Deploy" />
-
-    <PackageReference Include="Cultiv.Hangfire" />
+    <PackageReference Include="Umbraco.AI" />
+    <PackageReference Include="Umbraco.AI.Agent" />
+    <PackageReference Include="Umbraco.AI.Agent.Copilot" />
+    <PackageReference Include="Umbraco.AI.Amazon" />
+    <PackageReference Include="Umbraco.AI.Anthropic" />
+    <PackageReference Include="Umbraco.AI.Google" />
+    <PackageReference Include="Umbraco.AI.MicrosoftFoundry" />
+    <PackageReference Include="Umbraco.AI.OpenAI" />
+    <PackageReference Include="Umbraco.AI.Prompt" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
-    <PackageReference Include="Markdig" />
   </ItemGroup>
 
   <ItemGroup>

@@ -86,8 +86,6 @@ namespace UmbracoCommunity.Web.Extensions
 
         public static IUmbracoBuilder AddViewModelBuildersAndDecorators(this IUmbracoBuilder builder)
         {
-            // Register shared utilities
-            builder.Services.AddScoped<Utilities.ReleaseDiscussionParser>();
             builder.Services.AddScoped<IContentDataService, ContentDataService>();
 
             // Utilities
@@ -104,16 +102,8 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
-            // Register builders as both interface and concrete types
-            builder.Services.AddScoped<ReleasesHomePageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<ReleasesHomePageViewModel>>(sp => sp.GetRequiredService<ReleasesHomePageViewModelBuilder>());
-
-            builder.Services.AddScoped<IViewModelBuilder<ReleasePageViewModel>, ReleasePageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<AllReleasesPageViewModel>, AllReleasesPageViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<ComparePageViewModel>, ComparePageViewModelBuilder>();
 
             builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
-            builder.Services.AddScoped<IViewModelBuilder<MenuReleasesViewModel>, MenuReleasesViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<FooterViewModel>, FooterViewModelBuilder>();
 
             return builder;
