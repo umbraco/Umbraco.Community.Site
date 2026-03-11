@@ -127,4 +127,40 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
         var result = await _service.GetBlockDataTypes();
         return Ok(result);
     }
+
+    /// <summary>
+    /// Previews what a file import would do without making any changes.
+    /// Compares JSON files in umbraco/BlockRestrictions/ against the current DB state.
+    /// </summary>
+    [HttpGet("file-import/preview")]
+    public async Task<IActionResult> PreviewFileImport()
+    {
+        var result = await _service.PreviewFileImportAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Applies the file import: upserts rules from JSON files and deletes orphaned DB rules.
+    /// </summary>
+    [HttpPost("file-import/apply")]
+    public async Task<IActionResult> ApplyFileImport()
+    {
+        var result = await _service.ApplyFileImportAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Exports an existing database rule to a JSON file on disk.
+    /// Used to create a file for an orphaned DB rule so it persists across environments.
+    /// </summary>
+    [HttpPost("file-import/export-rule/{docTypeKey:guid}")]
+    public async Task<IActionResult> ExportRuleToFile(Guid docTypeKey)
+    {
+        var exported = await _service.ExportRuleToFileAsync(docTypeKey);
+        if (!exported)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
 }
