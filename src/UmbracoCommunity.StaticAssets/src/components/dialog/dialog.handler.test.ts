@@ -23,10 +23,17 @@ describe("DcDialogHandler", () => {
   });
 
   afterEach(() => {
+    // Dispatch dialog-close to clean up any pending listeners from unclosed dialogs
+    document.dispatchEvent(new CustomEvent("dialog-close"));
+
     // Clean up any dialogs created during tests
     const dialogs = document.querySelectorAll("dialog");
     dialogs.forEach(dialog => dialog.remove());
-    
+
+    // Clean up body state
+    document.body.className = "";
+    document.body.style.cssText = "";
+
     // Restore original dialog if it existed
     if (existingDialog) {
       document.body.appendChild(existingDialog);

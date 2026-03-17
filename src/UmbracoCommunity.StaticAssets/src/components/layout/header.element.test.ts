@@ -43,6 +43,10 @@ describe('DcHeaderElement', () => {
   })
 
   afterEach(() => {
+    element?.disconnectedCallback()
+    container?.remove()
+    document.body.className = ''
+    document.body.style.cssText = ''
     vi.restoreAllMocks()
     vi.useRealTimers()
   })
