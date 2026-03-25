@@ -4,7 +4,9 @@ This guide provides step-by-step instructions for creating new pages in this sol
 
 ## Overview
 
-The solution uses a structured approach for building pages with the following components:
+Not every page needs the full pipeline. Thanks to Umbraco's default routing and the ViewComponent-based layout, a simple page can be just a **document type + view** — no controller, view model, or builder required.
+
+For pages that need custom logic (query parameters, API calls, transformed data), the full structure is:
 
 1. **Document Type** - Umbraco content structure
 2. **Controller** - Handles HTTP requests and route hijacking
@@ -12,6 +14,36 @@ The solution uses a structured approach for building pages with the following co
 4. **View Model Builder** - Converts Umbraco content to view models
 5. **View** - Razor template for rendering
 6. **Tests** - Unit tests for the view model builder
+
+### Simple pages (no controller needed)
+
+If a page just renders its content properties and reusable blocks, you only need the document type, the generated model, and a view. Umbraco's default routing will handle it — no controller or view model builder is required.
+
+The **PageNotFound** page is a real example of this:
+
+```cshtml
+@* src/UmbracoCommunity.Web.UI/Views/PageNotFound.cshtml *@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<PageNotFound>
+@{
+    Layout = "Layout.cshtml";
+    var contentGrid = Model.ContentBlocks.ParseBlockGrid();
+}
+
+<partial name="~/Views/Partials/Components/BannerBlocks.cshtml" for="BannerContent" />
+<partial name="~/Views/Partials/Components/ContentBlocks.cshtml" model="contentGrid" />
+```
+
+That's the entire page — no controller, no view model class, no builder, no DI registration. The layout's ViewComponents handle menu, footer, and SEO automatically.
+
+**When to use this approach:**
+- The page only renders properties from its document type (text, images, blocks)
+- No query string parameters, pagination, or form handling
+- No data transformation or external API calls
+
+**When you need the full pipeline:**
+- The page accepts input (query params, filters, pagination)
+- You need to fetch or transform data beyond what's on the content node
+- You want a custom view model for testability or to reshape the data for the view
 
 ## Prerequisites
 
@@ -112,16 +144,15 @@ internal class MyCustomPageViewModelBuilder : ViewModelBuilderBase, IAsyncViewMo
 Create a controller that inherits from `RenderController`:
 
 ```csharp
-// src/UmbracoCommunity.Web/Controllers/MyCustomPageController.cs
+// src/UmbracoCommunity.Web/Controllers/Render/MyCustomPageController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
-using UmbracoCommunity.Web.Attributes;
 using UmbracoCommunity.Web.ViewModelBuilders;
 
-namespace UmbracoCommunity.Web.Controllers;
+namespace UmbracoCommunity.Web.Controllers.Render;
 
 public class MyCustomPageController : RenderController
 {
@@ -137,8 +168,6 @@ public class MyCustomPageController : RenderController
     [NonAction]
     public sealed override IActionResult Index() => throw new NotImplementedException();
 
-    [ApplyCommonElements]
-    [ApplyPageMetaData]
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
         MyCustomPageViewModel viewModel = await _viewModelBuilder.BuildAsync(
@@ -148,6 +177,8 @@ public class MyCustomPageController : RenderController
     }
 }
 ```
+
+> **Note:** Layout concerns (menu, footer, SEO meta tags) are handled automatically by ViewComponents in the layout — no action filter attributes are needed on controllers.
 
 ### Step 6: Register Dependencies
 
@@ -323,13 +354,15 @@ public async Task<MyCustomPageViewModel> BuildAsync(IPublishedContent currentPag
 }
 ```
 
-## Common Attributes
+## Common Patterns
 
-### Controller Attributes
+### Layout ViewComponents
 
-- `[ApplyCommonElements]` - Applies header, footer, and other common elements
-- `[ApplyPageMetaData]` - Applies SEO metadata
-- `[ApplyCertifiedDeveloperPageMetaData]` - Special metadata for developer pages
+Layout-level concerns are handled automatically by ViewComponents invoked in `Layout.cshtml` — no attributes are needed on controllers:
+- **MetaTagsViewComponent** — SEO metadata (title, OG tags, schema markup) via `ISeoDataService`
+- **MenuViewComponent** — Site navigation
+- **FooterViewComponent** — Footer content
+- **FaviconViewComponent** — Favicon
 
 ### View Model Builder Patterns
 

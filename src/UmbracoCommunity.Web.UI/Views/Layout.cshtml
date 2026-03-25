@@ -1,72 +1,39 @@
-﻿@{
+@{
 	Layout = null;
 }
-@using Umbraco.Cms.Core.Models
-@using Umbraco.Cms.Web.Common.PublishedModels;
-@using UmbracoCommunity.Web.Models.Pages
 @using Umbraco.Forms.Web
-@inherits UmbracoViewPage<PageViewModelBase>
+@using UmbracoCommunity.Web.Services
+
+@inject ContentContextService currentPage;
 
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
 <head>
-    <partial name="~/Views/Partials/Components/MetaTags.cshtml" />
-    <partial name="~/Views/Partials/Components/Robots.cshtml" for="Robots" />
-    @{
-        await RenderFavicon();
-    }
+    @await Component.InvokeAsync("MetaTags")
+    @await Component.InvokeAsync("Favicon")
     <link rel="stylesheet" vite-href="index" asp-add-nonce="true" />
-    <link rel="stylesheet" vite-href="@Model.ContentTypeAlias" />
+    <link rel="stylesheet" vite-href="@currentPage.ContentTypeAlias" />
     @RenderSection("Links", required: false)
     @RenderSection("CSS", required: false)
     @Html.RenderUmbracoFormDependencies(Url)
-    @{
-        await RenderPreloads();
-    }
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 </head>
 
-<body class="@GetBodyClasses()">
+<body class="document-@currentPage.ContentTypeAlias">
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <partial name="~/Views/Partials/Components/Menu.cshtml" for="Menu" />
+    @await Component.InvokeAsync("Menu")
 
     <main id="main-content">
         @RenderBody()
     </main>
 
-    <partial name="~/Views/Partials/Components/Footer.cshtml" for="Footer"/>
+    @await Component.InvokeAsync("Footer")
     <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
-    <script vite-src="@Model.ContentTypeAlias" asp-add-nonce="true"></script>
+    <script vite-src="@currentPage.ContentTypeAlias" asp-add-nonce="true"></script>
 
     @RenderSection("JS", required: false)
     @Html.PageScripts()
 </body>
 
 </html>
-
-@{
-    string GetBodyClasses()
-    {
-        var bodyClasses = new List<string> { $"document-{Model.ContentTypeAlias}" };
-        return string.Join(" ", bodyClasses);
-    }
-
-    async Task RenderFavicon()
-    {
-        if (Model.Favicon != null)
-        {
-            var sizes = new[] { 192, 32, 96, 16 };
-            foreach (var size in sizes)
-            {
-                var url = Model.Favicon.GetCropUrl(width: size, height: size, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
-                <link rel="icon" type="image/png" sizes="@(size)x@(size)" href="@url">
-            }
-        }
-        await Task.CompletedTask;
-    }
-
-    async Task RenderPreloads()
-    {
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    }
-}

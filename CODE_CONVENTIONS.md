@@ -41,7 +41,7 @@ Controllers are organized by type in subfolders (this is a project convention, n
   - Inherit from Umbraco's `RenderController`
   - **Controller name must match document type alias** [Umbraco] - required for route hijacking
   - Return views via `CurrentTemplate(viewModel)`
-  - Use `[ApplyCommonElements]` and `[ApplyPageMetaData]` attributes [Project]
+  - Layout concerns (menu, footer, SEO meta tags) are handled by ViewComponents, not controller attributes [Project]
 
 - **Plain MVC Controllers** (root `Controllers/`):
   - Inherit from `Controller`
@@ -72,8 +72,6 @@ public class BlogController : RenderController
     [NonAction]
     public sealed override IActionResult Index() => throw new NotImplementedException();
 
-    [ApplyCommonElements]
-    [ApplyPageMetaData]
     public IActionResult Index(CancellationToken cancellationToken)
     {
         var viewModel = _viewModelBuilder.Build(
@@ -159,7 +157,7 @@ From [Umbraco docs](https://docs.umbraco.com/umbraco-cms/implementation/services
 |---------|-----|-----|
 | Render Controllers | `IUmbracoContextAccessor` | Context exists on HTTP request thread |
 | API Controllers | `IUmbracoContextFactory` | May not have existing context; creates one if needed |
-| Action Filters | `IUmbracoContextAccessor` | Running within HTTP request |
+| ViewComponents | `ContentContextService` | Wraps `IUmbracoContextAccessor` with convenient properties |
 | Background Jobs | `IUmbracoContextFactory` | No HTTP request; must create context explicitly |
 | Singleton Services | `IUmbracoContextFactory` | Enables use outside request scope |
 
@@ -343,12 +341,17 @@ builder.Services.AddScoped<Utilities.UrlUtilities>();
 - **Entry Points**: Files starting with `_` in `entrypoints/` folder
 - **Tests**: Colocated with components using `.test.ts` suffix
 
-## Action Filters [Project]
+## ViewComponents [Project]
 
-Use custom action filters for cross-cutting concerns:
-- `[ApplyCommonElements]` - Injects menu and footer into `PageViewModelBase`
-- `[ApplyPageMetaData]` - Populates SEO metadata from content
-- `[ApplyCommonElementsReleases]` - Variant for release pages
+Layout-level cross-cutting concerns (menu, footer, SEO meta tags, favicon) are handled by ASP.NET Core ViewComponents in `ViewComponents/`, not action filter attributes. Each ViewComponent independently resolves its data via injected services (e.g., `ContentContextService`, `ISeoDataService`).
+
+ViewComponent views live in `Views/Shared/Components/{ComponentName}/{ComponentName}.cshtml` (named views, not `Default.cshtml`, to avoid ambiguous tab names in IDEs).
+
+**Key ViewComponents:**
+- `MetaTagsViewComponent` - Builds SEO metadata via `ISeoDataService`
+- `MenuViewComponent` - Builds site navigation
+- `FooterViewComponent` - Builds footer content
+- `FaviconViewComponent` - Renders the favicon
 
 ## Middleware [Project]
 
