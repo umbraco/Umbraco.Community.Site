@@ -183,3 +183,124 @@ export async function getBlockDataTypes(): Promise<BlockDataTypeInfo[]> {
   if (!response.ok) throw new Error(`Failed to fetch block data types: ${response.statusText}`);
   return response.json();
 }
+
+// ─── File import types ─────────────────────────────────────────────────────
+
+/** A rule diff showing file vs database state. */
+export interface FileImportRuleChange {
+  alias: string;
+  documentTypeKey: string;
+  fileBlocks: string[];
+  dbBlocks: string[];
+  blocksAdded: string[];
+  blocksRemoved: string[];
+}
+
+/** A database rule with no corresponding JSON file. */
+export interface FileImportOrphanedRule {
+  documentTypeKey: string;
+  alias: string;
+  currentBlocks: string[];
+}
+
+/** A JSON file referencing an unknown document type alias. */
+export interface FileImportUnknownAlias {
+  alias: string;
+}
+
+/** Preview response categorising all rules. */
+export interface FileImportPreviewResponse {
+  toAdd: FileImportRuleChange[];
+  toUpdate: FileImportRuleChange[];
+  unchanged: FileImportRuleChange[];
+  toDelete: FileImportOrphanedRule[];
+  unknownAliases: FileImportUnknownAlias[];
+  hasChanges: boolean;
+}
+
+/** An error that occurred while applying a specific rule. */
+export interface FileImportApplyError {
+  alias: string;
+  error: string;
+}
+
+/** Apply response with operation counts. */
+export interface FileImportApplyResponse {
+  added: number;
+  updated: number;
+  deleted: number;
+  skipped: number;
+  errors: FileImportApplyError[];
+}
+
+// ─── File import API functions ─────────────────────────────────────────────
+
+/** Previews what a file import would do without making changes. */
+export async function previewFileImport(): Promise<FileImportPreviewResponse> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/preview`);
+  if (!response.ok) throw new Error(`Failed to preview file import: ${response.statusText}`);
+  return response.json();
+}
+
+/** Applies the file import: upserts from files and deletes orphaned DB rules. */
+export async function applyFileImport(): Promise<FileImportApplyResponse> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/apply`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error(`Failed to apply file import: ${response.statusText}`);
+  return response.json();
+}
+
+/** Exports an existing DB rule to a JSON file on disk. */
+export async function exportRuleToFile(docTypeKey: string): Promise<void> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-rule/${docTypeKey}`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error(`Failed to export rule: ${response.statusText}`);
+}
+
+// ─── Zip export/import types ───────────────────────────────────────────────
+
+/** Response from the zip upload endpoint. */
+export interface FileUploadResponse {
+  filesWritten: number;
+  errors: FileImportApplyError[];
+}
+
+// ─── Zip export/import API functions ───────────────────────────────────────
+
+/** Downloads all database rules as a zip archive. */
+export async function exportDbRulesZip(): Promise<Blob> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-db`);
+  if (!response.ok) throw new Error(`Failed to export DB rules: ${response.statusText}`);
+  return response.blob();
+}
+
+/** Downloads all disk JSON files as a zip archive. */
+export async function exportDiskFilesZip(): Promise<Blob> {
+  const response = await fetchWithAuth(`${API_BASE}/file-import/export-files`);
+  if (!response.ok) throw new Error(`Failed to export disk files: ${response.statusText}`);
+  return response.blob();
+}
+
+/** Uploads a zip archive of block restriction JSON files. */
+export async function uploadZip(file: File): Promise<FileUploadResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const token = await resolveToken();
+  const baseUrl = _authConfig.baseUrl ?? "";
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  // Do not set Content-Type — the browser sets the multipart boundary automatically.
+  const response = await fetch(`${baseUrl}${API_BASE}/file-import/upload`, {
+    method: "POST",
+    headers,
+    body: formData,
+    credentials: _authConfig.credentials ?? "same-origin",
+  });
+  if (!response.ok) throw new Error(`Failed to upload zip: ${response.statusText}`);
+  return response.json();
+}

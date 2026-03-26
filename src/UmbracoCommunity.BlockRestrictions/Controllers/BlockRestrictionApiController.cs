@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UmbracoCommunity.BlockRestrictions.Models;
 
@@ -125,6 +126,80 @@ public class BlockRestrictionApiController : BlockRestrictionApiControllerBase
     public async Task<IActionResult> GetBlockDataTypes()
     {
         var result = await _service.GetBlockDataTypes();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Previews what a file import would do without making any changes.
+    /// Compares JSON files in umbraco/BlockRestrictions/ against the current DB state.
+    /// </summary>
+    [HttpGet("file-import/preview")]
+    public async Task<IActionResult> PreviewFileImport()
+    {
+        var result = await _service.PreviewFileImportAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Applies the file import: upserts rules from JSON files and deletes orphaned DB rules.
+    /// </summary>
+    [HttpPost("file-import/apply")]
+    public async Task<IActionResult> ApplyFileImport()
+    {
+        var result = await _service.ApplyFileImportAsync();
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Exports an existing database rule to a JSON file on disk.
+    /// Used to create a file for an orphaned DB rule so it persists across environments.
+    /// </summary>
+    [HttpPost("file-import/export-rule/{docTypeKey:guid}")]
+    public async Task<IActionResult> ExportRuleToFile(Guid docTypeKey)
+    {
+        var exported = await _service.ExportRuleToFileAsync(docTypeKey);
+        if (!exported)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Downloads all database rules as a zip archive of JSON files.
+    /// </summary>
+    [HttpGet("file-import/export-db")]
+    public async Task<IActionResult> ExportDbRulesAsZip()
+    {
+        var bytes = await _service.ExportDbRulesAsZipAsync();
+        var filename = $"block-restrictions-db-{DateTime.UtcNow:yyyy-MM-dd}.zip";
+        return File(bytes, "application/zip", filename);
+    }
+
+    /// <summary>
+    /// Downloads all JSON files currently on disk as a zip archive.
+    /// </summary>
+    [HttpGet("file-import/export-files")]
+    public IActionResult ExportDiskFilesAsZip()
+    {
+        var bytes = _service.ExportDiskFilesAsZip();
+        var filename = $"block-restrictions-files-{DateTime.UtcNow:yyyy-MM-dd}.zip";
+        return File(bytes, "application/zip", filename);
+    }
+
+    /// <summary>
+    /// Uploads a zip archive containing block restriction JSON files and writes them to disk.
+    /// </summary>
+    [HttpPost("file-import/upload")]
+    public IActionResult UploadZip(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        using var stream = file.OpenReadStream();
+        var result = _service.ImportZipToFiles(stream);
         return Ok(result);
     }
 }
