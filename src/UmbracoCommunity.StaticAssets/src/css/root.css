@@ -27,7 +27,7 @@
     --color-red: #e51400;
     --color-page-surface: var(--color-identity-smoke);
     --color-footer-headline: #babcd5;
-    --link-color: var(--color-black);
+    --link-color: var(--color-blue);
 
     --screen-md: 1024px;
     --screen-lg: 1216px;
