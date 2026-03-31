@@ -29,6 +29,14 @@
           "Alias": "icon",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
           "Name": "Icon",
+          "SortOrder": 2
+        },
+        {
+          "Key": "b7b21b68-88bd-490f-a62d-63281ea71271",
+          "Alias": "linkTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "If nothing entered, this will default to page name",
+          "Name": "Link title",
           "SortOrder": 1
         },
         {
@@ -37,7 +45,7 @@
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
           "Description": "Short text under the link (max 25 chars)",
           "Name": "Caption",
-          "SortOrder": 2
+          "SortOrder": 3
         }
       ]
     }
@@ -45,6 +53,10 @@
   "PropertyTypes": [],
   "Udi": "umb://document-type/dd701bc68aad4a1cb67c300f48ee948e",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
       "Ordering": true
@@ -63,5 +75,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.0.2"
 }
