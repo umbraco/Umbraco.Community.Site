@@ -18,14 +18,24 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>[Settings] Speakers block</summary>
-	[PublishedModel("settingsSpeakersBlock")]
-	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId, ISettingsSpeakerGrid
+	// Mixin Content Type with alias "settingsSpeakerGrid"
+	/// <summary>Settings - speaker grid</summary>
+	public partial interface ISettingsSpeakerGrid : IPublishedElement
+	{
+		/// <summary>Speakers per row</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		string SpeakersPerRow { get; }
+	}
+
+	/// <summary>Settings - speaker grid</summary>
+	[PublishedModel("settingsSpeakerGrid")]
+	public partial class SettingsSpeakerGrid : PublishedElementModel, ISettingsSpeakerGrid
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "settingsSpeakersBlock";
+		public new const string ModelTypeAlias = "settingsSpeakerGrid";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -34,14 +44,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsSpeakersBlock, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsSpeakerGrid, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public SettingsSpeakersBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public SettingsSpeakerGrid(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,19 +60,16 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("blockId")]
-		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
-
-		///<summary>
 		/// Speakers per row: The maximum number of speakers to show in a row next to each other, default is 4.   This only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("speakersPerRow")]
-		public virtual string SpeakersPerRow => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsSpeakerGrid.GetSpeakersPerRow(this, _publishedValueFallback);
+		public virtual string SpeakersPerRow => GetSpeakersPerRow(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Speakers per row</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static string GetSpeakersPerRow(ISettingsSpeakerGrid that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "speakersPerRow");
 	}
 }

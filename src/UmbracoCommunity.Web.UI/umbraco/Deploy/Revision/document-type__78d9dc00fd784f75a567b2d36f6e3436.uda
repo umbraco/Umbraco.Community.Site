@@ -1,0 +1,44 @@
+{
+  "Name": "Settings - speaker grid",
+  "Alias": "settingsSpeakerGrid",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-megaphone color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "d1e6978c-6dc5-46fc-9b16-ba058df0d361",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "46a171fd-26c8-45ce-bda7-5b24438025c6",
+          "Alias": "speakersPerRow",
+          "DataType": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
+          "Description": "The maximum number of speakers to show in a row next to each other, default is 4.  \nThis only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.",
+          "Name": "Speakers per row"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/78d9dc00fd784f75a567b2d36f6e3436",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.2"
+}
