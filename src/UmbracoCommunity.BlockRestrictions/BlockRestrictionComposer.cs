@@ -80,6 +80,10 @@ public class BlockRestrictionComposer : IComposer
         // Apply database migrations automatically on startup (creates the table if needed).
         builder.Services.AddHostedService<BlockRestrictionMigrationHostedService>();
 
+        // File-based persistence: singleton service for reading/writing JSON rule files.
+        // Import from files is triggered manually via the backoffice dashboard.
+        builder.Services.AddSingleton<BlockRestrictionFileService>();
+
         // Register the data access layer and business logic service as scoped
         // (one instance per HTTP request, matching Umbraco's service lifetime).
         builder.Services.AddScoped<BlockRestrictionStore>();

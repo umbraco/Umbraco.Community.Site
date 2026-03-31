@@ -369,8 +369,10 @@ export class SessionizeSessionDialogElement extends DcDialogBaseElement {
       .map((id) => {
         const info = this.#getCategoryItemName(id);
         if (!info) return null;
-        if (info.name.toLowerCase().includes("minute") ||
-            info.name.toLowerCase().includes("regular talk")) {
+        const lower = info.name.toLowerCase().trim();
+        if (lower.includes("minute") ||
+            lower.includes("regular talk") ||
+            ["yes", "no", "true", "false"].includes(lower)) {
           return null;
         }
         // Exclude audience filter items from topic hashtags
