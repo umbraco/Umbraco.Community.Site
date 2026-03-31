@@ -15,7 +15,7 @@
         }
 
         @{
-            var columns = Model.Settings?.Value<int>("columnsPerRow") ?? 0;
+            var columns = int.TryParse(Model.Settings?.SpeakersPerRow, out var parsed) ? parsed : 0;
             if (columns <= 0)
             {
                 columns = Math.Min(Model.Content.Speakers.Count(), 5);
