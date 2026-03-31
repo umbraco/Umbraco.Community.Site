@@ -132,7 +132,7 @@ async function runLocal(withDotnet) {
 
   if (withDotnet) {
     console.log(`\n${BOLD}Starting dotnet run...${RESET}\n`);
-    await runProcess("Web.UI", "dotnet", ["run"], projects["Web.UI"].path);
+    await runProcess("Web.UI", "dotnet", ["run", "--launch-profile", "Kestrel [ENV: Local]"], projects["Web.UI"].path);
   }
 }
 
@@ -153,7 +153,7 @@ async function runDev(withDotnet) {
 
   const tasks = [runProcess("StaticAssets", "npm", ["run", "dev"], sa.path)];
   if (withDotnet) {
-    tasks.push(runProcess("Web.UI", "dotnet", ["run"], projects["Web.UI"].path));
+    tasks.push(runProcess("Web.UI", "dotnet", ["run", "--launch-profile", "Kestrel [ENV: Development - default]"], projects["Web.UI"].path));
   }
 
   await Promise.all(tasks);
