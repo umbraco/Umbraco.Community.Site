@@ -18,6 +18,13 @@ img {
     max-width: 100%;
 }
 
+ul.no-margin p,
+ol.no-margin p {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
 /* Backoffice specific block styling */
 .dc-image-block,
 .dc-text-block,
@@ -335,6 +342,7 @@ img {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     margin-bottom: 10px;
+    padding: 10px;
 }
 
 .dc-faq-block dt {
