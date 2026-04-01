@@ -58,6 +58,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 - **Labels**: All form inputs have associated labels
 - **Error messages**: Form validation errors are clearly communicated
 - **Focus management**: Form fields receive focus in logical order
+- **Stepped forms**: When `EnableSteppedForm` is active, the `<dc-form-steps>` component validates required fields per step, scrolls to and focuses the first invalid field, and displays Umbraco Forms validation messages. A "Step X of Y" indicator communicates progress. Users can navigate back to previous steps without validation.
 
 ### Motion and Animation
 
