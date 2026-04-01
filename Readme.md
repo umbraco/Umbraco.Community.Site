@@ -12,18 +12,33 @@ If you need to work with valid API keys for services, or to store connection str
 
 The file is ignored from source control.
 
+### Building Everything
+
+From the repository root:
+
+```bash
+node build.mjs local
+```
+
+This builds all frontend projects (backoffice extensions and static assets) for deployment.
+
 ### Running the Solution Locally
 
-We need two processes running - IIS to serve Umbraco, and Vite's dev server to provide the front end assets.
+The quickest way to get everything running for development:
 
-So to start the environment:
+```bash
+node build.mjs dev:dotnet
+```
 
-- cd to `src/UmbracoCommunity.Web.UI`
-- `dotnet run`
-- open a new console
-- cd to `src/UmbracoCommunity.StaticAssets`
-- `npm run dev`
-- `npm ci` (if you get an error due to missing components on the previous command)
+This builds the backoffice extensions, then starts the Vite dev server and `dotnet run` together with color-coded output. The default launch profile uses the `Development` environment.
+
+If you prefer to run things separately (or run without the build script), you need two processes:
+
+- cd to `src/UmbracoCommunity.Web.UI` and run `dotnet run`
+- In a separate terminal, cd to `src/UmbracoCommunity.StaticAssets` and run `npm run dev`
+  - Run `npm ci` first if you get errors about missing packages
+
+See [BUILD.md](BUILD.md) for all build script options and launch profiles.
 
 ### Upgrading Packages
 
