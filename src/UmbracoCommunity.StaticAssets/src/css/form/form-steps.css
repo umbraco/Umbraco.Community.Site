@@ -1,0 +1,38 @@
+dc-form-steps .umbraco-forms-fieldset {
+  display: none;
+}
+
+dc-form-steps .umbraco-forms-fieldset.dc-form-steps__step--active {
+  display: block;
+}
+
+.dc-form-steps__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-sm);
+  margin-top: var(--unit-md);
+}
+
+.dc-form-steps__indicator {
+  font-size: var(--font-size-sm);
+  color: var(--color-grey);
+}
+
+.dc-form-steps__btn {
+  background-color: var(--color-dark);
+  border: none;
+  cursor: pointer;
+  color: var(--color-white);
+  padding: var(--unit-xs) var(--unit);
+  border-radius: var(--unit-xs);
+
+  &:hover {
+    background-color: var(--color-blue);
+    color: var(--color-pink);
+  }
+
+  &[hidden] {
+    visibility: hidden;
+  }
+}

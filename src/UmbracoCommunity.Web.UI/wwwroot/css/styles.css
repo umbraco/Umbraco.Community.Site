@@ -328,23 +328,80 @@ img {
 /* Accordion block */
 .dc-faqs {
     padding: 20px;
+    text-align: center;
 }
 
-.dc-faqs .block-title {
-    text-align: center;
+.dc-faq-block {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.dc-faq-block dt {
+    position: relative;
+}
+
+.dc-faq-block .dc-faqs__checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.dc-faq-block label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.dc-faq-block label::after {
+    content: '';
+    border: solid #283A97;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 4px;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.dc-faq-block .dc-faqs__checkbox:checked ~ label::after {
+    transform: rotate(-135deg);
+}
+
+.dc-faq-block svg {
+    display: none;
 }
 
 .dc-faq-block h3 {
     font-size: 16px;
     font-weight: bold;
+    margin: 0;
+    color: #283A97;
 }
 
-.dc-faq-block svg, .dc-faq-block input {
-    display: none;
+.dc-faq-block .expand {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease;
+}
+
+.dc-faq-block .dc-faqs__checkbox:checked ~ .expand {
+    max-height: 500px;
 }
 
 .dc-faq-block dd {
     margin: 0;
+    padding: 0 16px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
 }
 
 /* Video block preview */
