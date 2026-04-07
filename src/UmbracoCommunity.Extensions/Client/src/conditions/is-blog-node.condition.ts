@@ -7,6 +7,7 @@ import {
 import { UmbConditionBase } from "@umbraco-cms/backoffice/extension-registry";
 import { UMB_ENTITY_CONTEXT } from "@umbraco-cms/backoffice/entity";
 import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
+import { UMB_DOCUMENT_ENTITY_TYPE } from "@umbraco-cms/backoffice/document";
 import { UmbracoCommunityExtensionsService } from "../api/index.js";
 import { client } from "../api/client.gen.js";
 
@@ -34,8 +35,11 @@ export class IsBlogNodeCondition
   ) {
     super(host, args);
 
+    // Guard against null/undefined to prevent clobbering the client auth
+    // config during workspace transitions (which would cause 401s).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
-      const config = authContext?.getOpenApiConfiguration();
+      if (!authContext) return;
+      const config = authContext.getOpenApiConfiguration();
       client.setConfig({
         auth: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
@@ -51,6 +55,15 @@ export class IsBlogNodeCondition
 
     this.consumeContext(UMB_ENTITY_CONTEXT, (entityContext) => {
       if (!entityContext) {
+        this.permitted = false;
+        return;
+      }
+
+      // Only check blog status for content documents, not document types
+      // in the Settings section. getEntityType() returns 'document' for
+      // content nodes and 'document-type' for document types in Settings.
+      const entityType = entityContext.getEntityType();
+      if (entityType !== UMB_DOCUMENT_ENTITY_TYPE) {
         this.permitted = false;
         return;
       }

@@ -43,6 +43,10 @@ describe('DcHeaderElement', () => {
   })
 
   afterEach(() => {
+    element?.disconnectedCallback()
+    container?.remove()
+    document.body.className = ''
+    document.body.style.cssText = ''
     vi.restoreAllMocks()
     vi.useRealTimers()
   })
@@ -80,75 +84,73 @@ describe('DcHeaderElement', () => {
   })
 
   describe('menu button handling', () => {
+    let menuBtn: HTMLButtonElement
+
     beforeEach(() => {
       // Create proper DOM structure for menu functionality
       const header = element.querySelector('header')!
-      const menuBtn = document.createElement('button')
+      menuBtn = document.createElement('button')
       menuBtn.id = 'menuBtn'
       header.appendChild(menuBtn)
-      
+
       const navMobileBg = document.createElement('div')
       navMobileBg.className = 'nav-mobile-bg'
       header.appendChild(navMobileBg)
-      
+
       const navList = document.createElement('div')
       navList.className = 'nav-list'
       header.appendChild(navList)
-      
+
       element.connectedCallback()
     })
 
     it('should open menu when menu button is clicked', () => {
-      const menuBtn = element.querySelector('#menuBtn') as HTMLButtonElement
       const header = element.querySelector('header')!
-      
+
       menuBtn.click()
-      
+
       expect(header.classList.contains('menu-active')).toBe(true)
       expect(document.body.classList.contains('scroll-disabled')).toBe(true)
     })
 
     it('should close menu when menu button is clicked again', () => {
-      const menuBtn = element.querySelector('#menuBtn') as HTMLButtonElement
       const header = element.querySelector('header')!
-      
+
       // Open menu first
       menuBtn.click()
       expect(header.classList.contains('menu-active')).toBe(true)
-      
+
       // Close menu
       menuBtn.click()
-      
+
       // Fast-forward timers to complete the animation
       vi.advanceTimersByTime(500)
-      
+
       expect(header.classList.contains('menu-active')).toBe(false)
       expect(document.body.classList.contains('scroll-disabled')).toBe(false)
     })
 
     it('should remove search-active class when menu is toggled', () => {
-      const menuBtn = element.querySelector('#menuBtn') as HTMLButtonElement
       const header = element.querySelector('header')!
-      
+
       // Add search-active class first
       header.classList.add('search-active')
-      
+
       menuBtn.click()
-      
+
       expect(header.classList.contains('search-active')).toBe(false)
     })
 
     it('should remove mobile-active class from dropdown items when menu is toggled', () => {
-      const menuBtn = element.querySelector('#menuBtn') as HTMLButtonElement
       const header = element.querySelector('header')!
-      
+
       // Create dropdown items with mobile-active class
       const dropdownItem = document.createElement('div')
       dropdownItem.className = 'nav-item__dropdown mobile-active'
       header.appendChild(dropdownItem)
-      
+
       menuBtn.click()
-      
+
       expect(dropdownItem.classList.contains('mobile-active')).toBe(false)
     })
   })

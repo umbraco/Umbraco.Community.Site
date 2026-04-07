@@ -3,7 +3,6 @@
 @import "./image-block.css";
 @import "./hero-block.css";
 @import "./columns.css";
-@import "./sliders/sliders.css";
 @import "./faqs-block.css";
 @import "./faqs-and-image-block.css";
 @import "./intro-teaser-block.css";
@@ -14,18 +13,14 @@
 @import "./boxes-row.css";
 @import "./timeline-block.css";
 @import "./plan-comparison.css";
-@import "./steps-block.css";
-@import "./careers.css";
 @import "./spacing-block.css";
 @import "./headline-block.css";
-@import "./numbers-block.css";
 @import "./cards-block.css";
 @import "./image-and-text-block.css";
 @import "./big-cta-block.css";
 @import "./carousel/carousels.css";
 @import "./multiple-cards.css";
 @import "./quote-block.css";
-@import "./testimonial-logos-block.css";
 @import "./speakers-grid.css";
 @import "./program-block.css";
 

@@ -27,6 +27,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
         }
 
         private static readonly string[] s_noWebpConversionTypes = ["webp"];
+        private static readonly string[] s_vectorGraphicTypes = ["svg"];
 
         protected static string? GetImageUrl(
             MediaWithCrops? mediaWithCrops,
@@ -38,11 +39,17 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             bool? localCropsOnly = false,
             int? height = null,
             int? width = null,
-            bool? webp = true)
+            bool? webp = true,
+            int? quality = 85)
         {
             if (mediaWithCrops is null)
             {
                 return null;
+            }
+
+            if (IsVectorImage(mediaWithCrops))
+            {
+                return publishedUrlProvider.GetMediaUrl(mediaWithCrops);
             }
 
             string? cropUrl;
@@ -55,7 +62,8 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                     publishedUrlProvider,
                     width: width,
                     urlMode: mode,
-                    imageCropMode: ImageCropMode.Pad);
+                    imageCropMode: ImageCropMode.Pad,
+                    quality: quality);
             }
             else if (height is not null)
             {
@@ -65,24 +73,32 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                     publishedUrlProvider,
                     height: height,
                     urlMode: mode,
-                    imageCropMode: ImageCropMode.Pad);
+                    imageCropMode: ImageCropMode.Pad,
+                    quality: quality);
             }
             else if (localCropsOnly is false || mediaWithCrops.LocalCrops.HasCrops() is false)
             {
                 cropUrl = mediaWithCrops.GetCropUrl(
-                    cropAlias,
                     imageUrlGenerator,
                     publishedValueFallback,
                     publishedUrlProvider,
-                    mode);
+                    cropAlias: cropAlias,
+                    quality: quality,
+                    urlMode: mode,
+                    useCropDimensions: true);
             }
             else
             {
-                cropUrl = mediaWithCrops.LocalCrops.GetCropUrl(cropAlias, imageUrlGenerator);
+                var localCropUrl = mediaWithCrops.LocalCrops.GetCropUrl(cropAlias, imageUrlGenerator);
+                cropUrl = localCropUrl is not null ? $"{localCropUrl}&quality={quality}" : null;
             }
 
-            return CanConvertToWebp(cropUrl, mediaWithCrops, webp) ? AppendWebpFormatter(cropUrl) : cropUrl;
+            return CanConvertToWebp(cropUrl, mediaWithCrops, webp) ? PrependWebpFormatter(cropUrl) : cropUrl;
         }
+
+        private static bool IsVectorImage(MediaWithCrops mediaWithCrops) =>
+            mediaWithCrops.Content is UmbracoMediaVectorGraphics ||
+            s_vectorGraphicTypes.Contains((mediaWithCrops.Content as Image)?.UmbracoExtension);
 
         private static bool CanConvertToWebp([NotNullWhen(true)] string? cropUrl, MediaWithCrops mediaWithCrops, bool? webp = true) =>
         cropUrl is not null &&
@@ -90,14 +106,23 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
         mediaWithCrops.Content is not UmbracoMediaVectorGraphics &&
         s_noWebpConversionTypes.Contains((mediaWithCrops.Content as Image)?.UmbracoExtension) == false;
 
-        private static string AppendWebpFormatter(string cropUrl)
+        private static string PrependWebpFormatter(string cropUrl)
         {
             // cropUrl is usually, but not always, relative, UriBuilder requires absolute.
             bool isRelative = cropUrl.StartsWith('/');
             UriBuilder cropUrlBuilder = new(isRelative ? $"http://example.com{cropUrl}" : cropUrl);
-            NameValueCollection query = HttpUtility.ParseQueryString(cropUrlBuilder.Query);
-            query["format"] = "webp";
-            cropUrlBuilder.Query = query.ToString();
+            NameValueCollection existingQuery = HttpUtility.ParseQueryString(cropUrlBuilder.Query);
+
+            // Build query string with format=webp first, then existing parameters
+            var queryParts = new List<string> { "format=webp" };
+            foreach (string? key in existingQuery.AllKeys)
+            {
+                if (key is not null && !key.Equals("format", StringComparison.OrdinalIgnoreCase))
+                {
+                    queryParts.Add($"{HttpUtility.UrlEncode(key)}={HttpUtility.UrlEncode(existingQuery[key])}");
+                }
+            }
+            cropUrlBuilder.Query = string.Join("&", queryParts);
 
             return isRelative ? cropUrlBuilder.Path + cropUrlBuilder.Query : cropUrlBuilder.Uri.ToString();
         }
