@@ -1,0 +1,12 @@
+@using Umbraco.Cms.Core.Models
+@model MediaWithCrops?
+
+@if (Model != null)
+{
+    var sizes = new[] { 192, 32, 96, 16 };
+    foreach (var size in sizes)
+    {
+        var url = Model.GetCropUrl(width: size, height: size, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
+        <link rel="icon" type="image/png" sizes="@(size)x@(size)" href="@url">
+    }
+}

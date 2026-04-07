@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's an ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring automated GitHub integration for release tracking, community data synchronization, and Sessionize event integration.
+This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring automated GitHub integration for release tracking, community data synchronization, and Sessionize event integration.
+
+**Multi-tenancy**: The site runs multiple tenants from a single Umbraco instance, each with its own root content node. All content lookups (e.g., site settings, 404 pages, navigation) must be resolved **relative to the current request's content tree** — never assume a single root or use hardcoded paths. Traverse ancestors or use the current request's root node to find tenant-specific content.
 
 ## Solution Structure
 
@@ -18,30 +20,29 @@ The solution consists of 5 projects (uses Central Package Management via `Direct
 
 ### Key Directories in UmbracoCommunity.Web
 
-- **Features/** - Feature modules (GitHubSync, ReleaseOverview, Sessionize)
+- **Features/** - Self-contained feature modules (Sessionize) with their own controllers, models, and infrastructure
 - **Controllers/** - MVC controllers organized by type:
   - `Controllers/Api/` - API controllers (inherit from `ControllerBase`, have `[ApiController]` attribute)
   - `Controllers/Render/` - Umbraco render controllers (inherit from `RenderController`)
   - Root folder - Plain MVC controllers (inherit from `Controller`)
-- **Models/** - View models, blocks, and published content models
+- **Models/** - View models, content models, and published content models
   - `Models/Api/` - DTOs for API request/response objects
   - `Models/Pages/` - Page view models
-  - `Models/ContentModels/` - Content models
-  - `Models/ServiceModels/` - Service layer models
-  - `Models/ViewModels/Blocks/` - Block view models
-  - `Models/ViewModels/Components/` - Reusable component view models
-  - `Models/ViewModels/Properties/` - Property view models
+  - `Models/ContentModels/` - Block/element content models (e.g., `CardsBlock`, `TextBlock`, `VideoBlock`)
+  - `Models/ViewModels/` - View models for components (`Components/`), blocks (`Blocks/`), and properties (`Properties/`)
+  - `Models/ServiceModels/` - Service-layer models (e.g., `SitemapElement`)
+  - `Models/PublishedModels/` - Auto-generated (do not edit)
 - **ViewModelBuilders/** - Convert IPublishedContent to view models
   - `ViewModelBuilders/Pages/` - Page-specific view model builders
-  - `ViewModelBuilders/Components/` - Component view model builders
+  - `ViewModelBuilders/Components/` - Component view model builders (Menu, Footer)
   - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
-- **Services/** - Application services (`ContentDataService`)
+- **Services/** - Application services (`ContentDataService`, `ContentContextService`, `ISeoDataService`/`SeoDataService`)
+- **ViewComponents/** - ASP.NET Core View Components for layout concerns (MetaTags, Menu, Footer, Favicon)
+- **Routing/** - Custom content finders (e.g., `PageNotFoundContentFinder`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
-- **Attributes/** - Action filters (`ApplyCommonElements`, `ApplyPageMetaData`)
 - **Middleware/** - Custom middleware (CSP handling)
 - **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
-- **Migrations/** - EF Core migrations for GitHubDbContext
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
 - **Vite/** - Vite integration helpers and tag helpers
 
@@ -131,8 +132,9 @@ See `docs/BUILDING_PAGES.md` for detailed instructions.
 Reusable components using Umbraco's Block List editor:
 1. **Element Type** - Umbraco content structure
 2. **Settings Type** - optional configuration
-3. **View Model** - strongly-typed model (in `Models/ViewModels/Blocks/`)
-4. **View** - Razor partial (in `Views/Partials/Blocks/`)
+3. **Content Model** - strongly-typed model (in `Models/ContentModels/`)
+4. **View Model** - view-layer model (in `Models/ViewModels/Blocks/`)
+5. **View** - Razor partial (in `Views/Partials/Blocks/`)
 
 See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 
@@ -268,7 +270,7 @@ The site implements structured data using Schema.NET for better search engine vi
 - `ArticleSchemaBuilder` - Builds Article schema for blog posts with headline, datePublished, dateModified, author, image, publisher
 - `BreadcrumbSchemaBuilder` - Builds BreadcrumbList schema from content hierarchy
 
-**Meta Tags** (`Views/Partials/Components/MetaTags.cshtml`):
+**Meta Tags** (`Views/Shared/Components/MetaTags/MetaTags.cshtml`):
 - Title format: `Page Title | Site Name` (page-first for better SERP visibility)
 - Open Graph tags: og:title, og:description, og:type, og:site_name, og:locale, og:image, og:url
 - Twitter Cards: summary_large_image format
@@ -288,10 +290,9 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.2.0 on .NET 10
+- Umbraco CMS 17.2.2 on .NET 10
 - Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
-- Markdig 1.0.0 - Markdown processing
 - Schema.NET 13.0.0 - Structured data/schema markup
 - Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
 - Umbraco.Community.Contentment 6.1.1 - Extended content editors
@@ -314,11 +315,12 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 
 ## Important Notes
 
+- **Multi-tenant**: Always resolve content (settings, 404 pages, navigation) relative to the current request's root node — never assume a single root or use hardcoded content paths
 - **Git branch**: Main branch is `develop` (not main/master)
 - **Database**: Uses Entity Framework Core with SQLite/SQL Server support
 - **Security**: Never commit `appsettings.Local.json` - it's gitignored for secrets
 - **Frontend dev**: Always run both dotnet and npm dev servers for full HMR experience
 - **Models**: Remember to manually generate Models Builder classes after backoffice changes
-- **Action Filters**: Use `[ApplyCommonElements]` and `[ApplyPageMetaData]` attributes on controllers for consistent page rendering
+- **ViewComponents over filters**: Layout concerns (menu, footer, meta tags, favicon) are handled by ViewComponents, not action filter attributes
 - **Output Caching**: API endpoints use `[OutputCache]` with policy names from `OutputCachePolicies` class
 - **Upgrade Tool**: Use `tools/upgrade-umbraco/` for package version upgrades

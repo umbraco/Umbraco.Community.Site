@@ -1,13 +1,9 @@
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using UmbracoCommunity.Web.Models.ViewModels.Components;
 
 namespace UmbracoCommunity.Web.Models.Pages;
 
 public abstract class PageViewModelBase
 {
-    private readonly IList<string> _schemaMarkups = [];
-
     protected PageViewModelBase(IPublishedContent currentPage)
     {
         Key = currentPage.Key;
@@ -19,35 +15,7 @@ public abstract class PageViewModelBase
 
     public string Name { get; }
 
-    public string? SiteName { get; set; }
-
     public string ContentTypeAlias { get; init; }
 
     public string Culture { get; set; } = Constants.Culture.Default;
-
-    public MenuViewModel Menu { get; set; } = new();
-
-    public FooterViewModel Footer { get; set; } = new();
-
-    public string MetaTitle { get; set; } = string.Empty;
-
-    public string MetaDescription { get; set; } = string.Empty;
-
-    public string OpenGraphImageUrl { get; set; } = string.Empty;
-
-    public bool HasOpenGraphImageUrl => !string.IsNullOrWhiteSpace(OpenGraphImageUrl);
-
-    public string Robots { get; set; } = string.Empty;
-
-    public string? NextUrl { get; set; }
-
-    public string? PrevUrl { get; set; }
-
-    public string? CanonicalUrl { get; set; }
-
-    public MediaWithCrops? Favicon { get; set; }
-
-    public IReadOnlyCollection<string> SchemaMarkups => _schemaMarkups.AsReadOnly();
-
-    public void AddSchemaMarkup(string markup) => _schemaMarkups.Add(markup);
 }

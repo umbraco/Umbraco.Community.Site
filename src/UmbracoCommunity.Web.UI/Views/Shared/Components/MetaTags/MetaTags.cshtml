@@ -1,6 +1,7 @@
-﻿@using Joonasw.AspNetCore.SecurityHeaders.Csp
+@using Joonasw.AspNetCore.SecurityHeaders.Csp
+@using UmbracoCommunity.Web.Models.ViewModels.Components
 
-@model PageViewModelBase
+@model MetaTagsViewModel
 
 @inject ICspNonceService nonceService;
 @inject IWebHostEnvironment webHostEnvironment;
@@ -45,7 +46,28 @@
     <link rel="next" href="@Model.NextUrl" />
 }
 
-<title>@Model.Name | @Model.SiteName</title>
+<title>@Model.MetaTitle | @Model.SiteName</title>
+
+@if (string.IsNullOrEmpty(Model.Robots) && webHostEnvironment.IsDevelopment())
+{
+    <meta name="robots" content="noindex, nofollow" />
+}
+else if (string.IsNullOrEmpty(Model.Robots))
+{
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+}
+else if (Model.Robots == "noindex, follow")
+{
+    <meta name="robots" content="noindex, follow" />
+}
+else if (Model.Robots == "index, nofollow")
+{
+    <meta name="robots" content="index, nofollow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+}
+else if (Model.Robots == "noindex, nofollow")
+{
+    <meta name="robots" content="noindex, nofollow" />
+}
 
 @if (Model.SchemaMarkups.Any())
 {
