@@ -41,7 +41,12 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
                     var link = navItem.Content as LinkItem;
                     if (link?.Link != null)
                     {
-                        viewModel.AddTopLevelNavigationItem(new NavigationItem(link.Link));
+                        var navLink = new NavigationItem(link.Link);
+                        if (!string.IsNullOrWhiteSpace(link.LinkTitle))
+                        {
+                            navLink.Text = link.LinkTitle;
+                        }
+                        viewModel.AddTopLevelNavigationItem(navLink);
                     }
                     break;
                 case NavigationSection.ModelTypeAlias:
@@ -73,6 +78,10 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
                                             Caption = linkItem.Caption,
                                             IconUrl = linkItem.Icon != null ? linkItem.Icon.GetCropUrl() : null
                                         };
+                                        if (!string.IsNullOrWhiteSpace(linkItem.LinkTitle))
+                                        {
+                                            newLink.Text = linkItem.LinkTitle;
+                                        }
                                         columnArea.AddLink(newLink);
                                     }
 
