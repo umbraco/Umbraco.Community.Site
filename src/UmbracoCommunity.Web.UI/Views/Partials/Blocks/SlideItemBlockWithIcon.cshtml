@@ -1,0 +1,40 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+
+@{
+    var content = Model.Content as SlideItemBlockWithIcon;
+    var settings = Model.Settings as SettingsSlideItemBlock;
+    bool hasBg = settings.HasBg();
+    string overlayColor = hasBg ? settings!.BackgroundColour!.Color! : "#283a97";
+}
+
+@if (content != null)
+{
+    <div class="dc-slide-item">
+        @if (content.BackgroundImage != null)
+        {
+            <img class="dc-slide-item__bg"
+                 src="@content.BackgroundImage.MediaUrl()"
+                 alt=""
+                 loading="lazy"
+                 aria-hidden="true">
+        }
+        <div class="dc-slide-item__overlay" style="--slide-overlay-color: @overlayColor"></div>
+        <div class="dc-slide-item__content">
+            @if (content.Icon != null)
+            {
+                <img class="dc-slide-item__icon"
+                     src="@content.Icon.MediaUrl()"
+                     alt=""
+                     aria-hidden="true">
+            }
+            @if (!string.IsNullOrEmpty(content.Title))
+            {
+                <h3 class="dc-slide-item__title">@content.Title</h3>
+            }
+            @if (!string.IsNullOrEmpty(content.Content))
+            {
+                <p class="dc-slide-item__text">@content.Content</p>
+            }
+        </div>
+    </div>
+}
