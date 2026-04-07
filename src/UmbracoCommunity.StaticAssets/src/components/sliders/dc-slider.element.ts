@@ -12,6 +12,8 @@ export class DcSlider extends HTMLElement {
   #touchendY = 0;
   #isSwipeGesture = false;
   #minSwipeDistance = 50; // Minimum distance in pixels to trigger a swipe
+  #prevZone: HTMLElement | null = null;
+  #nextZone: HTMLElement | null = null;
 
   connectedCallback() {
     this.addEventListener("dc-slider-change", this.scrollContainer);
@@ -21,6 +23,8 @@ export class DcSlider extends HTMLElement {
     container.addEventListener("touchend", this.getTouchEndPoint, { passive: true });
 
     this.#itemCount = this.querySelectorAll(".slides > div").length;
+    this.#createHoverZones();
+    this.#updateHoverZones();
   }
 
   disconnectedCallback() {
@@ -29,6 +33,60 @@ export class DcSlider extends HTMLElement {
     container.removeEventListener("touchstart", this.getTouchStartPoint);
     container.removeEventListener("touchmove", this.getTouchMovePoint);
     container.removeEventListener("touchend", this.getTouchEndPoint);
+    this.#removeHoverZones();
+  }
+
+  #createHoverZones() {
+    const wrapper = this.querySelector(".slides-wrapper") as HTMLElement;
+    if (!wrapper) return;
+
+    this.#prevZone = this.#buildZone("prev");
+    this.#nextZone = this.#buildZone("next");
+
+    wrapper.appendChild(this.#prevZone);
+    wrapper.appendChild(this.#nextZone);
+  }
+
+  #buildZone(direction: "prev" | "next"): HTMLElement {
+    const zone = document.createElement("button");
+    zone.type = "button";
+    zone.className = `slider-hover-zone slider-hover-zone--${direction}`;
+    zone.setAttribute("aria-label", direction === "prev" ? "Previous slide" : "Next slide");
+    zone.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="${direction === "prev" ? "M15 18L9 12L15 6" : "M9 6L15 12L9 18"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    zone.addEventListener("click", () => {
+      this.#scrollContainer(direction);
+      this.#dispatchIndexChangedEvent();
+    });
+    return zone;
+  }
+
+  #removeHoverZones() {
+    this.#prevZone?.remove();
+    this.#nextZone?.remove();
+    this.#prevZone = null;
+    this.#nextZone = null;
+  }
+
+  #getMaxIndex(): number {
+    const wrapper = this.querySelector(".slides-wrapper") as HTMLElement;
+    const container = this.#getContainer();
+    if (!wrapper || !container || container.children.length === 0) return 0;
+
+    const scrollStep = (container.children[0] as HTMLElement).offsetWidth + 20;
+    const totalWidth = this.#itemCount * scrollStep - 20;
+    const visibleWidth = wrapper.offsetWidth;
+
+    if (totalWidth <= visibleWidth) return 0;
+
+    return Math.ceil((totalWidth - visibleWidth) / scrollStep);
+  }
+
+  #updateHoverZones() {
+    if (!this.#prevZone || !this.#nextZone) return;
+
+    const maxIndex = this.#getMaxIndex();
+    this.#prevZone.hidden = this.#currentIndex <= 0;
+    this.#nextZone.hidden = this.#currentIndex >= maxIndex;
   }
 
   getTouchStartPoint = (event: TouchEvent) => {
@@ -122,8 +180,12 @@ export class DcSlider extends HTMLElement {
 
     if (!container || !scrollStep) return;
 
-    this.#setTransform(container, index * scrollStep * -1);
-    this.#currentIndex = index;
+    const maxIndex = this.#getMaxIndex();
+    const clampedIndex = Math.max(0, Math.min(index, maxIndex));
+
+    this.#setTransform(container, clampedIndex * scrollStep * -1);
+    this.#currentIndex = clampedIndex;
+    this.#updateHoverZones();
   }
 
   #scrollContainer(direction: "next" | "prev") {
@@ -131,17 +193,16 @@ export class DcSlider extends HTMLElement {
 
     if (!container) return;
 
+    const maxIndex = this.#getMaxIndex();
     const left = container.dataset.left ? parseInt(container.dataset.left) : 0;
     const currentItem = (left * -1) / scrollStep + 1;
-    let newLeftValue = 0;
+    let newLeftValue = left;
 
     if (direction === "next") {
-      if (currentItem < this.#itemCount) {
+      if (this.#currentIndex < maxIndex) {
         newLeftValue = left - scrollStep;
         this.#currentIndex++;
       }
-
-      if (currentItem === this.#itemCount) this.#scrollToElementIndex(0);
     }
 
     if (direction === "prev") {
@@ -149,11 +210,10 @@ export class DcSlider extends HTMLElement {
         newLeftValue = left + scrollStep;
         this.#currentIndex--;
       }
-
-      if (currentItem === 1) this.#scrollToElementIndex(this.#itemCount - 1);
     }
 
     this.#setTransform(container, newLeftValue);
+    this.#updateHoverZones();
   }
 }
 

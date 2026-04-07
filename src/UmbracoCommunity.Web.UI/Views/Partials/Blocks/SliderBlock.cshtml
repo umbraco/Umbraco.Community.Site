@@ -1,0 +1,54 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<SliderBlock, SettingsSliderBlock>>
+
+@{
+    var slideItems = Model.Content.SlideItems?.ToList() ?? new List<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>();
+    bool hasBg = Model.Settings.HasBg();
+    bool bgIsDark = hasBg && Model.Settings.IsDark();
+}
+
+<div class="dc-slider-block @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
+    @if (hasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.Content.IdHash {
+                --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+            }
+        </style>
+    }
+
+    <div class="dc-slider-block__intro align-center" id="@(Model.Settings?.BlockId != null ? Model.Settings.BlockId : string.Empty)">
+        @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+        {
+            <p class="block-tagline">@Model.Content.Tagline</p>
+        }
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+    </div>
+
+    @if (slideItems.Any())
+    {
+        <dc-slider class="dc-slider-block__slider">
+            <div class="slides-wrapper">
+                <div class="slides">
+                    @foreach (var item in slideItems)
+                    {
+                        <div>
+                            <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="mobile-controls">
+                <dc-slider-controls count="@slideItems.Count"></dc-slider-controls>
+            </div>
+        </dc-slider>
+    }
+</div>
