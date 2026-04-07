@@ -9,10 +9,14 @@
     li {
         background-color: var(--color-light);
         border-radius: var(--border-radius);
-        font-size: .75rem;
+        font-size: 0.75rem; /* 12px */
         padding:0.25em 0.75em;
         white-space: nowrap;
         text-transform: lowercase;
+
+        @media (--sm) {
+            font-size: 0.875rem; /* 14px */
+        }
     }
 
     a {

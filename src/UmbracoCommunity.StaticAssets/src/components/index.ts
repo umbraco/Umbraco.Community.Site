@@ -2,6 +2,7 @@ export * from "./layout/header.element.js";
 export * from "./layout/footer.element.js";
 export * from "./video-pickers/video-picker-youtube.js";
 export * from "./video-pickers/video-picker-media.js";
+export * from "./form/form-steps.element.js";
 export * from "./carousel/dc-carousel.element.js";
 export * from "./carousel/dc-carousel-controls.element.js";
 export * from "./sessionize/index.js";

@@ -20,8 +20,18 @@
     <div class="dc-text-block">
         @{
             ViewData.TemplateInfo.HtmlFieldPrefix = "";
+            var isStepped = Model.Settings?.EnableSteppedForm == true;
         }
-        <umb-forms-render form-id="@Model.Content.Form.Value" />
+        @if (isStepped)
+        {
+            <dc-form-steps>
+                <umb-forms-render form-id="@Model.Content.Form.Value" />
+            </dc-form-steps>
+        }
+        else
+        {
+            <umb-forms-render form-id="@Model.Content.Form.Value" />
+        }
     </div>
 
 </div>

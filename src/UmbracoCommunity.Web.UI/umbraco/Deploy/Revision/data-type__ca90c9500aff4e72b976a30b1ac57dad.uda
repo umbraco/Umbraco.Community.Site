@@ -28,7 +28,8 @@
           "Umb.Tiptap.Toolbar.Heading3",
           "Umb.Tiptap.Toolbar.Heading4",
           "Umb.Tiptap.Toolbar.Heading5",
-          "Umb.Tiptap.Toolbar.ClearFormatting"
+          "Umb.Tiptap.Toolbar.ClearFormatting",
+          "UmbracoCommunity.Tiptap.StyleMenu"
         ]
       ]
     ],

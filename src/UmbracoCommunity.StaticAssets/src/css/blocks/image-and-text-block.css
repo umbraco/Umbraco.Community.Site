@@ -38,10 +38,8 @@
 }
 
 .dc-image-and-text-block__content p {
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 21px;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
 .dc-image-and-text-block__content .cta {
@@ -95,11 +93,6 @@
     padding-left: 0;
   }
 
-  .dc-image-and-text-block__content p {
-    font-size: 20px;
-    font-weight: 400;
-    line-height: 25px;
-  }
 }
 
 @media (--lg) {
