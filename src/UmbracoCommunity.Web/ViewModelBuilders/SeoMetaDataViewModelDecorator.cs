@@ -215,6 +215,12 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
                 Name = new OneOrMany<string>(webPageName),
             };
 
+            // Add @id so other schema nodes can reference this WebPage
+            if (!string.IsNullOrEmpty(viewModel.CanonicalUrl))
+            {
+                webPage.Id = new Uri($"{viewModel.CanonicalUrl}#webpage");
+            }
+
             // Add description if available
             if (!string.IsNullOrEmpty(viewModel.MetaDescription))
             {
@@ -225,6 +231,20 @@ namespace UmbracoCommunity.Web.ViewModelBuilders
             if (!string.IsNullOrEmpty(viewModel.CanonicalUrl))
             {
                 webPage.Url = new OneOrMany<Uri>(new Uri(viewModel.CanonicalUrl));
+            }
+
+            // Add publish/update dates for content freshness signals
+            if (contentModel is IPublishedContent content)
+            {
+                if (content.CreateDate != DateTime.MinValue)
+                {
+                    webPage.DatePublished = content.CreateDate;
+                }
+
+                if (content.UpdateDate != DateTime.MinValue)
+                {
+                    webPage.DateModified = content.UpdateDate;
+                }
             }
 
             // Add Organization as publisher (uses site settings or Umbraco defaults)

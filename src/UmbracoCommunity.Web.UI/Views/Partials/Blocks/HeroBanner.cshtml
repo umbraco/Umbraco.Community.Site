@@ -4,10 +4,10 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Content.Headline) && Model.Content.Image != null)
 {
-    var desktopImageUrl = Model.Content.Image.GetCropUrl("desktop50").AppendWebpFormatter();
-    var desktopImage2xUrl = Model.Content.Image.GetCropUrl("desktop2x50").AppendWebpFormatter();
-    var mobileImageUrl = Model.Content.Image.GetCropUrl("mobile50").AppendWebpFormatter();
-    var mobileImage2xUrl = Model.Content.Image.GetCropUrl("mobile2x50").AppendWebpFormatter();
+    var desktopImageUrl = Model.Content.Image.GetCropUrl("desktop50").PrependWebpFormatter();
+    var desktopImage2xUrl = Model.Content.Image.GetCropUrl("desktop2x50").PrependWebpFormatter();
+    var mobileImageUrl = Model.Content.Image.GetCropUrl("mobile50").PrependWebpFormatter();
+    var mobileImage2xUrl = Model.Content.Image.GetCropUrl("mobile2x50").PrependWebpFormatter();
 
     await RenderHeroPreloads(mobileImageUrl, mobileImage2xUrl, desktopImageUrl, desktopImage2xUrl);
 

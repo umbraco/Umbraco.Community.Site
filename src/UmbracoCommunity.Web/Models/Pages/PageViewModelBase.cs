@@ -37,8 +37,6 @@ public abstract class PageViewModelBase
 
     public bool HasOpenGraphImageUrl => !string.IsNullOrWhiteSpace(OpenGraphImageUrl);
 
-    public bool HideIntercom { get; set; }
-
     public string Robots { get; set; } = string.Empty;
 
     public string? NextUrl { get; set; }

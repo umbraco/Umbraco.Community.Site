@@ -1,0 +1,9 @@
+{
+  "DocumentTypeAlias": "eventsHome",
+  "AllowedBlocks": [
+    "codeBlock",
+    "imageBlock",
+    "richTextBlock",
+    "textBlock"
+  ]
+}

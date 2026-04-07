@@ -7,12 +7,18 @@ describe('VideoPickerYouTubeElement', () => {
   let element: VideoPickerYouTubeElement
 
   beforeEach(() => {
+    // Mock the YouTube IFrame API global
+    (globalThis as any).YT = {
+      Player: vi.fn()
+    }
+
     container = createTestContainer()
     element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
     container.appendChild(element)
   })
 
   afterEach(() => {
+    delete (globalThis as any).YT
     vi.restoreAllMocks()
   })
 
