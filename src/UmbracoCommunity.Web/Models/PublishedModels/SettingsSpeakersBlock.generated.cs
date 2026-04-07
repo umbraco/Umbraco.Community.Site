@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Speakers block</summary>
 	[PublishedModel("settingsSpeakersBlock")]
-	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId
+	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId, ISettingsSpeakerGrid
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -62,7 +62,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("columnsPerRow")]
-		public virtual string ColumnsPerRow => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetColumnsPerRow(this, _publishedValueFallback);
+		[ImplementPropertyType("speakersPerRow")]
+		public virtual string SpeakersPerRow => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsSpeakerGrid.GetSpeakersPerRow(this, _publishedValueFallback);
 	}
 }

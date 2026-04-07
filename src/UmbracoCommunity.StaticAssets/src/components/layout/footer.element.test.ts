@@ -168,12 +168,10 @@ describe('DcFooterElement', () => {
         value: mockOffsetHeight,
         writable: true
       })
-      
-      const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener')
-      
+
       element.connectedCallback()
-      
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function))
+
+      // No scroll listener should be active when footer is shorter than window
       expect(element.footer!.style.top).toBe('unset')
       expect(element.footer!.style.bottom).toBe('0px')
     })

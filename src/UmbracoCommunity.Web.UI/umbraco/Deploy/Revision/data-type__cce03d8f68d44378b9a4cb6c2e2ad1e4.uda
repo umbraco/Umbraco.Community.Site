@@ -6,7 +6,7 @@
     "blocks": [
       {
         "contentElementTypeKey": "dd701bc6-8aad-4a1c-b67c-300f48ee948e",
-        "label": "{umbLink: link}",
+        "label": "${linkTitle || link[0].name || \u0022Link item\u0022}",
         "editorSize": "large"
       }
     ],
@@ -24,5 +24,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.0.2"
 }

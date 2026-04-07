@@ -24,14 +24,6 @@
           "Description": "A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.",
           "Name": "Block id",
           "SortOrder": 100
-        },
-        {
-          "Key": "d88a9713-4990-4906-8e78-b19a9f15f032",
-          "Alias": "columnsPerRow",
-          "DataType": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
-          "Description": "The maximum number of speakers to show in a row next to each other, default is 4.  \nThis only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.",
-          "Name": "Speakers per row",
-          "SortOrder": 101
         }
       ]
     }
@@ -44,14 +36,10 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
       "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.0.2"
 }

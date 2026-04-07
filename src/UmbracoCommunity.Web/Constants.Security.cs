@@ -10,7 +10,7 @@
 
             public static readonly string[] DefaultAllowStyles = [];
 
-            public static readonly string[] DefaultAllowFonts = ["fonts.gstatic.com", "fonts.intercomcdn.com", "js.intercomcdn.com", "data:"];
+            public static readonly string[] DefaultAllowFonts = ["fonts.gstatic.com", "data:"];
 
             public static readonly string[] DefaultAllowWorkers = [];
 
