@@ -139,7 +139,7 @@ See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 ### Frontend Assets
 
 Located in `src/UmbracoCommunity.StaticAssets/src/`:
-- **components/** - Lit web components (including `sessionize/` for event components)
+- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`)
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
@@ -157,6 +157,8 @@ Built assets go to:
 - Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
+
+**Text Link Animation**: Inline text links within block content have an animated pink highlight (background-gradient that grows from a 2px underline to full highlight on hover). Defined globally in `typography.css`, scoped to text-only links via `:not(:has(img, svg, picture, video, div))`.
 
 ### Models Builder
 
@@ -250,6 +252,18 @@ Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice fu
 - Sessionize dashboard
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
+
+### Stepped Forms
+
+The form block supports an optional multi-step mode via the `EnableSteppedForm` toggle on `SettingsFormBlock`. When enabled, `FormBlock.cshtml` wraps the form in a `<dc-form-steps>` web component (`src/UmbracoCommunity.StaticAssets/src/components/form/form-steps.element.ts`) that:
+- Converts Umbraco Forms field groups (`.umbraco-forms-fieldset`) into navigable steps
+- Adds Previous/Next buttons and a step indicator
+- Validates required fields per step before advancing (supports text, checkbox, radio, and `data-val-required` attributes)
+- Uses a MutationObserver to handle async rendering from `<umb-forms-render>`
+
+### Rich Text Editor Style Menu
+
+A custom tiptap toolbar extension is defined in `App_Plugins/RichtextStyles/umbraco-package.json`. It provides a "Richtext styles" dropdown with grouped options for headings, inline formatting, blocks, and lists (including condensed list variants that apply a `no-margin` class to `ol`/`ul` tags).
 
 ### Vite Integration
 

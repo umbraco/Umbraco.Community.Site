@@ -14,6 +14,7 @@ export * from "./map/google-map.element.js";
 export * from "./currency-element.js";
 export * from "./uaas/index.js";
 export * from "./steps-wrapper.element.js";
+export * from "./form/form-steps.element.js";
 export * from "./careers.element.js";
 export * from "./numbers.element.js";
 export * from "./carousel/dc-carousel.element.js";

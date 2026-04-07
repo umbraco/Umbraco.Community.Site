@@ -50,20 +50,19 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Enable stepped form: In the case where a form is long and has multiple field groups, this toggle allows these groups to be served in multiple steps to the front-end user
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("enableSteppedForm")]
+		public virtual bool EnableSteppedForm => this.Value<bool>(_publishedValueFallback, "enableSteppedForm");
+
+		///<summary>
 		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("blockId")]
 		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
-
-		///<summary>
-		/// Speakers per row: The maximum number of speakers to show in a row next to each other, default is 4.   This only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("columnsPerRow")]
-		public virtual string ColumnsPerRow => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetColumnsPerRow(this, _publishedValueFallback);
 
 		///<summary>
 		/// Background colour

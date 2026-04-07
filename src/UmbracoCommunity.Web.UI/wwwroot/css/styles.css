@@ -18,6 +18,13 @@ img {
     max-width: 100%;
 }
 
+ul.no-margin p,
+ol.no-margin p {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
 /* Backoffice specific block styling */
 .dc-image-block,
 .dc-text-block,
@@ -237,6 +244,12 @@ img {
 }
 
 /* forms block */
+.dc-form-block .dc-text-block {
+    padding: 0;
+    max-height: 500px;
+    overflow: scroll;
+}
+
 .umbraco-forms-form {
     justify-content: center;
     display: flex;
@@ -244,6 +257,7 @@ img {
 
 .umbraco-forms-page {
     margin: 0 20px;
+    width: 500px;
 }
 
 .umbraco-forms-page h4 {
@@ -327,24 +341,64 @@ img {
 
 /* Accordion block */
 .dc-faqs {
-    padding: 20px;
+    padding: 10px;
+    text-align: center;
 }
 
-.dc-faqs .block-title {
-    text-align: center;
+.dc-faqs .dc-faq-block {
+    border: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.dc-faq-block {
+    padding: 5px;
+    text-align: left;
+}
+
+.dc-faq-block dt {
+    position: relative;
+}
+
+.dc-faq-block .dc-faqs__checkbox {
+    display: none;
+}
+
+.dc-faq-block label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.dc-faq-block label::after {
+    content: '';
+    border: solid #283A97;
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 4px;
+    transform: rotate(-135deg);
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.dc-faq-block svg {
+    display: none;
 }
 
 .dc-faq-block h3 {
     font-size: 16px;
     font-weight: bold;
-}
-
-.dc-faq-block svg, .dc-faq-block input {
-    display: none;
+    margin: 0;
+    color: #283A97;
 }
 
 .dc-faq-block dd {
     margin: 0;
+    padding: 0 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
 }
 
 /* Video block preview */
