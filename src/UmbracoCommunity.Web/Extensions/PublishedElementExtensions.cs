@@ -1,5 +1,7 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using UmbracoCommunity.Web.Models.PublishedModels;
+using UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
 namespace UmbracoCommunity.Web.Extensions;
 
@@ -7,6 +9,72 @@ public static class PublishedElementExtensions
 {
     public static T As<T>(this IPublishedElement? element) where T : class, IPublishedElement =>
         element as T ?? throw new ArgumentException($"Provided published element is null or not of the expected model type: {typeof(T).FullName}. Element provided is {GetElementDescription(element)}.", nameof(element));
+
+    public static IList<BlockGridRow> ParseBlockGrid(this BlockGridModel? contentBlocks)
+    {
+        var rows = new List<BlockGridRow>();
+        if (contentBlocks != null && contentBlocks.Any())
+        {
+            var columnSpan = contentBlocks.GridColumns ?? 12;
+
+            var columnCount = 0;
+            var blockRow = new BlockGridRow();
+            foreach (var block in contentBlocks)
+            {
+                var newSpan = block.ColumnSpan + columnCount;
+
+                if (newSpan == columnSpan || contentBlocks.Last() == block)
+                {
+                    blockRow.Blocks.Add(block);
+                    blockRow.HasMultipleBlocks = blockRow.Blocks.Count > 1;
+                    rows.Add(blockRow);
+                    blockRow = new BlockGridRow();
+
+                    columnCount = 0;
+                }
+                else if (newSpan > columnSpan)
+                {
+                    // add row to content
+                    if (blockRow.Blocks.Any())
+                    {
+                        blockRow.HasMultipleBlocks = blockRow.Blocks.Count > 1;
+                        rows.Add(blockRow);
+                    }
+
+                    // create new row
+                    blockRow = new BlockGridRow
+                    {
+                        Blocks = [block]
+                    };
+
+                    // set columnCount
+                    columnCount = block.ColumnSpan;
+                }
+                else
+                {
+                    blockRow.Blocks.Add(block);
+                    // update column count
+                    columnCount += block.ColumnSpan;
+                }
+            }
+        }
+        foreach (var row in rows)
+        {
+            var firstBlock = row.Blocks.FirstOrDefault();
+            if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings is ISettingsColour colourSettings)
+            {
+                if (colourSettings.BackgroundColour != null)
+                {
+                    row.BackgroundColour = colourSettings.BackgroundColour.Color;
+                    if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        row.HasBg = true;
+                    }
+                }
+            }
+        }
+        return rows;
+    }
 
     public static List<List<BlockGridItem>> GetRows(this BlockGridModel items)
     {

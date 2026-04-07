@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
@@ -16,7 +17,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
 
             var viewModel = new HomePageViewModel(currentPage)
             {
-                BlockContent = ParseBlockGrid(contentBlocks.ContentBlocks),
+                BlockContent = contentBlocks.ContentBlocks.ParseBlockGrid(),
                 Banner = bannerContent.BannerContent
             };
 

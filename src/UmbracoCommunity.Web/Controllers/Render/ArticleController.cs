@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
-using UmbracoCommunity.Web.Attributes;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.ViewModelBuilders;
 
@@ -23,8 +22,6 @@ namespace UmbracoCommunity.Web.Controllers.Render
         [NonAction]
         public sealed override IActionResult Index() => throw new NotImplementedException();
 
-        [ApplyCommonElements]
-        [ApplyPageMetaData]
         public IActionResult Index(CancellationToken cancellationToken)
         {
             ArticlePageViewModel viewModel = _viewModelBuilder.Build(

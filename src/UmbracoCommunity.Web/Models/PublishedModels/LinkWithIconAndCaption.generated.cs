@@ -72,5 +72,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("link")]
 		public virtual global::Umbraco.Cms.Core.Models.Link Link => this.Value<global::Umbraco.Cms.Core.Models.Link>(_publishedValueFallback, "link");
+
+		///<summary>
+		/// Link title: If nothing entered, this will default to page name
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("linkTitle")]
+		public virtual string LinkTitle => this.Value<string>(_publishedValueFallback, "linkTitle");
 	}
 }

@@ -30,7 +30,7 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Pages
             return new ArticlePageViewModel(currentPage)
             {
                 Teaser = contentModel.Teaser?.ToHtmlString(),
-                BlockContent = ParseBlockGrid(contentModel.ContentBlocks),
+                BlockContent = contentModel.ContentBlocks.ParseBlockGrid(),
                 PublishDate = contentModel.PublishDate != default ? contentModel.PublishDate : currentPage.CreateDate,
                 ReadTime = contentModel.ReadTime,
                 Categories = contentModel.Categories?.ToList() ?? new List<IPublishedContent>(0),

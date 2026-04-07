@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Configuration;
 using UmbracoCommunity.Web.Models.Pages;
-using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
 using UmbracoCommunity.Web.Services;
 using UmbracoCommunity.Web.ViewModelBuilders;
@@ -96,7 +95,9 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<ArticleSchemaBuilder>();
             builder.Services.AddScoped<BreadcrumbSchemaBuilder>();
 
-            builder.Services.AddScoped<IPageViewModelDecorator<CompositionSeo>, SeoMetaDataViewModelDecorator>();
+            // View component services
+            builder.Services.AddScoped<ContentContextService>();
+            builder.Services.AddScoped<ISeoDataService, SeoDataService>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();

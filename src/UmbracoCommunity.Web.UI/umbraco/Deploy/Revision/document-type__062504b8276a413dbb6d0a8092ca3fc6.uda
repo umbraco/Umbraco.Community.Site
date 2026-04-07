@@ -24,6 +24,14 @@
           "Description": "Select a destination page for the navigation item.",
           "Mandatory": true,
           "Name": "Link"
+        },
+        {
+          "Key": "c16a903a-b02d-475b-844a-b0a632894081",
+          "Alias": "linkTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "Description": "If nothing entered, this will default to the page name",
+          "Name": "Link title",
+          "SortOrder": 1
         }
       ]
     }
@@ -31,6 +39,10 @@
   "PropertyTypes": [],
   "Udi": "umb://document-type/062504b8276a413dbb6d0a8092ca3fc6",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
       "Ordering": true

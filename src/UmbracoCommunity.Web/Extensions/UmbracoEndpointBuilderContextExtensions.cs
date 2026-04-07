@@ -22,6 +22,16 @@ namespace UmbracoCommunity.Web.Extensions
                   action = "Index"
               });
 
+            // Register route for security.txt (RFC 9116)
+            builder.EndpointRouteBuilder.MapControllerRoute(
+              "SecurityTxt",
+              ".well-known/security.txt",
+              new
+              {
+                  controller = "SecurityTxt",
+                  action = "Index"
+              });
+
             return builder;
         }
     }
