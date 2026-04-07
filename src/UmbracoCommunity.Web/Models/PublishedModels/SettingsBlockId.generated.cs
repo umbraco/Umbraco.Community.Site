@@ -26,11 +26,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		string BlockId { get; }
-
-		/// <summary>Speakers per row</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		string ColumnsPerRow { get; }
 	}
 
 	/// <summary>Settings - block Id</summary>
@@ -76,18 +71,5 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		public static string GetBlockId(ISettingsBlockId that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "blockId");
-
-		///<summary>
-		/// Speakers per row: The maximum number of speakers to show in a row next to each other, default is 4.   This only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("columnsPerRow")]
-		public virtual string ColumnsPerRow => GetColumnsPerRow(this, _publishedValueFallback);
-
-		/// <summary>Static getter for Speakers per row</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static string GetColumnsPerRow(ISettingsBlockId that, IPublishedValueFallback publishedValueFallback) => that.Value<string>(publishedValueFallback, "columnsPerRow");
 	}
 }
