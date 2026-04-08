@@ -631,13 +631,18 @@ ol.no-margin p {
     position: absolute;
     inset: 0;
     background-color: var(--slide-overlay-color, #283a97);
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 .dc-slide-item__content {
     position: relative;
     padding: 16px;
     color: var(--slide-text-color);
+    background-color: var(--slide-overlay-color, #283a97);
+}
+
+.dc-slide-item__bg ~ .dc-slide-item__content {
+    background-color: transparent;
 }
 
 .dc-slide-item__tag {
