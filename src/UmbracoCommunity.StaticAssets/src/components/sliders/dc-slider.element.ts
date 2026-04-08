@@ -14,6 +14,15 @@ export class DcSlider extends HTMLElement {
   #minSwipeDistance = 50; // Minimum distance in pixels to trigger a swipe
   #prevZone: HTMLElement | null = null;
   #nextZone: HTMLElement | null = null;
+  #hasExplicitButtons = false;
+  #arrowButtonHandler = (event: Event) => {
+    const button = (event.target as HTMLElement).closest("[data-slider-action]") as HTMLElement;
+    if (!button) return;
+    const action = button.dataset.sliderAction as "prev" | "next";
+    if (action !== "prev" && action !== "next") return;
+    this.#scrollContainer(action);
+    this.#dispatchIndexChangedEvent();
+  };
 
   connectedCallback() {
     this.addEventListener("dc-slider-change", this.scrollContainer);
@@ -23,7 +32,17 @@ export class DcSlider extends HTMLElement {
     container.addEventListener("touchend", this.getTouchEndPoint, { passive: true });
 
     this.#itemCount = this.querySelectorAll(".slides > div").length;
-    this.#createHoverZones();
+
+    // Use explicit arrow buttons if present, otherwise create hover zones
+    const sliderBlock = this.closest(".dc-slider-block");
+    this.#hasExplicitButtons = sliderBlock?.classList.contains("has-buttons") ?? false;
+
+    if (this.#hasExplicitButtons) {
+      sliderBlock!.addEventListener("click", this.#arrowButtonHandler);
+    } else {
+      this.#createHoverZones();
+    }
+
     this.#updateHoverZones();
   }
 
@@ -33,7 +52,12 @@ export class DcSlider extends HTMLElement {
     container.removeEventListener("touchstart", this.getTouchStartPoint);
     container.removeEventListener("touchmove", this.getTouchMovePoint);
     container.removeEventListener("touchend", this.getTouchEndPoint);
-    this.#removeHoverZones();
+
+    if (this.#hasExplicitButtons) {
+      this.closest(".dc-slider-block")?.removeEventListener("click", this.#arrowButtonHandler);
+    } else {
+      this.#removeHoverZones();
+    }
   }
 
   #createHoverZones() {
@@ -72,8 +96,9 @@ export class DcSlider extends HTMLElement {
     const container = this.#getContainer();
     if (!wrapper || !container || container.children.length === 0) return 0;
 
-    const scrollStep = (container.children[0] as HTMLElement).offsetWidth + 20;
-    const totalWidth = this.#itemCount * scrollStep - 20;
+    const gap = parseFloat(getComputedStyle(container).columnGap) || 0;
+    const scrollStep = (container.children[0] as HTMLElement).offsetWidth + gap;
+    const totalWidth = this.#itemCount * scrollStep - gap;
     const visibleWidth = wrapper.offsetWidth;
 
     if (totalWidth <= visibleWidth) return 0;
@@ -82,11 +107,28 @@ export class DcSlider extends HTMLElement {
   }
 
   #updateHoverZones() {
-    if (!this.#prevZone || !this.#nextZone) return;
-
     const maxIndex = this.#getMaxIndex();
-    this.#prevZone.hidden = this.#currentIndex <= 0;
-    this.#nextZone.hidden = this.#currentIndex >= maxIndex;
+    const atStart = this.#currentIndex <= 0;
+    const atEnd = this.#currentIndex >= maxIndex;
+
+    // Update hover zones
+    if (this.#prevZone && this.#nextZone) {
+      this.#prevZone.hidden = atStart;
+      this.#nextZone.hidden = atEnd;
+    }
+
+    // Update explicit arrow buttons
+    if (this.#hasExplicitButtons) {
+      const sliderBlock = this.closest(".dc-slider-block");
+      if (!sliderBlock) return;
+
+      sliderBlock
+        .querySelectorAll<HTMLButtonElement>("[data-slider-action='prev']")
+        .forEach((btn) => (btn.disabled = atStart));
+      sliderBlock
+        .querySelectorAll<HTMLButtonElement>("[data-slider-action='next']")
+        .forEach((btn) => (btn.disabled = atEnd));
+    }
   }
 
   getTouchStartPoint = (event: TouchEvent) => {
@@ -155,7 +197,8 @@ export class DcSlider extends HTMLElement {
     scrollStep: number;
   } {
     const container = this.#getContainer();
-    const scrollStep = (container?.children[0] as HTMLElement).offsetWidth + 20;
+    const gap = container ? parseFloat(getComputedStyle(container).columnGap) || 0 : 0;
+    const scrollStep = (container?.children[0] as HTMLElement).offsetWidth + gap;
 
     return { container, scrollStep };
   }

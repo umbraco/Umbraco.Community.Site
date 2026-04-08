@@ -33,7 +33,19 @@ namespace UmbracoCommunity.Web.Helpers
 
         private static bool ColourIsDark(string colour)
         {
-            var darkBgs = new[] { "#3544B1", "#1b264f" }; // dark blue, blue
+            var hex = colour.TrimStart('#');
+            if (hex.Length is 6 or 8 &&
+                int.TryParse(hex[..2], System.Globalization.NumberStyles.HexNumber, null, out var r) &&
+                int.TryParse(hex[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g) &&
+                int.TryParse(hex[4..6], System.Globalization.NumberStyles.HexNumber, null, out var b))
+            {
+                // Relative luminance (ITU-R BT.709)
+                var luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+                return luminance < 0.5;
+            }
+
+            // Fallback: check known dark values
+            var darkBgs = new[] { "#3544B1", "#1b264f" };
             return darkBgs.Any(x => string.Equals(x, colour, StringComparison.InvariantCultureIgnoreCase));
         }
     }

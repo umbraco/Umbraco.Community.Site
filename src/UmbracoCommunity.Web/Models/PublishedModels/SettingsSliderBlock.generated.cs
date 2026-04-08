@@ -50,6 +50,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Display buttons: Check to display explicit arrows instead of the mouse over slide controls at the edges of the slider
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("displayButtons")]
+		public virtual bool DisplayButtons => this.Value<bool>(_publishedValueFallback, "displayButtons");
+
+		///<summary>
 		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
