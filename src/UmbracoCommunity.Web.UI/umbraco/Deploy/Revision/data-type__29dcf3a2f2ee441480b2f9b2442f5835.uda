@@ -110,7 +110,8 @@
         "contentElementTypeKey": "f2a94d08-4ffc-495d-ab47-3a70d9d1869a",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "d772969a-c9e8-4809-b952-5d17ae4a899d"
+        "settingsElementTypeKey": "d772969a-c9e8-4809-b952-5d17ae4a899d",
+        "editorSize": "large"
       },
       {
         "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",

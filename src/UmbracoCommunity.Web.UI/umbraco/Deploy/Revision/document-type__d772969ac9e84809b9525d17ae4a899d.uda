@@ -14,10 +14,30 @@
     "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
     "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "d4d49e50-6895-4298-b85c-efb1b1ede399",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "c3e048d7-4a0a-4f3c-8010-4aae39b9fd67",
+          "Alias": "displayButtons",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "Description": "Check to display explicit arrows to control the slider",
+          "Name": "Display buttons",
+          "SortOrder": -1
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/d772969ac9e84809b9525d17ae4a899d",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
       "Ordering": true
