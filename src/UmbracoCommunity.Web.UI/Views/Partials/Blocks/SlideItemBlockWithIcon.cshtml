@@ -18,7 +18,9 @@
                  loading="lazy"
                  aria-hidden="true">
         }
-        <div class="dc-slide-item__overlay"></div>
+        @if (!hasSlideColour) {
+            <div class="dc-slide-item__overlay"></div>
+        }
         <div class="dc-slide-item__content">
             @if (content.Icon != null)
             {

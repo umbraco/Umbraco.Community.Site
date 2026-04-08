@@ -103,12 +103,12 @@
 .dc-slide-item__overlay {
     position: absolute;
     inset: 0;
-    background-color: var(--slide-overlay-color);
-    opacity: 0.6;
+    background-color: var(--color-blue);
 }
 
 .dc-slide-item__bg ~ .dc-slide-item__overlay {
     background-color: var(--color-light-blue);
+    opacity: 0.6;
 }
 
 .dc-slide-item__content {
@@ -127,7 +127,16 @@
 }
 
 .dc-slide-item.bg-light {
-    --slide-text-color: var(--color-dark);
+    --slide-text-color: var(--color-blue);
+}
+
+/* Slide items without their own background or image inside a dark block → white card */
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__overlay {
+    background-color: var(--color-white);
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) {
+    --slide-text-color: var(--color-blue);
 }
 
 .dc-slide-item__tag {
@@ -142,6 +151,16 @@
     height: var(--unit-lg);
     margin-bottom: var(--unit);
     object-fit: contain;
+}
+
+/* Invert icon to white on slides with their own dark background */
+.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon {
+    filter: brightness(0) invert(1);
+}
+
+/* Default dark slides (no own bg) get inverted icon only when block is NOT dark */
+.dc-slider-block:not(.bg-dark) .dc-slide-item.bg-dark:not(.has-bg) .dc-slide-item__icon {
+    filter: brightness(0) invert(1);
 }
 
 .dc-slide-item__title {
