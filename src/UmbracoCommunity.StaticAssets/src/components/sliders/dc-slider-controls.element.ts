@@ -1,4 +1,3 @@
-import { arrowLeft, arrowRight } from "@umbraco-community/svg";
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
@@ -24,137 +23,74 @@ export class DcSliderControls extends LitElement {
     const index = (event as CustomEvent)?.detail?.index ?? -1;
     if (index === -1) return;
     this.currentIndex = index;
+  };
+
+  #pad(n: number) {
+    return n.toString().padStart(2, "0");
   }
 
-  #handlePrevClick() {
-    this.#dispatch("prev");
-    this.#setCurrentIndex(-1);
-  }
-
-  #handleNextClick() {
-    this.#dispatch("next");
-    this.#setCurrentIndex(1);
-  }
-
-  #dispatch(action: "next" | "prev") {
-    this.dispatchEvent(
-      new CustomEvent("dc-slider-change", {
-        detail: { action },
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
-  #setCurrentIndex(i: number) {
-    const newIndex = this.currentIndex + i;
-    if (newIndex < 0 || newIndex > this.count - 1) {
-      this.currentIndex = 0;
-      return;
-    }
-
-    this.currentIndex = newIndex;
-  }
-
-  #handleIndexClick(index: number) {
-    if (index === this.currentIndex) return;
-
-    this.dispatchEvent(
-      new CustomEvent("dc-slider-change", {
-        detail: { action: "index", index },
-        bubbles: true,
-        composed: true,
-      })
-    );
-
-    this.currentIndex = index;
+  get #pillPosition() {
+    const fraction = this.count <= 1 ? 0 : this.currentIndex / (this.count - 1);
+    return `calc(${fraction * 100}% - ${fraction} * var(--pill-width))`;
   }
 
   render() {
-    return html` <div class="flex">
-        <button
-          class="nav-button"
-          type="button"
-          aria-label="Previous slide arrow"
-          ?disabled=${this.currentIndex === 0}
-          @click=${this.#handlePrevClick}
-        >
-          ${arrowLeft}
-        </button>
-        <button
-          class="nav-button"
-          type="button"
-          aria-label="Next slide arrow"
-          @click=${this.#handleNextClick}
-        >
-          ${arrowRight}
-        </button>
+    return html`
+      <span class="progress-label">${this.#pad(1)}</span>
+      <div class="progress-track" role="progressbar"
+        aria-valuenow=${this.currentIndex + 1}
+        aria-valuemin="1"
+        aria-valuemax=${this.count}>
+        <div class="progress-pill" style="left: ${this.#pillPosition}"></div>
       </div>
-      <div id="mobileControlDots">
-        ${[...Array(Math.max(0, this.count))].map(
-          (_, index) =>
-            html`<span
-              class="dot ${this.currentIndex === index ? "active" : ""}"
-              @click="${() => this.#handleIndexClick(index)}"
-            ></span>`
-        )}
-      </div>`;
+      <span class="progress-label">${this.#pad(this.count)}</span>
+    `;
   }
 
   static styles = [
     css`
-      :host,
-      .flex {
+      :host {
         display: flex;
-      }
-      .nav-button {
-        display: flex;
+        align-items: center;
         justify-content: center;
-        align-items: center;
-        width: var(--unit-md);
-        height: var(--unit-md);
-        border: none;
-        padding: 0;
-        background-color: transparent;
-        cursor: pointer;
+        width: 100%;
+        gap: 1rem;
+        color: var(--slider-controls-color, var(--color-blue, #1b264f));
       }
 
-      .nav-button:hover {
-        background: transparent;
+      .progress-label {
+        font-size: var(--font-size-sm, 0.875rem);
+        line-height: 1;
+        flex-shrink: 0;
       }
 
-      .nav-button[disabled] {
-        pointer-events: none;
-        opacity: 0.5;
+      .progress-track {
+        position: relative;
+        flex: 0 1 12rem;
+        height: 2px;
+        border-radius: 1px;
+        overflow: hidden;
       }
 
-      #mobileControlDots {
-        display: flex;
-        align-items: center;
-        gap: 7px;
+      .progress-track::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+        opacity: 0.25;
       }
 
-      .dot:before {
-        display: block;
-        content: " ";
-        height: 10px;
-        width: 10px;
-        border-radius: 6px;
-        outline: 1px solid var(--color-black);
-        cursor: pointer;
-      }
-
-      .dot.active:before {
-        background-color: var(--color-black);
-        outline: none;
-        width: 12px;
-        height: 12px;
-      }
-
-      @media (min-width: 767px) {
-        #mobileControlDots {
-          display: none;
-        }
+      .progress-pill {
+        --pill-width: 1.5rem;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: var(--pill-width);
+        height: 3px;
+        background: currentColor;
+        border-radius: 2px;
+        transform: translateY(-50%);
+        transition: left 0.3s ease;
       }
     `,
   ];

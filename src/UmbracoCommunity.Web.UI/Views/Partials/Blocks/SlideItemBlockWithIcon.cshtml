@@ -9,7 +9,7 @@
 
 @if (content != null)
 {
-    <div class="dc-slide-item @(hasSlideColour ? "has-bg" : "") @(slideBgIsDark ? "bg-dark" : "bg-light")" style="@(hasSlideColour ? $"--slide-overlay-color: #{settings!.BackgroundColour!.Color}" : "")">
+    <div class="dc-slide-item @(hasSlideColour ? "has-bg" : "") @(slideBgIsDark ? "bg-dark" : "bg-light")" style="@(hasSlideColour ? $"--slide-overlay-color: {settings!.BackgroundColour!.Color}" : "")">
         @if (content.BackgroundImage != null)
         {
             <img class="dc-slide-item__bg"

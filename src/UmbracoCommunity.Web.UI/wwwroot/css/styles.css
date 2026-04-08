@@ -531,6 +531,14 @@ ol.no-margin p {
     color: #ffffff;
 }
 
+.dc-slide-item.bg-dark {
+    --slide-text-color: #ffffff;
+}
+
+.dc-slide-item.bg-light {
+    --slide-text-color: #000000;
+}
+
 .dc-slider-block__intro {
     text-align: center;
     margin-bottom: 20px;
@@ -629,7 +637,7 @@ ol.no-margin p {
 .dc-slide-item__content {
     position: relative;
     padding: 16px;
-    color: #ffffff;
+    color: var(--slide-text-color);
 }
 
 .dc-slide-item__tag {
@@ -651,13 +659,11 @@ ol.no-margin p {
     font-size: 14px;
     font-weight: 600;
     margin: 0 0 6px;
-    color: #ffffff;
 }
 
 .dc-slide-item__text {
     font-size: 12px;
     line-height: 1.4;
     margin: 0;
-    color: #ffffff;
     opacity: 0.9;
 }
