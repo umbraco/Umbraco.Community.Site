@@ -29,124 +29,132 @@ describe('DcSliderControls', () => {
     it('should render the component', () => {
       const shadowRoot = element.shadowRoot
       expect(shadowRoot).toBeTruthy()
-      
-      const flexContainer = shadowRoot?.querySelector('.flex')
-      expect(flexContainer).toBeTruthy()
+
+      const track = shadowRoot?.querySelector('.progress-track')
+      expect(track).toBeTruthy()
     })
   })
 
   describe('rendering', () => {
-    it('should render navigation buttons', () => {
-      const shadowRoot = element.shadowRoot
-      
-      const prevButton = shadowRoot?.querySelector('button[aria-label="Previous slide arrow"]')
-      const nextButton = shadowRoot?.querySelector('button[aria-label="Next slide arrow"]')
-      
-      expect(prevButton).toBeTruthy()
-      expect(nextButton).toBeTruthy()
+    it('should render progress labels and track', () => {
+      element.count = 5
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const labels = element.shadowRoot?.querySelectorAll('.progress-label')
+          const track = element.shadowRoot?.querySelector('.progress-track')
+          const pill = element.shadowRoot?.querySelector('.progress-pill')
+
+          expect(labels?.length).toBe(2)
+          expect(labels?.[0].textContent).toBe('01')
+          expect(labels?.[1].textContent).toBe('05')
+          expect(track).toBeTruthy()
+          expect(pill).toBeTruthy()
+          resolve()
+        }, 0)
+      })
     })
 
-    it('should render mobile control dots container', () => {
-      const shadowRoot = element.shadowRoot
-      const dotsContainer = shadowRoot?.querySelector('#mobileControlDots')
-      
-      expect(dotsContainer).toBeTruthy()
+    it('should always show 01 as the left label', () => {
+      element.count = 5
+      element.currentIndex = 3
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const labels = element.shadowRoot?.querySelectorAll('.progress-label')
+          expect(labels?.[0].textContent).toBe('01')
+          resolve()
+        }, 0)
+      })
+    })
+
+    it('should have progressbar role with aria attributes', () => {
+      element.count = 5
+      element.currentIndex = 2
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const track = element.shadowRoot?.querySelector('.progress-track')
+
+          expect(track?.getAttribute('role')).toBe('progressbar')
+          expect(track?.getAttribute('aria-valuenow')).toBe('3')
+          expect(track?.getAttribute('aria-valuemin')).toBe('1')
+          expect(track?.getAttribute('aria-valuemax')).toBe('5')
+          resolve()
+        }, 0)
+      })
     })
   })
 
-  describe('styling', () => {
-    it('should have correct CSS styles', () => {
-      const shadowRoot = element.shadowRoot
-      const styleElement = shadowRoot?.querySelector('style')
-      
-      expect(styleElement?.textContent).toContain('.nav-button')
-      expect(styleElement?.textContent).toContain('.dot')
-      expect(styleElement?.textContent).toContain('#mobileControlDots')
+  describe('progress pill position', () => {
+    it('should position pill at start for first slide', () => {
+      element.count = 5
+      element.currentIndex = 0
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const pill = element.shadowRoot?.querySelector('.progress-pill') as HTMLElement
+          expect(pill?.style.left).toBe('calc(0% - 0 * var(--pill-width))')
+          resolve()
+        }, 0)
+      })
     })
 
-    it('should have responsive styles', () => {
-      const shadowRoot = element.shadowRoot
-      const styleElement = shadowRoot?.querySelector('style')
-      
-      expect(styleElement?.textContent).toContain('@media (min-width: 767px)')
+    it('should position pill at end for last slide', () => {
+      element.count = 5
+      element.currentIndex = 4
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const pill = element.shadowRoot?.querySelector('.progress-pill') as HTMLElement
+          expect(pill?.style.left).toBe('calc(100% - 1 * var(--pill-width))')
+          resolve()
+        }, 0)
+      })
+    })
+
+    it('should position pill at middle for middle slide', () => {
+      element.count = 5
+      element.currentIndex = 2
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const pill = element.shadowRoot?.querySelector('.progress-pill') as HTMLElement
+          expect(pill?.style.left).toBe('calc(50% - 0.5 * var(--pill-width))')
+          resolve()
+        }, 0)
+      })
+    })
+
+    it('should position pill at start when count is 1', () => {
+      element.count = 1
+      element.currentIndex = 0
+      element.requestUpdate()
+
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          const pill = element.shadowRoot?.querySelector('.progress-pill') as HTMLElement
+          expect(pill?.style.left).toBe('calc(0% - 0 * var(--pill-width))')
+          resolve()
+        }, 0)
+      })
     })
   })
 
   describe('event handling', () => {
-    beforeEach(() => {
-      element.count = 5
-      element.currentIndex = 2
-      element.requestUpdate()
-    })
-
-    it('should handle previous button click', () => {
-      const prevButton = element.shadowRoot?.querySelector('button[aria-label="Previous slide arrow"]') as HTMLButtonElement
-      
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      prevButton?.click()
-      
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'dc-slider-change',
-          detail: { action: 'prev' }
-        })
-      )
-      expect(element.currentIndex).toBe(1)
-    })
-
-    it('should handle next button click', () => {
-      const nextButton = element.shadowRoot?.querySelector('button[aria-label="Next slide arrow"]') as HTMLButtonElement
-      
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      nextButton?.click()
-      
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'dc-slider-change',
-          detail: { action: 'next' }
-        })
-      )
-      expect(element.currentIndex).toBe(3)
-    })
-
-    it('should handle dot click', () => {
-      const dots = element.shadowRoot?.querySelectorAll('.dot')
-      const targetDot = dots?.[4] as HTMLElement // Click on the 5th dot (index 4)
-      
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      targetDot?.click()
-      
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'dc-slider-change',
-          detail: { action: 'index', index: 4 }
-        })
-      )
-      expect(element.currentIndex).toBe(4)
-    })
-
-    it('should not dispatch event when clicking current dot', () => {
-      const dots = element.shadowRoot?.querySelectorAll('.dot')
-      const currentDot = dots?.[2] as HTMLElement // Click on current dot (index 2)
-      
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      currentDot?.click()
-      
-      expect(dispatchEventSpy).not.toHaveBeenCalled()
-      expect(element.currentIndex).toBe(2) // Should remain unchanged
-    })
-
     it('should handle index change event', () => {
       const customEvent = new CustomEvent('dc-slider-index-changed', {
         detail: { index: 3 }
       })
-      
+
       document.dispatchEvent(customEvent)
-      
+
       expect(element.currentIndex).toBe(3)
     })
 
@@ -155,138 +163,36 @@ describe('DcSliderControls', () => {
       const customEvent = new CustomEvent('dc-slider-index-changed', {
         detail: { index: -1 }
       })
-      
+
       document.dispatchEvent(customEvent)
-      
+
       expect(element.currentIndex).toBe(originalIndex)
     })
 
     it('should ignore index change event without detail', () => {
       const originalIndex = element.currentIndex
       const customEvent = new CustomEvent('dc-slider-index-changed')
-      
+
       document.dispatchEvent(customEvent)
-      
+
       expect(element.currentIndex).toBe(originalIndex)
-    })
-  })
-
-  describe('navigation boundaries', () => {
-    beforeEach(() => {
-      element.count = 3
-      element.requestUpdate()
-    })
-
-    it('should wrap to beginning when going past end', () => {
-      element.currentIndex = 2 // Last index
-      const nextButton = element.shadowRoot?.querySelector('button[aria-label="Next slide arrow"]') as HTMLButtonElement
-      
-      nextButton?.click()
-      
-      expect(element.currentIndex).toBe(0) // Should wrap to beginning
-    })
-
-    it('should wrap to beginning when going before start', () => {
-      element.currentIndex = 0 // First index
-      const prevButton = element.shadowRoot?.querySelector('button[aria-label="Previous slide arrow"]') as HTMLButtonElement
-      
-      prevButton?.click()
-      
-      expect(element.currentIndex).toBe(0) // Should stay at beginning
-    })
-
-    it('should disable previous button at first index', () => {
-      element.currentIndex = 0
-      element.requestUpdate()
-      
-      const prevButton = element.shadowRoot?.querySelector('button[aria-label="Previous slide arrow"]') as HTMLButtonElement
-      
-      expect(prevButton?.disabled).toBe(true)
-    })
-
-    it('should enable previous button at other indices', () => {
-      element.count = 3
-      element.currentIndex = 1
-      element.requestUpdate()
-      
-      // Wait for the update to complete
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          const prevButton = element.shadowRoot?.querySelector('button[aria-label="Previous slide arrow"]') as HTMLButtonElement
-          
-          expect(prevButton?.disabled).toBe(false)
-          resolve()
-        }, 0)
-      })
-    })
-  })
-
-  describe('dot rendering', () => {
-    it('should render correct number of dots', () => {
-      element.count = 4
-      element.requestUpdate()
-      
-      // Wait for the update to complete
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          const dots = element.shadowRoot?.querySelectorAll('.dot')
-          expect(dots?.length).toBe(4)
-          resolve()
-        }, 0)
-      })
-    })
-
-    it('should mark current dot as active', () => {
-      element.count = 3
-      element.currentIndex = 1
-      element.requestUpdate()
-      
-      // Wait for the update to complete
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          const dots = element.shadowRoot?.querySelectorAll('.dot')
-          const activeDot = element.shadowRoot?.querySelector('.dot.active')
-          
-          expect(dots?.[1]).toBe(activeDot)
-          resolve()
-        }, 0)
-      })
-    })
-
-    it('should not mark other dots as active', () => {
-      element.count = 3
-      element.currentIndex = 1
-      element.requestUpdate()
-      
-      // Wait for the update to complete
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          const dots = element.shadowRoot?.querySelectorAll('.dot')
-          const activeDots = element.shadowRoot?.querySelectorAll('.dot.active')
-          
-          expect(activeDots?.length).toBe(1)
-          expect(dots?.[0].classList.contains('active')).toBe(false)
-          expect(dots?.[2].classList.contains('active')).toBe(false)
-          resolve()
-        }, 0)
-      })
     })
   })
 
   describe('lifecycle', () => {
     it('should add event listener on firstUpdated', () => {
       const addEventListenerSpy = vi.spyOn(document, 'addEventListener')
-      
+
       element.firstUpdated()
-      
+
       expect(addEventListenerSpy).toHaveBeenCalledWith('dc-slider-index-changed', element.indexChanged)
     })
 
     it('should remove event listener on disconnectedCallback', () => {
       const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener')
-      
+
       element.disconnectedCallback()
-      
+
       expect(removeEventListenerSpy).toHaveBeenCalledWith('dc-slider-index-changed', element.indexChanged)
     })
   })
@@ -294,40 +200,18 @@ describe('DcSliderControls', () => {
   describe('edge cases', () => {
     it('should handle zero count', () => {
       element.count = 0
-      element.requestUpdate()
-      
-      // Should not throw when rendering with zero count
-      expect(() => {
-        element.requestUpdate()
-      }).not.toThrow()
-      
-      const dots = element.shadowRoot?.querySelectorAll('.dot')
-      expect(dots?.length).toBe(0)
+      expect(() => element.requestUpdate()).not.toThrow()
     })
 
     it('should handle negative count', () => {
       element.count = -1
-      
-      // Should not throw when setting negative count
-      expect(() => {
-        element.requestUpdate()
-      }).not.toThrow()
-      
-      // Should handle negative count gracefully in rendering
-      const dots = element.shadowRoot?.querySelectorAll('.dot')
-      expect(dots?.length).toBe(0) // No dots should be rendered for negative count
+      expect(() => element.requestUpdate()).not.toThrow()
     })
-
 
     it('should handle currentIndex greater than count', () => {
       element.count = 3
       element.currentIndex = 5
-      element.requestUpdate()
-      
-      // Should not throw
-      expect(() => {
-        element.requestUpdate()
-      }).not.toThrow()
+      expect(() => element.requestUpdate()).not.toThrow()
     })
   })
 
@@ -342,32 +226,28 @@ describe('DcSliderControls', () => {
       expect(element.currentIndex).toBe(3)
     })
 
-    it('should reflect count changes in rendering', () => {
-      element.count = 2
+    it('should reflect count changes in end label', () => {
+      element.count = 7
       element.requestUpdate()
-      
-      // Wait for the update to complete
+
       return new Promise<void>((resolve) => {
         setTimeout(() => {
-          const dots = element.shadowRoot?.querySelectorAll('.dot')
-          expect(dots?.length).toBe(2)
+          const labels = element.shadowRoot?.querySelectorAll('.progress-label')
+          expect(labels?.[1].textContent).toBe('07')
           resolve()
         }, 0)
       })
     })
 
-    it('should reflect currentIndex changes in rendering', () => {
-      element.count = 3
-      element.currentIndex = 2
+    it('should reflect currentIndex changes in pill position', () => {
+      element.count = 4
+      element.currentIndex = 3
       element.requestUpdate()
-      
-      // Wait for the update to complete
+
       return new Promise<void>((resolve) => {
         setTimeout(() => {
-          const activeDot = element.shadowRoot?.querySelector('.dot.active')
-          const dots = element.shadowRoot?.querySelectorAll('.dot')
-          
-          expect(activeDot).toBe(dots?.[2])
+          const pill = element.shadowRoot?.querySelector('.progress-pill') as HTMLElement
+          expect(pill?.style.left).toBe('calc(100% - 1 * var(--pill-width))')
           resolve()
         }, 0)
       })

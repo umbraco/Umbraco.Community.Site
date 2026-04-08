@@ -4,12 +4,12 @@
    ========================================================================== */
 
 /* ==========================================================================
-   Base / Mobile (< 768px) — 1 card + 10% peek
+   Base / Mobile (< 768px) — 1 card + 20% peek
    ========================================================================== */
 
 .dc-slider-block {
     /* Slide card dimensions (overridden per breakpoint) */
-    --slide-width: calc((100vw - var(--unit) - var(--unit-xs)) / 1.1);
+    --slide-width: calc((100vw - var(--unit) - var(--unit-xs)) / 1.2);
     --slide-min-height: 17.5rem;
     --slide-tag-size: var(--unit-md);
     --slide-title-size: calc(var(--font-size) + 2px);
@@ -31,6 +31,7 @@
 
 .dc-slider-block.bg-dark {
     color: var(--color-white);
+    --slider-controls-color: var(--color-white);
 
     .block-title,
     .block-subtitle,
@@ -84,8 +85,11 @@
 }
 
 .dc-slide-item.has-bg {
-    border: 1px solid var(--color-light-blue);
     background-color: var(--slide-overlay-color);
+
+    border: if(
+        style(--slide-overlay-color: var(--block-background-color)): 1px solid var(--color-light-blue);
+    );
 }
 
 .dc-slide-item__bg {
@@ -232,12 +236,12 @@
 }
 
 /* ==========================================================================
-   Tablet (768px+) — 2 cards + 10% peek
+   Tablet (768px+) — 2 cards + 20% peek
    ========================================================================== */
 
 @media (--sm) {
     .dc-slider-block {
-        --slide-width: calc((100vw - var(--unit-md) - 2 * var(--unit-xs)) / 2.1);
+        --slide-width: calc((100vw - var(--unit-md) - 2 * var(--unit-xs)) / 2.2);
         --slide-min-height: 22.5rem;
         --slide-tag-size: 3.5rem;
         --slide-title-size: calc(var(--font-size) + 6px);
@@ -263,7 +267,7 @@
 }
 
 /* ==========================================================================
-   Desktop (1024px+) — column-span-based sizing with 10% peek
+   Desktop (1024px+) — column-span-based sizing with 20% peek
    ========================================================================== */
 
 @media (--md) {
@@ -286,13 +290,13 @@
     .dc-slider-block__slider .slides > div {
         /*
          * N = items that fit at full column span (12 / colSpan)
-         * Show N items + 10% of the next, accounting for gaps:
-         * width = (100cqi - N * gap) / (N + 0.1)
+         * Show N items + 20% of the next, accounting for gaps:
+         * width = (100cqi - N * gap) / (N + 0.2)
          */
         --_n: calc(12 / var(--slide-col-span, 3));
         width: calc(
             (100cqi - var(--_n) * var(--unit-xs)) /
-            (var(--_n) + 0.1)
+            (var(--_n) + 0.2)
         );
     }
 

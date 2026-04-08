@@ -8,10 +8,9 @@ export class DcSlider extends HTMLElement {
   #currentIndex = 0;
   #touchstartX = 0;
   #touchstartY = 0;
-  #touchendX = 0;
-  #touchendY = 0;
-  #isSwipeGesture = false;
-  #minSwipeDistance = 50; // Minimum distance in pixels to trigger a swipe
+  #isDragging = false;
+  #dragStartLeft = 0;
+  #swipeThreshold = 10; // Pixels before we decide swipe vs scroll direction
   #prevZone: HTMLElement | null = null;
   #nextZone: HTMLElement | null = null;
   #hasExplicitButtons = false;
@@ -133,50 +132,82 @@ export class DcSlider extends HTMLElement {
 
   getTouchStartPoint = (event: TouchEvent) => {
     if (!event.changedTouches || event.changedTouches.length === 0) return;
-    this.#isSwipeGesture = false;
-    this.#touchstartX = event.changedTouches[0].screenX;
-    this.#touchstartY = event.changedTouches[0].screenY;
-  }
+
+    const container = this.#getContainer();
+    if (!container) return;
+
+    this.#isDragging = false;
+    this.#touchstartX = event.changedTouches[0].clientX;
+    this.#touchstartY = event.changedTouches[0].clientY;
+    this.#dragStartLeft = container.dataset.left ? parseInt(container.dataset.left) : 0;
+
+    // Remove transition so the drag follows the finger instantly
+    container.style.transition = "none";
+  };
 
   getTouchMovePoint = (event: TouchEvent) => {
     if (!event.changedTouches || event.changedTouches.length === 0) return;
-    
-    const currentX = event.changedTouches[0].screenX;
-    const currentY = event.changedTouches[0].screenY;
-    
-    const deltaX = Math.abs(currentX - this.#touchstartX);
-    const deltaY = Math.abs(currentY - this.#touchstartY);
-    
-    // If we haven't determined this is a swipe gesture yet, check if it should be
-    if (!this.#isSwipeGesture && deltaX > this.#minSwipeDistance && deltaX > deltaY * 1.5) {
-      this.#isSwipeGesture = true;
-      // Only prevent scrolling when we're sure it's a swipe gesture
+
+    const currentX = event.changedTouches[0].clientX;
+    const currentY = event.changedTouches[0].clientY;
+    const deltaX = currentX - this.#touchstartX;
+    const deltaY = currentY - this.#touchstartY;
+
+    // Once we've committed to dragging, keep following the finger
+    if (this.#isDragging) {
       event.preventDefault();
+      const container = this.#getContainer();
+      if (container) {
+        container.style.transform = `translateX(${this.#dragStartLeft + deltaX}px)`;
+      }
+      return;
     }
-  }
+
+    // Determine direction: if horizontal wins, start dragging; otherwise let the page scroll
+    if (Math.abs(deltaX) > this.#swipeThreshold) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        this.#isDragging = true;
+        event.preventDefault();
+      }
+    }
+  };
 
   getTouchEndPoint = (event: TouchEvent) => {
     if (!event.changedTouches || event.changedTouches.length === 0) return;
 
-    this.#touchendX = event.changedTouches[0].screenX;
-    this.#touchendY = event.changedTouches[0].screenY;
+    const container = this.#getContainer();
+    if (!container) return;
 
-    const deltaX = Math.abs(this.#touchendX - this.#touchstartX);
-    const deltaY = Math.abs(this.#touchendY - this.#touchstartY);
+    // Re-enable transition for the snap animation
+    container.style.transition = "transform 0.3s ease";
 
-    // Only trigger slider navigation if:
-    // 1. Horizontal movement is greater than minimum swipe distance
-    // 2. Horizontal movement is significantly greater than vertical movement (to avoid triggering on vertical scrolls)
-    if (deltaX > this.#minSwipeDistance && deltaX > deltaY * 1.5) {
-      if (this.#touchendX < this.#touchstartX && this.#currentIndex > 0) {
-        this.#scrollContainer('next');
-        this.#dispatchIndexChangedEvent();
-      } else if (this.#touchendX > this.#touchstartX) {
-        this.#scrollContainer('prev');
-        this.#dispatchIndexChangedEvent();
+    if (!this.#isDragging) return;
+
+    const endX = event.changedTouches[0].clientX;
+    const dragDelta = endX - this.#touchstartX;
+    const { scrollStep } = this.#getContainerWithStep();
+
+    if (!scrollStep) return;
+
+    // Calculate how many slides were dragged past (round to nearest)
+    const slidesOffset = Math.round(Math.abs(dragDelta) / scrollStep);
+
+    if (slidesOffset > 0) {
+      const maxIndex = this.#getMaxIndex();
+      if (dragDelta < 0) {
+        // Swiped left → go forward
+        this.#currentIndex = Math.min(this.#currentIndex + slidesOffset, maxIndex);
+      } else {
+        // Swiped right → go back
+        this.#currentIndex = Math.max(this.#currentIndex - slidesOffset, 0);
       }
+      this.#dispatchIndexChangedEvent();
     }
-  }
+
+    // Snap to the resolved index
+    this.#setTransform(container, this.#currentIndex * scrollStep * -1);
+    this.#updateHoverZones();
+  };
 
   #dispatchIndexChangedEvent() {
     this.dispatchEvent(
@@ -204,6 +235,7 @@ export class DcSlider extends HTMLElement {
   }
 
   #setTransform(container: HTMLElement, translateX: number) {
+    container.style.transition = "transform 0.3s ease";
     container.style.transform = `translateX(${translateX}px)`;
     container.dataset.left = translateX.toString();
   }
