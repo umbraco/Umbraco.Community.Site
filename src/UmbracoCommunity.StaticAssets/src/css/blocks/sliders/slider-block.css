@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* ==========================================================================
-   Base / Mobile (< 768px) — 1 card + 20% peek
+   Base (mobile-first defaults) — 1 card + 20% peek
    ========================================================================== */
 
 .dc-slider-block {
@@ -153,12 +153,9 @@
     object-fit: contain;
 }
 
-/* Invert icon to white on slides with their own dark background */
-.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon {
-    filter: brightness(0) invert(1);
-}
-
-/* Default dark slides (no own bg) get inverted icon only when block is NOT dark */
+/* Invert icon to white when the slide background is dark.
+   Excludes slides without their own bg inside a dark block (those render as white cards). */
+.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon,
 .dc-slider-block:not(.bg-dark) .dc-slide-item.bg-dark:not(.has-bg) .dc-slide-item__icon {
     filter: brightness(0) invert(1);
 }
@@ -235,7 +232,7 @@
     padding: var(--unit-md) 0 var(--unit-xs);
 }
 
-/* has-buttons variant — base/mobile */
+/* has-buttons variant — hide hover zones and progress bar, left-align text */
 .dc-slider-block.has-buttons .slider-hover-zone {
     display: none !important;
 }
@@ -374,7 +371,7 @@
         background: linear-gradient(270deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
     }
 
-    /* Arrow buttons — switch to desktop position */
+    /* Arrow buttons — hide mobile, show desktop */
     .dc-slider-block__arrows--mobile {
         display: none;
     }
@@ -385,7 +382,7 @@
         flex-shrink: 0;
     }
 
-    /* has-buttons variant — desktop layout */
+    /* has-buttons variant — intro row with arrows beside text */
     .dc-slider-block.has-buttons .dc-slider-block__intro {
         display: flex;
         justify-content: space-between;
@@ -401,7 +398,7 @@
 }
 
 /* ==========================================================================
-   Desktop (1216px+)
+   Wide desktop (--lg / 1216px+) — increase padding for bg variant
    ========================================================================== */
 
 @media (--lg) {
@@ -421,7 +418,7 @@
 }
 
 /* ==========================================================================
-   Desktop (1408px+)
+   Extra-wide desktop (--xl / 1408px+) — increase padding for bg variant
    ========================================================================== */
 
 @media (--xl) {
