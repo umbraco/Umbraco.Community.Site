@@ -108,7 +108,7 @@
 
 .dc-slide-item__bg ~ .dc-slide-item__overlay {
     background-color: var(--color-light-blue);
-    opacity: 0.6;
+    opacity: 0.8;
 }
 
 .dc-slide-item__content {
