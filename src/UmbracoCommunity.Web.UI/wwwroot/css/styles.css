@@ -536,7 +536,20 @@ ol.no-margin p {
 }
 
 .dc-slide-item.bg-light {
-    --slide-text-color: #000000;
+    --slide-text-color: #283A97;
+}
+
+/* Slides without their own background or image inside a dark block → white card */
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__overlay {
+    background-color: #ffffff;
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__content {
+    background-color: #ffffff;
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) {
+    --slide-text-color: #283A97;
 }
 
 .dc-slider-block__intro {
@@ -630,6 +643,10 @@ ol.no-margin p {
 .dc-slide-item__overlay {
     position: absolute;
     inset: 0;
+    background-color: #283a97;
+}
+
+.dc-slide-item__bg ~ .dc-slide-item__overlay {
     background-color: var(--slide-overlay-color, #283a97);
     opacity: 0.6;
 }
@@ -647,7 +664,7 @@ ol.no-margin p {
 
 .dc-slide-item__tag {
     display: block;
-    font-size: 36px;
+    font-size: 24px;
     font-weight: 700;
     line-height: 1;
     margin-bottom: 8px;
@@ -658,6 +675,11 @@ ol.no-margin p {
     width: 36px;
     height: 36px;
     margin-bottom: 8px;
+}
+
+.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon,
+.dc-slider-block:not(.bg-dark) .dc-slide-item.bg-dark:not(.has-bg) .dc-slide-item__icon {
+    filter: brightness(0) invert(1);
 }
 
 .dc-slide-item__title {

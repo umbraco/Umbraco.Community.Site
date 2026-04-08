@@ -495,6 +495,7 @@ See these existing implementations for reference:
 - **CallToActionBlock**: `CallToActionBlockViewModel`, `CallToActionBlockViewModelBuilder`, `CallToActionBlock.cshtml`
 - **QuoteBlock**: `QuoteBlockViewModel`, `QuoteBlockViewModelBuilder`, `QuoteBlock.cshtml`
 - **ResultsBlock**: `ResultsBlockViewModel`, `ResultsBlockViewModelBuilder`, `ResultsBlock.cshtml`
+- **SliderBlock**: `SliderBlock.cshtml` — Container block with nested `SlideItemBlockWithTag` / `SlideItemBlockWithIcon` child items, dark/light background theming, and `dc-slider` / `dc-slider-controls` web components
 
 ## Troubleshooting
 
