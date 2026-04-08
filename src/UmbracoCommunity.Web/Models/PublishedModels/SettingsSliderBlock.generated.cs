@@ -50,7 +50,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Display buttons: Check to display explicit arrows instead of the mouse over slide controls at the edges of the slider
+		/// Display buttons: Check to display explicit arrows to control the slider
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("displayButtons")]
