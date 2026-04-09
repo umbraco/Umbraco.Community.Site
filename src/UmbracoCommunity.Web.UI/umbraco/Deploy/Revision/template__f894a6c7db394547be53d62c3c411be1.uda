@@ -1,6 +1,6 @@
 {
   "Name": "Layout",
-  "Alias": "Layout",
+  "Alias": "layout",
   "File": "umb://template-file/Layout.cshtml",
   "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Dependencies": [

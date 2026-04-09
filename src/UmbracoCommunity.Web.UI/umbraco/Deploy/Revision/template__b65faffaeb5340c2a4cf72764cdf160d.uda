@@ -1,6 +1,6 @@
 {
   "Name": "Home",
-  "Alias": "Home",
+  "Alias": "home",
   "File": "umb://template-file/Home.cshtml",
   "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/b65faffaeb5340c2a4cf72764cdf160d",

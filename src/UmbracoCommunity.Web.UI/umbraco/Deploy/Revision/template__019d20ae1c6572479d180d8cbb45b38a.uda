@@ -1,11 +1,17 @@
 {
   "Name": "Page not found",
-  "Alias": "PageNotFound",
+  "Alias": "pagenotfound",
   "File": "umb://template-file/PageNotFound.cshtml",
+  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/019d20ae1c6572479d180d8cbb45b38a",
   "Dependencies": [
     {
       "Udi": "umb://template-file/PageNotFound.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
       "Ordering": true,
       "Mode": "Exist"
     }
