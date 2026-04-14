@@ -10,12 +10,17 @@
         "allowInAreas": true
       },
       {
+        "contentElementTypeKey": "0cbc344a-cad8-4b82-853f-eb65ed0b7082",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
         "contentElementTypeKey": "66e0b557-3bbb-4dde-acea-7255772c5cfd",
         "allowAtRoot": true,
         "allowInAreas": true
       },
       {
-        "contentElementTypeKey": "0cbc344a-cad8-4b82-853f-eb65ed0b7082",
+        "contentElementTypeKey": "c339b679-8c52-429e-bfe4-6106b545df55",
         "allowAtRoot": true,
         "allowInAreas": true
       }
@@ -41,6 +46,9 @@
     },
     {
       "Udi": "umb://document-type/66e0b5573bbb4ddeacea7255772c5cfd"
+    },
+    {
+      "Udi": "umb://document-type/c339b6798c52429ebfe46106b545df55"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
