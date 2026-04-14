@@ -1,0 +1,57 @@
+{
+  "Name": "Slide item block with icon",
+  "Alias": "slideItemBlockWithIcon",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-star",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [
+    "umb://document-type/991422e28be34f17851b735729ed1ca4",
+    "umb://document-type/b9205609a713403f8195b538b89b30f3"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "e0ea1260-749b-4f8b-bf54-e6300f5f82c7",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "25ccdda5-b117-423b-8737-b9618ee7d4ec",
+          "Alias": "icon",
+          "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "Description": "Displayed at the top of the slide",
+          "Name": "Icon",
+          "SortOrder": -3
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/4d1a90171d344dd1bbec432f71ce66a0",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/991422e28be34f17851b735729ed1ca4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/b9205609a713403f8195b538b89b30f3",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.2"
+}

@@ -4,6 +4,20 @@
         text-align: center;
     }
 
+    .block-subtitle h2 {
+        font-size: 1.5rem;
+        margin-top: var(--unit);
+        display: inline-block;
+
+        @media (--sm) {
+            font-size: 1.75rem;
+        }
+
+        @media (--md) {
+            font-size: 2rem;
+        }
+    }
+
     input {
         position: absolute;
         width: 1px;

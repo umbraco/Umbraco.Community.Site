@@ -2,7 +2,7 @@
 
 <div class="dc-faq-block">
     @if (!string.IsNullOrEmpty(Model.Content.Title)){
-        <h3>@Model.Content.Title</h3>
+        <h4>@Model.Content.Title</h4>
     }
     @if (!Model.Content.Content.IsEmptyHtmlString()) {
         @Html.Raw(Model.Content.Content)

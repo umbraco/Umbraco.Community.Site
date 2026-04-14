@@ -1,0 +1,58 @@
+{
+  "Name": "Slide item picker grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 12,
+    "blocks": [
+      {
+        "contentElementTypeKey": "4d1a9017-1d34-4dd1-bbec-432f71ce66a0",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cb0161ea-b41c-4acc-a075-4d7938257e3a",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 4
+          },
+          {
+            "columnSpan": 6
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "999d8901-4c17-480d-a919-cd1db79b4900",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cb0161ea-b41c-4acc-a075-4d7938257e3a",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 4
+          },
+          {
+            "columnSpan": 6
+          }
+        ]
+      }
+    ],
+    "useLiveEditing": true
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/76c82541d35d4c1582ab9432aba0ef5e",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/4d1a90171d344dd1bbec432f71ce66a0"
+    },
+    {
+      "Udi": "umb://document-type/999d89014c17480da919cd1db79b4900"
+    },
+    {
+      "Udi": "umb://document-type/cb0161eab41c4acca0754d7938257e3a"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.2"
+}

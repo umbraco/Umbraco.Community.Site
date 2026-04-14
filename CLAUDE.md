@@ -263,6 +263,23 @@ The form block supports an optional multi-step mode via the `EnableSteppedForm` 
 - Validates required fields per step before advancing (supports text, checkbox, radio, and `data-val-required` attributes)
 - Uses a MutationObserver to handle async rendering from `<umb-forms-render>`
 
+### Slider Block
+
+The slider block (`SliderBlock`) is a container block that holds nested slide items rendered as a horizontally-scrollable carousel. It supports two slide item types: `SlideItemBlockWithTag` (text tag + title + content) and `SlideItemBlockWithIcon` (icon image + title + content).
+
+**Frontend Components** (`src/UmbracoCommunity.StaticAssets/src/components/sliders/`):
+- `dc-slider.element.ts` — Core slider with touch drag-to-scroll (follows finger, snaps to nearest slide on release), hover zone navigation on desktop, and explicit arrow button support
+- `dc-slider-controls.element.ts` — Progress bar indicator with zero-padded position labels (`01`...`06`) and a sliding pill showing current position. Hidden when explicit arrow buttons are displayed (`has-buttons` variant)
+
+**Slide item theming** — slides support per-item background colour, background image, or no background (defaults to blue overlay). When the parent slider block has a dark background, slides without their own background render as white cards with blue text. Icon images are inverted to white via CSS filter when the slide background is dark, except on white cards inside dark blocks.
+
+**CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/sliders/`):
+- `slider-block.css` — Main slider layout, slide item cards, hover zones, arrow buttons, and breakpoint overrides (mobile-first → `--sm` → `--md` → `--lg` → `--xl`)
+- `box-slider.css` / `box-slider-item.css` — Box slider variant styles
+- `link-slider.css` / `link-slider-item.css` — Link slider variant styles
+
+**Backoffice preview** — `Views/BlockPreviewApi/SlideItemBlockWithTag.cshtml` and `SlideItemBlockWithIcon.cshtml` provide simple vertical list previews. Backoffice-specific slider styles in `wwwroot/css/styles.css` mirror the frontend dark/light theming logic.
+
 ### Rich Text Editor Style Menu
 
 A custom tiptap toolbar extension is defined in `App_Plugins/RichtextStyles/umbraco-package.json`. It provides a "Richtext styles" dropdown with grouped options for headings, inline formatting, blocks, and lists (including condensed list variants that apply a `no-margin` class to `ol`/`ul` tags).
