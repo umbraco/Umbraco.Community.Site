@@ -1003,7 +1003,10 @@ export class SessionizeProgramElement extends LitElement {
       }
     }
 
-    return { top: topPixels, height: heightPixels };
+    return {
+      top: totalHeight > 0 ? (topPixels / totalHeight) * 100 : 0,
+      height: totalHeight > 0 ? (heightPixels / totalHeight) * 100 : 0,
+    };
   }
 
   #formatSessionTime(dateString: string): string {
