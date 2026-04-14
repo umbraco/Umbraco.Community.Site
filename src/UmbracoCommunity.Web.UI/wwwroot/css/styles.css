@@ -386,7 +386,7 @@ ol.no-margin p {
     display: none;
 }
 
-.dc-faq-block h3 {
+.dc-faq-block h4 {
     font-size: 16px;
     font-weight: bold;
     margin: 0;
@@ -558,4 +558,190 @@ dc-image-slider img {
     padding: 20px;
     width: 100%;
     color: #ffffff;
+}
+
+/* Slider block */
+.dc-slider-block {
+    padding: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.dc-slider-block.has-bg {
+    background-color: var(--block-background-color);
+}
+
+.dc-slider-block.bg-dark {
+    color: #ffffff;
+}
+
+.dc-slider-block.bg-dark .block-tagline,
+.dc-slider-block.bg-dark .block-title,
+.dc-slider-block.bg-dark .block-subtitle,
+.dc-slider-block.bg-dark .block-subtitle * {
+    color: #ffffff;
+}
+
+.dc-slide-item.bg-dark {
+    --slide-text-color: #ffffff;
+}
+
+.dc-slide-item.bg-light {
+    --slide-text-color: #283A97;
+}
+
+/* Slides without their own background or image inside a dark block → white card */
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__overlay {
+    background-color: #ffffff;
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__content {
+    background-color: #ffffff;
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) {
+    --slide-text-color: #283A97;
+}
+
+.dc-slider-block__intro {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dc-slider-block.has-buttons .dc-slider-block__intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: left;
+}
+
+.dc-slider-block.has-buttons .block-tagline,
+.dc-slider-block.has-buttons .block-title {
+    text-align: left;
+}
+
+.block-tagline {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #283A97;
+    margin: 0 0 10px;
+}
+
+.dc-slider-block__arrows {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.dc-slider-block__arrows--mobile {
+    display: none;
+}
+
+.slider-arrow-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 2px solid #283A97;
+    border-radius: 50%;
+    background: #ffffff;
+    padding: 0;
+    cursor: pointer;
+}
+
+.slider-arrow-btn--prev svg {
+    transform: rotate(180deg);
+}
+
+.dc-slider-block.bg-dark .slider-arrow-btn {
+    border-color: #ffffff;
+}
+
+.dc-slider-block__slider .slides {
+    display: flex;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.dc-slider-block__slider .slides > div {
+    flex-shrink: 0;
+    width: 220px;
+}
+
+.dc-slider-block__slider .mobile-controls,
+.dc-slider-block__slider .slides-wrapper .slider-hover-zone {
+    display: none;
+}
+
+.dc-slide-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.dc-slide-item__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dc-slide-item__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: #283a97;
+}
+
+.dc-slide-item__bg ~ .dc-slide-item__overlay {
+    background-color: var(--slide-overlay-color, #283a97);
+    opacity: 0.6;
+}
+
+.dc-slide-item__content {
+    position: relative;
+    padding: 16px;
+    color: var(--slide-text-color);
+    background-color: var(--slide-overlay-color, #283a97);
+}
+
+.dc-slide-item__bg ~ .dc-slide-item__content {
+    background-color: transparent;
+}
+
+.dc-slide-item__tag {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.dc-slide-item__icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 8px;
+}
+
+.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon,
+.dc-slider-block:not(.bg-dark) .dc-slide-item.bg-dark:not(.has-bg) .dc-slide-item__icon {
+    filter: brightness(0) invert(1);
+}
+
+.dc-slide-item__title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 6px;
+}
+
+.dc-slide-item__text {
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0;
+    opacity: 0.9;
 }

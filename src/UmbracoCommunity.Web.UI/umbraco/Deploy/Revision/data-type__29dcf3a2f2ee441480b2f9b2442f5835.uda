@@ -38,6 +38,12 @@
         "settingsElementTypeKey": "a801c7a3-117e-488b-bf41-05185c16a3ba"
       },
       {
+        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "editorSize": "full"
+      },
+      {
         "contentElementTypeKey": "e6c6b0dc-d60d-480a-b06e-6e81febdac98",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -101,6 +107,13 @@
         "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850"
       },
       {
+        "contentElementTypeKey": "f2a94d08-4ffc-495d-ab47-3a70d9d1869a",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "d772969a-c9e8-4809-b952-5d17ae4a899d",
+        "editorSize": "large"
+      },
+      {
         "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -143,12 +156,6 @@
           }
         ],
         "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
-      },
-      {
-        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "editorSize": "full"
       }
     ],
     "useLiveEditing": true,
@@ -235,6 +242,9 @@
       "Udi": "umb://document-type/cdca4cc35b164081906873e30005add5"
     },
     {
+      "Udi": "umb://document-type/d772969ac9e84809b9525d17ae4a899d"
+    },
+    {
       "Udi": "umb://document-type/e5b3d35689c044438fe45b26c52117a2"
     },
     {
@@ -245,6 +255,9 @@
     },
     {
       "Udi": "umb://document-type/f262c3ebd4404b638dbbb6da83f86f71"
+    },
+    {
+      "Udi": "umb://document-type/f2a94d084ffc495dab473a70d9d1869a"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",

@@ -6,15 +6,15 @@
   <ItemGroup>
     <!-- Umbraco -->
     <PackageVersion Include="Flip.Umbraco" Version="17.0.2" />
-    <PackageVersion Include="Umbraco.Cms" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="17.3.0" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="17.3.0" />
+    <PackageVersion Include="Umbraco.Cms" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="17.3.3" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="17.3.3" />
     <!-- Umbraco Cloud & Deploy -->
-    <PackageVersion Include="Umbraco.Cloud.Cms" Version="17.1.0" />
+    <PackageVersion Include="Umbraco.Cloud.Cms" Version="17.1.1" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="17.0.0" />
     <PackageVersion Include="Umbraco.Deploy.OnPrem" Version="17.0.2" />
     <PackageVersion Include="Umbraco.Deploy.Cloud" Version="17.0.2" />

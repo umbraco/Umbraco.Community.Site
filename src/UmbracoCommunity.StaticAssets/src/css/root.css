@@ -23,6 +23,7 @@
     --color-light-grey-navigation: #333;
     --color-light-grey: #d1d1d1;
     --color-dark-grey: #707070;
+    --color-light-blue: #5e6279;
     --color-green: #39d18c;
     --color-green-hover: #32b77b;
     --color-red: #e51400;
@@ -44,6 +45,7 @@
     --unit-lg: 3rem;
     --unit-xl: 5rem;
 
+    --font-size-xs: 12px;
     --font-size-sm: 14px;
     --font-size: 16px;
     --font-size-large: 24px;

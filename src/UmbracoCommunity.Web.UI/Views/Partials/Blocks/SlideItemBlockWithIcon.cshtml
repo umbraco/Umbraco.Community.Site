@@ -1,0 +1,44 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>
+
+@{
+    var content = Model.Content as SlideItemBlockWithIcon;
+    var settings = Model.Settings as SettingsSlideItemBlock;
+    var hasSlideColour = settings?.BackgroundColour?.Color != null;
+    var slideBgIsDark = !hasSlideColour || settings!.BackgroundColour!.Color.IsDark();
+}
+
+@if (content != null)
+{
+    <div class="dc-slide-item @(hasSlideColour ? "has-bg" : "") @(slideBgIsDark ? "bg-dark" : "bg-light")" style="@(hasSlideColour ? $"--slide-overlay-color: {settings!.BackgroundColour!.Color}" : "")">
+        @if (content.BackgroundImage != null)
+        {
+            <img class="dc-slide-item__bg"
+                 src="@content.BackgroundImage.MediaUrl()"
+                 alt=""
+                 loading="lazy"
+                 aria-hidden="true">
+        }
+        @if (!hasSlideColour) {
+            <div class="dc-slide-item__overlay"></div>
+        }
+        <div class="dc-slide-item__content">
+            @if (content.Icon != null)
+            {
+                <img class="dc-slide-item__icon"
+                     src="@content.Icon.MediaUrl()"
+                     alt=""
+                     aria-hidden="true">
+            }
+            <div class="dc-slide-item__detail">
+                @if (!string.IsNullOrEmpty(content.Title))
+                {
+                    <h3 class="dc-slide-item__title">@content.Title</h3>
+                }
+                @if (!string.IsNullOrEmpty(content.Content))
+                {
+                    <p class="dc-slide-item__text">@content.Content</p>
+                }
+            </div>
+        </div>
+    </div>
+}

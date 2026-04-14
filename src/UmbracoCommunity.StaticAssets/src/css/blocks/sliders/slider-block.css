@@ -1,0 +1,438 @@
+/* ==========================================================================
+   Slider Block
+   Breakpoints: base (mobile) → --sm (768px) → --md (1024px)
+   ========================================================================== */
+
+/* ==========================================================================
+   Base (mobile-first defaults) — 1 card + 20% peek
+   ========================================================================== */
+
+.dc-slider-block {
+    /* Slide card dimensions (overridden per breakpoint) */
+    --slide-width: calc((100vw - var(--unit) - var(--unit-xs)) / 1.2);
+    --slide-min-height: 17.5rem;
+    --slide-tag-size: var(--unit-md);
+    --slide-title-size: calc(var(--font-size) + 2px);
+    --slide-text-size: var(--font-size-sm);
+    --tagline-size: calc(var(--font-size-sm) - 2px);
+    --tagline-spacing: 2px;
+    --hover-zone-width: 3.75rem;
+
+    background-color: var(--block-background-color, var(--color-light));
+    padding: var(--unit-lg) 0;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+}
+
+.dc-slider-block.has-bg {
+    background-color: var(--block-background-color);
+    padding: var(--unit-md) 0;
+}
+
+.dc-slider-block.bg-dark {
+    color: var(--color-white);
+    --slider-controls-color: var(--color-white);
+
+    .block-title,
+    .block-subtitle,
+    .block-tagline {
+        color: var(--color-white);
+    }
+}
+
+/* Intro */
+.dc-slider-block__intro {
+    margin: 0 auto var(--unit-lg);
+    padding: 0 var(--unit);
+}
+
+.block-tagline {
+    color: var(--color-blue);
+    text-align: center;
+    font-size: var(--tagline-size);
+    font-weight: 500;
+    letter-spacing: var(--tagline-spacing);
+    text-transform: uppercase;
+    margin: 0 0 var(--unit);
+}
+
+/* Slider area */
+.dc-slider-block__slider {
+    display: block;
+    padding-left: var(--unit);
+}
+
+.dc-slider-block__slider .slides-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.dc-slider-block__slider .slides > div {
+    flex-shrink: 0;
+    --slide-col-span: 3;
+}
+
+/* Slide item cards */
+.dc-slide-item {
+    position: relative;
+    width: var(--slide-width);
+    min-height: var(--slide-min-height);
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--slide-overlay-color);
+}
+
+.dc-slide-item.has-bg {
+    background-color: var(--slide-overlay-color);
+
+    border: if(
+        style(--slide-overlay-color: var(--block-background-color)): 1px solid var(--color-light-blue);
+    );
+}
+
+.dc-slide-item__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dc-slide-item__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-blue);
+}
+
+.dc-slide-item__bg ~ .dc-slide-item__overlay {
+    background-color: var(--color-light-blue);
+    opacity: 0.8;
+}
+
+.dc-slide-item__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--unit-md);
+    color: var(--slide-text-color);
+    flex: 1;
+}
+
+.dc-slide-item.bg-dark {
+    --slide-text-color: var(--color-white);
+}
+
+.dc-slide-item.bg-light {
+    --slide-text-color: var(--color-blue);
+}
+
+/* Slide items without their own background or image inside a dark block → white card */
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) .dc-slide-item__overlay {
+    background-color: var(--color-white);
+}
+
+.dc-slider-block.bg-dark .dc-slide-item:not(.has-bg):not(:has(.dc-slide-item__bg)) {
+    --slide-text-color: var(--color-blue);
+}
+
+.dc-slide-item__tag {
+    font-size: var(--slide-tag-size);
+    line-height: 1;
+    margin-bottom: var(--unit);
+    opacity: 0.9;
+}
+
+.dc-slide-item__icon {
+    width: var(--unit-lg);
+    height: var(--unit-lg);
+    margin-bottom: var(--unit);
+    object-fit: contain;
+}
+
+/* Invert icon to white when the slide background is dark.
+   Excludes slides without their own bg inside a dark block (those render as white cards). */
+.dc-slide-item.bg-dark.has-bg .dc-slide-item__icon,
+.dc-slider-block:not(.bg-dark) .dc-slide-item.bg-dark:not(.has-bg) .dc-slide-item__icon {
+    filter: brightness(0) invert(1);
+}
+
+.dc-slide-item__title {
+    font-size: var(--slide-title-size);
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0 0 var(--unit-sm);
+}
+
+.dc-slide-item__text {
+    font-size: var(--slide-text-size);
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Hover zones — hidden on mobile */
+.slider-hover-zone {
+    display: none;
+}
+
+/* Arrow buttons */
+.slider-arrow-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid var(--color-blue);
+    border-radius: 50%;
+    background-color: var(--color-white);
+    color: var(--color-blue);
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+}
+
+.slider-arrow-btn:hover:not([disabled]) {
+    transform: scale(1.05);
+}
+
+.slider-arrow-btn[disabled] {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+.slider-arrow-btn:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+}
+
+.slider-arrow-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.slider-arrow-btn--prev svg {
+    transform: rotate(180deg);
+}
+
+.dc-slider-block__arrows {
+    display: flex;
+    gap: var(--unit-xs);
+}
+
+.dc-slider-block__arrows--desktop {
+    display: none;
+}
+
+.dc-slider-block__arrows--mobile {
+    padding: var(--unit-md) 0 var(--unit-xs);
+}
+
+/* has-buttons variant — hide hover zones and progress bar, left-align text */
+.dc-slider-block.has-buttons .slider-hover-zone {
+    display: none !important;
+}
+
+.dc-slider-block.has-buttons .mobile-controls {
+    display: none;
+}
+
+.dc-slider-block.has-buttons .block-tagline,
+.dc-slider-block.has-buttons .block-title,
+.dc-slider-block.has-buttons .block-subtitle {
+    text-align: left;
+}
+
+.dc-slider-block.has-buttons .block-title {
+    align-self: flex-start;
+}
+
+/* ==========================================================================
+   Tablet (768px+) — 2 cards + 20% peek
+   ========================================================================== */
+
+@media (--sm) {
+    .dc-slider-block {
+        --slide-width: calc((100vw - var(--unit-md) - 2 * var(--unit-xs)) / 2.2);
+        --slide-min-height: 22.5rem;
+        --slide-tag-size: 3.5rem;
+        --slide-title-size: calc(var(--font-size) + 6px);
+        --slide-text-size: var(--font-size);
+        --tagline-size: var(--font-size-sm);
+        --tagline-spacing: 3px;
+
+        padding: var(--unit-xl) 0;
+    }
+
+    .dc-slider-block__intro {
+        margin-bottom: var(--unit-md);
+        padding: 0 var(--unit-md);
+    }
+
+    .dc-slider-block__slider {
+        padding-left: var(--unit-md);
+    }
+
+    .dc-slider-block__arrows--mobile {
+        padding: var(--unit-lg) 0 var(--unit);
+    }
+}
+
+/* ==========================================================================
+   Desktop (1024px+) — column-span-based sizing with 20% peek
+   ========================================================================== */
+
+@media (--md) {
+    .dc-slider-block {
+        --slide-min-height: 23.75rem;
+    }
+
+    .dc-slider-block.has-bg {
+        padding: var(--unit-xl) 0;
+    }
+
+    .dc-slider-block__slider {
+        padding-left: var(--unit-md);
+    }
+
+    .dc-slider-block__slider .slides-wrapper {
+        container-type: inline-size;
+    }
+
+    .dc-slider-block__slider .slides > div {
+        /*
+         * N = items that fit at full column span (12 / colSpan)
+         * Show N items + 20% of the next, accounting for gaps:
+         * width = (100cqi - N * gap) / (N + 0.2)
+         */
+        --_n: calc(12 / var(--slide-col-span, 3));
+        width: calc(
+            (100cqi - var(--_n) * var(--unit-xs)) /
+            (var(--_n) + 0.2)
+        );
+    }
+
+    .dc-slide-item {
+        width: 100%;
+    }
+
+    .dc-slide-item__text {
+        line-height: 1.6;
+    }
+
+    /* Hover zones — visible on desktop */
+    .slider-hover-zone {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: var(--hover-zone-width);
+        z-index: 2;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        color: var(--color-white);
+        background: transparent;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+
+    .slider-hover-zone:hover {
+        opacity: 1;
+    }
+
+    .slider-hover-zone:focus-visible {
+        opacity: 1;
+        outline: var(--focus-outline);
+        outline-offset: calc(var(--focus-outline-offset) * -1);
+    }
+
+    .slider-hover-zone:focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    .slider-hover-zone svg {
+        filter: drop-shadow(0 1px var(--border-radius) rgba(0, 0, 0, 0.4));
+    }
+
+    .slider-hover-zone--prev {
+        left: 0;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+    }
+
+    .slider-hover-zone--next {
+        right: 0;
+        background: linear-gradient(270deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+    }
+
+    /* Arrow buttons — hide mobile, show desktop */
+    .dc-slider-block__arrows--mobile {
+        display: none;
+    }
+
+    .dc-slider-block__arrows--desktop {
+        display: flex;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+
+    /* has-buttons variant — intro row with arrows beside text */
+    .dc-slider-block.has-buttons .dc-slider-block__intro {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        column-gap: var(--unit-xs);
+        max-width: var(--max-width);
+        padding: 0 var(--unit-md);
+    }
+
+    .dc-slider-block.has-buttons .dc-slider-block__arrows--mobile {
+        padding-left: var(--unit-md);
+    }
+}
+
+/* ==========================================================================
+   Wide desktop (--lg / 1216px+) — increase padding for bg variant
+   ========================================================================== */
+
+@media (--lg) {
+    .has-bg {
+        .dc-slider-block__slider {
+            padding-left: var(--unit-lg);
+        }
+
+        &.dc-slider-block.has-buttons .dc-slider-block__intro {
+            padding: 0 var(--unit-lg);
+        }
+
+        &.dc-slider-block.has-buttons .dc-slider-block__arrows--mobile {
+            padding-left: var(--unit-lg);
+        }
+    }
+}
+
+/* ==========================================================================
+   Extra-wide desktop (--xl / 1408px+) — increase padding for bg variant
+   ========================================================================== */
+
+@media (--xl) {
+    .has-bg {
+        .dc-slider-block__slider {
+            padding-left: var(--unit-xl);
+        }
+
+        &.dc-slider-block.has-buttons .dc-slider-block__intro {
+            padding: 0 var(--unit-xl);
+        }
+
+        &.dc-slider-block.has-buttons .dc-slider-block__arrows--mobile {
+            padding-left: var(--unit-xl);
+        }
+    }
+}
