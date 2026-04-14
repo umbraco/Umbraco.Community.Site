@@ -1,6 +1,6 @@
 {
   "Name": "Article",
-  "Alias": "article",
+  "Alias": "Article",
   "File": "umb://template-file/Article.cshtml",
   "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/e0cab8acf5604b7aab7fef76f6a305ea",

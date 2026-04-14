@@ -1,6 +1,6 @@
 {
   "Name": "Member login / logout",
-  "Alias": "memberloginlogout",
+  "Alias": "MemberLoginLogout",
   "File": "umb://template-file/MemberLoginLogout.cshtml",
   "Udi": "umb://template/019c6fe3b9d274d99c2e7292da657b37",
   "Dependencies": [

@@ -1,6 +1,6 @@
 {
   "Name": "Blog",
-  "Alias": "blog",
+  "Alias": "Blog",
   "File": "umb://template-file/Blog.cshtml",
   "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/a6802f363bd04a37bc344a3657f54a0c",

@@ -1,6 +1,6 @@
 {
   "Name": "Content page",
-  "Alias": "contentpage",
+  "Alias": "ContentPage",
   "File": "umb://template-file/ContentPage.cshtml",
   "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
