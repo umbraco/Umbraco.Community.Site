@@ -1,6 +1,6 @@
 @using Umbraco.Cms.Core.Models
 @using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBannerWithImageSlider>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBannerWithImageSlider, SettingsHeroBannerWithImageSlider>>
 
 @if (!string.IsNullOrWhiteSpace(Model.Content.Headline))
 {
@@ -28,7 +28,7 @@
         </div>
         @if (Model.Content.SliderImages?.Any() ?? false)
         {
-            <dc-image-slider>
+            <dc-image-slider @(Model.Settings?.AutoSlideImages == true ? "auto-slide" : "")>
                 @foreach (var image in Model.Content.SliderImages)
                 {
                     <img src="@image.MediaUrl()"
