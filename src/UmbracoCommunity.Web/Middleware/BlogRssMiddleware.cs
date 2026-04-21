@@ -82,7 +82,10 @@ public partial class BlogRssMiddleware
             if (article.Teaser is not null)
             {
                 var teaserHtml = article.Teaser.ToHtmlString();
-                item.Add(new XElement("description", StripHtmlTags(teaserHtml)));
+                if (teaserHtml is not null)
+                {
+                    item.Add(new XElement("description", StripHtmlTags(teaserHtml)));
+                }
             }
 
             if (article.ReadTime > 0)

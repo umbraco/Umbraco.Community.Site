@@ -2,9 +2,9 @@
 
 @{
     var slideItems = Model.Content.SlideItems?.ToList() ?? new List<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>();
-    bool hasBg = Model.Settings.HasBg();
-    bool bgIsDark = hasBg && Model.Settings.IsDark();
-    bool showButtons = Model.Settings.DisplayButtons;
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    bool showButtons = Model.Settings?.DisplayButtons ?? false;
 }
 
 <div class="dc-slider-block @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty) @(showButtons ? "has-buttons" : string.Empty)" id="@Model.Content.IdHash">

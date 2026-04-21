@@ -101,10 +101,8 @@ public class BlogArticleApiController : UmbracoCommunityExtensionsApiControllerB
     private IContent? FindOrCreateFolder(int parentId, string contentTypeAlias, string folderName)
     {
         // Try to find existing folder
-        var children = _contentService.GetPagedChildren(parentId, 0, int.MaxValue, out _);
-        var existingFolder = children.FirstOrDefault(c =>
-            c.ContentType.Alias == contentTypeAlias &&
-            c.Name == folderName);
+        var children = _contentService.GetPagedChildren(parentId, 0, int.MaxValue, out _, [contentTypeAlias], null, null, false);
+        var existingFolder = children.FirstOrDefault(c => c.Name == folderName);
 
         if (existingFolder != null)
         {
@@ -128,9 +126,8 @@ public class BlogArticleApiController : UmbracoCommunityExtensionsApiControllerB
     {
         const string baseName = "New Article";
 
-        var children = _contentService.GetPagedChildren(parentId, 0, int.MaxValue, out _);
+        var children = _contentService.GetPagedChildren(parentId, 0, int.MaxValue, out _, [ArticleDocTypeAlias], null, null, false);
         var existingNames = children
-            .Where(c => c.ContentType.Alias == ArticleDocTypeAlias)
             .Select(c => c.Name)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
