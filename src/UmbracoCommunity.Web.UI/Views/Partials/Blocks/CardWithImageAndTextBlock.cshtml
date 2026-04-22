@@ -3,13 +3,15 @@
 
 @{
     var gridCols = Model.GridColumns ?? 12;
+    var isFullWidth = Model.ColumnSpan >= gridCols;
+    var itemClass = "dc-boxes-row__item" + (isFullWidth ? " dc-boxes-row__item--full-width" : string.Empty);
 }
 
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
     if (Model.Content.Link != null)
     {
-        <a id="@Model.Content.IdHash" class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        <a id="@Model.Content.IdHash" class="@itemClass" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
@@ -18,7 +20,7 @@
     }
     else
     {
-        <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+        <div id="@Model.Content.IdHash" class="@itemClass">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);

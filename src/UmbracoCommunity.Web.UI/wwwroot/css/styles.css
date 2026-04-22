@@ -273,14 +273,61 @@ ol.no-margin p {
     column-gap: 10px;
 }
 
-.dc-boxes-row__items.item-grid {
-    flex-wrap: wrap;
+/* Image-only + text-only card pair gets the image-text-row spacing. */
+.dc-boxes-row__items--image-text-pair {
+    gap: 20px;
+    column-gap: 30px;
 }
 
 .dc-boxes-row__item a {
     text-decoration: none;
 }
 
+/* Full-width image+text card mirrors the frontend image-text-row layout
+   so the backoffice preview matches the rendered page. */
+.dc-boxes-row__item--full-width {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    column-gap: 20px;
+}
+
+.dc-boxes-row__item--full-width .row-item-image {
+    flex: 1;
+}
+
+.dc-boxes-row__item--full-width .row-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.dc-boxes-row__item--full-width .dc-boxes-row__item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 0;
+}
+
+/* Image-only cards stretch their image to fill the card, so they align
+   with a taller sibling text-only card in the same grid row. */
+.dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image img:not(.is-circle) {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Circular image modifier (shared across image, card, speaker blocks) */
 .is-circle {
     clip-path: circle();
 }

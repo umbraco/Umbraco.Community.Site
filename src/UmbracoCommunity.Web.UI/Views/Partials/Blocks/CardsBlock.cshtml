@@ -1,4 +1,32 @@
+@using Umbraco.Cms.Core.Models.Blocks
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardsBlock, SettingsCardsBlock>>
+
+@functions {
+    bool IsImageOnlyCard(BlockGridItem item)
+    {
+        if (item.Content is not CardWithImageAndTextBlock card) return false;
+        var cardContent = card.CardContent;
+        if (cardContent == null || !cardContent.Any()) return false;
+        return cardContent.All(c =>
+            c.Content.ContentType.Alias == ImageBlock.ModelTypeAlias ||
+            c.Content.ContentType.Alias == ImageBlockWithOverlay.ModelTypeAlias);
+    }
+
+    bool IsTextOnlyCard(BlockGridItem item)
+    {
+        if (item.Content is not CardWithImageAndTextBlock card) return false;
+        var cardContent = card.CardContent;
+        if (cardContent == null || !cardContent.Any()) return false;
+        return cardContent.All(c => c.Content.ContentType.Alias == TextBlock.ModelTypeAlias);
+    }
+
+    bool IsImageTextPair(List<BlockGridItem> cardGroup)
+    {
+        if (cardGroup.Count != 2) return false;
+        return (IsImageOnlyCard(cardGroup[0]) && IsTextOnlyCard(cardGroup[1])) ||
+               (IsTextOnlyCard(cardGroup[0]) && IsImageOnlyCard(cardGroup[1]));
+    }
+}
 
 @{
     bool hasBg = Model.Settings.HasBg();
@@ -31,7 +59,9 @@
             @foreach (var cardGroup in rows)
                 if (cardGroup != null) {
                 {
-                    <div class="dc-boxes-row__items">
+                    var isImageTextPair = IsImageTextPair(cardGroup);
+                    var itemsClass = "dc-boxes-row__items" + (isImageTextPair ? " dc-boxes-row__items--image-text-pair" : string.Empty);
+                    <div class="@itemsClass">
                         @foreach (var item in cardGroup)
                         {
                             <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
