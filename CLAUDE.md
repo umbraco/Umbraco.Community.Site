@@ -141,7 +141,7 @@ See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 ### Frontend Assets
 
 Located in `src/UmbracoCommunity.StaticAssets/src/`:
-- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`)
+- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`, `image-slider/` for drag-to-scroll image slider)
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
@@ -279,6 +279,31 @@ The slider block (`SliderBlock`) is a container block that holds nested slide it
 - `link-slider.css` / `link-slider-item.css` — Link slider variant styles
 
 **Backoffice preview** — `Views/BlockPreviewApi/SlideItemBlockWithTag.cshtml` and `SlideItemBlockWithIcon.cshtml` provide simple vertical list previews. Backoffice-specific slider styles in `wwwroot/css/styles.css` mirror the frontend dark/light theming logic.
+
+### Hero Banner with Image Slider
+
+A hero block combining CTA-style text content with a horizontally-scrollable image gallery.
+
+**Content Properties** (`HeroBannerWithImageSlider`):
+- `Headline` (string, max 40 chars) — Main heading
+- `Tagline` (string) — Small uppercase label above headline
+- `BodyText` (IHtmlEncodedString) — Rich text body content
+- `CallToActionLinks` (IEnumerable\<Link\>, max 2) — CTA buttons (Blue + TransparentBlue themes)
+- `SliderImages` (IEnumerable\<MediaWithCrops\>) — Images for the slider
+
+**Settings** (`SettingsHeroBannerWithImageSlider`):
+- `AutoSlideImages` (bool) — Toggle automatic scrolling of images
+
+**Frontend Component** (`src/UmbracoCommunity.StaticAssets/src/components/image-slider/dc-image-slider.element.ts`):
+- `<dc-image-slider>` — Provides mouse drag-to-scroll; touch scrolling handled natively via CSS overflow
+- `auto-slide` HTML attribute enables automatic scrolling with infinite loop (cloned children with seamless scroll reset)
+- Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, or when the tab is hidden
+- Respects `prefers-reduced-motion: reduce`
+
+**CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/hero-image-slider-block.css`):
+- Text styling matches the Call to Action block (centred, same responsive font sizes)
+- Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
+- Uses design system variables from `root.css`
 
 ### Rich Text Editor Style Menu
 

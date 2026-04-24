@@ -490,6 +490,57 @@ ol.no-margin p {
     line-height: 2rem;
 }
 
+/* Hero banner with image slider */
+.dc-hero-image-slider {
+    padding: 20px;
+    text-align: center;
+}
+
+.dc-hero-image-slider__tagline {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #283A97;
+    margin: 0 0 0.5rem;
+}
+
+.dc-hero-image-slider__content h2 {
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 45px;
+    color: #283A97;
+    margin: 0;
+}
+
+.dc-hero-image-slider__body {
+    font-size: 16px;
+    line-height: 21px;
+    padding: 1.25rem 0 0;
+}
+
+.dc-hero-image-slider__ctas {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+}
+
+dc-image-slider {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+    padding: 1rem 0 0;
+}
+
+dc-image-slider img {
+    height: 120px;
+    width: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 /* Text block */
 .dc-text-block.has-image {
     position: relative;

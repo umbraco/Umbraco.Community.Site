@@ -63,6 +63,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 ### Motion and Animation
 
 - **Prefers-reduced-motion**: The site respects the user's motion preferences via `@media (prefers-reduced-motion: reduce)`
+- **Auto-sliding image slider**: The `<dc-image-slider>` component checks `prefers-reduced-motion` on connect and disables auto-slide entirely when the user prefers reduced motion. Cloned images used for infinite looping are marked `aria-hidden="true"` to avoid duplicate screen reader announcements.
 - **Animation timing**: Transitions use appropriate durations that don't cause discomfort
 
 ## CSS Architecture for Accessibility

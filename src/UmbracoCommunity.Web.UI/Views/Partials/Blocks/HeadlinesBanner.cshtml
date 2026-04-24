@@ -8,7 +8,7 @@
     @if (hasBg)
     {
         <div class="hero-overlay"></div>
-        <img src="@Model.Content.BackgroundImage.GetCropUrl(width: 800, height: 200)" class="hero-image" alt="@Model.Content.BackgroundImage.Name" />
+        <img src="@Model.Content.BackgroundImage!.GetCropUrl(width: 800, height: 200)" class="hero-image" alt="@Model.Content.BackgroundImage!.Name" />
     }
 
     <div class="hero-content">

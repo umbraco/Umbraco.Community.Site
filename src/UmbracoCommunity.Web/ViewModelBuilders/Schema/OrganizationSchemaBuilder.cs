@@ -30,7 +30,7 @@ internal class OrganizationSchemaBuilder
 
         var organization = new Organization
         {
-            Name = hasCustomSettings ? organizationName : DefaultOrganizationName
+            Name = hasCustomSettings ? organizationName! : DefaultOrganizationName
         };
 
         // Add organization URL
