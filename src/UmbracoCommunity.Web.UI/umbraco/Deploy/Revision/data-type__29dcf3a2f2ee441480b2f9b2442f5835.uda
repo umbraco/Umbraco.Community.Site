@@ -19,6 +19,11 @@
         "settingsElementTypeKey": "03989c3a-65f3-4bc5-bfdf-3d6e1bd35193"
       },
       {
+        "contentElementTypeKey": "52cb8b78-56ce-47be-90da-6c08e4025527",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      },
+      {
         "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -195,6 +200,9 @@
     },
     {
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
+    },
+    {
+      "Udi": "umb://document-type/52cb8b7856ce47be90da6c08e4025527"
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"

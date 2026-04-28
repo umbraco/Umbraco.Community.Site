@@ -1,0 +1,66 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<BlogShowcaseBlock>>
+@using System.Globalization
+@using UmbracoCommunity.Web.Services
+
+@inject IBlogService BlogService;
+
+@{
+    var categoryKeys = Model.Content.BlogCategoryFilter?.Select(c => c.Key);
+    var articles = BlogService.GetRecentArticles(
+        Umbraco.AssignedContentItem,
+        categoryKeys,
+        Model.Content.BlogTagFilter,
+        Model.Content.ResolvedNumberOfPostsToShow).ToList();
+}
+
+@if (articles.Count > 0)
+{
+    <div class="dc-blog-showcase-block align-center" id="@Model.Content.IdHash">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        <div class="dc-blog-showcase-block__grid count-@articles.Count">
+            @foreach (var article in articles)
+            {
+                var date = article.PublishDate != default ? article.PublishDate : article.CreateDate;
+                var hasTeaser = article.Teaser != null && !article.Teaser.IsEmptyHtmlString();
+                <a class="dc-blog-showcase-block__card" href="@article.Url()">
+                    @if (article.ThumbnailImage != null)
+                    {
+                        <figure class="dc-blog-showcase-block__media">
+                            <img src="@article.ThumbnailImage.GetCropUrl(width: 600, height: 400)"
+                                 alt=""
+                                 loading="lazy"
+                                 width="600"
+                                 height="400" />
+                        </figure>
+                    }
+                    <div class="dc-blog-showcase-block__content">
+                        <h3 class="dc-blog-showcase-block__title">@article.Name</h3>
+                        @if (hasTeaser)
+                        {
+                            <div class="dc-blog-showcase-block__teaser">
+                                @Html.Raw(article.Teaser?.ToHtmlString())
+                            </div>
+                        }
+                        <div class="dc-blog-showcase-block__meta">
+                            <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)</time>
+                            @if (article.ReadTime > 0)
+                            {
+                                <span class="dc-blog-showcase-block__readtime">@article.ReadTime min read</span>
+                            }
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+}
