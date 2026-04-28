@@ -57,10 +57,15 @@ function runProcess(name, cmd, args, cwd) {
     const project = projects[name];
     const prefix = project ? `${project.color}[${name}]${RESET} ` : "";
 
+    // On Windows, npm/npx are .cmd files and need a shell. dotnet is a .exe
+    // and must NOT use a shell — passing it through cmd.exe mangles args that
+    // contain spaces + brackets (e.g. the "Kestrel [ENV: Local]" profile name).
+    const needsShell = process.platform === "win32" && (cmd === "npm" || cmd === "npx");
+
     const proc = spawn(cmd, args, {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
-      shell: process.platform === "win32",
+      shell: needsShell,
       env: {
         ...process.env,
         FORCE_COLOR: "1",        // chalk, Vite, most Node tools
