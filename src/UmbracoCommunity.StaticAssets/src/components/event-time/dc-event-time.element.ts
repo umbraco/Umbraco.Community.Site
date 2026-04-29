@@ -110,9 +110,35 @@ export class DcEventTime extends HTMLElement {
       </p>
     `;
 
+    let openCleanup: AbortController | null = null;
+    let closeTimer: number | null = null;
+
     popover.addEventListener("toggle", (ev) => {
-      if ((ev as ToggleEvent).newState !== "open") return;
-      this.#positionPopover(button, popover);
+      const state = (ev as ToggleEvent).newState;
+      if (state === "open") {
+        this.#positionPopover(button, popover);
+
+        openCleanup?.abort();
+        openCleanup = new AbortController();
+
+        const close = () => {
+          if (popover.matches(":popover-open")) popover.hidePopover();
+        };
+
+        // Close on any scroll within the document (capture so nested scrollers count too).
+        window.addEventListener("scroll", close, { capture: true, passive: true, signal: openCleanup.signal });
+
+        // Auto-close after 10 seconds.
+        if (closeTimer !== null) window.clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(close, 10_000);
+      } else {
+        openCleanup?.abort();
+        openCleanup = null;
+        if (closeTimer !== null) {
+          window.clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      }
     });
 
     this.append(startEl, sep, endEl, button, popover);
