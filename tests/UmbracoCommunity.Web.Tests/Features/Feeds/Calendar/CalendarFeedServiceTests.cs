@@ -53,6 +53,35 @@ public class CalendarFeedServiceTests
     }
 
     [Fact]
+    public async Task Filters_out_cancelled_events()
+    {
+        const string json = """
+        {
+          "feed": { "title": "x", "sourceUrl": "https://x", "generatedAt": "2026-04-29T08:00:00Z" },
+          "events": [
+            {
+              "id": "live", "url": "https://x/live", "title": "Live", "summary": null,
+              "publishedAt": "2026-01-01T00:00:00Z",
+              "startsAt": "2026-05-01T00:00:00Z", "endsAt": "2026-05-01T01:00:00Z",
+              "location": null, "organizer": null,
+              "attendanceMode": "inPerson", "isHqOrganized": false, "isCancelled": false
+            },
+            {
+              "id": "dead", "url": "https://x/dead", "title": "Dead", "summary": null,
+              "publishedAt": "2026-01-01T00:00:00Z",
+              "startsAt": "2026-05-02T00:00:00Z", "endsAt": "2026-05-02T01:00:00Z",
+              "location": null, "organizer": null,
+              "attendanceMode": "inPerson", "isHqOrganized": false, "isCancelled": true
+            }
+          ]
+        }
+        """;
+        var (service, _, _) = CreateService(StubHandler.Json(json));
+        var result = await service.GetUpcomingEventsAsync();
+        result.Select(e => e.Id).Should().Equal("live");
+    }
+
+    [Fact]
     public async Task Returns_events_sorted_ascending_by_startsAt()
     {
         var json = SampleJson(

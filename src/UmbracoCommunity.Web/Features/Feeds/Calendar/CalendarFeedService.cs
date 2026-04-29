@@ -81,6 +81,7 @@ public sealed class CalendarFeedService : ICalendarFeedService
         var nowUtc = _time.GetUtcNow();
         return feed.Events
             .Where(e => e.EndsAt > nowUtc)
+            .Where(e => !e.IsCancelled)
             .OrderBy(e => e.StartsAt)
             .ToArray();
     }

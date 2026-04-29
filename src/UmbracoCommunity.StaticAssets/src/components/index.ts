@@ -8,5 +8,6 @@ export * from "./carousel/dc-carousel-controls.element.js";
 export * from "./sliders/dc-slider.element.js";
 export * from "./sliders/dc-slider-controls.element.js";
 export * from "./image-slider/dc-image-slider.element.js";
+export * from "./event-time/dc-event-time.element.js";
 export * from "./sessionize/index.js";
 export * from "./event-schedule/index.js";

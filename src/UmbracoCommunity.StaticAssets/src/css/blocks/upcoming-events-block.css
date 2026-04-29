@@ -25,11 +25,6 @@
     border-radius: 4px;
 }
 
-.dc-upcoming-events__item.is-cancelled .dc-upcoming-events__title {
-    text-decoration: line-through;
-    opacity: 0.7;
-}
-
 .dc-upcoming-events__title {
     font-weight: 600;
     font-size: 1.125rem;
@@ -57,10 +52,3 @@
     color: #fff;
 }
 
-.dc-upcoming-events__badge--hq {
-    background: #3544b1;
-}
-
-.dc-upcoming-events__badge--cancelled {
-    background: #c83434;
-}
