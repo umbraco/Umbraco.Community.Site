@@ -2,6 +2,25 @@ import { customElement } from "lit/decorators.js";
 
 const elementName = "dc-event-time";
 
+const dateFmt = new Intl.DateTimeFormat(undefined, {
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
+const timeFmt = new Intl.DateTimeFormat(undefined, {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+const tzFmt = new Intl.DateTimeFormat(undefined, { timeZoneName: "short" });
+
+const infoIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
+
+let popoverIdCounter = 0;
+
 @customElement(elementName)
 export class DcEventTime extends HTMLElement {
   static observedAttributes = ["start", "end"];
@@ -23,37 +42,35 @@ export class DcEventTime extends HTMLElement {
     const end = new Date(endAttr);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return;
 
-    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const dateFmt = new Intl.DateTimeFormat(undefined, {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-    const timeFmt = new Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-    const tzFmt = new Intl.DateTimeFormat(undefined, { timeZoneName: "short" });
+    const localTzName =
+      tzFmt
+        .formatToParts(start)
+        .find((p) => p.type === "timeZoneName")?.value ??
+      Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const sameDay =
-      dateFmt.format(start) === dateFmt.format(end);
+    const sourceOffsetMinutes = parseOffsetMinutes(startAttr);
+    const sourceTzLabel = formatOffsetLabel(sourceOffsetMinutes);
 
-    const tzPart = tzFmt
-      .formatToParts(start)
-      .find((p) => p.type === "timeZoneName")?.value ?? localTz;
-
-    const startText = `${dateFmt.format(start)}, ${timeFmt.format(start)}`;
-    const endText = sameDay
+    const localSameDay = dateFmt.format(start) === dateFmt.format(end);
+    const localStart = `${dateFmt.format(start)}, ${timeFmt.format(start)}`;
+    const localEnd = localSameDay
       ? timeFmt.format(end)
       : `${dateFmt.format(end)}, ${timeFmt.format(end)}`;
 
+    const sourceStart = formatAtOffset(start, sourceOffsetMinutes);
+    const sourceEnd = formatAtOffset(end, sourceOffsetMinutes);
+    const sourceSameDay = sourceStart.dateLabel === sourceEnd.dateLabel;
+    const sourceStartText = `${sourceStart.dateLabel}, ${sourceStart.timeLabel}`;
+    const sourceEndText = sourceSameDay
+      ? sourceEnd.timeLabel
+      : `${sourceEnd.dateLabel}, ${sourceEnd.timeLabel}`;
+
+    const popoverId = `dc-event-time-popover-${++popoverIdCounter}`;
     this.replaceChildren();
 
     const startEl = document.createElement("time");
     startEl.setAttribute("datetime", startAttr);
-    startEl.textContent = startText;
+    startEl.textContent = localStart;
 
     const sep = document.createElement("span");
     sep.className = "dc-upcoming-events__range-sep";
@@ -61,14 +78,83 @@ export class DcEventTime extends HTMLElement {
 
     const endEl = document.createElement("time");
     endEl.setAttribute("datetime", endAttr);
-    endEl.textContent = endText;
+    endEl.textContent = localEnd;
 
-    const tzEl = document.createElement("span");
-    tzEl.className = "dc-upcoming-events__tz";
-    tzEl.textContent = ` (${tzPart})`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "dc-event-time__info";
+    button.setAttribute("aria-label", "About this event time");
+    button.setAttribute("popovertarget", popoverId);
+    button.innerHTML = infoIcon;
 
-    this.append(startEl, sep, endEl, tzEl);
+    const popover = document.createElement("div");
+    popover.id = popoverId;
+    popover.className = "dc-event-time__popover";
+    popover.setAttribute("popover", "auto");
+    popover.innerHTML = `
+      <p class="dc-event-time__popover-row">
+        <span class="dc-event-time__popover-label">Your time (${escape(localTzName)}):</span>
+        <span class="dc-event-time__popover-value">${escape(localStart)} — ${escape(localEnd)}</span>
+      </p>
+      <p class="dc-event-time__popover-row">
+        <span class="dc-event-time__popover-label">Event time (${escape(sourceTzLabel)}):</span>
+        <span class="dc-event-time__popover-value">${escape(sourceStartText)} — ${escape(sourceEndText)}</span>
+      </p>
+    `;
+
+    this.append(startEl, sep, endEl, button, popover);
   }
+}
+
+function parseOffsetMinutes(iso: string): number {
+  const m = iso.match(/(Z|[+-]\d{2}:?\d{2})$/);
+  if (!m) return 0;
+  if (m[0] === "Z") return 0;
+  const sign = m[0][0] === "+" ? 1 : -1;
+  const digits = m[0].slice(1).replace(":", "");
+  const hours = parseInt(digits.slice(0, 2), 10);
+  const minutes = parseInt(digits.slice(2, 4), 10);
+  return sign * (hours * 60 + minutes);
+}
+
+function formatOffsetLabel(minutes: number): string {
+  if (minutes === 0) return "UTC";
+  const sign = minutes < 0 ? "-" : "+";
+  const abs = Math.abs(minutes);
+  const h = Math.floor(abs / 60);
+  const m = abs % 60;
+  return m === 0 ? `UTC${sign}${h}` : `UTC${sign}${h}:${m.toString().padStart(2, "0")}`;
+}
+
+function formatAtOffset(d: Date, offsetMinutes: number): { dateLabel: string; timeLabel: string } {
+  // Shift the absolute instant by the target offset, then format in UTC so the
+  // displayed wall-clock matches the source timezone regardless of the visitor's TZ.
+  const shifted = new Date(d.getTime() + offsetMinutes * 60 * 1000);
+  const utcDateFmt = new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const utcTimeFmt = new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+  });
+  return {
+    dateLabel: utcDateFmt.format(shifted),
+    timeLabel: utcTimeFmt.format(shifted),
+  };
+}
+
+function escape(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 declare global {

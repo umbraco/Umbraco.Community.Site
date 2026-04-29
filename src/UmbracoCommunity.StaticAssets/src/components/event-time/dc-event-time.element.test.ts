@@ -33,13 +33,12 @@ describe("dc-event-time", () => {
     expect(times[1].getAttribute("datetime")).toBe("2026-04-30T20:00:00+01:00");
   });
 
-  it("renders only the end time (no date) when same day", () => {
+  it("renders only the end time (no date) when same day in local TZ", () => {
     const el = makeElement(
       "2026-04-30T18:00:00+01:00",
       "2026-04-30T20:00:00+01:00"
     );
     const [, endEl] = el.querySelectorAll("time");
-    // End text should not include a year — same-day rendering
     expect(endEl.textContent).not.toMatch(/2026/);
   });
 
@@ -53,20 +52,57 @@ describe("dc-event-time", () => {
     expect(endEl.textContent).toMatch(/2026/);
   });
 
-  it("includes a timezone indicator", () => {
+  it("renders an info button with popover target", () => {
     const el = makeElement(
       "2026-04-30T18:00:00+01:00",
       "2026-04-30T20:00:00+01:00"
     );
-    const tz = el.querySelector(".dc-upcoming-events__tz");
-    expect(tz).not.toBeNull();
-    expect(tz?.textContent).toMatch(/^ \(.+\)$/);
+    const button = el.querySelector("button.dc-event-time__info");
+    expect(button).not.toBeNull();
+    const popoverId = button!.getAttribute("popovertarget");
+    expect(popoverId).toBeTruthy();
+    const popover = el.querySelector(`#${popoverId}`);
+    expect(popover).not.toBeNull();
+    expect(popover!.getAttribute("popover")).toBe("auto");
   });
 
-  it("leaves fallback content alone when attributes are missing", () => {
+  it("popover shows source-timezone label and times", () => {
+    const el = makeElement(
+      "2026-04-30T18:00:00+01:00",
+      "2026-04-30T20:00:00+01:00"
+    );
+    const popover = el.querySelector(".dc-event-time__popover");
+    expect(popover).not.toBeNull();
+    expect(popover!.textContent).toContain("UTC+1");
+    // Locale separator may be ':' or '.'; just check the digits show up.
+    expect(popover!.textContent).toMatch(/18[.:]00/);
+    expect(popover!.textContent).toMatch(/20[.:]00/);
+  });
+
+  it("popover labels UTC for zero-offset events", () => {
+    const el = makeElement(
+      "2026-06-10T08:00:00Z",
+      "2026-06-10T09:00:00Z"
+    );
+    const popover = el.querySelector(".dc-event-time__popover");
+    expect(popover!.textContent).toContain("Event time (UTC)");
+  });
+
+  it("popover handles negative offsets (e.g. Eastern US)", () => {
+    const el = makeElement(
+      "2026-05-01T10:00:00-04:00",
+      "2026-05-01T11:00:00-04:00"
+    );
+    const popover = el.querySelector(".dc-event-time__popover");
+    expect(popover!.textContent).toContain("UTC-4");
+    expect(popover!.textContent).toMatch(/10[.:]00/);
+  });
+
+  it("does not render time elements when attributes are missing", () => {
     const el = document.createElement("dc-event-time");
     el.innerHTML = "<span>fallback</span>";
     container.appendChild(el);
+    expect(el.querySelector("time")).toBeNull();
     expect(el.querySelector("span")?.textContent).toBe("fallback");
   });
 
@@ -76,6 +112,7 @@ describe("dc-event-time", () => {
     el.setAttribute("end", "also-not-a-date");
     el.innerHTML = "<span>fallback</span>";
     container.appendChild(el);
+    expect(el.querySelector("button")).toBeNull();
     expect(el.querySelector("span")?.textContent).toBe("fallback");
   });
 });

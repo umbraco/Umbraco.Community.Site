@@ -35,6 +35,44 @@
     opacity: 0.85;
 }
 
+.dc-event-time__info {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0 0.25rem;
+    margin: 0 0 0 0.25rem;
+    color: inherit;
+    cursor: pointer;
+    vertical-align: middle;
+    line-height: 1;
+    opacity: 0.6;
+}
+
+.dc-event-time__info:hover,
+.dc-event-time__info:focus-visible {
+    opacity: 1;
+}
+
+.dc-event-time__popover {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    max-width: 22rem;
+    font-size: 0.9rem;
+    background: white;
+    color: black;
+}
+
+.dc-event-time__popover-row {
+    margin: 0.25rem 0;
+}
+
+.dc-event-time__popover-label {
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
 .dc-upcoming-events__badges {
     display: flex;
     flex-wrap: wrap;

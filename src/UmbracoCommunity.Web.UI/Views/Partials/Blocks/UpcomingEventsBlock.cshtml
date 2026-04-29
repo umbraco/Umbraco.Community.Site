@@ -30,7 +30,6 @@
                 var startIso = ev.StartsAt.ToString("o", CultureInfo.InvariantCulture);
                 var endIso = ev.EndsAt.ToString("o", CultureInfo.InvariantCulture);
                 var sameDay = ev.StartsAt.Date == ev.EndsAt.Date && ev.StartsAt.Offset == ev.EndsAt.Offset;
-                var tz = FormatOffset(ev.StartsAt.Offset);
 
                 <li class="dc-upcoming-events__item">
                     <a class="dc-upcoming-events__title" href="@ev.Url" rel="noopener" target="_blank">
@@ -53,7 +52,6 @@
                                     @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.EndsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
                                 }
                             </time>
-                            <span class="dc-upcoming-events__tz"> (@tz)</span>
                         </dc-event-time>
                         @if (!string.IsNullOrWhiteSpace(ev.Location))
                         {
@@ -73,14 +71,3 @@
     }
 </section>
 
-@functions {
-    static string FormatOffset(TimeSpan offset)
-    {
-        if (offset == TimeSpan.Zero) return "UTC";
-        var sign = offset < TimeSpan.Zero ? "-" : "+";
-        var abs = offset.Duration();
-        return abs.Minutes == 0
-            ? $"UTC{sign}{abs.Hours}"
-            : $"UTC{sign}{abs.Hours}:{abs.Minutes:D2}";
-    }
-}
