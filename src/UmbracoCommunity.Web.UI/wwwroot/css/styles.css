@@ -864,6 +864,10 @@ dc-image-slider img {
     margin-top: 1.5rem;
 }
 
+.dc-blog-showcase-block.bg-dark .dc-blog-showcase-block__cta a {
+    color: #ffffff;
+}
+
 .dc-blog-showcase-block__grid.count-1 {
     grid-template-columns: minmax(0, 320px);
     justify-content: center;

@@ -9,7 +9,7 @@
 
 .dc-blog-showcase-block.has-bg {
   background-color: var(--block-background-color);
-  padding: var(--unit-lg) var(--unit);
+  padding: var(--unit-lg) var(--unit) var(--unit-md);
   border-radius: var(--border-radius-lg);
 }
 
@@ -102,6 +102,10 @@
   justify-content: flex-end;
   margin-top: var(--unit-md);
   padding: 0 var(--unit);
+}
+
+.dc-blog-showcase-block.bg-dark .dc-blog-showcase-block__cta a {
+  color: var(--color-white);
 }
 
 .dc-blog-showcase-block__card {
@@ -199,16 +203,23 @@
   }
 
   .dc-blog-showcase-block.has-bg {
-    padding: var(--unit-xl) var(--unit-md);
+    padding: var(--unit-xl) var(--unit-md) var(--unit-md);
   }
 
+  /* Single-column stack of horizontal cards (image left, text right).
+     Avoids awkward empty space when an odd number of articles would
+     leave a half-empty trailing row in a 2-column layout. */
   .dc-blog-showcase-block__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
-  .dc-blog-showcase-block__grid.count-1 {
-    grid-template-columns: minmax(0, 600px);
-    justify-content: center;
+  .dc-blog-showcase-block__grid .dc-blog-showcase-block__card {
+    flex-direction: row;
+  }
+
+  .dc-blog-showcase-block__grid .dc-blog-showcase-block__media {
+    flex: 0 0 40%;
+    aspect-ratio: auto;
   }
 }
 
@@ -242,14 +253,26 @@
 }
 
 @media (--lg) {
+  /* Back to a multi-column grid of vertical cards */
   .dc-blog-showcase-block__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.75rem;
     margin-top: var(--unit-lg);
+    justify-content: stretch;
+  }
+
+  .dc-blog-showcase-block__grid .dc-blog-showcase-block__card {
+    flex-direction: column;
+  }
+
+  .dc-blog-showcase-block__grid .dc-blog-showcase-block__media {
+    flex: initial;
+    aspect-ratio: 16 / 9;
   }
 
   .dc-blog-showcase-block__grid.count-1 {
     grid-template-columns: minmax(0, 700px);
+    justify-content: center;
   }
 
   .dc-blog-showcase-block__grid.count-2 {
