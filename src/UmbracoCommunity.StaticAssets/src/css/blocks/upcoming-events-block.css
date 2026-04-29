@@ -1,0 +1,66 @@
+.dc-upcoming-events {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dc-upcoming-events__headline {
+    margin: 0;
+}
+
+.dc-upcoming-events__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.dc-upcoming-events__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+}
+
+.dc-upcoming-events__item.is-cancelled .dc-upcoming-events__title {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.dc-upcoming-events__title {
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.dc-upcoming-events__meta {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.dc-upcoming-events__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.dc-upcoming-events__badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: currentColor;
+    color: #fff;
+}
+
+.dc-upcoming-events__badge--hq {
+    background: #3544b1;
+}
+
+.dc-upcoming-events__badge--cancelled {
+    background: #c83434;
+}

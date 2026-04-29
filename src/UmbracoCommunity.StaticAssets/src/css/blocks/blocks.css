@@ -25,6 +25,7 @@
 @import "./quote-block.css";
 @import "./speakers-grid.css";
 @import "./program-block.css";
+@import "./upcoming-events-block.css";
 
 .dc-block-list {
   display: flex;

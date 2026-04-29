@@ -1,0 +1,65 @@
+@using System.Globalization
+@using Umbraco.Cms.Core.Models.Blocks
+@using UmbracoCommunity.Web.Features.Feeds.Calendar
+@using UmbracoCommunity.Web.Models.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<UpcomingEventsBlock, SettingsUpcomingEventsBlock>>
+@inject ICalendarFeedService FeedService
+
+@{
+    var maxItems = Math.Max(1, Model.Content.MaxItems);
+    var allEvents = await FeedService.GetUpcomingEventsAsync();
+    var events = allEvents.Take(maxItems).ToList();
+}
+
+@if (events.Count == 0 && string.IsNullOrWhiteSpace(Model.Content.Headline))
+{
+    return;
+}
+
+<section class="dc-upcoming-events dc-upcoming-events--@Model.Content.IdHash">
+    @if (!string.IsNullOrWhiteSpace(Model.Content.Headline))
+    {
+        <h2 class="dc-upcoming-events__headline">@Model.Content.Headline</h2>
+    }
+
+    @if (events.Count > 0)
+    {
+        <ul class="dc-upcoming-events__list">
+            @foreach (var ev in events)
+            {
+                var classes = "dc-upcoming-events__item";
+                if (ev.IsCancelled) { classes += " is-cancelled"; }
+
+                <li class="@classes">
+                    <a class="dc-upcoming-events__title" href="@ev.Url" rel="noopener" target="_blank">
+                        @ev.Title
+                    </a>
+                    <div class="dc-upcoming-events__meta">
+                        <time datetime="@ev.StartsAt.ToString("o", CultureInfo.InvariantCulture)">
+                            @ev.StartsAt.ToString("ddd d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)
+                        </time>
+                        @if (!string.IsNullOrWhiteSpace(ev.Location))
+                        {
+                            <span class="dc-upcoming-events__location">· @ev.Location</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ev.Organizer))
+                        {
+                            <span class="dc-upcoming-events__organizer">· @ev.Organizer</span>
+                        }
+                    </div>
+                    <div class="dc-upcoming-events__badges">
+                        @if (ev.IsHqOrganized)
+                        {
+                            <span class="dc-upcoming-events__badge dc-upcoming-events__badge--hq">HQ-organized</span>
+                        }
+                        @if (ev.IsCancelled)
+                        {
+                            <span class="dc-upcoming-events__badge dc-upcoming-events__badge--cancelled">Cancelled</span>
+                        }
+                        <span class="dc-upcoming-events__badge dc-upcoming-events__badge--mode">@ev.AttendanceMode</span>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</section>
