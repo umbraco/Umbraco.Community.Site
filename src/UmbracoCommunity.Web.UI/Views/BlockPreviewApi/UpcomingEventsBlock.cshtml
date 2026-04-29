@@ -1,0 +1,6 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UpcomingEventsBlock>>
+
+<div class="dc-upcoming-events-preview">
+    <h3>@(string.IsNullOrWhiteSpace(Model.Content.Headline) ? "Upcoming Events" : Model.Content.Headline)</h3>
+    <p><em>Live preview shows up to @Model.Content.MaxItems upcoming Umbraco community events from umbracalendar.com on the front end.</em></p>
+</div>
