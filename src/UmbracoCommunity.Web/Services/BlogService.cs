@@ -6,6 +6,9 @@ namespace UmbracoCommunity.Web.Services;
 
 internal class BlogService : IBlogService
 {
+    public Blog? GetBlogPage(IPublishedContent? currentPage)
+        => currentPage?.Root()?.DescendantsOrSelf<Blog>().FirstOrDefault();
+
     public IEnumerable<Article> GetRecentArticles(
         IPublishedContent? currentPage,
         IEnumerable<Guid>? categoryKeys = null,
@@ -17,7 +20,7 @@ internal class BlogService : IBlogService
             return [];
         }
 
-        var blogPage = currentPage?.Root()?.DescendantsOrSelf<Blog>().FirstOrDefault();
+        var blogPage = GetBlogPage(currentPage);
         if (blogPage is null)
         {
             return [];

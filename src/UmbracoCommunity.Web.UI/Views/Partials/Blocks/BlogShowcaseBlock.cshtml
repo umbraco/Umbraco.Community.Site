@@ -1,4 +1,4 @@
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<BlogShowcaseBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<BlogShowcaseBlock, SettingsBlogShowcaseBlock>>
 @using System.Globalization
 @using UmbracoCommunity.Web.Services
 
@@ -11,56 +11,134 @@
         categoryKeys,
         Model.Content.BlogTagFilter,
         Model.Content.ResolvedNumberOfPostsToShow).ToList();
+    var blogPage = BlogService.GetBlogPage(Umbraco.AssignedContentItem);
+
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    bool isSlider = string.Equals(Model.Settings?.PostDisplay, "Slider", StringComparison.OrdinalIgnoreCase);
+    string displayClass = isSlider ? "dc-blog-showcase-block--slider" : "dc-blog-showcase-block--grid";
 }
 
 @if (articles.Count > 0)
 {
-    <div class="dc-blog-showcase-block align-center" id="@Model.Content.IdHash">
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
+    <div class="dc-blog-showcase-block @displayClass @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty) @(isSlider ? "has-buttons" : string.Empty)" id="@Model.Content.IdHash">
+        @if (hasBg)
         {
-            <h2 class="block-title">@Model.Content.Title</h2>
+            <style asp-add-nonce="true">
+                #@Model.Content.IdHash {
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                }
+            </style>
         }
-        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+
+        <div class="dc-blog-showcase-block__intro @(isSlider ? string.Empty : "align-center")" id="@(Model.Settings?.BlockId ?? string.Empty)">
+            <div class="dc-blog-showcase-block__intro-text">
+                @if (!string.IsNullOrEmpty(Model.Content.Title))
+                {
+                    <h2 class="block-title">@Model.Content.Title</h2>
+                }
+                @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+                {
+                    <div class="block-subtitle">
+                        @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+                    </div>
+                }
+            </div>
+            @if (isSlider)
+            {
+                <div class="dc-blog-showcase-block__arrows dc-blog-showcase-block__arrows--desktop">
+                    <button class="slider-arrow-btn slider-arrow-btn--prev" type="button" aria-label="Previous post" data-slider-action="prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                    <button class="slider-arrow-btn" type="button" aria-label="Next post" data-slider-action="next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                </div>
+            }
+        </div>
+
+        @if (isSlider)
         {
-            <div class="block-subtitle">
-                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            <dc-slider class="dc-blog-showcase-block__slider">
+                <div class="slides-wrapper">
+                    <div class="slides">
+                        @foreach (var article in articles)
+                        {
+                            <div>
+                                @{ RenderCard(article); }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="dc-blog-showcase-block__arrows dc-blog-showcase-block__arrows--mobile">
+                    <button class="slider-arrow-btn slider-arrow-btn--prev" type="button" aria-label="Previous post" data-slider-action="prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                    <button class="slider-arrow-btn" type="button" aria-label="Next post" data-slider-action="next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                </div>
+            </dc-slider>
+        }
+        else
+        {
+            <div class="dc-blog-showcase-block__grid count-@articles.Count">
+                @foreach (var article in articles)
+                {
+                    RenderCard(article);
+                }
             </div>
         }
 
-        <div class="dc-blog-showcase-block__grid count-@articles.Count">
-            @foreach (var article in articles)
-            {
-                var date = article.PublishDate != default ? article.PublishDate : article.CreateDate;
-                var hasTeaser = article.Teaser != null && !article.Teaser.IsEmptyHtmlString();
-                <a class="dc-blog-showcase-block__card" href="@article.Url()">
-                    @if (article.ThumbnailImage != null)
-                    {
-                        <figure class="dc-blog-showcase-block__media">
-                            <img src="@article.ThumbnailImage.GetCropUrl(width: 600, height: 400)"
-                                 alt=""
-                                 loading="lazy"
-                                 width="600"
-                                 height="400" />
-                        </figure>
-                    }
-                    <div class="dc-blog-showcase-block__content">
-                        <h3 class="dc-blog-showcase-block__title">@article.Name</h3>
-                        @if (hasTeaser)
-                        {
-                            <div class="dc-blog-showcase-block__teaser">
-                                @Html.Raw(article.Teaser?.ToHtmlString())
-                            </div>
-                        }
-                        <div class="dc-blog-showcase-block__meta">
-                            <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)</time>
-                            @if (article.ReadTime > 0)
-                            {
-                                <span class="dc-blog-showcase-block__readtime">@article.ReadTime min read</span>
-                            }
-                        </div>
-                    </div>
-                </a>
-            }
-        </div>
+        @if (blogPage is not null)
+        {
+            <div class="dc-blog-showcase-block__cta">
+                <a href="@blogPage.Url()">Read more on the blog</a>
+            </div>
+        }
     </div>
+}
+
+@functions {
+    void RenderCard(Article article)
+    {
+        var date = article.PublishDate != default ? article.PublishDate : article.CreateDate;
+        var hasTeaser = article.Teaser != null && !article.Teaser.IsEmptyHtmlString();
+        <a class="dc-blog-showcase-block__card" href="@article.Url()">
+            @if (article.ThumbnailImage != null)
+            {
+                <figure class="dc-blog-showcase-block__media">
+                    <img src="@article.ThumbnailImage.GetCropUrl(width: 600, height: 400)"
+                         alt=""
+                         loading="lazy"
+                         width="600"
+                         height="400" />
+                </figure>
+            }
+            <div class="dc-blog-showcase-block__content">
+                <h3 class="dc-blog-showcase-block__title">@article.Name</h3>
+                @if (hasTeaser)
+                {
+                    <div class="dc-blog-showcase-block__teaser">
+                        @Html.Raw(article.Teaser?.ToHtmlString())
+                    </div>
+                }
+                <div class="dc-blog-showcase-block__meta">
+                    <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)</time>
+                    @if (article.ReadTime > 0)
+                    {
+                        <span class="dc-blog-showcase-block__readtime">@article.ReadTime min read</span>
+                    }
+                </div>
+            </div>
+        </a>
+    }
 }

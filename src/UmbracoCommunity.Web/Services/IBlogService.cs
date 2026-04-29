@@ -10,4 +10,6 @@ public interface IBlogService
         IEnumerable<Guid>? categoryKeys = null,
         IEnumerable<string>? tags = null,
         int count = 3);
+
+    Blog? GetBlogPage(IPublishedContent? currentPage);
 }

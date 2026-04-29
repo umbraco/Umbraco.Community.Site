@@ -2,6 +2,28 @@
   --blog-showcase-card-bg: var(--color-white);
   --blog-showcase-card-fg: var(--color-dark);
   --blog-showcase-card-radius: 20px;
+
+  /* Slider variant — overridden per breakpoint */
+  --blog-showcase-slide-width: calc((100vw - var(--unit) - var(--unit)) / 1.2);
+}
+
+.dc-blog-showcase-block.has-bg {
+  background-color: var(--block-background-color);
+  padding: var(--unit-lg) var(--unit);
+  border-radius: var(--border-radius-lg);
+}
+
+.dc-blog-showcase-block.bg-dark {
+  color: var(--color-white);
+}
+
+.dc-blog-showcase-block.bg-dark .block-title,
+.dc-blog-showcase-block.bg-dark .block-subtitle {
+  color: var(--color-white);
+}
+
+.dc-blog-showcase-block__intro {
+  text-align: center;
 }
 
 .dc-blog-showcase-block__grid {
@@ -9,6 +31,77 @@
   grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-top: var(--unit-md);
+}
+
+/* Slider variant — horizontally-scrollable list */
+.dc-blog-showcase-block--slider {
+  overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider {
+  display: block;
+  margin-top: var(--unit-md);
+}
+
+.dc-blog-showcase-block__slider .slides-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider .slides {
+  display: flex;
+  column-gap: var(--unit);
+  will-change: transform;
+}
+
+.dc-blog-showcase-block__slider .slides > div {
+  flex-shrink: 0;
+  width: var(--blog-showcase-slide-width);
+  display: flex;
+}
+
+.dc-blog-showcase-block__slider .slides > div > .dc-blog-showcase-block__card {
+  width: 100%;
+}
+
+/* Slider arrow buttons */
+.dc-blog-showcase-block__arrows {
+  display: flex;
+  gap: var(--unit-xs);
+}
+
+.dc-blog-showcase-block__arrows--desktop {
+  display: none;
+}
+
+.dc-blog-showcase-block__arrows--mobile {
+  padding: var(--unit-md) var(--unit) 0;
+  justify-content: flex-end;
+}
+
+/* Left-align intro text when buttons are present (matches slider block) */
+.dc-blog-showcase-block.has-buttons .block-title,
+.dc-blog-showcase-block.has-buttons .block-subtitle {
+  text-align: left;
+}
+
+.dc-blog-showcase-block.has-buttons .block-title {
+  align-self: flex-start;
+}
+
+/* On dark backgrounds, invert arrow button colours */
+.dc-blog-showcase-block.bg-dark .slider-arrow-btn {
+  border-color: var(--color-white);
+  background-color: transparent;
+  color: var(--color-white);
+}
+
+/* "Read more on the blog" CTA */
+.dc-blog-showcase-block__cta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--unit-md);
+  padding: 0 var(--unit);
 }
 
 .dc-blog-showcase-block__card {
@@ -20,12 +113,11 @@
   overflow: hidden;
   text-decoration: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: transform 100ms linear, box-shadow 200ms ease;
+  transition: box-shadow 200ms ease;
   height: 100%;
 }
 
 .dc-blog-showcase-block__card:hover {
-  transform: scale(1.02);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
@@ -46,6 +138,11 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 400ms ease;
+}
+
+.dc-blog-showcase-block__card:hover .dc-blog-showcase-block__media img {
+  transform: scale(1.06);
 }
 
 .dc-blog-showcase-block__content {
@@ -96,6 +193,15 @@
 }
 
 @media (--sm) {
+  .dc-blog-showcase-block {
+    /* 2 cards + 20% peek */
+    --blog-showcase-slide-width: calc((100vw - var(--unit-md) - 2 * var(--unit)) / 2.2);
+  }
+
+  .dc-blog-showcase-block.has-bg {
+    padding: var(--unit-xl) var(--unit-md);
+  }
+
   .dc-blog-showcase-block__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -103,6 +209,35 @@
   .dc-blog-showcase-block__grid.count-1 {
     grid-template-columns: minmax(0, 600px);
     justify-content: center;
+  }
+}
+
+@media (--md) {
+  .dc-blog-showcase-block__slider .slides-wrapper {
+    container-type: inline-size;
+  }
+
+  .dc-blog-showcase-block__slider .slides > div {
+    /* 3 cards + 20% peek of the next */
+    width: calc((100cqi - 3 * var(--unit)) / 3.2);
+  }
+
+  /* Desktop intro becomes flex row with title left, arrows right */
+  .dc-blog-showcase-block.has-buttons .dc-blog-showcase-block__intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    column-gap: var(--unit-xs);
+  }
+
+  .dc-blog-showcase-block__arrows--mobile {
+    display: none;
+  }
+
+  .dc-blog-showcase-block__arrows--desktop {
+    display: flex;
+    align-items: flex-end;
+    flex-shrink: 0;
   }
 }
 

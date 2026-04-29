@@ -752,6 +752,25 @@ dc-image-slider img {
     text-align: center;
 }
 
+.dc-blog-showcase-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 15px;
+}
+
+.dc-blog-showcase-block.bg-dark {
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block.bg-dark .block-title,
+.dc-blog-showcase-block.bg-dark .block-subtitle,
+.dc-blog-showcase-block.bg-dark .block-subtitle * {
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block__intro {
+    text-align: center;
+}
+
 .dc-blog-showcase-block .block-title {
     color: #283A97;
     font-size: 28px;
@@ -772,6 +791,77 @@ dc-image-slider img {
     gap: 12px;
     text-align: left;
     margin-top: 1rem;
+}
+
+/* Slider variant — horizontally-scrollable list (backoffice preview) */
+.dc-blog-showcase-block--slider {
+    overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider {
+    display: block;
+    margin-top: 1rem;
+}
+
+.dc-blog-showcase-block__slider .slides-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider .slides {
+    display: flex;
+    gap: 16px;
+    text-align: left;
+}
+
+.dc-blog-showcase-block__slider .slides > div {
+    flex-shrink: 0;
+    width: 220px;
+    display: flex;
+}
+
+.dc-blog-showcase-block__slider .slides > div > .dc-blog-showcase-block__card {
+    width: 100%;
+}
+
+.dc-blog-showcase-block__slider .slider-hover-zone,
+.dc-blog-showcase-block__slider .mobile-controls {
+    display: none;
+}
+
+/* Slider arrow buttons (backoffice preview) */
+.dc-blog-showcase-block__arrows {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.dc-blog-showcase-block__arrows--mobile {
+    display: none;
+}
+
+.dc-blog-showcase-block.has-buttons .dc-blog-showcase-block__intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: left;
+}
+
+.dc-blog-showcase-block.has-buttons .block-title,
+.dc-blog-showcase-block.has-buttons .block-subtitle {
+    text-align: left;
+}
+
+.dc-blog-showcase-block.bg-dark .slider-arrow-btn {
+    border-color: #ffffff;
+    background-color: transparent;
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block__cta {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
 }
 
 .dc-blog-showcase-block__grid.count-1 {

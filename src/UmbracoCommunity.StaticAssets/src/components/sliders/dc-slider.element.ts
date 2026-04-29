@@ -33,7 +33,7 @@ export class DcSlider extends HTMLElement {
     this.#itemCount = this.querySelectorAll(".slides > div").length;
 
     // Use explicit arrow buttons if present, otherwise create hover zones
-    const sliderBlock = this.closest(".dc-slider-block");
+    const sliderBlock = this.closest(".dc-slider-block, .dc-blog-showcase-block");
     this.#hasExplicitButtons = sliderBlock?.classList.contains("has-buttons") ?? false;
 
     if (this.#hasExplicitButtons) {
@@ -53,7 +53,7 @@ export class DcSlider extends HTMLElement {
     container.removeEventListener("touchend", this.getTouchEndPoint);
 
     if (this.#hasExplicitButtons) {
-      this.closest(".dc-slider-block")?.removeEventListener("click", this.#arrowButtonHandler);
+      this.closest(".dc-slider-block, .dc-blog-showcase-block")?.removeEventListener("click", this.#arrowButtonHandler);
     } else {
       this.#removeHoverZones();
     }
@@ -118,7 +118,7 @@ export class DcSlider extends HTMLElement {
 
     // Update explicit arrow buttons
     if (this.#hasExplicitButtons) {
-      const sliderBlock = this.closest(".dc-slider-block");
+      const sliderBlock = this.closest(".dc-slider-block, .dc-blog-showcase-block");
       if (!sliderBlock) return;
 
       sliderBlock
