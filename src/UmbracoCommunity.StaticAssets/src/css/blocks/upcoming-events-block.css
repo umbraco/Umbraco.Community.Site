@@ -66,7 +66,8 @@
     background: white;
     color: black;
     width: max-content;
-    max-width: min(28rem, calc(100vw - 1rem));
+    max-width: calc(100vw - 1rem);
+    overflow: visible;
 }
 
 .dc-event-time__popover::backdrop {
@@ -74,16 +75,21 @@
 }
 
 .dc-event-time__popover-row {
-    margin: 0.25rem 0;
-    white-space: nowrap;
+    margin: 0.5rem 0;
+    display: block;
 }
 
+.dc-event-time__popover-row:first-child { margin-top: 0; }
+.dc-event-time__popover-row:last-child { margin-bottom: 0; }
+
 .dc-event-time__popover-label {
+    display: block;
     font-weight: 600;
-    margin-right: 0.25rem;
+    margin-bottom: 0.125rem;
 }
 
 .dc-event-time__popover-value {
+    display: block;
     white-space: nowrap;
 }
 
