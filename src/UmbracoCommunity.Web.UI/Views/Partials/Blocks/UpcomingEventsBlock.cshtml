@@ -38,8 +38,14 @@
                     <div class="dc-upcoming-events__meta">
                         <dc-event-time start="@startIso" end="@endIso">
                             <time datetime="@startIso">
-                                @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture),
-                                @ev.StartsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                @if (sameDay)
+                                {
+                                    @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.StartsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                }
+                                else
+                                {
+                                    @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
+                                }
                             </time>
                             <span class="dc-upcoming-events__range-sep"> — </span>
                             <time datetime="@endIso">
@@ -49,7 +55,7 @@
                                 }
                                 else
                                 {
-                                    @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.EndsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                    @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
                                 }
                             </time>
                         </dc-event-time>

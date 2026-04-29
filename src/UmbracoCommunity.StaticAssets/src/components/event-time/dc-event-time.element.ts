@@ -52,8 +52,16 @@ export class DcEventTime extends HTMLElement {
     const sourceTzLabel = formatOffsetLabel(sourceOffsetMinutes);
 
     const localSameDay = dateFmt.format(start) === dateFmt.format(end);
-    const localStart = `${dateFmt.format(start)}, ${timeFmt.format(start)}`;
+    // Same-day: "Thu 30 Apr 2026, 18:00 — 20:00".
+    // Multi-day: dates only in the main flow ("Wed 10 Jun 2026 — Thu 11 Jun 2026"); times in popover.
+    const localStart = localSameDay
+      ? `${dateFmt.format(start)}, ${timeFmt.format(start)}`
+      : dateFmt.format(start);
     const localEnd = localSameDay
+      ? timeFmt.format(end)
+      : dateFmt.format(end);
+    const localStartFull = `${dateFmt.format(start)}, ${timeFmt.format(start)}`;
+    const localEndFull = localSameDay
       ? timeFmt.format(end)
       : `${dateFmt.format(end)}, ${timeFmt.format(end)}`;
 
@@ -94,7 +102,7 @@ export class DcEventTime extends HTMLElement {
     popover.innerHTML = `
       <p class="dc-event-time__popover-row">
         <span class="dc-event-time__popover-label">Your time (${escape(localTzName)}):</span>
-        <span class="dc-event-time__popover-value">${escape(localStart)} — ${escape(localEnd)}</span>
+        <span class="dc-event-time__popover-value">${escape(localStartFull)} — ${escape(localEndFull)}</span>
       </p>
       <p class="dc-event-time__popover-row">
         <span class="dc-event-time__popover-label">Event time (${escape(sourceTzLabel)}):</span>
