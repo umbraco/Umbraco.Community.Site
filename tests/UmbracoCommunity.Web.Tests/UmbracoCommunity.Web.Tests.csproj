@@ -26,4 +26,10 @@
     <ProjectReference Include="..\..\src\UmbracoCommunity.Web\UmbracoCommunity.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
