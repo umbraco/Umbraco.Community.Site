@@ -8,6 +8,9 @@ public sealed class RegisterFeeds : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
+        builder.Services.Configure<CalendarFeedOptions>(
+            builder.Config.GetSection(CalendarFeedOptions.SectionName));
+
         builder.Services.AddSingleton(TimeProvider.System);
 
         builder.Services.AddHttpClient<CalendarFeedHttpClient>(client =>
