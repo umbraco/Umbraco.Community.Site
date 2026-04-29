@@ -86,7 +86,8 @@ describe("dc-event-time", () => {
     );
     const popover = el.querySelector(".dc-event-time__popover");
     expect(popover).not.toBeNull();
-    expect(popover!.textContent).toContain("UTC+1");
+    expect(popover!.textContent).toContain("Where the event is held (UTC+1)");
+    expect(popover!.textContent).toContain("In your timezone");
     // Locale separator may be ':' or '.'; just check the digits show up.
     expect(popover!.textContent).toMatch(/18[.:]00/);
     expect(popover!.textContent).toMatch(/20[.:]00/);
@@ -98,7 +99,7 @@ describe("dc-event-time", () => {
       "2026-06-10T09:00:00Z"
     );
     const popover = el.querySelector(".dc-event-time__popover");
-    expect(popover!.textContent).toContain("Event time (UTC)");
+    expect(popover!.textContent).toContain("Where the event is held (UTC)");
   });
 
   it("popover handles negative offsets (e.g. Eastern US)", () => {

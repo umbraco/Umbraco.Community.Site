@@ -101,16 +101,43 @@ export class DcEventTime extends HTMLElement {
     popover.setAttribute("popover", "auto");
     popover.innerHTML = `
       <p class="dc-event-time__popover-row">
-        <span class="dc-event-time__popover-label">Your time (${escape(localTzName)}):</span>
+        <span class="dc-event-time__popover-label">In your timezone (${escape(localTzName)}):</span>
         <span class="dc-event-time__popover-value">${escape(localStartFull)} — ${escape(localEndFull)}</span>
       </p>
       <p class="dc-event-time__popover-row">
-        <span class="dc-event-time__popover-label">Event time (${escape(sourceTzLabel)}):</span>
+        <span class="dc-event-time__popover-label">Where the event is held (${escape(sourceTzLabel)}):</span>
         <span class="dc-event-time__popover-value">${escape(sourceStartText)} — ${escape(sourceEndText)}</span>
       </p>
     `;
 
+    popover.addEventListener("toggle", (ev) => {
+      if ((ev as ToggleEvent).newState !== "open") return;
+      this.#positionPopover(button, popover);
+    });
+
     this.append(startEl, sep, endEl, button, popover);
+  }
+
+  #positionPopover(anchor: HTMLElement, popover: HTMLElement) {
+    const anchorRect = anchor.getBoundingClientRect();
+    const popRect = popover.getBoundingClientRect();
+    const margin = 4;
+
+    // Prefer below; flip above if it'd overflow viewport bottom.
+    let top = anchorRect.bottom + margin;
+    if (top + popRect.height > window.innerHeight - margin) {
+      top = Math.max(margin, anchorRect.top - popRect.height - margin);
+    }
+
+    // Align left edge to anchor; clamp to viewport.
+    let left = anchorRect.left;
+    if (left + popRect.width > window.innerWidth - margin) {
+      left = window.innerWidth - popRect.width - margin;
+    }
+    if (left < margin) left = margin;
+
+    popover.style.top = `${top}px`;
+    popover.style.left = `${left}px`;
   }
 }
 

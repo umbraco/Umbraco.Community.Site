@@ -54,23 +54,37 @@
 }
 
 .dc-event-time__popover {
+    /* Override [popover] UA defaults that center on screen. */
+    position: fixed;
+    inset: auto;
     margin: 0;
     padding: 0.75rem 1rem;
-    border: 1px solid currentColor;
-    border-radius: 4px;
-    max-width: 22rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
     font-size: 0.9rem;
     background: white;
     color: black;
+    width: max-content;
+    max-width: min(28rem, calc(100vw - 1rem));
+}
+
+.dc-event-time__popover::backdrop {
+    background: transparent;
 }
 
 .dc-event-time__popover-row {
     margin: 0.25rem 0;
+    white-space: nowrap;
 }
 
 .dc-event-time__popover-label {
     font-weight: 600;
     margin-right: 0.25rem;
+}
+
+.dc-event-time__popover-value {
+    white-space: nowrap;
 }
 
 .dc-upcoming-events__badges {
