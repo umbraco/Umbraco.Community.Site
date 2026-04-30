@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { copyFileSync, existsSync } from "node:fs";
+import { copyFileSync, existsSync, createWriteStream } from "node:fs";
+import { mkdir, rename, copyFile } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { pipeline } from "node:stream/promises";
+import { Readable } from "node:stream";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
+
+const WEB_UI = resolve(ROOT, "src/UmbracoCommunity.Web.UI");
+const SEED_URL_ENV = "IMPORT_ON_STARTUP_URL";
+const SEED_FILE_ENV = "IMPORT_ON_STARTUP_FILE";
+const SEED_TARGET = resolve(WEB_UI, "umbraco/Deploy/import-on-startup.zip");
+const SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.sqlite.db");
 
 const projects = {
   BlockRestrictions: {
@@ -32,7 +41,7 @@ const BOLD = "\x1b[1m";
 const RED = "\x1b[31m";
 const GREEN = "\x1b[32m";
 
-const MODES = ["dev", "dev:dotnet", "local", "local:dotnet"];
+const MODES = ["dev", "dev:dotnet", "local", "local:dotnet", "seed", "reset"];
 
 function log(msg) {
   console.log(`${BOLD}${msg}${RESET}`);
@@ -182,6 +191,93 @@ async function runDev(withDotnet) {
   await Promise.all(tasks);
 }
 
+function utcTimestamp() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+
+async function obtainSeedZip() {
+  const url = process.env[SEED_URL_ENV];
+  const file = process.env[SEED_FILE_ENV];
+
+  if (url && file) {
+    logError(`Both ${SEED_URL_ENV} and ${SEED_FILE_ENV} are set — choose one.`);
+    process.exit(1);
+  }
+  if (!url && !file) {
+    logError(`Neither ${SEED_URL_ENV} nor ${SEED_FILE_ENV} is set.`);
+    logError("Set one of:");
+    logError(`  ${SEED_URL_ENV}=https://example.blob.core.windows.net/seed/import-on-startup.latest.zip`);
+    logError(`  ${SEED_FILE_ENV}=./path/to/local/import-on-startup.zip`);
+    process.exit(1);
+  }
+
+  const targetDir = dirname(SEED_TARGET);
+  if (!existsSync(targetDir)) {
+    await mkdir(targetDir, { recursive: true });
+  }
+
+  if (file) {
+    const source = resolve(file);
+    if (!existsSync(source)) {
+      logError(`File not found: ${source}`);
+      process.exit(1);
+    }
+    log(`Copying seed zip from ${source}`);
+    await copyFile(source, SEED_TARGET);
+  } else {
+    log(`Downloading seed zip from ${url}`);
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+    }
+    if (!res.body) {
+      throw new Error("Download failed: empty response body");
+    }
+    await pipeline(Readable.fromWeb(res.body), createWriteStream(SEED_TARGET));
+  }
+
+  console.log(`${GREEN}Seed zip written to ${SEED_TARGET}${RESET}`);
+  console.log(`${BOLD}Next: run \`node build.mjs dev:dotnet\` — Umbraco Deploy will import the zip on first boot and delete it on success.${RESET}`);
+}
+
+async function backupSqlite() {
+  const ts = utcTimestamp();
+  const candidates = [SQLITE_DB, `${SQLITE_DB}-shm`, `${SQLITE_DB}-wal`];
+  let renamed = 0;
+  for (const src of candidates) {
+    if (!existsSync(src)) continue;
+    const dest = `${src}.bak-${ts}`;
+    try {
+      await rename(src, dest);
+      console.log(`Renamed ${src} -> ${dest}`);
+      renamed++;
+    } catch (err) {
+      if (err.code === "EBUSY" || err.code === "EPERM" || err.code === "EACCES") {
+        logError(`Cannot rename ${src}: file is locked.`);
+        logError("Stop any running 'dotnet run' instance and try again.");
+        process.exit(1);
+      }
+      throw err;
+    }
+  }
+  if (renamed === 0) {
+    log("No existing SQLite DB to back up — Umbraco will install fresh on next boot.");
+  }
+}
+
+async function runSeed() {
+  log("Mode: seed (place latest import-on-startup.zip)\n");
+  await obtainSeedZip();
+}
+
+async function runReset() {
+  log("Mode: reset (back up SQLite DB + place latest import-on-startup.zip)\n");
+  await backupSqlite();
+  await obtainSeedZip();
+}
+
 async function promptMode() {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) => {
@@ -191,11 +287,13 @@ async function promptMode() {
         `  2) dev:dotnet   - Build backoffice + start Vite dev server + dotnet run\n` +
         `  3) local        - Build all projects for cloud deployment\n` +
         `  4) local:dotnet - Build all projects for cloud + dotnet run\n` +
-        `\nChoice [1-4]: `,
+        `  5) seed         - Place latest import-on-startup.zip into umbraco/Deploy/\n` +
+        `  6) reset        - Back up SQLite DB, then place latest import-on-startup.zip\n` +
+        `\nChoice [1-6]: `,
       (answer) => {
         rl.close();
         const trimmed = answer.trim().toLowerCase();
-        const map = { "1": "dev", "2": "dev:dotnet", "3": "local", "4": "local:dotnet" };
+        const map = { "1": "dev", "2": "dev:dotnet", "3": "local", "4": "local:dotnet", "5": "seed", "6": "reset" };
         resolve(map[trimmed] || (MODES.includes(trimmed) ? trimmed : "dev"));
       }
     );
@@ -214,6 +312,15 @@ async function main() {
     process.exit(1);
   } else {
     mode = await promptMode();
+  }
+
+  if (mode === "seed") {
+    await runSeed();
+    return;
+  }
+  if (mode === "reset") {
+    await runReset();
+    return;
   }
 
   const withDotnet = mode.endsWith(":dotnet");

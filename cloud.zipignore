@@ -21,3 +21,6 @@ node_modules/*
 
 ## ignore this file
 cloud.zipignore
+
+## Seed zip used for local-only Umbraco Deploy import-on-startup — must never reach Cloud
+**/umbraco/Deploy/import-on-startup.zip
