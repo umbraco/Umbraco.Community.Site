@@ -17,6 +17,12 @@ const SEED_FILE_ENV = "IMPORT_ON_STARTUP_FILE";
 const SEED_TARGET = resolve(WEB_UI, "umbraco/Deploy/import-on-startup.zip");
 const SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.sqlite.db");
 
+// TODO: set to the public blob URL once provisioned, e.g.
+// "https://example.blob.core.windows.net/seed/import-on-startup.latest.zip"
+// While this is null, contributors must set IMPORT_ON_STARTUP_URL or
+// IMPORT_ON_STARTUP_FILE explicitly, and the first-run prompt is suppressed.
+const DEFAULT_SEED_URL = null;
+
 const projects = {
   BlockRestrictions: {
     path: resolve(ROOT, "src/UmbracoCommunity.BlockRestrictions/Client"),
@@ -136,6 +142,8 @@ async function runLocal(withDotnet) {
   const label = withDotnet ? "local:dotnet" : "local";
   log(`Mode: ${label} (building all projects for cloud deployment${withDotnet ? " + dotnet run" : ""})\n`);
 
+  await offerFirstTimeSeed();
+
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
     buildProject("Extensions", "build"),
@@ -172,6 +180,8 @@ async function runDev(withDotnet) {
   const label = withDotnet ? "dev:dotnet" : "dev";
   log(`Mode: ${label} (building backoffice extensions, then starting dev servers)\n`);
 
+  await offerFirstTimeSeed();
+
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
     buildProject("Extensions", "build"),
@@ -197,17 +207,24 @@ function utcTimestamp() {
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}-${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
 }
 
-async function obtainSeedZip() {
-  const url = process.env[SEED_URL_ENV];
-  const file = process.env[SEED_FILE_ENV];
+function hasUsableSeedSource() {
+  return Boolean(process.env[SEED_FILE_ENV] || process.env[SEED_URL_ENV] || DEFAULT_SEED_URL);
+}
 
-  if (url && file) {
+async function obtainSeedZip() {
+  const file = process.env[SEED_FILE_ENV];
+  const explicitUrl = process.env[SEED_URL_ENV];
+
+  if (explicitUrl && file) {
     logError(`Both ${SEED_URL_ENV} and ${SEED_FILE_ENV} are set — choose one.`);
     process.exit(1);
   }
+
+  const url = file ? null : (explicitUrl ?? DEFAULT_SEED_URL);
+
   if (!url && !file) {
-    logError(`Neither ${SEED_URL_ENV} nor ${SEED_FILE_ENV} is set.`);
-    logError("Set one of:");
+    logError("No seed source available.");
+    logError(`Set ${SEED_URL_ENV} or ${SEED_FILE_ENV}, e.g.:`);
     logError(`  ${SEED_URL_ENV}=https://example.blob.core.windows.net/seed/import-on-startup.latest.zip`);
     logError(`  ${SEED_FILE_ENV}=./path/to/local/import-on-startup.zip`);
     process.exit(1);
@@ -264,6 +281,36 @@ async function backupSqlite() {
   }
   if (renamed === 0) {
     log("No existing SQLite DB to back up — Umbraco will install fresh on next boot.");
+  }
+}
+
+async function promptYesNo(question, defaultYes = true) {
+  if (!process.stdin.isTTY) return false;
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    const suffix = defaultYes ? " (Y/n) " : " (y/N) ";
+    rl.question(`${BOLD}${question}${RESET}${suffix}`, (answer) => {
+      rl.close();
+      const trimmed = answer.trim().toLowerCase();
+      if (!trimmed) return resolve(defaultYes);
+      resolve(trimmed === "y" || trimmed === "yes");
+    });
+  });
+}
+
+async function offerFirstTimeSeed() {
+  if (existsSync(SQLITE_DB)) return;
+
+  if (!hasUsableSeedSource()) {
+    log(`No Umbraco database found. To seed from a snapshot, set ${SEED_URL_ENV} or ${SEED_FILE_ENV} and run \`node build.mjs seed\`.`);
+    return;
+  }
+
+  if (!process.stdin.isTTY) return;
+
+  const yes = await promptYesNo("No Umbraco database found. Seed from the latest community snapshot before starting?");
+  if (yes) {
+    await runSeed();
   }
 }
 
