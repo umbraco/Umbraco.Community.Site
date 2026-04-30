@@ -75,15 +75,22 @@ function runProcess(name, cmd, args, cwd) {
     const project = projects[name];
     const prefix = project ? `${project.color}[${name}]${RESET} ` : "";
 
-    // On Windows, npm/npx are .cmd files and need a shell. dotnet is a .exe
-    // and must NOT use a shell — passing it through cmd.exe mangles args that
-    // contain spaces + brackets (e.g. the "Kestrel [ENV: Local]" profile name).
-    const needsShell = process.platform === "win32" && (cmd === "npm" || cmd === "npx");
+    // On Windows, npm/npx are .cmd batch files. Two security fixes constrain us:
+    // - Node 22+ refuses to spawn .cmd directly without a shell (EINVAL,
+    //   CVE-2024-27980 BatBadBut).
+    // - Node 24+ deprecates passing an args array alongside shell:true (DEP0190),
+    //   because args are concatenated unescaped.
+    // Workaround: build a single quoted command string and pass empty args.
+    // dotnet is a .exe and runs without shell on every platform.
+    const isWindowsBatch = process.platform === "win32" && (cmd === "npm" || cmd === "npx");
+    const quoteArg = (a) => /^[A-Za-z0-9._:=/\\-]+$/.test(a) ? a : `"${a.replace(/"/g, '\\"')}"`;
+    const spawnCmd = isWindowsBatch ? [cmd, ...args.map(quoteArg)].join(" ") : cmd;
+    const spawnArgs = isWindowsBatch ? [] : args;
 
-    const proc = spawn(cmd, args, {
+    const proc = spawn(spawnCmd, spawnArgs, {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
-      shell: needsShell,
+      shell: isWindowsBatch,
       env: {
         ...process.env,
         FORCE_COLOR: "1",        // chalk, Vite, most Node tools
