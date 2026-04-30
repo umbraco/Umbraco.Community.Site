@@ -2,12 +2,12 @@
 
 import { spawn } from "node:child_process";
 import { copyFileSync, existsSync, createWriteStream } from "node:fs";
-import { mkdir, rename, copyFile, unlink } from "node:fs/promises";
+import { mkdir, rename, copyFile, unlink, open } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { pipeline } from "node:stream/promises";
-import { Readable } from "node:stream";
+import { Readable, PassThrough } from "node:stream";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 
@@ -22,6 +22,9 @@ const SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.sqlite.db");
 // While this is null, contributors must set IMPORT_ON_STARTUP_URL or
 // IMPORT_ON_STARTUP_FILE explicitly, and the first-run prompt is suppressed.
 const DEFAULT_SEED_URL = null;
+
+const SEED_TIMEOUT_MS = Number(process.env.IMPORT_ON_STARTUP_TIMEOUT_MS) || 30 * 60_000;
+const ZIP_MAGIC = Buffer.from([0x50, 0x4b, 0x03, 0x04]);
 
 const projects = {
   BlockRestrictions: {
@@ -211,6 +214,60 @@ function hasUsableSeedSource() {
   return Boolean(process.env[SEED_FILE_ENV] || process.env[SEED_URL_ENV] || DEFAULT_SEED_URL);
 }
 
+async function assertValidZip(filePath) {
+  const fd = await open(filePath, "r");
+  try {
+    const buf = Buffer.alloc(4);
+    await fd.read(buf, 0, 4, 0);
+    if (!buf.equals(ZIP_MAGIC)) {
+      throw new Error(
+        `Staged file is not a valid zip (first bytes: ${buf.toString("hex")}, expected ${ZIP_MAGIC.toString("hex")}). ` +
+          `The source likely returned an error page or wrong content.`,
+      );
+    }
+  } finally {
+    await fd.close();
+  }
+}
+
+function formatMB(bytes) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+async function downloadToFile(url, destPath) {
+  const res = await fetch(url, { signal: AbortSignal.timeout(SEED_TIMEOUT_MS) });
+  if (!res.ok) {
+    throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+  }
+  if (!res.body) {
+    throw new Error("Download failed: empty response body");
+  }
+
+  const total = parseInt(res.headers.get("content-length") ?? "0", 10);
+  const showProgress = process.stderr.isTTY;
+  const counter = new PassThrough();
+  let received = 0;
+  let lastLog = 0;
+
+  counter.on("data", (chunk) => {
+    received += chunk.length;
+    if (!showProgress) return;
+    const now = Date.now();
+    if (now - lastLog < 250) return;
+    lastLog = now;
+    const line = total > 0
+      ? `  ${formatMB(received)} / ${formatMB(total)} (${((received / total) * 100).toFixed(1)}%)`
+      : `  ${formatMB(received)}`;
+    process.stderr.write(`\r${line}\x1b[K`);
+  });
+
+  await pipeline(Readable.fromWeb(res.body), counter, createWriteStream(destPath));
+
+  if (showProgress) {
+    process.stderr.write(`\r  ${formatMB(received)} downloaded.\x1b[K\n`);
+  }
+}
+
 async function obtainSeedZip() {
   const file = process.env[SEED_FILE_ENV];
   const explicitUrl = process.env[SEED_URL_ENV];
@@ -252,15 +309,9 @@ async function obtainSeedZip() {
       await copyFile(source, stage);
     } else {
       log(`Downloading seed zip from ${url}`);
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
-      }
-      if (!res.body) {
-        throw new Error("Download failed: empty response body");
-      }
-      await pipeline(Readable.fromWeb(res.body), createWriteStream(stage));
+      await downloadToFile(url, stage);
     }
+    await assertValidZip(stage);
     await rename(stage, SEED_TARGET);
   } catch (err) {
     if (existsSync(stage)) await unlink(stage).catch(() => {});
