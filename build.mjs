@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { copyFileSync, existsSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -135,10 +135,28 @@ async function runLocal(withDotnet) {
 
   console.log(`\n${GREEN}${BOLD}All builds completed successfully.${RESET}`);
 
+  ensureLocalAppSettings();
+
   if (withDotnet) {
     console.log(`\n${BOLD}Starting dotnet run...${RESET}\n`);
     await runProcess("Web.UI", "dotnet", ["run", "--launch-profile", "Kestrel [ENV: Local]"], projects["Web.UI"].path);
   }
+}
+
+function ensureLocalAppSettings() {
+  const webUiPath = projects["Web.UI"].path;
+  const localPath = resolve(webUiPath, "appsettings.Local.json");
+  const developmentPath = resolve(webUiPath, "appsettings.Development.json");
+
+  if (existsSync(localPath)) return;
+
+  if (!existsSync(developmentPath)) {
+    logError(`appsettings.Local.json is missing and appsettings.Development.json was not found to copy from.`);
+    return;
+  }
+
+  copyFileSync(developmentPath, localPath);
+  log(`[Web.UI] appsettings.Local.json was missing — copied from appsettings.Development.json.`);
 }
 
 async function runDev(withDotnet) {
