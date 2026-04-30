@@ -2,7 +2,7 @@
 
 import { spawn } from "node:child_process";
 import { copyFileSync, existsSync, createWriteStream } from "node:fs";
-import { mkdir, rename, copyFile } from "node:fs/promises";
+import { mkdir, rename, copyFile, unlink } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -235,24 +235,36 @@ async function obtainSeedZip() {
     await mkdir(targetDir, { recursive: true });
   }
 
-  if (file) {
-    const source = resolve(file);
-    if (!existsSync(source)) {
-      logError(`File not found: ${source}`);
-      process.exit(1);
+  // Atomic write: stage at .partial, rename on success, clean up on failure.
+  // Guarantees the target is either fully valid or unchanged — Deploy never
+  // sees a half-written zip.
+  const stage = `${SEED_TARGET}.partial`;
+  if (existsSync(stage)) await unlink(stage);
+
+  try {
+    if (file) {
+      const source = resolve(file);
+      if (!existsSync(source)) {
+        logError(`File not found: ${source}`);
+        process.exit(1);
+      }
+      log(`Copying seed zip from ${source}`);
+      await copyFile(source, stage);
+    } else {
+      log(`Downloading seed zip from ${url}`);
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
+      }
+      if (!res.body) {
+        throw new Error("Download failed: empty response body");
+      }
+      await pipeline(Readable.fromWeb(res.body), createWriteStream(stage));
     }
-    log(`Copying seed zip from ${source}`);
-    await copyFile(source, SEED_TARGET);
-  } else {
-    log(`Downloading seed zip from ${url}`);
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Download failed: HTTP ${res.status} ${res.statusText}`);
-    }
-    if (!res.body) {
-      throw new Error("Download failed: empty response body");
-    }
-    await pipeline(Readable.fromWeb(res.body), createWriteStream(SEED_TARGET));
+    await rename(stage, SEED_TARGET);
+  } catch (err) {
+    if (existsSync(stage)) await unlink(stage).catch(() => {});
+    throw err;
   }
 
   console.log(`${GREEN}Seed zip written to ${SEED_TARGET}${RESET}`);
