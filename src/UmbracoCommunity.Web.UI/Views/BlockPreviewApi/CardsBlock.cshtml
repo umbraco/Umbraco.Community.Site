@@ -1,0 +1,30 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardsBlock, SettingsCardsBlock>>
+
+@{
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    var blockStyle = hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null;
+}
+
+<div class="dc-boxes align-center @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@blockStyle">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+    }
+
+    <div class="dc-boxes-row">
+        <div class="dc-boxes-row__items">
+            @if (Model.Content.Cards != null)
+            {
+                foreach (var item in Model.Content.Cards)
+                {
+                    <partial name="@($"~/Views/BlockPreviewApi/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                }
+            }
+        </div>
+    </div>
+</div>

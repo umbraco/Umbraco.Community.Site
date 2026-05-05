@@ -8,13 +8,18 @@
 @if (Model.Content.Cards != null && Model.Content.Cards.Any())
 {
     var rows = Model.Content.Cards.GetRows();
-    <style asp-add-nonce="true">
-        #@Model.Content.IdHash {
-            --block-background-color: @Model.Settings?.BackgroundColour?.Color;
-        }
-    </style>
 
-    <div class="dc-boxes align-center" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    if (hasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.Content.IdHash {
+                --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+            }
+        </style>
+    }
+
+    <div class="dc-boxes align-center @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
+         id="@Model.Content.IdHash">
         @if (!string.IsNullOrEmpty(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>
@@ -26,8 +31,8 @@
             </div>
         }
 
-        <div class="dc-boxes-row @(hasBg ? "has-bg" : "transparent") @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
-            
+        <div class="dc-boxes-row" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+
             @foreach (var cardGroup in rows)
                 if (cardGroup != null) {
                 {

@@ -1,15 +1,19 @@
 @using Umbraco.Cms.Core.Models.Blocks
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithImageAndTextBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithImageAndTextBlock, SettingsCardWithImageAndTextBlock>>
 
 @{
     var gridCols = Model.GridColumns ?? 12;
+    var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
+    var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
+    var cardClasses = $"dc-boxes-row__item {(hasCardBg ? "has-bg" : string.Empty)} {(hasCardBg ? (cardBgIsDark ? "bg-dark" : "bg-light") : string.Empty)}".Trim();
+    var cardStyle = hasCardBg ? $"--card-background-color: {Model.Settings!.BackgroundColour!.Color}" : null;
 }
 
 @if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
 {
     if (Model.Content.Link != null)
     {
-        <a id="@Model.Content.IdHash" class="dc-boxes-row__item" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        <a id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
@@ -18,7 +22,7 @@
     }
     else
     {
-        <div id="@Model.Content.IdHash" class="dc-boxes-row__item">
+        <div id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);

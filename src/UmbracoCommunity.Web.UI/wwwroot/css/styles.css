@@ -265,20 +265,141 @@ ol.no-margin p {
 }
 
 /* cards block */
+.dc-boxes.has-bg {
+    background-color: var(--block-background-color);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.dc-boxes.bg-dark,
+.dc-boxes.bg-dark .block-title,
+.dc-boxes.bg-dark .block-subtitle,
+.dc-boxes.bg-dark .block-subtitle * {
+    color: #ffffff;
+}
+
+.dc-boxes-row {
+    background: transparent;
+}
+
 .dc-boxes-row__items {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     justify-content: center;
     overflow: hidden;
-    column-gap: 10px;
+    gap: 12px;
+}
+
+/* Each card defaults to full width; the per-card preview view injects a span override */
+.dc-boxes-row__items > * {
+    grid-column-end: span 12;
 }
 
 .dc-boxes-row__items.item-grid {
     flex-wrap: wrap;
 }
 
-.dc-boxes-row__item a {
+.dc-boxes-row__item {
+    color: #283A97;
+    box-sizing: border-box;
+}
+
+.dc-boxes-row__item a,
+.dc-boxes-row__item a:hover {
     text-decoration: none;
+    color: inherit;
+}
+
+.dc-boxes-row__item .row-item-image img {
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.dc-boxes-row__item .dc-boxes-row__item-content {
+    margin-top: 12px;
+}
+
+/* Block-level dark only cascades to cards without their own bg */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) {
+    color: #ffffff;
+}
+
+/* Per-card background */
+.dc-boxes-row__item.has-bg {
+    background-color: var(--card-background-color);
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.dc-boxes-row__item.has-bg.bg-dark {
+    color: #ffffff;
+}
+
+.dc-boxes-row__item.has-bg.bg-light {
+    color: #283A97;
+}
+
+/* Inline text links inherit text colour on dark cards (block-dark cascade or per-card-dark) */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) a:not(.btn),
+.dc-boxes-row__item.has-bg.bg-dark a:not(.btn) {
+    color: inherit;
+}
+
+.dc-boxes-row__item.has-bg .dc-boxes-row__item-content {
+    margin-top: 12px;
+}
+
+/* Text-only card variant */
+.dc-boxes-row__item--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Outline for text cards without their own bg, so they read as cards */
+.dc-boxes-row__item--text:not(.has-bg) {
+    padding: 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 16px;
+}
+
+.dc-boxes.bg-dark .dc-boxes-row__item--text:not(.has-bg) {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content {
+    margin-top: 0;
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content > :first-child {
+    margin-top: 0;
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content > :last-child {
+    margin-bottom: 0;
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content h2,
+.dc-boxes-row__item--text .dc-boxes-row__item-content h3,
+.dc-boxes-row__item--text .dc-boxes-row__item-content h4 {
+    margin-top: 0;
+    font-weight: 500;
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content h2 { font-size: 22px; line-height: 1.2; }
+.dc-boxes-row__item--text .dc-boxes-row__item-content h3 { font-size: 18px; line-height: 1.3; }
+.dc-boxes-row__item--text .dc-boxes-row__item-content h4 { font-size: 16px; line-height: 1.4; }
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content ul,
+.dc-boxes-row__item--text .dc-boxes-row__item-content ol {
+    padding-left: 20px;
+    line-height: 1.5;
 }
 
 .is-circle {

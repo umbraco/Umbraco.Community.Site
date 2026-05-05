@@ -1,17 +1,24 @@
+.dc-boxes.has-bg {
+    background-color: var(--block-background-color);
+    padding: var(--unit-md);
+    border-radius: 20px;
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dc-boxes.bg-dark,
+.dc-boxes.bg-dark .block-title,
+.dc-boxes.bg-dark .block-subtitle,
+.dc-boxes.bg-dark .block-subtitle * {
+    color: var(--color-white);
+}
+
 .dc-boxes-row {
     position: relative;
     max-width: var(--max-width);
     overflow: hidden;
     background: transparent;
-
-    &.has-bg {
-        padding: var(--unit-md);
-        border-radius: 20px;
-    }
-
-    &.bg-dark {
-        color: var(--color-white);
-    }
 }
 
 .dc-boxes-row__items {
@@ -31,8 +38,104 @@
     }
 }
 
-.dc-boxes-row.bg-dark .dc-boxes-row__item {
+/* Block-level dark only cascades to cards without their own bg */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) {
     color: var(--color-white);
+}
+
+/* Per-card background colour (mirrors the slider per-slide pattern) */
+.dc-boxes-row__item.has-bg {
+    background-color: var(--card-background-color);
+    padding: var(--unit-md);
+    border-radius: var(--border-radius-xl);
+}
+
+.dc-boxes-row__item.has-bg.bg-dark {
+    color: var(--color-white);
+}
+
+.dc-boxes-row__item.has-bg.bg-light {
+    color: var(--color-blue);
+}
+
+/* When a card has its own bg, link colour follows the card's text colour */
+.dc-boxes-row__item.has-bg.bg-dark a:hover {
+    color: var(--color-identity-white);
+}
+
+.dc-boxes-row__item.has-bg.bg-light a:hover {
+    color: var(--color-identity-blue);
+}
+
+/* Inline text links inherit text colour on dark cards (block-dark cascade or per-card-dark),
+   so they stay readable. Excludes .btn so styled CTAs keep their own theming. */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) a:not(.btn),
+.dc-boxes-row__item.has-bg.bg-dark a:not(.btn) {
+    color: inherit;
+}
+
+/* Text-only card variant — rich text content, no image layout */
+.dc-boxes-row__item--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+}
+
+/* Outline for text cards without their own bg, so they read as cards */
+.dc-boxes-row__item--text:not(.has-bg) {
+    padding: var(--unit-md);
+    border: 1px solid var(--color-grey);
+    border-radius: var(--border-radius-xl);
+}
+
+/* Inside a dark block, the outline switches to a translucent white */
+.dc-boxes.bg-dark .dc-boxes-row__item--text:not(.has-bg) {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dc-boxes-row__item--text .dc-boxes-row__item-content {
+    width: auto;
+    flex: initial;
+    margin-top: 0;
+
+    > :first-child {
+        margin-top: 0;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+
+    h2, h3, h4 {
+        margin-top: 0;
+        font-weight: 500;
+    }
+
+    h2 {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    h3 {
+        font-size: 22px;
+        line-height: 1.3;
+    }
+
+    h4 {
+        font-size: 18px;
+        line-height: 1.4;
+    }
+
+    p {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    ul, ol {
+        padding-left: 1.25rem;
+        line-height: 1.6;
+    }
 }
 
 .dc-boxes-row__item {
@@ -108,7 +211,7 @@
     color: var(--color-identity-blue);
 }
 
-.dc-boxes-row.bg-dark a:hover {
+.dc-boxes.bg-dark a:hover {
     color: var(--color-identity-white);
 }
 
@@ -146,11 +249,28 @@
         }
     }
 
+    .dc-boxes-row__item.has-bg,
+    .dc-boxes-row__item--text:not(.has-bg) {
+        padding: var(--unit-md);
+    }
+
+    .dc-boxes-row__item--text {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+
     .dc-boxes-row__item-content {
         min-width: 0;
         flex: 1 1 0;
         width: 0;
         margin-top: 0;
+    }
+
+    .dc-boxes-row__item--text .dc-boxes-row__item-content {
+        width: auto;
+        flex: initial;
     }
 
     .dc-boxes-row__item .row-item-image {
@@ -175,6 +295,15 @@
                 font-weight: normal;
             }
         }
+    }
+
+    .dc-boxes-row__item.has-bg,
+    .dc-boxes-row__item--text:not(.has-bg) {
+        padding: var(--unit-md);
+    }
+
+    .dc-boxes-row__item--text {
+        justify-content: flex-start;
     }
 
     .dc-boxes-row__item:has(.dc-image-wrapper):has(.overlay) {
