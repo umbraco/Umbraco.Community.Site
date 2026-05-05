@@ -94,11 +94,8 @@
     border-color: rgba(255, 255, 255, 0.3);
 }
 
-.dc-boxes-row__item--text .dc-boxes-row__item-content {
-    width: auto;
-    flex: initial;
-    margin-top: 0;
-
+/* Shared rich-text typography for any card content (text-only and image+text) */
+.dc-boxes-row__item-content {
     > :first-child {
         margin-top: 0;
     }
@@ -136,6 +133,13 @@
         padding-left: 1.25rem;
         line-height: 1.6;
     }
+}
+
+/* Text-only card variant — layout overrides only; typography is shared above */
+.dc-boxes-row__item--text .dc-boxes-row__item-content {
+    width: auto;
+    flex: initial;
+    margin-top: 0;
 }
 
 .dc-boxes-row__item {
@@ -194,12 +198,21 @@
     font-weight: 500;
 }
 
-.dc-boxes-row__item p {
+.dc-boxes-row__item .text p {
     font-size: 18px;
     font-weight: 400;
 }
 
-.dc-boxes-row__item-content {
+/* Spacing between the image and adjacent content goes on the image:
+   - first-child image → gap below it
+   - otherwise (image follows text) → gap above it */
+.dc-boxes-row__item > .row-item-image:first-child,
+.dc-boxes-row__item > .dc-image-wrapper:first-child {
+    margin-bottom: var(--unit-md);
+}
+
+.dc-boxes-row__item > .row-item-image:not(:first-child),
+.dc-boxes-row__item > .dc-image-wrapper:not(:first-child) {
     margin-top: var(--unit-md);
 }
 
@@ -276,6 +289,13 @@
     .dc-boxes-row__item .row-item-image {
         width: 50%;
     }
+
+    /* Flex row + gap handles spacing — drop the positional image margins */
+    .dc-boxes-row__item > .row-item-image,
+    .dc-boxes-row__item > .dc-image-wrapper {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
 }
 
 @media (--md) {
@@ -313,13 +333,23 @@
     .dc-boxes-row__item .row-item-image {
         max-width: 100%;
         width: 100%;
-        margin-top: 0;
     }
 
     .dc-boxes-row__item-content {
         min-width: none;
         flex: 1 1 auto;
         width: auto;
+    }
+
+    /* Re-enable positional image margins — flex column at this breakpoint has gap: 0 */
+    .dc-boxes-row__item > .row-item-image:first-child,
+    .dc-boxes-row__item > .dc-image-wrapper:first-child {
+        margin-bottom: var(--unit-md);
+    }
+
+    .dc-boxes-row__item > .row-item-image:not(:first-child),
+    .dc-boxes-row__item > .dc-image-wrapper:not(:first-child) {
+        margin-top: var(--unit-md);
     }
 }
 
