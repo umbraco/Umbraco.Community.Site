@@ -3,9 +3,17 @@
 
 @{
     var gridCols = Model.GridColumns ?? 12;
+    var isFullWidth = Model.ColumnSpan >= gridCols;
     var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
     var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
-    var cardClasses = $"dc-boxes-row__item {(hasCardBg ? "has-bg" : string.Empty)} {(hasCardBg ? (cardBgIsDark ? "bg-dark" : "bg-light") : string.Empty)}".Trim();
+    var classParts = new List<string> { "dc-boxes-row__item" };
+    if (isFullWidth) classParts.Add("dc-boxes-row__item--full-width");
+    if (hasCardBg)
+    {
+        classParts.Add("has-bg");
+        classParts.Add(cardBgIsDark ? "bg-dark" : "bg-light");
+    }
+    var itemClass = string.Join(" ", classParts);
     var cardStyle = hasCardBg ? $"--card-background-color: {Model.Settings!.BackgroundColour!.Color}" : null;
 }
 
@@ -13,7 +21,7 @@
 {
     if (Model.Content.Link != null)
     {
-        <a id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+        <a id="@Model.Content.IdHash" class="@itemClass" style="@cardStyle" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
@@ -22,7 +30,7 @@
     }
     else
     {
-        <div id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle">
+        <div id="@Model.Content.IdHash" class="@itemClass" style="@cardStyle">
             @{
                 RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);

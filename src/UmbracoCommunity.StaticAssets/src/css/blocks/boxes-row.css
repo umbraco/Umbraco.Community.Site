@@ -332,3 +332,100 @@
         }
     }
 }
+
+/* Full-width image+text cards mirror the .dc-image-and-text-block row layout
+   so editors get a consistent look whether they use an Image Text Row or a
+   full-span Card With Image And Text inside a Cards Block. */
+@media (--sm) {
+    .dc-boxes-row__item--full-width {
+        flex-direction: row;
+        align-items: stretch;
+        column-gap: var(--unit-md);
+    }
+
+    .dc-boxes-row__item--full-width .row-item-image {
+        flex: 1;
+        width: auto;
+        max-width: none;
+        align-self: stretch;
+        display: flex;
+    }
+
+    .dc-boxes-row__item--full-width .row-item-image img {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .dc-boxes-row__item--full-width .dc-boxes-row__item-content {
+        flex: 1;
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
+
+@media (--md) {
+    .dc-boxes-row__item--full-width {
+        column-gap: 3rem;
+    }
+}
+
+@media (--lg) {
+    .dc-boxes-row__item--full-width {
+        column-gap: 5rem;
+    }
+}
+
+@media (--xl) {
+    .dc-boxes-row__item--full-width {
+        column-gap: 6.25rem;
+    }
+}
+
+/* A cards row of exactly one image-only card + one text-only card uses
+   the same spacing progression as .dc-image-and-text-block so it reads
+   like an image-text-row. `gap` applies at all breakpoints — visible as
+   row-gap when cards stack (<1024px) and column-gap when they sit
+   side-by-side (>=1024px). The modifier class is emitted by
+   CardsBlock.cshtml when the pattern matches. */
+.dc-boxes-row__items--image-text-pair {
+    gap: 3rem;
+
+    @media (--lg) {
+        column-gap: 5rem;
+    }
+
+    @media (--xl) {
+        column-gap: 6.25rem;
+    }
+}
+
+/* Image-only cards: stretch the image to fill the card so it aligns
+   with a taller sibling text-only card in the same grid row.
+   (Circle images are excluded — they should stay at natural size.) */
+@media (--sm) {
+    .dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) {
+        align-items: stretch;
+    }
+
+    .dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image {
+        flex: 1;
+        width: 100%;
+        max-width: none;
+        align-self: stretch;
+        display: flex;
+        min-height: 0;
+    }
+
+    .dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image img:not(.is-circle) {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
