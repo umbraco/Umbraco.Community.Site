@@ -13,7 +13,9 @@
         @if (content.BackgroundImage != null)
         {
             <img class="dc-slide-item__bg"
-                 src="@content.BackgroundImage.MediaUrl()"
+                 srcset="@content.BackgroundImage.GetCropUrl("slideMobile") 400w, @content.BackgroundImage.GetCropUrl("slideMobile2x") 800w, @content.BackgroundImage.GetCropUrl("slideDesktop") 1200w, @content.BackgroundImage.GetCropUrl("slideDesktop2x") 2400w"
+                 sizes="(max-width: 768px) 400px, 800px"
+                 src="@content.BackgroundImage.GetCropUrl("slideDesktop")"
                  alt=""
                  loading="lazy"
                  aria-hidden="true">

@@ -9,7 +9,7 @@
         <div class="video-block-preview">
             @if (Model.Settings?.Thumbnail != null)
             {
-                <img src="@Model.Settings.Thumbnail.GetCropUrl()" />
+                <img src="@Model.Settings.Thumbnail.GetCropUrl("mobile2x")" />
             }
             <p>Video source: @Model.Content.Video.Url</p>
         </div>
@@ -17,7 +17,7 @@
     else 
     {
         var linkIsExternal = Model.Content.Video.Type == LinkType.External;
-        var thumbnailUrl = Model.Settings?.Thumbnail?.GetCropUrl();
+        var thumbnailUrl = Model.Settings?.Thumbnail?.GetCropUrl("desktop");
         var autoplay = Model.Settings?.Autoplay ?? false;
         var format = Model.Settings?.Format != null && Model.Settings.Format.Contains("4:3") ? 43 : 169;
         var allows = @Model.Settings.GetAllow();
