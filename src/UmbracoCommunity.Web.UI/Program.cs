@@ -33,6 +33,22 @@ app.UseWhen(
     appBuilder => appBuilder.UseResponseCaching()
 );
 
+// Long-cache /media responses at the browser/CDN. Umbraco appends ?v=<hash> to
+// media URLs so the URL changes when content changes, which is what makes
+// "immutable" safe here.
+app.UseWhen(
+    n => n.Request.Path.StartsWithSegments("/media", StringComparison.OrdinalIgnoreCase),
+    appBuilder => appBuilder.Use((context, next) =>
+    {
+        context.Response.OnStarting(() =>
+        {
+            context.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
+            return Task.CompletedTask;
+        });
+        return next();
+    })
+);
+
 await app.BootUmbracoAsync();
 
 app.UseHttpsRedirection();
