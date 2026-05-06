@@ -10,7 +10,9 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/4884d61e23484b8faf2b410386bbb14b",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
   "PropertyGroups": [
     {
       "Key": "8af03dda-0bab-4089-ab5f-8fe6ecf73bc3",
@@ -18,12 +20,6 @@
       "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
-        {
-          "Key": "bb5ef90e-c798-4abd-b7f0-12d19f1a2d43",
-          "Alias": "headline",
-          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Name": "Headline"
-        },
         {
           "Key": "c1241519-06fc-4253-aaec-dcc903fde146",
           "Alias": "maxItems",
@@ -39,15 +35,15 @@
   "Udi": "umb://document-type/2e5758c0a2fb4a599d19c7b994db0cef",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type-container/4884d61e23484b8faf2b410386bbb14b",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
       "Ordering": true
     }
   ],
