@@ -33,16 +33,17 @@ app.UseWhen(
     appBuilder => appBuilder.UseResponseCaching()
 );
 
-// Long-cache /media responses at the browser/CDN. Umbraco appends ?v=<hash> to
-// media URLs so the URL changes when content changes, which is what makes
-// "immutable" safe here.
+// Long-cache /media responses at the browser/CDN. Umbraco's GetCropUrl
+// helpers append ?v=<hash> so most image URLs change on edit; for stable
+// direct-path URLs (e.g. the header logo) we omit "immutable" so browsers
+// can still revalidate via ETag/Last-Modified after max-age.
 app.UseWhen(
     n => n.Request.Path.StartsWithSegments("/media", StringComparison.OrdinalIgnoreCase),
     appBuilder => appBuilder.Use((context, next) =>
     {
         context.Response.OnStarting(() =>
         {
-            context.Response.Headers["Cache-Control"] = "public, max-age=31536000, immutable";
+            context.Response.Headers["Cache-Control"] = "public, max-age=31536000";
             return Task.CompletedTask;
         });
         return next();
