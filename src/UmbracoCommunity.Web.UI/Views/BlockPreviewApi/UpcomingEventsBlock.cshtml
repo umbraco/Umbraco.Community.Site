@@ -1,6 +1,15 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<UpcomingEventsBlock>>
 
 <div class="dc-upcoming-events-preview">
-    <h3>@(string.IsNullOrWhiteSpace(Model.Content.Headline) ? "Upcoming Events" : Model.Content.Headline)</h3>
-    <p><em>Live preview shows up to @Model.Content.MaxItems upcoming Umbraco community events from umbracalendar.com on the front end.</em></p>
+    <h3>@(string.IsNullOrWhiteSpace(Model.Content.Title) ? "Upcoming Events" : Model.Content.Title)</h3>
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="dc-upcoming-events-preview__subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
+    }
+    <p class="dc-upcoming-events-preview__note">
+        Live preview shows up to <strong>@Model.Content.MaxItems</strong> upcoming Umbraco community events from
+        <a href="https://umbracalendar.com" rel="noopener" target="_blank">umbracalendar.com</a> on the front end.
+    </p>
 </div>

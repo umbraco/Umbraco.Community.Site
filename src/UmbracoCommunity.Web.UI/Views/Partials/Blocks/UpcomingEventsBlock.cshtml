@@ -11,15 +11,31 @@
     var events = allEvents.Take(maxItems).ToList();
 }
 
-@if (events.Count == 0 && string.IsNullOrWhiteSpace(Model.Content.Headline))
+@functions {
+    static string FormatAttendanceMode(AttendanceMode mode) => mode switch
+    {
+        AttendanceMode.InPerson => "In person",
+        AttendanceMode.Online => "Online",
+        AttendanceMode.Hybrid => "Hybrid",
+        _ => "TBC"
+    };
+}
+
+@if (events.Count == 0 && string.IsNullOrWhiteSpace(Model.Content.Title))
 {
     return;
 }
 
-<section class="dc-upcoming-events dc-upcoming-events--@Model.Content.IdHash">
-    @if (!string.IsNullOrWhiteSpace(Model.Content.Headline))
+<section class="dc-upcoming-events align-center" id="@Model.Content.IdHash">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
     {
-        <h2 class="dc-upcoming-events__headline">@Model.Content.Headline</h2>
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
     }
 
     @if (events.Count > 0)
@@ -32,48 +48,56 @@
                 var sameDay = ev.StartsAt.Date == ev.EndsAt.Date && ev.StartsAt.Offset == ev.EndsAt.Offset;
 
                 <li class="dc-upcoming-events__item">
-                    <a class="dc-upcoming-events__title" href="@ev.Url" rel="noopener" target="_blank">
-                        @ev.Title
-                    </a>
-                    <div class="dc-upcoming-events__meta">
-                        <dc-event-time start="@startIso" end="@endIso">
-                            <time datetime="@startIso">
-                                @if (sameDay)
-                                {
-                                    @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.StartsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
-                                }
-                                else
-                                {
-                                    @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
-                                }
-                            </time>
-                            <span class="dc-upcoming-events__range-sep"> — </span>
-                            <time datetime="@endIso">
-                                @if (sameDay)
-                                {
-                                    @ev.EndsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
-                                }
-                                else
-                                {
-                                    @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
-                                }
-                            </time>
-                        </dc-event-time>
+                    <a class="dc-upcoming-events__link" href="@ev.Url" rel="noopener" target="_blank">
+                        <span class="dc-upcoming-events__badge dc-upcoming-events__badge--@ev.AttendanceMode.ToString().ToLowerInvariant()">
+                            @FormatAttendanceMode(ev.AttendanceMode)
+                        </span>
+                        <h3 class="dc-upcoming-events__title">@ev.Title</h3>
+                        <ul class="dc-upcoming-events__meta">
+                        <li class="dc-upcoming-events__meta-item">
+                            <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                            <dc-event-time start="@startIso" end="@endIso">
+                                <time datetime="@startIso">
+                                    @if (sameDay)
+                                    {
+                                        @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.StartsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                    }
+                                    else
+                                    {
+                                        @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
+                                    }
+                                </time>
+                                <span class="dc-upcoming-events__range-sep"> — </span>
+                                <time datetime="@endIso">
+                                    @if (sameDay)
+                                    {
+                                        @ev.EndsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                    }
+                                    else
+                                    {
+                                        @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
+                                    }
+                                </time>
+                            </dc-event-time>
+                        </li>
                         @if (!string.IsNullOrWhiteSpace(ev.Location))
                         {
-                            <span class="dc-upcoming-events__location">· @ev.Location</span>
+                            <li class="dc-upcoming-events__meta-item">
+                                <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>@ev.Location</span>
+                            </li>
                         }
                         @if (!string.IsNullOrWhiteSpace(ev.Organizer))
                         {
-                            <span class="dc-upcoming-events__organizer">· @ev.Organizer</span>
+                            <li class="dc-upcoming-events__meta-item">
+                                <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-7"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                                <span>@ev.Organizer</span>
+                            </li>
                         }
-                    </div>
-                    <div class="dc-upcoming-events__badges">
-                        <span class="dc-upcoming-events__badge dc-upcoming-events__badge--mode">@ev.AttendanceMode</span>
-                    </div>
+                        </ul>
+                    </a>
                 </li>
             }
         </ul>
     }
 </section>
-

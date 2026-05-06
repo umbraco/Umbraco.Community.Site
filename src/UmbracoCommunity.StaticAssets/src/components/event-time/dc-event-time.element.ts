@@ -94,6 +94,7 @@ export class DcEventTime extends HTMLElement {
     button.setAttribute("aria-label", "About this event time");
     button.setAttribute("popovertarget", popoverId);
     button.innerHTML = infoIcon;
+    button.addEventListener("click", (ev) => ev.stopPropagation());
 
     const popover = document.createElement("div");
     popover.id = popoverId;
