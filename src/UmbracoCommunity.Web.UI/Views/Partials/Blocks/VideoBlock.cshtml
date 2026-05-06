@@ -9,7 +9,7 @@
         <div class="video-block-preview">
             @if (Model.Settings?.Thumbnail != null)
             {
-                <img src="@Model.Settings.Thumbnail.GetCropUrl("mobile2x")" />
+                <img src="@Model.Settings.Thumbnail.GetCropUrl("mobile2x")" width="960" height="540" alt="" />
             }
             <p>Video source: @Model.Content.Video.Url</p>
         </div>
