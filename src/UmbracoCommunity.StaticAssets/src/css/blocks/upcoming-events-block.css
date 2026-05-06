@@ -8,6 +8,23 @@
     }
 }
 
+.dc-upcoming-events.has-bg {
+    background-color: var(--block-background-color);
+    padding: var(--unit-md) var(--unit);
+    border-radius: var(--border-radius-xl);
+
+    @media (--md) {
+        padding: var(--unit-lg) var(--unit-md);
+    }
+}
+
+.dc-upcoming-events.bg-dark,
+.dc-upcoming-events.bg-dark .block-title,
+.dc-upcoming-events.bg-dark .block-subtitle,
+.dc-upcoming-events.bg-dark .block-subtitle * {
+    color: var(--color-white);
+}
+
 .dc-upcoming-events__list {
     list-style: none;
     margin: var(--unit-md) 0 0;
