@@ -65,18 +65,18 @@ describe("dc-event-time", () => {
     expect(popover!.textContent).toMatch(/22[.:]00/);
   });
 
-  it("renders an info button with popover target", () => {
+  it("renders an info button linked to its popover", () => {
     const el = makeElement(
       "2026-04-30T18:00:00+01:00",
       "2026-04-30T20:00:00+01:00"
     );
     const button = el.querySelector("button.dc-event-time__info");
     expect(button).not.toBeNull();
-    const popoverId = button!.getAttribute("popovertarget");
+    const popoverId = button!.getAttribute("aria-controls");
     expect(popoverId).toBeTruthy();
     const popover = el.querySelector(`#${popoverId}`);
     expect(popover).not.toBeNull();
-    expect(popover!.getAttribute("popover")).toBe("auto");
+    expect(popover!.getAttribute("popover")).toBe("manual");
   });
 
   it("popover shows source-timezone label and times", () => {

@@ -46,12 +46,19 @@
                 var startIso = ev.StartsAt.ToString("o", CultureInfo.InvariantCulture);
                 var endIso = ev.EndsAt.ToString("o", CultureInfo.InvariantCulture);
                 var sameDay = ev.StartsAt.Date == ev.EndsAt.Date && ev.StartsAt.Offset == ev.EndsAt.Offset;
+                var flag = CountryFlagHelper.GetFlag(ev.Location, ev.Organizer, ev.Title);
 
                 <li class="dc-upcoming-events__item">
                     <a class="dc-upcoming-events__link" href="@ev.Url" rel="noopener" target="_blank">
-                        <span class="dc-upcoming-events__badge dc-upcoming-events__badge--@ev.AttendanceMode.ToString().ToLowerInvariant()">
-                            @FormatAttendanceMode(ev.AttendanceMode)
-                        </span>
+                        <div class="dc-upcoming-events__top">
+                            <span class="dc-upcoming-events__badge dc-upcoming-events__badge--@ev.AttendanceMode.ToString().ToLowerInvariant()">
+                                @FormatAttendanceMode(ev.AttendanceMode)
+                            </span>
+                            @if (flag != null)
+                            {
+                                <span class="dc-upcoming-events__flag" aria-hidden="true">@flag</span>
+                            }
+                        </div>
                         <h3 class="dc-upcoming-events__title">@ev.Title</h3>
                         <ul class="dc-upcoming-events__meta">
                         <li class="dc-upcoming-events__meta-item">

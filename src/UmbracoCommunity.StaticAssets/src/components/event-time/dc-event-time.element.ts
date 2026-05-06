@@ -92,14 +92,28 @@ export class DcEventTime extends HTMLElement {
     button.type = "button";
     button.className = "dc-event-time__info";
     button.setAttribute("aria-label", "About this event time");
-    button.setAttribute("popovertarget", popoverId);
+    button.setAttribute("aria-controls", popoverId);
+    button.setAttribute("aria-expanded", "false");
     button.innerHTML = infoIcon;
-    button.addEventListener("click", (ev) => ev.stopPropagation());
+    button.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        // Pre-position based on the button so the first paint isn't at the
+        // browser's default top-left fallback. The toggle handler refines if
+        // the popover would overflow the viewport.
+        const rect = button.getBoundingClientRect();
+        popover.style.top = `${rect.bottom + 4}px`;
+        popover.style.left = `${rect.left}px`;
+
+        popover.togglePopover();
+    });
 
     const popover = document.createElement("div");
     popover.id = popoverId;
     popover.className = "dc-event-time__popover";
-    popover.setAttribute("popover", "auto");
+    popover.setAttribute("popover", "manual");
+    popover.addEventListener("click", (ev) => ev.stopPropagation());
     popover.innerHTML = `
       <p class="dc-event-time__popover-row">
         <span class="dc-event-time__popover-label">In your timezone (${escape(localTzName)}):</span>
@@ -112,10 +126,10 @@ export class DcEventTime extends HTMLElement {
     `;
 
     let openCleanup: AbortController | null = null;
-    let closeTimer: number | null = null;
 
     popover.addEventListener("toggle", (ev) => {
       const state = (ev as ToggleEvent).newState;
+      button.setAttribute("aria-expanded", state === "open" ? "true" : "false");
       if (state === "open") {
         this.#positionPopover(button, popover);
 
@@ -126,19 +140,35 @@ export class DcEventTime extends HTMLElement {
           if (popover.matches(":popover-open")) popover.hidePopover();
         };
 
-        // Close on any scroll within the document (capture so nested scrollers count too).
-        window.addEventListener("scroll", close, { capture: true, passive: true, signal: openCleanup.signal });
+        const signal = openCleanup.signal;
 
-        // Auto-close after 10 seconds.
-        if (closeTimer !== null) window.clearTimeout(closeTimer);
-        closeTimer = window.setTimeout(close, 10_000);
+        // Close on click outside the popover/trigger (we run popover="manual"
+        // so the browser's light dismiss isn't doing this for us). Capture
+        // phase so clicks on a sibling popover's trigger button still close
+        // this one even though that button calls stopPropagation.
+        document.addEventListener("click", (clickEvent) => {
+          const target = clickEvent.target as Node;
+          if (!popover.contains(target) && !button.contains(target)) close();
+        }, { capture: true, signal });
+
+        // Close on Escape.
+        document.addEventListener("keydown", (keyEvent) => {
+          if (keyEvent.key === "Escape") close();
+        }, { signal });
+
+        // Close on user scroll past a small threshold so any layout-settling
+        // scroll right after open doesn't immediately dismiss the popover.
+        const initialScrollY = window.scrollY;
+        const initialScrollX = window.scrollX;
+        window.addEventListener("scroll", () => {
+          if (Math.abs(window.scrollY - initialScrollY) > 8 ||
+              Math.abs(window.scrollX - initialScrollX) > 8) {
+            close();
+          }
+        }, { passive: true, signal });
       } else {
         openCleanup?.abort();
         openCleanup = null;
-        if (closeTimer !== null) {
-          window.clearTimeout(closeTimer);
-          closeTimer = null;
-        }
       }
     });
 

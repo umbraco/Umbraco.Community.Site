@@ -7,6 +7,9 @@ import "../css/styles.css";
 import '../components/index.js';
 import "../integrations/index.js";
 import { FAQsAccordion } from "../components/faqs-accordion.element";
+import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+
+polyfillCountryFlagEmojis("Twemoji Country Flags", "/fonts/TwemojiCountryFlags.woff2");
 
 import {
   setUtmCookies,
