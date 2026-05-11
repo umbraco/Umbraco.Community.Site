@@ -19,6 +19,8 @@ node build.mjs dev:dotnet  # build backoffice + start Vite dev server + dotnet r
 
 If you've already got a local database and just want to refresh content without nuking your DB, use `node build.mjs seed` instead of `reset`.
 
+For day-to-day work, just run `node build.mjs` with no arguments and pick from the interactive menu — that's the easiest way to start each session.
+
 ### Other ways to run
 
 If you'd rather skip the seed step or run things by hand, the dev script supports several modes:
