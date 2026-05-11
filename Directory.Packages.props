@@ -41,6 +41,15 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.7" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.7" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <!-- Testing -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.7" />
     <!-- Other -->
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageVersion Include="Schema.NET" Version="13.0.0" />

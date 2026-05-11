@@ -745,3 +745,36 @@ dc-image-slider img {
     margin: 0;
     opacity: 0.9;
 }
+
+/* Upcoming events block preview */
+.dc-upcoming-events-preview {
+    padding: 20px;
+    border: 1px solid #d1d1d1;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.dc-upcoming-events-preview h3 {
+    color: #283A97;
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.dc-upcoming-events-preview__subtitle {
+    color: #283A97;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+}
+
+.dc-upcoming-events-preview__note {
+    color: #5e6279;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+    font-style: italic;
+}
+
+.dc-upcoming-events-preview__note a {
+    color: #283A97;
+}
