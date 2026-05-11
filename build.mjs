@@ -410,21 +410,18 @@ async function promptMode(showAdvanced) {
   // Menu numbers: contributor-facing modes come first; advanced (cloud build)
   // modes are only listed when --advanced is passed. Direct CLI mode names
   // (e.g. `node build.mjs local`) always work regardless.
-  const visible = showAdvanced
-    ? [
-        ["dev", "Build backoffice + start Vite dev server"],
-        ["dev:dotnet", "Build backoffice + start Vite dev server + dotnet run"],
-        ["seed", "Download latest import-on-startup.zip into umbraco/Deploy/"],
-        ["reset", "Back up SQLite DB, then download latest import-on-startup.zip"],
-        ["local", "Build all projects for cloud deployment"],
-        ["local:dotnet", "Build all projects for cloud + dotnet run"],
-      ]
-    : [
-        ["dev", "Build backoffice + start Vite dev server"],
-        ["dev:dotnet", "Build backoffice + start Vite dev server + dotnet run"],
-        ["seed", "Download latest import-on-startup.zip into umbraco/Deploy/"],
-        ["reset", "Back up SQLite DB, then download latest import-on-startup.zip"],
-      ];
+  const visible = [
+    ["dev", "Build backoffice + start Vite dev server"],
+    ["dev:dotnet", "Build backoffice + start Vite dev server + dotnet run"],
+    ["seed", "Download latest import-on-startup.zip into umbraco/Deploy/"],
+    ["reset", "Back up SQLite DB, then download latest import-on-startup.zip"],
+    ...(showAdvanced
+      ? [
+          ["local", "Build all projects for cloud deployment"],
+          ["local:dotnet", "Build all projects for cloud + dotnet run"],
+        ]
+      : []),
+  ];
 
   const longest = Math.max(...visible.map(([m]) => m.length));
   const lines = visible.map(([mode, desc], i) => `  ${i + 1}) ${mode.padEnd(longest)} - ${desc}`);
