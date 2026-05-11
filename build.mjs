@@ -395,22 +395,39 @@ async function runReset() {
   await obtainSeedZip();
 }
 
-async function promptMode() {
+async function promptMode(showAdvanced) {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
+  // Menu numbers: contributor-facing modes come first; advanced (cloud build)
+  // modes are only listed when --advanced is passed. Direct CLI mode names
+  // (e.g. `node build.mjs local`) always work regardless.
+  const visible = showAdvanced
+    ? [
+        ["dev", "Build backoffice + start Vite dev server"],
+        ["dev:dotnet", "Build backoffice + start Vite dev server + dotnet run"],
+        ["seed", "Download latest import-on-startup.zip into umbraco/Deploy/"],
+        ["reset", "Back up SQLite DB, then download latest import-on-startup.zip"],
+        ["local", "Build all projects for cloud deployment"],
+        ["local:dotnet", "Build all projects for cloud + dotnet run"],
+      ]
+    : [
+        ["dev", "Build backoffice + start Vite dev server"],
+        ["dev:dotnet", "Build backoffice + start Vite dev server + dotnet run"],
+        ["seed", "Download latest import-on-startup.zip into umbraco/Deploy/"],
+        ["reset", "Back up SQLite DB, then download latest import-on-startup.zip"],
+      ];
+
+  const longest = Math.max(...visible.map(([m]) => m.length));
+  const lines = visible.map(([mode, desc], i) => `  ${i + 1}) ${mode.padEnd(longest)} - ${desc}`);
+  const map = Object.fromEntries(visible.map(([mode], i) => [String(i + 1), mode]));
+
   return new Promise((resolve) => {
     rl.question(
       `${BOLD}Select build mode:${RESET}\n` +
-        `  1) dev          - Build backoffice + start Vite dev server\n` +
-        `  2) dev:dotnet   - Build backoffice + start Vite dev server + dotnet run\n` +
-        `  3) local        - Build all projects for cloud deployment\n` +
-        `  4) local:dotnet - Build all projects for cloud + dotnet run\n` +
-        `  5) seed         - Place latest import-on-startup.zip into umbraco/Deploy/\n` +
-        `  6) reset        - Back up SQLite DB, then place latest import-on-startup.zip\n` +
-        `\nChoice [1-6]: `,
+        lines.join("\n") +
+        `\n\nChoice [1-${visible.length}]: `,
       (answer) => {
         rl.close();
         const trimmed = answer.trim().toLowerCase();
-        const map = { "1": "dev", "2": "dev:dotnet", "3": "local", "4": "local:dotnet", "5": "seed", "6": "reset" };
         resolve(map[trimmed] || (MODES.includes(trimmed) ? trimmed : "dev"));
       }
     );
@@ -418,17 +435,19 @@ async function promptMode() {
 }
 
 async function main() {
-  const arg = process.argv[2]?.toLowerCase();
+  const args = process.argv.slice(2).map((a) => a.toLowerCase());
+  const showAdvanced = args.includes("--advanced") || args.includes("-a");
+  const arg = args.find((a) => !a.startsWith("-"));
   let mode;
 
-  if (MODES.includes(arg)) {
+  if (arg && MODES.includes(arg)) {
     mode = arg;
   } else if (arg) {
     logError(`Unknown mode: ${arg}`);
-    console.log(`Usage: node build.mjs [${MODES.join("|")}]\n`);
+    console.log(`Usage: node build.mjs [${MODES.join("|")}] [--advanced]\n`);
     process.exit(1);
   } else {
-    mode = await promptMode();
+    mode = await promptMode(showAdvanced);
   }
 
   if (mode === "seed") {
