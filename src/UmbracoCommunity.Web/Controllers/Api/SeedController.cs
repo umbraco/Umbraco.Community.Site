@@ -1,22 +1,22 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Web.Common.Authorization;
 using UmbracoCommunity.Web.Features.Seed;
 
 namespace UmbracoCommunity.Web.Controllers.Api;
 
+/// <summary>
+/// Public endpoints for serving the latest seed export and surfacing its status.
+/// The authenticated "regenerate" endpoint lives in the Extensions project as a backoffice
+/// management API so it benefits from existing JWT auth plumbing.
+/// </summary>
 [ApiController]
 [Route("seed")]
 public sealed class SeedController : ControllerBase
 {
     private readonly ISeedExportService _service;
-    private readonly ILogger<SeedController> _logger;
 
-    public SeedController(ISeedExportService service, ILogger<SeedController> logger)
+    public SeedController(ISeedExportService service)
     {
         _service = service;
-        _logger = logger;
     }
 
     /// <summary>Downloads the latest snapshot zip. Public — referenced by contributor build script.</summary>
@@ -35,34 +35,4 @@ public sealed class SeedController : ControllerBase
     /// <summary>Returns last success/failure timestamps and in-progress state.</summary>
     [HttpGet("status")]
     public ActionResult<SeedExportStatus> Status() => _service.GetStatus();
-
-    /// <summary>
-    /// Triggers a regeneration in the background and returns 202 immediately.
-    /// Returns 409 if a regeneration is already in flight.
-    /// Requires Settings-section backoffice access.
-    /// </summary>
-    [HttpPost("regenerate")]
-    [Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
-    public IActionResult Regenerate()
-    {
-        if (_service.GetStatus().IsRunning)
-        {
-            return Conflict(_service.GetStatus());
-        }
-
-        // Fire and forget. Status fields on the service capture progress/result.
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await _service.RegenerateAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Manual seed regenerate failed.");
-            }
-        });
-
-        return Accepted(_service.GetStatus());
-    }
 }
