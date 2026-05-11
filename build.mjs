@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -43,8 +43,19 @@ function logError(msg) {
 }
 
 function ensureNodeModules(name, projectPath) {
-  if (!existsSync(resolve(projectPath, "node_modules"))) {
-    log(`[${name}] node_modules missing, running npm ci...`);
+  const nodeModules = resolve(projectPath, "node_modules");
+  const installMarker = resolve(nodeModules, ".package-lock.json");
+  const lockFile = resolve(projectPath, "package-lock.json");
+
+  let reason = null;
+  if (!existsSync(nodeModules)) {
+    reason = "node_modules missing";
+  } else if (existsSync(lockFile) && (!existsSync(installMarker) || statSync(lockFile).mtimeMs > statSync(installMarker).mtimeMs)) {
+    reason = "package-lock.json is newer than installed packages";
+  }
+
+  if (reason) {
+    log(`[${name}] ${reason}, running npm ci...`);
     return runProcess(name, "npm", ["ci"], projectPath);
   }
   return Promise.resolve();
