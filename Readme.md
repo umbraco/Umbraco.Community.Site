@@ -19,12 +19,6 @@ node build.mjs dev:dotnet  # build backoffice + start Vite dev server + dotnet r
 
 If you've already got a local database and just want to refresh content without nuking your DB, use `node build.mjs seed` instead of `reset`.
 
-### Configuration
-
-If you need to work with valid API keys for services, or to store connection strings to local databases, you should create a copy of the `appsettings.Development.json` file and name it  `appsettings.Local.json`.
-
-The file is ignored from source control.
-
 ### Other ways to run
 
 If you'd rather skip the seed step or run things by hand, the dev script supports several modes:
