@@ -40,14 +40,6 @@ If you prefer to run things separately (or run without the build script), you ne
 - In a separate terminal, cd to `src/UmbracoCommunity.StaticAssets` and run `npm run dev`
   - Run `npm ci` first if you get errors about missing packages
 
-### Building everything (deployment)
-
-```bash
-node build.mjs --advanced local
-```
-
-Builds all frontend projects (backoffice extensions and static assets) for deployment. The `local` and `local:dotnet` modes are hidden from the default menu (they're only relevant for maintainers preparing a cloud deploy) — pass `--advanced` to reveal them.
-
 See [BUILD.md](BUILD.md) for all build script options and launch profiles.
 
 ### Upgrading Packages
