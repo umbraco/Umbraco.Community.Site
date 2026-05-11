@@ -17,11 +17,10 @@ const SEED_FILE_ENV = "IMPORT_ON_STARTUP_FILE";
 const SEED_TARGET = resolve(WEB_UI, "umbraco/Deploy/import-on-startup.zip");
 const SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.sqlite.db");
 
-// TODO: set to the public blob URL once provisioned, e.g.
-// "https://example.blob.core.windows.net/seed/import-on-startup.latest.zip"
-// While this is null, contributors must set IMPORT_ON_STARTUP_URL or
-// IMPORT_ON_STARTUP_FILE explicitly, and the first-run prompt is suppressed.
-const DEFAULT_SEED_URL = null;
+// Public snapshot served by the community site (regenerated daily by the
+// SeedExportHostedService). Override per-run with IMPORT_ON_STARTUP_URL or
+// IMPORT_ON_STARTUP_FILE.
+const DEFAULT_SEED_URL = "https://community.umbraco.com/seed/latest.zip";
 
 const SEED_TIMEOUT_MS = Number(process.env.IMPORT_ON_STARTUP_TIMEOUT_MS) || 30 * 60_000;
 const ZIP_MAGIC = Buffer.from([0x50, 0x4b, 0x03, 0x04]);
