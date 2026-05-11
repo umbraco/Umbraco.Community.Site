@@ -62,6 +62,8 @@
                 var endIso = ev.EndsAt.ToString("o", CultureInfo.InvariantCulture);
                 var sameDay = ev.StartsAt.Date == ev.EndsAt.Date && ev.StartsAt.Offset == ev.EndsAt.Offset;
                 var flag = CountryFlagHelper.GetFlag(ev.Location, ev.Organizer, ev.Title);
+                var showScreen = ev.AttendanceMode is AttendanceMode.Online or AttendanceMode.Hybrid;
+                var showFlag = ev.AttendanceMode != AttendanceMode.Online && flag != null;
 
                 <li class="dc-upcoming-events__item">
                     <a class="dc-upcoming-events__link" href="@ev.Url" rel="noopener" target="_blank">
@@ -69,9 +71,18 @@
                             <span class="dc-upcoming-events__badge dc-upcoming-events__badge--@ev.AttendanceMode.ToString().ToLowerInvariant()">
                                 @FormatAttendanceMode(ev.AttendanceMode)
                             </span>
-                            @if (flag != null)
+                            @if (showScreen || showFlag)
                             {
-                                <span class="dc-upcoming-events__flag" aria-hidden="true">@flag</span>
+                                <span class="dc-upcoming-events__flag" aria-hidden="true">
+                                    @if (showScreen)
+                                    {
+                                        <svg class="dc-upcoming-events__screen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                                    }
+                                    @if (showFlag)
+                                    {
+                                        @flag
+                                    }
+                                </span>
                             }
                         </div>
                         <h3 class="dc-upcoming-events__title">@ev.Title</h3>

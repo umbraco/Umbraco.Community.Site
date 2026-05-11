@@ -87,6 +87,17 @@
     font-family: "Twemoji Country Flags", "Lato", sans-serif;
     font-size: 1.5rem;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.dc-upcoming-events__screen {
+    width: 1.1em;
+    height: 1.1em;
+    color: var(--color-blue);
+    display: block;
+    margin-top: 2px;
 }
 
 .dc-upcoming-events__badge {
