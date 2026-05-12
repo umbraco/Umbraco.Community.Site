@@ -35,6 +35,15 @@ ol.no-margin p {
 /* Image with overlay styling */
 .dc-image-wrapper {
     position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.dc-image-wrapper img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .dc-image-wrapper .overlay {
@@ -61,6 +70,29 @@ ol.no-margin p {
     > * {
         max-width: 90ch;
     }
+}
+
+/* Cards context: stack image/overlay/text via grid (matching frontend boxes-row.css)
+   so the overlay text sits at the bottom of the image, not full-fill. */
+.dc-boxes-row__item .dc-image-wrapper {
+    display: grid;
+    align-items: center;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .dc-image,
+.dc-boxes-row__item .dc-image-wrapper .overlay,
+.dc-boxes-row__item .dc-image-wrapper .text {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .overlay,
+.dc-boxes-row__item .dc-image-wrapper .text {
+    position: relative;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .text {
+    align-self: end;
 }
 
 /* Title block styles */
@@ -360,17 +392,6 @@ ol.no-margin p {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-}
-
-/* Outline for text cards without their own bg, so they read as cards */
-.dc-boxes-row__item--text:not(.has-bg) {
-    padding: 16px;
-    border: 1px solid #d9d9d9;
-    border-radius: 16px;
-}
-
-.dc-boxes.bg-dark .dc-boxes-row__item--text:not(.has-bg) {
-    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Text-only card has no preceding image, so drop the content top-margin */
@@ -950,4 +971,20 @@ dc-image-slider img {
 
 .dc-upcoming-events-preview__note a {
     color: #283A97;
+}
+
+.dc-upcoming-events-preview.has-bg {
+    background-color: var(--block-background-color);
+    border-color: transparent;
+}
+
+.dc-upcoming-events-preview.bg-dark,
+.dc-upcoming-events-preview.bg-dark h3,
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__subtitle {
+    color: #ffffff;
+}
+
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__note,
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__note a {
+    color: rgba(255, 255, 255, 0.85);
 }

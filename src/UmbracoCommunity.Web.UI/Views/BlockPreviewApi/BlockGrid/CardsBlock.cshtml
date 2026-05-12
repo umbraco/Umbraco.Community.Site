@@ -22,7 +22,7 @@
             {
                 foreach (var item in Model.Content.Cards)
                 {
-                    <partial name="@($"~/Views/BlockPreviewApi/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                    <partial name="@($"~/Views/BlockPreviewApi/BlockGrid/{item.Content.ContentType.Alias}.cshtml")" model="item" />
                 }
             }
         </div>
