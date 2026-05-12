@@ -278,7 +278,7 @@ The slider block (`SliderBlock`) is a container block that holds nested slide it
 - `box-slider.css` / `box-slider-item.css` — Box slider variant styles
 - `link-slider.css` / `link-slider-item.css` — Link slider variant styles
 
-**Backoffice preview** — `Views/BlockPreviewApi/SlideItemBlockWithTag.cshtml` and `SlideItemBlockWithIcon.cshtml` provide simple vertical list previews. Backoffice-specific slider styles in `wwwroot/css/styles.css` mirror the frontend dark/light theming logic.
+**Backoffice preview** — slide items don't have dedicated views under `Views/BlockPreviewApi/BlockGrid/`; they fall back to `Views/Partials/Blocks/SlideItemBlockWithTag.cshtml` / `SlideItemBlockWithIcon.cshtml` via the BlockPreview `ViewLocations` chain in `appsettings.json`. Backoffice-specific slider styles in `wwwroot/css/styles.css` mirror the frontend dark/light theming logic.
 
 ### Hero Banner with Image Slider
 
