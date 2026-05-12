@@ -32,6 +32,11 @@ ol.no-margin p {
     padding: 20px;
 }
 
+.dc-image-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 20px;
+}
+
 /* Image with overlay styling */
 .dc-image-wrapper {
     position: relative;
@@ -736,6 +741,15 @@ dc-image-slider img {
 }
 
 /* Text block */
+.dc-text-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 20px;
+}
+
+.dc-text-block.bg-dark {
+    color: #ffffff;
+}
+
 .dc-text-block.has-image {
     position: relative;
 }
