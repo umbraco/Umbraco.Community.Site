@@ -34,9 +34,9 @@
                 {
                     <h3 class="dc-slide-item__title">@content.Title</h3>
                 }
-                @if (!string.IsNullOrEmpty(content.Content))
+                @if (!content.Content.IsEmptyHtmlString())
                 {
-                    <p class="dc-slide-item__text">@content.Content</p>
+                    <div class="dc-slide-item__text">@Html.Raw(content.Content.ToHtmlString())</div>
                 }
             </div>
         </div>
