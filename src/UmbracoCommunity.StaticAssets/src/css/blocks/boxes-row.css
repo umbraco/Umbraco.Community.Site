@@ -140,6 +140,7 @@
         position: relative;
     }
 
+
     .overlay {
         width: 100%;
         height: 100%;
@@ -322,7 +323,7 @@
     }
 
     .dc-boxes-row__item-content {
-        min-width: none;
+        min-width: auto;
         flex: 1 1 auto;
         width: auto;
     }
@@ -400,6 +401,33 @@
     .dc-boxes-row__item--full-width {
         column-gap: 6.25rem;
     }
+}
+
+/* Icon block — size and currentColor tinting work in any context (card or standalone preview) */
+.row-item-icon.has-colour svg,
+.row-item-icon.has-colour svg * {
+    stroke: currentColor;
+}
+
+.row-item-icon--xs svg { width: 50px; height: 50px; }
+.row-item-icon--sm svg { width: 75px; height: 75px; }
+.row-item-icon--md svg { width: 100px; height: 100px; }
+.row-item-icon--lg svg { width: 150px; height: 150px; }
+
+/* Icon cards: when an IconBlock is in the card content, centre items in the card */
+.dc-boxes-row__item--icon-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+}
+
+/* Stop the content block from flex-growing to fill the column, so the icon +
+   content group has free space to be centred by justify-content. */
+.dc-boxes-row__item--icon-card .dc-boxes-row__item-content {
+    flex: initial;
+    width: auto;
 }
 
 /* A cards row of exactly one image-only card + one text-only card uses

@@ -355,6 +355,24 @@ ol.no-margin p {
     object-fit: cover;
 }
 
+.row-item-icon.has-colour svg,
+.row-item-icon.has-colour svg * {
+    stroke: currentColor;
+}
+
+.row-item-icon--xs svg { width: 50px; height: 50px; }
+.row-item-icon--sm svg { width: 75px; height: 75px; }
+.row-item-icon--md svg { width: 100px; height: 100px; }
+.row-item-icon--lg svg { width: 150px; height: 150px; }
+
+.dc-boxes-row__item--icon-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+}
+
 /* Image-position-based spacing: gap below if image is first, gap above otherwise */
 .dc-boxes-row__item > .row-item-image:first-child,
 .dc-boxes-row__item > .dc-image-wrapper:first-child {

@@ -6,8 +6,10 @@
     var isFullWidth = Model.ColumnSpan >= gridCols;
     var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
     var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
+    var hasIcon = Model.Content.CardContent?.Any(b => b.Content.ContentType.Alias == IconBlock.ModelTypeAlias) ?? false;
     var classParts = new List<string> { "dc-boxes-row__item" };
     if (isFullWidth) classParts.Add("dc-boxes-row__item--full-width");
+    if (hasIcon) classParts.Add("dc-boxes-row__item--icon-card");
     if (hasCardBg)
     {
         classParts.Add("has-bg");
@@ -23,7 +25,7 @@
     {
         <a id="@Model.Content.IdHash" class="@itemClass" style="@cardStyle" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
             @{
-                RenderCard(Model.Content.CardContent);
+                await RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
             }
         </a>
@@ -32,7 +34,7 @@
     {
         <div id="@Model.Content.IdHash" class="@itemClass" style="@cardStyle">
             @{
-                RenderCard(Model.Content.CardContent);
+                await RenderCard(Model.Content.CardContent);
                 await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash);
             }
         </div>
@@ -40,7 +42,7 @@
 }
 
 @functions {
-    void RenderCard(BlockListModel elements)
+    async Task RenderCard(BlockListModel elements)
     {
         @foreach (var contentItem in elements)
         {
@@ -89,6 +91,15 @@
                     if (textItem?.Text == null || textItem.Text.IsEmptyHtmlString()) break;
                     <div class="dc-boxes-row__item-content">
                         @Html.Raw(textItem?.Text)
+                    </div>
+                    break;
+                case IconBlock.ModelTypeAlias:
+                    var iconItem = contentItem.Content as IconBlock;
+                    if (iconItem?.Icon == null) break;
+                    var iconColour = iconItem.Colour?.Color;
+                    var iconSize = string.IsNullOrEmpty(iconItem.IconSize) ? "md" : iconItem.IconSize;
+                    <div class="row-item-icon row-item-icon--@iconSize @(iconColour != null ? "has-colour" : string.Empty)" style="@(iconColour != null ? $"color: {iconColour}" : null)">
+                        <svg-src media="@iconItem.Icon" alt-text="@iconItem.AltText"></svg-src>
                     </div>
                     break;
             }

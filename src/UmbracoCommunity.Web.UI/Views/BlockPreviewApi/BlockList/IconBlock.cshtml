@@ -1,0 +1,11 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<IconBlock>>
+
+@if (Model.Content.Icon != null)
+{
+    var iconColour = Model.Content.Colour?.Color;
+    var iconSize = string.IsNullOrEmpty(Model.Content.IconSize) ? "md" : Model.Content.IconSize;
+
+    <div class="row-item-icon row-item-icon--@iconSize @(iconColour != null ? "has-colour" : string.Empty)" style="@(iconColour != null ? $"color: {iconColour}" : null)">
+        <svg-src media="@Model.Content.Icon" alt-text="@Model.Content.AltText"></svg-src>
+    </div>
+}
