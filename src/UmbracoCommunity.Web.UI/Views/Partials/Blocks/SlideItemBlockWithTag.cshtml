@@ -33,7 +33,7 @@
                 }
                 @if (!content.Content.IsEmptyHtmlString())
                 {
-                    <div class="dc-slide-item__text">@Html.Raw(content.Content.ToHtmlString())</div>
+                    <div class="dc-slide-item__text">@Html.Raw(content.Content?.ToHtmlString())</div>
                 }
             </div>
         </div>
