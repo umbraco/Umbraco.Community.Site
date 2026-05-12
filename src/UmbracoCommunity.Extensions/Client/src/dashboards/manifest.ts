@@ -23,7 +23,7 @@ export const manifests: Array<UmbExtensionManifest> = [
     elementName: "seed-export-dashboard",
     js: () => import("./seed-export-dashboard.element.js"),
     meta: {
-      label: "Snapshot exports",
+      label: "Snapshot Exports",
       pathname: "snapshot-exports",
     },
     conditions: [
