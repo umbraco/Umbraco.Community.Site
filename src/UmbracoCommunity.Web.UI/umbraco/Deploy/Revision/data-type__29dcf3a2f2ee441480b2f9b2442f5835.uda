@@ -162,6 +162,12 @@
           }
         ],
         "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+      },
+      {
+        "contentElementTypeKey": "2e5758c0-a2fb-4a59-9d19-c7b994db0cef",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cf29263f-836d-4c3c-9260-c408365fa346"
       }
     ],
     "useLiveEditing": true,
@@ -195,6 +201,9 @@
     },
     {
       "Udi": "umb://document-type/299b4e217d6b4da68faf4f281c104dcc"
+    },
+    {
+      "Udi": "umb://document-type/2e5758c0a2fb4a599d19c7b994db0cef"
     },
     {
       "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
@@ -252,6 +261,9 @@
     },
     {
       "Udi": "umb://document-type/cdca4cc35b164081906873e30005add5"
+    },
+    {
+      "Udi": "umb://document-type/cf29263f836d4c3c9260c408365fa346"
     },
     {
       "Udi": "umb://document-type/d772969ac9e84809b9525d17ae4a899d"
