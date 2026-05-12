@@ -1,0 +1,42 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<ColumnComparisonItem>>
+
+@{
+    var settings = Model.Settings as SettingsColumnComparisonItem;
+    var bgIsDark = settings?.BackgroundColour != null && settings.IsDark();
+    var columnColour = settings?.BackgroundColour?.Color;
+}
+
+<div class="plan-column @(bgIsDark ? "bg-dark" : string.Empty)" style="@(columnColour != null ? $"--column-colour: {columnColour}" : null)">
+    @if (!string.IsNullOrWhiteSpace(Model.Content.ColumnTag))
+    {
+        <span class="plan-comparison__most-popular">@Model.Content.ColumnTag</span>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Content.Title))
+    {
+        <h2 class="plan-comparison__title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.ShortDescription.IsEmptyHtmlString())
+    {
+        <div class="plan-comparison__text">@Html.Raw(Model.Content.ShortDescription?.ToHtmlString())</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.Content.PriceHeadlineFigure))
+    {
+        <div class="plan-comparison__price-wrapper">
+            <div class="plan-comparison__price">@Model.Content.PriceHeadlineFigure</div>
+            @if (!string.IsNullOrEmpty(Model.Content.PriceSubtitle))
+            {
+                <div class="plan-comparison__price-subtitle">@Model.Content.PriceSubtitle</div>
+            }
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Content.DescriptionHeader))
+    {
+        <div class="plan-column__includes">
+            <p class="header">@Model.Content.DescriptionHeader</p>
+            @if (!Model.Content.FullDescription.IsEmptyHtmlString())
+            {
+                @Html.Raw(Model.Content.FullDescription?.ToHtmlString())
+            }
+        </div>
+    }
+</div>

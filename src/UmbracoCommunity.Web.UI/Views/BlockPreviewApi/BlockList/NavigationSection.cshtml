@@ -1,0 +1,20 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<NavigationSection>>
+
+<div class="dc-navigation-section-preview">
+    <h3>@(string.IsNullOrWhiteSpace(Model.Content.SectionName) ? "Untitled section" : Model.Content.SectionName)</h3>
+    @if (Model.Content.Columns != null && Model.Content.Columns.Any())
+    {
+        <ul class="dc-navigation-section-preview__columns">
+            @foreach (var col in Model.Content.Columns)
+            {
+                var column = col.Content as NavigationSectionColumn;
+                if (column == null) { continue; }
+                var linkCount = column.NavigationColumnItems?.Count() ?? 0;
+                <li>
+                    <span class="dc-navigation-section-preview__headline">@(string.IsNullOrWhiteSpace(column.Headline) ? "Untitled column" : column.Headline)</span>
+                    <span class="dc-navigation-section-preview__count">@linkCount link@(linkCount == 1 ? "" : "s")</span>
+                </li>
+            }
+        </ul>
+    }
+</div>

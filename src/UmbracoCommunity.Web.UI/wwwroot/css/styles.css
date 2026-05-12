@@ -1020,3 +1020,123 @@ dc-image-slider img {
 .dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__note a {
     color: rgba(255, 255, 255, 0.85);
 }
+
+/* Navigation section preview */
+.dc-navigation-section-preview {
+    padding: 20px;
+    border: 1px solid #d1d1d1;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.dc-navigation-section-preview h3 {
+    color: #283A97;
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__columns {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dc-navigation-section-preview__columns li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.dc-navigation-section-preview__headline {
+    color: #283A97;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__count {
+    color: #5e6279;
+    font-size: 0.85rem;
+}
+
+.dc-navigation-section-preview__column {
+    padding: 20px;
+    border: 1px solid #d1d1d1;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.dc-navigation-section-preview__column h4 {
+    color: #283A97;
+    margin: 0 0 6px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__column p {
+    margin: 0;
+}
+
+/* Link with icon + caption preview */
+.dc-link-with-icon-and-caption-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid #d1d1d1;
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #283A97;
+    text-decoration: none;
+}
+
+.dc-link-with-icon-and-caption-preview svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.dc-link-with-icon-and-caption-preview__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dc-link-with-icon-and-caption-preview__title {
+    font-weight: 500;
+}
+
+.dc-link-with-icon-and-caption-preview__caption {
+    color: #5e6279;
+    font-size: 0.85rem;
+}
+
+/* Card spacer block — matches frontend spacing-block.css sizes so the
+   spacer occupies the right vertical room in the editor preview. */
+.dc-spacing-block {
+    display: block;
+    width: 100%;
+}
+
+.dc-spacing-block.sm { height: 8px; }
+.dc-spacing-block.md { height: 16px; }
+.dc-spacing-block.lg { height: 32px; }
+.dc-spacing-block.xl { height: 80px; }
+
+/* Link item preview */
+.dc-link-item-preview {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #d1d1d1;
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #283A97;
+    text-decoration: none;
+    font-weight: 500;
+}
