@@ -1,0 +1,23 @@
+{
+  "DocumentTypeAlias": "home",
+  "AllowedBlocks": [
+    "accordionBlock",
+    "banner",
+    "callToActionBlock",
+    "cardsBlock",
+    "columnsComparisonBlock",
+    "formBlock",
+    "headlinesBanner",
+    "heroBanner",
+    "imageBlock",
+    "imageBlockWithOverlay",
+    "programBlock",
+    "quotesBlock",
+    "sliderBlock",
+    "speakersBlock",
+    "textBlock",
+    "titleBlock",
+    "upcomingEventsBlock",
+    "videoBlock"
+  ]
+}
