@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Content blocks - content page</summary>
-	[PublishedModel("contentBlocksContentPage")]
-	public partial class ContentBlocksContentPage : PublishedElementModel
+	/// <summary>[Settings] Blog showcase block</summary>
+	[PublishedModel("settingsBlogShowcaseBlock")]
+	public partial class SettingsBlogShowcaseBlock : PublishedElementModel, ISettingsBlockId, ISettingsColour
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "contentBlocksContentPage";
+		public new const string ModelTypeAlias = "settingsBlogShowcaseBlock";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -34,14 +34,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<ContentBlocksContentPage, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SettingsBlogShowcaseBlock, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public ContentBlocksContentPage(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public SettingsBlogShowcaseBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,11 +50,27 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Content blocks
+		/// Post display: Choose how to display posts
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("contentBlocks")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "contentBlocks");
+		[ImplementPropertyType("postDisplay")]
+		public virtual string PostDisplay => this.Value<string>(_publishedValueFallback, "postDisplay");
+
+		///<summary>
+		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("blockId")]
+		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
+
+		///<summary>
+		/// Background colour
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("backgroundColour")]
+		public virtual global::Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter.PickedColor BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
 	}
 }
