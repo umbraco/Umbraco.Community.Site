@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using UmbracoCommunity.Web.Helpers;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Blocks;
 
@@ -60,17 +61,12 @@ public static class PublishedElementExtensions
         }
         foreach (var row in rows)
         {
-            var firstBlock = row.Blocks.FirstOrDefault();
-            if (firstBlock != null && firstBlock.Settings != null && firstBlock.Settings is ISettingsColour colourSettings)
+            var firstBlockWithBg = row.Blocks
+                .FirstOrDefault(b => b.Settings is ISettingsColour cs && cs.HasBg());
+            if (firstBlockWithBg?.Settings is ISettingsColour colourSettings)
             {
-                if (colourSettings.BackgroundColour != null)
-                {
-                    row.BackgroundColour = colourSettings.BackgroundColour.Color;
-                    if (!string.Equals(row.BackgroundColour, "#ffffff", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        row.HasBg = true;
-                    }
-                }
+                row.BackgroundColour = colourSettings.BackgroundColour?.Color;
+                row.HasBg = true;
             }
         }
         return rows;
