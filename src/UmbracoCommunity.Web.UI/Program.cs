@@ -43,7 +43,10 @@ app.UseWhen(
     {
         context.Response.OnStarting(() =>
         {
-            context.Response.Headers["Cache-Control"] = "public, max-age=31536000";
+            if (context.Response.StatusCode is >= 200 and < 400)
+            {
+                context.Response.Headers["Cache-Control"] = "public, max-age=31536000";
+            }
             return Task.CompletedTask;
         });
         return next();
