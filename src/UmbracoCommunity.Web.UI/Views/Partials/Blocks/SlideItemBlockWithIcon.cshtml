@@ -13,7 +13,11 @@
         @if (content.BackgroundImage != null)
         {
             <img class="dc-slide-item__bg"
-                 src="@content.BackgroundImage.MediaUrl()"
+                 srcset="@content.BackgroundImage.GetCropUrl("slideMobile") 400w, @content.BackgroundImage.GetCropUrl("slideMobile2x") 800w, @content.BackgroundImage.GetCropUrl("slideDesktop") 1200w, @content.BackgroundImage.GetCropUrl("slideDesktop2x") 2400w"
+                 sizes="(max-width: 768px) 400px, 800px"
+                 src="@content.BackgroundImage.GetCropUrl("slideDesktop")"
+                 width="1200"
+                 height="900"
                  alt=""
                  loading="lazy"
                  aria-hidden="true">
@@ -25,7 +29,9 @@
             @if (content.Icon != null)
             {
                 <img class="dc-slide-item__icon"
-                     src="@content.Icon.MediaUrl()"
+                     src="@content.Icon.GetCropUrl(width: 96)"
+                     width="96"
+                     height="96"
                      alt=""
                      aria-hidden="true">
             }

@@ -19,6 +19,12 @@
         "settingsElementTypeKey": "03989c3a-65f3-4bc5-bfdf-3d6e1bd35193"
       },
       {
+        "contentElementTypeKey": "52cb8b78-56ce-47be-90da-6c08e4025527",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "13bb5102-6cde-45ad-8b4d-716f6899b3e8"
+      },
+      {
         "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -185,6 +191,9 @@
       "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24"
     },
     {
+      "Udi": "umb://document-type/13bb51026cde45ad8b4d716f6899b3e8"
+    },
+    {
       "Udi": "umb://document-type/192ec43aea4a42f7a09d48abf9c2e09f"
     },
     {
@@ -204,6 +213,9 @@
     },
     {
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
+    },
+    {
+      "Udi": "umb://document-type/52cb8b7856ce47be90da6c08e4025527"
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"

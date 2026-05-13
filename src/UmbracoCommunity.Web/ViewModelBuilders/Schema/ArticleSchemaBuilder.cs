@@ -71,7 +71,7 @@ internal class ArticleSchemaBuilder
         // Add thumbnail image
         if (articleContent.ThumbnailImage is not null)
         {
-            var imageUrl = articleContent.ThumbnailImage.MediaUrl();
+            var imageUrl = articleContent.ThumbnailImage.GetCropUrl("og");
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var absoluteImageUrl = _urlUtilities.MakeAbsoluteUrl(imageUrl);

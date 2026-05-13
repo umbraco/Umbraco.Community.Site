@@ -48,7 +48,7 @@ internal class OrganizationSchemaBuilder
         // Add logo
         if (hasCustomSettings && organizationLogo is not null)
         {
-            var logoUrl = organizationLogo.MediaUrl();
+            var logoUrl = organizationLogo.GetCropUrl("logo");
             // If URL is relative, make it absolute using the organization URL as base
             if (!string.IsNullOrEmpty(logoUrl))
             {

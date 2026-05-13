@@ -1,0 +1,16 @@
+{
+  "Name": "Post display dropdown",
+  "EditorAlias": "Umbraco.DropDown.Flexible",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "items": [
+      "Grid",
+      "Slider"
+    ]
+  },
+  "Udi": "umb://data-type/5bdd4d7ef4954703aa2cc71f37bd49ce",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.2"
+}
