@@ -162,6 +162,8 @@ Built assets go to:
 
 **Text Link Animation**: Inline text links within block content have an animated pink highlight (background-gradient that grows from a 2px underline to full highlight on hover). Defined globally in `typography.css`, scoped to text-only links via `:not(:has(img, svg, picture, video, div))`.
 
+**SVG Fill Safeguard**: Illustrator-exported SVGs ship an inline `<style>` block with auto-generated class names (`.st0`–`.st9`) that hard-code fills and bleed across SVGs on the same page (inline `<style>` is document-scoped, not SVG-scoped). `base.css` defends against this with a global `svg .stX { fill: inherit }` rule, so icon SVGs cleanly pick up the surrounding text colour. Multi-colour SVGs (e.g. the site logo) need their original palette preserved — wrap them in an element with the `.preserve-svg-fills` class to opt out of the safeguard. The global rule already negates that class via `:not(.preserve-svg-fills *)`. Example: `Views/Partials/Components/Logo.cshtml` (`<span class="logo-container preserve-svg-fills">`).
+
 ### Models Builder
 
 Models are generated in **SourceCodeManual** mode (development) / **Nothing** mode (production):
