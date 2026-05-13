@@ -31,11 +31,14 @@
             <dc-image-slider @(Model.Settings?.AutoSlideImages == true ? "auto-slide" : "")>
                 @foreach (var image in Model.Content.SliderImages)
                 {
+                    var naturalWidth = image.Value<int>("umbracoWidth");
+                    var naturalHeight = image.Value<int>("umbracoHeight");
+                    var displayHeight = naturalWidth > 0 ? 1200 * naturalHeight / naturalWidth : 900;
                     <img srcset="@image.GetCropUrl(width: 400) 400w, @image.GetCropUrl(width: 800) 800w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 2400) 2400w"
                          sizes="(max-width: 768px) 400px, 800px"
                          src="@image.GetCropUrl(width: 1200)"
                          width="1200"
-                         height="900"
+                         height="@displayHeight"
                          alt="@image.Name"
                          loading="lazy"
                          draggable="false" />
