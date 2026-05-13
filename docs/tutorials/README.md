@@ -27,7 +27,8 @@ You don't need to read the suite in order. Each tutorial points at the next logi
 
 ### Refinements
 
-- **[Scoping inline SVG `<style>` to prevent class-name bleed](refinements/scoping-inline-svg-styles.md)** *(builds on the inline SVG TagHelper)* — Illustrator-exported SVGs ship `<style>` blocks with generic class names (`.st0`, `.st1`, …) that are document-scoped, not SVG-scoped. Two such SVGs on one page fight over the same class names. Fix: have the TagHelper add a unique class per SVG instance and prefix every internal selector with it.
+- **[Scoping inline SVG `<style>` to prevent class-name bleed](refinements/scoping-inline-svg-styles.md)** *(builds on the inline SVG TagHelper)* — Illustrator-exported SVGs ship `<style>` blocks with generic class names (`.st0`, `.st1`, …) that are document-scoped, not SVG-scoped. Two such SVGs on one page fight over the same class names. Fix: have the TagHelper add a deterministic class per SVG file and prefix every internal selector with it.
+- **[Caching the scoped SVG output](refinements/caching-scoped-svg-output.md)** *(builds on the scoping refinement)* — Once the scoped SVG markup is deterministic per media path, every render of the same SVG is byte-identical. Wrap the read + sanitise + parse + scope work in Umbraco's `RuntimeCache` keyed by media path; serve the cached blob directly on the hot path. Skips the cloud media round-trip entirely after warm-up.
 
 ## Contributing a new tutorial
 

@@ -197,6 +197,8 @@ This one recolours the logo's blue path to white when the logo sits over a dark 
 
 ## Where to go next
 
-Now that every SVG produces deterministic scoped output, you can cache the result instead of re-doing the read + sanitise + parse + prefix work on every render. That's the subject of the next refinement, which builds directly on this one.
+Now that every SVG produces deterministic scoped output, you can cache the result instead of re-doing the read + sanitise + parse + prefix work on every render. That's the subject of the next refinement:
+
+→ [Caching the scoped SVG output](./caching-scoped-svg-output.md)
 
 The full implementation in this repo includes both layers — see [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs).

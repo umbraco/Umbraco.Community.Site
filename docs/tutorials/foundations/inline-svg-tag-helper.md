@@ -281,7 +281,7 @@ The real use site in this repo is at [`src/UmbracoCommunity.Web.UI/Views/Partial
 
 ## Trade-offs and known limits
 
-- **Every render reads from media storage.** This minimal version has no caching, so for media backed by local disk it's fast enough but for cloud blob storage it'll add tens of milliseconds per inline SVG per page. The repo's version in `SvgTagHelper.cs` solves this — see the caching refinement (covered alongside the [scoping tutorial](../refinements/scoping-inline-svg-styles.md)).
+- **Every render reads from media storage.** This minimal version has no caching, so for media backed by local disk it's fast enough but for cloud blob storage it'll add tens of milliseconds per inline SVG per page. The repo's version solves this — see [Caching the scoped SVG output](../refinements/caching-scoped-svg-output.md).
 - **No `class` attribute injection.** Upstream's TagHelper accepts `class="..."` and merges it onto the root `<svg>`; ours doesn't. If you need that, mirror the pattern in Step 7: read the existing `class` attribute, concatenate, set.
 - **Single-tag-name target.** `[HtmlTargetElement("svg-src")]` binds to one element name. If you wanted both `<our-svg>` and `<svg-src>` to work during a migration, you'd need to decorate the class with the attribute twice (it's repeatable).
 - **No XML namespace handling.** HtmlAgilityPack is forgiving about SVG-as-HTML, but if your SVG uses XML namespaces other than the default (`xmlns:dc`, `xmlns:cc`, …) you may see them stripped or normalised in the output. For Illustrator-exported SVGs this doesn't bite.
