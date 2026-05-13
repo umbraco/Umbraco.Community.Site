@@ -496,6 +496,7 @@ See these existing implementations for reference:
 - **QuoteBlock**: `QuoteBlockViewModel`, `QuoteBlockViewModelBuilder`, `QuoteBlock.cshtml`
 - **ResultsBlock**: `ResultsBlockViewModel`, `ResultsBlockViewModelBuilder`, `ResultsBlock.cshtml`
 - **SliderBlock**: `SliderBlock.cshtml` — Container block with nested `SlideItemBlockWithTag` / `SlideItemBlockWithIcon` child items, dark/light background theming, and `dc-slider` / `dc-slider-controls` web components
+- **BlogShowcaseBlock**: `BlogShowcaseBlock.cshtml`, `Services/BlogService.cs` — Service-driven content (resolves tenant's `Blog` page from the current root, queries descendants with optional category/tag filtering), display-mode toggle via a settings dropdown (grid vs. slider), and reuses the existing `dc-slider` web component across block types via a shared `closest()` selector
 
 ## Troubleshooting
 

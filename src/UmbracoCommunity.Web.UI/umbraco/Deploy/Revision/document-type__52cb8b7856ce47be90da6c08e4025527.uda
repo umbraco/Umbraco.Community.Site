@@ -1,0 +1,75 @@
+{
+  "Name": "Blog showcase block",
+  "Alias": "blogShowcaseBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-newspaper",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/15378f489fa64bc495318e325f00a398",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "ea340cde-65b0-44aa-9c32-150abd3e9db0",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "32d6b19e-d11d-4bdc-b401-26aef557629c",
+          "Alias": "numberOfPostsToShow",
+          "DataType": "umb://data-type/83195a3004a741f8a6a834a1e034fdfb",
+          "Description": "Defaults to 3, max 12",
+          "Name": "Number of posts to show"
+        },
+        {
+          "Key": "b539b4b3-bc14-49d9-9d27-5828fbe080fe",
+          "Alias": "blogCategoryFilter",
+          "DataType": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+          "Description": "Optional category filter to show posts assigned to a particular category",
+          "Name": "Blog category filter",
+          "SortOrder": 2
+        },
+        {
+          "Key": "d0e2cfa3-47ff-4c58-927b-d870674151a0",
+          "Alias": "blogTagFilter",
+          "DataType": "umb://data-type/17be192fa1364d50a29e74b7b021b3a9",
+          "Description": "Optional tag filter to only show posts with certain tags in the showcase",
+          "Name": "Blog tag filter",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/52cb8b7856ce47be90da6c08e4025527",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/17be192fa1364d50a29e74b7b021b3a9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/83195a3004a741f8a6a834a1e034fdfb",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/15378f489fa64bc495318e325f00a398",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.2"
+}

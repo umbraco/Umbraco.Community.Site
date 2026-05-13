@@ -270,7 +270,7 @@ The form block supports an optional multi-step mode via the `EnableSteppedForm` 
 The slider block (`SliderBlock`) is a container block that holds nested slide items rendered as a horizontally-scrollable carousel. It supports two slide item types: `SlideItemBlockWithTag` (text tag + title + content) and `SlideItemBlockWithIcon` (icon image + title + content).
 
 **Frontend Components** (`src/UmbracoCommunity.StaticAssets/src/components/sliders/`):
-- `dc-slider.element.ts` — Core slider with touch drag-to-scroll (follows finger, snaps to nearest slide on release), hover zone navigation on desktop, and explicit arrow button support
+- `dc-slider.element.ts` — Core slider with touch drag-to-scroll (follows finger, snaps to nearest slide on release), hover zone navigation on desktop, and explicit arrow button support. Reused by the Blog Showcase Block — its `closest()` lookup matches both `.dc-slider-block` and `.dc-blog-showcase-block`, and the `has-buttons` class on either ancestor opts into explicit-button mode.
 - `dc-slider-controls.element.ts` — Progress bar indicator with zero-padded position labels (`01`...`06`) and a sliding pill showing current position. Hidden when explicit arrow buttons are displayed (`has-buttons` variant)
 
 **Slide item theming** — slides support per-item background colour, background image, or no background (defaults to blue overlay). When the parent slider block has a dark background, slides without their own background render as white cards with blue text. Icon images are inverted to white via CSS filter when the slide background is dark, except on white cards inside dark blocks.
@@ -306,6 +306,37 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
 - Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
 - Uses design system variables from `root.css`
+
+### Blog Showcase Block
+
+A block that surfaces recent articles from the tenant's Blog page, with optional category/tag filters and a switch between grid and slider layouts.
+
+**Content Properties** (`BlogShowcaseBlock`):
+- `Title` / `Subtitle` — via `IContentBlockIntro` mixin
+- `BlogCategoryFilter` (IEnumerable\<IPublishedContent\>) — Optional category filter (content picker)
+- `BlogTagFilter` (List\<string\>) — Optional tag filter
+- `NumberOfPostsToShow` (int) — Defaults to 3, capped at 12 (see `ResolvedNumberOfPostsToShow`)
+
+**Settings** (`SettingsBlogShowcaseBlock`, mixes in `ISettingsBlockId` + `ISettingsColour`):
+- `PostDisplay` (dropdown: "Grid" / "Slider") — Layout mode
+- `BlockId` — Anchor id (from `ISettingsBlockId`)
+- `BackgroundColour` — Block background (from `ISettingsColour`)
+
+**Service** (`Services/BlogService.cs`):
+- `GetRecentArticles(currentPage, categoryKeys?, tags?, count)` — Resolves the tenant's `Blog` page via `currentPage.Root().DescendantsOrSelf<Blog>()` and returns its descendants ordered by publish/create date, with optional category/tag filtering.
+- `GetBlogPage(currentPage)` — Returns the resolved `Blog` page (used by the partial to render the "Read more on the blog" CTA link).
+
+**View** (`Views/Partials/Blocks/BlogShowcaseBlock.cshtml`):
+- Inherits `BlockGridItem<BlogShowcaseBlock, SettingsBlogShowcaseBlock>`
+- Card markup is extracted into a `void RenderCard(Article)` local function inside `@functions { ... }` (codebase convention) so grid and slider modes share the same card output
+- Slider mode reuses the `<dc-slider>` web component (`.slides-wrapper > .slides > div` structure) and adds `has-buttons` to opt into the explicit-button code path; desktop arrows render inside the intro, mobile arrows inside the slider — same SVG/`data-slider-action` markup as the slider block
+- "Read more on the blog" CTA renders as a plain right-aligned text link below the cards (picks up the global `#main-content a:not(.btn)` pink-underline animation)
+
+**CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/blog-showcase-block.css`):
+- `.dc-blog-showcase-block--grid` / `--slider` modifiers select between layouts
+- Slider variant defines `--blog-showcase-slide-width` per breakpoint (1 / 2 / 3 cards + 20% peek at base / `--sm` / `--md`), with column-gap of `var(--unit)`
+- Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
+- `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
 
 ### Rich Text Editor Style Menu
 
