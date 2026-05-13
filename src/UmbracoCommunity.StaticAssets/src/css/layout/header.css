@@ -472,15 +472,6 @@ body:not(.mobile) .nav-start .logo-container svg {
   height: 100%;
 }
 
-/* Apply colors to SVG classes in logo */
-.logo-container .st0 {
-  fill: #F5C1BC !important;
-}
-
-.logo-container .st1 {
-  fill: #283A97 !important;
-}
-
 body.hero-full-width:not(.scroll):not(.mobile) .nav-start .logo-link svg path:not([class]) {
   fill: var(--color-white);
 }

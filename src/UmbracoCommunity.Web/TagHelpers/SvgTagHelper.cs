@@ -80,42 +80,78 @@ namespace UmbracoCommunity.Web.TagHelpers
 
             output.Attributes.RemoveAll("media");
 
-            if (Width.HasValue || Height.HasValue || AltText.HasValue())
+            HtmlDocument doc = new HtmlDocument();
+            try
             {
-                HtmlDocument doc = new HtmlDocument();
-                try
+                doc.LoadHtml(cleanedFileContents);
+                var svgs = doc.DocumentNode.SelectNodes("//svg");
+                if (svgs != null && svgs.Count > 0)
                 {
-                    doc.LoadHtml(cleanedFileContents);
-                    var svgs = doc.DocumentNode.SelectNodes("//svg");
-                    if (svgs != null && svgs.Count > 0)
+                    foreach (var svgNode in svgs)
                     {
-                        foreach (var svgNode in svgs)
+                        if (Width.HasValue)
                         {
-                            if (Width.HasValue)
-                            {
-                                svgNode.SetAttributeValue("width", Width.Value.ToString());
-                            }
-                            if (Height.HasValue)
-                            {
-                                svgNode.SetAttributeValue("height", Height.Value.ToString());
-                            }
-                            if (AltText.HasValue())
-                            {
-                                svgNode.SetAttributeValue("alt", AltText.ToString());
-                            }
+                            svgNode.SetAttributeValue("width", Width.Value.ToString());
+                        }
+                        if (Height.HasValue)
+                        {
+                            svgNode.SetAttributeValue("height", Height.Value.ToString());
+                        }
+                        if (AltText.HasValue())
+                        {
+                            svgNode.SetAttributeValue("alt", AltText.ToString());
                         }
 
-                        cleanedFileContents = doc.DocumentNode.OuterHtml;
+                        ScopeInlineStyles(svgNode);
                     }
+
+                    cleanedFileContents = doc.DocumentNode.OuterHtml;
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error processing svg for html output");
-                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing svg for html output");
             }
 
             output.TagName = null;
             output.Content.SetHtmlContent(cleanedFileContents);
         }
+
+        // Adds a unique class to <svg> and prefixes every selector in its inline
+        // <style> blocks with that class. Illustrator-exported class names like
+        // .st0–.stN are document-scoped by default, so without this they bleed
+        // across every SVG on the page that happens to share class names.
+        private static void ScopeInlineStyles(HtmlNode svgNode)
+        {
+            var styleNodes = svgNode.SelectNodes(".//style");
+            if (styleNodes == null || styleNodes.Count == 0)
+            {
+                return;
+            }
+
+            var scopeClass = $"svg-{Guid.NewGuid():N}".Substring(0, 12);
+            var existing = svgNode.GetAttributeValue("class", string.Empty);
+            svgNode.SetAttributeValue(
+                "class",
+                string.IsNullOrEmpty(existing) ? scopeClass : $"{existing} {scopeClass}");
+
+            foreach (var styleNode in styleNodes)
+            {
+                styleNode.InnerHtml = PrefixCssSelectors(styleNode.InnerHtml, scopeClass);
+            }
+        }
+
+        private static readonly Regex SelectorRegex = new(
+            @"(^|\})\s*(?<sel>[^@{}][^{}]*?)\s*\{",
+            RegexOptions.Compiled);
+
+        private static string PrefixCssSelectors(string css, string scopeClass) =>
+            SelectorRegex.Replace(css, m =>
+            {
+                var prefixed = string.Join(
+                    ", ",
+                    m.Groups["sel"].Value.Split(',').Select(s => $".{scopeClass} {s.Trim()}"));
+                return $"{m.Groups[1].Value}{prefixed} {{";
+            });
     }
 }
