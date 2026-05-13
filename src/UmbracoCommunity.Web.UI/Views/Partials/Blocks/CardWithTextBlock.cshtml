@@ -1,0 +1,48 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithTextBlock, SettingsCardWithTextBlock>>
+
+@{
+    var gridCols = Model.GridColumns ?? 12;
+    var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
+    var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
+    var cardClasses = $"dc-boxes-row__item dc-boxes-row__item--text {(hasCardBg ? "has-bg" : string.Empty)} {(hasCardBg ? (cardBgIsDark ? "bg-dark" : "bg-light") : string.Empty)}".Trim();
+    var cardStyle = hasCardBg ? $"--card-background-color: {Model.Settings!.BackgroundColour!.Color}" : null;
+}
+
+@if (Model.Content.CardContent != null && !Model.Content.CardContent.IsEmptyHtmlString())
+{
+    if (Model.Content.Link != null)
+    {
+        <a id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle" href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name">
+            <div class="dc-boxes-row__item-content">
+                @Html.Raw(Model.Content.CardContent.ToHtmlString())
+            </div>
+            @{ await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash); }
+        </a>
+    }
+    else
+    {
+        <div id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle">
+            <div class="dc-boxes-row__item-content">
+                @Html.Raw(Model.Content.CardContent.ToHtmlString())
+            </div>
+            @{ await RenderStyle(Model.ColumnSpan, gridCols, Model.Content.IdHash); }
+        </div>
+    }
+}
+
+@functions {
+    async Task RenderStyle(int columnSpan, int totalColumns, string idHash)
+    {
+        <style asp-add-nonce="true">
+            .dc-boxes-row__items #@(idHash) {
+                grid-column-end: span @totalColumns;
+            }
+
+            @@media (min-width: 1024px) {
+                .dc-boxes-row__items #@(idHash) {
+                    grid-column-end: span @columnSpan;
+                }
+            }
+        </style>
+    }
+}

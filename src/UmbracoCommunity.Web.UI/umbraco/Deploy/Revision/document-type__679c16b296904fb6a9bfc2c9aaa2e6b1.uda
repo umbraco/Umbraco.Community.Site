@@ -1,6 +1,6 @@
 {
-  "Name": "[Settings] Card with image and text block",
-  "Alias": "settingsCardWithImageAndTextBlock",
+  "Name": "[Settings] Card with text block",
+  "Alias": "settingsCardWithTextBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings",
@@ -15,7 +15,7 @@
   ],
   "PropertyGroups": [],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/b3e2087d8b9e41f0a8f5ef665c79d776",
+  "Udi": "umb://document-type/679c16b296904fb6a9bfc2c9aaa2e6b1",
   "Dependencies": [
     {
       "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",

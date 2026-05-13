@@ -3,11 +3,11 @@
 /* padding prevents margin collapsing */
 .dc-image-block.has-bg {
   padding: var(--unit-md);
-    border-radius: 20px;
+  border-radius: 20px;
   max-width: none;
   margin-left: 0;
   margin-right: 0;
-  background-color: transparent;
+  background-color: var(--block-background-color);
 }
 
 .dc-image-block {

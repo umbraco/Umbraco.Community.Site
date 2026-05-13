@@ -1,0 +1,19 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<LinkWithIconAndCaption>>
+
+@if (Model.Content?.Link != null)
+{
+    var title = !string.IsNullOrWhiteSpace(Model.Content.LinkTitle) ? Model.Content.LinkTitle : Model.Content.Link.Name;
+    <a href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name" class="dc-link-with-icon-and-caption-preview">
+        @if (Model.Content.Icon != null)
+        {
+            <svg-src media="@Model.Content.Icon" width="24" height="24" alt-text="@title"></svg-src>
+        }
+        <span class="dc-link-with-icon-and-caption-preview__body">
+            <span class="dc-link-with-icon-and-caption-preview__title">@title</span>
+            @if (!string.IsNullOrWhiteSpace(Model.Content.Caption))
+            {
+                <span class="dc-link-with-icon-and-caption-preview__caption">@Model.Content.Caption</span>
+            }
+        </span>
+    </a>
+}

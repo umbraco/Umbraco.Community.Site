@@ -1,0 +1,9 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<LinkItem>>
+
+@if (Model.Content?.Link != null)
+{
+    var title = !string.IsNullOrWhiteSpace(Model.Content.LinkTitle) ? Model.Content.LinkTitle : Model.Content.Link.Name;
+    <a href="@Model.Content.Link.Url" target="@Model.Content.Link.Target" title="@Model.Content.Link.Name" class="dc-link-item-preview">
+        @title
+    </a>
+}

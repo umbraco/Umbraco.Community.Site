@@ -1,0 +1,13 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<ImageBlock>>
+
+@if (Model.Content.Image is not null)
+{
+    var settings = Model.Settings as SettingsImageBlock;
+    var imgIsCircle = settings?.ImageIsCircular ?? false;
+
+    <div class="dc-image-block">
+        <div class="dc-image-wrapper">
+            <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+        </div>
+    </div>
+}

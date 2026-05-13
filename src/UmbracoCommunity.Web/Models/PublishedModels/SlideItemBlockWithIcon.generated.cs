@@ -71,7 +71,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("content")]
-		public virtual string Content => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockContent.GetContent(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Content => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockContent.GetContent(this, _publishedValueFallback);
 
 		///<summary>
 		/// Title

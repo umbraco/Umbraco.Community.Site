@@ -1,0 +1,66 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithImageAndTextBlock, SettingsCardWithImageAndTextBlock>>
+
+@{
+    var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
+    var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
+    var hasIcon = Model.Content.CardContent?.Any(b => b.Content.ContentType.Alias == IconBlock.ModelTypeAlias) ?? false;
+    var cardClasses = $"dc-boxes-row__item {(hasIcon ? "dc-boxes-row__item--icon-card" : string.Empty)} {(hasCardBg ? "has-bg" : string.Empty)} {(hasCardBg ? (cardBgIsDark ? "bg-dark" : "bg-light") : string.Empty)}".Trim();
+    var span = Model.ColumnSpan > 0 ? Model.ColumnSpan : 12;
+    var cardStyle = $"grid-column-end: span {span};{(hasCardBg ? $" --card-background-color: {Model.Settings!.BackgroundColour!.Color};" : string.Empty)}";
+}
+
+@if (Model.Content.CardContent != null && Model.Content.CardContent.Any())
+{
+    <div id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle">
+        @foreach (var contentItem in Model.Content.CardContent)
+        {
+            switch (contentItem.Content.ContentType.Alias)
+            {
+                case ImageBlock.ModelTypeAlias:
+                    var imageItem = contentItem.Content as ImageBlock;
+                    if (imageItem?.Image == null) break;
+                    var imageSettings = contentItem.Settings as SettingsImageBlock;
+                    var imgIsCircle = imageSettings?.ImageIsCircular ?? false;
+                    <div class="row-item-image">
+                        <img src="@imageItem.Image.GetCropUrl(width: 240, height: 160)"
+                             alt="@imageItem.AltText"
+                             class="@(imgIsCircle ? "is-circle" : string.Empty)"
+                             loading="lazy" />
+                    </div>
+                    break;
+                case ImageBlockWithOverlay.ModelTypeAlias:
+                    var imageOverlayItem = contentItem.Content as ImageBlockWithOverlay;
+                    if (imageOverlayItem?.Image == null) break;
+                    <div class="dc-image-wrapper">
+                        <img src="@imageOverlayItem.Image.GetCropUrl(width: 320, height: 200)"
+                             alt="@imageOverlayItem.AltText"
+                             class="dc-image"
+                             loading="lazy" />
+                        @if (!imageOverlayItem.OverlayText.IsEmptyHtmlString())
+                        {
+                            <div class="overlay"></div>
+                            <div class="text">@Html.Raw(imageOverlayItem.OverlayText)</div>
+                        }
+                    </div>
+                    break;
+                case TextBlock.ModelTypeAlias:
+                    var textItem = contentItem.Content as TextBlock;
+                    if (textItem?.Text == null || textItem.Text.IsEmptyHtmlString()) break;
+                    <div class="dc-boxes-row__item-content">
+                        @Html.Raw(textItem?.Text)
+                    </div>
+                    break;
+                case IconBlock.ModelTypeAlias:
+                    var iconItem = contentItem.Content as IconBlock;
+                    if (iconItem?.Icon == null) break;
+                    var iconColour = iconItem.Colour?.Color;
+                    var iconSize = string.IsNullOrEmpty(iconItem.IconSize) ? "md" : iconItem.IconSize;
+                    <div class="row-item-icon row-item-icon--@iconSize @(iconColour != null ? "has-colour" : string.Empty)" style="@(iconColour != null ? $"color: {iconColour}" : null)">
+                        <svg-src media="@iconItem.Icon" alt-text="@iconItem.AltText"></svg-src>
+                    </div>
+                    break;
+            }
+        }
+    </div>
+}

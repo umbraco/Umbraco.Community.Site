@@ -8,6 +8,7 @@
   &.has-bg {
     padding: var(--unit-md);
     border-radius: 20px;
+    background-color: var(--block-background-color);
   }
 
   &.bg-dark {

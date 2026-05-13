@@ -1,45 +1,44 @@
 {
-  "Name": "Content - block content",
-  "Alias": "contentBlockContent",
+  "Name": "Card with text block",
+  "Alias": "cardWithTextBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
-  "Icon": "icon-text-align-justify color-green",
+  "Icon": "icon-text-align-justify",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
-  "Parent": "umb://document-type-container/6716f0185a644f5791eb8a952e12a890",
+  "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
   "CompositionContentTypes": [],
   "PropertyGroups": [
     {
-      "Key": "d53c4feb-9b53-47e1-9b60-850f1ef073ab",
+      "Key": "c4700e6c-e5d8-4f65-b0bd-bbc459cf46a8",
       "Name": "Content",
       "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
-          "Key": "3c811986-4746-4e66-8ddb-af86ecc52d7c",
-          "Alias": "content",
+          "Key": "42c3d1bb-d592-4bf0-b885-dcf7eb3beeb6",
+          "Alias": "cardContent",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
-          "Name": "Content",
-          "SortOrder": -1
+          "Name": "Card content"
         },
         {
-          "Key": "a7f136b5-652f-440a-8a2e-5aa3f8f7d449",
-          "Alias": "title",
-          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-          "Name": "Title",
-          "SortOrder": -2
+          "Key": "81d03103-62c8-4c86-8332-af17ab8b04e2",
+          "Alias": "link",
+          "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "Name": "Link",
+          "SortOrder": 1
         }
       ]
     }
   ],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/991422e28be34f17851b735729ed1ca4",
+  "Udi": "umb://document-type/361d9af64cfa49df9c2e14eafcd30342",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
       "Ordering": true
     },
     {
@@ -47,7 +46,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type-container/6716f0185a644f5791eb8a952e12a890",
+      "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
       "Ordering": true
     }
   ],
