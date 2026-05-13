@@ -1,0 +1,55 @@
+{
+  "Name": "Card with text block",
+  "Alias": "cardWithTextBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-text-align-justify",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "c4700e6c-e5d8-4f65-b0bd-bbc459cf46a8",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "42c3d1bb-d592-4bf0-b885-dcf7eb3beeb6",
+          "Alias": "cardContent",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "Name": "Card content"
+        },
+        {
+          "Key": "81d03103-62c8-4c86-8332-af17ab8b04e2",
+          "Alias": "link",
+          "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "Name": "Link",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/361d9af64cfa49df9c2e14eafcd30342",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/c8943f7c4ace46b0876aca952a9d78ba",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.2"
+}

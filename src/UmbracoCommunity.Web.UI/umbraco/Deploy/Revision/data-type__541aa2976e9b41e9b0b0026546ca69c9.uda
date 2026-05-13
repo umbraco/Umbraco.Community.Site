@@ -1,0 +1,52 @@
+{
+  "Name": "Icon size",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "Extra small",
+              "value": "xs",
+              "icon": "icon-stop",
+              "description": "50px"
+            },
+            {
+              "name": "Small",
+              "value": "sm",
+              "icon": "icon-stop",
+              "description": "75px"
+            },
+            {
+              "name": "Medium",
+              "value": "md",
+              "icon": "icon-stop",
+              "description": "100px"
+            },
+            {
+              "name": "Large",
+              "value": "lg",
+              "icon": "icon-stop",
+              "description": "150px"
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.DropdownListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "allowEmpty": false
+        }
+      }
+    ]
+  },
+  "Udi": "umb://data-type/541aa2976e9b41e9b0b0026546ca69c9",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.0.2"
+}

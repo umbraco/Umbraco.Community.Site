@@ -16,6 +16,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Schema.NET" />
     <PackageReference Include="Umbraco.Cms" />
+    <PackageReference Include="Umbraco.Deploy.Core" />
+    <PackageReference Include="Umbraco.Deploy.Infrastructure" />
   </ItemGroup>
 
   <ItemGroup>

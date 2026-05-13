@@ -1,0 +1,8 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardSpacerBlock>>
+
+@{
+    var spacingSize = Model.Content.Size;
+    var span = Model.ColumnSpan > 0 ? Model.ColumnSpan : 12;
+}
+
+<div class="dc-spacing-block @spacingSize" style="grid-column-end: span @span;"></div>

@@ -32,9 +32,23 @@ ol.no-margin p {
     padding: 20px;
 }
 
+.dc-image-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 20px;
+}
+
 /* Image with overlay styling */
 .dc-image-wrapper {
     position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.dc-image-wrapper img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .dc-image-wrapper .overlay {
@@ -61,6 +75,29 @@ ol.no-margin p {
     > * {
         max-width: 90ch;
     }
+}
+
+/* Cards context: stack image/overlay/text via grid (matching frontend boxes-row.css)
+   so the overlay text sits at the bottom of the image, not full-fill. */
+.dc-boxes-row__item .dc-image-wrapper {
+    display: grid;
+    align-items: center;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .dc-image,
+.dc-boxes-row__item .dc-image-wrapper .overlay,
+.dc-boxes-row__item .dc-image-wrapper .text {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .overlay,
+.dc-boxes-row__item .dc-image-wrapper .text {
+    position: relative;
+}
+
+.dc-boxes-row__item .dc-image-wrapper .text {
+    align-self: end;
 }
 
 /* Title block styles */
@@ -184,15 +221,12 @@ ol.no-margin p {
 
 .btn.cta:hover svg {
     transform: rotate(45deg);
+    background-color: #283A97;
+    border-color: #283A97;
 }
 
 .btn.cta svg path {
     stroke: #283A97;
-}
-
-.btn.cta:hover svg {
-    background-color: #283A97;
-    border-color: #283A97;
 }
 
 .dc-big-cta-block__content h2 {
@@ -265,22 +299,202 @@ ol.no-margin p {
 }
 
 /* cards block */
+.dc-boxes.has-bg {
+    background-color: var(--block-background-color);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.dc-boxes.bg-dark,
+.dc-boxes.bg-dark .block-title,
+.dc-boxes.bg-dark .block-subtitle,
+.dc-boxes.bg-dark .block-subtitle * {
+    color: #ffffff;
+}
+
+.dc-boxes-row {
+    background: transparent;
+}
+
 .dc-boxes-row__items {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     justify-content: center;
     overflow: hidden;
-    column-gap: 10px;
+    gap: 12px;
 }
 
-.dc-boxes-row__items.item-grid {
-    flex-wrap: wrap;
+/* Each card defaults to full width; the per-card preview view injects a span override */
+.dc-boxes-row__items > * {
+    grid-column-end: span 12;
 }
 
-.dc-boxes-row__item a {
+/* Image-only + text-only card pair gets the image-text-row spacing. */
+.dc-boxes-row__items--image-text-pair {
+    gap: 20px;
+    column-gap: 30px;
+}
+
+.dc-boxes-row__item {
+    color: #283A97;
+    box-sizing: border-box;
+}
+
+.dc-boxes-row__item a,
+.dc-boxes-row__item a:hover {
     text-decoration: none;
+    color: inherit;
 }
 
+.dc-boxes-row__item .row-item-image img {
+    width: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.row-item-icon.has-colour svg,
+.row-item-icon.has-colour svg * {
+    stroke: currentColor;
+}
+
+.row-item-icon--xs svg { width: 50px; height: 50px; }
+.row-item-icon--sm svg { width: 75px; height: 75px; }
+.row-item-icon--md svg { width: 100px; height: 100px; }
+.row-item-icon--lg svg { width: 150px; height: 150px; }
+
+.dc-boxes-row__item--icon-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+}
+
+/* Image-position-based spacing: gap below if image is first, gap above otherwise */
+.dc-boxes-row__item > .row-item-image:first-child,
+.dc-boxes-row__item > .dc-image-wrapper:first-child {
+    margin-bottom: 12px;
+}
+
+.dc-boxes-row__item > .row-item-image:not(:first-child),
+.dc-boxes-row__item > .dc-image-wrapper:not(:first-child) {
+    margin-top: 12px;
+}
+
+/* Block-level dark only cascades to cards without their own bg */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) {
+    color: #ffffff;
+}
+
+/* Per-card background */
+.dc-boxes-row__item.has-bg {
+    background-color: var(--card-background-color);
+    padding: 20px;
+    border-radius: 16px;
+}
+
+.dc-boxes-row__item.has-bg.bg-dark {
+    color: #ffffff;
+}
+
+.dc-boxes-row__item.has-bg.bg-light {
+    color: #283A97;
+}
+
+/* Inline text links inherit text colour on dark cards (block-dark cascade or per-card-dark) */
+.dc-boxes.bg-dark .dc-boxes-row__item:not(.has-bg) a:not(.btn),
+.dc-boxes-row__item.has-bg.bg-dark a:not(.btn) {
+    color: inherit;
+}
+
+/* Text-only card variant */
+.dc-boxes-row__item--text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Text-only card has no preceding image, so drop the content top-margin */
+.dc-boxes-row__item--text .dc-boxes-row__item-content {
+    margin-top: 0;
+}
+
+/* Shared rich-text typography for any card content (text-only and image+text) */
+.dc-boxes-row__item-content > :first-child {
+    margin-top: 0;
+}
+
+.dc-boxes-row__item-content > :last-child {
+    margin-bottom: 0;
+}
+
+.dc-boxes-row__item-content h2,
+.dc-boxes-row__item-content h3,
+.dc-boxes-row__item-content h4 {
+    margin-top: 0;
+    font-weight: 500;
+}
+
+.dc-boxes-row__item-content h2 { font-size: 22px; line-height: 1.2; }
+.dc-boxes-row__item-content h3 { font-size: 18px; line-height: 1.3; }
+.dc-boxes-row__item-content h4 { font-size: 16px; line-height: 1.4; }
+
+.dc-boxes-row__item-content p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.dc-boxes-row__item-content ul,
+.dc-boxes-row__item-content ol {
+    padding-left: 20px;
+    line-height: 1.5;
+}
+
+/* Full-width image+text card mirrors the frontend image-text-row layout
+   so the backoffice preview matches the rendered page. */
+.dc-boxes-row__item--full-width {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    column-gap: 20px;
+}
+
+.dc-boxes-row__item--full-width .row-item-image {
+    flex: 1;
+}
+
+.dc-boxes-row__item--full-width .row-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.dc-boxes-row__item--full-width .dc-boxes-row__item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 0;
+}
+
+/* Image-only cards stretch their image to fill the card, so they align
+   with a taller sibling text-only card in the same grid row. */
+.dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.dc-boxes-row__item:not(:has(.dc-boxes-row__item-content)) .row-item-image img:not(.is-circle) {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Circular image modifier (shared across image, card, speaker blocks) */
 .is-circle {
     clip-path: circle();
 }
@@ -542,6 +756,15 @@ dc-image-slider img {
 }
 
 /* Text block */
+.dc-text-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 20px;
+}
+
+.dc-text-block.bg-dark {
+    color: #ffffff;
+}
+
 .dc-text-block.has-image {
     position: relative;
 }
@@ -777,4 +1000,332 @@ dc-image-slider img {
 
 .dc-upcoming-events-preview__note a {
     color: #283A97;
+}
+
+.dc-upcoming-events-preview.has-bg {
+    background-color: var(--block-background-color);
+    border-color: transparent;
+}
+
+.dc-upcoming-events-preview.bg-dark,
+.dc-upcoming-events-preview.bg-dark h3,
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__subtitle {
+    color: #ffffff;
+}
+
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__note,
+.dc-upcoming-events-preview.bg-dark .dc-upcoming-events-preview__note a {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Navigation section preview */
+.dc-navigation-section-preview {
+    padding: 20px;
+    border: 1px solid #d1d1d1;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.dc-navigation-section-preview h3 {
+    color: #283A97;
+    margin: 0 0 12px;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__columns {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dc-navigation-section-preview__columns li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.dc-navigation-section-preview__headline {
+    color: #283A97;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__count {
+    color: #5e6279;
+    font-size: 0.85rem;
+}
+
+.dc-navigation-section-preview__column {
+    padding: 20px;
+    border: 1px solid #d1d1d1;
+    border-radius: 15px;
+    background-color: #ffffff;
+}
+
+.dc-navigation-section-preview__column h4 {
+    color: #283A97;
+    margin: 0 0 6px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.dc-navigation-section-preview__column p {
+    margin: 0;
+}
+
+/* Link with icon + caption preview */
+.dc-link-with-icon-and-caption-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid #d1d1d1;
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #283A97;
+    text-decoration: none;
+}
+
+.dc-link-with-icon-and-caption-preview svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.dc-link-with-icon-and-caption-preview__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dc-link-with-icon-and-caption-preview__title {
+    font-weight: 500;
+}
+
+.dc-link-with-icon-and-caption-preview__caption {
+    color: #5e6279;
+    font-size: 0.85rem;
+}
+
+/* Card spacer block — matches frontend spacing-block.css sizes so the
+   spacer occupies the right vertical room in the editor preview. */
+.dc-spacing-block {
+    display: block;
+    width: 100%;
+}
+
+.dc-spacing-block.sm { height: 8px; }
+.dc-spacing-block.md { height: 16px; }
+.dc-spacing-block.lg { height: 32px; }
+.dc-spacing-block.xl { height: 80px; }
+
+/* Link item preview */
+.dc-link-item-preview {
+    display: inline-block;
+    padding: 8px 14px;
+    border: 1px solid #d1d1d1;
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #283A97;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Blog showcase block */
+.dc-blog-showcase-block {
+    padding: 20px;
+    text-align: center;
+}
+
+.dc-blog-showcase-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 15px;
+}
+
+.dc-blog-showcase-block.bg-dark {
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block.bg-dark .block-title,
+.dc-blog-showcase-block.bg-dark .block-subtitle,
+.dc-blog-showcase-block.bg-dark .block-subtitle * {
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block__intro {
+    text-align: center;
+}
+
+.dc-blog-showcase-block .block-title {
+    color: #283A97;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+}
+
+.dc-blog-showcase-block .block-subtitle {
+    color: #5e6279;
+    font-size: 16px;
+    margin: 0 0 1rem;
+}
+
+.dc-blog-showcase-block__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+/* Slider variant — horizontally-scrollable list (backoffice preview) */
+.dc-blog-showcase-block--slider {
+    overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider {
+    display: block;
+    margin-top: 1rem;
+}
+
+.dc-blog-showcase-block__slider .slides-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.dc-blog-showcase-block__slider .slides {
+    display: flex;
+    gap: 16px;
+    text-align: left;
+}
+
+.dc-blog-showcase-block__slider .slides > div {
+    flex-shrink: 0;
+    width: 220px;
+    display: flex;
+}
+
+.dc-blog-showcase-block__slider .slides > div > .dc-blog-showcase-block__card {
+    width: 100%;
+}
+
+.dc-blog-showcase-block__slider .slider-hover-zone,
+.dc-blog-showcase-block__slider .mobile-controls {
+    display: none;
+}
+
+/* Slider arrow buttons (backoffice preview) */
+.dc-blog-showcase-block__arrows {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.dc-blog-showcase-block__arrows--mobile {
+    display: none;
+}
+
+.dc-blog-showcase-block.has-buttons .dc-blog-showcase-block__intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: left;
+}
+
+.dc-blog-showcase-block.has-buttons .block-title,
+.dc-blog-showcase-block.has-buttons .block-subtitle {
+    text-align: left;
+}
+
+.dc-blog-showcase-block.bg-dark .slider-arrow-btn {
+    border-color: #ffffff;
+    background-color: transparent;
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block__cta {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.dc-blog-showcase-block.bg-dark .dc-blog-showcase-block__cta a {
+    color: #ffffff;
+}
+
+.dc-blog-showcase-block__grid.count-1 {
+    grid-template-columns: minmax(0, 320px);
+    justify-content: center;
+}
+
+.dc-blog-showcase-block__grid.count-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dc-blog-showcase-block__card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+}
+
+.dc-blog-showcase-block__media {
+    margin: 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #f1f0ee;
+}
+
+.dc-blog-showcase-block__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.dc-blog-showcase-block__content {
+    padding: 12px 14px 14px;
+}
+
+.dc-blog-showcase-block__title {
+    color: #283A97;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0 0 6px;
+}
+
+.dc-blog-showcase-block__teaser {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #5e6279;
+    margin: 0 0 8px;
+}
+
+.dc-blog-showcase-block__teaser p {
+    margin: 0;
+}
+
+.dc-blog-showcase-block__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 12px;
+    color: #707070;
+}
+
+.dc-blog-showcase-block__readtime::before {
+    content: "·";
+    margin-right: 0.5rem;
 }

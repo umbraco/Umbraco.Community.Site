@@ -173,6 +173,20 @@
     line-height: 1.5;
     margin: 0;
     opacity: 0.9;
+
+    > :first-child {
+        margin-top: 0;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Inline rich-text links inherit the slide's text colour so they stay
+   readable on dark slides. Excludes .btn so styled CTAs keep their theming. */
+.dc-slide-item__content a:not(.btn) {
+    color: inherit;
 }
 
 /* Hover zones — hidden on mobile */

@@ -98,6 +98,7 @@ namespace UmbracoCommunity.Web.Extensions
             // View component services
             builder.Services.AddScoped<ContentContextService>();
             builder.Services.AddScoped<ISeoDataService, SeoDataService>();
+            builder.Services.AddScoped<IBlogService, BlogService>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();

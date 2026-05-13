@@ -21,7 +21,7 @@
         {
           "Key": "3c811986-4746-4e66-8ddb-af86ecc52d7c",
           "Alias": "content",
-          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
           "Name": "Content",
           "SortOrder": -1
         },
@@ -43,7 +43,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
       "Ordering": true
     },
     {

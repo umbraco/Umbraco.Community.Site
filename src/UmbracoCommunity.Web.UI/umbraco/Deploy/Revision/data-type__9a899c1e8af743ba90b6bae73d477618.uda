@@ -5,6 +5,9 @@
   "Configuration": {
     "blocks": [
       {
+        "contentElementTypeKey": "6dbeafa2-f882-4582-9400-1611b49f0966"
+      },
+      {
         "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
       },
@@ -32,6 +35,9 @@
     },
     {
       "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    },
+    {
+      "Udi": "umb://document-type/6dbeafa2f882458294001611b49f0966"
     },
     {
       "Udi": "umb://document-type/76b1f843a56b4e60b2165460b730ea5c"

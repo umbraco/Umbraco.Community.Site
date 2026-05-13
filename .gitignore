@@ -439,9 +439,18 @@ ood.flag
 
 # Umbraco.Deploy.OnPrem creates this file when running locally - file not needed in Cloud repo
 **/TriggerDeploy.ps1
+
+# Seed zip downloaded by `node build.mjs seed|reset` — never commit, never deploy
+**/umbraco/Deploy/import-on-startup.zip
+
+# Never commit exported Deploy content
+**/umbraco/Deploy/Exports/
+
+# Timestamped SQLite backups created by `node build.mjs reset`
+**/umbraco/Data/Umbraco.sqlite.db*.bak-*
+
 src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
-
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
 /src/UmbracoCommunity.BlockRestrictions/wwwroot/App_Plugins/
 .claude

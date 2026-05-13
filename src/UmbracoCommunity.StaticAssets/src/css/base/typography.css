@@ -186,7 +186,7 @@ table {
   .block-title {
     font-size: 60px;
     line-height: 65px;
-    margin: 0 0 var(--unit);
+    margin: 0 0 var(--unit-md);
   }
 
   .block-subtitle {

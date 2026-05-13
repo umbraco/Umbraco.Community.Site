@@ -6,31 +6,29 @@ The source of the new Umbraco community site that is currently being built to re
 
 Clone the repository locally.
 
-### Configuration
+### Quick start (recommended for new contributors)
 
-If you need to work with valid API keys for services, or to store connection strings to local databases, you should create a copy of the `appsettings.Development.json` file and name it  `appsettings.Local.json`.
-
-The file is ignored from source control.
-
-### Building Everything
-
-From the repository root:
+The fastest way to get a working local environment is to seed it from the live community site's snapshot, then start the dev servers:
 
 ```bash
-node build.mjs local
+node build.mjs reset       # back up any existing local DB and pull the latest snapshot
+node build.mjs dev:dotnet  # build backoffice + start Vite dev server + dotnet run
 ```
 
-This builds all frontend projects (backoffice extensions and static assets) for deployment.
+`reset` downloads a recent export (schema + content + media) from the live community site, drops it at `umbraco/Deploy/import-on-startup.zip`, and renames any existing `Umbraco.sqlite.db` (and its `-shm`/`-wal` siblings) with a timestamp so the next boot installs fresh. The first `dev:dotnet` run after a seed takes a few minutes while Deploy imports the snapshot.
 
-### Running the Solution Locally
+If you've already got a local database and just want to refresh content without nuking your DB, use `node build.mjs seed` instead of `reset`.
 
-The quickest way to get everything running for development:
+For day-to-day work, just run `node build.mjs` with no arguments and pick from the interactive menu — that's the easiest way to start each session.
+
+### Other ways to run
+
+If you'd rather skip the seed step or run things by hand, the dev script supports several modes:
 
 ```bash
-node build.mjs dev:dotnet
+node build.mjs dev:dotnet   # what Quick start uses
+node build.mjs dev          # Vite dev server only (you run dotnet yourself)
 ```
-
-This builds the backoffice extensions, then starts the Vite dev server and `dotnet run` together with color-coded output. The default launch profile uses the `Development` environment.
 
 If you prefer to run things separately (or run without the build script), you need two processes:
 

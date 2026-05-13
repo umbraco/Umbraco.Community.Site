@@ -19,7 +19,8 @@
           }
         ],
         "editorSize": "",
-        "thumbnail": "/wwwroot/App_Plugins/BlockListThumbs/Cards/CardWithImageAndTextBlock.png"
+        "thumbnail": "/wwwroot/App_Plugins/BlockListThumbs/Cards/CardWithImageAndTextBlock.png",
+        "settingsElementTypeKey": "b3e2087d-8b9e-41f0-a8f5-ef665c79d776"
       },
       {
         "contentElementTypeKey": "a70a1169-cb27-436f-95c8-1648180cf2bf",
@@ -28,6 +29,20 @@
         "columnSpanOptions": [
           {
             "columnSpan": 12
+          }
+        ]
+      },
+      {
+        "contentElementTypeKey": "361d9af6-4cfa-49df-9c2e-14eafcd30342",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "679c16b2-9690-4fb6-a9bf-c2c9aaa2e6b1",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 4
+          },
+          {
+            "columnSpan": 6
           }
         ]
       }
@@ -46,7 +61,16 @@
       "Ordering": true
     },
     {
+      "Udi": "umb://document-type/361d9af64cfa49df9c2e14eafcd30342"
+    },
+    {
+      "Udi": "umb://document-type/679c16b296904fb6a9bfc2c9aaa2e6b1"
+    },
+    {
       "Udi": "umb://document-type/a70a1169cb27436f95c81648180cf2bf"
+    },
+    {
+      "Udi": "umb://document-type/b3e2087d8b9e41f0a8f5ef665c79d776"
     },
     {
       "Udi": "umb://document-type/f50886faf7f14c48aff7a85b672b23eb"
