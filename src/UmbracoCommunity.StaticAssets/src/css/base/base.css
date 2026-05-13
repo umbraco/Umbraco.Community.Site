@@ -62,17 +62,19 @@ li::marker {
   color: inherit;
 }
 
-/* Global SVG style tag override - high specificity */
-svg .st0,
-svg .st1,
-svg .st2,
-svg .st3,
-svg .st4,
-svg .st5,
-svg .st6,
-svg .st7,
-svg .st8,
-svg .st9 {
+/* Global SVG style tag override - high specificity.
+   Opt out per-SVG by wrapping it in .preserve-svg-fills (e.g. multi-colour logos
+   that ship their own inline <style> palette). */
+svg:not(.preserve-svg-fills *) .st0,
+svg:not(.preserve-svg-fills *) .st1,
+svg:not(.preserve-svg-fills *) .st2,
+svg:not(.preserve-svg-fills *) .st3,
+svg:not(.preserve-svg-fills *) .st4,
+svg:not(.preserve-svg-fills *) .st5,
+svg:not(.preserve-svg-fills *) .st6,
+svg:not(.preserve-svg-fills *) .st7,
+svg:not(.preserve-svg-fills *) .st8,
+svg:not(.preserve-svg-fills *) .st9 {
   fill: inherit;
 }
 
