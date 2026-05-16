@@ -54,6 +54,15 @@ public static class NotFoundTrackerBuilderExtensions
         // Ignore matcher — no-op in Plan 1; replaced by full impl in Plan 2.
         builder.Services.TryAddSingleton<INotFoundIgnoreRuleMatcher, NoOpIgnoreRuleMatcher>();
 
+        // Fail-fast guard: if the host forgot to register an INotFoundPageResolver,
+        // surface an actionable error at the first 404 instead of a generic DI failure.
+        // TryAddSingleton lets the host's own registration win when present.
+        builder.Services.TryAddSingleton<INotFoundPageResolver>(_ =>
+            throw new InvalidOperationException(
+                "Umbraco.Community.NotFoundTracker: no INotFoundPageResolver registered. " +
+                "The host must call builder.Services.AddSingleton<INotFoundPageResolver, YourResolver>() " +
+                "after builder.AddNotFoundTracker()."));
+
         // Content finder. The host must register an INotFoundPageResolver.
         builder.SetContentLastChanceFinder<NotFoundTrackingContentFinder>();
 
