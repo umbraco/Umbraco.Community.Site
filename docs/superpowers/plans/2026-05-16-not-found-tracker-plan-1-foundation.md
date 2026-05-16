@@ -2127,6 +2127,23 @@ No commit needed if everything passed. If anything didn't behave as expected, de
 
 ---
 
+## Task 18 verification status (recorded 2026-05-16)
+
+Partial — environment had **no published content**, so Umbraco's "Welcome to your Umbraco installation" middleware short-circuited every request before `IContentLastChanceFinder` could run, meaning no 404 row was ever recorded during the smoke test.
+
+**Verified:**
+- ✅ Migration hosted service ran on startup; log: `Applying 1 pending NotFoundTracker migration(s): 20260516104002_InitialCreate` → `NotFoundTracker migrations applied successfully`.
+- ✅ All three tables present in `Umbraco.sqlite.db`: `NotFoundHits`, `NotFoundHitQueryStrings`, `NotFoundIgnoreRules`.
+- ✅ Server boots cleanly with the new package referenced; no exceptions on startup once `ASPNETCORE_ENVIRONMENT=Development` was set (NB: `dotnet run --no-launch-profile` defaults to Production, which routes the DbContext to SqlClient — use the launch profile or set `ASPNETCORE_ENVIRONMENT=Development` explicitly).
+- ✅ Clean shutdown.
+- ✅ 21/21 unit + integration tests pass.
+
+**Still to verify (next time the dev DB has seeded content):**
+- Hit a non-existent URL → row appears in `NotFoundHits` within ~10 s.
+- Hammer the same URL 100× → `HitCount` increments to ~100 on a single row.
+- Hit `?campaign=...&id=...` → row appears in `NotFoundHitQueryStrings` with the right `QueryString` value.
+- Stop server during in-flight events → graceful drain flushes pending events to DB before exit.
+
 ## Plan 1 self-review
 
 **Spec coverage:**
