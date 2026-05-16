@@ -11,6 +11,7 @@ using Umbraco.Community.NotFoundTracker.Infrastructure;
 using Umbraco.Community.NotFoundTracker.Matching;
 using Umbraco.Community.NotFoundTracker.Recording;
 using Umbraco.Community.NotFoundTracker.Routing;
+using Umbraco.Community.NotFoundTracker.Services;
 
 namespace Umbraco.Community.NotFoundTracker;
 
@@ -48,6 +49,7 @@ public static class NotFoundTrackerBuilderExtensions
         // Recording pipeline.
         builder.Services.AddSingleton<NotFoundHitChannel>();
         builder.Services.AddHostedService<NotFoundHitWriterService>();
+        builder.Services.AddHostedService<NotFoundRetentionService>();
 
         // Ignore matcher — no-op in Plan 1; replaced by full impl in Plan 2.
         builder.Services.TryAddSingleton<INotFoundIgnoreRuleMatcher, NoOpIgnoreRuleMatcher>();
