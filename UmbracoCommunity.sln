@@ -47,8 +47,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.Web.Tests", "tests\UmbracoCommunity.Web.Tests\UmbracoCommunity.Web.Tests.csproj", "{01CE0985-3887-4057-82EF-807A739879B7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Community.NotFoundTracker", "src\Umbraco.Community.NotFoundTracker\Umbraco.Community.NotFoundTracker.csproj", "{883449C8-6667-45CC-A8F3-156317FC77ED}"
 EndProject
 Global
@@ -150,7 +148,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{01CE0985-3887-4057-82EF-807A739879B7} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{883449C8-6667-45CC-A8F3-156317FC77ED} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F82B796A-0297-45AF-BD1E-5CA3C452ED80}
