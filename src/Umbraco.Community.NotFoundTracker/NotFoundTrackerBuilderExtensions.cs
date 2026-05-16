@@ -3,26 +3,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Community.NotFoundTracker.Configuration;
+using Umbraco.Extensions;
 using Umbraco.Community.NotFoundTracker.Infrastructure;
+using Umbraco.Community.NotFoundTracker.Matching;
+using Umbraco.Community.NotFoundTracker.Recording;
+using Umbraco.Community.NotFoundTracker.Routing;
 
 namespace Umbraco.Community.NotFoundTracker;
 
 public static class NotFoundTrackerBuilderExtensions
 {
-    /// <summary>
-    /// Registers all services for the NotFoundTracker package. Call from a host composer.
-    /// The host MUST also register an <c>INotFoundPageResolver</c> implementation —
-    /// it tells the package which content node to render for an unrecorded 404.
-    /// </summary>
     public static IUmbracoBuilder AddNotFoundTracker(this IUmbracoBuilder builder)
     {
-        // Bind options from configuration (section "NotFoundTracker").
         builder.Services.Configure<NotFoundTrackerOptions>(
             builder.Config.GetSection(Constants.ConfigurationSectionName));
 
-        // EF Core DbContext factory — same pattern as BlockRestrictions.
         builder.Services.AddDbContextFactory<NotFoundTrackerDbContext>((sp, options) =>
         {
             var connectionString = builder.Config["ConnectionStrings:umbracoDbDSN"];
@@ -47,7 +45,16 @@ public static class NotFoundTrackerBuilderExtensions
 
         builder.Services.AddHostedService<NotFoundTrackerMigrationHostedService>();
 
-        // Recording pipeline, finder, retention — all added in later tasks of this plan.
+        // Recording pipeline.
+        builder.Services.AddSingleton<NotFoundHitChannel>();
+        builder.Services.AddHostedService<NotFoundHitWriterService>();
+
+        // Ignore matcher — no-op in Plan 1; replaced by full impl in Plan 2.
+        builder.Services.TryAddSingleton<INotFoundIgnoreRuleMatcher, NoOpIgnoreRuleMatcher>();
+
+        // Content finder. The host must register an INotFoundPageResolver.
+        builder.SetContentLastChanceFinder<NotFoundTrackingContentFinder>();
+
         return builder;
     }
 }
