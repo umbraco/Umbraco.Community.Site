@@ -1,20 +1,24 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Community.NotFoundTracker.Routing;
 using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Routing;
 
-public class PageNotFoundContentFinder : IContentLastChanceFinder
+/// <summary>
+/// Tenant-aware "PageNotFound" resolver. Walks the current request's domain root for a
+/// PageNotFound node and falls back to the first one found across all root content nodes.
+/// Implements <see cref="INotFoundPageResolver"/> for the Umbraco.Community.NotFoundTracker package.
+/// </summary>
+public class CommunitySitePageNotFoundResolver : INotFoundPageResolver
 {
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IServiceScopeFactory _serviceScopeFactory;
 
-    public PageNotFoundContentFinder(
+    public CommunitySitePageNotFoundResolver(
         IUmbracoContextAccessor umbracoContextAccessor,
         IServiceScopeFactory serviceScopeFactory)
     {
@@ -22,7 +26,7 @@ public class PageNotFoundContentFinder : IContentLastChanceFinder
         _serviceScopeFactory = serviceScopeFactory;
     }
 
-    public Task<bool> TryFindContent(IPublishedRequestBuilder request)
+    public Task<IPublishedContent?> ResolveAsync(IPublishedRequestBuilder request)
     {
         Models.PublishedModels.PageNotFound? notFoundPage = null;
 
@@ -37,7 +41,6 @@ public class PageNotFoundContentFinder : IContentLastChanceFinder
                 .FirstOrDefault();
         }
 
-        // Fallback: find the first PageNotFound node across all root nodes
         if (notFoundPage is null)
         {
             using var scope = _serviceScopeFactory.CreateScope();
@@ -47,22 +50,6 @@ public class PageNotFoundContentFinder : IContentLastChanceFinder
                 .FirstOrDefault();
         }
 
-        if (notFoundPage is null)
-        {
-            return Task.FromResult(false);
-        }
-
-        request.SetPublishedContent(notFoundPage);
-        request.SetResponseStatus(404);
-
-        return Task.FromResult(true);
-    }
-}
-
-public class PageNotFoundContentFinderComposer : IComposer
-{
-    public void Compose(IUmbracoBuilder builder)
-    {
-        builder.SetContentLastChanceFinder<PageNotFoundContentFinder>();
+        return Task.FromResult<IPublishedContent?>(notFoundPage);
     }
 }
