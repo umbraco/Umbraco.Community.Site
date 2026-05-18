@@ -3146,6 +3146,31 @@ cd src/UmbracoCommunity.Web.UI && ASPNETCORE_ENVIRONMENT=Development dotnet run 
 
 ---
 
+## Task 18 verification status (recorded 2026-05-18)
+
+Static verification complete; live browser smoke test deferred to the user (same content-less-Umbraco constraint as Plans 1 + 2, plus the user's own dev server holding port 65178 during implementation).
+
+**Verified:**
+- ✅ Full solution builds (`dotnet build UmbracoCommunity.sln`) — 0 errors.
+- ✅ 84/84 backend tests pass.
+- ✅ Frontend bundle builds (`npm run build` in `Client/`) — produces `not-found-tracker.js` (0.13 kB), `not-found-tracker-dashboard.element-*.js` (2.08 kB), `bundle.manifests-*.js` (45.48 kB / 11.91 kB gzipped) under `wwwroot/App_Plugins/UmbracoCommunityNotFoundTracker/`.
+- ✅ All custom elements compile + register via side-effect imports in `bundle.manifests.ts`.
+- ✅ Dashboard manifest registers under Content section with `Umb.Condition.SectionAlias` matching `Umb.Section.Content`.
+- ✅ TypeScript strict mode passes — no unused-variable or implicit-any errors.
+
+**Implementation deviations from the plan (all sound):**
+- **Task 4** wired all four management services into the builder extension (not just the redirect service). Task 6 then skipped the service-registration step it would have done — the services were already in place.
+- **Task 11**: tsconfig uses the global `UmbExtensionManifest` type via `"types": ["@umbraco-cms/backoffice/extension-types", "vitest/globals"]` rather than the plan's `import type { ManifestTypes }` (which doesn't exist in the installed `@umbraco-cms/backoffice` version). Matches the BlockRestrictions project pattern.
+- **Task 13**: dashboard manifest uses `elementName` + `js` (matches Extensions project pattern) instead of the plan's `element: () => import(...)`. Added `export default` to the dashboard element to satisfy `ElementLoaderExports<UmbDashboardElement>`.
+
+**Still to verify (live browser smoke test, blocked by user's running dev server):**
+- Backoffice → Content → "404 Tracker" dashboard appears.
+- Hits tab: filters, sort, pagination, bulk-select, per-row actions (Redirect modal opens, Ignore modal opens, Delete confirms).
+- Ignore rules tab: built-in preset (~43 rows) appears; source filter narrows; Add rule modal works; `ConfigSeeded` rows show 🔒 and no Delete button; Re-seed button works.
+- Multi-tenant permission UX: a user with restricted start nodes sees only their hostname in the dropdown and only their hits/rules.
+
+The user can run these checks themselves on a content-loaded dev DB when convenient.
+
 ## Plan 3 self-review
 
 **Spec coverage:**
