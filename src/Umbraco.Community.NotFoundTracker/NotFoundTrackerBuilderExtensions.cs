@@ -51,8 +51,10 @@ public static class NotFoundTrackerBuilderExtensions
         builder.Services.AddHostedService<NotFoundHitWriterService>();
         builder.Services.AddHostedService<NotFoundRetentionService>();
 
-        // Ignore matcher — no-op in Plan 1; replaced by full impl in Plan 2.
-        builder.Services.TryAddSingleton<INotFoundIgnoreRuleMatcher, NoOpIgnoreRuleMatcher>();
+        // Ignore matcher — real implementation wired in Plan 2.
+        builder.Services.AddSingleton<IgnoreRuleLoader>();
+        builder.Services.AddSingleton<INotFoundIgnoreRuleMatcher, IgnoreRuleMatcher>();
+        builder.Services.AddHostedService<AutoPresetSeedingService>();
 
         // Fail-fast guard: if the host forgot to register an INotFoundPageResolver,
         // surface an actionable error at the first 404 instead of a generic DI failure.
