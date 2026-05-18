@@ -31,17 +31,14 @@ public sealed class NotFoundUserScopeService : INotFoundUserScopeService
 
         var startNodes = user.StartContentIds ?? Array.Empty<int>();
 
-        // Full-access if user has root (-1) as a start node.
-        if (startNodes.Contains(-1))
+        // Full-access if user has no start-node restriction (Umbraco's default for admins) or the
+        // explicit root marker (-1). Either signals "unrestricted content access".
+        if (startNodes.Length == 0 || startNodes.Contains(-1))
         {
             return new UserScope(new HashSet<string>(StringComparer.Ordinal), hasFullAccess: true);
         }
 
         var accessible = new HashSet<string>(StringComparer.Ordinal);
-        if (startNodes.Length == 0)
-        {
-            return new UserScope(accessible, hasFullAccess: false);
-        }
 
         // Map: each domain row has a RootContentId — collect domains whose root content
         // is in the user's start node set. (Descendant-node domain lookups can be added
