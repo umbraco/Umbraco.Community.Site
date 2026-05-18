@@ -13,6 +13,7 @@ public class NotFoundTrackerDbContext : DbContext
     public DbSet<NotFoundHitEntity> NotFoundHits { get; set; } = null!;
     public DbSet<NotFoundHitQueryStringEntity> NotFoundHitQueryStrings { get; set; } = null!;
     public DbSet<NotFoundIgnoreRuleEntity> NotFoundIgnoreRules { get; set; } = null!;
+    public DbSet<NotFoundPresetSeedRecordEntity> NotFoundPresetSeedRecords { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +57,17 @@ public class NotFoundTrackerDbContext : DbContext
             entity.Property(e => e.Note).HasMaxLength(500);
 
             entity.HasIndex(e => new { e.Hostname, e.MatchType, e.Path });
+        });
+
+        modelBuilder.Entity<NotFoundPresetSeedRecordEntity>(entity =>
+        {
+            entity.ToTable("NotFoundPresetSeedRecords");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Hostname).HasMaxLength(255);
+            entity.Property(e => e.Path).IsRequired().HasMaxLength(2048);
+
+            entity.HasIndex(e => new { e.Hostname, e.MatchType, e.Path }).IsUnique();
         });
     }
 }
