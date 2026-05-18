@@ -2,6 +2,8 @@ import { LitElement, html, css, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { NotFoundTrackerApi } from "../api/not-found-tracker-api.js";
 import type { HitListItem, HitListResponse } from "../api/types.js";
+import "./modals/create-redirect-modal.element.js";
+import "./modals/add-ignore-rule-modal.element.js";
 
 const STATUS_LABELS = ["Active", "Ignored", "Redirected"];
 const SORTS = [
@@ -26,6 +28,8 @@ export class HitsTabElement extends LitElement {
   @state() private take = 25;
 
   @state() private selectedIds = new Set<number>();
+  @state() private redirectingFor: HitListItem | null = null;
+  @state() private ignoringFor: HitListItem | null = null;
 
   static styles = css`
     :host { display: block; }
@@ -165,6 +169,8 @@ export class HitsTabElement extends LitElement {
                 <td>${new Date(item.lastSeenUtc).toLocaleString()}</td>
                 <td><span class="badge status-${item.status}">${STATUS_LABELS[item.status]}</span></td>
                 <td>
+                  <button @click=${() => (this.redirectingFor = item)}>Redirect</button>
+                  <button @click=${() => (this.ignoringFor = item)}>Ignore</button>
                   <button @click=${() => this.deleteOne(item.id)}>Delete</button>
                 </td>
               </tr>
@@ -177,6 +183,36 @@ export class HitsTabElement extends LitElement {
         <span>${this.skip + 1}-${Math.min(this.skip + this.take, this.total)} of ${this.total}</span>
         <button @click=${() => { this.skip += this.take; this.load(); }} ?disabled=${this.skip + this.take >= this.total}>Next ›</button>
       </div>
+
+      ${this.redirectingFor
+        ? html`
+          <div style="position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
+            <div style="background:white;border-radius:6px;">
+              <not-found-tracker-create-redirect-modal
+                .hitId=${this.redirectingFor.id}
+                .hitPath=${this.redirectingFor.path}
+                @done=${() => { this.redirectingFor = null; this.load(); }}
+                @cancel=${() => (this.redirectingFor = null)}
+              ></not-found-tracker-create-redirect-modal>
+            </div>
+          </div>
+        `
+        : nothing}
+      ${this.ignoringFor
+        ? html`
+          <div style="position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
+            <div style="background:white;border-radius:6px;">
+              <not-found-tracker-add-ignore-rule-modal
+                .hitId=${this.ignoringFor.id}
+                .suggestedPath=${this.ignoringFor.path}
+                .suggestedHostname=${this.ignoringFor.hostname}
+                @done=${() => { this.ignoringFor = null; this.load(); }}
+                @cancel=${() => (this.ignoringFor = null)}
+              ></not-found-tracker-add-ignore-rule-modal>
+            </div>
+          </div>
+        `
+        : nothing}
     `;
   }
 }
