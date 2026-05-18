@@ -176,6 +176,62 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
         return Ok(new BulkOpResponse { Processed = processed, Skipped = skipped });
     }
 
+    [HttpGet("ignore-rules")]
+    public async Task<ActionResult<IReadOnlyList<IgnoreRuleItem>>> ListIgnoreRules(CancellationToken ct)
+    {
+        var rules = await _rules.ListAsync(_scope.GetCurrentScope(), ct);
+        return Ok(rules.Select(MapRule).ToList());
+    }
+
+    [HttpPost("ignore-rules")]
+    public async Task<IActionResult> CreateIgnoreRule([FromBody] CreateIgnoreRuleRequest request, CancellationToken ct)
+    {
+        var result = await _rules.CreateAsync(
+            new CreateIgnoreRuleInput(request.Path, (IgnoreMatchType)request.MatchType, request.Hostname, request.Note),
+            _scope.GetCurrentScope(), ct);
+
+        return MapMutation(result);
+    }
+
+    [HttpPut("ignore-rules/{id:int}")]
+    public async Task<IActionResult> UpdateIgnoreRule(int id, [FromBody] UpdateIgnoreRuleRequest request, CancellationToken ct)
+    {
+        var result = await _rules.UpdateAsync(id,
+            new UpdateIgnoreRuleInput(request.Path, (IgnoreMatchType)request.MatchType, request.Hostname, request.Note),
+            _scope.GetCurrentScope(), ct);
+
+        return MapMutation(result);
+    }
+
+    [HttpDelete("ignore-rules/{id:int}")]
+    public async Task<IActionResult> DeleteIgnoreRule(int id, CancellationToken ct)
+    {
+        var result = await _rules.DeleteAsync(id, _scope.GetCurrentScope(), ct);
+        return MapMutation(result);
+    }
+
+    private IActionResult MapMutation(IgnoreRuleMutation m) => m.Result switch
+    {
+        IgnoreRuleMutationResult.Ok => m.Entity is null ? NoContent() : Ok(MapRule(m.Entity)),
+        IgnoreRuleMutationResult.NotFound => NotFound(),
+        IgnoreRuleMutationResult.Forbidden => StatusCode(StatusCodes.Status403Forbidden, new { reason = m.Reason }),
+        IgnoreRuleMutationResult.Conflict => Conflict(new { reason = m.Reason }),
+        IgnoreRuleMutationResult.InvalidInput => BadRequest(new { reason = m.Reason }),
+        _ => StatusCode(StatusCodes.Status500InternalServerError),
+    };
+
+    private static IgnoreRuleItem MapRule(NotFoundIgnoreRuleEntity r) => new()
+    {
+        Id = r.Id,
+        Hostname = r.Hostname,
+        MatchType = (byte)r.MatchType,
+        Path = r.Path,
+        Source = (byte)r.Source,
+        Note = r.Note,
+        CreatedUtc = r.CreatedUtc,
+        IsReadOnly = r.Source == IgnoreRuleSource.ConfigSeeded,
+    };
+
     private static HitListItem MapItem(NotFoundHitEntity h) => new()
     {
         Id = h.Id,
