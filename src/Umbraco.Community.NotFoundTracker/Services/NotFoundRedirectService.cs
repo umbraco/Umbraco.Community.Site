@@ -53,19 +53,17 @@ public sealed class NotFoundRedirectService : INotFoundRedirectService
             return new RedirectResult(RedirectResultKind.TargetContentNotFound);
         }
 
-        // The full URL the editor wants to register is (hostname + path). Umbraco's
-        // RedirectUrlService.Register stores by URL and resolves on incoming request match.
-        var url = string.IsNullOrEmpty(hit.Hostname)
-            ? hit.Path
-            : $"{hit.Hostname}{hit.Path}";
-
+        // Umbraco's IRedirectUrlService.Register keys redirects by a hash of the URL string only;
+        // prepending the hostname produces a key that no incoming request can ever match
+        // (the request lookup uses just the path). Tenant disambiguation for duplicate paths
+        // is Umbraco's responsibility via route stubs / content roots, not ours to encode here.
         try
         {
-            _redirectUrlService.Register(url, targetContent.Key, culture);
+            _redirectUrlService.Register(hit.Path, targetContent.Key, culture);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to register redirect for hit {HitId} (url='{Url}')", hitId, url);
+            _logger.LogError(ex, "Failed to register redirect for hit {HitId} (path='{Path}')", hitId, hit.Path);
             return new RedirectResult(RedirectResultKind.Failed, Reason: ex.Message);
         }
 
