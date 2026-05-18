@@ -56,6 +56,12 @@ public static class NotFoundTrackerBuilderExtensions
         builder.Services.AddSingleton<INotFoundIgnoreRuleMatcher, IgnoreRuleMatcher>();
         builder.Services.AddHostedService<AutoPresetSeedingService>();
 
+        // Management services.
+        builder.Services.AddScoped<INotFoundHitService, NotFoundHitService>();
+        builder.Services.AddScoped<INotFoundIgnoreRuleService, NotFoundIgnoreRuleService>();
+        builder.Services.AddScoped<INotFoundUserScopeService, NotFoundUserScopeService>();
+        builder.Services.AddScoped<INotFoundRedirectService, NotFoundRedirectService>();
+
         // Fail-fast guard: if the host forgot to register an INotFoundPageResolver,
         // surface an actionable error at the first 404 instead of a generic DI failure.
         // TryAddSingleton lets the host's own registration win when present.
