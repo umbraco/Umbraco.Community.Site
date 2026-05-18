@@ -1,4 +1,5 @@
 import "./dashboards/hits-tab.element.js";
+import "./dashboards/ignore-rules-tab.element.js";
 
 export const manifests: Array<UmbExtensionManifest> = [
   {
