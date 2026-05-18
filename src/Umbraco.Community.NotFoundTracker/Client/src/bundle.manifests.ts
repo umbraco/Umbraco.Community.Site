@@ -1,3 +1,5 @@
+import "./dashboards/hits-tab.element.js";
+
 export const manifests: Array<UmbExtensionManifest> = [
   {
     type: "dashboard",

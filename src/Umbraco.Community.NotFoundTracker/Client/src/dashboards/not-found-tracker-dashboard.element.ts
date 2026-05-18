@@ -62,7 +62,6 @@ export default NotFoundTrackerDashboardElement;
 declare global {
   interface HTMLElementTagNameMap {
     "not-found-tracker-dashboard": NotFoundTrackerDashboardElement;
-    "not-found-tracker-hits-tab": HTMLElement;
     "not-found-tracker-ignore-rules-tab": HTMLElement;
   }
 }
