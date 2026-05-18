@@ -44,6 +44,7 @@ public sealed class AutoPresetSeedingService : IHostedService
         try
         {
             await SeedAutoPresetAsync(cancellationToken);
+            await ReconcileConfigSeededAsync(cancellationToken);
             await _matcher.RefreshAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -106,6 +107,60 @@ public sealed class AutoPresetSeedingService : IHostedService
         {
             await context.SaveChangesAsync(ct);
             _logger.LogInformation("NotFoundTracker seeded {Count} auto-preset rules", inserted);
+        }
+    }
+
+    private async Task ReconcileConfigSeededAsync(CancellationToken ct)
+    {
+        // Parse all config-declared rules up front so an invalid MatchType fails fast
+        // before any DB writes happen.
+        var desired = _options.Value.AdditionalAutoPresetRules
+            .Select(AutoPresetRuleConfigParser.Parse)
+            .Select(r => (r.Hostname, r.MatchType, r.Path))
+            .ToHashSet();
+
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+
+        var existingConfigSeeded = await context.NotFoundIgnoreRules
+            .Where(r => r.Source == IgnoreRuleSource.ConfigSeeded)
+            .ToListAsync(ct);
+
+        var existingKeys = existingConfigSeeded
+            .Select(r => (r.Hostname, r.MatchType, r.Path))
+            .ToHashSet();
+
+        // Delete config-seeded rows no longer declared in config.
+        var toDelete = existingConfigSeeded
+            .Where(r => !desired.Contains((r.Hostname, r.MatchType, r.Path)))
+            .ToList();
+        if (toDelete.Count > 0)
+        {
+            context.NotFoundIgnoreRules.RemoveRange(toDelete);
+        }
+
+        // Insert config rules not yet present (with Source=ConfigSeeded only — a UserDefined
+        // or AutoPreset row with the same path stays separate).
+        var toInsert = desired
+            .Where(key => !existingKeys.Contains(key))
+            .ToList();
+        foreach (var (hostname, matchType, path) in toInsert)
+        {
+            context.NotFoundIgnoreRules.Add(new NotFoundIgnoreRuleEntity
+            {
+                Hostname = hostname,
+                MatchType = matchType,
+                Path = path,
+                Source = IgnoreRuleSource.ConfigSeeded,
+                CreatedUtc = DateTime.UtcNow,
+            });
+        }
+
+        if (toDelete.Count > 0 || toInsert.Count > 0)
+        {
+            await context.SaveChangesAsync(ct);
+            _logger.LogInformation(
+                "NotFoundTracker reconciled config-seeded rules: +{Inserted} -{Deleted}",
+                toInsert.Count, toDelete.Count);
         }
     }
 }

@@ -115,6 +115,129 @@ public class AutoPresetSeedingServiceTests : IDisposable
         matcher.IsIgnored("any-host", "/legit").Should().BeFalse();
     }
 
+    [Fact]
+    public async Task Config_rules_are_inserted_with_ConfigSeeded_source()
+    {
+        var opts = new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = false,  // isolate: only test config branch
+            AdditionalAutoPresetRules =
+            {
+                new AutoPresetRuleConfig { Path = "/legacy", MatchType = "PathPrefix" },
+                new AutoPresetRuleConfig { Path = "/secret.html", MatchType = "Exact", Hostname = "site-a.example" },
+            }
+        };
+        var (service, _) = Build(opts);
+
+        await service.StartAsync(CancellationToken.None);
+
+        using var verify = Ctx();
+        var rows = await verify.NotFoundIgnoreRules.ToListAsync();
+        rows.Should().HaveCount(2);
+        rows.Should().OnlyContain(r => r.Source == IgnoreRuleSource.ConfigSeeded);
+
+        rows.Should().Contain(r => r.Path == "/legacy" && r.MatchType == IgnoreMatchType.PathPrefix && r.Hostname == null);
+        rows.Should().Contain(r => r.Path == "/secret.html" && r.MatchType == IgnoreMatchType.Exact && r.Hostname == "site-a.example");
+    }
+
+    [Fact]
+    public async Task Config_rule_removed_from_config_is_deleted_on_next_boot()
+    {
+        // First boot: config has /legacy.
+        var (service1, _) = Build(new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = false,
+            AdditionalAutoPresetRules = { new AutoPresetRuleConfig { Path = "/legacy", MatchType = "PathPrefix" } }
+        });
+        await service1.StartAsync(CancellationToken.None);
+
+        (await Ctx().NotFoundIgnoreRules.AnyAsync(r => r.Path == "/legacy")).Should().BeTrue();
+
+        // Second boot: /legacy removed from config.
+        var (service2, _) = Build(new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = false,
+            AdditionalAutoPresetRules = { }  // empty
+        });
+        await service2.StartAsync(CancellationToken.None);
+
+        (await Ctx().NotFoundIgnoreRules.AnyAsync(r => r.Path == "/legacy")).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UserDefined_rule_with_same_path_as_config_is_not_clobbered()
+    {
+        // Editor manually added /shared with Source=UserDefined.
+        using (var ctx = Ctx())
+        {
+            ctx.NotFoundIgnoreRules.Add(new NotFoundIgnoreRuleEntity
+            {
+                Hostname = null,
+                MatchType = IgnoreMatchType.PathPrefix,
+                Path = "/shared",
+                Source = IgnoreRuleSource.UserDefined,
+                CreatedUtc = DateTime.UtcNow,
+            });
+            await ctx.SaveChangesAsync();
+        }
+
+        // Config also declares /shared.
+        var (service, _) = Build(new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = false,
+            AdditionalAutoPresetRules =
+            {
+                new AutoPresetRuleConfig { Path = "/shared", MatchType = "PathPrefix" }
+            }
+        });
+        await service.StartAsync(CancellationToken.None);
+
+        using var verify = Ctx();
+        var rows = await verify.NotFoundIgnoreRules.Where(r => r.Path == "/shared").ToListAsync();
+        rows.Should().HaveCount(2);
+        rows.Should().ContainSingle(r => r.Source == IgnoreRuleSource.UserDefined);
+        rows.Should().ContainSingle(r => r.Source == IgnoreRuleSource.ConfigSeeded);
+    }
+
+    [Fact]
+    public async Task AutoPreset_rule_with_same_path_as_config_remains_separate()
+    {
+        // First boot: built-in preset seeded /wp-admin. Then config adds /wp-admin too.
+        var (service, _) = Build(new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = true,
+            AdditionalAutoPresetRules =
+            {
+                new AutoPresetRuleConfig { Path = "/wp-admin", MatchType = "PathPrefix" }
+            }
+        });
+        await service.StartAsync(CancellationToken.None);
+
+        using var verify = Ctx();
+        var rows = await verify.NotFoundIgnoreRules.Where(r => r.Path == "/wp-admin").ToListAsync();
+        rows.Should().HaveCount(2);
+        rows.Should().ContainSingle(r => r.Source == IgnoreRuleSource.AutoPreset);
+        rows.Should().ContainSingle(r => r.Source == IgnoreRuleSource.ConfigSeeded);
+    }
+
+    [Fact]
+    public async Task Invalid_match_type_in_config_throws_at_startup()
+    {
+        var (service, _) = Build(new NotFoundTrackerOptions
+        {
+            SeedAutoPreset = false,
+            AdditionalAutoPresetRules =
+            {
+                new AutoPresetRuleConfig { Path = "/foo", MatchType = "Regex" }
+            }
+        });
+
+        var act = async () => await service.StartAsync(CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*Regex*Exact*PathPrefix*");
+    }
+
     private sealed class TestFactory : IDbContextFactory<NotFoundTrackerDbContext>
     {
         private readonly DbContextOptions<NotFoundTrackerDbContext> _options;
