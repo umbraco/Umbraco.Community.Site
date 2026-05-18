@@ -12,17 +12,20 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     private readonly INotFoundIgnoreRuleService _rules;
     private readonly INotFoundRedirectService _redirects;
     private readonly INotFoundUserScopeService _scope;
+    private readonly Infrastructure.AutoPresetSeedingService _seedingService;
 
     public NotFoundTrackerApiController(
         INotFoundHitService hits,
         INotFoundIgnoreRuleService rules,
         INotFoundRedirectService redirects,
-        INotFoundUserScopeService scope)
+        INotFoundUserScopeService scope,
+        Infrastructure.AutoPresetSeedingService seedingService)
     {
         _hits = hits;
         _rules = rules;
         _redirects = redirects;
         _scope = scope;
+        _seedingService = seedingService;
     }
 
     [HttpGet("hits")]
@@ -208,6 +211,17 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     {
         var result = await _rules.DeleteAsync(id, _scope.GetCurrentScope(), ct);
         return MapMutation(result);
+    }
+
+    [HttpPost("ignore-rules/reseed-auto-preset")]
+    public async Task<IActionResult> ReseedAutoPreset(CancellationToken ct)
+    {
+        if (!_scope.GetCurrentScope().HasFullAccess)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { reason = "Full access required." });
+        }
+        await _seedingService.SeedAndReconcileAsync(ct);
+        return NoContent();
     }
 
     private IActionResult MapMutation(IgnoreRuleMutation m) => m.Result switch

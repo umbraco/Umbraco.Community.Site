@@ -56,6 +56,18 @@ public sealed class AutoPresetSeedingService : IHostedService
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
+    /// <summary>
+    /// Re-runs the seeding pass on demand (used by the management API). Equivalent to what
+    /// StartAsync does on boot: inserts any missing auto-preset entries (respecting tombstones),
+    /// reconciles config-seeded rows, refreshes the matcher.
+    /// </summary>
+    public async Task SeedAndReconcileAsync(CancellationToken ct)
+    {
+        await SeedAutoPresetAsync(ct);
+        await ReconcileConfigSeededAsync(ct);
+        await _matcher.RefreshAsync(ct);
+    }
+
     private async Task SeedAutoPresetAsync(CancellationToken ct)
     {
         if (!_options.Value.SeedAutoPreset)

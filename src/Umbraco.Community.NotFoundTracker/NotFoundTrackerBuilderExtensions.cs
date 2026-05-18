@@ -57,7 +57,8 @@ public static class NotFoundTrackerBuilderExtensions
         // Ignore matcher — real implementation wired in Plan 2.
         builder.Services.AddSingleton<IgnoreRuleLoader>();
         builder.Services.AddSingleton<INotFoundIgnoreRuleMatcher, IgnoreRuleMatcher>();
-        builder.Services.AddHostedService<AutoPresetSeedingService>();
+        builder.Services.AddSingleton<AutoPresetSeedingService>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<AutoPresetSeedingService>());
 
         // Management services.
         builder.Services.AddScoped<INotFoundHitService, NotFoundHitService>();
