@@ -1,36 +1,59 @@
 import { LitElement, html, css, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
+import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext, umbConfirmModal } from "@umbraco-cms/backoffice/modal";
 import { NotFoundTrackerApi } from "../api/not-found-tracker-api.js";
 import type { IgnoreRuleItem } from "../api/types.js";
-import "./modals/add-ignore-rule-modal.element.js";
+import { ADD_IGNORE_RULE_MODAL } from "./modals/add-ignore-rule-modal.token.js";
 
 const MATCH_LABELS = ["Exact", "Prefix"];
 const SOURCE_LABELS = ["User-defined", "Auto-preset", "Config"];
 
 @customElement("not-found-tracker-ignore-rules-tab")
-export class IgnoreRulesTabElement extends LitElement {
+export class IgnoreRulesTabElement extends UmbElementMixin(LitElement) {
   @state() private rules: IgnoreRuleItem[] = [];
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private sourceFilter: number | "all" = "all";
   @state() private hostnameFilter = "";
   @state() private search = "";
-  @state() private addingRule = false;
+
+  private _modalManager?: UmbModalManagerContext;
+
+  constructor() {
+    super();
+    this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (ctx) => {
+      this._modalManager = ctx;
+    });
+  }
 
   static styles = css`
     :host { display: block; }
-    .toolbar { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
-    .field { display: flex; flex-direction: column; gap: 4px; }
-    .field label { font-size: 12px; color: var(--uui-color-text-alt, #686c87); }
-    select, input { padding: 6px 8px; border: 1px solid var(--uui-color-border, #d6d6d6); border-radius: 3px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--uui-color-divider, #e9e9eb); }
-    th { background: var(--uui-color-surface-alt, #f9f9fb); }
-    .badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; background: var(--uui-color-surface-alt, #f0f0f4); }
-    .badge.source-1 { background: #e3effa; color: #1f5a8a; }
-    .badge.source-2 { background: #f0e3fa; color: #5a1f8a; }
-    .readonly { opacity: .7; }
-    .lock-icon { font-size: 14px; margin-right: 4px; }
+    .toolbar {
+      display: flex;
+      gap: var(--uui-size-space-3);
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: var(--uui-size-space-4);
+    }
+    .field { display: flex; flex-direction: column; gap: var(--uui-size-1); min-width: 160px; }
+    .field > uui-input,
+    .field > uui-select { width: 100%; }
+    .spacer { flex: 1; }
+    .path-cell { display: inline-flex; align-items: center; gap: var(--uui-size-space-2); }
+    .readonly { opacity: 0.7; }
+    .empty {
+      text-align: center;
+      padding: var(--uui-size-space-6);
+      color: var(--uui-color-text-alt);
+    }
+    .error-banner {
+      color: var(--uui-color-danger);
+      background: var(--uui-color-danger-emphasis, #fde7e7);
+      padding: var(--uui-size-space-3);
+      border-radius: var(--uui-border-radius);
+      margin-bottom: var(--uui-size-space-3);
+    }
   `;
 
   connectedCallback() {
@@ -51,7 +74,7 @@ export class IgnoreRulesTabElement extends LitElement {
   }
 
   private filteredRules() {
-    return this.rules.filter(r => {
+    return this.rules.filter((r) => {
       if (this.sourceFilter !== "all" && r.source !== this.sourceFilter) return false;
       if (this.hostnameFilter && (r.hostname ?? "") !== this.hostnameFilter) return false;
       if (this.search && !r.path.includes(this.search.toLowerCase())) return false;
@@ -60,17 +83,41 @@ export class IgnoreRulesTabElement extends LitElement {
   }
 
   private hostnames() {
-    return [...new Set(this.rules.map(r => r.hostname ?? "").filter(Boolean))];
+    return [...new Set(this.rules.map((r) => r.hostname ?? "").filter(Boolean))];
   }
 
   private async deleteOne(rule: IgnoreRuleItem) {
-    if (!confirm(`Delete ignore rule for "${rule.path}"?`)) return;
+    try {
+      await umbConfirmModal(this, {
+        headline: "Delete ignore rule?",
+        content: html`
+          <p>This removes the rule that ignores <strong>${rule.path}</strong>.</p>
+          <p>
+            Future requests to URLs matching this rule will be <strong>recorded as 404s again</strong>
+            and reappear in the Hits list.
+          </p>
+        `,
+        color: "danger",
+        confirmLabel: "Delete rule",
+      });
+    } catch {
+      return; // cancelled
+    }
     try {
       await NotFoundTrackerApi.deleteIgnoreRule(rule.id);
       await this.load();
     } catch (e) {
-      alert(`Delete failed: ${(e as Error).message}`);
+      this.error = `Delete failed: ${(e as Error).message}`;
     }
+  }
+
+  private async openAddRuleModal() {
+    if (!this._modalManager) return;
+    const modal = this._modalManager.open(this, ADD_IGNORE_RULE_MODAL, {
+      data: { hitId: 0, suggestedPath: "", suggestedHostname: null },
+    });
+    const submitted = await modal.onSubmit().then(() => true).catch(() => false);
+    if (submitted) await this.load();
   }
 
   private async reseed() {
@@ -83,87 +130,128 @@ export class IgnoreRulesTabElement extends LitElement {
     }
   }
 
+  private sourceColor(source: number): "default" | "positive" | "warning" {
+    switch (source) {
+      case 1: return "warning"; // Auto-preset
+      case 2: return "positive"; // Config
+      default: return "default"; // User-defined
+    }
+  }
+
   render() {
     const filtered = this.filteredRules();
+    const sourceOptions = [
+      { name: "All sources", value: "all", selected: this.sourceFilter === "all" },
+      { name: "User-defined", value: "0", selected: this.sourceFilter === 0 },
+      { name: "Auto-preset", value: "1", selected: this.sourceFilter === 1 },
+      { name: "Config", value: "2", selected: this.sourceFilter === 2 },
+    ];
+    const hostnameOptions = [
+      { name: "All sites", value: "", selected: this.hostnameFilter === "" },
+      ...this.hostnames().map((h) => ({ name: h, value: h, selected: this.hostnameFilter === h })),
+    ];
+
     return html`
       <div class="toolbar">
         <div class="field">
-          <label>Source</label>
-          <select @change=${(e: Event) => { const v = (e.target as HTMLSelectElement).value; this.sourceFilter = v === "all" ? "all" : parseInt(v); }}>
-            <option value="all">All</option>
-            <option value="0">User-defined</option>
-            <option value="1">Auto-preset</option>
-            <option value="2">Config</option>
-          </select>
+          <uui-label>Source</uui-label>
+          <uui-select
+            .options=${sourceOptions}
+            @change=${(e: Event) => {
+              const v = (e.target as HTMLSelectElement).value;
+              this.sourceFilter = v === "all" ? "all" : parseInt(v);
+            }}
+          ></uui-select>
         </div>
         <div class="field">
-          <label>Hostname</label>
-          <select @change=${(e: Event) => (this.hostnameFilter = (e.target as HTMLSelectElement).value)}>
-            <option value="">All</option>
-            ${this.hostnames().map(h => html`<option value=${h}>${h}</option>`)}
-          </select>
+          <uui-label>Hostname</uui-label>
+          <uui-select
+            .options=${hostnameOptions}
+            @change=${(e: Event) => (this.hostnameFilter = (e.target as HTMLSelectElement).value)}
+          ></uui-select>
         </div>
         <div class="field">
-          <label>Search</label>
-          <input type="search" placeholder="Path contains..." @input=${(e: Event) => (this.search = (e.target as HTMLInputElement).value)}>
+          <uui-label>Search</uui-label>
+          <uui-input
+            type="search"
+            placeholder="Path contains…"
+            .value=${this.search}
+            @input=${(e: Event) => (this.search = (e.target as HTMLInputElement).value)}
+          ></uui-input>
         </div>
-        <div style="margin-left:auto; display:flex; gap:8px; align-items:flex-end;">
-          <button @click=${() => (this.addingRule = true)}>Add rule</button>
-          <button @click=${this.reseed}>Re-seed auto-preset</button>
-        </div>
+        <div class="spacer"></div>
+        <uui-button
+          look="primary"
+          label="Add rule"
+          @click=${() => this.openAddRuleModal()}
+        ></uui-button>
+        <uui-button
+          look="secondary"
+          label="Re-seed auto-preset"
+          @click=${this.reseed}
+        ></uui-button>
       </div>
 
-      ${this.error ? html`<div style="color:red;">${this.error}</div>` : nothing}
-      ${this.loading ? html`<div>Loading…</div>` : nothing}
+      ${this.error ? html`<div class="error-banner">${this.error}</div>` : nothing}
+      ${this.loading ? html`<uui-loader></uui-loader>` : nothing}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Path</th>
-            <th>Match</th>
-            <th>Hostname</th>
-            <th>Source</th>
-            <th>Note</th>
-            <th>Created</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.length === 0 && !this.loading
-            ? html`<tr><td colspan="7" style="text-align:center;padding:24px;color:#888;">No rules.</td></tr>`
-            : filtered.map(r => html`
-              <tr class=${r.isReadOnly ? "readonly" : ""}>
-                <td>${r.isReadOnly ? html`<span class="lock-icon" title="Managed via appsettings.json">🔒</span>` : ""}${r.path}</td>
-                <td>${MATCH_LABELS[r.matchType]}</td>
-                <td>${r.hostname ?? "All sites"}</td>
-                <td><span class="badge source-${r.source}">${SOURCE_LABELS[r.source]}</span></td>
-                <td>${r.note ?? ""}</td>
-                <td>${new Date(r.createdUtc).toLocaleDateString()}</td>
-                <td>
-                  ${r.isReadOnly
-                    ? nothing
-                    : html`<button @click=${() => this.deleteOne(r)}>Delete</button>`}
-                </td>
-              </tr>
-            `)}
-        </tbody>
-      </table>
+      <uui-table>
+        <uui-table-head>
+          <uui-table-head-cell>Path</uui-table-head-cell>
+          <uui-table-head-cell>Match</uui-table-head-cell>
+          <uui-table-head-cell>Hostname</uui-table-head-cell>
+          <uui-table-head-cell>Source</uui-table-head-cell>
+          <uui-table-head-cell>Note</uui-table-head-cell>
+          <uui-table-head-cell>Created</uui-table-head-cell>
+          <uui-table-head-cell></uui-table-head-cell>
+        </uui-table-head>
+        ${filtered.length === 0 && !this.loading
+          ? html`
+              <uui-table-row>
+                <uui-table-cell colspan="7">
+                  <div class="empty">No rules.</div>
+                </uui-table-cell>
+              </uui-table-row>
+            `
+          : filtered.map(
+              (r) => html`
+                <uui-table-row class=${r.isReadOnly ? "readonly" : ""}>
+                  <uui-table-cell>
+                    <span class="path-cell">
+                      ${r.isReadOnly
+                        ? html`<uui-icon name="icon-lock" title="Managed via appsettings.json"></uui-icon>`
+                        : nothing}
+                      ${r.path}
+                    </span>
+                  </uui-table-cell>
+                  <uui-table-cell>${MATCH_LABELS[r.matchType]}</uui-table-cell>
+                  <uui-table-cell>${r.hostname ?? "All sites"}</uui-table-cell>
+                  <uui-table-cell>
+                    <uui-tag look="${this.sourceColor(r.source) === "default" ? "default" : "primary"}"
+                             color="${this.sourceColor(r.source)}">
+                      ${SOURCE_LABELS[r.source]}
+                    </uui-tag>
+                  </uui-table-cell>
+                  <uui-table-cell>${r.note ?? ""}</uui-table-cell>
+                  <uui-table-cell>${new Date(r.createdUtc).toLocaleDateString()}</uui-table-cell>
+                  <uui-table-cell>
+                    ${r.isReadOnly
+                      ? nothing
+                      : html`
+                          <uui-button
+                            compact
+                            look="secondary"
+                            color="danger"
+                            label="Delete"
+                            @click=${() => this.deleteOne(r)}
+                          ></uui-button>
+                        `}
+                  </uui-table-cell>
+                </uui-table-row>
+              `,
+            )}
+      </uui-table>
 
-      ${this.addingRule
-        ? html`
-          <div style="position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:1000;">
-            <div style="background:white;border-radius:6px;">
-              <not-found-tracker-add-ignore-rule-modal
-                .hitId=${0}
-                .suggestedPath=${""}
-                .suggestedHostname=${null}
-                @done=${() => { this.addingRule = false; this.load(); }}
-                @cancel=${() => (this.addingRule = false)}
-              ></not-found-tracker-add-ignore-rule-modal>
-            </div>
-          </div>
-        `
-        : nothing}
     `;
   }
 }

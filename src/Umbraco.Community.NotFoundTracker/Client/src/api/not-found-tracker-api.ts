@@ -2,11 +2,34 @@ import type { HitListResponse, HitListQuery, HitDetail, IgnoreRuleItem, BulkOpRe
 
 const BASE = "/umbraco/umbracocommunitynotfoundtracker/api/v1";
 
+// Umbraco's Management API is bearer-authenticated. The dashboard root element
+// consumes UMB_AUTH_CONTEXT and calls setAuthConfig() with a token getter so
+// each request can attach a fresh Authorization header.
+interface ApiAuthConfig {
+  token?: () => Promise<string | undefined>;
+  baseUrl?: string;
+  credentials?: RequestCredentials;
+}
+
+let _authConfig: ApiAuthConfig = {};
+
+export function setAuthConfig(config: ApiAuthConfig) {
+  _authConfig = config;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${BASE}${path}`, {
+  const token = await _authConfig.token?.();
+  const baseUrl = _authConfig.baseUrl ?? "";
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(init?.headers as Record<string, string> | undefined),
+  };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const response = await fetch(`${baseUrl}${BASE}${path}`, {
     ...init,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    credentials: _authConfig.credentials ?? "same-origin",
+    headers,
   });
   if (!response.ok) {
     const text = await response.text();

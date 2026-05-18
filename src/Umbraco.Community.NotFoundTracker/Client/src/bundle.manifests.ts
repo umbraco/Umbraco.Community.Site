@@ -20,4 +20,10 @@ export const manifests: Array<UmbExtensionManifest> = [
       },
     ],
   },
+  {
+    type: "modal",
+    alias: "NotFoundTracker.Modal.AddIgnoreRule",
+    name: "Add Ignore Rule Modal",
+    element: () => import("./dashboards/modals/add-ignore-rule-modal.element.js"),
+  },
 ];

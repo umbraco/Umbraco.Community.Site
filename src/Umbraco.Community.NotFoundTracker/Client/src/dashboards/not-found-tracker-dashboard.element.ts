@@ -1,55 +1,49 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
+import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
+import { setAuthConfig } from "../api/not-found-tracker-api.js";
 
 @customElement("not-found-tracker-dashboard")
-export class NotFoundTrackerDashboardElement extends LitElement {
+export class NotFoundTrackerDashboardElement extends UmbElementMixin(LitElement) {
   @state() private activeTab: "hits" | "rules" = "hits";
+
+  constructor() {
+    super();
+    this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+      if (!authContext) return;
+      setAuthConfig({
+        token: () => authContext.getLatestToken(),
+        baseUrl: authContext.getOpenApiConfiguration().base,
+        credentials: authContext.getOpenApiConfiguration().credentials as RequestCredentials,
+      });
+    });
+  }
 
   static styles = css`
     :host {
       display: block;
-      padding: var(--uui-size-space-4, 16px);
+      padding: var(--uui-size-space-5, 20px);
     }
-    .tabs {
-      display: flex;
-      gap: var(--uui-size-space-2, 8px);
-      border-bottom: 1px solid var(--uui-color-divider, #e9e9eb);
+    uui-tab-group {
       margin-bottom: var(--uui-size-space-4, 16px);
-    }
-    .tab-btn {
-      background: none;
-      border: 0;
-      padding: var(--uui-size-space-3, 12px) var(--uui-size-space-4, 16px);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      font: inherit;
-    }
-    .tab-btn[aria-selected="true"] {
-      border-bottom-color: var(--uui-color-selected, #3544b1);
-      color: var(--uui-color-selected, #3544b1);
     }
   `;
 
   render() {
     return html`
-      <div role="tablist" class="tabs">
-        <button
-          class="tab-btn"
-          role="tab"
-          aria-selected="${this.activeTab === "hits"}"
+      <uui-tab-group>
+        <uui-tab
+          label="Hits"
+          ?active=${this.activeTab === "hits"}
           @click=${() => (this.activeTab = "hits")}
-        >
-          Hits
-        </button>
-        <button
-          class="tab-btn"
-          role="tab"
-          aria-selected="${this.activeTab === "rules"}"
+        ></uui-tab>
+        <uui-tab
+          label="Ignore rules"
+          ?active=${this.activeTab === "rules"}
           @click=${() => (this.activeTab = "rules")}
-        >
-          Ignore rules
-        </button>
-      </div>
+        ></uui-tab>
+      </uui-tab-group>
       ${this.activeTab === "hits"
         ? html`<not-found-tracker-hits-tab></not-found-tracker-hits-tab>`
         : html`<not-found-tracker-ignore-rules-tab></not-found-tracker-ignore-rules-tab>`}
