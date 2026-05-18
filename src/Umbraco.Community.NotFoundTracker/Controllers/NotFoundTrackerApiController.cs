@@ -85,6 +85,97 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
         return Ok(hosts);
     }
 
+    [HttpDelete("hits/{id:int}")]
+    public async Task<IActionResult> DeleteHit(int id, CancellationToken ct)
+    {
+        var ok = await _hits.DeleteAsync(id, _scope.GetCurrentScope(), ct);
+        return ok ? NoContent() : NotFound();
+    }
+
+    [HttpPost("hits/bulk-delete")]
+    public async Task<ActionResult<BulkOpResponse>> BulkDeleteHits([FromBody] BulkIdsRequest request, CancellationToken ct)
+    {
+        var (processed, skipped) = await _hits.BulkDeleteAsync(request.Ids, _scope.GetCurrentScope(), ct);
+        return Ok(new BulkOpResponse { Processed = processed, Skipped = skipped });
+    }
+
+    [HttpPost("hits/{id:int}/redirect")]
+    public async Task<IActionResult> CreateRedirect(int id, [FromBody] CreateRedirectRequest request, CancellationToken ct)
+    {
+        var result = await _redirects.CreateRedirectForHitAsync(id, request.TargetContentKey, request.Culture, _scope.GetCurrentScope(), ct);
+
+        return result.Kind switch
+        {
+            RedirectResultKind.Ok => NoContent(),
+            RedirectResultKind.HitNotFound => NotFound(),
+            RedirectResultKind.Forbidden => StatusCode(StatusCodes.Status403Forbidden, new { reason = result.Reason }),
+            RedirectResultKind.TargetContentNotFound => BadRequest(new { reason = "Target content not found." }),
+            RedirectResultKind.TargetContentNotAccessible => StatusCode(StatusCodes.Status403Forbidden, new { reason = result.Reason }),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new { reason = result.Reason ?? "Redirect failed." }),
+        };
+    }
+
+    [HttpPost("hits/{id:int}/ignore")]
+    public async Task<IActionResult> CreateIgnoreFromHit(
+        int id, [FromBody] CreateIgnoreRuleRequest request, CancellationToken ct)
+    {
+        var scope = _scope.GetCurrentScope();
+
+        // Resolve the hit so we can flip its status after rule creation.
+        var hit = await _hits.GetAsync(id, scope, ct);
+        if (hit is null) return NotFound();
+
+        // Create the rule.
+        var ruleResult = await _rules.CreateAsync(
+            new CreateIgnoreRuleInput(request.Path, (IgnoreMatchType)request.MatchType, request.Hostname, request.Note),
+            scope, ct);
+
+        if (ruleResult.Result == IgnoreRuleMutationResult.Forbidden)
+            return StatusCode(StatusCodes.Status403Forbidden, new { reason = ruleResult.Reason });
+        if (ruleResult.Result == IgnoreRuleMutationResult.Conflict)
+            return Conflict(new { reason = ruleResult.Reason });
+        if (ruleResult.Result == IgnoreRuleMutationResult.InvalidInput)
+            return BadRequest(new { reason = ruleResult.Reason });
+
+        // Delete the hit — the editor's intent ("ignore this URL") means stop showing it.
+        // The ignore rule prevents future recording; deleting the existing row clears it now.
+        await _hits.DeleteAsync(id, scope, ct);
+
+        return NoContent();
+    }
+
+    [HttpPost("hits/bulk-ignore")]
+    public async Task<ActionResult<BulkOpResponse>> BulkIgnoreHits([FromBody] BulkIgnoreRequest request, CancellationToken ct)
+    {
+        var scope = _scope.GetCurrentScope();
+        var matchType = (IgnoreMatchType)request.MatchType;
+        var processed = 0;
+        var skipped = 0;
+
+        foreach (var id in request.Ids)
+        {
+            var hit = await _hits.GetAsync(id, scope, ct);
+            if (hit is null) { skipped++; continue; }
+
+            var ruleResult = await _rules.CreateAsync(
+                new CreateIgnoreRuleInput(hit.Path, matchType, hit.Hostname, Note: null),
+                scope, ct);
+
+            if (ruleResult.Result == IgnoreRuleMutationResult.Ok)
+            {
+                await _hits.DeleteAsync(id, scope, ct);
+                processed++;
+            }
+            else
+            {
+                // Duplicate rule, forbidden, etc. — count as skipped.
+                skipped++;
+            }
+        }
+
+        return Ok(new BulkOpResponse { Processed = processed, Skipped = skipped });
+    }
+
     private static HitListItem MapItem(NotFoundHitEntity h) => new()
     {
         Id = h.Id,
