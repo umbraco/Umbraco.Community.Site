@@ -36,17 +36,26 @@ public sealed class NotFoundHitWriterService : BackgroundService
     {
         var flushInterval = _options.Value.WriterFlushInterval;
         var batchSize = _options.Value.WriterBatchSize;
-        using var timer = new PeriodicTimer(flushInterval);
 
         try
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Wake on either timer tick OR first item arriving in an empty channel,
+                // Wake on either flush interval OR first item arriving in an empty channel,
                 // whichever comes first. Gives low-latency drain after idle, batching under load.
-                var timerTask = timer.WaitForNextTickAsync(stoppingToken).AsTask();
-                var readyTask = _channel.Reader.WaitToReadAsync(stoppingToken).AsTask();
-                await Task.WhenAny(timerTask, readyTask);
+                // (PeriodicTimer can't be used here — its WaitForNextTickAsync is single-consumer,
+                // and racing it against the channel via Task.WhenAny leaves a pending wait that
+                // throws InvalidOperationException on the next iteration.)
+                using var waitCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+                waitCts.CancelAfter(flushInterval);
+                try
+                {
+                    await _channel.Reader.WaitToReadAsync(waitCts.Token);
+                }
+                catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+                {
+                    // Flush interval elapsed — fall through to drain.
+                }
 
                 await DrainOnceAsync(batchSize, stoppingToken);
             }
