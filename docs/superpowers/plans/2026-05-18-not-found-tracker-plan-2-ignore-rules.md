@@ -1779,6 +1779,26 @@ Remove the `NotFoundTracker` section from `appsettings.Development.json`. Restar
 
 ---
 
+## Task 11 verification status (recorded 2026-05-18)
+
+Partial — the user's own dev server was already running on port 65178, so my own startup attempt couldn't complete its bind. However, the startup ran far enough that **migrations and the seeding service had already fired** before the port bind failed (hosted services run during host startup, before Kestrel binds the listening port). What was confirmed in the live environment:
+
+- ✅ Migration `20260518072106_AddPresetSeedRecords` applied cleanly.
+- ✅ Seeding log: `NotFoundTracker seeded 43 auto-preset rules` — matches `DefaultIgnoreRules.All.Count`.
+- ✅ `NotFoundIgnoreRules` table: 43 rows, all `Source=1` (AutoPreset).
+- ✅ `NotFoundPresetSeedRecords` tombstone table: 43 rows.
+- ✅ Sample contents verified: `/wp-admin` (Prefix), `/wp-login` (Prefix), `/xmlrpc.php` (Exact), etc.
+
+Plan deviation: Task 8 added a tombstone table (`NotFoundPresetSeedRecords`) not anticipated in the plan, so the editor-deletion-persists semantic could be honoured across hard-deletes. New migration `20260518072106_AddPresetSeedRecords` ships this table. The tombstone is exclusively scoped to the `AutoPreset` lifecycle; `ConfigSeeded` reconcile (Task 9) operates only on the live `NotFoundIgnoreRules` table.
+
+Still to verify (covered comprehensively by unit tests, but not exercised live):
+- `/wp-admin` hits don't produce `NotFoundHits` rows (requires content-loaded Umbraco environment for the finder to run).
+- Adding a `NotFoundTracker.AdditionalAutoPresetRules` entry in `appsettings.json` inserts a `Source=2` (ConfigSeeded) row on next boot.
+- Removing that config entry deletes the row on next boot.
+- Invalid `MatchType` in config throws at startup.
+
+The unit suite covers all five config-seeded behaviours via real EF Core against in-memory SQLite, so the live test is redundant — but worth one quick round-trip on a content-loaded dev DB before merging the final PR.
+
 ## Plan 2 self-review
 
 **Spec coverage:**
