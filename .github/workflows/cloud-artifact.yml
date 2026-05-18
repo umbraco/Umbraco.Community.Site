@@ -102,7 +102,13 @@ jobs:
         working-directory: src/UmbracoCommunity.BlockRestrictions/Client
         run: npm ci && npm run build
         shell: bash
-        
+
+      # build the not-found tracker client assets (backoffice dashboard)
+      - name: Build not-found tracker client
+        working-directory: src/Umbraco.Community.NotFoundTracker/Client
+        run: npm ci && npm run build
+        shell: bash
+
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code
         run: |

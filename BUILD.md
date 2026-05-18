@@ -19,7 +19,7 @@ If no mode is provided, an interactive prompt lets you pick one.
 
 ### dev / dev:dotnet (default)
 
-The typical development workflow. Builds the two backoffice extension projects first (BlockRestrictions and Extensions), then starts the Vite dev server for StaticAssets. With `:dotnet`, the .NET backend starts alongside the Vite server.
+The typical development workflow. Builds the three backoffice extension projects first (BlockRestrictions, Extensions, and NotFoundTracker), then starts the Vite dev server for StaticAssets. With `:dotnet`, the .NET backend starts alongside the Vite server.
 
 ```bash
 # Just the frontend
@@ -31,7 +31,7 @@ node build.mjs dev:dotnet
 
 ### local / local:dotnet
 
-Performs a full production-style build of all three frontend projects (BlockRestrictions, Extensions, and StaticAssets with `build:for:cloud`). Use this to test the cloud deployment build locally.
+Performs a full production-style build of all four frontend projects (BlockRestrictions, Extensions, NotFoundTracker, and StaticAssets with `build:for:cloud`). Use this to test the cloud deployment build locally.
 
 ```bash
 # Build only
@@ -54,12 +54,13 @@ The Local environment reads from `appsettings.Local.json` (gitignored), which is
 
 ## Projects
 
-The script manages three frontend projects:
+The script manages four frontend projects:
 
 | Project | Directory | Build command |
 |---|---|---|
 | BlockRestrictions | `src/UmbracoCommunity.BlockRestrictions/Client` | `npm run build` |
 | Extensions | `src/UmbracoCommunity.Extensions/Client` | `npm run build` |
+| NotFoundTracker | `src/Umbraco.Community.NotFoundTracker/Client` | `npm run build` |
 | StaticAssets | `src/UmbracoCommunity.StaticAssets` | `npm run build:for:cloud` (local) / `npm run dev` (dev) |
 
 Missing `node_modules` are detected automatically and `npm ci` runs before the build.
