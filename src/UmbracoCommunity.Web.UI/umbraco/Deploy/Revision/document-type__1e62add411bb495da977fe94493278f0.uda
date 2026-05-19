@@ -21,6 +21,7 @@
           "Key": "c5c0e7ee-4a51-4e2b-98a0-0f5ad44c60c8",
           "Alias": "bannerContent",
           "DataType": "umb://data-type/dbe265a26f0541e3b07ce9d9ab34992f",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Banner content"
         }
       ]
@@ -46,5 +47,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

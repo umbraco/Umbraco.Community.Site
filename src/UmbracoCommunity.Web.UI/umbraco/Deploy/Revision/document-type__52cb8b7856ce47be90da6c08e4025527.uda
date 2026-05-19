@@ -24,6 +24,7 @@
           "Key": "32d6b19e-d11d-4bdc-b401-26aef557629c",
           "Alias": "numberOfPostsToShow",
           "DataType": "umb://data-type/83195a3004a741f8a6a834a1e034fdfb",
+          "ValueType": "System.Int32",
           "Description": "Defaults to 3, max 12",
           "Name": "Number of posts to show"
         },
@@ -31,6 +32,7 @@
           "Key": "b539b4b3-bc14-49d9-9d27-5828fbe080fe",
           "Alias": "blogCategoryFilter",
           "DataType": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.PublishedContent.IPublishedContent\u003E",
           "Description": "Optional category filter to show posts assigned to a particular category",
           "Name": "Blog category filter",
           "SortOrder": 2
@@ -39,6 +41,7 @@
           "Key": "d0e2cfa3-47ff-4c58-927b-d870674151a0",
           "Alias": "blogTagFilter",
           "DataType": "umb://data-type/17be192fa1364d50a29e74b7b021b3a9",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Description": "Optional tag filter to only show posts with certain tags in the showcase",
           "Name": "Blog tag filter",
           "SortOrder": 1
@@ -71,5 +74,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

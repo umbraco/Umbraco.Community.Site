@@ -21,6 +21,7 @@
           "Key": "f37ead4f-fa5d-4509-b9c5-f34bcd406b9c",
           "Alias": "imageIsCircular",
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
           "Name": "Image is circular"
         }
       ]
@@ -39,5 +40,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

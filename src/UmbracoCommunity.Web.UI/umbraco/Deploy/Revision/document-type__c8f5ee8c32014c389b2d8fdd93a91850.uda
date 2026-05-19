@@ -24,6 +24,7 @@
           "Key": "b80e1d2e-d1ca-4e03-80aa-b2fda60cbde1",
           "Alias": "maxNumberOfSpeakers",
           "DataType": "umb://data-type/9480b43b4c02469cbad96e0a00f8408f",
+          "ValueType": "System.Int32",
           "Description": "Cap the returned speakers at a specific amount. If left blank will return all speakers.",
           "Name": "Max number of speakers"
         },
@@ -31,6 +32,7 @@
           "Key": "ff426714-942f-4381-9d8e-4ddfc6cdf1e6",
           "Alias": "topSpeakersOnly",
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
           "Description": "In sessionize it is possible to flag a speaker as a \u0022top speaker\u0022. Toggle this property to only display these headline names.",
           "Name": "Top speakers only",
           "SortOrder": 1
@@ -63,5 +65,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

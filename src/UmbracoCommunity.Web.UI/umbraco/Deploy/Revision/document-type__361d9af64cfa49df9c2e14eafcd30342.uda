@@ -22,12 +22,14 @@
           "Key": "42c3d1bb-d592-4bf0-b885-dcf7eb3beeb6",
           "Alias": "cardContent",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
           "Name": "Card content"
         },
         {
           "Key": "81d03103-62c8-4c86-8332-af17ab8b04e2",
           "Alias": "link",
           "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
           "Name": "Link",
           "SortOrder": 1
         }
@@ -51,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
