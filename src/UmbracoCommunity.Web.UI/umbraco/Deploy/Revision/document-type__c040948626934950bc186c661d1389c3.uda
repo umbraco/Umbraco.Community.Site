@@ -21,6 +21,7 @@
           "Key": "0efc7b51-1c4c-4de6-bbf1-f751f6481045",
           "Alias": "speakerName",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Mandatory": true,
           "Name": "Speaker name",
           "SortOrder": 1
@@ -29,6 +30,7 @@
           "Key": "458d7ab7-f1e5-4e25-a61c-2e6254330481",
           "Alias": "speakerDescription",
           "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
           "Description": "e.g. job title",
           "Name": "Speaker description",
           "SortOrder": 2
@@ -37,6 +39,7 @@
           "Key": "57a6f1f1-cc35-4da5-8c23-372b3add2add",
           "Alias": "speakerImage",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Mandatory": true,
           "Name": "Speaker image"
         }
@@ -64,5 +67,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

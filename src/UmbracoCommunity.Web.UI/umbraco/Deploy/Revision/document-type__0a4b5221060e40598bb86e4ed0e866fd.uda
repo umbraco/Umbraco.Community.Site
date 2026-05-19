@@ -21,6 +21,7 @@
           "Key": "40859138-0cae-441f-9b43-296dfa65c65e",
           "Alias": "buttonColour",
           "DataType": "umb://data-type/24eb753fafd7493c9743cf55a6e08c42",
+          "ValueType": "System.String",
           "Name": "Button colour"
         }
       ]
@@ -39,5 +40,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

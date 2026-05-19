@@ -25,6 +25,7 @@
           "Key": "91fa62f5-68d4-499f-b5ec-6443ac6458e9",
           "Alias": "tag",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "Displayed at the top of the slide",
           "Name": "Tag",
           "SortOrder": -3
@@ -53,5 +54,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

@@ -22,6 +22,7 @@
           "Key": "625a454b-ef67-4b91-8688-edea2e6a97c8",
           "Alias": "sessionsToHighlight",
           "DataType": "umb://data-type/381148c9358545aea602bb58b77f8679",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Name": "Sessions to highlight"
         }
       ]
@@ -40,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

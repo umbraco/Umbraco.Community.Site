@@ -24,6 +24,7 @@
           "Key": "a45608c8-c3fd-42bc-828a-2bc9a090730e",
           "Alias": "form",
           "DataType": "umb://data-type/c26b699954f34088b3db37f0f1bd4162",
+          "ValueType": "System.Nullable\u003CSystem.Guid\u003E",
           "Mandatory": true,
           "Name": "Form"
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
