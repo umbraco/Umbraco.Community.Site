@@ -99,6 +99,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<ContentContextService>();
             builder.Services.AddScoped<ISeoDataService, SeoDataService>();
             builder.Services.AddScoped<IBlogService, BlogService>();
+            builder.Services.AddScoped<IPageNotFoundSuggestionService, PageNotFoundSuggestionService>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<ArticlePageViewModel>, ArticlePageViewModelBuilder>();
