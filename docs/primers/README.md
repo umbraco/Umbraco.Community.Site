@@ -9,6 +9,7 @@ If you're new to the codebase, start here. If you've been here a while and someo
 ## What's here
 
 - **[Frontend primer](frontend.md)** — the Vite-powered public-site frontend in `UmbracoCommunity.StaticAssets`. Covers the dual dev workflow, the manifest-driven Razor integration, the entrypoint convention, Lit + PostCSS, testing, and what builds for production. Backoffice frontends are signposted at the end.
+- **[Backend primer](backend.md)** — the C# side in `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI`. Covers the request flow (URL → render controller → view model builder → view), the three controller flavours, the builder pattern and DI registration, bootstrapping through composers, output caching policies, and the self-contained `Features/Sessionize/` module pattern.
 
 ## Adding a new primer
 

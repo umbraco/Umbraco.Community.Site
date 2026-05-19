@@ -8,13 +8,13 @@ These aren't tutorials — see [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md
 
 If you only write three more, these are the ones with the strongest "broad area with scattered docs that need threading" shape:
 
-- **`backend`** — the C# side. Sibling primer to `frontend.md`. Covers how a request flows from URL → controller → view model builder → view, the `Features/Controllers/Models/ViewModelBuilders` structure, where to put new things (API controller vs. `RenderController` vs. plain MVC controller), and the ViewComponent-over-action-filter convention. Biggest orientation gap in the codebase right now.
+- ~~**`backend`**~~ — shipped as [backend.md](./backend.md).
 - **`multi-tenancy`** — the [multi-tenant content resolution tutorial](../tutorials/foundations/multi-tenant-content-resolution.md) is the foundation, and the two refinements (404, schema) layer on it, but there's no top-level "here's what tenancy looks like in this codebase" overview that someone unfamiliar can read in five minutes. Primer would frame the multi-root content tree, the `GetSiteSettings()` convention, the domain-binding rule for routing-level lookups, and link out to the tutorial suite for depth.
 - **`backoffice`** — the frontend primer punts on `UmbracoCommunity.Extensions/Client/` and `UmbracoCommunity.BlockRestrictions/Client/`. A backoffice primer would cover both: App_Plugins manifest format, the Umbraco backoffice design system (`@umbraco-cms/backoffice`), how property editors / workspace views / dashboards are registered, and the dual-Vite-project setup.
 
 ## The full list
 
-- **`backend`** — see top picks. Sibling primer to `frontend.md`.
+- ~~**`backend`**~~ — shipped (see top picks).
 - **`multi-tenancy`** — see top picks. Pulls together an existing tutorial suite.
 - **`backoffice`** — see top picks. Covers the two backoffice client codebases.
 - **`content-modelling`** — document types, element types, block types, compositions (`ICompositionPageConfiguration`, `ICompositionSeo`, …), the auto-generated `PublishedModels` namespace, and the view-model-builder pipeline that converts `IPublishedContent` into view-shaped models. Threads together the `Models/` folder structure and the `BUILDING_PAGES.md` / `BUILDING_BLOCKS.md` how-tos.
