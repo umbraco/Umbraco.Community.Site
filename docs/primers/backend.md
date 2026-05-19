@@ -195,6 +195,5 @@ Promote from a flat folder to a `Features/<Name>/` module when there are 5+ clas
 
 - **[`docs/BUILDING_PAGES.md`](../BUILDING_PAGES.md)** — adding a new page type end to end (doc type → render controller → view model → builder → view).
 - **[`docs/BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md)** — adding a new content block (element type → content model → view model → partial view).
-- **[`docs/CODE_CONVENTIONS.md`](../CODE_CONVENTIONS.md)** — the naming and architectural conventions referenced throughout this primer.
 
 For *why* specific patterns are shaped the way they are — multi-tenant content resolution, the SEO schema fallback, the custom content finder for 404s — see the [tutorials suite](../tutorials/README.md).
