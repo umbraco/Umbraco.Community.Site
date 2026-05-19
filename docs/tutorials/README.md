@@ -24,6 +24,7 @@ You don't need to read the suite in order. Each tutorial points at the next logi
 ### Foundations
 
 - **[Building an inline SVG TagHelper for Umbraco](foundations/inline-svg-tag-helper.md)** — A custom `<svg-src>` TagHelper that reads SVG files from Umbraco media and inlines them into the page, so they can be styled and animated with CSS. Adapted from Warren Buckley's [Our.Umbraco.TagHelpers](https://github.com/umbraco-community/Our-Umbraco-TagHelpers).
+- **[Resolving content in a multi-tenant Umbraco site](foundations/multi-tenant-content-resolution.md)** — One Umbraco instance, multiple tenant root content nodes. Walks through the `Root()` + `GetSiteSettings()` pattern that keeps every content lookup scoped to the current request's tenant, the document-tree shape it assumes, and the small set of helpers that consumers (menu, footer, SEO, sitemap) lean on.
 
 ### Refinements
 

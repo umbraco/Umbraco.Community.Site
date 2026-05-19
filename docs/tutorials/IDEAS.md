@@ -8,7 +8,7 @@ These don't follow the tutorial section template — that's for the actual write
 
 If you only write three more, these are the ones with the strongest "non-obvious problem, broad audience" shape:
 
-- **`multi-tenant-content-resolution`** — every content lookup uses `currentPage.Root()` instead of hardcoded paths. The tutorial would explain *why* (one Umbraco instance, multiple tenant roots) and walk through the traversal patterns this codebase uses for site settings, 404s, sitemap, and navigation. Easy to get wrong; load-bearing across the whole site.
+- ~~**`multi-tenant-content-resolution`**~~ — shipped as [foundations/multi-tenant-content-resolution.md](./foundations/multi-tenant-content-resolution.md).
 - **`vite-umbraco-manifest-integration`** — modern frontend tooling talking to a server-rendered Razor view. Dev mode hits the Vite dev server on `:5123` for HMR; prod mode reads `manifest.json` and emits the right `<script>`/`<link>` tags via a TagHelper. Audience is much wider than this repo — every "I want Vite/React/Lit in my .NET project" tutorial online either skips this or gets it wrong.
 - **`mutation-observer-progressive-enhancement`** — the `<dc-form-steps>` problem: your enhancement runs before the thing it enhances exists. Umbraco Forms async-renders inside `<umb-forms-render>`, so the steps component uses a MutationObserver to wait for the field groups to appear, then converts them to steps. The pattern transfers anywhere you're enhancing async-rendered DOM.
 
@@ -16,7 +16,7 @@ If you only write three more, these are the ones with the strongest "non-obvious
 
 Reusable primitives that other tutorials can build on.
 
-- **`multi-tenant-content-resolution`** — see top picks. Foundation for almost any other tenant-aware tutorial we'd write.
+- ~~**`multi-tenant-content-resolution`**~~ — shipped (see top picks).
 - **`vite-umbraco-manifest-integration`** — see top picks. Foundation for the dual-build refinement below and anything else frontend-related.
 - **`intersection-observer-paused-animation`** — the `<dc-image-slider>` auto-scroll. `requestAnimationFrame` for the loop, `IntersectionObserver` to pause when off-screen, `visibilitychange` for tab switches, `prefers-reduced-motion` for accessibility. The general lesson: how to animate something cheaply *and* politely without leaning on a library.
 - **`drag-to-scroll-with-snap`** — the `<dc-slider>` component. Touch drag follows finger and snaps on release; desktop gets hover-zone navigation; explicit arrow buttons are an opt-in. Building a usable scroller in vanilla web components instead of pulling in Swiper / Embla.
