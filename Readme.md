@@ -1,6 +1,6 @@
 # Umbraco Community Website
 
-The source of the new Umbraco community site that is currently being built to replace [community.umbraco.com](https://community.umbraco.com).
+The source of the Umbraco community site - [community.umbraco.com](https://community.umbraco.com).
 
 ## Local Development
 
@@ -8,29 +8,33 @@ Clone the repository locally.
 
 ### Quick start (recommended for new contributors)
 
-The fastest way to get a working local environment is to seed it from the live community site's snapshot, then start the dev servers:
+The easiest way to get a working local environment is to run the build script and follow instructions:
 
 ```bash
-node build.mjs reset       # back up any existing local DB and pull the latest snapshot
-node build.mjs dev:dotnet  # build backoffice + start Vite dev server + dotnet run
+node build.mjs
 ```
 
-`reset` downloads a recent export (schema + content + media) from the live community site, drops it at `umbraco/Deploy/import-on-startup.zip`, and renames any existing `Umbraco.sqlite.db` (and its `-shm`/`-wal` siblings) with a timestamp so the next boot installs fresh. The first `dev:dotnet` run after a seed takes a few minutes while Deploy imports the snapshot.
+On a fresh clone, the script identifies there is no database so offers to download the latest community snapshot and run first-time setup for you. Say yes, then you will have a fully working website!
 
-If you've already got a local database and just want to refresh content without nuking your DB, use `node build.mjs seed` instead of `reset`.
+The whole thing takes a few minutes on first run. Subsequent runs reuse the local DB and skip straight to the dev servers.
 
-For day-to-day work, just run `node build.mjs` with no arguments and pick from the interactive menu — that's the easiest way to start each session.
+#### Refreshing content later
+
+Once you have a working database, the interactive menu also offers:
+
+- **`seed`** — pull the latest snapshot and queue it for the next boot, keeping your existing DB schema.
+- **`reset`** — rename `Umbraco.sqlite.db` (and its `-shm`/`-wal` siblings) aside with a timestamp, then re-run the same first-time setup as a clean clone.
+
+Both are also available directly as `node build.mjs seed` / `node build.mjs reset`.
 
 ### Other ways to run
 
-If you'd rather skip the seed step or run things by hand, the dev script supports several modes:
-
 ```bash
 node build.mjs dev:dotnet   # what Quick start uses
-node build.mjs dev          # Vite dev server only (you run dotnet yourself)
+node build.mjs dev          # Vite dev server only (you start dotnet yourself, e.g. in your IDE)
 ```
 
-If you prefer to run things separately (or run without the build script), you need two processes:
+If you'd rather run things separately (or skip the build script entirely), you need two processes:
 
 - cd to `src/UmbracoCommunity.Web.UI` and run `dotnet run`
 - In a separate terminal, cd to `src/UmbracoCommunity.StaticAssets` and run `npm run dev`

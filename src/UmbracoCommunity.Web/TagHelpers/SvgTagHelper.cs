@@ -201,6 +201,7 @@ namespace UmbracoCommunity.Web.TagHelpers
             var styleNodes = svgNode.SelectNodes(".//style");
             if (styleNodes == null || styleNodes.Count == 0) return;
 
+
             var existing = svgNode.GetAttributeValue("class", string.Empty);
             svgNode.SetAttributeValue(
                 "class",
