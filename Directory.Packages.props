@@ -53,5 +53,9 @@
     <!-- Other -->
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
     <PackageVersion Include="Schema.NET" Version="13.0.0" />
+    <!-- Transitive override: pin a patched OpenTelemetry.Api to silence a moderate
+         severity advisory on 1.13.1 (pulled in via Umbraco.AI.* / Azure SDK, not
+         Umbraco core, so it is not addressed by the Umbraco 17.4 dependency bumps). -->
+    <PackageVersion Include="OpenTelemetry.Api" Version="1.15.3" />
   </ItemGroup>
 </Project>
