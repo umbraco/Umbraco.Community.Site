@@ -7,7 +7,7 @@ namespace Umbraco.Community.NotFoundTracker.Services;
 /// </summary>
 public interface INotFoundUserScopeService
 {
-    UserScope GetCurrentScope();
+    Task<UserScope> GetCurrentScopeAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class UserScope

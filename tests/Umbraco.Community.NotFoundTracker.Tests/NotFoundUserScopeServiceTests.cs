@@ -11,12 +11,12 @@ namespace Umbraco.Community.NotFoundTracker.Tests;
 public class NotFoundUserScopeServiceTests
 {
     [Fact]
-    public void Full_access_when_start_nodes_include_root()
+    public async Task Full_access_when_start_nodes_include_root()
     {
         var user = MockUser(startNodes: new[] { -1 });
         var sut = Build(user, domains: Array.Empty<IDomain>());
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.HasFullAccess.Should().BeTrue();
         scope.AccessibleHostnames.Should().BeEmpty();
@@ -24,11 +24,11 @@ public class NotFoundUserScopeServiceTests
     }
 
     [Fact]
-    public void No_user_returns_empty_scope_without_full_access()
+    public async Task No_user_returns_empty_scope_without_full_access()
     {
         var sut = Build(currentUser: null, domains: Array.Empty<IDomain>());
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.HasFullAccess.Should().BeFalse();
         scope.AccessibleHostnames.Should().BeEmpty();
@@ -36,7 +36,7 @@ public class NotFoundUserScopeServiceTests
     }
 
     [Fact]
-    public void Single_start_node_collects_its_domains()
+    public async Task Single_start_node_collects_its_domains()
     {
         var user = MockUser(startNodes: new[] { 100 });
         var domains = new[]
@@ -46,7 +46,7 @@ public class NotFoundUserScopeServiceTests
         };
         var sut = Build(user, domains);
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.HasFullAccess.Should().BeFalse();
         scope.AccessibleHostnames.Should().BeEquivalentTo(["site-a.example"]);
@@ -55,20 +55,20 @@ public class NotFoundUserScopeServiceTests
     }
 
     [Fact]
-    public void Hostnames_are_lowercased_in_the_scope()
+    public async Task Hostnames_are_lowercased_in_the_scope()
     {
         var user = MockUser(startNodes: new[] { 100 });
         var domains = new[] { MockDomain("Site-A.Example", contentId: 100) };
         var sut = Build(user, domains);
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.AccessibleHostnames.Should().Contain("site-a.example");
         scope.CanAccessHostname("site-a.example").Should().BeTrue();
     }
 
     [Fact]
-    public void Multiple_start_nodes_union_their_hostnames()
+    public async Task Multiple_start_nodes_union_their_hostnames()
     {
         var user = MockUser(startNodes: new[] { 100, 200 });
         var domains = new[]
@@ -79,13 +79,13 @@ public class NotFoundUserScopeServiceTests
         };
         var sut = Build(user, domains);
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.AccessibleHostnames.Should().BeEquivalentTo(["a.example", "b.example"]);
     }
 
     [Fact]
-    public void Wildcard_domain_without_name_is_ignored()
+    public async Task Wildcard_domain_without_name_is_ignored()
     {
         var user = MockUser(startNodes: new[] { 100 });
         var domains = new[]
@@ -95,7 +95,7 @@ public class NotFoundUserScopeServiceTests
         };
         var sut = Build(user, domains);
 
-        var scope = sut.GetCurrentScope();
+        var scope = await sut.GetCurrentScopeAsync();
 
         scope.AccessibleHostnames.Should().BeEquivalentTo(["a.example"]);
     }
@@ -110,7 +110,7 @@ public class NotFoundUserScopeServiceTests
     private static IDomain MockDomain(string? name, int contentId)
     {
         var d = new Mock<IDomain>();
-        d.Setup(x => x.DomainName).Returns(name);
+        d.Setup(x => x.DomainName).Returns(name!);
         d.Setup(x => x.RootContentId).Returns(contentId);
         return d.Object;
     }
@@ -123,7 +123,7 @@ public class NotFoundUserScopeServiceTests
         security.Setup(s => s.BackOfficeSecurity).Returns(backOfficeSecurity.Object);
 
         var domainService = new Mock<IDomainService>();
-        domainService.Setup(d => d.GetAll(It.IsAny<bool>())).Returns(domains);
+        domainService.Setup(d => d.GetAllAsync(It.IsAny<bool>())).ReturnsAsync(domains);
 
         return new NotFoundUserScopeService(
             security.Object,

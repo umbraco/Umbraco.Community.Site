@@ -21,7 +21,7 @@ public sealed class NotFoundUserScopeService : INotFoundUserScopeService
         _logger = logger;
     }
 
-    public UserScope GetCurrentScope()
+    public async Task<UserScope> GetCurrentScopeAsync(CancellationToken cancellationToken = default)
     {
         var user = _security.BackOfficeSecurity?.CurrentUser;
         if (user is null)
@@ -44,7 +44,8 @@ public sealed class NotFoundUserScopeService : INotFoundUserScopeService
         // is in the user's start node set. (Descendant-node domain lookups can be added
         // later if needed; for v1 we only honour domains directly assigned to start nodes.)
         var startNodeSet = new HashSet<int>(startNodes);
-        foreach (var domain in _domainService.GetAll(includeWildcards: true))
+        var domains = await _domainService.GetAllAsync(includeWildcards: true).ConfigureAwait(false);
+        foreach (var domain in domains)
         {
             if (domain.RootContentId is null) continue;
             if (!startNodeSet.Contains(domain.RootContentId.Value)) continue;

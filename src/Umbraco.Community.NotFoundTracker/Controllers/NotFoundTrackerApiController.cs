@@ -48,7 +48,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
             Take = Math.Clamp(take, 1, 200),
         };
 
-        var (items, total) = await _hits.ListAsync(query, _scope.GetCurrentScope(), ct);
+        var (items, total) = await _hits.ListAsync(query, await _scope.GetCurrentScopeAsync(ct), ct);
         return Ok(new HitListResponse
         {
             Total = total,
@@ -59,7 +59,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     [HttpGet("hits/{id:int}")]
     public async Task<ActionResult<HitDetail>> GetHit(int id, CancellationToken ct)
     {
-        var hit = await _hits.GetAsync(id, _scope.GetCurrentScope(), ct);
+        var hit = await _hits.GetAsync(id, await _scope.GetCurrentScopeAsync(ct), ct);
         if (hit is null) return NotFound();
 
         return Ok(new HitDetail
@@ -84,28 +84,28 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     [HttpGet("hits/hostnames")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetHostnames(CancellationToken ct)
     {
-        var hosts = await _hits.GetDistinctHostnamesAsync(_scope.GetCurrentScope(), ct);
+        var hosts = await _hits.GetDistinctHostnamesAsync(await _scope.GetCurrentScopeAsync(ct), ct);
         return Ok(hosts);
     }
 
     [HttpDelete("hits/{id:int}")]
     public async Task<IActionResult> DeleteHit(int id, CancellationToken ct)
     {
-        var ok = await _hits.DeleteAsync(id, _scope.GetCurrentScope(), ct);
+        var ok = await _hits.DeleteAsync(id, await _scope.GetCurrentScopeAsync(ct), ct);
         return ok ? NoContent() : NotFound();
     }
 
     [HttpPost("hits/bulk-delete")]
     public async Task<ActionResult<BulkOpResponse>> BulkDeleteHits([FromBody] BulkIdsRequest request, CancellationToken ct)
     {
-        var (processed, skipped) = await _hits.BulkDeleteAsync(request.Ids, _scope.GetCurrentScope(), ct);
+        var (processed, skipped) = await _hits.BulkDeleteAsync(request.Ids, await _scope.GetCurrentScopeAsync(ct), ct);
         return Ok(new BulkOpResponse { Processed = processed, Skipped = skipped });
     }
 
     [HttpPost("hits/{id:int}/redirect")]
     public async Task<IActionResult> CreateRedirect(int id, [FromBody] CreateRedirectRequest request, CancellationToken ct)
     {
-        var result = await _redirects.CreateRedirectForHitAsync(id, request.TargetContentKey, request.Culture, _scope.GetCurrentScope(), ct);
+        var result = await _redirects.CreateRedirectForHitAsync(id, request.TargetContentKey, request.Culture, await _scope.GetCurrentScopeAsync(ct), ct);
 
         return result.Kind switch
         {
@@ -122,7 +122,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     public async Task<IActionResult> CreateIgnoreFromHit(
         int id, [FromBody] CreateIgnoreRuleRequest request, CancellationToken ct)
     {
-        var scope = _scope.GetCurrentScope();
+        var scope = await _scope.GetCurrentScopeAsync(ct);
 
         // Resolve the hit so we can flip its status after rule creation.
         var hit = await _hits.GetAsync(id, scope, ct);
@@ -150,7 +150,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     [HttpPost("hits/bulk-ignore")]
     public async Task<ActionResult<BulkOpResponse>> BulkIgnoreHits([FromBody] BulkIgnoreRequest request, CancellationToken ct)
     {
-        var scope = _scope.GetCurrentScope();
+        var scope = await _scope.GetCurrentScopeAsync(ct);
         var matchType = (IgnoreMatchType)request.MatchType;
         var processed = 0;
         var skipped = 0;
@@ -182,7 +182,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     [HttpGet("ignore-rules")]
     public async Task<ActionResult<IReadOnlyList<IgnoreRuleItem>>> ListIgnoreRules(CancellationToken ct)
     {
-        var rules = await _rules.ListAsync(_scope.GetCurrentScope(), ct);
+        var rules = await _rules.ListAsync(await _scope.GetCurrentScopeAsync(ct), ct);
         return Ok(rules.Select(MapRule).ToList());
     }
 
@@ -191,7 +191,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     {
         var result = await _rules.CreateAsync(
             new CreateIgnoreRuleInput(request.Path, (IgnoreMatchType)request.MatchType, request.Hostname, request.Note),
-            _scope.GetCurrentScope(), ct);
+            await _scope.GetCurrentScopeAsync(ct), ct);
 
         return MapMutation(result);
     }
@@ -201,7 +201,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     {
         var result = await _rules.UpdateAsync(id,
             new UpdateIgnoreRuleInput(request.Path, (IgnoreMatchType)request.MatchType, request.Hostname, request.Note),
-            _scope.GetCurrentScope(), ct);
+            await _scope.GetCurrentScopeAsync(ct), ct);
 
         return MapMutation(result);
     }
@@ -209,14 +209,15 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     [HttpDelete("ignore-rules/{id:int}")]
     public async Task<IActionResult> DeleteIgnoreRule(int id, CancellationToken ct)
     {
-        var result = await _rules.DeleteAsync(id, _scope.GetCurrentScope(), ct);
+        var result = await _rules.DeleteAsync(id, await _scope.GetCurrentScopeAsync(ct), ct);
         return MapMutation(result);
     }
 
     [HttpPost("ignore-rules/reseed-auto-preset")]
     public async Task<IActionResult> ReseedAutoPreset(CancellationToken ct)
     {
-        if (!_scope.GetCurrentScope().HasFullAccess)
+        var scope = await _scope.GetCurrentScopeAsync(ct);
+        if (!scope.HasFullAccess)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new { reason = "Full access required." });
         }
