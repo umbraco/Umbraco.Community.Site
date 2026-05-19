@@ -6,6 +6,7 @@ Each tutorial is self-contained: it states the concrete problem, explains the tr
 
 These sit alongside the other docs in this folder rather than replacing them:
 
+- **[Primers](../primers/)** orient you to a whole area of the codebase (e.g. the frontend) with links out to the deeper docs for each topic. Start here if you're new.
 - **How-to guides** like [`BUILDING_PAGES.md`](../BUILDING_PAGES.md) and [`BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md) tell you the conventions for adding new things to this codebase.
 - **Operational notes** like [`LESSONS_LEARNED.md`](../LESSONS_LEARNED.md) cover workflow gotchas (Umbraco upgrades, cloud deploys, schema management).
 - **Tutorials** *(this folder)* explain *why* a particular piece of the codebase is shaped the way it is, and how to build something similar from scratch.
