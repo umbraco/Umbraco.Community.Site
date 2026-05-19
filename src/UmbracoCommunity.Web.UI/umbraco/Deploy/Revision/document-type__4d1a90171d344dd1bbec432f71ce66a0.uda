@@ -25,6 +25,7 @@
           "Key": "25ccdda5-b117-423b-8737-b9618ee7d4ec",
           "Alias": "icon",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "Displayed at the top of the slide",
           "Name": "Icon",
           "SortOrder": -3
@@ -53,5 +54,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

@@ -21,6 +21,7 @@
           "Key": "edc64d55-8cc8-4eb9-960d-c29829a73234",
           "Alias": "backgroundColour",
           "DataType": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+          "ValueType": "Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter\u002BPickedColor",
           "Name": "Background colour"
         }
       ]
@@ -39,5 +40,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

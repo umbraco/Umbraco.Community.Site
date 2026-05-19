@@ -21,6 +21,7 @@
           "Key": "46a171fd-26c8-45ce-bda7-5b24438025c6",
           "Alias": "speakersPerRow",
           "DataType": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
+          "ValueType": "System.String",
           "Description": "The maximum number of speakers to show in a row next to each other, default is 4.  \nThis only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.",
           "Name": "Speakers per row"
         }
@@ -40,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

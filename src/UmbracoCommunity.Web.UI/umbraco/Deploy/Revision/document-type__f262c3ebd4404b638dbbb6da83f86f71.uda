@@ -17,6 +17,7 @@
       "Key": "138e0675-c350-47ff-9f58-2a7c463d10a7",
       "Alias": "eventSchedule",
       "DataType": "umb://data-type/0bb279e64e3f4779bd39ec9f59a071bb",
+      "ValueType": "System.Text.Json.JsonDocument",
       "Name": "Condensed Schedule",
       "LabelOnTop": true
     }
@@ -33,5 +34,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
