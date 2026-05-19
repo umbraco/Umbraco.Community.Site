@@ -151,5 +151,7 @@ When you go from "I understand how this hangs together" to "I want to add a thin
 
 - **[`docs/BUILDING_PAGES.md`](../BUILDING_PAGES.md)** — adding a new page type end to end. The frontend bit is creating a new `_<alias>.ts` entrypoint that gets picked up automatically by `Layout.cshtml`.
 - **[`docs/BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md)** — adding a new content block. Touches `components/` if the block has interactive behaviour.
+- **[`CODE_CONVENTIONS.md`](../../CODE_CONVENTIONS.md)** — naming patterns including TypeScript component file names (`*.element.ts`) and the `dc-` web-component tag prefix used on the public site.
+- **[`ACCESSIBILITY.md`](../../ACCESSIBILITY.md)** — WCAG 2.1 AA conformance notes: focus management, keyboard navigation, ARIA, the Lucide icon conventions. Worth reading before adding any interactive component.
 
 For *why* specific bits are shaped the way they are — the SVG TagHelper, the slider components, the form-steps progressive enhancement — see the [tutorials suite](../tutorials/README.md).
