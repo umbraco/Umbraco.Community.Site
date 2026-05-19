@@ -37,6 +37,7 @@
           "Key": "db7ed1b5-fc12-4e9d-844e-d0b738829241",
           "Alias": "featuredBlogPost",
           "DataType": "umb://data-type/fd1e0da556064862b6795d0cf3a52a59",
+          "ValueType": "Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent",
           "Name": "Featured blog post"
         }
       ]
@@ -50,6 +51,7 @@
           "Key": "c038649e-3694-4e7b-ac9a-79056538d49b",
           "Alias": "numberOfBlogArticlesPerPage",
           "DataType": "umb://data-type/16475fdf08f14127be207dfad649583e",
+          "ValueType": "System.Int32",
           "Name": "Number of blog articles per page"
         }
       ]
@@ -65,6 +67,7 @@
           "Key": "a1b2c3d4-1111-4a7b-8c9d-0e1f2a3b4c5d",
           "Alias": "rssTitle",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "Title shown in the RSS feed channel. Defaults to the page name if empty.",
           "Name": "Feed title"
         },
@@ -72,6 +75,7 @@
           "Key": "a1b2c3d4-2222-4a7b-8c9d-0e1f2a3b4c5d",
           "Alias": "rssDescription",
           "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
           "Description": "Description shown in the RSS feed channel.",
           "Name": "Feed description",
           "SortOrder": 1
@@ -80,6 +84,7 @@
           "Key": "a1b2c3d4-3333-4a7b-8c9d-0e1f2a3b4c5d",
           "Alias": "rssItemCount",
           "DataType": "umb://data-type/16475fdf08f14127be207dfad649583e",
+          "ValueType": "System.Int32",
           "Description": "Maximum number of articles in the RSS feed. Defaults to 25 if empty.",
           "Name": "Number of feed items",
           "SortOrder": 2
@@ -129,5 +134,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

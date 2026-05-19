@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Schema.NET;
-using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -16,9 +15,7 @@ namespace UmbracoCommunity.Web.Services;
 
 internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 {
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IImageUrlGenerator _imageUrlGenerator;
-    private readonly IPublishedValueFallback _publishedValueFallback;
+    private readonly IImageUrlBuilder _imageUrlBuilder;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly SessionizeApiClient _sessionizeApiClient;
     private readonly OrganizationSchemaBuilder _organizationSchemaBuilder;
@@ -27,9 +24,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly UrlUtilities _urlUtilities;
 
     public SeoDataService(
-        IPublishedUrlProvider publishedUrlProvider,
-        IImageUrlGenerator imageUrlGenerator,
-        IPublishedValueFallback publishedValueFallback,
+        IImageUrlBuilder imageUrlBuilder,
         IHttpContextAccessor httpContextAccessor,
         SessionizeApiClient sessionizeApiClient,
         OrganizationSchemaBuilder organizationSchemaBuilder,
@@ -37,9 +32,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
         UrlUtilities urlUtilities)
     {
-        _publishedUrlProvider = publishedUrlProvider;
-        _imageUrlGenerator = imageUrlGenerator;
-        _publishedValueFallback = publishedValueFallback;
+        _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
         _sessionizeApiClient = sessionizeApiClient;
         _organizationSchemaBuilder = organizationSchemaBuilder;
@@ -158,13 +151,10 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     }
 
     private string GetEnsuredOpenGraphImageUrl(MediaWithCrops mediaWithCrops) =>
-        GetImageUrl(
+        _imageUrlBuilder.GetImageUrl(
             mediaWithCrops,
             "Social",
-            _imageUrlGenerator,
-            _publishedValueFallback,
-            _publishedUrlProvider,
-            UrlMode.Absolute,
+            mode: UrlMode.Absolute,
             webp: false) ?? string.Empty;
 
     private void AddBaseSchema(MetaTagsViewModel viewModel, ICompositionSeo contentModel, SocialSettings? socialSettings, IPublishedContent currentPage)

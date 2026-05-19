@@ -28,6 +28,7 @@
           "Key": "16c35df0-f125-430e-8a42-7707eca15385",
           "Alias": "teaser",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
           "Name": "Teaser"
         }
       ]
@@ -43,6 +44,7 @@
           "Key": "00f961ee-87ef-49a6-bad8-96df35256f55",
           "Alias": "categories",
           "DataType": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.PublishedContent.IPublishedContent\u003E",
           "Name": "Categories",
           "SortOrder": 3
         },
@@ -50,6 +52,7 @@
           "Key": "0f55f9a5-90a0-41c8-89ec-b658b88fc93c",
           "Alias": "readTime",
           "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+          "ValueType": "System.Int32",
           "Description": "In minutes",
           "Name": "Read time",
           "SortOrder": 5
@@ -58,6 +61,7 @@
           "Key": "2bbd15e5-c7c7-4c07-a15a-67c4cfc8d693",
           "Alias": "publishDate",
           "DataType": "umb://data-type/5046194e4237453ca54715db3a07c4e1",
+          "ValueType": "System.DateTime",
           "Name": "Publish date",
           "SortOrder": 2
         },
@@ -65,6 +69,7 @@
           "Key": "8df798e1-1449-4fd9-8ea6-a120661b548d",
           "Alias": "tags",
           "DataType": "umb://data-type/e351950048d7422c8b6e9e8c8297c628",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CSystem.String\u003E",
           "Name": "Tags",
           "SortOrder": 4
         },
@@ -72,6 +77,7 @@
           "Key": "a5e9c820-7ec6-4e4a-a0b8-35f0bfb1a13a",
           "Alias": "author",
           "DataType": "umb://data-type/0ebf9c6de56b464a9715676aebb61a4f",
+          "ValueType": "Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent",
           "Name": "Author",
           "SortOrder": 1
         },
@@ -79,6 +85,7 @@
           "Key": "cdf4dbdb-f839-47e0-82a3-8c60b763a409",
           "Alias": "thumbnailImage",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Thumbnail image"
         }
       ]
@@ -149,5 +156,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
