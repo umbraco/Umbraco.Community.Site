@@ -18,3 +18,5 @@ A new primer earns its keep when an area of the codebase has:
 - A scattering of how-to / tutorial / reference docs that benefit from being threaded together.
 
 If the answer fits in a paragraph in CLAUDE.md, it doesn't need a primer. If you find yourself writing the same "let me explain how X works in this project" thread three times, it does.
+
+See [`IDEAS.md`](./IDEAS.md) for candidate primers worth writing.
