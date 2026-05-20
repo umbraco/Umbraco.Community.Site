@@ -13,7 +13,7 @@ public sealed class NotFoundHitService : INotFoundHitService
         _contextFactory = contextFactory;
     }
 
-    public async Task<(IReadOnlyList<NotFoundHitEntity> items, int total)> ListAsync(
+    public async Task<(IReadOnlyList<HitListRow> items, int total)> ListAsync(
         HitListQuery query, UserScope scope, CancellationToken ct)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
@@ -24,7 +24,7 @@ public sealed class NotFoundHitService : INotFoundHitService
         {
             if (scope.AccessibleHostnames.Count == 0)
             {
-                return (Array.Empty<NotFoundHitEntity>(), 0);
+                return (Array.Empty<HitListRow>(), 0);
             }
             q = q.Where(h => scope.AccessibleHostnames.Contains(h.Hostname));
         }
@@ -33,7 +33,7 @@ public sealed class NotFoundHitService : INotFoundHitService
         {
             if (!scope.CanAccessHostname(query.Hostname))
             {
-                return (Array.Empty<NotFoundHitEntity>(), 0);
+                return (Array.Empty<HitListRow>(), 0);
             }
             q = q.Where(h => h.Hostname == query.Hostname);
         }
@@ -53,11 +53,16 @@ public sealed class NotFoundHitService : INotFoundHitService
         {
             HitSort.Popularity => q.OrderByDescending(h => h.HitCount).ThenByDescending(h => h.LastSeenUtc),
             HitSort.FirstSeen => q.OrderByDescending(h => h.FirstSeenUtc),
+            HitSort.QueryStringCount => q.OrderByDescending(h => h.QueryStrings.Count()).ThenByDescending(h => h.LastSeenUtc),
             _ => q.OrderByDescending(h => h.LastSeenUtc),
         };
 
         var total = await q.CountAsync(ct);
-        var items = await q.Skip(query.Skip).Take(query.Take).ToListAsync(ct);
+        var items = await q
+            .Skip(query.Skip)
+            .Take(query.Take)
+            .Select(h => new HitListRow(h, h.QueryStrings.Count()))
+            .ToListAsync(ct);
 
         return (items, total);
     }

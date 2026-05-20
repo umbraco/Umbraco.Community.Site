@@ -4,7 +4,7 @@ namespace Umbraco.Community.NotFoundTracker.Services;
 
 public interface INotFoundHitService
 {
-    Task<(IReadOnlyList<NotFoundHitEntity> items, int total)> ListAsync(HitListQuery query, UserScope scope, CancellationToken ct);
+    Task<(IReadOnlyList<HitListRow> items, int total)> ListAsync(HitListQuery query, UserScope scope, CancellationToken ct);
     Task<NotFoundHitEntity?> GetAsync(int id, UserScope scope, CancellationToken ct);
     Task<IReadOnlyList<string>> GetDistinctHostnamesAsync(UserScope scope, CancellationToken ct);
     Task<bool> DeleteAsync(int id, UserScope scope, CancellationToken ct);
@@ -21,9 +21,12 @@ public sealed class HitListQuery
     public int Take { get; init; } = 25;
 }
 
+public sealed record HitListRow(NotFoundHitEntity Hit, int QueryStringCount);
+
 public enum HitSort
 {
     RecentlySeen = 0,
     Popularity = 1,
     FirstSeen = 2,
+    QueryStringCount = 3,
 }

@@ -9,4 +9,5 @@ public sealed class HitListItem
     public DateTime FirstSeenUtc { get; set; }
     public DateTime LastSeenUtc { get; set; }
     public byte Status { get; set; }
+    public int QueryStringCount { get; set; }
 }

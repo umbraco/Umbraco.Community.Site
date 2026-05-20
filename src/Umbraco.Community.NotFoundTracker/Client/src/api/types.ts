@@ -6,6 +6,7 @@ export interface HitListItem {
   firstSeenUtc: string;
   lastSeenUtc: string;
   status: number;       // 0 Active, 1 IgnoredManually, 2 Redirected
+  queryStringCount: number;
 }
 
 export interface HitListResponse {

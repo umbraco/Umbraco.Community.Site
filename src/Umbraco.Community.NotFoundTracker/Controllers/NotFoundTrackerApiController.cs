@@ -247,14 +247,15 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
         IsReadOnly = r.Source == IgnoreRuleSource.ConfigSeeded,
     };
 
-    private static HitListItem MapItem(NotFoundHitEntity h) => new()
+    private static HitListItem MapItem(HitListRow row) => new()
     {
-        Id = h.Id,
-        Hostname = h.Hostname,
-        Path = h.Path,
-        HitCount = h.HitCount,
-        FirstSeenUtc = h.FirstSeenUtc,
-        LastSeenUtc = h.LastSeenUtc,
-        Status = (byte)h.Status,
+        Id = row.Hit.Id,
+        Hostname = row.Hit.Hostname,
+        Path = row.Hit.Path,
+        HitCount = row.Hit.HitCount,
+        FirstSeenUtc = row.Hit.FirstSeenUtc,
+        LastSeenUtc = row.Hit.LastSeenUtc,
+        Status = (byte)row.Hit.Status,
+        QueryStringCount = row.QueryStringCount,
     };
 }

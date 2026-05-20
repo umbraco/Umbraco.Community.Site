@@ -6,12 +6,14 @@ import { UMB_DOCUMENT_PICKER_MODAL } from "@umbraco-cms/backoffice/document";
 import { NotFoundTrackerApi } from "../api/not-found-tracker-api.js";
 import type { HitListItem, HitListResponse } from "../api/types.js";
 import { ADD_IGNORE_RULE_MODAL } from "./modals/add-ignore-rule-modal.token.js";
+import { HIT_DETAILS_MODAL } from "./modals/hit-details-modal.token.js";
 
 const STATUS_LABELS = ["Active", "Ignored", "Redirected"];
 const SORTS = [
   { value: "0", name: "Recently seen" },
   { value: "1", name: "Popularity" },
   { value: "2", name: "First seen" },
+  { value: "3", name: "Query strings" },
 ];
 
 @customElement("not-found-tracker-hits-tab")
@@ -56,6 +58,11 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     .row-actions { display: flex; gap: var(--uui-size-space-1); }
     .status-cell uui-tag { text-transform: none; }
     .checkbox-cell { width: 1%; white-space: nowrap; }
+    .path-link {
+      color: var(--uui-color-interactive);
+      text-decoration: none;
+    }
+    .path-link:hover { text-decoration: underline; }
     .empty {
       text-align: center;
       padding: var(--uui-size-space-6);
@@ -172,6 +179,11 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     await this.load();
   }
 
+  private openDetails(item: HitListItem) {
+    if (!this._modalManager) return;
+    this._modalManager.open(this, HIT_DETAILS_MODAL, { data: { hitId: item.id } });
+  }
+
   private async openIgnoreModal(item: HitListItem) {
     if (!this._modalManager) return;
     const modal = this._modalManager.open(this, ADD_IGNORE_RULE_MODAL, {
@@ -217,7 +229,6 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     ];
     const statusOptions = [
       { name: "Active", value: "0", selected: this.statusFilter === 0 },
-      { name: "Ignored", value: "1", selected: this.statusFilter === 1 },
       { name: "Redirected", value: "2", selected: this.statusFilter === 2 },
     ];
     const sortOptions = SORTS.map((s) => ({ ...s, selected: String(this.sort) === s.value }));
@@ -302,7 +313,7 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
           <uui-table-head-cell>Path</uui-table-head-cell>
           <uui-table-head-cell>Hostname</uui-table-head-cell>
           <uui-table-head-cell>Hits</uui-table-head-cell>
-          <uui-table-head-cell>Last seen</uui-table-head-cell>
+          <uui-table-head-cell>Query strings</uui-table-head-cell>
           <uui-table-head-cell>Status</uui-table-head-cell>
           <uui-table-head-cell></uui-table-head-cell>
         </uui-table-head>
@@ -325,10 +336,17 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
                       @change=${() => this.toggleSelect(item.id)}
                     >
                   </uui-table-cell>
-                  <uui-table-cell>${item.path}</uui-table-cell>
+                  <uui-table-cell>
+                    <a
+                      class="path-link"
+                      href=${`https://${item.hostname}${item.path}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >${item.path}</a>
+                  </uui-table-cell>
                   <uui-table-cell>${item.hostname}</uui-table-cell>
                   <uui-table-cell>${item.hitCount}</uui-table-cell>
-                  <uui-table-cell>${new Date(item.lastSeenUtc).toLocaleString()}</uui-table-cell>
+                  <uui-table-cell>${item.queryStringCount}</uui-table-cell>
                   <uui-table-cell class="status-cell">
                     <uui-tag look="${this.statusColor(item.status) === "default" ? "default" : "primary"}"
                              color="${this.statusColor(item.status)}">
@@ -337,6 +355,12 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
                   </uui-table-cell>
                   <uui-table-cell>
                     <div class="row-actions">
+                      <uui-button
+                        compact
+                        look="secondary"
+                        label="Details"
+                        @click=${() => this.openDetails(item)}
+                      ></uui-button>
                       <uui-button
                         compact
                         look="secondary"

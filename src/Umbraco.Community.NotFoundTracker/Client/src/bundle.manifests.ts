@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
     name: "404 Tracker",
     elementName: "not-found-tracker-dashboard",
     js: () => import("./dashboards/not-found-tracker-dashboard.element.js"),
-    weight: 100,
+    weight: 5,
     meta: {
       label: "404 Tracker",
       pathname: "not-found-tracker",
@@ -25,5 +25,11 @@ export const manifests: Array<UmbExtensionManifest> = [
     alias: "NotFoundTracker.Modal.AddIgnoreRule",
     name: "Add Ignore Rule Modal",
     element: () => import("./dashboards/modals/add-ignore-rule-modal.element.js"),
+  },
+  {
+    type: "modal",
+    alias: "NotFoundTracker.Modal.HitDetails",
+    name: "Hit Details Modal",
+    element: () => import("./dashboards/modals/hit-details-modal.element.js"),
   },
 ];
