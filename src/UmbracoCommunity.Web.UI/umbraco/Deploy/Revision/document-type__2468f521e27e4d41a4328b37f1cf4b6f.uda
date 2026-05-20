@@ -22,6 +22,7 @@
           "Key": "39ee3016-da1d-4968-9660-6ccca2b0ca6c",
           "Alias": "rooms",
           "DataType": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Name": "Rooms",
           "SortOrder": 2
         },
@@ -29,6 +30,7 @@
           "Key": "66806de6-465d-4f13-bf8f-5e173fc595c8",
           "Alias": "days",
           "DataType": "umb://data-type/e431b1e550dd46c8b6f3199ee74130df",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Name": "Days",
           "SortOrder": 1
         },
@@ -36,6 +38,7 @@
           "Key": "b077e32d-8468-49bc-abc3-dc250474a7d7",
           "Alias": "tags",
           "DataType": "umb://data-type/d4918285888d4dbc9e47f8c020496959",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Name": "Tags"
         }
       ]
@@ -62,5 +65,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

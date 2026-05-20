@@ -24,6 +24,7 @@
           "Key": "8b1f7d63-1a86-4940-9861-d6383509dd53",
           "Alias": "speakers",
           "DataType": "umb://data-type/ad814178052141819416058facfd591a",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Mandatory": true,
           "Name": "Speakers"
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

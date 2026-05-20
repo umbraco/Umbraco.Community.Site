@@ -24,6 +24,7 @@
           "Key": "c3e048d7-4a0a-4f3c-8010-4aae39b9fd67",
           "Alias": "displayButtons",
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
           "Description": "Check to display explicit arrows to control the slider",
           "Name": "Display buttons",
           "SortOrder": -1
@@ -52,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

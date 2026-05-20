@@ -23,6 +23,7 @@
           "Key": "0eecfee4-5ae5-40f0-94fe-5a848abd6c42",
           "Alias": "siteWideOgImage",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "Base image which is used when a page is shared on a social platform in the case that there is no image defined on the page",
           "Mandatory": true,
           "Name": "Site wide OG image"
@@ -38,12 +39,14 @@
           "Key": "34a36415-200b-4457-a7f0-286fd2b261d2",
           "Alias": "organisationName",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Organisation name"
         },
         {
           "Key": "8c75041f-b35f-4cfe-84ab-4c45ae35f299",
           "Alias": "organisationLogo",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "Min 112x112px, recommended 1200x630px",
           "Name": "Organisation logo",
           "SortOrder": 1
@@ -52,6 +55,7 @@
           "Key": "d99707ed-febd-4115-8096-ec078a2975d8",
           "Alias": "organisationUrl",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Organisation url",
           "SortOrder": 2
         }
@@ -79,5 +83,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

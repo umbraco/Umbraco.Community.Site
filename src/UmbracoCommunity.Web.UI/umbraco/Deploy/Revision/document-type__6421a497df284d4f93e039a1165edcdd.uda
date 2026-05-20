@@ -21,6 +21,7 @@
           "Key": "a19a1834-cb7b-485d-9d08-465428a20ee6",
           "Alias": "footerLinkItems",
           "DataType": "umb://data-type/f4585f3d873240c3a08318fb5d061063",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Footer link items"
         }
       ]
@@ -39,5 +40,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

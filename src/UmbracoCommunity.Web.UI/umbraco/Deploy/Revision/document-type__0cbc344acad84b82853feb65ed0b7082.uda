@@ -22,6 +22,7 @@
           "Key": "11e164b3-3349-49ba-8059-95beee247943",
           "Alias": "footnote",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Footnote",
           "SortOrder": 4
         },
@@ -29,6 +30,7 @@
           "Key": "5d193d9d-48a9-4d51-8fb0-a560f777f219",
           "Alias": "superHeadline",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "Appears first at the top (small)",
           "Name": "Super headline",
           "SortOrder": 1
@@ -37,6 +39,7 @@
           "Key": "9176276d-2724-4c08-b828-4d42613e601d",
           "Alias": "subheadline",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Subheadline",
           "SortOrder": 3
         },
@@ -44,12 +47,14 @@
           "Key": "c8a060ee-308e-4756-ae6c-90fc38571ab0",
           "Alias": "backgroundImage",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Background image"
         },
         {
           "Key": "f254b99f-ffd3-4a16-9571-33105a9688fe",
           "Alias": "headline",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Mandatory": true,
           "Name": "Headline",
           "SortOrder": 2
@@ -74,5 +79,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

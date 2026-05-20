@@ -21,6 +21,7 @@
           "Key": "c8de20a7-cb2d-4c55-9bf1-82967b38d723",
           "Alias": "size",
           "DataType": "umb://data-type/2cfb8a66fac94b318125be856658db63",
+          "ValueType": "System.String",
           "Mandatory": true,
           "Name": "Size"
         }
@@ -40,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

@@ -104,15 +104,31 @@ async Task<int> UpdatePackagesAsync(Dictionary<string, string?> options)
     {
         try
         {
-            var latestVersion = await GetLatestVersionAsync(http, package.Name);
-            if (latestVersion != null && latestVersion != package.Version)
+            string? newVersionSpec = null;
+
+            if (TryParseVersionRange(package.Version, out var lb, out var lv, out var uv, out var ub))
             {
-                updates.Add((package.Name, package.Version, latestVersion));
-                Console.WriteLine($"  {package.Name}: {package.Version} -> {latestVersion}");
+                var latest = await GetLatestVersionInRangeAsync(http, package.Name, lb, lv, uv, ub);
+                var currentLower = TryParseVersion(lv);
+                var latestParsed = latest != null ? TryParseVersion(latest) : null;
+                if (latestParsed != null && currentLower != null && CompareVersions(latestParsed.Value, currentLower.Value) > 0)
+                    newVersionSpec = $"{lb}{latest},{uv}{ub}";
+            }
+            else
+            {
+                var latest = await GetLatestVersionAsync(http, package.Name);
+                if (latest != null && latest != package.Version)
+                    newVersionSpec = latest;
+            }
+
+            if (newVersionSpec != null)
+            {
+                updates.Add((package.Name, package.Version, newVersionSpec));
+                Console.WriteLine($"  {package.Name}: {package.Version} -> {newVersionSpec}");
 
                 if (!dryRun)
                 {
-                    package.Element.SetAttributeValue("Version", latestVersion);
+                    package.Element.SetAttributeValue("Version", newVersionSpec);
                 }
             }
             else
@@ -174,6 +190,83 @@ async Task<string?> GetLatestVersionAsync(HttpClient http, string packageName)
     {
         return null;
     }
+}
+
+async Task<string?> GetLatestVersionInRangeAsync(HttpClient http, string packageName, char lowerBracket, string lowerVersion, string upperVersion, char upperBracket)
+{
+    var url = $"https://api.nuget.org/v3-flatcontainer/{packageName.ToLowerInvariant()}/index.json";
+    try
+    {
+        var response = await http.GetFromJsonAsync<NuGetVersionsResponse>(url);
+        if (response?.Versions == null || response.Versions.Length == 0)
+            return null;
+
+        var latest = response.Versions
+            .Select(TryParseVersion)
+            .Where(v => v != null)
+            .Select(v => v!.Value)
+            .Where(v => !v.IsPrerelease)
+            .Where(v => IsVersionInRange(v, lowerBracket, lowerVersion, upperBracket, upperVersion))
+            .OrderByDescending(v => v.Major)
+            .ThenByDescending(v => v.Minor)
+            .ThenByDescending(v => v.Patch)
+            .FirstOrDefault();
+
+        return latest.Original;
+    }
+    catch
+    {
+        return null;
+    }
+}
+
+bool TryParseVersionRange(string version, out char lowerBracket, out string lowerVersion, out string upperVersion, out char upperBracket)
+{
+    lowerBracket = '['; lowerVersion = ""; upperVersion = ""; upperBracket = ')';
+    var match = Regex.Match(version, @"^([\[\(])([^,]*),([^,]*)([\]\)])$");
+    if (!match.Success) return false;
+    lowerBracket = match.Groups[1].Value[0];
+    lowerVersion = match.Groups[2].Value.Trim();
+    upperVersion = match.Groups[3].Value.Trim();
+    upperBracket = match.Groups[4].Value[0];
+    return true;
+}
+
+bool IsVersionInRange(
+    (int Major, int Minor, int Patch, bool IsPrerelease, string Original) v,
+    char lowerBracket, string lowerVersion,
+    char upperBracket, string upperVersion)
+{
+    if (!string.IsNullOrEmpty(lowerVersion))
+    {
+        var lower = TryParseVersion(lowerVersion);
+        if (lower != null)
+        {
+            var cmp = CompareVersions(v, lower.Value);
+            if (lowerBracket == '[' && cmp < 0) return false;
+            if (lowerBracket == '(' && cmp <= 0) return false;
+        }
+    }
+    if (!string.IsNullOrEmpty(upperVersion))
+    {
+        var upper = TryParseVersion(upperVersion);
+        if (upper != null)
+        {
+            var cmp = CompareVersions(v, upper.Value);
+            if (upperBracket == ']' && cmp > 0) return false;
+            if (upperBracket == ')' && cmp >= 0) return false;
+        }
+    }
+    return true;
+}
+
+int CompareVersions(
+    (int Major, int Minor, int Patch, bool IsPrerelease, string Original) a,
+    (int Major, int Minor, int Patch, bool IsPrerelease, string Original) b)
+{
+    if (a.Major != b.Major) return a.Major.CompareTo(b.Major);
+    if (a.Minor != b.Minor) return a.Minor.CompareTo(b.Minor);
+    return a.Patch.CompareTo(b.Patch);
 }
 
 (int Major, int Minor, int Patch, bool IsPrerelease, string Original)? TryParseVersion(string version)
