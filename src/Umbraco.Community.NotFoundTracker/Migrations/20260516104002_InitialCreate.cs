@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,15 +15,16 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 name: "NotFoundHits",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Hostname = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Path = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
-                    HitCount = table.Column<long>(type: "INTEGER", nullable: false),
-                    FirstSeenUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastSeenUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    LastUserAgent = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
-                    Status = table.Column<byte>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Hostname = table.Column<string>(maxLength: 255, nullable: false),
+                    Path = table.Column<string>(maxLength: 2048, nullable: false),
+                    HitCount = table.Column<long>(nullable: false),
+                    FirstSeenUtc = table.Column<DateTime>(nullable: false),
+                    LastSeenUtc = table.Column<DateTime>(nullable: false),
+                    LastUserAgent = table.Column<string>(maxLength: 512, nullable: true),
+                    Status = table.Column<byte>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -34,14 +35,15 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 name: "NotFoundIgnoreRules",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Hostname = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    MatchType = table.Column<byte>(type: "INTEGER", nullable: false),
-                    Path = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
-                    Source = table.Column<byte>(type: "INTEGER", nullable: false),
-                    Note = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    CreatedUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Hostname = table.Column<string>(maxLength: 255, nullable: true),
+                    MatchType = table.Column<byte>(nullable: false),
+                    Path = table.Column<string>(maxLength: 2048, nullable: false),
+                    Source = table.Column<byte>(nullable: false),
+                    Note = table.Column<string>(maxLength: 500, nullable: true),
+                    CreatedUtc = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,12 +54,13 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 name: "NotFoundHitQueryStrings",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    HitId = table.Column<int>(type: "INTEGER", nullable: false),
-                    QueryString = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
-                    HitCount = table.Column<long>(type: "INTEGER", nullable: false),
-                    LastSeenUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HitId = table.Column<int>(nullable: false),
+                    QueryString = table.Column<string>(maxLength: 2048, nullable: false),
+                    HitCount = table.Column<long>(nullable: false),
+                    LastSeenUtc = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,10 +74,9 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotFoundHitQueryStrings_HitId_QueryString",
+                name: "IX_NotFoundHitQueryStrings_HitId",
                 table: "NotFoundHitQueryStrings",
-                columns: new[] { "HitId", "QueryString" },
-                unique: true);
+                column: "HitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotFoundHitQueryStrings_LastSeenUtc",
@@ -87,10 +89,9 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 column: "HitCount");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotFoundHits_Hostname_Path",
+                name: "IX_NotFoundHits_Hostname",
                 table: "NotFoundHits",
-                columns: new[] { "Hostname", "Path" },
-                unique: true);
+                column: "Hostname");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotFoundHits_LastSeenUtc",
@@ -98,9 +99,9 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 column: "LastSeenUtc");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotFoundIgnoreRules_Hostname_MatchType_Path",
+                name: "IX_NotFoundIgnoreRules_Hostname",
                 table: "NotFoundIgnoreRules",
-                columns: new[] { "Hostname", "MatchType", "Path" });
+                column: "Hostname");
         }
 
         /// <inheritdoc />

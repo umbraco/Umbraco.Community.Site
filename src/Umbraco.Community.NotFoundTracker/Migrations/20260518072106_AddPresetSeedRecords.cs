@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,12 +15,13 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 name: "NotFoundPresetSeedRecords",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Hostname = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    MatchType = table.Column<byte>(type: "INTEGER", nullable: false),
-                    Path = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
-                    SeededUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Hostname = table.Column<string>(maxLength: 255, nullable: true),
+                    MatchType = table.Column<byte>(nullable: false),
+                    Path = table.Column<string>(maxLength: 2048, nullable: false),
+                    SeededUtc = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,10 +29,9 @@ namespace Umbraco.Community.NotFoundTracker.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotFoundPresetSeedRecords_Hostname_MatchType_Path",
+                name: "IX_NotFoundPresetSeedRecords_Hostname",
                 table: "NotFoundPresetSeedRecords",
-                columns: new[] { "Hostname", "MatchType", "Path" },
-                unique: true);
+                column: "Hostname");
         }
 
         /// <inheritdoc />

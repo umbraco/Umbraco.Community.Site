@@ -26,7 +26,7 @@ public class NotFoundTrackerDbContext : DbContext
             entity.Property(e => e.Path).IsRequired().HasMaxLength(2048);
             entity.Property(e => e.LastUserAgent).HasMaxLength(512);
 
-            entity.HasIndex(e => new { e.Hostname, e.Path }).IsUnique();
+            entity.HasIndex(e => e.Hostname);
             entity.HasIndex(e => e.LastSeenUtc);
             entity.HasIndex(e => e.HitCount);
 
@@ -43,7 +43,7 @@ public class NotFoundTrackerDbContext : DbContext
 
             entity.Property(e => e.QueryString).IsRequired().HasMaxLength(2048);
 
-            entity.HasIndex(e => new { e.HitId, e.QueryString }).IsUnique();
+            entity.HasIndex(e => e.HitId);
             entity.HasIndex(e => e.LastSeenUtc);
         });
 
@@ -56,7 +56,7 @@ public class NotFoundTrackerDbContext : DbContext
             entity.Property(e => e.Path).IsRequired().HasMaxLength(2048);
             entity.Property(e => e.Note).HasMaxLength(500);
 
-            entity.HasIndex(e => new { e.Hostname, e.MatchType, e.Path });
+            entity.HasIndex(e => e.Hostname);
         });
 
         modelBuilder.Entity<NotFoundPresetSeedRecordEntity>(entity =>
@@ -67,7 +67,7 @@ public class NotFoundTrackerDbContext : DbContext
             entity.Property(e => e.Hostname).HasMaxLength(255);
             entity.Property(e => e.Path).IsRequired().HasMaxLength(2048);
 
-            entity.HasIndex(e => new { e.Hostname, e.MatchType, e.Path }).IsUnique();
+            entity.HasIndex(e => e.Hostname);
         });
     }
 }
