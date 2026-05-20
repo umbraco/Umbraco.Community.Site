@@ -30,6 +30,22 @@ export class DocSearchElement extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     document.addEventListener("click", this.#boundDocumentClick);
+    this.#seedFromUrl();
+  }
+
+  #seedFromUrl() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const initial = params.get("q");
+      if (initial && initial.trim().length >= minQueryLength) {
+        this._query = initial;
+        this._open = true;
+        this._loading = true;
+        this.#runSearch(initial);
+      }
+    } catch {
+      // URLSearchParams not available — ignore.
+    }
   }
 
   disconnectedCallback() {
