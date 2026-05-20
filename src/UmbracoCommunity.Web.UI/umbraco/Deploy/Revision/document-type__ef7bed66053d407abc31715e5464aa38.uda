@@ -21,6 +21,7 @@
           "Key": "7576226d-c7da-4d99-9fea-ce33cfefcab0",
           "Alias": "avatar",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Avatar"
         }
       ]
@@ -39,5 +40,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

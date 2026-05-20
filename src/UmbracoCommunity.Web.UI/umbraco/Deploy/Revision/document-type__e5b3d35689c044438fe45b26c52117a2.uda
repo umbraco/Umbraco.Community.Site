@@ -24,6 +24,7 @@
           "Key": "9d0eb644-9ed6-4d1c-826a-1170fd232bc9",
           "Alias": "cards",
           "DataType": "umb://data-type/389db651adbd477185d01cbe3a46d985",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Cards",
           "SortOrder": 2
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

@@ -23,6 +23,7 @@
           "Key": "7b53de83-6e72-4cab-8e5b-572d98cd9d2f",
           "Alias": "hideFromSitemap",
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
           "Name": "Hide from sitemap"
         }
       ]
@@ -41,5 +42,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

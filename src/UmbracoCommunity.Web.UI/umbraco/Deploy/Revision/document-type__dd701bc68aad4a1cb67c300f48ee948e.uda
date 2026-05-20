@@ -21,6 +21,7 @@
           "Key": "817ec50f-0c5b-42fb-a0d2-694c3f249373",
           "Alias": "link",
           "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
           "Mandatory": true,
           "Name": "Link"
         },
@@ -28,6 +29,7 @@
           "Key": "82236666-87ba-4eaf-9e28-812044103c31",
           "Alias": "icon",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Icon",
           "SortOrder": 2
         },
@@ -35,6 +37,7 @@
           "Key": "b7b21b68-88bd-490f-a62d-63281ea71271",
           "Alias": "linkTitle",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "If nothing entered, this will default to page name",
           "Name": "Link title",
           "SortOrder": 1
@@ -43,6 +46,7 @@
           "Key": "f91614d5-33a6-4b6c-acb3-b9a542238074",
           "Alias": "caption",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Description": "Short text under the link (max 25 chars)",
           "Name": "Caption",
           "SortOrder": 3
@@ -75,5 +79,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

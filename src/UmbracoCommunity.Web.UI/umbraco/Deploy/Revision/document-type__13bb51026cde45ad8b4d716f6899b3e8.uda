@@ -24,6 +24,7 @@
           "Key": "79ef8fa8-9b5c-41a2-a2b6-c95cd023120a",
           "Alias": "postDisplay",
           "DataType": "umb://data-type/5bdd4d7ef4954703aa2cc71f37bd49ce",
+          "ValueType": "System.String",
           "Description": "Choose how to display posts",
           "Name": "Post display",
           "SortOrder": 101
@@ -52,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
