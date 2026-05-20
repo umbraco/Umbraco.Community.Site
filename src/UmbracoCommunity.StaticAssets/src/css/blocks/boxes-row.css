@@ -366,6 +366,7 @@
         max-width: none;
         align-self: stretch;
         display: flex;
+        min-width: 0;
     }
 
     .dc-boxes-row__item--full-width .row-item-image img {
@@ -382,6 +383,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        min-width: 0;
     }
 }
 
@@ -437,7 +439,7 @@
    side-by-side (>=1024px). The modifier class is emitted by
    CardsBlock.cshtml when the pattern matches. */
 .dc-boxes-row__items--image-text-pair {
-    gap: 3rem;
+    row-gap: 3rem;
 
     @media (--lg) {
         column-gap: 5rem;
