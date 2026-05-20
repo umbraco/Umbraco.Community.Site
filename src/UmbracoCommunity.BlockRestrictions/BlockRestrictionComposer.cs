@@ -5,6 +5,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using UmbracoCommunity.BlockRestrictions.Infrastructure;
 
 namespace UmbracoCommunity.BlockRestrictions;
@@ -77,8 +78,10 @@ public class BlockRestrictionComposer : IComposer
             opt.OperationFilter<BlockRestrictionsOperationSecurityFilter>();
         });
 
-        // Apply database migrations automatically on startup (creates the table if needed).
-        builder.Services.AddHostedService<BlockRestrictionMigrationHostedService>();
+        // Apply database migrations after Umbraco has finished booting. Using a notification
+        // handler (rather than an IHostedService) avoids racing Umbraco's unattended installer
+        // for the SQLite write lock on a fresh install — see issue #132.
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, BlockRestrictionMigrationNotificationHandler>();
 
         // File-based persistence: singleton service for reading/writing JSON rule files.
         // Import from files is triggered manually via the backoffice dashboard.

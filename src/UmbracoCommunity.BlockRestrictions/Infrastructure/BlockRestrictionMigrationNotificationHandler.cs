@@ -1,32 +1,35 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace UmbracoCommunity.BlockRestrictions.Infrastructure;
 
 /// <summary>
-/// Hosted service that automatically applies pending EF Core migrations on application startup.
-/// This ensures the BlockRestrictionRules table is created/updated without requiring manual
-/// migration commands. Runs once on startup and then completes.
+/// Applies pending EF Core migrations once Umbraco has finished booting.
 ///
-/// For SQLite, also ensures the database directory exists (Umbraco may not have created
-/// the Data directory yet on a fresh install).
+/// Why a notification handler instead of <see cref="Microsoft.Extensions.Hosting.IHostedService"/>:
+/// on a fresh install Umbraco runs its unattended installer during host startup, which creates
+/// and populates the SQLite database. A hosted service runs concurrently with that installer and
+/// can block on a SQLite write lock for several minutes (issue #132). Deferring to
+/// <see cref="UmbracoApplicationStartedNotification"/> guarantees Umbraco has finished its own
+/// database setup before we touch the file.
 /// </summary>
-public class BlockRestrictionMigrationHostedService : IHostedService
+public class BlockRestrictionMigrationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDbContextFactory<BlockRestrictionDbContext> _contextFactory;
-    private readonly ILogger<BlockRestrictionMigrationHostedService> _logger;
+    private readonly ILogger<BlockRestrictionMigrationNotificationHandler> _logger;
 
-    public BlockRestrictionMigrationHostedService(
+    public BlockRestrictionMigrationNotificationHandler(
         IDbContextFactory<BlockRestrictionDbContext> contextFactory,
-        ILogger<BlockRestrictionMigrationHostedService> logger)
+        ILogger<BlockRestrictionMigrationNotificationHandler> logger)
     {
         _contextFactory = contextFactory;
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
     {
         try
         {
@@ -37,7 +40,7 @@ public class BlockRestrictionMigrationHostedService : IHostedService
             var isSqlite = context.Database.IsSqlite();
 
             // SQLite: ensure the directory for the database file exists.
-            // On a fresh Umbraco install the umbraco/Data/ folder may not exist yet.
+            // Umbraco will have created it during install, but belt-and-braces for non-install boots.
             if (isSqlite && connectionString != null)
             {
                 var builder = new SqliteConnectionStringBuilder(connectionString);
@@ -50,7 +53,6 @@ public class BlockRestrictionMigrationHostedService : IHostedService
                 }
             }
 
-            // Check for and apply any pending migrations.
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync(cancellationToken);
             if (pendingMigrations.Any())
             {
@@ -71,7 +73,4 @@ public class BlockRestrictionMigrationHostedService : IHostedService
             _logger.LogError(ex, "Failed to apply BlockRestrictions database migrations");
         }
     }
-
-    /// <summary>No cleanup needed on shutdown.</summary>
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

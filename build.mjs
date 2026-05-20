@@ -68,7 +68,7 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const CYAN = "\x1b[36m";
 
-const MODES = ["dev", "dev:dotnet", "local", "local:dotnet", "seed", "reset"];
+const MODES = ["dev", "dev:dotnet", "local", "local:dotnet", "seed", "reset", "update-packages", "update-packages:dry-run"];
 
 const LAUNCH_PROFILE_DEV = "Kestrel [ENV: Development - default]";
 const LAUNCH_PROFILE_LOCAL = "Kestrel [ENV: Local]";
@@ -542,6 +542,15 @@ async function runSeed() {
   log("Next dotnet boot will pick up the zip via Umbraco Deploy's ImportOnStartup.");
 }
 
+async function runUpdatePackages(dryRun) {
+  const label = dryRun ? "update-packages:dry-run" : "update-packages";
+  log(`Mode: ${label} (updating NuGet versions in Directory.Packages.props)\n`);
+  const args = ["run", "--project", "tools/upgrade-umbraco", "--", "update-packages"];
+  if (dryRun) args.push("--dry-run");
+  await runProcess("upgrade-umbraco", "dotnet", args, ROOT);
+  console.log(`\n${GREEN}${BOLD}Done.${RESET}`);
+}
+
 async function runReset() {
   log("Mode: reset (back up SQLite DB + run first-time setup)\n");
   await backupSqlite();
@@ -640,6 +649,18 @@ async function promptMode(showAdvanced) {
         summary: "Cloud-shaped build + dotnet run.",
         detail: "Full cloud-shape boot for end-to-end testing.",
       },
+      {
+        key: "update-packages:dry-run",
+        label: "update-packages:dry-run (advanced)",
+        summary: "Preview NuGet package updates in Directory.Packages.props.",
+        detail: "Runs the upgrade-umbraco tool in dry-run mode — shows what would change without modifying any files.",
+      },
+      {
+        key: "update-packages",
+        label: "update-packages (advanced)",
+        summary: "Apply NuGet package updates to Directory.Packages.props.",
+        detail: "Runs the upgrade-umbraco tool to bump every package to its latest stable version.",
+      },
     );
   }
 
@@ -698,6 +719,10 @@ async function main() {
   }
   if (mode === "reset") {
     await runReset();
+    return;
+  }
+  if (mode === "update-packages" || mode === "update-packages:dry-run") {
+    await runUpdatePackages(mode === "update-packages:dry-run");
     return;
   }
 

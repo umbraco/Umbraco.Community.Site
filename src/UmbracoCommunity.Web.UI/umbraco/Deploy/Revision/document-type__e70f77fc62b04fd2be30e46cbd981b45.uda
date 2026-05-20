@@ -21,6 +21,7 @@
           "Key": "05d323ae-4d18-45db-99f7-614a052c749e",
           "Alias": "shortDescription",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
           "Name": "Short description",
           "SortOrder": 2
         },
@@ -28,6 +29,7 @@
           "Key": "3c50a1ce-2438-4ac3-b557-3f9a33336e8d",
           "Alias": "fullDescription",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
           "Name": "Full description",
           "SortOrder": 7
         },
@@ -35,6 +37,7 @@
           "Key": "8658d20b-e745-4fc0-a0c1-5a1247792db0",
           "Alias": "priceSubtitle",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Price subtitle",
           "SortOrder": 4
         },
@@ -42,6 +45,7 @@
           "Key": "8c924cf1-406c-4f2f-80a8-57bdb93f7235",
           "Alias": "callToActionLinks",
           "DataType": "umb://data-type/b4e3535a175347e28568602cf8cfee6f",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
           "Name": "Call to action links",
           "SortOrder": 5
         },
@@ -49,6 +53,7 @@
           "Key": "8e66d26e-4a58-4310-b553-0598bd30333b",
           "Alias": "descriptionHeader",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Description header",
           "SortOrder": 6
         },
@@ -56,6 +61,7 @@
           "Key": "ad885667-31fc-4898-b0fd-cf97916989a4",
           "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Mandatory": true,
           "Name": "Title",
           "SortOrder": 1
@@ -64,6 +70,7 @@
           "Key": "f599ae6a-4959-47f2-b8f4-27fdea1410cc",
           "Alias": "priceHeadlineFigure",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Name": "Price headline figure",
           "SortOrder": 3
         },
@@ -71,6 +78,7 @@
           "Key": "f825b297-a7b1-4ae8-b033-c1443fd079d6",
           "Alias": "columnTag",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Name": "Column tag"
         }
       ]
@@ -101,5 +109,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
