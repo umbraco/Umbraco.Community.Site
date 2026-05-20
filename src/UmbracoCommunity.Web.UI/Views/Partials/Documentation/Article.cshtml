@@ -1,0 +1,17 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@model DocumentationPageViewModel
+
+@{
+    var article = Model.Article!;
+}
+
+<header class="documentation__header">
+    <h1>@article.Title</h1>
+    <p class="documentation__meta">
+        <time datetime="@article.LastModifiedUtc.ToString("o")">Updated @article.LastModifiedUtc.ToString("MMMM d, yyyy")</time>
+    </p>
+</header>
+
+<div class="documentation-prose">
+    @Model.ArticleHtml
+</div>

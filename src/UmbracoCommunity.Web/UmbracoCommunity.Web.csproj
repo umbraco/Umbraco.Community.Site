@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

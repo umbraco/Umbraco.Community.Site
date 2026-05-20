@@ -1,0 +1,34 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@using UmbracoCommunity.Web.ViewModelBuilders.Pages
+@model DocumentationPageViewModel
+
+<header class="documentation__header">
+    <h1>@Model.DocRootTitle</h1>
+</header>
+
+@if (Model.Index.HasContent)
+{
+    <div class="documentation__nodes">
+        @foreach (var node in Model.Index.Sections)
+        {
+            var nodeUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, node.PathSegments);
+            <div class="documentation-card">
+                <h2 class="documentation-card__title">
+                    <a href="@nodeUrl">@node.Title</a>
+                </h2>
+                @if (!string.IsNullOrWhiteSpace(node.Intro?.Excerpt))
+                {
+                    <p class="documentation-card__excerpt">@node.Intro.Excerpt</p>
+                }
+                @{
+                    var totalCount = node.Articles.Count + node.Subsections.Sum(s => s.Articles.Count);
+                }
+                <p class="documentation-card__meta">@totalCount @(totalCount == 1 ? "article" : "articles")</p>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="documentation__empty">No documentation has been published yet.</p>
+}

@@ -1,0 +1,25 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@model IReadOnlyList<DocumentationCrumb>
+
+@if (Model.Count > 1)
+{
+    <nav class="documentation-crumbs" aria-label="Breadcrumb">
+        <ol class="documentation-crumbs__list">
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                var crumb = Model[i];
+                var isLast = i == Model.Count - 1;
+                <li class="documentation-crumbs__item">
+                    @if (isLast)
+                    {
+                        <span aria-current="page">@crumb.Title</span>
+                    }
+                    else
+                    {
+                        <a href="@crumb.Url">@crumb.Title</a>
+                    }
+                </li>
+            }
+        </ol>
+    </nav>
+}
