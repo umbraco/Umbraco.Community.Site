@@ -1,3 +1,7 @@
+---
+tags: [svg, css-scoping, style-isolation, tag-helper]
+---
+
 # Scoping inline SVG `<style>` to prevent class-name bleed
 
 > **Prerequisites:** This tutorial extends an existing inline-SVG TagHelper. If you don't have one yet (or want to understand the one we're modifying), start with [Building an inline SVG TagHelper for Umbraco](../foundations/inline-svg-tag-helper.md). The walkthrough below assumes you've read it.

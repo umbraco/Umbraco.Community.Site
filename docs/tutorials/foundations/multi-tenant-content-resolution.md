@@ -1,3 +1,7 @@
+---
+tags: [multi-tenant, content-resolution, site-settings, ipublishedcontent]
+---
+
 # Resolving content in a multi-tenant Umbraco site
 
 This tutorial walks through the pattern the Umbraco Community site uses for **multi-tenancy** — running several distinct sites out of one Umbraco instance — and the small set of helpers that keep every content lookup scoped to *this request's* tenant rather than accidentally reaching into another one.

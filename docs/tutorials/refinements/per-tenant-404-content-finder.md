@@ -1,3 +1,7 @@
+---
+tags: [multi-tenant, 404, content-finder, routing]
+---
+
 # Per-tenant 404 pages with `IContentLastChanceFinder`
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). That tutorial covers the `Root()` + `GetSiteSettings()` resolution pattern this one extends to a corner of Umbraco where there *is no current page* — the request 404'd before it got that far.

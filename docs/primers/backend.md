@@ -1,3 +1,7 @@
+---
+tags: [primer, backend, architecture, controllers, view-models]
+---
+
 # Backend primer
 
 The C# side of the site lives across five projects, with **`src/UmbracoCommunity.Web/`** as the heart — controllers, view model builders, services, view components, and the small ASP.NET integrations Umbraco doesn't ship by default. This primer is an orientation doc, sibling to the [frontend primer](frontend.md); each section sketches what's there and links out for depth.

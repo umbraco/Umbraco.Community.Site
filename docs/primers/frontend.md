@@ -1,3 +1,7 @@
+---
+tags: [primer, frontend, architecture, vite, lit]
+---
+
 # Frontend primer
 
 The public site's frontend lives in **`src/UmbracoCommunity.StaticAssets/`** — a Vite + TypeScript + Lit project that builds JS, CSS, and other static assets the Razor views in `UmbracoCommunity.Web.UI` consume at request time. This primer is an orientation doc: each section sketches what's there and links out to a tutorial, how-to, or source file for depth.

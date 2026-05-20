@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Markdig;
+using Markdig.Extensions.Yaml;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
@@ -38,6 +39,8 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     private string? _resolvedRoot;
     private string? _repositoryUrl;
 
+    public event EventHandler? IndexRebuilt;
+
     public DocumentationService(
         IHostEnvironment hostEnvironment,
         IConfiguration configuration,
@@ -49,6 +52,7 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         _pipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
             .UseAutoIdentifiers()
+            .UseYamlFrontMatter()
             .Build();
 
         _index = new Lazy<DocumentationIndex>(BuildIndex, isThreadSafe: true);
@@ -197,6 +201,14 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
             var raw = File.ReadAllText(filePath);
             var document = Markdown.Parse(raw, _pipeline);
 
+            // Extract YAML frontmatter (if present) for tags, then drop the block from the rendered HTML.
+            var frontMatter = document.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
+            var tags = ExtractTags(frontMatter);
+            if (frontMatter is not null)
+            {
+                document.Remove(frontMatter);
+            }
+
             // Extract title from first H1 then strip it from the rendered output.
             var (title, h1Block) = ExtractTitleAndHeading(document);
             if (h1Block is not null)
@@ -228,13 +240,66 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                 Excerpt: excerpt,
                 LastModifiedUtc: File.GetLastWriteTimeUtc(filePath),
                 SectionPathSegments: sectionPathSegments,
-                IsSectionIntro: isReadme);
+                IsSectionIntro: isReadme,
+                Tags: tags);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to build documentation article for {FilePath}", filePath);
             return null;
         }
+    }
+
+    private static readonly Regex TagsInlineList = new(@"^\s*tags\s*:\s*\[(.*?)\]\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex TagsKeyHeader = new(@"^\s*tags\s*:\s*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex TagListItem = new(@"^\s*-\s*(.+?)\s*$", RegexOptions.Compiled);
+
+    private static IReadOnlyList<string> ExtractTags(YamlFrontMatterBlock? frontMatter)
+    {
+        if (frontMatter is null)
+        {
+            return Array.Empty<string>();
+        }
+
+        var text = frontMatter.Lines.ToString();
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return Array.Empty<string>();
+        }
+
+        // Supports both inline syntax  →  tags: [foo, bar-baz, "quoted thing"]
+        // and the block list syntax   →  tags:\n  - foo\n  - bar-baz
+        var lines = text.Split('\n');
+        var collected = new List<string>();
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i];
+            var inlineMatch = TagsInlineList.Match(line);
+            if (inlineMatch.Success)
+            {
+                foreach (var part in inlineMatch.Groups[1].Value.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var trimmed = part.Trim().Trim('"', '\'');
+                    if (trimmed.Length > 0) collected.Add(trimmed);
+                }
+                break;
+            }
+
+            if (TagsKeyHeader.IsMatch(line))
+            {
+                for (var j = i + 1; j < lines.Length; j++)
+                {
+                    var itemMatch = TagListItem.Match(lines[j]);
+                    if (!itemMatch.Success) break;
+                    var trimmed = itemMatch.Groups[1].Value.Trim().Trim('"', '\'');
+                    if (trimmed.Length > 0) collected.Add(trimmed);
+                }
+                break;
+            }
+        }
+
+        return collected.Count == 0 ? Array.Empty<string>() : collected;
     }
 
     private static (string? Title, HeadingBlock? Block) ExtractTitleAndHeading(MarkdownDocument document)
@@ -555,6 +620,7 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         {
             _index = new Lazy<DocumentationIndex>(BuildIndex, isThreadSafe: true);
         }
+        IndexRebuilt?.Invoke(this, EventArgs.Empty);
     }
 
     public void Dispose()

@@ -69,12 +69,7 @@
 
 <aside class="documentation-nav" aria-label="Documentation navigation">
     <p class="documentation-nav__title">@Model.DocRootTitle</p>
-    @if (Model.Mode != DocumentationViewMode.Root)
-    {
-        <a class="documentation-nav__back" href="@(Model.DocRootUrl + "/")">
-            <span aria-hidden="true">&larr;</span> Documentation home
-        </a>
-    }
+    <dc-doc-search class="documentation-nav__search" doc-root-url="@Model.DocRootUrl"></dc-doc-search>
     @if (Model.Index.HasContent)
     {
         <ul class="documentation-nav__list documentation-nav__list--root">
@@ -83,5 +78,11 @@
                 RenderSection(node, 0);
             }
         </ul>
+    }
+    @if (Model.Mode != DocumentationViewMode.Root)
+    {
+        <a class="documentation-nav__back" href="@(Model.DocRootUrl + "/")">
+            <span aria-hidden="true">&larr;</span> Documentation home
+        </a>
     }
 </aside>

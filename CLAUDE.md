@@ -413,3 +413,9 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 - **ViewComponents over filters**: Layout concerns (menu, footer, meta tags, favicon) are handled by ViewComponents, not action filter attributes
 - **Output Caching**: API endpoints use `[OutputCache]` with policy names from `OutputCachePolicies` class
 - **Upgrade Tool**: Use `tools/upgrade-umbraco/` for package version upgrades
+
+## Pending follow-ups
+
+Check intermittently and clear as conditions become true.
+
+- **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.

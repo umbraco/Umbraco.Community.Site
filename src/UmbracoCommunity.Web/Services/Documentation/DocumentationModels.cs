@@ -28,4 +28,5 @@ public sealed record DocumentationArticle(
     string? Excerpt,
     DateTime LastModifiedUtc,
     IReadOnlyList<string> SectionPathSegments,
-    bool IsSectionIntro);
+    bool IsSectionIntro,
+    IReadOnlyList<string> Tags);

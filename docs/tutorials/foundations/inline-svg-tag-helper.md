@@ -1,3 +1,7 @@
+---
+tags: [svg, tag-helper, razor, media]
+---
+
 # Building an inline SVG TagHelper for Umbraco
 
 This tutorial walks through the `<svg-src>` TagHelper that the Umbraco Community site uses to inline SVG files from media into views. It's a *foundation* piece — most of the SVG-related tutorials in this suite build on top of it.

@@ -1,3 +1,7 @@
+---
+tags: [svg, caching, runtime-cache, performance]
+---
+
 # Caching the scoped SVG output
 
 > **Prerequisites:** This refinement builds directly on [Scoping inline SVG `<style>` to prevent class-name bleed](./scoping-inline-svg-styles.md). The cache layer described below only works because the scope class introduced there is *deterministic per media path*. If you skipped straight here, read that one first — the caching is the easy part once scoping is in place.

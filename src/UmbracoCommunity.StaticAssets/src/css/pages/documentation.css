@@ -22,7 +22,6 @@
   gap: var(--unit-md);
   max-width: var(--max-width);
   margin-inline: auto;
-  padding-inline: var(--unit-md);
 
   @media (--md) {
     grid-template-columns: 320px 1fr;
@@ -57,6 +56,11 @@
   letter-spacing: 0.08em;
 }
 
+.documentation-nav__search {
+  display: block;
+  margin-bottom: var(--unit-sm);
+}
+
 .documentation-nav__back {
   display: flex;
   align-items: center;
@@ -64,9 +68,7 @@
   font-size: 0.85rem;
   color: var(--color-blue);
   text-decoration: none;
-  margin-bottom: var(--unit-sm);
-  padding-bottom: var(--unit-sm);
-  border-bottom: 1px solid var(--color-light);
+  margin-top: var(--unit-md);
 }
 
 .documentation-nav__back:hover {
@@ -157,6 +159,25 @@
   margin-top: var(--unit-xs);
   font-size: 0.85rem;
   color: var(--color-dark-grey);
+}
+
+.documentation__tags {
+  list-style: none;
+  margin: var(--unit-xs) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xxs);
+}
+
+.documentation__tag {
+  font-size: 0.75rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background-color: var(--color-light);
+  color: var(--color-dark);
 }
 
 .documentation__empty {
@@ -380,7 +401,7 @@
 }
 
 .documentation-prose blockquote {
-  margin: 0;
+  margin: 0 0 var(--unit-sm);
   padding: var(--unit-sm) var(--unit-md);
   border-left: 4px solid var(--color-blue);
   background-color: var(--color-light);

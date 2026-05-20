@@ -1,3 +1,7 @@
+---
+tags: [seo, schema-org, multi-tenant, social-settings]
+---
+
 # Tenant-aware fallback for schema and SEO metadata
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). The fallback chain below leans on the `GetSocialSettings()` extension method established there. If you haven't read the foundation, the resolution side of this tutorial will look like magic.
