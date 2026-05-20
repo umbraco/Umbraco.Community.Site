@@ -27,7 +27,7 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
   @state() private hostnameFilter = "";
   @state() private statusFilter: number = 0;
   @state() private search = "";
-  @state() private sort: number = 0;
+  @state() private sort: number = 1;
   @state() private skip = 0;
   @state() private take = 25;
 
