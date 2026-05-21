@@ -46,6 +46,10 @@ const projects = {
     path: resolve(ROOT, "src/UmbracoCommunity.Extensions/Client"),
     color: "\x1b[35m", // magenta
   },
+  NotFoundTracker: {
+    path: resolve(ROOT, "src/Umbraco.Community.NotFoundTracker/Client"),
+    color: "\x1b[32m", // green
+  },
   StaticAssets: {
     path: resolve(ROOT, "src/UmbracoCommunity.StaticAssets"),
     color: "\x1b[33m", // yellow
@@ -185,6 +189,7 @@ async function runLocal(withDotnet) {
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
     buildProject("Extensions", "build"),
+    buildProject("NotFoundTracker", "build"),
     buildProject("StaticAssets", "build:for:cloud"),
   ]);
 
@@ -223,6 +228,7 @@ async function runDev(withDotnet, firstTimeIntro = null) {
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
     buildProject("Extensions", "build"),
+    buildProject("NotFoundTracker", "build"),
   ]);
 
   const servers = withDotnet ? "Vite dev server + dotnet run" : "Vite dev server";

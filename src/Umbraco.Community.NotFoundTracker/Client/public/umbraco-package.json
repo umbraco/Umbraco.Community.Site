@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.Community.NotFoundTracker",
+  "name": "404 Tracker",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "Umbraco.Community.NotFoundTracker.Bundle",
+      "name": "Not Found Tracker Bundle",
+      "js": "/App_Plugins/UmbracoCommunityNotFoundTracker/not-found-tracker.js"
+    }
+  ]
+}
