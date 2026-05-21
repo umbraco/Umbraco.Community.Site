@@ -33,6 +33,9 @@
     <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="1.2.4" />
     <PackageVersion Include="Umbraco.AI.OpenAI" Version="1.2.4" />
     <PackageVersion Include="Umbraco.AI.Prompt" Version="1.8.6" />
+    <PackageVersion Include="Umbraco.AI.Search" Version="1.0.0-beta4" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="1.0.0-beta4" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="1.0.0-beta4" />
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.3.2" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="6.1.4" />

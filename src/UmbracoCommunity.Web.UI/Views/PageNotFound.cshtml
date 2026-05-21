@@ -8,4 +8,5 @@
 }
 
 <partial name="~/Views/Partials/Components/BannerBlocks.cshtml" for="BannerContent" />
+@await Component.InvokeAsync("PageNotFoundSuggestions", new { currentPage = Model })
 <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" model="contentGrid" />

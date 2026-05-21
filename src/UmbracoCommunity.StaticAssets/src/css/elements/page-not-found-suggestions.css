@@ -1,0 +1,111 @@
+@import "../base/media-queries.css";
+
+/* The 404 hero just holds a short headline + intro — shrink the default 90px
+   vertical hero padding so the suggestions list sits close beneath it. */
+.document-pageNotFound .hero {
+  --hero-padding: var(--unit-md) 0;
+
+  @media (--sm) {
+    --hero-padding: var(--unit-md) 0;
+  }
+
+  @media (--md) {
+    --hero-padding: var(--unit-md) 0;
+  }
+}
+
+.document-pageNotFound .hero-content {
+  padding: var(--unit-sm) var(--unit);
+}
+
+.dc-page-not-found-suggestions {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 0 var(--unit-lg);
+  text-align: center;
+
+  @media (--md) {
+    padding: 0 0 var(--unit-xl);
+  }
+}
+
+.dc-page-not-found-suggestions__heading {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0 0 var(--unit-md);
+  color: var(--color-blue);
+
+  @media (--md) {
+    font-size: 1.75rem;
+    margin-bottom: var(--unit-lg);
+  }
+}
+
+.dc-page-not-found-suggestions__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--unit-sm);
+  max-width: var(--narrow-width);
+
+  @media (--md) {
+    gap: var(--unit);
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Card-style link — opt out of the global #main-content text-link gradient animation
+   so the card keeps its white background instead of growing a pink underline + fill.
+   The global rule's specificity is higher than ours, so we use !important for the
+   gradient-related properties. */
+.dc-page-not-found-suggestions__link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xxs);
+  padding: var(--unit-md) !important;
+  background-color: var(--color-white);
+  background-image: none !important;
+  background-size: auto !important;
+  border-radius: var(--border-radius-lg);
+  color: var(--color-blue);
+  text-decoration: none;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-blue);
+  }
+}
+
+.dc-page-not-found-suggestions__breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xxs) var(--unit-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+}
+
+.dc-page-not-found-suggestions__sep {
+  color: var(--color-dark-grey);
+}
+
+.dc-page-not-found-suggestions__title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.dc-page-not-found-suggestions__description {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--color-light-blue);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
