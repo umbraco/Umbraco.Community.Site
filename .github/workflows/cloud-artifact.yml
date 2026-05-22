@@ -22,10 +22,6 @@ on:
         required: true
       umbracoCloudJson:
         required: true
-      deployLicenseKey:
-        required: true
-      formsLicenseKey:
-        required: true
     outputs:
       artifactId:
         description: 'The Id of the uploaded artifact'
@@ -67,18 +63,6 @@ jobs:
         working-directory: ${{ inputs.pathToWebsite }}
         shell: pwsh
         run: set-content 'umbraco-cloud.json' -value '${{ secrets.umbracoCloudJson }}' 
-
-      # Create Deploy license key file from Secret
-      - name: Deploy License Key
-        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
-        shell: pwsh
-        run: set-content 'umbracoDeploy.lic' -value '${{ secrets.deployLicenseKey }}' 
-
-      # Create Forms license key file from Secret
-      - name: Forms License Key
-        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
-        shell: pwsh
-        run: set-content 'umbracoForms.lic' -value '${{ secrets.formsLicenseKey }}' 
 
       # switch the gitignore files so cloud does not ignore the build frontend assets
       - name: Prepare Cloud Git Ignore

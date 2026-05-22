@@ -19,8 +19,6 @@ jobs:
       projectId: ${{ secrets.PROJECT_ID }}
       umbracoCloudApiKey: ${{ secrets.UMBRACO_CLOUD_API_KEY }}
       umbracoCloudJson: ${{ secrets.UMBRACO_CLOUD_JSON }}
-      deployLicenseKey: ${{ secrets.DEPLOY_LICENSE_KEY }}
-      formsLicenseKey: ${{ secrets.FORMS_LICENSE_KEY }}
 
   # Deploy to Umbraco Cloud
   cloud-deployment:
