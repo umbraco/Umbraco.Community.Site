@@ -168,6 +168,13 @@
         "allowAtRoot": true,
         "allowInAreas": true,
         "settingsElementTypeKey": "cf29263f-836d-4c3c-9260-c408365fa346"
+      },
+      {
+        "contentElementTypeKey": "58b66287-d573-4883-a87f-7e8efed122ed",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Lists Umbraco MVPs",
+        "settingsElementTypeKey": "400d03b3-566f-49aa-94d0-6e22a7f362ca"
       }
     ],
     "useLiveEditing": true,
@@ -212,10 +219,16 @@
       "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
     },
     {
+      "Udi": "umb://document-type/400d03b3566f49aa94d06e22a7f362ca"
+    },
+    {
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
     },
     {
       "Udi": "umb://document-type/52cb8b7856ce47be90da6c08e4025527"
+    },
+    {
+      "Udi": "umb://document-type/58b66287d5734883a87f7e8efed122ed"
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"

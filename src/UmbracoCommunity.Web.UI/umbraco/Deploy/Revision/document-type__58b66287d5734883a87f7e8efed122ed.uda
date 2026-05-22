@@ -1,0 +1,31 @@
+{
+  "Name": "MVP block",
+  "Alias": "mvpBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-trophy",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/684eb93dd1b5454b87118d7c468e2e99",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/58b66287d5734883a87f7e8efed122ed",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/684eb93dd1b5454b87118d7c468e2e99",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.0.2"
+}

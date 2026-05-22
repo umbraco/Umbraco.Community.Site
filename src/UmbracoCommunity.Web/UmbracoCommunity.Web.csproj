@@ -24,4 +24,8 @@
     <Folder Include="Models\PublishedModels\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Features\Mvp\Data\mvp.json" />
+  </ItemGroup>
+
 </Project>
