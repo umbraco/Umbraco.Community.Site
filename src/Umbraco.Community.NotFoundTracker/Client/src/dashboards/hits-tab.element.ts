@@ -222,6 +222,15 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     }
   }
 
+  private buildHitUrl(item: HitListItem): string {
+    // Hostname may be stored bare ("codegarden.umbraco.com") or with a scheme
+    // ("https://codegarden.umbraco.com") depending on how it was captured.
+    // Use as-is when a scheme is present, otherwise default to https.
+    const host = item.hostname;
+    if (/^https?:\/\//i.test(host)) return `${host}${item.path}`;
+    return `https://${host}${item.path}`;
+  }
+
   render() {
     const hostnameOptions = [
       { name: "All sites", value: "", selected: this.hostnameFilter === "" },
@@ -339,7 +348,7 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
                   <uui-table-cell>
                     <a
                       class="path-link"
-                      href=${`https://${item.hostname}${item.path}`}
+                      href=${this.buildHitUrl(item)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >${item.path}</a>
