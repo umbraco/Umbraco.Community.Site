@@ -22,6 +22,10 @@ on:
         required: true
       umbracoCloudJson:
         required: true
+      deployLicenseKey:
+        required: true
+      formsLicenseKey:
+        required: true
     outputs:
       artifactId:
         description: 'The Id of the uploaded artifact'
