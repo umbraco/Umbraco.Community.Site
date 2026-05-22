@@ -44,7 +44,7 @@ jobs:
           else
             TARGET_FILE="$SOLUTION_FILE"
           fi
-          dotnet-CycloneDX "$TARGET_FILE" --output ./sbom --filename bom-dotnet.xml --output-format Xml --enable-github-licenses --github-bearer-token ${{ secrets.GITHUB_TOKEN }}
+          dotnet-CycloneDX "$TARGET_FILE" --output ./sbom --filename bom-dotnet.xml --output-format Xml --spec-version 1.6 --enable-github-licenses --github-bearer-token ${{ secrets.GITHUB_TOKEN }}
 
       # Node.js SBOM
       - name: Setup Node.js
@@ -65,7 +65,7 @@ jobs:
         run: |
           if [ -f "$FRONTEND_DIR/package-lock.json" ] || [ -f "$FRONTEND_DIR/yarn.lock" ]; then
             cd "$FRONTEND_DIR"
-            npx @cyclonedx/cyclonedx-npm -o ../../sbom/bom-frontend.xml
+            npx @cyclonedx/cyclonedx-npm --spec-version 1.6 -o ../../sbom/bom-frontend.xml
           else
             echo "No package-lock.json or yarn.lock found in $FRONTEND_DIR, skipping frontend SBOM."
           fi
