@@ -28,6 +28,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Features\Mvp\Data\mvp.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Community.NotFoundTracker\Umbraco.Community.NotFoundTracker.csproj" />
   </ItemGroup>
 
