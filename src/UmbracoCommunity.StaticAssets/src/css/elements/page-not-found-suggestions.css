@@ -29,17 +29,6 @@
   }
 }
 
-.dc-page-not-found-suggestions__heading {
-  font-size: 1.5rem;
-  font-weight: 500;
-  margin: 0 0 var(--unit-md);
-  color: var(--color-blue);
-
-  @media (--md) {
-    font-size: 1.75rem;
-    margin-bottom: var(--unit-lg);
-  }
-}
 
 .dc-page-not-found-suggestions__list {
   list-style: none;
