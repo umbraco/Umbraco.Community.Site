@@ -36,7 +36,7 @@ public class NotFoundHitServiceTests : IDisposable
         var (items, total) = await BuildService().ListAsync(new HitListQuery(), Scoped("a.example"), default);
 
         items.Should().HaveCount(1);
-        items[0].Hostname.Should().Be("a.example");
+        items[0].Hit.Hostname.Should().Be("a.example");
         total.Should().Be(1);
     }
 
@@ -76,7 +76,7 @@ public class NotFoundHitServiceTests : IDisposable
             FullAccess(),
             default);
 
-        items.Select(i => i.Path).Should().ContainInOrder("/high", "/mid", "/low");
+        items.Select(i => i.Hit.Path).Should().ContainInOrder("/high", "/mid", "/low");
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class NotFoundHitServiceTests : IDisposable
             FullAccess(),
             default);
 
-        items.Select(i => i.Path).Should().ContainInOrder("/recent", "/old");
+        items.Select(i => i.Hit.Path).Should().ContainInOrder("/recent", "/old");
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class NotFoundHitServiceTests : IDisposable
 
         var (items, _) = await BuildService().ListAsync(new HitListQuery(), FullAccess(), default);
 
-        items.Should().ContainSingle(i => i.Path == "/active");
+        items.Should().ContainSingle(i => i.Hit.Path == "/active");
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class NotFoundHitServiceTests : IDisposable
 
         items.Should().HaveCount(5);
         total.Should().Be(30);
-        items[0].Path.Should().Be("/p10");
+        items[0].Hit.Path.Should().Be("/p10");
     }
 
     [Fact]
