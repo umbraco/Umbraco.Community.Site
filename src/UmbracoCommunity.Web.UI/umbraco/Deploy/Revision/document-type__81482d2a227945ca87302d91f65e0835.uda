@@ -24,6 +24,7 @@
           "Key": "d6dc05b6-607b-4b07-a816-a51596dcda8c",
           "Alias": "programConfiguration",
           "DataType": "umb://data-type/3513fc1153854c69b99748599b80c561",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListItem",
           "Description": "If no configuration is entered then nothing will display in the block",
           "Name": "Program configuration"
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

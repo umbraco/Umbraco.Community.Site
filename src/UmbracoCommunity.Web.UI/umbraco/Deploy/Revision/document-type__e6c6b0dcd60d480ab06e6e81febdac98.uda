@@ -24,6 +24,7 @@
           "Key": "5d423ef3-6a5f-4f28-8ef5-66496f7adf4d",
           "Alias": "columnContentItems",
           "DataType": "umb://data-type/dc000c295d3c46f0ab2161fbbd243d09",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
           "Mandatory": true,
           "Name": "Column content items"
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

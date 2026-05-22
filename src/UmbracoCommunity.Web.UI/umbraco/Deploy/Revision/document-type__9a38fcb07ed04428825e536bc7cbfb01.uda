@@ -22,6 +22,7 @@
           "Key": "eb34396e-f47e-46ce-a8f2-6ecd117745da",
           "Alias": "rooms",
           "DataType": "umb://data-type/39ee5b5d47d6488292a325993565e179",
+          "ValueType": "System.Collections.Generic.List\u003CSystem.String\u003E",
           "Name": "Rooms"
         }
       ]
@@ -40,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
