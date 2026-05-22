@@ -38,7 +38,7 @@ jobs:
     outputs:
       artifactId: ${{ steps.upload-artifact.outputs.artifactId }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.newSha }}
 

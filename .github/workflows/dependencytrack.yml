@@ -7,7 +7,6 @@ on:
       - '*'
 
 env:
-  FRONTEND_DIR: "src/UmbracoCommunity.StaticAssets"
   TRACKER_ENDPOINT: "https://ca-live-global-dtrack-api.purplemoss-6e7d841c.westeurope.azurecontainerapps.io/api/v1/bom"
 
 jobs:
@@ -15,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # .NET SBOM
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '9.0.x'
 
@@ -48,28 +47,39 @@ jobs:
 
       # Node.js SBOM
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22.x'
 
-      - name: Install CycloneDX Node.js CLI in frontend
-        run: |
-          if [ -f "$FRONTEND_DIR/package.json" ]; then
-            cd "$FRONTEND_DIR"
-            npm install --save-dev @cyclonedx/cyclonedx-npm
-          else
-            echo "No package.json found in $FRONTEND_DIR, skipping CycloneDX install."
-          fi
+      - name: Install CycloneDX Node.js CLI
+        run: npm install -g @cyclonedx/cyclonedx-npm
 
-      - name: Generate SBOM for Node.js (frontend)
+      # Each frontend tree gets its own SBOM and its own Dependency-Track
+      # project, so vulnerabilities can be attributed to the package they
+      # ship in. New trees: append a "<slug>:<dir>" line below.
+      - name: Generate SBOMs for all frontend trees
         run: |
-          if [ -f "$FRONTEND_DIR/package-lock.json" ] || [ -f "$FRONTEND_DIR/yarn.lock" ]; then
-            cd "$FRONTEND_DIR"
-            npx @cyclonedx/cyclonedx-npm --spec-version 1.6 -o ../../sbom/bom-frontend.xml
-          else
-            echo "No package-lock.json or yarn.lock found in $FRONTEND_DIR, skipping frontend SBOM."
-          fi
-          
+          set -e
+          mkdir -p ./sbom
+          for entry in \
+            "frontend:src/UmbracoCommunity.StaticAssets" \
+            "extensions-client:src/UmbracoCommunity.Extensions/Client" \
+            "block-restrictions-client:src/UmbracoCommunity.BlockRestrictions/Client" \
+            "not-found-tracker-client:src/Umbraco.Community.NotFoundTracker/Client" ; do
+            slug="${entry%%:*}"
+            dir="${entry##*:}"
+            if [ ! -f "$dir/package-lock.json" ]; then
+              echo "::warning::Skipping $slug ($dir) — no package-lock.json"
+              continue
+            fi
+            echo "::group::Installing $slug ($dir)"
+            (cd "$dir" && npm ci --no-audit --no-fund)
+            echo "::endgroup::"
+            echo "::group::Generating SBOM for $slug"
+            (cd "$dir" && cyclonedx-npm --spec-version 1.6 --output-format xml -o "$GITHUB_WORKSPACE/sbom/bom-$slug.xml")
+            echo "::endgroup::"
+          done
+
       # Upload .NET SBOM
       - name: Upload .NET SBOM to Dependency-Track
         env:
@@ -85,21 +95,28 @@ jobs:
             -F "projectVersion=${{ github.ref_name }}" \
             -F "bom=@./sbom/bom-dotnet.xml"
 
-      # Upload Node.js SBOM (if exists)
-      - name: Upload Node.js SBOM to Dependency-Track
+      # Each ./sbom/bom-<slug>.xml lands as a separate Dependency-Track project
+      # named <repo>-<slug> (e.g. Umbraco.Community.Site-not-found-tracker-client).
+      - name: Upload frontend SBOMs to Dependency-Track
         env:
           DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
         run: |
-          if [ -f ./sbom/bom-frontend.xml ]; then
+          set -e
+          shopt -s nullglob
+          for bom in ./sbom/bom-*.xml; do
+            # skip the .NET one, uploaded separately
+            [ "$bom" = "./sbom/bom-dotnet.xml" ] && continue
+            slug=$(basename "$bom" .xml)
+            slug="${slug#bom-}"
+            echo "::group::Uploading $slug"
             curl --fail-with-body -v -i -w "\nHTTP Status: %{http_code}\n" \
               -X POST "$TRACKER_ENDPOINT" \
               -H "X-Api-Key: $DTRACK_API_KEY" \
               -H "accept: application/json" \
               -H "Content-Type: multipart/form-data" \
               -F "autoCreate=true" \
-              -F "projectName=${{ github.event.repository.name }}-frontend" \
+              -F "projectName=${{ github.event.repository.name }}-$slug" \
               -F "projectVersion=${{ github.ref_name }}" \
-              -F "bom=@./sbom/bom-frontend.xml"
-          else
-            echo "No frontend SBOM to upload."
-          fi
+              -F "bom=@$bom"
+            echo "::endgroup::"
+          done
