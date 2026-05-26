@@ -32,7 +32,7 @@
                         @foreach (var link in Model.BottomLinks)
                         {
                             <li>
-                                <a href="@link.Url" target="@link.Target" title="@link.Name">@link.Name</a>
+                                <a href="@link.Url" target="@link.Target" rel="@link.Target.NewTabRel()" title="@link.Name">@link.Name</a>
                             </li>
                         }
                     </ul>
@@ -45,7 +45,7 @@
                         @foreach (var socialIcon in Model.SocialLinks)
                         {
                             <li>
-                                <a href="@socialIcon?.Content.Link?.Url" target="@socialIcon?.Content.Link?.Target" title="@socialIcon?.Content.Link?.Name">
+                                <a href="@socialIcon?.Content.Link?.Url" target="@socialIcon?.Content.Link?.Target" rel="@socialIcon?.Content.Link?.Target.NewTabRel()" title="@socialIcon?.Content.Link?.Name">
                                     @if (socialIcon?.Content.Icon != null)
                                     {
                                         <svg-src media="@socialIcon?.Content.Icon" width="24" height="24" alt-text="@socialIcon?.Content.Link?.Name"></svg-src>
