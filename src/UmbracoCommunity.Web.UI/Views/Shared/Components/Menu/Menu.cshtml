@@ -177,7 +177,7 @@
     private void RenderNavigationItem(NavigationItem item)
     {
         <li class="nav-item">
-            <a href="@item.Url" title="@item.Text">@item.Text</a>
+            <a href="@item.Url" title="@item.Text" target="@item.Target" rel="@item.Target.NewTabRel()">@item.Text</a>
         </li>
     }
 
@@ -215,6 +215,8 @@
                                 {
                                     var hasCaption = !string.IsNullOrEmpty(sectionItem.Caption);
                                     <a href="@sectionItem.Url" title="@sectionItem.Text"
+                                       target="@sectionItem.Target"
+                                       rel="@sectionItem.Target.NewTabRel()"
                                        class="@(hasCaption ? "has-caption" : "")">
                                         <section>
                                             @if (!string.IsNullOrEmpty(sectionItem.IconUrl))
