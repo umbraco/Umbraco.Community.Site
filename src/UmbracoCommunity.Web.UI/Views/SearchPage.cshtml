@@ -1,0 +1,55 @@
+@using UmbracoCommunity.Web.Models.Pages
+@inherits UmbracoViewPage<SearchPageViewModel>
+
+@{
+    Layout = "Layout.cshtml";
+    var actionUrl = Context.Request.Path.Value ?? "/";
+}
+
+<section class="search-page">
+    <h1 class="search-page__title">Search</h1>
+
+    <form method="GET" action="@actionUrl" role="search" class="search-page__form">
+        <label for="search-page-input" class="sr-only">Search the site</label>
+        <input
+            type="text"
+            id="search-page-input"
+            name="q"
+            value="@Model.Query"
+            placeholder="What are you looking for?"
+            autofocus />
+        <button type="submit" class="btn">Search</button>
+    </form>
+
+    @if (Model.HasQuery)
+    {
+        if (Model.Results.Count == 0)
+        {
+            <p class="search-page__empty">No results for <strong>@Model.Query</strong>.</p>
+        }
+        else
+        {
+            <p class="search-page__count">
+                Your search for <em>@Model.Query</em> returned @Model.Results.Count result@(Model.Results.Count == 1 ? "" : "s").
+            </p>
+
+            <ul class="search-page__results">
+                @foreach (var item in Model.Results)
+                {
+                    <li class="search-page__result">
+                        <h2 class="search-page__result-title">
+                            <a href="@item.Url">@item.Name</a>
+                        </h2>
+                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                        {
+                            <p class="search-page__result-description">@item.Description</p>
+                        }
+                        <p class="search-page__result-url">
+                            <a href="@item.Url">@item.Url</a>
+                        </p>
+                    </li>
+                }
+            </ul>
+        }
+    }
+</section>

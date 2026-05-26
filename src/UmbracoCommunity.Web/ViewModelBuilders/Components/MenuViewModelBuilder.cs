@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
@@ -13,8 +14,13 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
 internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
 {
+    private const string SearchPageContentTypeAlias = "searchPage";
+
+    private readonly IPublishedUrlProvider _publishedUrlProvider;
+
     public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches)
     {
+        _publishedUrlProvider = publishedUrlProvider;
     }
 
     public MenuViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -29,6 +35,14 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
         var siteSettings = currentPage.GetSiteSettings();
         viewModel.SiteName = siteSettings?.SiteName;
         viewModel.Logo = siteSettings?.HeaderLogo;
+
+        var searchPage = currentPage.Root()
+            .DescendantsOrSelf()
+            .FirstOrDefault(c => c.ContentType.Alias.Equals(SearchPageContentTypeAlias, StringComparison.OrdinalIgnoreCase));
+        if (searchPage != null)
+        {
+            viewModel.SearchPageUrl = searchPage.Url(_publishedUrlProvider);
+        }
 
         var navSettings = currentPage.GetNavigationSettings(siteSettings);
         if (navSettings?.HeaderNavigationItems == null || !navSettings.HeaderNavigationItems.Any()) return viewModel;
