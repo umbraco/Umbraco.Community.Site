@@ -1,0 +1,26 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@model DocumentationPageViewModel
+
+@{
+    var article = Model.Article!;
+}
+
+<header class="documentation__header">
+    <h1>@article.Title</h1>
+    <p class="documentation__meta">
+        <time datetime="@article.LastModifiedUtc.ToString("o")">Updated @article.LastModifiedUtc.ToString("MMMM d, yyyy")</time>
+    </p>
+    @if (article.Tags.Count > 0)
+    {
+        <ul class="documentation__tags" aria-label="Tags">
+            @foreach (var tag in article.Tags)
+            {
+                <li class="documentation__tag">@tag</li>
+            }
+        </ul>
+    }
+</header>
+
+<div class="documentation-prose">
+    @Model.ArticleHtml
+</div>

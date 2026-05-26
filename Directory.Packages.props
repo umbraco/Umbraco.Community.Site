@@ -55,6 +55,7 @@
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.8" />
     <!-- Other -->
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
+    <PackageVersion Include="Markdig" Version="0.45.0" />
     <PackageVersion Include="Schema.NET" Version="13.0.0" />
   </ItemGroup>
 </Project>

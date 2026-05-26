@@ -43,6 +43,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--
+      Surface repo-root /docs/{tutorials,primers} to the running app as App_Docs/.
+      Linked so the same relative layout works in dev (ContentRoot = project dir) and publish output.
+    -->
+    <Content Include="..\..\docs\tutorials\**\*.md">
+      <Link>App_Docs\tutorials\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\docs\primers\**\*.md">
+      <Link>App_Docs\primers\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.BlockRestrictions\UmbracoCommunity.BlockRestrictions.csproj" />
   </ItemGroup>
