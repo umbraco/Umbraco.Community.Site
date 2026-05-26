@@ -1,0 +1,94 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<MvpBlock, SettingsMvpBlock>>
+@using UmbracoCommunity.Web.Features.Mvp.Infrastructure
+@using UmbracoCommunity.Web.Features.Mvp.Models
+
+@inject IMvpDataService MvpService;
+
+@{
+    var showLatestOnly = Model.Settings?.ShowLatestYearOnly ?? false;
+    // showLatestOnly = true  → just the most recent year (the "Current MVPs" page).
+    // showLatestOnly = false → the archive, EXCLUDING the most recent year (which lives
+    //                          on its own page via the toggle), so we don't show it twice.
+    IReadOnlyList<MvpYear> years = showLatestOnly
+        ? (MvpService.GetLatest() is { } latest ? new[] { latest } : Array.Empty<MvpYear>())
+        : MvpService.GetAll().Skip(1).ToList();
+
+    var showJumpList = years.Count > 1;
+}
+
+@functions {
+    private void RenderMembers(IEnumerable<MvpMember> members)
+    {
+        <div class="dc-speakers-grid" data-columns="5">
+            @foreach (var m in members)
+            {
+                var gitHubUrl = string.IsNullOrWhiteSpace(m.GitHubHandle) ? null : $"https://github.com/{m.GitHubHandle}";
+                <text>@if (gitHubUrl is not null)
+                {
+                    <a class="dc-speakers-grid__item dc-mvp__card" href="@gitHubUrl" rel="noopener noreferrer" target="_blank" aria-label="@(m.Name) on GitHub">
+                        <img class="dc-image is-circle"
+                             src="@m.AvatarUrl"
+                             srcset="@m.AvatarSrcset"
+                             alt="@m.Name"
+                             loading="lazy" width="150" height="150" />
+                        <p class="speaker-name">@m.Name</p>
+                    </a>
+                }
+                else
+                {
+                    <div class="dc-speakers-grid__item dc-mvp__card">
+                        <img class="dc-image is-circle"
+                             src="@m.AvatarUrl"
+                             srcset="@m.AvatarSrcset"
+                             alt="@m.Name"
+                             loading="lazy" width="150" height="150" />
+                        <p class="speaker-name">@m.Name</p>
+                    </div>
+                }</text>
+            }
+        </div>
+    }
+}
+
+<section class="dc-mvp align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+    }
+
+    @if (showJumpList)
+    {
+        <nav class="dc-mvp__years" aria-label="Jump to year">
+            <ul>
+                @foreach (var y in years)
+                {
+                    <li><a href="#mvp-@y.Year">@y.Year</a></li>
+                }
+            </ul>
+        </nav>
+    }
+
+    @foreach (var y in years)
+    {
+        var anchor = $"mvp-{y.Year}";
+        var newMembers = y.Members.Where(m => !m.IsRenewal).ToList();
+        var renewedMembers = y.Members.Where(m => m.IsRenewal).ToList();
+
+        <section class="dc-mvp__year" id="@anchor">
+            @if (newMembers.Count > 0)
+            {
+                <h3 class="dc-mvp__year-heading">Umbraco MVPs @y.Year</h3>
+                RenderMembers(newMembers);
+            }
+            @if (renewedMembers.Count > 0)
+            {
+                <h3 class="dc-mvp__year-heading">Umbraco MVPs @y.Year (renewed)</h3>
+                RenderMembers(renewedMembers);
+            }
+        </section>
+    }
+</section>

@@ -93,6 +93,10 @@ npm run build:for:cloud
 # Build Extensions backoffice client (separate build)
 cd src/UmbracoCommunity.Extensions/Client
 npm run build
+
+# Build NotFoundTracker backoffice client (separate build)
+cd src/Umbraco.Community.NotFoundTracker/Client
+npm run build
 ```
 
 ### Testing

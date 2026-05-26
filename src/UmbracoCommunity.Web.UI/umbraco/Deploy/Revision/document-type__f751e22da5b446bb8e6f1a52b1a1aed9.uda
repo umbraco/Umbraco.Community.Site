@@ -1,0 +1,32 @@
+{
+  "Name": "Search Page",
+  "Alias": "searchPage",
+  "DefaultTemplate": "umb://template/019e63562d5f7d92bced383e3d48af2d",
+  "AllowedTemplates": [
+    "umb://template/019e63562d5f7d92bced383e3d48af2d"
+  ],
+  "HistoryCleanup": {},
+  "Icon": "icon-search",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/f751e22da5b446bb8e6f1a52b1a1aed9",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://template/019e63562d5f7d92bced383e3d48af2d",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}
