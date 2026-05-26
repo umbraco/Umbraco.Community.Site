@@ -34,13 +34,16 @@ You don't need to read the suite in order. Each tutorial points at the next logi
 - **[Per-tenant 404 pages with `IContentLastChanceFinder`](refinements/per-tenant-404-content-finder.md)** *(builds on multi-tenant content resolution)* — When the request 404'd there's no current page to anchor tenant lookups off. Resolve the tenant root from the domain binding instead (`request.Domain?.ContentId`), walk descendants for a `PageNotFound` content type, and hand it back to Umbraco's router with HTTP status 404.
 - **[Tenant-aware fallback for schema and SEO metadata](refinements/tenant-fallback-for-schema-and-seo.md)** *(builds on multi-tenant content resolution)* — Every page emits `Organization` schema, but editors forget to fill in tenant brand fields. A small `OrganizationSchemaBuilder` accepts a nullable `SocialSettings` and falls back to hardcoded constants so unconfigured tenants still produce valid schema.
 
+### Planned
+
+The backlog in [`IDEAS.md`](./IDEAS.md) lists tutorials that haven't been written yet. Each idea there also has a placeholder file under `foundations/` or `refinements/` with a status callout and a "what this will cover" sketch — useful if you're picking one up to write, or just want to scan what's coming without reading the backlog index.
+
 ## Contributing a new tutorial
 
 When adding a new tutorial:
 
-1. Pick the right folder — does it stand alone, or does it require an earlier piece of code? Foundations live in `foundations/`; anything that says *"first you need X"* belongs in `refinements/`.
-2. Use kebab-case filenames that describe the *technique*, not the bug (so the file is findable later as a "how do I do X" reference, not just "the time we broke Y").
-3. Follow the section structure used by the existing tutorials: a one-paragraph framing, then **The problem** → **Why the obvious fix doesn't work** → **Our approach** → **Walkthrough** → **Alternatives we considered** → **Trade-offs and known limits**. For foundation pieces, swap "The problem" for **Why you might want this** and "Why the obvious fix doesn't work" for **What we're building**.
-4. Link to real files in this repo using paths relative to the tutorial file (e.g. `../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`).
-5. Credit prior art. If the code is adapted from a community project, lead with a "Credit where it's due" section linking the source and naming contributors.
-6. Add the tutorial to the list above.
+1. Check the [backlog](./IDEAS.md) first. If your topic is already there, it has a placeholder file under `foundations/` or `refinements/` — expand the stub in place rather than creating a duplicate. If your topic isn't listed yet, that's fine; just pick the right folder for it (foundations stand alone; refinements depend on an earlier piece of code) and create a new file with a kebab-case filename that describes the *technique* rather than the bug.
+2. Follow the section structure used by the existing tutorials: a one-paragraph framing, then **The problem** → **Why the obvious fix doesn't work** → **Our approach** → **Walkthrough** → **Alternatives we considered** → **Trade-offs and known limits**. For foundation pieces, swap "The problem" for **Why you might want this** and "Why the obvious fix doesn't work" for **What we're building**.
+3. Link to real files in this repo using paths relative to the tutorial file (e.g. `../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`).
+4. Credit prior art. If the code is adapted from a community project, lead with a "Credit where it's due" section linking the source and naming contributors.
+5. Move the tutorial out of "planned" and into the relevant section above: add it to **What's here**, and update its backlog entry in [`IDEAS.md`](./IDEAS.md) (either strike it through with a "shipped as ..." note, or remove the bullet entirely) — all in the same commit.

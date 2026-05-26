@@ -11,6 +11,10 @@ If you're new to the codebase, start here. If you've been here a while and someo
 - **[Frontend primer](frontend.md)** — the Vite-powered public-site frontend in `UmbracoCommunity.StaticAssets`. Covers the dual dev workflow, the manifest-driven Razor integration, the entrypoint convention, Lit + PostCSS, testing, and what builds for production. Backoffice frontends are signposted at the end.
 - **[Backend primer](backend.md)** — the C# side in `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI`. Covers the request flow (URL → render controller → view model builder → view), the three controller flavours, the builder pattern and DI registration, bootstrapping through composers, output caching policies, and the self-contained `Features/Sessionize/` module pattern.
 
+### Planned
+
+The backlog in [`IDEAS.md`](./IDEAS.md) lists primers that haven't been written yet. Each idea there also has a placeholder file in this folder with a status callout and a "what this will cover" sketch — useful if you're picking one up to write, or just want to scan what's coming without reading the backlog index.
+
 ## Adding a new primer
 
 A new primer earns its keep when an area of the codebase has:
@@ -20,4 +24,4 @@ A new primer earns its keep when an area of the codebase has:
 
 If the answer fits in a paragraph in CLAUDE.md, it doesn't need a primer. If you find yourself writing the same "let me explain how X works in this project" thread three times, it does.
 
-See [`IDEAS.md`](./IDEAS.md) for candidate primers worth writing.
+See [`IDEAS.md`](./IDEAS.md) for candidate primers worth writing. Each one already has a stub file in this folder — expand the stub in place rather than creating a new file, then move the entry out of the backlog and into the **What's here** list above in the same commit.

@@ -25,10 +25,10 @@ If you only write three more, these are the ones with the strongest "broad area 
 
 ## How to use this list
 
-When you write a primer:
+Every idea above has a placeholder file linked inline (the `[stub →]` link next to the slug). When you write a primer:
 
-1. Move its entry from this file into the "What's here" section in [`README.md`](./README.md) as part of the same commit that adds the primer.
-2. Either delete the entry from this file or replace it with a one-line note that it shipped.
-3. If the primer reveals a tutorial-shaped gap (something it wants to link to but no tutorial exists), add an entry to [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md) in the same commit.
+1. Open the stub file and replace its scaffolding with the full primer — same path, same filename, no new file to create.
+2. Move the bullet from here to the "What's here" section in [`README.md`](./README.md) in the same commit; either strike it through with a `— shipped as [path](path)` note or remove it outright.
+3. If the primer reveals a tutorial-shaped gap (something it wants to link to but no tutorial exists), add an entry to [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md) — and a fresh stub file alongside it — in the same commit.
 
-The brainstorm shouldn't get stale. If an entry has been sitting here for six months and you've never reached for it, that's a signal to delete rather than to feel guilty about it.
+The brainstorm shouldn't get stale. If an entry has been sitting here for six months and you've never reached for it, that's a signal to delete both the bullet and its stub rather than to feel guilty about it.

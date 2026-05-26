@@ -43,10 +43,10 @@ Improvements layered on top of a foundation, in this repo or otherwise.
 
 ## How to use this list
 
-When you pick one to write:
+Every idea above has a placeholder file linked inline (the `[stub →]` link next to the slug). When you pick one to write:
 
-1. Move it from here to the "What's here" section in [`README.md`](./README.md) as part of the same commit that adds the tutorial file.
-2. Either delete its entry here or leave a one-line note that it shipped — whichever feels less confusing later.
-3. If the tutorial unlocks a new candidate (e.g. "this would be even better with a follow-up on X"), add the new idea to this file in the same commit.
+1. Open the stub file and replace its scaffolding with the full tutorial — same path, same filename, no new file to create.
+2. Move the bullet from here to the "What's here" section in [`README.md`](./README.md) in the same commit; either strike the bullet through with a `— shipped as [path](path)` note (the convention the other shipped entries use) or remove it outright.
+3. If the tutorial unlocks a new candidate (e.g. "this would be even better with a follow-up on X"), add the new idea to this file *and* create a fresh stub file alongside it in the same commit so the two stay in lockstep.
 
-The brainstorm shouldn't get stale. If an entry has been sitting here for six months and you've never reached for it, that's a signal to delete rather than to feel guilty about it.
+The brainstorm shouldn't get stale. If an entry has been sitting here for six months and you've never reached for it, that's a signal to delete both the bullet and its stub rather than to feel guilty about it.
