@@ -6,7 +6,7 @@ tags: [svg, css-scoping, style-isolation, tag-helper]
 
 > **Prerequisites:** This tutorial extends an existing inline-SVG TagHelper. If you don't have one yet (or want to understand the one we're modifying), start with [Building an inline SVG TagHelper for Umbraco](../foundations/inline-svg-tag-helper.md). The walkthrough below assumes you've read it.
 
-A surprising number of "the logo went the wrong colour" bugs trace back to the same root cause: inline `<style>` blocks inside SVGs aren't actually scoped to the SVG they live in. This tutorial walks through how we hit the problem on the Umbraco community site, why the obvious fixes don't hold, and how we solved it with a small change to a single TagHelper.
+There's a surprisingly satisfying class of "the logo went the wrong colour" bugs that all trace back to the same root cause: inline `<style>` blocks inside SVGs aren't actually scoped to the SVG they live in, even though every fibre of your developer instinct says they ought to be. This tutorial walks through how we ran into the problem on the Umbraco Community site, why the obvious fixes don't quite hold up, and how we ended up solving it with a small change to a single TagHelper.
 
 ## The problem
 
@@ -36,7 +36,7 @@ The symptom: as soon as the footer logo loaded on the page, the header logo's `.
 
 ## Why the obvious fix doesn't work
 
-The reflex is to think of an SVG's `<style>` as part of the SVG, the way a CSS rule inside a Web Component's Shadow DOM is. **It isn't.** Inline `<style>` in SVG (and in HTML) is document-scoped — the browser adds those rules to the document's global stylesheet list. The last `.st0 { fill: ... }` declared on the page wins for every `.st0` element, regardless of which SVG it sits in.
+The instinctive reaction is to think of an SVG's `<style>` as part of the SVG itself, the way a CSS rule inside a Web Component's Shadow DOM is. **It isn't.** Inline `<style>` in SVG (and in HTML) is document-scoped — the browser adds those rules to the document's global stylesheet list. The last `.st0 { fill: ... }` declared on the page wins for every `.st0` element, regardless of which SVG it happens to sit in. Frustrating, but consistent.
 
 You can patch a single instance with author CSS:
 
@@ -81,7 +81,7 @@ The selectors are still global cascade-wise, but they can't match `.st0` paths i
 
 ### Step 1 — Find where you control SVG output
 
-The community site already has a TagHelper that reads an SVG from media storage and inlines it into the response: `src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`. It already uses HtmlAgilityPack to parse the SVG, so adding one more parse step is essentially free.
+The community site already has a TagHelper that reads an SVG from media storage and inlines it into the response: `src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`. It already uses [HtmlAgilityPack](https://html-agility-pack.net/) (a forgiving HTML/XML parser for .NET that gives you a navigable DOM-like tree from a string of markup) to parse the SVG, so adding one more parse-and-mutate step on top is essentially free.
 
 If your project doesn't have something like this, you'll need it. The point of this tutorial is the *idea* — scope at serve time, not at author time — which works wherever you control the SVG payload.
 
@@ -201,8 +201,10 @@ This one recolours the logo's blue path to white when the logo sits over a dark 
 
 ## Where to go next
 
-Now that every SVG produces deterministic scoped output, you can cache the result instead of re-doing the read + sanitise + parse + prefix work on every render. That's the subject of the next refinement:
+Now that every SVG produces deterministic scoped output, we can cache the result instead of re-doing the read + sanitise + parse + prefix work on every single render. That's the subject of the next refinement:
 
 → [Caching the scoped SVG output](./caching-scoped-svg-output.md)
 
-The full implementation in this repo includes both layers — see [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs).
+The full implementation in this repo includes both layers, side by side — see [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs).
+
+Hopefully that takes one of those persistent "why on earth is the logo white now?" mysteries off your plate.

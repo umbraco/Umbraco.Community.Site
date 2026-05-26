@@ -6,7 +6,7 @@ tags: [multi-tenant, 404, content-finder, routing]
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). That tutorial covers the `Root()` + `GetSiteSettings()` resolution pattern this one extends to a corner of Umbraco where there *is no current page* — the request 404'd before it got that far.
 
-Multi-tenant Umbraco sites need multi-tenant 404 pages. The header and footer of Tenant A's 404 should be Tenant A's; the URL in the browser should still belong to Tenant A. This tutorial walks through the small content finder that makes that work — and the subtlety that forces it to resolve the tenant from the domain binding rather than from the (non-existent) current page.
+Multi-tenant Umbraco sites need multi-tenant 404 pages — it goes to reason that if a request lands on Tenant A's domain and ends up at a missing URL, the user shouldn't suddenly be looking at Tenant B's header and footer just because we couldn't find the page they asked for. This tutorial walks through the small content finder that makes that work, and the subtlety that forces it to resolve the tenant from the domain binding rather than from the (non-existent) current page.
 
 ## The problem
 
@@ -35,9 +35,9 @@ A few approaches that don't actually get you there:
 
 ## Our approach
 
-Umbraco's request pipeline calls `IContentFinder` implementations in order to match a URL to an `IPublishedContent`. When all of them fail, it calls `IContentLastChanceFinder` — exactly one of them, registered via `builder.SetContentLastChanceFinder<T>()`. That's the hook for "I'm about to serve a 404; would you like to serve content instead?"
+Umbraco's request pipeline calls a chain of `IContentFinder` implementations in turn, asking each of them to match a URL to an `IPublishedContent`. When all of them fail to find anything, Umbraco calls a single `IContentLastChanceFinder` — exactly one, registered via `builder.SetContentLastChanceFinder<T>()`. That last-chance finder is the hook for "I'm about to serve a 404; would you like to serve content instead?", and it's exactly the right place for our per-tenant logic to live.
 
-Inside `TryFindContent` you get an `IPublishedRequestBuilder`, which exposes `request.Domain?.ContentId` — the content ID of the root node bound to the request's domain. That's the tenancy signal you need: even though there's no current page, Umbraco *does* know which tenant the request belongs to, because it knew which domain was hit.
+Inside `TryFindContent` you get an `IPublishedRequestBuilder` — think of it as Umbraco's mutable wrapper around the in-flight request, with hooks for "use this published content", "set this response status", and so on. It exposes `request.Domain?.ContentId`, which is the content ID of the root node bound to the request's domain. That's the tenancy signal you need: even though there's no current page, Umbraco *does* know which tenant the request belongs to, because it knew which domain was hit.
 
 From there, the implementation is the foundation pattern in reverse: instead of `currentPage.Root()` → walk down, you have the root directly → walk down. Look for a `PageNotFound`-typed descendant under that root, hand it back to the request builder, set the status code to 404, done.
 
@@ -84,7 +84,7 @@ public class PageNotFoundContentFinder : IContentLastChanceFinder
 
 Two dependencies, both injected:
 
-- **`IUmbracoContextAccessor`** to read the published content cache. This is how we resolve a content ID into a content node.
+- **`IUmbracoContextAccessor`** to reach the published content cache. The `UmbracoContext` is Umbraco's per-request handle on the published content tree and the request itself; the *accessor* is the small interface you inject when you want to read that handle from anywhere outside an Umbraco render controller. We need it here because the content finder runs before any controller does.
 - **`IServiceScopeFactory`** for the fallback path that needs `IPublishedContentQuery`. We'll explain why this is `IServiceScopeFactory` rather than a direct `IPublishedContentQuery` injection in step 4.
 
 ### Step 2 — Read the tenant root from the request's domain
@@ -97,7 +97,7 @@ var rootContentId = request.Domain?.ContentId;
 
 When the request hit `community.example.com`, Umbraco matched the host to a configured domain in the backoffice (Settings → Culture and Hostnames on the tenant root). That match populates `request.Domain` with — among other things — the `ContentId` of the bound root node. If no domain matched, `request.Domain` is null and `rootContentId` is null.
 
-The strongly-typed `Models.PublishedModels.PageNotFound` is the document type the editor uses for tenant 404 pages. Umbraco's Models Builder generated it from a content type with alias `pageNotFound`. Putting one of these under each tenant root and publishing it is the editor-facing half of this feature.
+The strongly-typed `Models.PublishedModels.PageNotFound` is the document type the editor uses for tenant 404 pages. Umbraco's Models Builder generated it from a content type with alias `pageNotFound` — Models Builder reads your document types out of the database at build time and emits a typed C# class per type, so we can lean on the compiler instead of stringly-typed property lookups. Putting one of these `PageNotFound` nodes under each tenant root and publishing it is the editor-facing half of this feature.
 
 ### Step 3 — Resolve the root and find the 404 page
 
@@ -200,7 +200,7 @@ public Task<bool> TryFindContent(IPublishedRequestBuilder request)
 
 ### Step 6 — Register it
 
-`IContentLastChanceFinder` is a *single-implementation* contract. Umbraco's `SetContentLastChanceFinder<T>()` registers your type and replaces whatever was there before. Wrap it in a composer in the same file:
+`IContentLastChanceFinder` is a *single-implementation* contract. Umbraco's `SetContentLastChanceFinder<T>()` registers your type and replaces whatever was there before. Wrap it in a composer in the same file — a *composer* is an Umbraco-specific startup hook: any class that implements `IComposer` is picked up at boot and given a chance to register things with the DI container, which is exactly what we need to tell Umbraco about our last-chance finder:
 
 ```csharp
 public class PageNotFoundContentFinderComposer : IComposer
@@ -236,3 +236,5 @@ The DI registration for `PageNotFoundContentFinder` itself is *also* done by `Se
 The other refinement that builds on the multi-tenant resolution foundation handles a related question: what happens when the tenant root exists but the editor hasn't configured the brand metadata yet, and you still need to emit valid `Organization` schema in the page head?
 
 → [Tenant-aware fallback for schema and SEO metadata](./tenant-fallback-for-schema-and-seo.md)
+
+Hopefully that takes the "but where do I hook the 404 in?" head-scratching off your plate the next time you set up a multi-tenant site.

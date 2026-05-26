@@ -4,13 +4,13 @@ tags: [multi-tenant, content-resolution, site-settings, ipublishedcontent]
 
 # Resolving content in a multi-tenant Umbraco site
 
-This tutorial walks through the pattern the Umbraco Community site uses for **multi-tenancy** — running several distinct sites out of one Umbraco instance — and the small set of helpers that keep every content lookup scoped to *this request's* tenant rather than accidentally reaching into another one.
+Running multiple sites from a single Umbraco instance is one of those things that looks easy until you've shipped one — and then suddenly every content lookup needs to know which tenant it belongs to. This tutorial walks through the pattern the Umbraco Community site uses for **multi-tenancy** (several distinct sites out of one Umbraco instance) and the small set of helpers that keep every content lookup scoped to *this request's* tenant rather than wandering off into another one's tree.
 
-It's a *foundation* piece. Several other tutorials in this suite (the per-tenant 404 finder, the tenant-aware SEO schema fallback) build on top of it. If your project only ever serves one site from one Umbraco instance, you can skip this — `umbracoHelper.ContentAtRoot().First()` is fine for you. The pattern below only earns its keep once you have two or more tenant roots in the same tree.
+It's a *foundation* piece. Several other tutorials in this suite (the per-tenant 404 finder, the tenant-aware SEO schema fallback) build directly on top of it. If your project only ever serves one site from one Umbraco instance, then you can skip this with my blessing — `umbracoHelper.ContentAtRoot().First()` is perfectly fine for you. The pattern below only earns its keep once you have two or more tenant roots living in the same tree.
 
 ## Why you might want this
 
-Umbraco supports multiple top-level content nodes in a single instance, each bound to its own domain (or set of domains). That's the cheap way to host several sites from one CMS — shared media library, shared user accounts, shared deployments, but each site gets its own URLs, its own settings, its own content. The Umbraco backoffice looks something like this:
+Let us take a moment to look at what Umbraco gives us out of the box. It supports multiple top-level content nodes in a single instance, each bound to its own domain (or set of domains). That's the cheap way to host several sites from one CMS — shared media library, shared user accounts, shared deployments, but each site gets its own URLs, its own settings, its own content. The Umbraco backoffice ends up looking something like this:
 
 ```
 Content (Umbraco's "root")
@@ -39,7 +39,7 @@ A pattern, not a single class. The headline rule is:
 
 > **Every content lookup starts from the current request's content node and walks up or down its own subtree. Nothing reaches across to a sibling root.**
 
-In code, that means three things:
+In code, that means three things. (A quick note on terminology before we dive in: `IPublishedContent` is Umbraco's core interface for any node in the published content tree — every page, every settings node, every block of content you can render is an `IPublishedContent`. Most of the extension methods we'll talk about hang off this interface, so once you've got one you've got a foothold into the tenant's tree.)
 
 1. **`currentPage.Root()`** is the lever for "give me the top of the current tenant's subtree". The `Root()` extension is built into Umbraco — it walks up the ancestor chain to the topmost content node.
 2. **A small set of `Get<Setting>()` extension methods** wrap "from the current page, find this tenant's Settings node, then the configured child of that". They're the *only* place `Root()` gets called in this repo (with one exception we'll cover at the end).
@@ -97,6 +97,8 @@ public static Settings? GetSiteSettings(this IPublishedContent content)
 ```
 
 That's the whole thing. From any content node, walk up to the tenant root, then look for a child whose document-type alias matches `Settings.ModelTypeAlias`. Return it as a strongly-typed `Settings` model (or null if the editor hasn't created one yet).
+
+(`Settings` here is a Models Builder-generated class — Umbraco's Models Builder reads your document types out of the database and emits a typed C# class per type, so instead of stringly-typed `content.Value<string>("siteName")` calls you get `settings.SiteName` with full IntelliSense. The same generation gives us `NavigationSettings`, `SocialSettings`, and every other content-type-as-class you'll see in this codebase.)
 
 The reason this is the lever the rest of the codebase pulls is that **`Settings` is the parent of everything tenant-configurable**. Navigation, social/SEO, and any future per-tenant config live as children of this node. Once you have `Settings`, you have the door to all of them.
 
@@ -231,3 +233,5 @@ Two refinements build directly on this foundation:
 → [Per-tenant 404 pages with `IContentLastChanceFinder`](../refinements/per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off, because the request 404'd.
 
 → [Tenant-aware fallback for schema and SEO metadata](../refinements/tenant-fallback-for-schema-and-seo.md) — what to do when the tenant root exists but the editor hasn't filled in `SocialSettings` yet, and you still need to emit valid `Organization` schema.
+
+Hopefully this saves you a class of bug that's surprisingly easy to write and equally annoying to track down later on.

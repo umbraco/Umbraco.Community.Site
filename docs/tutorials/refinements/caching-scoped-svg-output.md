@@ -6,7 +6,7 @@ tags: [svg, caching, runtime-cache, performance]
 
 > **Prerequisites:** This refinement builds directly on [Scoping inline SVG `<style>` to prevent class-name bleed](./scoping-inline-svg-styles.md). The cache layer described below only works because the scope class introduced there is *deterministic per media path*. If you skipped straight here, read that one first — the caching is the easy part once scoping is in place.
 
-Once the SVG TagHelper produces deterministic scoped output, every render of the same media item is byte-identical. That makes the whole pipeline cacheable: we can do the read + sanitise + parse + selector-prefix work *once* and reuse the result for an hour. On cloud-hosted media this is the difference between every page render making N media-storage round-trips and making zero.
+Once the SVG TagHelper produces deterministic scoped output, every render of the same media item is byte-identical — which is a rather lovely property to have, because it makes the whole pipeline cacheable. We can do the read + sanitise + parse + selector-prefix work *once* and then happily reuse the result for an hour. On cloud-hosted media in particular this is the difference between every page render making N media-storage round-trips and making zero of them, which is a meaningful difference in latency for the end user.
 
 ## The problem
 
@@ -38,7 +38,7 @@ This is the version we landed on. It hinges on the fact that the scope class der
 
 ## Our approach
 
-Umbraco ships an in-process cache — `Umbraco.Cms.Core.Cache.AppCaches` — with three policies: `RuntimeCache` (in-memory, per-app), `RequestCache` (per-request), and `IsolatedCaches` (named, longer-lived). For our use case `RuntimeCache` is the right one: SVGs are tiny, shared across all requests, and we want them to outlive any single request.
+Umbraco ships an in-process cache — `Umbraco.Cms.Core.Cache.AppCaches` — with three flavours to pick from: `RuntimeCache` (in-memory, lives for the lifetime of the app), `RequestCache` (per-request, dies at the end of the response), and `IsolatedCaches` (named, longer-lived, useful when you want to evict a whole named slice in one go). For our use case `RuntimeCache` is the right pick: SVGs are tiny, shared across all requests, and we very much want them to outlive any single request.
 
 `RuntimeCache.GetCacheItem<T>(key, factory, timeout)` is the API. If the key is in the cache, return the value; otherwise call the factory, store the result with the given TTL, and return it. The factory is invoked atomically per key, so concurrent first-render requests don't all race to read the same SVG.
 
@@ -222,6 +222,6 @@ The TagHelper now does three things, each layered cleanly on the previous one:
 2. **Scoping** — scope the SVG's inline `<style>` so class names don't bleed across SVGs on the same page.
 3. **Caching** — serve repeated renders of the same SVG from `RuntimeCache`, skipping the read/parse/scope work for everything after the first.
 
-For a page with ten inline SVGs on cloud-backed media, that goes from ten round-trips and ten parse cycles per render to effectively zero, once warm. The render-path overhead of `<svg-src>` becomes negligible.
+For a page with ten inline SVGs on cloud-backed media, that goes from ten round-trips and ten parse cycles per render down to effectively zero, once warm. The render-path overhead of `<svg-src>` becomes negligible — and that's a pleasing place to leave it.
 
-The full implementation is at [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs).
+The full implementation is at [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs). Hopefully that gives you a complete picture of how the three layers fit together, and a pattern you can lift into your own TagHelpers when the same shape comes up.

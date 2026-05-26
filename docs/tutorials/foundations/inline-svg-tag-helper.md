@@ -4,7 +4,9 @@ tags: [svg, tag-helper, razor, media]
 
 # Building an inline SVG TagHelper for Umbraco
 
-This tutorial walks through the `<svg-src>` TagHelper that the Umbraco Community site uses to inline SVG files from media into views. It's a *foundation* piece — most of the SVG-related tutorials in this suite build on top of it.
+SVGs are wonderful for icons and brand marks — small, sharp, infinitely scalable — but only if you can actually *style* them from CSS, and that's where things tend to get fiddly. This tutorial walks through the `<svg-src>` TagHelper that the Umbraco Community site uses to inline SVG files from Umbraco media straight into the rendered Razor view, where CSS and JavaScript can then reach inside them. It's a *foundation* piece — most of the SVG-related tutorials in this suite build on top of it.
+
+(If you've not written a TagHelper before, the short version is: a TagHelper is a small Razor extension that looks like an HTML element in your view but gets expanded server-side, in C#, before the page is sent to the browser. We'll build one from scratch below.)
 
 ## Credit where it's due
 
@@ -46,7 +48,7 @@ Behind the scenes, the TagHelper:
 1. Resolves the Umbraco media item to a file path.
 2. Reads the SVG file contents from media storage.
 3. Strips any embedded `<script>` tags and `javascript:` URLs (defensive — editors upload these files).
-4. Parses the markup with [HtmlAgilityPack](https://html-agility-pack.net/) so it can mutate it.
+4. Parses the markup with [HtmlAgilityPack](https://html-agility-pack.net/) (a forgiving HTML/XML parser for .NET — it reads the SVG into a navigable DOM-like tree you can edit from C#) so it can mutate it.
 5. Injects the `width`, `height`, and `alt` attributes you passed.
 6. Replaces the `<svg-src>` tag with the SVG content.
 
@@ -94,7 +96,7 @@ namespace UmbracoCommunity.Web.TagHelpers
 
 ### Step 2 — Wire up Umbraco services via DI
 
-We need to resolve the Umbraco media URL and open the file from media storage. Both are services Umbraco registers in DI: `IPublishedUrlProvider` for the URL, `MediaFileManager` for the file content.
+We need to resolve the Umbraco media URL and open the file from media storage. Both are services Umbraco registers in DI for you: `IPublishedUrlProvider` translates a media item to its public URL, and `MediaFileManager` is Umbraco's abstraction over wherever the media files actually live (local disk in development, cloud blob storage in production).
 
 ```csharp
 private readonly IPublishedUrlProvider _urlProvider;
@@ -258,11 +260,13 @@ Setting `TagName = null` removes the outer `<svg-src>...</svg-src>` wrapper enti
 
 ### Step 9 — Use it from Razor
 
-Once the TagHelper is in the assembly, register it in `Views/_ViewImports.cshtml`:
+Once the TagHelper is in the assembly, register it in `Views/_ViewImports.cshtml` — that's the file ASP.NET Razor scans before compiling any view, so anything declared there (using-statements, tag-helper registrations, namespace imports) is automatically available across every view in the folder and its children:
 
 ```cshtml
 @addTagHelper *, UmbracoCommunity.Web
 ```
+
+The `*` means "all TagHelpers in this assembly"; `UmbracoCommunity.Web` is the project that contains our `SvgTagHelper`.
 
 Now you can call it from any view:
 
@@ -295,3 +299,5 @@ The real use site in this repo is at [`src/UmbracoCommunity.Web.UI/Views/Partial
 If you're using this TagHelper across many SVGs on the same page and you've ever hit the "wrong colour after the logo loaded" bug, the next stop is:
 
 → [Scoping inline SVG `<style>` to prevent class-name bleed](../refinements/scoping-inline-svg-styles.md)
+
+Hopefully that gives you a working foundation to inline SVGs from Umbraco media — and a small toolkit you can keep stretching as the rest of the suite builds on it.

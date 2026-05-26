@@ -2,7 +2,7 @@
 
 Short, standalone tutorials covering specific problems we've hit on the Umbraco Community site and the approaches we took to solve them.
 
-Each tutorial is self-contained: it states the concrete problem, explains the trade-offs of our solution, and walks through the implementation file by file. They're written so a developer on a different Umbraco project (or no Umbraco project at all) can pick up the pattern, but they reference real code in this repo so anyone working *on* this site can jump straight to the source.
+Each tutorial is self-contained: it states the concrete problem, explains the trade-offs of our solution, and walks through the implementation file by file. They're written so a developer on a different Umbraco project (or no Umbraco project at all) can pick up the pattern — but they reference real code in this repo so anyone working *on* the site can jump straight to the source if they prefer to read code over prose.
 
 These sit alongside the other docs in this folder rather than replacing them:
 
@@ -18,7 +18,7 @@ Tutorials are split into two kinds:
 - **`foundations/`** — pieces of code that other tutorials build on. Read these first if a refinement says it's a prerequisite.
 - **`refinements/`** — extensions, bug fixes, or improvements layered onto a foundation. Each refinement names the foundation it depends on at the top.
 
-You don't need to read the suite in order. Each tutorial points at the next logical stop in its closing section, so you can follow a thread, or jump straight to whichever problem matches the one in front of you.
+You don't need to read the suite in order. Each tutorial points at the next logical stop in its closing section, so you can either follow a thread the whole way through, or just jump straight to whichever problem happens to match the one in front of you.
 
 ## What's here
 
