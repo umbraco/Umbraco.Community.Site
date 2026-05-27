@@ -14,6 +14,7 @@ namespace UmbracoCommunity.Web.Services;
 internal sealed class SearchService : ISearchService
 {
     private const int ExcerptMaxChars = 200;
+    private const int MaxIndexFetch = 500;
     private static readonly string IndexName = Umbraco.Cms.Core.Constants.UmbracoIndexes.ExternalIndexName;
     private static readonly Regex HtmlTagRegex = new("<[^>]+>", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
@@ -38,6 +39,7 @@ internal sealed class SearchService : ISearchService
     public Task<(IReadOnlyList<SearchResultItem> Results, int Total)> SearchAsync(
         IPublishedContent currentPage,
         string query,
+        int skip,
         int take,
         CancellationToken ct)
     {
@@ -45,6 +47,8 @@ internal sealed class SearchService : ISearchService
         {
             return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((Array.Empty<SearchResultItem>(), 0));
         }
+
+        if (skip < 0) skip = 0;
 
         if (!_examineManager.TryGetIndex(IndexName, out var index))
         {
@@ -64,12 +68,14 @@ internal sealed class SearchService : ISearchService
         {
             // ManagedQuery searches the default analyzed text fields across all indexed properties.
             // Exclude pages flagged hideFromSearch and any node without a template (non-routable).
+            // Fetch up to MaxIndexFetch and apply tenant + current-page filtering in memory so
+            // pagination totals stay accurate after filtering.
             searchResults = index.Searcher
                 .CreateQuery("content")
                 .ManagedQuery(query)
                 .Not().Field("hideFromSearch", "1")
                 .Not().Field("templateID", "0")
-                .Execute(QueryOptions.SkipTake(0, Math.Max(take * 3, 10)));
+                .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
         }
         catch (Exception ex)
         {
@@ -77,16 +83,26 @@ internal sealed class SearchService : ISearchService
             return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((Array.Empty<SearchResultItem>(), 0));
         }
 
-        var items = new List<SearchResultItem>(take);
+        var filtered = new List<ISearchResult>();
         foreach (var result in searchResults)
         {
-            if (items.Count >= take) break;
             if (!int.TryParse(result.Id, out var id)) continue;
 
             var content = umbracoContext.Content.GetById(id);
             if (content is null) continue;
             if (content.Root().Id != tenantRootId) continue;
             if (content.Id == currentPage.Id) continue;
+
+            filtered.Add(result);
+        }
+
+        var total = filtered.Count;
+        var items = new List<SearchResultItem>(take);
+        foreach (var result in filtered.Skip(skip).Take(take))
+        {
+            var id = int.Parse(result.Id);
+            var content = umbracoContext.Content.GetById(id);
+            if (content is null) continue;
 
             items.Add(new SearchResultItem
             {
@@ -100,7 +116,7 @@ internal sealed class SearchService : ISearchService
             });
         }
 
-        return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((items, (int)searchResults.TotalItemCount));
+        return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((items, total));
     }
 
     private static string? BuildExcerpt(string? raw)

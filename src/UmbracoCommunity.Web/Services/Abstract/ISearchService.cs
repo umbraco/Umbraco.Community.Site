@@ -13,6 +13,7 @@ public interface ISearchService
     Task<(IReadOnlyList<SearchResultItem> Results, int Total)> SearchAsync(
         IPublishedContent currentPage,
         string query,
+        int skip,
         int take,
         CancellationToken ct);
 }
