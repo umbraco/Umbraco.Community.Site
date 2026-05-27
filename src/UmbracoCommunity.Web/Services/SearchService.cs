@@ -16,6 +16,18 @@ internal sealed class SearchService : ISearchService
     private const int ExcerptMaxChars = 200;
     private const int MaxIndexFetch = 500;
     private static readonly string IndexName = Umbraco.Cms.Core.Constants.UmbracoIndexes.ExternalIndexName;
+
+    // Scope the managed query to author-content fields so editor identity
+    // (writerName/creatorName) and other system metadata don't surface as hits.
+    private static readonly string[] SearchFields =
+    {
+        "nodeName",
+        "metaTitle",
+        "metaDescription",
+        "teaser",
+        "bannerContent",
+        "contentBlocks",
+    };
     private static readonly Regex HtmlTagRegex = new("<[^>]+>", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
@@ -72,7 +84,7 @@ internal sealed class SearchService : ISearchService
             // pagination totals stay accurate after filtering.
             searchResults = index.Searcher
                 .CreateQuery("content")
-                .ManagedQuery(query)
+                .ManagedQuery(query, SearchFields)
                 .Not().Field("hideFromSearch", "1")
                 .Not().Field("templateID", "0")
                 .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
