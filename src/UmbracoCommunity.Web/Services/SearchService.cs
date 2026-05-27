@@ -1,12 +1,11 @@
-using System.Net;
-using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Models.Pages;
 
@@ -64,9 +63,12 @@ internal sealed class SearchService : ISearchService
         try
         {
             // ManagedQuery searches the default analyzed text fields across all indexed properties.
+            // Exclude pages flagged hideFromSearch and any node without a template (non-routable).
             searchResults = index.Searcher
                 .CreateQuery("content")
                 .ManagedQuery(query)
+                .Not().Field("hideFromSearch", "1")
+                .Not().Field("templateID", "0")
                 .Execute(QueryOptions.SkipTake(0, Math.Max(take * 3, 10)));
         }
         catch (Exception ex)
@@ -85,15 +87,15 @@ internal sealed class SearchService : ISearchService
             if (content is null) continue;
             if (content.Root().Id != tenantRootId) continue;
             if (content.Id == currentPage.Id) continue;
-            if (content.TemplateId <= 0) continue; // skip non-routable items
 
             items.Add(new SearchResultItem
             {
                 Name = content.Name ?? string.Empty,
                 Url = content.Url(_publishedUrlProvider),
-                Description = BuildExcerpt(
-                    content.Value<string>("seoDescription")
-                    ?? content.Value<string>("teaser")),
+                Description =
+                    BuildExcerpt(result.GetValues("metaDescription").FirstOrDefault())
+                    ?? BuildExcerpt(result.GetValues("teaser").FirstOrDefault())
+                    ?? BuildExcerpt(result.GetValues("contentBlocks").FirstOrDefault()),
                 ContentTypeAlias = content.ContentType.Alias,
             });
         }
@@ -106,6 +108,7 @@ internal sealed class SearchService : ISearchService
         if (string.IsNullOrWhiteSpace(raw)) return null;
         var text = WebUtility.HtmlDecode(HtmlTagRegex.Replace(raw, " "));
         text = WhitespaceRegex.Replace(text, " ").Trim();
+        if (text.Length == 0) return null;
         if (text.Length <= ExcerptMaxChars) return text;
         return text[..ExcerptMaxChars].TrimEnd() + "…";
     }
