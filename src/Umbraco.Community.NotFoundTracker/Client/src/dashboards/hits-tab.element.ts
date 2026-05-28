@@ -166,6 +166,32 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     await this.load();
   }
 
+  private async ignoreSelected() {
+    if (this.selectedIds.size === 0) return;
+    const count = this.selectedIds.size;
+    try {
+      await umbConfirmModal(this, {
+        headline: `Ignore ${count} hit${count === 1 ? "" : "s"}?`,
+        content: html`
+          <p>
+            This creates an <strong>exact-match</strong> ignore rule for each selected path and
+            removes the row${count === 1 ? "" : "s"} from the list.
+          </p>
+          <p>Future hits on the same path${count === 1 ? "" : "s"} won't be tracked.</p>
+        `,
+        confirmLabel: count === 1 ? "Ignore hit" : `Ignore ${count} hits`,
+      });
+    } catch {
+      return; // cancelled
+    }
+    const result = await NotFoundTrackerApi.bulkIgnoreHits([...this.selectedIds], 0);
+    this.selectedIds.clear();
+    await this.load();
+    if (result.skipped > 0) {
+      this.error = `Ignored ${result.processed}; skipped ${result.skipped} (already covered by an existing rule).`;
+    }
+  }
+
   private async deleteOne(item: HitListItem) {
     try {
       await umbConfirmModal(this, {
@@ -310,6 +336,11 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
         ></uui-button>
         ${this.selectedIds.size > 0
           ? html`
+              <uui-button
+                look="primary"
+                label=${`Ignore selected (${this.selectedIds.size})`}
+                @click=${this.ignoreSelected}
+              ></uui-button>
               <uui-button
                 look="primary"
                 color="danger"
