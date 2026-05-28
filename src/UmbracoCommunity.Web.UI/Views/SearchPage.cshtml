@@ -7,19 +7,30 @@
 }
 
 <section class="search-page">
-    <h1 class="search-page__title">Search</h1>
+    <header class="search-page__header">
+        <h1 class="search-page__title">Search</h1>
+        <p class="search-page__subtitle">Let us help you find what you are looking for</p>
 
-    <form method="GET" action="@actionUrl" role="search" class="search-page__form">
-        <label for="search-page-input" class="sr-only">Search the site</label>
-        <input
-            type="text"
-            id="search-page-input"
-            name="q"
-            value="@Model.Query"
-            placeholder="What are you looking for?"
-            autofocus />
-        <button type="submit" class="btn">Search</button>
-    </form>
+        <form method="GET" action="@actionUrl" role="search" class="search-page__form">
+            <label for="search-page-input" class="sr-only">Search the site</label>
+            <span class="search-page__form-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                          stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M21 21L16.7 16.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                </svg>
+            </span>
+            <input
+                type="search"
+                id="search-page-input"
+                name="q"
+                value="@Model.Query"
+                placeholder="Search"
+                autofocus />
+            <button type="submit" class="btn is-blue">Search</button>
+        </form>
+    </header>
 
     @if (Model.HasQuery)
     {
@@ -30,26 +41,53 @@
         else
         {
             <p class="search-page__count">
-                Your search for <em>@Model.Query</em> returned @Model.Results.Count result@(Model.Results.Count == 1 ? "" : "s").
+                Your search for <em>@Model.Query</em> returned @Model.TotalResults result@(Model.TotalResults == 1 ? "" : "s").
             </p>
 
             <ul class="search-page__results">
                 @foreach (var item in Model.Results)
                 {
                     <li class="search-page__result">
-                        <h2 class="search-page__result-title">
-                            <a href="@item.Url">@item.Name</a>
-                        </h2>
+                        <h2 class="search-page__result-title">@item.Name</h2>
                         @if (!string.IsNullOrWhiteSpace(item.Description))
                         {
                             <p class="search-page__result-description">@item.Description</p>
                         }
-                        <p class="search-page__result-url">
-                            <a href="@item.Url">@item.Url</a>
-                        </p>
+                        <a class="search-page__result-url" href="@item.Url">@item.Url</a>
                     </li>
                 }
             </ul>
+
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="search-page__pagination" aria-label="Search results pages">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a class="search-page__pagination-link" href="@Model.GetPageUrl(1)" rel="first">First</a>
+                        <a class="search-page__pagination-link" href="@Model.GetPageUrl(Model.CurrentPage - 1)" rel="prev">Previous</a>
+                    }
+                    else
+                    {
+                        <span class="search-page__pagination-link is-disabled" aria-disabled="true">First</span>
+                        <span class="search-page__pagination-link is-disabled" aria-disabled="true">Previous</span>
+                    }
+
+                    <span class="search-page__pagination-current" aria-current="page">
+                        Page @Model.CurrentPage of @Model.TotalPages
+                    </span>
+
+                    @if (Model.HasNextPage)
+                    {
+                        <a class="search-page__pagination-link" href="@Model.GetPageUrl(Model.CurrentPage + 1)" rel="next">Next</a>
+                        <a class="search-page__pagination-link" href="@Model.GetPageUrl(Model.TotalPages)" rel="last">Last</a>
+                    }
+                    else
+                    {
+                        <span class="search-page__pagination-link is-disabled" aria-disabled="true">Next</span>
+                        <span class="search-page__pagination-link is-disabled" aria-disabled="true">Last</span>
+                    }
+                </nav>
+            }
         }
     }
 </section>

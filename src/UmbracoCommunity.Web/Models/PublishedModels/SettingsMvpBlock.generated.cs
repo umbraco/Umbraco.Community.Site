@@ -18,7 +18,7 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Settings MVP block</summary>
+	/// <summary>[Settings] MVP block</summary>
 	[PublishedModel("settingsMvpBlock")]
 	public partial class SettingsMvpBlock : PublishedElementModel, ISettingsBlockId
 	{

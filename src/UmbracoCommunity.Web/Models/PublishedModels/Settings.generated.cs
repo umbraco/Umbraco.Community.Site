@@ -82,6 +82,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string SiteName => this.Value<string>(_publishedValueFallback, "siteName");
 
 		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
+
+		///<summary>
 		/// Hide from sitemap
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
