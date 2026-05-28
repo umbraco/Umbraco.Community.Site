@@ -12,6 +12,7 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     private readonly INotFoundIgnoreRuleService _rules;
     private readonly INotFoundRedirectService _redirects;
     private readonly INotFoundUserScopeService _scope;
+    private readonly NotFoundHostnameGroupService _hostnameGroups;
     private readonly Infrastructure.AutoPresetSeedingService _seedingService;
 
     public NotFoundTrackerApiController(
@@ -19,18 +20,20 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
         INotFoundIgnoreRuleService rules,
         INotFoundRedirectService redirects,
         INotFoundUserScopeService scope,
+        NotFoundHostnameGroupService hostnameGroups,
         Infrastructure.AutoPresetSeedingService seedingService)
     {
         _hits = hits;
         _rules = rules;
         _redirects = redirects;
         _scope = scope;
+        _hostnameGroups = hostnameGroups;
         _seedingService = seedingService;
     }
 
     [HttpGet("hits")]
     public async Task<ActionResult<HitListResponse>> ListHits(
-        [FromQuery] string? hostname,
+        [FromQuery(Name = "hostname")] string[]? hostname,
         [FromQuery] byte? status,
         [FromQuery] string? search,
         [FromQuery] byte sort = 0,
@@ -38,9 +41,16 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
         [FromQuery] int take = 25,
         CancellationToken ct = default)
     {
+        var hostnames = hostname?
+            .Where(h => !string.IsNullOrEmpty(h))
+            .Select(Matching.UrlNormalizer.NormalizeHostname)
+            .Where(h => !string.IsNullOrEmpty(h))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
         var query = new HitListQuery
         {
-            Hostname = string.IsNullOrEmpty(hostname) ? null : hostname.ToLowerInvariant(),
+            Hostnames = hostnames is { Count: > 0 } ? hostnames : null,
             Status = status.HasValue ? (HitStatus)status.Value : HitStatus.Active,
             Search = search,
             Sort = (HitSort)sort,
@@ -86,6 +96,13 @@ public sealed class NotFoundTrackerApiController : NotFoundTrackerApiControllerB
     {
         var hosts = await _hits.GetDistinctHostnamesAsync(await _scope.GetCurrentScopeAsync(ct), ct);
         return Ok(hosts);
+    }
+
+    [HttpGet("hits/hostname-groups")]
+    public async Task<ActionResult<IReadOnlyList<HostnameGroup>>> GetHostnameGroups(CancellationToken ct)
+    {
+        var groups = await _hostnameGroups.GetGroupsAsync(await _scope.GetCurrentScopeAsync(ct), ct);
+        return Ok(groups);
     }
 
     [HttpDelete("hits/{id:int}")]

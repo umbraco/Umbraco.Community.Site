@@ -13,13 +13,16 @@ namespace Umbraco.Community.NotFoundTracker.Infrastructure;
 public class NotFoundTrackerMigrationHostedService : IHostedService
 {
     private readonly IDbContextFactory<NotFoundTrackerDbContext> _contextFactory;
+    private readonly HostnameNormalizationService _normalizer;
     private readonly ILogger<NotFoundTrackerMigrationHostedService> _logger;
 
     public NotFoundTrackerMigrationHostedService(
         IDbContextFactory<NotFoundTrackerDbContext> contextFactory,
+        HostnameNormalizationService normalizer,
         ILogger<NotFoundTrackerMigrationHostedService> logger)
     {
         _contextFactory = contextFactory;
+        _normalizer = normalizer;
         _logger = logger;
     }
 
@@ -54,6 +57,10 @@ public class NotFoundTrackerMigrationHostedService : IHostedService
             {
                 _logger.LogInformation("No pending NotFoundTracker migrations");
             }
+
+            // Backfill normalization for rows recorded before UrlNormalizer stripped schemes
+            // and trailing slashes. Idempotent: skips rows already in canonical form.
+            await _normalizer.NormalizeAsync(cancellationToken);
         }
         catch (Exception ex)
         {

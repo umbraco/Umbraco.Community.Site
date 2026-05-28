@@ -29,7 +29,25 @@ public static class UrlNormalizer
 
     public static string NormalizeHostname(string? hostname)
     {
-        return string.IsNullOrEmpty(hostname) ? string.Empty : hostname.ToLowerInvariant();
+        if (string.IsNullOrEmpty(hostname))
+        {
+            return string.Empty;
+        }
+
+        var lower = hostname.ToLowerInvariant();
+
+        // Strip scheme so "https://example.com" and "example.com" collapse to one bucket.
+        if (lower.StartsWith("https://", StringComparison.Ordinal))
+        {
+            lower = lower[8..];
+        }
+        else if (lower.StartsWith("http://", StringComparison.Ordinal))
+        {
+            lower = lower[7..];
+        }
+
+        // Strip trailing slash(es) so "example.com/" and "example.com" match.
+        return lower.TrimEnd('/');
     }
 
     private static string CollapseSlashes(string input)
