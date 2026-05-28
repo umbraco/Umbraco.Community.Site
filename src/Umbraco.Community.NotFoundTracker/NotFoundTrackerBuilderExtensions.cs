@@ -47,6 +47,7 @@ public static class NotFoundTrackerBuilderExtensions
             options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
+        builder.Services.AddSingleton<HostnameNormalizationService>();
         builder.Services.AddHostedService<NotFoundTrackerMigrationHostedService>();
 
         // Recording pipeline.
@@ -64,6 +65,7 @@ public static class NotFoundTrackerBuilderExtensions
         builder.Services.AddScoped<INotFoundHitService, NotFoundHitService>();
         builder.Services.AddScoped<INotFoundIgnoreRuleService, NotFoundIgnoreRuleService>();
         builder.Services.AddScoped<INotFoundUserScopeService, NotFoundUserScopeService>();
+        builder.Services.AddScoped<NotFoundHostnameGroupService>();
         builder.Services.AddScoped<INotFoundRedirectService, NotFoundRedirectService>();
 
         // Fail-fast guard: if the host forgot to register an INotFoundPageResolver,

@@ -57,7 +57,7 @@ public class NotFoundHitServiceTests : IDisposable
         await Seed(("a.example", "/foo"), ("b.example", "/bar"));
 
         var (items, _) = await BuildService().ListAsync(
-            new HitListQuery { Hostname = "b.example" },
+            new HitListQuery { Hostnames = new[] { "b.example" } },
             Scoped("a.example"),
             default);
 

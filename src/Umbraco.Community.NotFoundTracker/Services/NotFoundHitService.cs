@@ -29,13 +29,14 @@ public sealed class NotFoundHitService : INotFoundHitService
             q = q.Where(h => scope.AccessibleHostnames.Contains(h.Hostname));
         }
 
-        if (!string.IsNullOrEmpty(query.Hostname))
+        if (query.Hostnames is { Count: > 0 })
         {
-            if (!scope.CanAccessHostname(query.Hostname))
+            var allowed = query.Hostnames.Where(scope.CanAccessHostname).ToList();
+            if (allowed.Count == 0)
             {
                 return (Array.Empty<HitListRow>(), 0);
             }
-            q = q.Where(h => h.Hostname == query.Hostname);
+            q = q.Where(h => allowed.Contains(h.Hostname));
         }
 
         if (query.Status.HasValue)
