@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Search.Core.Services;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
+using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Services;
 
@@ -80,6 +81,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
             var content = umbracoContext.Content.GetById(id);
             if (content is null) continue;          // content was unpublished/deleted since cache write
             if (content.Id == currentPage.Id) continue;
+            if (!IsRoutableAndSearchable(content)) continue;
             suggestions.Add(content);
         }
 
@@ -130,6 +132,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
         var droppedNotDocument = 0;
         var droppedNotFound = 0;
         var droppedOtherTenant = 0;
+        var droppedHideFromSearch = 0;
 
         foreach (var doc in result.Documents)
         {
@@ -141,17 +144,25 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
             if (content is null) { droppedNotFound++; continue; }
             if (content.Id == currentPage.Id) continue;          // never suggest the 404 page itself
             if (content.Root().Id != tenantRootId) { droppedOtherTenant++; continue; }
+            if (!IsRoutableAndSearchable(content)) { droppedHideFromSearch++; continue; }
             if (ids.Contains(content.Id)) continue;
 
             ids.Add(content.Id);
         }
 
         _logger.LogInformation(
-            "PageNotFound suggestions: kept {Kept}/{Inspected} (notDocument={NotDocument}, notFound={NotFound}, otherTenant={OtherTenant})",
-            ids.Count, inspected, droppedNotDocument, droppedNotFound, droppedOtherTenant);
+            "PageNotFound suggestions: kept {Kept}/{Inspected} (notDocument={NotDocument}, notFound={NotFound}, otherTenant={OtherTenant}, hideFromSearch={HideFromSearch})",
+            ids.Count, inspected, droppedNotDocument, droppedNotFound, droppedOtherTenant, droppedHideFromSearch);
 
         return ids;
     }
+
+    // Mirrors the site-search gating: only routable pages whose doc type opts into the
+    // page-config composition AND has not been flagged hideFromSearch are suggestable.
+    private static bool IsRoutableAndSearchable(IPublishedContent content)
+        => content.TemplateId.HasValue
+           && content is ICompositionPageConfiguration pageConfig
+           && !pageConfig.HideFromSearch;
 
     private static string BuildQuery(string requestedPath, string? referrerUrl)
     {
