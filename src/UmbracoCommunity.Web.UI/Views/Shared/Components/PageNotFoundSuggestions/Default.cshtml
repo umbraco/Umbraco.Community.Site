@@ -17,6 +17,7 @@
 @if (Model is { Count: > 0 })
 {
     <section class="dc-page-not-found-suggestions">
+        <h2 class="dc-page-not-found-suggestions__heading">Perhaps it was one of these?</h2>
         <ul class="dc-page-not-found-suggestions__list">
             @foreach (var item in Model)
             {

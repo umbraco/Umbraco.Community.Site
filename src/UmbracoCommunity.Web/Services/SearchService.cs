@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Models.Pages;
+using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Services;
 
@@ -85,7 +86,6 @@ internal sealed class SearchService : ISearchService
             searchResults = index.Searcher
                 .CreateQuery("content")
                 .ManagedQuery(query, SearchFields)
-                .Not().Field("hideFromSearch", "1")
                 .Not().Field("templateID", "0")
                 .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
         }
@@ -104,6 +104,13 @@ internal sealed class SearchService : ISearchService
             if (content is null) continue;
             if (content.Root().Id != tenantRootId) continue;
             if (content.Id == currentPage.Id) continue;
+            // Only routable pages whose doc type opts into the page-config composition AND
+            // that haven't been flagged hideFromSearch are searchable. Doing this in code (vs
+            // in the Examine query) sidesteps the fact that nodes without the composition
+            // simply don't have the hideFromSearch field indexed at all.
+            if (!content.TemplateId.HasValue) continue;
+            if (content is not ICompositionPageConfiguration pageConfig) continue;
+            if (pageConfig.HideFromSearch) continue;
 
             filtered.Add(result);
         }
