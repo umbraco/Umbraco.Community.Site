@@ -32,6 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="UmbracoCommunity.Web.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Umbraco.Community.NotFoundTracker\Umbraco.Community.NotFoundTracker.csproj" />
   </ItemGroup>
 
