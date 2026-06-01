@@ -35,7 +35,7 @@ public class CommunitySitePageNotFoundResolver : INotFoundPageResolver
         Models.PublishedModels.PageNotFound? notFoundPage = null;
 
         var rootContentId = request.Domain?.ContentId;
-        _logger.LogInformation(
+        _logger.LogDebug(
             "PageNotFound resolver: domain='{Domain}' rootContentId={RootId} requestUri='{Uri}'",
             request.Domain?.Name, rootContentId, request.Uri);
 
@@ -46,7 +46,7 @@ public class CommunitySitePageNotFoundResolver : INotFoundPageResolver
             notFoundPage = rootNode?
                 .DescendantsOrSelf<Models.PublishedModels.PageNotFound>()
                 .FirstOrDefault();
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "PageNotFound resolver: domain branch — rootNode={RootNode}, found={FoundId}",
                 rootNode?.Id, notFoundPage?.Id);
         }
@@ -59,7 +59,7 @@ public class CommunitySitePageNotFoundResolver : INotFoundPageResolver
             notFoundPage = roots
                 .SelectMany(r => r.DescendantsOrSelf<Models.PublishedModels.PageNotFound>())
                 .FirstOrDefault();
-            _logger.LogInformation(
+            _logger.LogDebug(
                 "PageNotFound resolver: fallback branch — roots=[{Roots}], found={FoundId}",
                 string.Join(",", roots.Select(r => $"{r.Id}:{r.ContentType.Alias}")),
                 notFoundPage?.Id);

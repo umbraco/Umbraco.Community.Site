@@ -82,7 +82,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
         var query = BuildQuery(requestedPath, referrerUrl);
         if (string.IsNullOrWhiteSpace(query))
         {
-            _logger.LogInformation("PageNotFound suggestions: empty query for path '{Path}' (no usable tokens)", requestedPath);
+            _logger.LogDebug("PageNotFound suggestions: empty query for path '{Path}' (no usable tokens)", requestedPath);
             return Array.Empty<IPublishedContent>();
         }
 
@@ -141,7 +141,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
         var searcher = _searcherResolver.GetSearcher(IndexAlias);
         if (searcher is null)
         {
-            _logger.LogInformation("PageNotFound suggestions: no searcher registered for index '{Index}' — install + configure Umbraco.AI.Search", IndexAlias);
+            _logger.LogDebug("PageNotFound suggestions: no searcher registered for index '{Index}' — install + configure Umbraco.AI.Search", IndexAlias);
             return Array.Empty<int>();
         }
 
@@ -176,7 +176,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
             SearchGate.Release();
         }
 
-        _logger.LogInformation("PageNotFound suggestions: index='{Index}' query='{Query}' returned {Total} match(es)",
+        _logger.LogDebug("PageNotFound suggestions: index='{Index}' query='{Query}' returned {Total} match(es)",
             IndexAlias, query, result.Total);
 
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext) || umbracoContext.Content is null)
@@ -207,7 +207,7 @@ internal sealed class PageNotFoundSuggestionService : IPageNotFoundSuggestionSer
             ids.Add(content.Id);
         }
 
-        _logger.LogInformation(
+        _logger.LogDebug(
             "PageNotFound suggestions: kept {Kept}/{Inspected} (notDocument={NotDocument}, notFound={NotFound}, otherTenant={OtherTenant}, hideFromSearch={HideFromSearch})",
             ids.Count, inspected, droppedNotDocument, droppedNotFound, droppedOtherTenant, droppedHideFromSearch);
 
