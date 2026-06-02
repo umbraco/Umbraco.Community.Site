@@ -24,6 +24,18 @@ export class SessionizeSpeakersElement extends LitElement {
   @property({ type: Number, attribute: "max-speakers" })
   maxSpeakers?: number;
 
+  /**
+   * Optional: Number of columns on desktop (default: 4, max: 5)
+   */
+  @property({ type: Number, attribute: "columns" })
+  columns = 4;
+
+  /**
+   * Optional: URL of the program page, used to link session titles
+   */
+  @property({ type: String, attribute: "program-url" })
+  programUrl?: string;
+
   @state()
   private _speakers: SessionizeSpeaker[] = [];
 
@@ -32,6 +44,9 @@ export class SessionizeSpeakersElement extends LitElement {
 
   @state()
   private _error: string | null = null;
+
+  @state()
+  private _statusMessage = "";
 
   #dialogHandler = new DcDialogHandler();
 
@@ -44,6 +59,7 @@ export class SessionizeSpeakersElement extends LitElement {
     try {
       this._loading = true;
       this._error = null;
+      this._statusMessage = "Loading speakers...";
 
       let speakers = await SessionizeService.getSpeakers();
 
@@ -58,9 +74,16 @@ export class SessionizeSpeakersElement extends LitElement {
       }
 
       this._speakers = speakers;
+
+      // Announce results to screen readers
+      const count = this._speakers.length;
+      this._statusMessage = count === 0
+        ? "No speakers found"
+        : `Loaded ${count} speaker${count !== 1 ? "s" : ""}`;
     } catch (error) {
       this._error =
         error instanceof Error ? error.message : "Failed to load speakers";
+      this._statusMessage = `Error: ${this._error}`;
       console.error("Error loading speakers:", error);
     } finally {
       this._loading = false;
@@ -88,6 +111,7 @@ export class SessionizeSpeakersElement extends LitElement {
   #openSpeakerDialog(speaker: SessionizeSpeaker) {
     const dialog = new SessionizeSpeakerDialogElement();
     dialog.speaker = speaker;
+    dialog.programUrl = this.programUrl;
     this.#dialogHandler.open(dialog);
   }
 
@@ -116,6 +140,10 @@ export class SessionizeSpeakersElement extends LitElement {
         )}
         <p class="speaker-name">${speaker.fullName}</p>
         ${when(
+            speaker.pronouns,
+            () => html`<p class="speaker-pronouns">${speaker.pronouns}</p>`
+          )}
+        ${when(
             speaker.tagLine,
             () => html`<p class="speaker-tagline">${speaker.tagLine}</p>`
           )}
@@ -128,22 +156,52 @@ export class SessionizeSpeakersElement extends LitElement {
       return html`<div class="dc-speakers-grid empty">No speakers found.</div>`;
     }
 
+    const cols = Math.min(Math.max(this.columns, 1), 5);
     return html`
-      <div class="dc-speakers-grid">
+      <div class="dc-speakers-grid" data-columns="${cols}">
         ${this._speakers.map((speaker) => this.#renderSpeaker(speaker))}
       </div>
     `;
   }
 
+  #renderStatusAnnouncer() {
+    return html`
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${this._statusMessage}</div>
+    `;
+  }
+
   render() {
-    if (this._loading) return this.#renderLoading();
-    if (this._error) return this.#renderError();
-    return this.#renderSpeakers();
+    return html`
+      ${this.#renderStatusAnnouncer()}
+      ${this._loading
+        ? this.#renderLoading()
+        : this._error
+          ? this.#renderError()
+          : this.#renderSpeakers()}
+    `;
   }
 
   static styles = css`
     :host {
       display: block;
+    }
+
+    /* Screen reader only - visually hidden but accessible */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .dc-speakers-grid {
@@ -164,6 +222,14 @@ export class SessionizeSpeakersElement extends LitElement {
         .dc-speakers-grid {
             grid-template-columns: repeat(4, 1fr);
             gap: var(--unit-md) var(--unit-lg);
+        }
+
+        .dc-speakers-grid[data-columns="3"] {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .dc-speakers-grid[data-columns="5"] {
+            grid-template-columns: repeat(5, 1fr);
         }
     }
 
@@ -188,6 +254,13 @@ export class SessionizeSpeakersElement extends LitElement {
             font-weight: bold;
             font-size: var(--font-size-large);
             margin: 1rem 0 0;
+            text-align: center;
+        }
+
+        .speaker-pronouns {
+            font-size: var(--font-size-sm);
+            color: var(--color-dark-grey, #6b7280);
+            margin: 0.25rem 0 0;
             text-align: center;
         }
 

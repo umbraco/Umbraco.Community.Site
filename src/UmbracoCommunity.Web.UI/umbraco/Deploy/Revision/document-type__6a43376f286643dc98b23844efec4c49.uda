@@ -1,6 +1,6 @@
 {
-  "Name": "Content blocks - homepage",
-  "Alias": "contentBlocksHomepage",
+  "Name": "[Composition] Content blocks",
+  "Alias": "compositionContentBlocks",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-shape-square color-green",
@@ -28,7 +28,8 @@
         {
           "Key": "49e61cfd-3271-44ef-b18a-3c20ec9bcce9",
           "Alias": "contentBlocks",
-          "DataType": "umb://data-type/240aa2c4592b42f9aa5221c20f4a502e",
+          "DataType": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Content blocks",
           "LabelOnTop": true
         }
@@ -39,7 +40,7 @@
   "Udi": "umb://document-type/6a43376f286643dc98b23844efec4c49",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/240aa2c4592b42f9aa5221c20f4a502e",
+      "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
       "Ordering": true
     },
     {
@@ -48,5 +49,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

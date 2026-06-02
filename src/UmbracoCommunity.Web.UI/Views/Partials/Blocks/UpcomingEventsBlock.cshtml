@@ -1,0 +1,136 @@
+@using System.Globalization
+@using Umbraco.Cms.Core.Models.Blocks
+@using UmbracoCommunity.Web.Features.Feeds.Calendar
+@using UmbracoCommunity.Web.Models.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<UpcomingEventsBlock, SettingsUpcomingEventsBlock>>
+@inject ICalendarFeedService FeedService
+
+@{
+    var maxItems = Math.Max(1, Model.Content.MaxItems);
+    var allEvents = await FeedService.GetUpcomingEventsAsync();
+    var events = allEvents.Take(maxItems).ToList();
+}
+
+@functions {
+    static string FormatAttendanceMode(AttendanceMode mode) => mode switch
+    {
+        AttendanceMode.InPerson => "In person",
+        AttendanceMode.Online => "Online",
+        AttendanceMode.Hybrid => "Hybrid",
+        _ => "TBC"
+    };
+}
+
+@if (events.Count == 0 && string.IsNullOrWhiteSpace(Model.Content.Title))
+{
+    return;
+}
+
+@{
+    bool hasBg = Model.Settings.HasBg();
+    bool bgIsDark = hasBg && Model.Settings.IsDark();
+}
+
+@if (hasBg)
+{
+    <style asp-add-nonce="true">
+        #@Model.Content.IdHash {
+            --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+        }
+    </style>
+}
+
+<section class="dc-upcoming-events align-center @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
+         id="@Model.Content.IdHash">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
+    }
+
+    @if (events.Count > 0)
+    {
+        <ul class="dc-upcoming-events__list">
+            @foreach (var ev in events)
+            {
+                var startIso = ev.StartsAt.ToString("o", CultureInfo.InvariantCulture);
+                var endIso = ev.EndsAt.ToString("o", CultureInfo.InvariantCulture);
+                var sameDay = ev.StartsAt.Date == ev.EndsAt.Date && ev.StartsAt.Offset == ev.EndsAt.Offset;
+                var flag = CountryFlagHelper.GetFlag(ev.Location, ev.Organizer, ev.Title);
+                var showScreen = ev.AttendanceMode is AttendanceMode.Online or AttendanceMode.Hybrid;
+                var showFlag = ev.AttendanceMode != AttendanceMode.Online && flag != null;
+
+                <li class="dc-upcoming-events__item">
+                    <a class="dc-upcoming-events__link" href="@ev.Url" rel="noopener" target="_blank">
+                        <div class="dc-upcoming-events__top">
+                            <span class="dc-upcoming-events__badge dc-upcoming-events__badge--@ev.AttendanceMode.ToString().ToLowerInvariant()">
+                                @FormatAttendanceMode(ev.AttendanceMode)
+                            </span>
+                            @if (showScreen || showFlag)
+                            {
+                                <span class="dc-upcoming-events__flag" aria-hidden="true">
+                                    @if (showScreen)
+                                    {
+                                        <svg class="dc-upcoming-events__screen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                                    }
+                                    @if (showFlag)
+                                    {
+                                        @flag
+                                    }
+                                </span>
+                            }
+                        </div>
+                        <h3 class="dc-upcoming-events__title">@ev.Title</h3>
+                        <ul class="dc-upcoming-events__meta">
+                        <li class="dc-upcoming-events__meta-item">
+                            <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                            <dc-event-time start="@startIso" end="@endIso">
+                                <time datetime="@startIso">
+                                    @if (sameDay)
+                                    {
+                                        @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)<text>, </text>@ev.StartsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                    }
+                                    else
+                                    {
+                                        @ev.StartsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
+                                    }
+                                </time>
+                                <span class="dc-upcoming-events__range-sep"> — </span>
+                                <time datetime="@endIso">
+                                    @if (sameDay)
+                                    {
+                                        @ev.EndsAt.ToString("HH:mm", CultureInfo.InvariantCulture)
+                                    }
+                                    else
+                                    {
+                                        @ev.EndsAt.ToString("ddd d MMM yyyy", CultureInfo.InvariantCulture)
+                                    }
+                                </time>
+                            </dc-event-time>
+                        </li>
+                        @if (!string.IsNullOrWhiteSpace(ev.Location))
+                        {
+                            <li class="dc-upcoming-events__meta-item">
+                                <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>@ev.Location</span>
+                            </li>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ev.Organizer))
+                        {
+                            <li class="dc-upcoming-events__meta-item">
+                                <svg class="dc-upcoming-events__icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-7"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                                <span>@ev.Organizer</span>
+                            </li>
+                        }
+                        </ul>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+</section>

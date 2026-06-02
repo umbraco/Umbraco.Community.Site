@@ -1,0 +1,18 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CardWithTextBlock, SettingsCardWithTextBlock>>
+
+@{
+    var hasCardBg = Model.Settings?.BackgroundColour?.Color != null;
+    var cardBgIsDark = hasCardBg && Model.Settings!.BackgroundColour!.Color.IsDark();
+    var cardClasses = $"dc-boxes-row__item dc-boxes-row__item--text {(hasCardBg ? "has-bg" : string.Empty)} {(hasCardBg ? (cardBgIsDark ? "bg-dark" : "bg-light") : string.Empty)}".Trim();
+    var span = Model.ColumnSpan > 0 ? Model.ColumnSpan : 12;
+    var cardStyle = $"grid-column-end: span {span};{(hasCardBg ? $" --card-background-color: {Model.Settings!.BackgroundColour!.Color};" : string.Empty)}";
+}
+
+@if (Model.Content.CardContent != null && !Model.Content.CardContent.IsEmptyHtmlString())
+{
+    <div id="@Model.Content.IdHash" class="@cardClasses" style="@cardStyle">
+        <div class="dc-boxes-row__item-content">
+            @Html.Raw(Model.Content.CardContent.ToHtmlString())
+        </div>
+    </div>
+}

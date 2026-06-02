@@ -12,7 +12,14 @@
         </div>
     }
     
-    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "")></dc-sessionize-speakers>
+    @{
+        var columns = int.TryParse(Model.Settings?.SpeakersPerRow, out var parsed) ? parsed : (int?)null;
+        var columnsAttr = columns > 0 ? $"columns={columns}" : "";
+        var root = Umbraco.AssignedContentItem?.Root();
+        var programPage = root?.Descendants()?.FirstOrDefault(c => c.UrlSegment == "program");
+        var programUrl = programPage?.Url() ?? "/program/";
+    }
+    <dc-sessionize-speakers top-speakers-only="@Model.Settings?.TopSpeakersOnly" @(Model.Settings?.MaxNumberOfSpeakers != null && Model.Settings?.MaxNumberOfSpeakers > 0 ? $"max-speakers={Model.Settings?.MaxNumberOfSpeakers}" : "") @columnsAttr program-url="@programUrl"></dc-sessionize-speakers>
 
     @if (Context.Request.IsBlockPreviewRequest())
     {

@@ -1,0 +1,15 @@
+{
+  "Name": "Member login / logout",
+  "Alias": "MemberLoginLogout",
+  "File": "umb://template-file/MemberLoginLogout.cshtml",
+  "Udi": "umb://template/019c6fe3b9d274d99c2e7292da657b37",
+  "Dependencies": [
+    {
+      "Udi": "umb://template-file/MemberLoginLogout.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "17.1.0"
+}

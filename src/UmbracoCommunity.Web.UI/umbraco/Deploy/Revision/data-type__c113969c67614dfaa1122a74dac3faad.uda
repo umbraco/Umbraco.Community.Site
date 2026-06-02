@@ -1,0 +1,55 @@
+{
+  "Name": "Radio button list - speaker columns",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
+  "Configuration": {
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "3 columns",
+              "value": "3",
+              "icon": "icon-stop",
+              "description": ""
+            },
+            {
+              "name": "4 columns",
+              "value": "4",
+              "icon": "icon-stop",
+              "description": ""
+            },
+            {
+              "name": "5 columns",
+              "value": "5",
+              "icon": "icon-stop",
+              "description": ""
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.RadioButtonListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "orientation": "horizontal",
+          "showDescriptions": false,
+          "showIcons": false,
+          "allowClear": true
+        }
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+  "Udi": "umb://data-type/c113969c67614dfaa1122a74dac3faad",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

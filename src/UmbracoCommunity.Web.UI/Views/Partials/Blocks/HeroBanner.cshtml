@@ -1,12 +1,15 @@
 @using Umbraco.Cms.Core.Models
+@using UmbracoCommunity.Web.Services
 @using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
+@inject IImageUrlBuilder ImageUrls
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBanner>>
+
 @if (!string.IsNullOrWhiteSpace(Model.Content.Headline) && Model.Content.Image != null)
 {
-    var desktopImageUrl = Model.Content.Image.GetCropUrl("desktop50").AppendWebpFormatter();
-    var desktopImage2xUrl = Model.Content.Image.GetCropUrl("desktop2x50").AppendWebpFormatter();
-    var mobileImageUrl = Model.Content.Image.GetCropUrl("mobile50").AppendWebpFormatter();
-    var mobileImage2xUrl = Model.Content.Image.GetCropUrl("mobile2x50").AppendWebpFormatter();
+    var desktopImageUrl = ImageUrls.GetImageUrl(Model.Content.Image, "desktop50");
+    var desktopImage2xUrl = ImageUrls.GetImageUrl(Model.Content.Image, "desktop2x50");
+    var mobileImageUrl = ImageUrls.GetImageUrl(Model.Content.Image, "mobile50");
+    var mobileImage2xUrl = ImageUrls.GetImageUrl(Model.Content.Image, "mobile2x50");
 
     await RenderHeroPreloads(mobileImageUrl, mobileImage2xUrl, desktopImageUrl, desktopImage2xUrl);
 

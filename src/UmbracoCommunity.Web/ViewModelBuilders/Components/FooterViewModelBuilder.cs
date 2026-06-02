@@ -29,7 +29,7 @@ internal class FooterViewModelBuilder : IViewModelBuilder<FooterViewModel>
             viewModel.LinkColumns = navSettings.FooterLinks;
             if (navSettings.SocialSharingLinks != null && navSettings.SocialSharingLinks.Count > 0)
             {
-                viewModel.SocialLinks = [.. navSettings.SocialSharingLinks.Where(x => x != null).Select(l => l as BlockGridItem<LinkWithIcon>)];
+                viewModel.SocialLinks = [.. navSettings.SocialSharingLinks.OfType<BlockGridItem<LinkWithIcon>>()];
             }
             if (navSettings.BottomLinks != null && navSettings.BottomLinks.Any())
             {

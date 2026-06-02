@@ -1,0 +1,69 @@
+@using Umbraco.Cms.Core.Models
+@using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBannerWithImageSlider, SettingsHeroBannerWithImageSlider>>
+
+@if (!string.IsNullOrWhiteSpace(Model.Content.Headline))
+{
+    <div class="dc-hero-image-slider">
+        <div class="dc-hero-image-slider__content">
+            @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+            {
+                <p class="dc-hero-image-slider__tagline">@Model.Content.Tagline</p>
+            }
+            <h2>@Model.Content.Headline</h2>
+            @if (!Model.Content.BodyText.IsEmptyHtmlString())
+            {
+                <div class="dc-hero-image-slider__body">
+                    @Html.Raw(Model.Content.BodyText?.ToHtmlString())
+                </div>
+            }
+            @if (Model.Content.CallToActionLinks?.Any() ?? false)
+            {
+                <div class="dc-hero-image-slider__ctas">
+                    @{
+                        RenderCtaButtons(Model.Content.CallToActionLinks.ToList());
+                    }
+                </div>
+            }
+        </div>
+        @if (Model.Content.SliderImages?.Any() ?? false)
+        {
+            <dc-image-slider @(Model.Settings?.AutoSlideImages == true ? "auto-slide" : "")>
+                @{ var slideIndex = 0; }
+                @foreach (var image in Model.Content.SliderImages)
+                {
+                    var naturalWidth = image.Value<int>("umbracoWidth");
+                    var naturalHeight = image.Value<int>("umbracoHeight");
+                    var displayHeight = naturalWidth > 0 ? 1200 * naturalHeight / naturalWidth : 900;
+                    var isFirst = slideIndex == 0;
+                    <img srcset="@image.GetCropUrl(width: 400) 400w, @image.GetCropUrl(width: 800) 800w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 2400) 2400w"
+                         sizes="(max-width: 768px) 400px, 800px"
+                         src="@image.GetCropUrl(width: 1200)"
+                         width="1200"
+                         height="@displayHeight"
+                         alt="@image.Name"
+                         loading="@(isFirst ? "eager" : "lazy")"
+                         fetchpriority="@(isFirst ? "high" : "auto")"
+                         draggable="false" />
+                    slideIndex++;
+                }
+            </dc-image-slider>
+        }
+    </div>
+}
+
+@functions {
+    void RenderCtaButtons(List<Link> ctaButtons)
+    {
+        var themes = new ButtonLinkTheme[] {
+            ButtonLinkTheme.Blue,
+            ButtonLinkTheme.TransparentBlue
+        };
+
+        for (var i = 0; i < ctaButtons.Count; i++)
+        {
+            var cta = ctaButtons[i];
+            @Html.RenderButtonCTA(cta.Url, cta.Name, cta.Target, cta.Name, themes[i])
+        }
+    }
+}

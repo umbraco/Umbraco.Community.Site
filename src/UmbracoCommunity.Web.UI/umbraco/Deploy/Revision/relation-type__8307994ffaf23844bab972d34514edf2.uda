@@ -6,5 +6,5 @@
   "Udi": "umb://relation-type/8307994ffaf23844bab972d34514edf2",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.RelationTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.0.2"
 }

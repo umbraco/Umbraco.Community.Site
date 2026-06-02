@@ -38,7 +38,7 @@ jobs:
     outputs:
       artifactId: ${{ steps.upload-artifact.outputs.artifactId }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.newSha }}
 
@@ -68,18 +68,6 @@ jobs:
         shell: pwsh
         run: set-content 'umbraco-cloud.json' -value '${{ secrets.umbracoCloudJson }}' 
 
-      # Create Deploy license key file from Secret
-      - name: Deploy License Key
-        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
-        shell: pwsh
-        run: set-content 'umbracoDeploy.lic' -value '${{ secrets.deployLicenseKey }}' 
-
-      # Create Forms license key file from Secret
-      - name: Forms License Key
-        working-directory: "${{ inputs.pathToWebsite }}/umbraco/Licenses"
-        shell: pwsh
-        run: set-content 'umbracoForms.lic' -value '${{ secrets.formsLicenseKey }}' 
-
       # switch the gitignore files so cloud does not ignore the build frontend assets
       - name: Prepare Cloud Git Ignore
         run: cp cloud.gitignore .gitignore
@@ -96,7 +84,19 @@ jobs:
         working-directory: src/UmbracoCommunity.Extensions/Client
         run: npm ci && npm run build
         shell: bash
-        
+
+      # build the block restrictions client assets
+      - name: Build block restrictions client
+        working-directory: src/UmbracoCommunity.BlockRestrictions/Client
+        run: npm ci && npm run build
+        shell: bash
+
+      # build the not-found tracker client assets (backoffice dashboard)
+      - name: Build not-found tracker client
+        working-directory: src/Umbraco.Community.NotFoundTracker/Client
+        run: npm ci && npm run build
+        shell: bash
+
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code
         run: |

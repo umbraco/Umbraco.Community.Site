@@ -1,0 +1,30 @@
+{
+  "Name": "Authors",
+  "Alias": "authors",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-edit",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": [
+      "umb://document-type/ef7bed66053d407abc31715e5464aa38"
+    ]
+  },
+  "Parent": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/78ddfed9e514470e8ac6cf571303d61f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/ef7bed66053d407abc31715e5464aa38",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

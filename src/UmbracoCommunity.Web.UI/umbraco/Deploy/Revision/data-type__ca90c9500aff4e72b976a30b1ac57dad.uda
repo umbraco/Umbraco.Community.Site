@@ -28,7 +28,8 @@
           "Umb.Tiptap.Toolbar.Heading3",
           "Umb.Tiptap.Toolbar.Heading4",
           "Umb.Tiptap.Toolbar.Heading5",
-          "Umb.Tiptap.Toolbar.ClearFormatting"
+          "Umb.Tiptap.Toolbar.ClearFormatting",
+          "UmbracoCommunity.Tiptap.StyleMenu"
         ]
       ]
     ],
@@ -101,5 +102,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

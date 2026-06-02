@@ -1,0 +1,8 @@
+{
+  "Name": "Restricted blocks",
+  "ContainedObjectType": "30a2a501-1978-4ddb-a57b-f7efed43ba3c",
+  "Udi": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContainerArtifact",
+  "__version": "17.1.0"
+}

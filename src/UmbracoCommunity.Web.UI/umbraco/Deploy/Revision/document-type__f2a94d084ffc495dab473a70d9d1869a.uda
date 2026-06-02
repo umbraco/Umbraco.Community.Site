@@ -1,0 +1,63 @@
+{
+  "Name": "Slider block",
+  "Alias": "sliderBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-arrow-right",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "9da55cc5-337b-441e-9323-c5f125181303",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "3f37a061-df72-428d-978d-15d473eb7f77",
+          "Alias": "tagline",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Name": "Tagline",
+          "SortOrder": -3
+        },
+        {
+          "Key": "eb991f2f-9526-405f-a6ab-fa7b56da909a",
+          "Alias": "slideItems",
+          "DataType": "umb://data-type/76c82541d35d4c1582ab9432aba0ef5e",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
+          "Name": "Slide items"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/f2a94d084ffc495dab473a70d9d1869a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/76c82541d35d4c1582ab9432aba0ef5e",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

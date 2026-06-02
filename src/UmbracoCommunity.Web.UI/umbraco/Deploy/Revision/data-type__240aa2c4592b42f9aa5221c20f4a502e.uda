@@ -74,7 +74,7 @@
         "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "a7706b68-c3a3-411d-9550-557f83a5d97d",
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
         "columnSpanOptions": [
           {
             "columnSpan": 6
@@ -151,6 +151,12 @@
           }
         ],
         "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+      },
+      {
+        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "editorSize": "full"
       }
     ],
     "createLabel": "Add new content block"
@@ -217,9 +223,6 @@
       "Udi": "umb://document-type/a22baea724fa4cc5bab78f68e2d16028"
     },
     {
-      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
-    },
-    {
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
     },
     {
@@ -251,8 +254,11 @@
     },
     {
       "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
+    },
+    {
+      "Udi": "umb://document-type/f262c3ebd4404b638dbbb6da83f86f71"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

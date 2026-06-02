@@ -9,7 +9,7 @@
     <ul>
         @foreach (var link in Model.Content.Links)
         {
-            <li><a href="@link.Url" target="@link.Target" title="@link.Name">@link.Name</a></li>
+            <li><a href="@link.Url" target="@link.Target" rel="@link.Target.NewTabRel()" title="@link.Name">@link.Name</a></li>
         }
     </ul>
 }

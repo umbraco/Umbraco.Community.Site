@@ -55,12 +55,16 @@
                         var typedItem = item.Content as AccordionItemBlock;
                         if (typedItem == null) continue;
                         var checkboxIdentifier = $"faq-and-image-item-{Model.IdHash}-{index}";
+                        var panelId = $"panel-{checkboxIdentifier}";
                         <div class="dc-faqs__item">
-                            <input type="checkbox" id="@checkboxIdentifier" class="dc-faqs__checkbox" @(index == 0 ? "checked" : "") />
+                            <input type="checkbox" id="@checkboxIdentifier" class="dc-faqs__checkbox"
+                                   @(index == 0 ? "checked" : "")
+                                   aria-expanded="@(index == 0 ? "true" : "false")"
+                                   aria-controls="@panelId" />
                             <label for="@checkboxIdentifier" class="dc-faqs__question">
                                 @typedItem.Title
-                                <span class="dc-faqs__icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27" fill="none">
+                                <span class="dc-faqs__icon" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 27 27" fill="none" aria-hidden="true">
                                         <path d="M7.875 7.875L19.125 7.875V19.125" stroke="currentColor" stroke-width="1.5"
                                               stroke-linecap="round" stroke-linejoin="round" />
                                         <path d="M7.875 19.125L19.125 7.875" stroke="currentColor" stroke-width="1.5"
@@ -68,7 +72,8 @@
                                     </svg>
                                 </span>
                             </label>
-                            <div class="dc-faqs__answer">
+                            <div class="dc-faqs__answer" id="@panelId" role="region"
+                                 aria-labelledby="@checkboxIdentifier">
                                 @Html.Raw(typedItem.Content?.ToHtmlString())
                             </div>
                         </div>

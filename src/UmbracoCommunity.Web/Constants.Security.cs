@@ -10,7 +10,7 @@
 
             public static readonly string[] DefaultAllowStyles = [];
 
-            public static readonly string[] DefaultAllowFonts = ["fonts.gstatic.com", "fonts.intercomcdn.com", "js.intercomcdn.com", "data:"];
+            public static readonly string[] DefaultAllowFonts = ["fonts.gstatic.com", "data:"];
 
             public static readonly string[] DefaultAllowWorkers = [];
 
@@ -20,7 +20,7 @@
 
             public static readonly string[] DefaultAllowScripts = ["*.youtube.com"];
 
-            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "data:", "sessionize.com", "cache.sessionize.com"];
+            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "api.dicebear.com", "data:", "sessionize.com", "cache.sessionize.com"];
 
             public static readonly string[] DefaultAllowFormActions = [];
 

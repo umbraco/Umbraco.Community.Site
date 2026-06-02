@@ -24,6 +24,7 @@
           "Key": "87cd87c6-5a2b-4a8c-84df-53d7cbf5464e",
           "Alias": "accordionItems",
           "DataType": "umb://data-type/d38f5bd232b64a4d90b5a55d68445a0f",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Accordion items"
         }
       ]
@@ -46,5 +47,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

@@ -21,6 +21,7 @@
           "Key": "7674f63b-a126-49a2-971f-cf4e465dccf6",
           "Alias": "navigationColumnItems",
           "DataType": "umb://data-type/cce03d8f68d44378b9a4cb6c2e2ad1e4",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
           "Name": "Navigation column items",
           "SortOrder": 2,
           "LabelOnTop": true
@@ -29,6 +30,7 @@
           "Key": "d55f4e47-efe9-4c92-b391-d9a9cf181ce6",
           "Alias": "headline",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Headline",
           "SortOrder": 1
         }
@@ -52,5 +54,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

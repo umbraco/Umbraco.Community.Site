@@ -24,7 +24,7 @@ html {
 
 body {
   background-color: var(--color-page-surface);
-  color: var(--color-black);
+  color: var(--color-blue);
   font-family: var(--font-family);
   line-height: 1.6;
 }
@@ -57,20 +57,52 @@ video {
   color: var(--color-white);
 }
 
-/* Global SVG style tag override - high specificity */
-svg .st0,
-svg .st1,
-svg .st2,
-svg .st3,
-svg .st4,
-svg .st5,
-svg .st6,
-svg .st7,
-svg .st8,
-svg .st9 {
-  fill: inherit;
+/* List markers inherit text color */
+li::marker {
+  color: inherit;
 }
 
 dialog {
   border-radius: var(--border-radius-lg);
+}
+
+/* ==========================================================================
+   Focus Styles - Accessibility
+   Using :focus-visible for keyboard-only focus indication (better UX)
+   ========================================================================== */
+
+/* Global focus styles for all focusable elements */
+:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Remove default focus for mouse users, keep for keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Links - ensure visible focus */
+a:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: var(--border-radius);
+}
+
+/* Skip link for keyboard navigation - hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--unit);
+  z-index: 9999;
+  padding: var(--unit-sm) var(--unit);
+  background-color: var(--color-blue);
+  color: var(--color-white);
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  top: var(--unit);
 }

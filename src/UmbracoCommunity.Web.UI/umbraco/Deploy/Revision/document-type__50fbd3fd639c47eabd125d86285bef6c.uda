@@ -22,6 +22,7 @@
           "Key": "3e39652d-d422-4a1f-a52c-97c0fb361c93",
           "Alias": "callToActionLinkText",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "If not added, the title of the link will be used",
           "Name": "Call to action link text"
         },
@@ -29,6 +30,7 @@
           "Key": "b44bab91-8459-4ca3-a777-856690ae864f",
           "Alias": "callToActionLink",
           "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
           "Mandatory": true,
           "Name": "Call to action link",
           "SortOrder": 1
@@ -53,5 +55,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

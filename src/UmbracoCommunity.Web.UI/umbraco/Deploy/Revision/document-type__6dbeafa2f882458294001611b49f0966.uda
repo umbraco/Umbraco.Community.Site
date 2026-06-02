@@ -1,0 +1,81 @@
+{
+  "Name": "Icon block",
+  "Alias": "iconBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-crown",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "ac4eff38-0951-4b32-93c4-a2435153f1fb",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "0f367bbd-fc4a-4754-b7e7-849238a5157d",
+          "Alias": "icon",
+          "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Name": "Icon"
+        },
+        {
+          "Key": "18ff2986-d126-4edb-ab79-51834ef43c12",
+          "Alias": "colour",
+          "DataType": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+          "ValueType": "Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter\u002BPickedColor",
+          "Name": "Colour",
+          "SortOrder": 2
+        },
+        {
+          "Key": "24f0dd7e-7955-4a55-a64f-916515422b38",
+          "Alias": "iconSize",
+          "DataType": "umb://data-type/541aa2976e9b41e9b0b0026546ca69c9",
+          "ValueType": "System.String",
+          "Name": "Icon size",
+          "SortOrder": 3
+        },
+        {
+          "Key": "541a6056-8b98-4e0b-9e95-3b520f88369a",
+          "Alias": "altText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Name": "Alt text",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/6dbeafa2f882458294001611b49f0966",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/541aa2976e9b41e9b0b0026546ca69c9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/b8b879229bba4558991b06105ffea202",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

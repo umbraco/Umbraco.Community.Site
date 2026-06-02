@@ -28,6 +28,9 @@ interface SelectedFilter {
 
 const elementName = "dc-sessionize-program";
 
+// Category item ID for "Available with free ticket" in Sessionize
+const FREE_TICKET_CATEGORY_ITEM_ID = 453362;
+
 // Default timezone (Copenhagen for CodeGarden)
 const DEFAULT_TIMEZONE = "Europe/Copenhagen";
 
@@ -68,10 +71,16 @@ export class SessionizeProgramElement extends LitElement {
   private _selectedTimezone = DEFAULT_TIMEZONE;
 
   @state()
+  private _freeTicketOnly = false;
+
+  @state()
   private _loading = true;
 
   @state()
   private _error: string | null = null;
+
+  @state()
+  private _statusMessage = "";
 
   // Cached/computed values - updated in willUpdate when dependencies change
   #filteredSessionsByRoom = new Map<number, SessionizeSession[]>();
@@ -153,7 +162,8 @@ export class SessionizeProgramElement extends LitElement {
     if (
       changedProperties.has("_schedule") ||
       changedProperties.has("_selectedDayIndex") ||
-      changedProperties.has("_selectedFilters")
+      changedProperties.has("_selectedFilters") ||
+      changedProperties.has("_freeTicketOnly")
     ) {
       this.#updateFilteredSessions();
     }
@@ -205,6 +215,7 @@ export class SessionizeProgramElement extends LitElement {
     try {
       this._loading = true;
       this._error = null;
+      this._statusMessage = "Loading program schedule...";
 
       // Fetch schedule and categories in parallel
       const [schedule, categories] = await Promise.all([
@@ -241,9 +252,17 @@ export class SessionizeProgramElement extends LitElement {
           }
         }
       }
+
+      // Count total sessions across all days
+      const totalSessions = schedule.reduce((total, day) =>
+        total + day.timeSlots.reduce((slotTotal, slot) =>
+          slotTotal + slot.rooms.filter(r => r.session).length, 0), 0);
+      const dayCount = schedule.length;
+      this._statusMessage = `Program loaded: ${totalSessions} session${totalSessions !== 1 ? "s" : ""} across ${dayCount} day${dayCount !== 1 ? "s" : ""}`;
     } catch (error) {
       this._error =
         error instanceof Error ? error.message : "Failed to load program";
+      this._statusMessage = `Error: ${this._error}`;
       console.error("Error loading program:", error);
     } finally {
       this._loading = false;
@@ -318,38 +337,36 @@ export class SessionizeProgramElement extends LitElement {
       }
     }
 
-    // Rename certain categories for clarity
-    const titleMapping: Record<string, string> = {
-      tags: "Topic",
-      track: "Track",
-      level: "Level",
+    // Only include specific categories as filter dropdowns
+    const allowedCategories: Record<string, string> = {
+      "audience filter": "Audience",
+      "tags": "Topic",
+      "track": "Track",
+      "level": "Level",
     };
 
-    // Include categories that make sense for filtering (Tags, Track, Level, etc.)
-    // Exclude session format categories (those with names like "45 (regular talks)")
     for (const category of categories) {
-      const isSessionFormat = category.items.some(
-        (item) => item.name.toLowerCase().includes("regular talk") ||
-                  item.name.toLowerCase().includes("minute")
-      );
+      const lowerTitle = category.title.toLowerCase();
+      const displayTitle = allowedCategories[lowerTitle];
 
-      if (!isSessionFormat && category.items.length > 0) {
-        const lowerTitle = category.title.toLowerCase();
-        const displayTitle = titleMapping[lowerTitle] || category.title;
+      if (!displayTitle || category.items.length === 0) continue;
 
-        // Only include items that are actually used in sessions
-        const usedItems = category.items.filter((item) => usedCategoryItemIds.has(item.id));
+      // Only include items that are actually used in sessions and aren't boolean-like values
+      const usedItems = category.items.filter((item) => {
+        if (!usedCategoryItemIds.has(item.id)) return false;
+        const lower = item.name.toLowerCase().trim();
+        return !["yes", "no", "true", "false"].includes(lower);
+      });
 
-        if (usedItems.length > 0) {
-          dropdowns.push({
-            id: category.id,
-            title: displayTitle,
-            items: usedItems.map((item) => ({
-              id: item.id,
-              name: item.name,
-            })),
-          });
-        }
+      if (usedItems.length > 0) {
+        dropdowns.push({
+          id: category.id,
+          title: displayTitle,
+          items: usedItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+          })),
+        });
       }
     }
 
@@ -366,26 +383,84 @@ export class SessionizeProgramElement extends LitElement {
       ...this._selectedFilters,
       { id: itemId, name: itemName, categoryTitle },
     ];
+
+    // Announce filter addition (defer to after willUpdate recalculates filtered sessions)
+    setTimeout(() => {
+      this._statusMessage = `Filter added: ${itemName}. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
   }
 
   #removeFilter(filterId: number) {
+    const filter = this._selectedFilters.find((f) => f.id === filterId);
     this._selectedFilters = this._selectedFilters.filter((f) => f.id !== filterId);
+
+    // Announce filter removal
+    if (filter) {
+      // Use setTimeout to announce after the filtered count updates
+      setTimeout(() => {
+        this._statusMessage = `Filter removed: ${filter.name}. ${this.#filteredSessionIds.size} sessions shown.`;
+      }, 0);
+    }
   }
 
   #clearAllFilters() {
     this._selectedFilters = [];
+    this._freeTicketOnly = false;
+
+    // Announce filters cleared
+    setTimeout(() => {
+      this._statusMessage = `All filters cleared. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
   }
 
   #sessionMatchesFilter(session: SessionizeSession): boolean {
-    // No filters selected = show everything
+    // Free ticket toggle: if active, only show sessions with the free ticket category item
+    if (this._freeTicketOnly && !session.categoryItems.includes(FREE_TICKET_CATEGORY_ITEM_ID)) {
+      return false;
+    }
+
+    // No dropdown filters selected = show everything (subject to free ticket toggle above)
     if (this._selectedFilters.length === 0) {
       return true;
     }
 
-    // OR logic: session matches if it has ANY of the selected category items
-    return this._selectedFilters.some((filter) =>
-      session.categoryItems.includes(filter.id)
+    // Group filters by category: OR within a category, AND across categories
+    const filtersByCategory = new Map<string, SelectedFilter[]>();
+    for (const filter of this._selectedFilters) {
+      const group = filtersByCategory.get(filter.categoryTitle) || [];
+      group.push(filter);
+      filtersByCategory.set(filter.categoryTitle, group);
+    }
+
+    return Array.from(filtersByCategory.values()).every((group) =>
+      group.some((filter) => session.categoryItems.includes(filter.id))
     );
+  }
+
+  #isAvailableWithFreeTicket(session: SessionizeSession): boolean {
+    return session.categoryItems.includes(FREE_TICKET_CATEGORY_ITEM_ID);
+  }
+
+  #getSessionAudienceLabel(session: SessionizeSession): "Business" | "Technical" | null {
+    const audienceCategory = this._categories.find(
+      (c) => c.title.toLowerCase() === "audience filter"
+    );
+    if (!audienceCategory) return null;
+
+    const businessItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "business"
+    );
+    const technicalItem = audienceCategory.items.find(
+      (i) => i.name.toLowerCase() === "technical"
+    );
+
+    const hasBusiness = businessItem && session.categoryItems.includes(businessItem.id);
+    const hasTechnical = technicalItem && session.categoryItems.includes(technicalItem.id);
+
+    // Both or neither = all audiences, don't show a label
+    if (hasBusiness === hasTechnical) return null;
+
+    return hasBusiness ? "Business" : "Technical";
   }
 
   #formatDate(dateString: string): string {
@@ -562,7 +637,7 @@ export class SessionizeProgramElement extends LitElement {
   }
 
   #hasActiveFiltersOrCustomTimezone(): boolean {
-    return this._selectedFilters.length > 0 || this._selectedTimezone !== DEFAULT_TIMEZONE;
+    return this._selectedFilters.length > 0 || this._selectedTimezone !== DEFAULT_TIMEZONE || this._freeTicketOnly;
   }
 
   #getSelectedTimezoneLabel(): string {
@@ -588,6 +663,21 @@ export class SessionizeProgramElement extends LitElement {
               <span class="sticky-timezone">
                 <span class="sticky-label">Timezone:</span>
                 ${this.#getSelectedTimezoneLabel()}
+              </span>
+            `
+          )}
+          ${when(
+            this._freeTicketOnly,
+            () => html`
+              <span class="sticky-free-ticket">
+                <span class="free-ticket-badge">Free ticket</span>
+                <button
+                  class="filter-pill-remove"
+                  @click=${() => this.#onFreeTicketToggle()}
+                  aria-label="Remove free ticket filter"
+                >
+                  &times;
+                </button>
               </span>
             `
           )}
@@ -621,6 +711,16 @@ export class SessionizeProgramElement extends LitElement {
     `;
   }
 
+  #onFreeTicketToggle() {
+    this._freeTicketOnly = !this._freeTicketOnly;
+
+    setTimeout(() => {
+      this._statusMessage = this._freeTicketOnly
+        ? `Showing free ticket sessions only. ${this.#filteredSessionIds.size} sessions shown.`
+        : `Showing all sessions. ${this.#filteredSessionIds.size} sessions shown.`;
+    }, 0);
+  }
+
   #renderFilters() {
     if (this._categoryDropdowns.length === 0) return nothing;
 
@@ -648,6 +748,14 @@ export class SessionizeProgramElement extends LitElement {
               `
             )}
           </div>
+          <label class="free-ticket-toggle">
+            <input
+              type="checkbox"
+              .checked=${this._freeTicketOnly}
+              @change=${() => this.#onFreeTicketToggle()}
+            />
+            <span class="free-ticket-label">Free ticket sessions only</span>
+          </label>
         </div>
         ${when(
           this._selectedFilters.length > 0,
@@ -895,10 +1003,10 @@ export class SessionizeProgramElement extends LitElement {
       }
     }
 
-    const top = (topPixels / totalHeight) * 100;
-    const heightPercent = (heightPixels / totalHeight) * 100;
-
-    return { top, height: heightPercent };
+    return {
+      top: totalHeight > 0 ? (topPixels / totalHeight) * 100 : 0,
+      height: totalHeight > 0 ? (heightPixels / totalHeight) * 100 : 0,
+    };
   }
 
   #formatSessionTime(dateString: string): string {
@@ -928,7 +1036,7 @@ export class SessionizeProgramElement extends LitElement {
     const isDistant = this.#isDistantTimezone();
 
     // Use uniform height for distant timezones, variable for local
-    const hourHeight = 200; // pixels per hour
+    const hourHeight = 260; // pixels per hour
     const earlyHourHeight = isDistant ? hourHeight : 90; // half-height for hours before 9am (Copenhagen time only)
     const earlyHourCutoff = 9;
 
@@ -1003,10 +1111,13 @@ export class SessionizeProgramElement extends LitElement {
             }
           }
           const isShortBreak = isBreakOrActivity && durationMinutes <= 15;
+          const isShortSession = !isShortBreak && durationMinutes <= 30;
+          const audienceLabel = isBreakOrActivity ? null : this.#getSessionAudienceLabel(session);
+          const isFreeTicket = !isBreakOrActivity && this.#isAvailableWithFreeTicket(session);
 
           return html`
             <div
-              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""}"
+              class="timeline-session ${isBreakOrActivity ? "service-session" : ""} ${isShortBreak ? "short-break" : ""} ${isShortSession ? "short-session" : ""} ${isFreeTicket ? "free-ticket" : ""}"
               style="top: ${position.top}%; height: ${position.height}%;"
               @click=${() => this.#openSessionDialog(session)}
               role="button"
@@ -1026,7 +1137,19 @@ export class SessionizeProgramElement extends LitElement {
                       speakerNames,
                       () => html`<p class="session-speakers" title=${speakerNames}>${speakerNames}</p>`
                     )}
-                    <p class="session-time">${startTime} - ${endTime}</p>
+                    <div class="session-footer">
+                      <p class="session-time">${startTime} - ${endTime}</p>
+                      <div class="session-badges">
+                        ${when(
+                          isFreeTicket,
+                          () => html`<span class="free-ticket-badge">free ticket</span>`
+                        )}
+                        ${when(
+                          audienceLabel,
+                          () => html`<span class="audience-badge">${audienceLabel!.toLowerCase()}</span>`
+                        )}
+                      </div>
+                    </div>
                   `
               }
             </div>
@@ -1057,9 +1180,11 @@ export class SessionizeProgramElement extends LitElement {
                   .filter((room) => room.session && this.#filteredSessionIds.has(room.session.id))
                   .map((room) => {
                     const isBreakOrActivity = room.session?.isServiceSession || room.session?.categoryItems.length === 0;
+                    const audienceLabel = isBreakOrActivity ? null : this.#getSessionAudienceLabel(room.session!);
+                    const isFreeTicket = !isBreakOrActivity && this.#isAvailableWithFreeTicket(room.session!);
                     return html`
                       <div
-                        class="mobile-session-card ${isBreakOrActivity ? "service-session" : ""}"
+                        class="mobile-session-card ${isBreakOrActivity ? "service-session" : ""} ${isFreeTicket ? "free-ticket" : ""}"
                         @click=${() => room.session && this.#openSessionDialog(room.session)}
                         role="button"
                         tabindex="0"
@@ -1080,14 +1205,26 @@ export class SessionizeProgramElement extends LitElement {
                             </p>
                           `
                         )}
-                        ${when(
-                          room.session?.startsAt && room.session?.endsAt,
-                          () => html`
-                            <p class="session-time">
-                              ${this.#formatSessionTime(room.session!.startsAt!)} - ${this.#formatSessionTime(room.session!.endsAt!)}
-                            </p>
-                          `
-                        )}
+                        <div class="session-footer">
+                          ${when(
+                            room.session?.startsAt && room.session?.endsAt,
+                            () => html`
+                              <p class="session-time">
+                                ${this.#formatSessionTime(room.session!.startsAt!)} - ${this.#formatSessionTime(room.session!.endsAt!)}
+                              </p>
+                            `
+                          )}
+                          <div class="session-badges">
+                            ${when(
+                              isFreeTicket,
+                              () => html`<span class="free-ticket-badge">free ticket</span>`
+                            )}
+                            ${when(
+                              audienceLabel,
+                              () => html`<span class="audience-badge">${audienceLabel!.toLowerCase()}</span>`
+                            )}
+                          </div>
+                        </div>
                       </div>
                     `;
                   })}
@@ -1099,31 +1236,57 @@ export class SessionizeProgramElement extends LitElement {
     `;
   }
 
-  render() {
-    if (this._loading) return this.#renderLoading();
-    if (this._error) return this.#renderError();
-
-    if (!this._schedule.length) {
-      return html`<div class="empty-state">No program available.</div>`;
-    }
-
+  #renderStatusAnnouncer() {
     return html`
-      ${this.#renderStickyBar()}
-      <div class="program-container">
-        <div class="program-controls">
-          ${this.#renderFilters()}
-          ${this.#renderTimezoneSelector()}
-        </div>
-        ${this.#renderTabs()}
-        <div class="schedule-desktop">${this.#renderScheduleGrid()}</div>
-        <div class="schedule-mobile-view">${this.#renderMobileSchedule()}</div>
-      </div>
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >${this._statusMessage}</div>
+    `;
+  }
+
+  render() {
+    return html`
+      ${this.#renderStatusAnnouncer()}
+      ${this._loading
+        ? this.#renderLoading()
+        : this._error
+          ? this.#renderError()
+          : !this._schedule.length
+            ? html`<div class="empty-state">No program available.</div>`
+            : html`
+                ${this.#renderStickyBar()}
+                <div class="program-container">
+                  <div class="program-controls">
+                    ${this.#renderFilters()}
+                    ${this.#renderTimezoneSelector()}
+                  </div>
+                  ${this.#renderTabs()}
+                  <div class="schedule-desktop">${this.#renderScheduleGrid()}</div>
+                  <div class="schedule-mobile-view">${this.#renderMobileSchedule()}</div>
+                </div>
+              `}
     `;
   }
 
   static styles = css`
     :host {
       display: block;
+    }
+
+    /* Screen reader only - visually hidden but accessible */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .program-container {
@@ -1393,6 +1556,64 @@ export class SessionizeProgramElement extends LitElement {
       box-shadow: 0 0 0 3px rgba(53, 68, 177, 0.15);
     }
 
+    .free-ticket-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      padding: var(--unit-xs, 0.5rem) var(--unit-sm, 0.75rem);
+      border: 1px solid var(--color-grey, #d1d5db);
+      border-radius: var(--border-radius, 6px);
+      background: var(--color-white, #fff);
+      font-size: 0.9rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .free-ticket-toggle:hover {
+      border-color: var(--color-green, #2bc47a);
+    }
+
+    .free-ticket-toggle:has(input:checked) {
+      border-color: var(--color-green, #2bc47a);
+      background: color-mix(in srgb, var(--color-green, #2bc47a) 8%, var(--color-white, #fff));
+    }
+
+    .free-ticket-toggle input {
+      accent-color: var(--color-green, #2bc47a);
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .free-ticket-label {
+      color: var(--color-dark, #1b264f);
+      font-weight: 500;
+    }
+
+    .sticky-free-ticket {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--color-green, #2bc47a);
+      border-radius: var(--border-radius-xl, 22px);
+      padding: 0.15rem 0.4rem 0.15rem 0.5rem;
+    }
+
+    .sticky-free-ticket .free-ticket-badge {
+      font-size: 0.75rem;
+      padding: 0;
+      background: none;
+    }
+
+    .sticky-free-ticket .filter-pill-remove {
+      color: var(--color-white, #fff);
+      opacity: 0.8;
+    }
+
+    .sticky-free-ticket .filter-pill-remove:hover {
+      opacity: 1;
+    }
+
     .selected-filters {
       display: flex;
       flex-wrap: wrap;
@@ -1636,6 +1857,7 @@ export class SessionizeProgramElement extends LitElement {
       position: absolute;
       left: 4px;
       right: 4px;
+      min-height: 100px;
       padding: 0.5rem;
       background: var(--color-white, #fff);
       border: 1px solid var(--color-blue, #3544b1);
@@ -1647,6 +1869,7 @@ export class SessionizeProgramElement extends LitElement {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
+      z-index: 1;
     }
 
     .timeline-session:hover {
@@ -1660,7 +1883,27 @@ export class SessionizeProgramElement extends LitElement {
       border-left-color: var(--color-grey, #d1d5db);
     }
 
+    .timeline-session.short-session {
+      min-height: 95px;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .timeline-session.short-session .session-title {
+      font-size: 0.73rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-speakers {
+      font-size: 0.65rem;
+      margin-bottom: 0;
+    }
+
+    .timeline-session.short-session .session-time {
+      font-size: 0.65rem;
+    }
+
     .timeline-session.short-break {
+      min-height: 0;
       flex-direction: row;
       align-items: center;
       justify-content: center;
@@ -1708,7 +1951,6 @@ export class SessionizeProgramElement extends LitElement {
 
     .timeline-session .session-time {
       margin: 0;
-      margin-top: auto;
       font-size: 0.7rem;
       font-weight: 500;
       color: var(--color-grey-dark, #6b7280);
@@ -1826,6 +2068,64 @@ export class SessionizeProgramElement extends LitElement {
       font-size: 0.75rem;
       font-weight: 600;
       margin-bottom: var(--unit-xs, 0.5rem);
+    }
+
+    /* Session footer (time + audience badge) */
+    .session-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      gap: 0.25rem;
+    }
+
+    .session-footer > .session-time {
+      margin: 0;
+    }
+
+    .session-badges {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .audience-badge {
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--border-radius-xl, 22px);
+      font-size: 0.6rem;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+      border: 1px solid var(--color-grey, #d9d9d9);
+      color: var(--color-dark-grey, #707070);
+      text-transform: lowercase;
+    }
+
+    .free-ticket-badge {
+      padding: 0.1rem 0.4rem;
+      border-radius: var(--border-radius-xl, 22px);
+      font-size: 0.6rem;
+      font-weight: 600;
+      line-height: 1;
+      white-space: nowrap;
+      background-color: var(--color-green, #2bc47a);
+      color: var(--color-white, #fff);
+      text-transform: lowercase;
+    }
+
+    .timeline-session.free-ticket {
+      border-left: 3px solid var(--color-green, #2bc47a);
+    }
+
+    .mobile-session-card.free-ticket {
+      border-left: 3px solid var(--color-green, #2bc47a);
+    }
+
+    .timeline-session.short-session .audience-badge,
+    .timeline-session.short-session .free-ticket-badge {
+      font-size: 0.55rem;
+      padding: 0.1rem 0.3rem;
     }
 
     .mobile-session-card .session-title {

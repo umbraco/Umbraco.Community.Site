@@ -4,430 +4,30 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:44383' | (string & {});
 };
 
-export type ContributionStats = {
-    totalExternalPullRequests: number;
-    totalExternalContributors: number;
-    startDate: string;
-    endDate: string;
-    topContributors: Array<ContributorDetail>;
+export type CreateBlogArticleResponse = {
+    articleKey: string;
+    articleName: string;
 };
 
-export type ContributorDetail = {
-    login: string;
-    name: string;
-    pullRequestCount: number;
+export type SeedExportStatus = {
+    isRunning: boolean;
+    lastSuccessAt?: string | null;
+    lastSuccessSizeBytes?: number | null;
+    lastFailureAt?: string | null;
+    lastError?: string | null;
+    startedAt?: string | null;
 };
 
-export type DocumentGranularPermissionModel = {
-    key: string;
-    readonly context: string;
-    permission: string;
-};
-
-export type DocumentPropertyValueGranularPermissionModel = {
-    key: string;
-    readonly context: string;
-    permission: string;
-};
-
-export type EmploymentPeriod = {
-    start?: string | null;
-    end?: string | null;
-};
-
-export type EventMessageTypeModel = 'Default' | 'Info' | 'Error' | 'Success' | 'Warning';
-
-export type GitHubAuthor = {
-    login: string;
-    name?: string | null;
-    url: string;
-};
-
-export type GitHubDataExport = {
-    issues: Array<GitHubIssue>;
-    pullRequests: Array<GitHubPullRequest>;
-    discussions: Array<GitHubDiscussion>;
-    nuGetPackages: {
-        [key: string]: {
-            [key: string]: string;
-        };
+export type CreateBlogArticleData = {
+    body?: never;
+    path: {
+        blogNodeKey: string;
     };
-};
-
-export type GitHubDiscussion = {
-    id: string;
-    title: string;
-    number: number;
-    url: string;
-    body: string;
-    createdAt: string;
-    updatedAt?: string | null;
-    repository: GitHubRepository;
-    labels: Array<string>;
-    categoryId: string;
-    categoryName: string;
-};
-
-export type GitHubHqMember = {
-    id: string;
-    login: string;
-    name: string;
-    periods: Array<EmploymentPeriod>;
-};
-
-export type GitHubIssue = {
-    id: string;
-    title: string;
-    number: number;
-    url: string;
-    createdAt: string;
-    updatedAt?: string | null;
-    state: string;
-    author?: GitHubAuthor | null;
-    repository: GitHubRepository;
-    labels: Array<string>;
-};
-
-export type GitHubPullRequest = {
-    id: string;
-    title: string;
-    number: number;
-    url: string;
-    createdAt: string;
-    updatedAt?: string | null;
-    mergedAt?: string | null;
-    state: string;
-    author?: GitHubAuthor | null;
-    mergedBy?: GitHubAuthor | null;
-    repository: GitHubRepository;
-    labels: Array<string>;
-};
-
-export type GitHubRepository = {
-    name: string;
-    url: string;
-};
-
-export type NotificationHeaderModel = {
-    message: string;
-    category: string;
-    type: EventMessageTypeModel;
-};
-
-export type ReadOnlyUserGroupModel = {
-    id: number;
-    key: string;
-    name: string;
-    icon?: string | null;
-    startContentId?: number | null;
-    startMediaId?: number | null;
-    alias: string;
-    hasAccessToAllLanguages: boolean;
-    allowedLanguages: Array<number>;
-    permissions: Array<string>;
-    granularPermissions: Array<DocumentGranularPermissionModel | DocumentPropertyValueGranularPermissionModel | UnknownTypeGranularPermissionModel>;
-    allowedSections: Array<string>;
-};
-
-export type ReleaseInfo = {
-    version: string;
-    releaseDate: string;
-    isLts: boolean;
-    isMajor: boolean;
-    isPreRelease: boolean;
-    url: string;
-    totalPullRequests: number;
-    externalPullRequests: number;
-    externalContributors: number;
-    topContributors: Array<ContributorDetail>;
-};
-
-export type ReleaseSummary = {
-    startDate: string;
-    endDate: string;
-    releases: Array<ReleaseInfo>;
-};
-
-export type SampleDataImportResult = {
-    hqMembersAdded: number;
-    hqMembersUpdated: number;
-    issuesAdded: number;
-    issuesUpdated: number;
-    pullRequestsAdded: number;
-    pullRequestsUpdated: number;
-    discussionsAdded: number;
-    discussionsUpdated: number;
-    nuGetPackagesAdded: number;
-    nuGetPackagesUpdated: number;
-    readonly totalAdded: number;
-    readonly totalUpdated: number;
-};
-
-export type SessionizeCacheRefreshResult = {
-    success: boolean;
-    message: string;
-    refreshedAt: string;
-};
-
-export type UnknownTypeGranularPermissionModel = {
-    context: string;
-    permission: string;
-};
-
-export type UserGroupModel = {
-    id: number;
-    key: string;
-    createDate: string;
-    updateDate: string;
-    deleteDate?: string | null;
-    readonly hasIdentity: boolean;
-    startMediaId?: number | null;
-    startContentId?: number | null;
-    icon?: string | null;
-    alias: string;
-    name?: string | null;
-    hasAccessToAllLanguages: boolean;
-    permissions: Array<string>;
-    granularPermissions: Array<DocumentGranularPermissionModel | DocumentPropertyValueGranularPermissionModel | UnknownTypeGranularPermissionModel>;
-    readonly allowedSections: Array<string>;
-    readonly userCount: number;
-    readonly allowedLanguages: Array<number>;
-};
-
-export type UserKindModel = 'Default' | 'Api';
-
-export type UserModel = {
-    id: number;
-    key: string;
-    createDate: string;
-    updateDate: string;
-    deleteDate?: string | null;
-    readonly hasIdentity: boolean;
-    emailConfirmedDate?: string | null;
-    invitedDate?: string | null;
-    username: string;
-    email: string;
-    rawPasswordValue?: string | null;
-    passwordConfiguration?: string | null;
-    isApproved: boolean;
-    isLockedOut: boolean;
-    lastLoginDate?: string | null;
-    lastPasswordChangeDate?: string | null;
-    lastLockoutDate?: string | null;
-    failedPasswordAttempts: number;
-    comments?: string | null;
-    userState: UserStateModel;
-    name?: string | null;
-    readonly allowedSections: Array<string>;
-    profileData: UserModel | UserProfileModel;
-    securityStamp?: string | null;
-    avatar?: string | null;
-    sessionTimeout: number;
-    startContentIds?: Array<number> | null;
-    startMediaIds?: Array<number> | null;
-    language?: string | null;
-    kind: UserKindModel;
-    readonly groups: Array<ReadOnlyUserGroupModel | UserGroupModel>;
-};
-
-export type UserProfileModel = {
-    id: number;
-    name?: string | null;
-};
-
-export type UserStateModel = 'Active' | 'Disabled' | 'LockedOut' | 'Invited' | 'Inactive' | 'All';
-
-export type DocumentGranularPermissionModelWritable = {
-    key: string;
-    permission: string;
-};
-
-export type DocumentPropertyValueGranularPermissionModelWritable = {
-    key: string;
-    permission: string;
-};
-
-export type SampleDataImportResultWritable = {
-    hqMembersAdded: number;
-    hqMembersUpdated: number;
-    issuesAdded: number;
-    issuesUpdated: number;
-    pullRequestsAdded: number;
-    pullRequestsUpdated: number;
-    discussionsAdded: number;
-    discussionsUpdated: number;
-    nuGetPackagesAdded: number;
-    nuGetPackagesUpdated: number;
-};
-
-export type UserGroupModelWritable = {
-    id: number;
-    key: string;
-    createDate: string;
-    updateDate: string;
-    deleteDate?: string | null;
-    startMediaId?: number | null;
-    startContentId?: number | null;
-    icon?: string | null;
-    alias: string;
-    name?: string | null;
-    hasAccessToAllLanguages: boolean;
-    permissions: Array<string>;
-    granularPermissions: Array<DocumentGranularPermissionModelWritable | DocumentPropertyValueGranularPermissionModelWritable | UnknownTypeGranularPermissionModel>;
-};
-
-export type UserModelWritable = {
-    id: number;
-    key: string;
-    createDate: string;
-    updateDate: string;
-    deleteDate?: string | null;
-    emailConfirmedDate?: string | null;
-    invitedDate?: string | null;
-    username: string;
-    email: string;
-    rawPasswordValue?: string | null;
-    passwordConfiguration?: string | null;
-    isApproved: boolean;
-    isLockedOut: boolean;
-    lastLoginDate?: string | null;
-    lastPasswordChangeDate?: string | null;
-    lastLockoutDate?: string | null;
-    failedPasswordAttempts: number;
-    comments?: string | null;
-    userState: UserStateModel;
-    name?: string | null;
-    securityStamp?: string | null;
-    avatar?: string | null;
-    sessionTimeout: number;
-    startContentIds?: Array<number> | null;
-    startMediaIds?: Array<number> | null;
-    language?: string | null;
-    kind: UserKindModel;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsData = {
-    body?: never;
-    path?: never;
-    query?: {
-        startDate?: string;
-        endDate?: string;
-    };
-    url: '/umbraco/umbracocommunityextensions/api/v1/contributions';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses = {
-    /**
-     * OK
-     */
-    200: ContributionStats;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponse = GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses];
-
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataData = {
-    body?: never;
-    path?: never;
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data';
+    url: '/umbraco/umbracocommunityextensions/api/v1/blog/{blogNodeKey}/create-article';
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/export-github-data';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses = {
-    /**
-     * OK
-     */
-    200: GitHubDataExport;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponse = GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses];
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses = {
-    /**
-     * OK
-     */
-    200: Array<GitHubHqMember>;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponse = GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses];
-
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersData = {
-    body?: GitHubHqMember;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers';
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersErrors = {
+export type CreateBlogArticleErrors = {
     /**
      * Bad Request
      */
@@ -436,345 +36,117 @@ export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
 };
 
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses = {
+export type CreateBlogArticleResponses = {
     /**
      * Created
      */
-    201: GitHubHqMember;
+    201: CreateBlogArticleResponse;
 };
 
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponse = PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses];
+export type CreateBlogArticleResponse2 = CreateBlogArticleResponses[keyof CreateBlogArticleResponses];
 
-export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
+export type IsBlogNodeData = {
     body?: never;
     path: {
-        id: string;
+        nodeKey: string;
     };
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
+    url: '/umbraco/umbracocommunityextensions/api/v1/blog/{nodeKey}/is-blog';
 };
 
-export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
+export type IsBlogNodeErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-    /**
-     * Not Found
-     */
-    404: unknown;
 };
 
-export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
-    /**
-     * No Content
-     */
-    204: void;
-};
-
-export type DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
-    body?: never;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
+export type IsBlogNodeResponses = {
     /**
      * OK
      */
-    200: GitHubHqMember;
+    200: boolean;
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
+export type IsBlogNodeResponse = IsBlogNodeResponses[keyof IsBlogNodeResponses];
 
-export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData = {
-    body?: GitHubHqMember;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}';
-};
-
-export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: unknown;
-};
-
-export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses = {
-    /**
-     * OK
-     */
-    200: GitHubHqMember;
-};
-
-export type PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponse = PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses[keyof PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses];
-
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportData = {
-    body?: Array<GitHubHqMember>;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/import';
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataData = {
-    body?: GitHubDataExport;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/import-github-data';
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataErrors = {
-    /**
-     * Bad Request
-     */
-    400: unknown;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses = {
-    /**
-     * OK
-     */
-    200: SampleDataImportResult;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponse = PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses];
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataData = {
+export type ClearSessionizeCacheData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-github-data';
+    url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache';
 };
 
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses = {
-    /**
-     * OK
-     */
-    200: SampleDataImportResult;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponse = PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses];
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-hq-members';
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1PingData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/ping';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1PingErrors = {
+export type ClearSessionizeCacheErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1PingResponses = {
+export type ClearSessionizeCacheResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1PingResponse = GetUmbracoUmbracocommunityextensionsApiV1PingResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1PingResponses];
+export type ClearSessionizeCacheResponse = ClearSessionizeCacheResponses[keyof ClearSessionizeCacheResponses];
 
-export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesData = {
-    body?: never;
-    path?: never;
-    query?: {
-        startDate?: string;
-        endDate?: string;
-    };
-    url: '/umbraco/umbracocommunityextensions/api/v1/releases';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses = {
-    /**
-     * OK
-     */
-    200: ReleaseSummary;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponse = GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses];
-
-export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheData = {
+export type RegenerateData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache';
+    url: '/umbraco/umbracocommunityextensions/api/v1/seed/regenerate';
 };
 
-export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheErrors = {
+export type RegenerateErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
-};
-
-export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses = {
     /**
-     * OK
+     * Conflict
      */
-    200: SessionizeCacheRefreshResult;
+    409: SeedExportStatus;
 };
 
-export type PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponse = PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses[keyof PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses];
+export type RegenerateError = RegenerateErrors[keyof RegenerateErrors];
 
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameData = {
+export type RegenerateResponses = {
+    /**
+     * Accepted
+     */
+    202: SeedExportStatus;
+};
+
+export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
+
+export type StatusData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/whatsMyName';
+    url: '/umbraco/umbracocommunityextensions/api/v1/seed/status';
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameErrors = {
+export type StatusErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses = {
+export type StatusResponses = {
     /**
      * OK
      */
-    200: string;
+    200: SeedExportStatus;
 };
 
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponse = GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses];
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/whatsTheTimeMrWolf';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponse = GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses];
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/whoAmI';
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses = {
-    /**
-     * OK
-     */
-    200: UserModel;
-};
-
-export type GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponse = GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses[keyof GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses];
+export type StatusResponse = StatusResponses[keyof StatusResponses];

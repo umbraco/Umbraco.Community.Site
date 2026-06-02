@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging;
+using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Features.Sessionize.Models;
 
@@ -26,7 +28,7 @@ public class SessionizeApiController : ControllerBase
     [HttpGet("sessions")]
     [ProducesResponseType(typeof(List<SessionizeSession>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetSessions(CancellationToken cancellationToken)
     {
         try
@@ -67,7 +69,7 @@ public class SessionizeApiController : ControllerBase
     [ProducesResponseType(typeof(SessionizeSession), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "sessionId" })]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetSession(string sessionId, CancellationToken cancellationToken)
     {
         try
@@ -111,7 +113,7 @@ public class SessionizeApiController : ControllerBase
     [HttpGet("speakers")]
     [ProducesResponseType(typeof(List<SessionizeSpeaker>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetSpeakers(CancellationToken cancellationToken)
     {
         try
@@ -152,7 +154,7 @@ public class SessionizeApiController : ControllerBase
     [ProducesResponseType(typeof(SessionizeSpeaker), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "speakerId" })]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetSpeaker(string speakerId, CancellationToken cancellationToken)
     {
         try
@@ -196,7 +198,7 @@ public class SessionizeApiController : ControllerBase
     [HttpGet("schedule")]
     [ProducesResponseType(typeof(List<SessionizeSchedule>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetSchedule(CancellationToken cancellationToken)
     {
         try
@@ -299,7 +301,7 @@ public class SessionizeApiController : ControllerBase
     [HttpGet("categories")]
     [ProducesResponseType(typeof(List<SessionizeCategory>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    [ResponseCache(Duration = 300, VaryByHeader = "Accept")]
+    [OutputCache(PolicyName = OutputCachePolicies.ExternalApi)]
     public async Task<IActionResult> GetCategories(CancellationToken cancellationToken)
     {
         try

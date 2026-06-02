@@ -22,6 +22,7 @@
           "Key": "09848d63-f589-49de-a474-e108190077d2",
           "Alias": "altText",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Name": "Alt text",
           "SortOrder": 1
         },
@@ -29,6 +30,7 @@
           "Key": "d7192ea9-26ef-4f24-ab67-98bdb77c5842",
           "Alias": "image",
           "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Image"
         }
       ]
@@ -51,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

@@ -22,6 +22,7 @@
           "Key": "265f4213-739e-470e-8f53-fe6dfe1ceab4",
           "Alias": "bodyText",
           "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
           "Name": "Body text",
           "SortOrder": 3
         },
@@ -29,6 +30,7 @@
           "Key": "b367e5b0-4294-46ae-8099-229f580fbdc5",
           "Alias": "callToActionLinks",
           "DataType": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
           "Description": "Max 2 items",
           "Name": "Call to action links",
           "SortOrder": 4
@@ -37,6 +39,7 @@
           "Key": "e2daf431-63a3-42cf-b0d0-f3ed90ea39a2",
           "Alias": "image",
           "DataType": "umb://data-type/3fb379b2ee414143abd26f1fdf8df72e",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Mandatory": true,
           "Name": "Image",
           "SortOrder": 2
@@ -45,12 +48,14 @@
           "Key": "ec85184a-d259-413c-a5b4-44b97a75d57d",
           "Alias": "tagline",
           "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
           "Name": "Tagline"
         },
         {
           "Key": "f889b1bd-2c60-497d-939e-baf6bb5126f4",
           "Alias": "headline",
           "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
           "Description": "Max 40 chars",
           "Mandatory": true,
           "Name": "Headline",
@@ -84,5 +89,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

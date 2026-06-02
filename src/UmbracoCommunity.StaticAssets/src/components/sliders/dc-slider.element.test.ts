@@ -60,10 +60,11 @@ describe('DcSlider', () => {
       const element = new DcSlider()
       const mockTouchEvent = {
         changedTouches: [{
-          screenX: 100,
-          screenY: 200
-        }]
-      } as TouchEvent
+          clientX: 100,
+          clientY: 200
+        }],
+        preventDefault: vi.fn()
+      } as unknown as TouchEvent
 
       expect(() => {
         element.getTouchStartPoint(mockTouchEvent)
@@ -116,137 +117,135 @@ describe('DcSlider', () => {
     it('should handle touch start', () => {
       const mockTouchEvent = {
         changedTouches: [{
-          screenX: 100,
-          screenY: 200
+          clientX: 100,
+          clientY: 200
         }]
-      } as TouchEvent
+      } as unknown as TouchEvent
 
       element.getTouchStartPoint(mockTouchEvent)
-      
+
       // Touch start should set initial coordinates
       expect(() => element.getTouchStartPoint(mockTouchEvent)).not.toThrow()
     })
 
-    it('should handle touch move with swipe gesture detection', () => {
+    it('should handle touch move with horizontal drag detection', () => {
+      // Set initial touch position
+      element.getTouchStartPoint({
+        changedTouches: [{
+          clientX: 100,
+          clientY: 200
+        }]
+      } as unknown as TouchEvent)
+
       const mockTouchEvent = {
         changedTouches: [{
-          screenX: 200, // Moved 100px horizontally
-          screenY: 210  // Moved only 10px vertically
+          clientX: 200, // Moved 100px horizontally
+          clientY: 210  // Moved only 10px vertically
         }],
         preventDefault: vi.fn()
       } as unknown as TouchEvent
 
-      // Set initial touch position
-      element.getTouchStartPoint({
-        changedTouches: [{
-          screenX: 100,
-          screenY: 200
-        }]
-      } as TouchEvent)
-
       element.getTouchMovePoint(mockTouchEvent)
-      
-      // Should call preventDefault for horizontal swipe
+
+      // Should call preventDefault for horizontal drag
       expect(mockTouchEvent.preventDefault).toHaveBeenCalled()
     })
 
-    it('should handle touch move without swipe gesture', () => {
+    it('should handle touch move without triggering drag for small movement', () => {
+      // Set initial touch position
+      element.getTouchStartPoint({
+        changedTouches: [{
+          clientX: 100,
+          clientY: 200
+        }]
+      } as unknown as TouchEvent)
+
       const mockTouchEvent = {
         changedTouches: [{
-          screenX: 110, // Small horizontal movement
-          screenY: 200
+          clientX: 105, // Small horizontal movement (below threshold)
+          clientY: 200
         }],
         preventDefault: vi.fn()
       } as unknown as TouchEvent
 
-      // Set initial touch position
-      element.getTouchStartPoint({
-        changedTouches: [{
-          screenX: 100,
-          screenY: 200
-        }]
-      } as TouchEvent)
-
       element.getTouchMovePoint(mockTouchEvent)
-      
+
       // Should not call preventDefault for small movement
       expect(mockTouchEvent.preventDefault).not.toHaveBeenCalled()
     })
 
-    it('should handle touch end with swipe to next', () => {
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      const mockTouchEvent = {
-        changedTouches: [{
-          screenX: 30, // Swiped left (next) - 70px movement (100-30)
-          screenY: 200
-        }]
-      } as TouchEvent
-
+    it('should handle touch end after drag', () => {
       // Set initial touch position
       element.getTouchStartPoint({
         changedTouches: [{
-          screenX: 100,
-          screenY: 200
+          clientX: 100,
+          clientY: 200
         }]
-      } as TouchEvent)
+      } as unknown as TouchEvent)
 
-      element.getTouchEndPoint(mockTouchEvent)
-      
-      // The swipe logic should execute without errors
-      expect(() => element.getTouchEndPoint(mockTouchEvent)).not.toThrow()
+      // Trigger drag by moving horizontally
+      element.getTouchMovePoint({
+        changedTouches: [{
+          clientX: 30,
+          clientY: 200
+        }],
+        preventDefault: vi.fn()
+      } as unknown as TouchEvent)
+
+      const mockEndEvent = {
+        changedTouches: [{
+          clientX: 30,
+          clientY: 200
+        }]
+      } as unknown as TouchEvent
+
+      expect(() => element.getTouchEndPoint(mockEndEvent)).not.toThrow()
     })
 
-    it('should handle touch end with swipe to previous', () => {
+    it('should not trigger navigation when drag is not started', () => {
       const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      const mockTouchEvent = {
-        changedTouches: [{
-          screenX: 170, // Swiped right (previous) - 70px movement (170-100)
-          screenY: 200
-        }]
-      } as TouchEvent
 
       // Set initial touch position
       element.getTouchStartPoint({
         changedTouches: [{
-          screenX: 100,
-          screenY: 200
+          clientX: 100,
+          clientY: 200
         }]
-      } as TouchEvent)
+      } as unknown as TouchEvent)
 
-      element.getTouchEndPoint(mockTouchEvent)
-      
-      // Should dispatch index changed event for valid swipe
-      expect(dispatchEventSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'dc-slider-index-changed'
-        })
-      )
-    })
-
-    it('should not trigger swipe for vertical movement', () => {
-      const dispatchEventSpy = vi.spyOn(element, 'dispatchEvent')
-      
-      const mockTouchEvent = {
+      // End without any move (tap)
+      element.getTouchEndPoint({
         changedTouches: [{
-          screenX: 100, // No horizontal movement
-          screenY: 250  // Large vertical movement
+          clientX: 100,
+          clientY: 200
         }]
-      } as TouchEvent
+      } as unknown as TouchEvent)
 
-      // Set initial touch position
-      element.getTouchStartPoint({
-        changedTouches: [{
-          screenX: 100,
-          screenY: 200
-        }]
-      } as TouchEvent)
-
-      element.getTouchEndPoint(mockTouchEvent)
-      
-      // Should not dispatch index changed event for vertical movement
+      // Should not dispatch index changed event for a tap
       expect(dispatchEventSpy).not.toHaveBeenCalled()
+    })
+
+    it('should not start drag for vertical movement', () => {
+      // Set initial touch position
+      element.getTouchStartPoint({
+        changedTouches: [{
+          clientX: 100,
+          clientY: 200
+        }]
+      } as unknown as TouchEvent)
+
+      const mockTouchEvent = {
+        changedTouches: [{
+          clientX: 105, // Small horizontal movement
+          clientY: 250  // Large vertical movement
+        }],
+        preventDefault: vi.fn()
+      } as unknown as TouchEvent
+
+      element.getTouchMovePoint(mockTouchEvent)
+
+      // Should not call preventDefault for vertical scroll
+      expect(mockTouchEvent.preventDefault).not.toHaveBeenCalled()
     })
   })
 
@@ -289,7 +288,8 @@ describe('DcSlider', () => {
   describe('edge cases', () => {
     it('should handle touch events with null changedTouches', () => {
       const mockTouchEvent = {
-        changedTouches: null
+        changedTouches: null,
+        preventDefault: vi.fn()
       } as unknown as TouchEvent
 
       expect(() => {
@@ -301,7 +301,8 @@ describe('DcSlider', () => {
 
     it('should handle touch events with undefined changedTouches', () => {
       const mockTouchEvent = {
-        changedTouches: undefined
+        changedTouches: undefined,
+        preventDefault: vi.fn()
       } as unknown as TouchEvent
 
       expect(() => {

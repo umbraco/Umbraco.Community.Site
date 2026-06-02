@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Speakers block</summary>
 	[PublishedModel("settingsSpeakersBlock")]
-	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId
+	public partial class SettingsSpeakersBlock : PublishedElementModel, ISettingsBlockId, ISettingsSpeakerGrid
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,5 +56,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("blockId")]
 		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
+
+		///<summary>
+		/// Speakers per row: The maximum number of speakers to show in a row next to each other, default is 4.   This only applies to large screens, smaller screens will have responsive behavior, so the number of speakers next to each other depends on how much space is available.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("speakersPerRow")]
+		public virtual string SpeakersPerRow => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsSpeakerGrid.GetSpeakersPerRow(this, _publishedValueFallback);
 	}
 }

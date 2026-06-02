@@ -1,9 +1,0 @@
-﻿@using UmbracoCommunity.Web.Models.Pages
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ReleasesHomePageViewModel>
-@{
-	Layout = "LayoutReleases.cshtml";
-}
-
-<div class="dc-block-list releases-container">
-    @await Html.PartialAsync("~/Views/Partials/ReleaseOverview/_ReleasesOverview.cshtml", Model)
-</div>

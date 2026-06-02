@@ -3,10 +3,36 @@
   "EditorAlias": "Umbraco.MediaPicker3",
   "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
   "Configuration": {
-    "multiple": true
+    "multiple": true,
+    "crops": [
+      {
+        "label": "Mobile",
+        "alias": "mobile",
+        "width": 400,
+        "height": 300
+      },
+      {
+        "label": "Mobile 2x",
+        "alias": "mobile2x",
+        "width": 800,
+        "height": 600
+      },
+      {
+        "label": "Desktop",
+        "alias": "desktop",
+        "width": 1200,
+        "height": 900
+      },
+      {
+        "label": "Desktop 2x",
+        "alias": "desktop2x",
+        "width": 2400,
+        "height": 1800
+      }
+    ]
   },
   "Udi": "umb://data-type/1b661f4022424b44b9cb3990ee2b13c0",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

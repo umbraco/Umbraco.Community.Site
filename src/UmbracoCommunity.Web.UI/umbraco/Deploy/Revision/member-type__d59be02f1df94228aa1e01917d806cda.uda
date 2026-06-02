@@ -18,6 +18,7 @@
           "Key": "0000001c-0000-0000-0000-000000000000",
           "Alias": "umbracoMemberComments",
           "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
           "Name": "Comments"
         }
       ]
@@ -32,5 +33,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MemberTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

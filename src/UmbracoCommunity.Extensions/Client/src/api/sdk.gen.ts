@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses, GetUmbracoUmbracocommunityextensionsApiV1ContributionsData, GetUmbracoUmbracocommunityextensionsApiV1ContributionsErrors, GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses, GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataData, GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataErrors, GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataResponses, GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersData, GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersErrors, GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersResponses, GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataData, GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataErrors, GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses, GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses, GetUmbracoUmbracocommunityextensionsApiV1HqmembersData, GetUmbracoUmbracocommunityextensionsApiV1HqmembersErrors, GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses, GetUmbracoUmbracocommunityextensionsApiV1PingData, GetUmbracoUmbracocommunityextensionsApiV1PingErrors, GetUmbracoUmbracocommunityextensionsApiV1PingResponses, GetUmbracoUmbracocommunityextensionsApiV1ReleasesData, GetUmbracoUmbracocommunityextensionsApiV1ReleasesErrors, GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses, GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameData, GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameErrors, GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses, GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfData, GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfErrors, GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses, GetUmbracoUmbracocommunityextensionsApiV1WhoAmIData, GetUmbracoUmbracocommunityextensionsApiV1WhoAmIErrors, GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses, PostUmbracoUmbracocommunityextensionsApiV1HqmembersData, PostUmbracoUmbracocommunityextensionsApiV1HqmembersErrors, PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportData, PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportErrors, PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportResponses, PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataData, PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataErrors, PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataData, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataErrors, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersData, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersErrors, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersResponses, PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheData, PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheErrors, PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses, PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses } from './types.gen';
+import type { ClearSessionizeCacheData, ClearSessionizeCacheErrors, ClearSessionizeCacheResponses, CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RegenerateData, RegenerateErrors, RegenerateResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,253 +19,67 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 export class UmbracoCommunityExtensionsService {
-    public static getUmbracoUmbracocommunityextensionsApiV1Contributions<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1ContributionsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1ContributionsResponses, GetUmbracoUmbracocommunityextensionsApiV1ContributionsErrors, ThrowOnError>({
+    public static createBlogArticle<ThrowOnError extends boolean = false>(options: Options<CreateBlogArticleData, ThrowOnError>) {
+        return (options.client ?? client).post<CreateBlogArticleResponses, CreateBlogArticleErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/contributions',
+            url: '/umbraco/umbracocommunityextensions/api/v1/blog/{blogNodeKey}/create-article',
             ...options
         });
     }
     
-    public static getUmbracoUmbracocommunityextensionsApiV1DownloadGithubData<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataResponses, GetUmbracoUmbracocommunityextensionsApiV1DownloadGithubDataErrors, ThrowOnError>({
+    public static isBlogNode<ThrowOnError extends boolean = false>(options: Options<IsBlogNodeData, ThrowOnError>) {
+        return (options.client ?? client).get<IsBlogNodeResponses, IsBlogNodeErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data',
+            url: '/umbraco/umbracocommunityextensions/api/v1/blog/{nodeKey}/is-blog',
             ...options
         });
     }
     
-    public static getUmbracoUmbracocommunityextensionsApiV1DownloadHqmembers<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersResponses, GetUmbracoUmbracocommunityextensionsApiV1DownloadHqmembersErrors, ThrowOnError>({
+    public static clearSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<ClearSessionizeCacheData, ThrowOnError>) {
+        return (options?.client ?? client).post<ClearSessionizeCacheResponses, ClearSessionizeCacheErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers',
+            url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache',
             ...options
         });
     }
     
-    public static getUmbracoUmbracocommunityextensionsApiV1ExportGithubData<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataResponses, GetUmbracoUmbracocommunityextensionsApiV1ExportGithubDataErrors, ThrowOnError>({
+    public static regenerate<ThrowOnError extends boolean = false>(options?: Options<RegenerateData, ThrowOnError>) {
+        return (options?.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/export-github-data',
+            url: '/umbraco/umbracocommunityextensions/api/v1/seed/regenerate',
             ...options
         });
     }
     
-    public static getUmbracoUmbracocommunityextensionsApiV1Hqmembers<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1HqmembersData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1HqmembersResponses, GetUmbracoUmbracocommunityextensionsApiV1HqmembersErrors, ThrowOnError>({
+    public static status<ThrowOnError extends boolean = false>(options?: Options<StatusData, ThrowOnError>) {
+        return (options?.client ?? client).get<StatusResponses, StatusErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers',
-            ...options
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1Hqmembers<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1HqmembersData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1HqmembersResponses, PostUmbracoUmbracocommunityextensionsApiV1HqmembersErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static deleteUmbracoUmbracocommunityextensionsApiV1HqmembersById<ThrowOnError extends boolean = false>(options: Options<DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, ThrowOnError>) {
-        return (options.client ?? client).delete<DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses, DeleteUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1HqmembersById<ThrowOnError extends boolean = false>(options: Options<GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, ThrowOnError>) {
-        return (options.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses, GetUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options
-        });
-    }
-    
-    public static putUmbracoUmbracocommunityextensionsApiV1HqmembersById<ThrowOnError extends boolean = false>(options: Options<PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdData, ThrowOnError>) {
-        return (options.client ?? client).put<PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdResponses, PutUmbracoUmbracocommunityextensionsApiV1HqmembersByIdErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1HqmembersImport<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportResponses, PostUmbracoUmbracocommunityextensionsApiV1HqmembersImportErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/import',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1ImportGithubData<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportGithubDataErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-github-data',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubData<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleGithubDataErrors, ThrowOnError>({
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-github-data',
-            ...options
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembers<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersResponses, PostUmbracoUmbracocommunityextensionsApiV1ImportSampleHqMembersErrors, ThrowOnError>({
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-hq-members',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1Ping<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1PingData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1PingResponses, GetUmbracoUmbracocommunityextensionsApiV1PingErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/ping',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1Releases<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1ReleasesData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1ReleasesResponses, GetUmbracoUmbracocommunityextensionsApiV1ReleasesErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/releases',
-            ...options
-        });
-    }
-    
-    public static postUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCache<ThrowOnError extends boolean = false>(options?: Options<PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheData, ThrowOnError>) {
-        return (options?.client ?? client).post<PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheResponses, PostUmbracoUmbracocommunityextensionsApiV1SessionizeRefreshCacheErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1WhatsMyName<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameResponses, GetUmbracoUmbracocommunityextensionsApiV1WhatsMyNameErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whatsMyName',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolf<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfResponses, GetUmbracoUmbracocommunityextensionsApiV1WhatsTheTimeMrWolfErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whatsTheTimeMrWolf',
-            ...options
-        });
-    }
-    
-    public static getUmbracoUmbracocommunityextensionsApiV1WhoAmI<ThrowOnError extends boolean = false>(options?: Options<GetUmbracoUmbracocommunityextensionsApiV1WhoAmIData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetUmbracoUmbracocommunityextensionsApiV1WhoAmIResponses, GetUmbracoUmbracocommunityextensionsApiV1WhoAmIErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/whoAmI',
+            url: '/umbraco/umbracocommunityextensions/api/v1/seed/status',
             ...options
         });
     }

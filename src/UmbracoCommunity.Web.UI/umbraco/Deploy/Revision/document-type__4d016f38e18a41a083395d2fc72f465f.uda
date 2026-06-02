@@ -1,6 +1,6 @@
 {
-  "Name": "Page configuration",
-  "Alias": "pageConfiguration",
+  "Name": "[Composition] Page configuration",
+  "Alias": "compositionPageConfiguration",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-settings color-green",
@@ -23,7 +23,16 @@
           "Key": "7b53de83-6e72-4cab-8e5b-572d98cd9d2f",
           "Alias": "hideFromSitemap",
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
           "Name": "Hide from sitemap"
+        },
+        {
+          "Key": "fe8addc9-890d-40ed-9049-004e2af4d566",
+          "Alias": "hideFromSearch",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Name": "Hide from search",
+          "SortOrder": 1
         }
       ]
     }
@@ -41,5 +50,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

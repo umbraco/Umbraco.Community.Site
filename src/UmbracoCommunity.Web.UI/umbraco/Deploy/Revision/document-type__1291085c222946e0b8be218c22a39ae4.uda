@@ -24,6 +24,7 @@
           "Key": "8d37d7c4-28ef-4ae8-8f18-2d60d8cdb5cb",
           "Alias": "backgroundImage",
           "DataType": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Mandatory": true,
           "Name": "Background image"
         }
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

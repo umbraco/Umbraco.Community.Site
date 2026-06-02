@@ -1,0 +1,65 @@
+@using UmbracoCommunity.Web.Models.ViewModels.Components
+@model FooterViewModel
+
+<dc-footer>
+    <div class="footer-placeholder"></div>
+    <footer class="sticky-footer">
+        <div class="footer-inner">
+            <div class="footer-inner__logo">
+                <span>
+                    @if (Model.Logo != null)
+                    {
+                        <svg-src media="Model.Logo"></svg-src>
+                    }
+                </span>
+            </div>
+
+            <div class="footer-inner__links">
+                @if (Model.LinkColumns != null && Model.LinkColumns.Any())
+                {
+                    foreach (var column in Model.LinkColumns)
+                    {
+                        <partial name="@($"~/Views/Partials/Blocks/FooterLinkColumn.cshtml")" model="column" />
+                    }
+                }
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom__bottom-links">
+                @if (Model.BottomLinks != null && Model.BottomLinks.Any())
+                {
+                    <ul>
+                        @foreach (var link in Model.BottomLinks)
+                        {
+                            <li>
+                                <a href="@link.Url" target="@link.Target" rel="@link.Target.NewTabRel()" title="@link.Name">@link.Name</a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="footer-bottom__social-links">
+                @if (Model.SocialLinks != null && Model.SocialLinks.Any())
+                {
+                    <ul>
+                        @foreach (var socialIcon in Model.SocialLinks)
+                        {
+                            <li>
+                                <a href="@socialIcon?.Content.Link?.Url" target="@socialIcon?.Content.Link?.Target" rel="@socialIcon?.Content.Link?.Target.NewTabRel()" title="@socialIcon?.Content.Link?.Name">
+                                    @if (socialIcon?.Content.Icon != null)
+                                    {
+                                        <svg-src media="@socialIcon?.Content.Icon" width="24" height="24" alt-text="@socialIcon?.Content.Link?.Name"></svg-src>
+                                    }
+                                    else
+                                    {
+                                        @socialIcon?.Content.Link?.Name
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </footer>
+</dc-footer>

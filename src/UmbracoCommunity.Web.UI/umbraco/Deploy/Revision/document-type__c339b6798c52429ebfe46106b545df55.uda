@@ -1,0 +1,92 @@
+{
+  "Name": "Hero banner with image slider",
+  "Alias": "heroBannerWithImageSlider",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-width",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "11e12cec-a6f9-468f-9282-ce451dad896f",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "004ef328-0d5f-4db8-a19a-b2d3c7ae7fa0",
+          "Alias": "callToActionLinks",
+          "DataType": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
+          "Description": "Max 2 items",
+          "Name": "Call to action links",
+          "SortOrder": 4
+        },
+        {
+          "Key": "8242f06a-f140-4dbb-855a-ead5bd79f1b5",
+          "Alias": "tagline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
+          "Name": "Tagline"
+        },
+        {
+          "Key": "8dc8cee8-04c0-4329-a893-2ac989d1214c",
+          "Alias": "bodyText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+          "Name": "Body text",
+          "SortOrder": 3
+        },
+        {
+          "Key": "d2a9d548-19d4-4fc3-bbd9-4cbad0c8565c",
+          "Alias": "headline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
+          "Description": "Max 40 chars",
+          "Mandatory": true,
+          "Name": "Headline",
+          "SortOrder": 1
+        },
+        {
+          "Key": "fba8ff86-f2c1-4bf5-b746-ccb0f07efcb2",
+          "Alias": "sliderImages",
+          "DataType": "umb://data-type/1b661f4022424b44b9cb3990ee2b13c0",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.MediaWithCrops\u003E",
+          "Name": "Slider images",
+          "SortOrder": 5
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/c339b6798c52429ebfe46106b545df55",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/1b661f4022424b44b9cb3990ee2b13c0",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

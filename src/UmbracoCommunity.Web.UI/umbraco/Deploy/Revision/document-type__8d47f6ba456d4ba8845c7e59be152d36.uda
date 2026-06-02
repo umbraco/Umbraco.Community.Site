@@ -14,7 +14,10 @@
       "umb://document-type/8e1503b98fa94a84b3a6a3eba44f81e2",
       "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
       "umb://document-type/5dd905b68303403c85ba905f7463e3c4",
-      "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5"
+      "umb://document-type/8ddeb446ec2a45c99abe2f44747cf5b5",
+      "umb://document-type/47d5651bf5bb45c785fcb4bad22cb13d",
+      "umb://document-type/a5426be724f54bf48882e311c6430cd7",
+      "umb://document-type/f751e22da5b446bb8e6f1a52b1a1aed9"
     ]
   },
   "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
@@ -38,6 +41,10 @@
     },
     {
       "Udi": "umb://document-type/1e66f4d148ba4c7482efaa8c77d42e35",
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://document-type/47d5651bf5bb45c785fcb4bad22cb13d",
       "Mode": "Exist"
     },
     {
@@ -65,11 +72,19 @@
       "Mode": "Exist"
     },
     {
+      "Udi": "umb://document-type/a5426be724f54bf48882e311c6430cd7",
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://document-type/f751e22da5b446bb8e6f1a52b1a1aed9",
+      "Mode": "Exist"
+    },
+    {
       "Udi": "umb://template/b65faffaeb5340c2a4cf72764cdf160d",
       "Ordering": true,
       "Mode": "Exist"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

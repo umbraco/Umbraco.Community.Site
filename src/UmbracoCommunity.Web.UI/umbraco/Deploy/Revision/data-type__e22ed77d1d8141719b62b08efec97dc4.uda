@@ -1,0 +1,39 @@
+{
+  "Name": "Blog category picker",
+  "EditorAlias": "Umbraco.MultiNodeTreePicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.ContentPicker",
+  "Configuration": {
+    "minNumber": 0,
+    "maxNumber": 0,
+    "startNode": {
+      "type": "content",
+      "dynamicRoot": {
+        "originAlias": "Site",
+        "querySteps": [
+          {
+            "unique": "f621046e-a09d-4879-8909-cc19ec83b085",
+            "alias": "NearestDescendantOrSelf",
+            "anyOfDocTypeKeys": [
+              "23f25b01-e427-405d-8ace-d3e729d15318"
+            ]
+          }
+        ]
+      }
+    },
+    "filter": "23dd4b5d-f15a-4c03-90a6-8cb50a6beb00"
+  },
+  "Parent": "umb://data-type-container/08ed7e586e6743d389520ca5c663e32b",
+  "Udi": "umb://data-type/e22ed77d1d8141719b62b08efec97dc4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/08ed7e586e6743d389520ca5c663e32b",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/23dd4b5df15a4c0390a68cb50a6beb00",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

@@ -17,6 +17,8 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.Configure<UmbracoPipelineOptions>(options =>
             {
                 options.AddFilter(new UmbracoPipelineFilter("DisableCspFilter", postPipeline: app => app.UseMiddleware<DisableCspMiddleware>()));
+                options.AddFilter(new UmbracoPipelineFilter("BlogFolderRedirect", postPipeline: app => app.UseMiddleware<BlogFolderRedirectMiddleware>()));
+                options.AddFilter(new UmbracoPipelineFilter("BlogRss", prePipeline: app => app.UseMiddleware<BlogRssMiddleware>()));
             });
 
             return builder;

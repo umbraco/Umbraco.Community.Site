@@ -21,6 +21,7 @@
           "Key": "a415fb5f-b572-41d0-957a-989312b53e6e",
           "Alias": "quoteItems",
           "DataType": "umb://data-type/d19aaa9ec6ae4c81b3e89b596f8c83ff",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Mandatory": true,
           "Name": "Quote items"
         }
@@ -40,5 +41,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

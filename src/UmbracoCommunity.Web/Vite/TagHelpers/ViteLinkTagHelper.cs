@@ -50,7 +50,7 @@ public class ViteLinkTagHelper : ViteTagHelperBase
                     linkTag.Attributes[attribute.Name] = attribute.Value?.ToString();
                 }
 
-                linkTag.Attributes["href"] = css;
+                linkTag.Attributes["href"] = EntryNameWithBase(css);
                 output.PostElement.AppendHtml(linkTag);
             }
 

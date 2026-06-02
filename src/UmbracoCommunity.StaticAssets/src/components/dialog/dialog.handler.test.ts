@@ -6,19 +6,11 @@ describe("DcDialogHandler", () => {
   let mockElement: HTMLElement;
   let existingDialog: HTMLDialogElement | null;
 
-  // Mock HTMLDialogElement if not available
+  // Mock HTMLDialogElement methods not fully supported in jsdom
   beforeEach(() => {
-    // Mock the dialog element's methods
-    const originalCreateElement = document.createElement.bind(document);
-    vi.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      const element = originalCreateElement(tagName);
-      if (tagName === 'dialog') {
-        (element as any).showModal = vi.fn();
-        (element as any).close = vi.fn();
-      }
-      return element;
-    });
-    
+    HTMLDialogElement.prototype.showModal = vi.fn();
+    HTMLDialogElement.prototype.close = vi.fn();
+
     handler = new DcDialogHandler();
     mockElement = document.createElement("div");
     mockElement.textContent = "Test Content";
@@ -31,10 +23,17 @@ describe("DcDialogHandler", () => {
   });
 
   afterEach(() => {
+    // Dispatch dialog-close to clean up any pending listeners from unclosed dialogs
+    document.dispatchEvent(new CustomEvent("dialog-close"));
+
     // Clean up any dialogs created during tests
     const dialogs = document.querySelectorAll("dialog");
     dialogs.forEach(dialog => dialog.remove());
-    
+
+    // Clean up body state
+    document.body.className = "";
+    document.body.style.cssText = "";
+
     // Restore original dialog if it existed
     if (existingDialog) {
       document.body.appendChild(existingDialog);

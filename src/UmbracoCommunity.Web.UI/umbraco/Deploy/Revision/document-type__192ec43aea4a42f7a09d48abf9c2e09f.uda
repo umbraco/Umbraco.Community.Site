@@ -24,6 +24,7 @@
           "Key": "59a5f8d1-6659-45ad-944f-752e3d31fd5c",
           "Alias": "backgroundImage",
           "DataType": "umb://data-type/5e7d17720ae44a57ba22f3bdfeaf3467",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "Will override any background colour defined",
           "Name": "Background image",
           "SortOrder": 1
@@ -52,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

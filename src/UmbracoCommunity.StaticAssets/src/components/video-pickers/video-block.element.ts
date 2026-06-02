@@ -30,14 +30,14 @@ export abstract class DcVideoBlockElement extends LitElement {
 
     #renderPlayBtn() {
         return html`
-        <svg class="play-icon" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><style>.cls-1{fill:#fff}</style></defs><path class="cls-1" d="M49.31 98.42A47.69 47.69 0 1 1 97 50.74a47.74 47.74 0 0 1-47.69 47.68Zm0-90.3a42.62 42.62 0 1 0 42.62 42.62A42.67 42.67 0 0 0 49.31 8.12Z"/><path class="cls-1" d="M35.25 73.01V26.28l40.47 23.37-40.47 23.36z"/></svg>`;
+        <svg class="play-icon" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true"><defs><style>.cls-1{fill:#fff}</style></defs><path class="cls-1" d="M49.31 98.42A47.69 47.69 0 1 1 97 50.74a47.74 47.74 0 0 1-47.69 47.68Zm0-90.3a42.62 42.62 0 1 0 42.62 42.62A42.67 42.67 0 0 0 49.31 8.12Z"/><path class="cls-1" d="M35.25 73.01V26.28l40.47 23.37-40.47 23.36z"/></svg>`;
     }
 
     #renderPoster() {
         const hasDetails = this.name && this.name?.length > 0 ? true : false;
 
         return html`
-            <div class="poster ${!hasDetails ? 'no-details' : ''}" style="background-image: url('${this.thumbnail}');" @click=${this.playVideo}>
+            <div class="poster ${!hasDetails ? 'no-details' : ''}" style="background-image: url('${this.thumbnail}');" @click=${this.playVideo} role="button" tabindex="0" aria-label="Play video${this.name ? `: ${this.name}` : ''}" @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.playVideo(); }}}>
                 <div class="details">
                     ${this.#renderPlayBtn()}
                     ${hasDetails ? html`<p>${this.name}<span>${this.length}</span></p>` : ''}

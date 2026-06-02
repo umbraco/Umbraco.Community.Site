@@ -11,7 +11,8 @@
   },
   "Parent": "umb://document-type-container/5b79e1faf4bb40ad83b7fc231c8613ee",
   "CompositionContentTypes": [
-    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+    "umb://document-type/78d9dc00fd784f75a567b2d36f6e3436"
   ],
   "PropertyGroups": [],
   "PropertyTypes": [],
@@ -24,8 +25,12 @@
     {
       "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
       "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/78d9dc00fd784f75a567b2d36f6e3436",
+      "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

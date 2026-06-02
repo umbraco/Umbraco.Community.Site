@@ -1,0 +1,58 @@
+{
+  "Name": "Slide item block with tag",
+  "Alias": "slideItemBlockWithTag",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-coverflow",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [
+    "umb://document-type/991422e28be34f17851b735729ed1ca4",
+    "umb://document-type/b9205609a713403f8195b538b89b30f3"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "26fc12f6-65d7-4923-960d-024a14586ce1",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "91fa62f5-68d4-499f-b5ec-6443ac6458e9",
+          "Alias": "tag",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Displayed at the top of the slide",
+          "Name": "Tag",
+          "SortOrder": -3
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/999d89014c17480da919cd1db79b4900",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/991422e28be34f17851b735729ed1ca4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/b9205609a713403f8195b538b89b30f3",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

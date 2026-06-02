@@ -1,0 +1,12 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.PageNotFound>
+@using ContentModels = UmbracoCommunity.Web.Models.PublishedModels;
+@{
+    Layout = "Layout.cshtml";
+
+    var contentGrid = Model.ContentBlocks.ParseBlockGrid();
+}
+
+<partial name="~/Views/Partials/Components/BannerBlocks.cshtml" for="BannerContent" />
+@await Component.InvokeAsync("PageNotFoundSuggestions", new { currentPage = Model })
+<partial name="~/Views/Partials/Components/ContentBlocks.cshtml" model="contentGrid" />

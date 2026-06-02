@@ -370,9 +370,10 @@ healthchecksdb
 # Customize langguage files in /config/lang/{language}.user.xml
 **/umbraco/config/lang/
 
-# JSON Schema file for appsettings
-# This is auto generated from the build
-**/appsettings-schema.json
+# JSON Schema files for appsettings
+# These are auto generated from the build
+**/appsettings-schema*.json
+**/umbraco-package-schema.json
 
 # This is the no-nodes, installer & upgrader pages from Umbraco
 # Nuget package Umbraco.Cms.StaticAssets will copy them in during dotnet build
@@ -421,7 +422,7 @@ tests/**/appsettings-schema.*.json
 ood.flag
 /src/UmbracoCommunity.Web.UI/wwwroot/assets
 /src/UmbracoCommunity.StaticAssets/dist
-/src/UmbracoCommunity.StaticAssets/tsconfig.tsbuildinfo
+/src/UmbracoCommunity.StaticAssets/*.tsbuildinfo
 /src/UmbracoCommunity.Web.UI/appsettings.Local.json
 
 # --------------------------------------------------------------
@@ -438,9 +439,21 @@ ood.flag
 
 # Umbraco.Deploy.OnPrem creates this file when running locally - file not needed in Cloud repo
 **/TriggerDeploy.ps1
+
+# Seed zip downloaded by `node build.mjs seed|reset` — never commit, never deploy
+**/umbraco/Deploy/import-on-startup.zip
+
+# Never commit exported Deploy content
+**/umbraco/Deploy/Exports/
+
+# Timestamped SQLite backups created by `node build.mjs reset`
+**/umbraco/Data/Umbraco.sqlite.db*.bak-*
+
 src/UmbracoCommunity.StaticAssets/.vite
 App_Data/
-
-Hangfire.db*
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
+/src/UmbracoCommunity.BlockRestrictions/wwwroot/App_Plugins/
+/src/Umbraco.Community.NotFoundTracker/wwwroot/App_Plugins/
 .claude
+.mcp.json
+src/UmbracoCommunity.Web.UI/Hangfire.db*

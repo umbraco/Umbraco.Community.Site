@@ -1,0 +1,43 @@
+@model PagingViewModel
+
+<ul class="pagination">
+    @if (Model.CurrentPage > 1)
+    {
+        <li><a href="?page=1@(Model.AdditionalQueryString)">First</a></li>
+    }
+    else
+    {
+        <li class="disabled">First</li>
+    }
+
+    @if (Model.HasPrevious)
+    {
+        <li><a href="?page=@(Model.CurrentPage - 1)@Model.AdditionalQueryString">Previous</a></li>
+    }
+    else
+    {
+        <li class="disabled">Previous</li>
+    }
+
+    <li>@Model.CurrentPage</li>
+
+    @if (Model.HasNext)
+    {
+        <li><a href="?page=@(Model.CurrentPage + 1)@Model.AdditionalQueryString">Next</a></li>
+    }
+    else
+    {
+        <li class="disabled">Next</li>
+    }
+
+    @if (Model.CurrentPage < Model.TotalPages)
+    {
+        <li><a href="?page=@Model.TotalPages@Model.AdditionalQueryString">Last</a></li>
+    }
+    else
+    {
+        <li class="disabled">Last</li>
+    }
+</ul>
+
+

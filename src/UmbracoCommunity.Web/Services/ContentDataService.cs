@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ServiceModels;
@@ -10,18 +11,14 @@ namespace UmbracoCommunity.Web.Services;
 internal class ContentDataService : IContentDataService
 {
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-    
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IPublishedValueFallback _publishedValueFallback;
 
     public ContentDataService(
         IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedUrlProvider publishedUrlProvider,
-        IPublishedValueFallback publishedValueFallback)
+        IPublishedUrlProvider publishedUrlProvider)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
         _publishedUrlProvider = publishedUrlProvider;
-        _publishedValueFallback = publishedValueFallback;
     }
     public IReadOnlyList<SitemapElement> GetSitemap(IPublishedContent homeNode)
     {
@@ -45,10 +42,18 @@ internal class ContentDataService : IContentDataService
 
     private void AddSitemapItems(List<SitemapElement> siteMapElements, IPublishedContent currentNode)
     {
-        var sitemapItemsToAdd = currentNode.Children(c => c.TemplateId.HasValue && c is IPageConfiguration pageConfig && !pageConfig.HideFromSitemap);
-        foreach (IPublishedContent node in sitemapItemsToAdd ?? [])
+        foreach (IPublishedContent node in currentNode.Children() ?? [])
         {
-            if (node.IsVisible(_publishedValueFallback))
+            // HideFromSitemap is inherited by descendants — skip the whole branch.
+            if (node is ICompositionPageConfiguration pageConfig && pageConfig.HideFromSitemap)
+            {
+                continue;
+            }
+
+            // Non-routable "folder" nodes (no template, or doc types without the page-config
+            // composition) are skipped themselves but their descendants are still iterated —
+            // this supports Blog Year/Blog Month folders that contain routable articles.
+            if (node.TemplateId.HasValue && node is ICompositionPageConfiguration)
             {
                 siteMapElements.Add(new SitemapElement
                 {

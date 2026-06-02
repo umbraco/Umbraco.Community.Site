@@ -1,0 +1,87 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<SliderBlock, SettingsSliderBlock>>
+
+@{
+    var slideItems = Model.Content.SlideItems?.ToList() ?? new List<Umbraco.Cms.Core.Models.Blocks.BlockGridItem>();
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    bool showButtons = Model.Settings?.DisplayButtons ?? false;
+}
+
+<div class="dc-slider-block @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty) @(showButtons ? "has-buttons" : string.Empty)" id="@Model.Content.IdHash">
+    @if (hasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.Content.IdHash {
+                --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+            }
+        </style>
+    }
+
+    <div class="dc-slider-block__intro @(showButtons ? string.Empty : "align-center")" id="@(Model.Settings?.BlockId != null ? Model.Settings.BlockId : string.Empty)">
+        <div class="dc-slider-block__intro-text">
+            @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+            {
+                <p class="block-tagline">@Model.Content.Tagline</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.Content.Title))
+            {
+                <h2 class="block-title">@Model.Content.Title</h2>
+            }
+            @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+            {
+                <div class="block-subtitle">
+                    @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+                </div>
+            }
+        </div>
+        @if (showButtons)
+        {
+            <div class="dc-slider-block__arrows dc-slider-block__arrows--desktop">
+                <button class="slider-arrow-btn slider-arrow-btn--prev" type="button" aria-label="Previous slide" data-slider-action="prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                        <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                    </svg>
+                </button>
+                <button class="slider-arrow-btn" type="button" aria-label="Next slide" data-slider-action="next">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                        <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                    </svg>
+                </button>
+            </div>
+        }
+    </div>
+
+    @if (slideItems.Any())
+    {
+        <dc-slider class="dc-slider-block__slider">
+            <div class="slides-wrapper">
+                <div class="slides">
+                    @foreach (var item in slideItems)
+                    {
+                        <div style="--slide-col-span: @item.ColumnSpan">
+                            <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" />
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (showButtons)
+            {
+                <div class="dc-slider-block__arrows dc-slider-block__arrows--mobile">
+                    <button class="slider-arrow-btn slider-arrow-btn--prev" type="button" aria-label="Previous slide" data-slider-action="prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                    <button class="slider-arrow-btn" type="button" aria-label="Next slide" data-slider-action="next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                        </svg>
+                    </button>
+                </div>
+            }
+            <div class="mobile-controls">
+                <dc-slider-controls count="@slideItems.Count"></dc-slider-controls>
+            </div>
+        </dc-slider>
+    }
+</div>

@@ -1,13 +1,14 @@
 .dc-text-block {
   position: relative;
-  background: var(--block-background-color);
-  color: var(--block-text-color);
+  background: transparent;
+  color: inherit;
   display: flex;
   justify-content: center;
 
   &.has-bg {
     padding: var(--unit-md);
     border-radius: 20px;
+    background-color: var(--block-background-color);
   }
 
   &.bg-dark {
@@ -57,4 +58,10 @@
   > :last-child {
     margin-bottom: 0;
   }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
 }

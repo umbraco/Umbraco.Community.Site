@@ -1,9 +1,10 @@
-:root {
+:root,
+:host {
     --color-identity-blue: #283a97;
     --color-identity-dark: #1b264f;
-    --color-identity-darkest: #162335;
-    --color-identity-smoke: #f2ebe6;
-    --color-identity-white: #f9f7f4;
+    --color-identity-darkest: #000000;
+    --color-identity-smoke: #f1f0ee;
+    --color-identity-white: #ffffff;
     --color-identity-orange: #f79c37;
     --color-identity-yellow: #fad634;
     --color-identity-pink: #f5c1bc;
@@ -22,12 +23,13 @@
     --color-light-grey-navigation: #333;
     --color-light-grey: #d1d1d1;
     --color-dark-grey: #707070;
+    --color-light-blue: #5e6279;
     --color-green: #39d18c;
     --color-green-hover: #32b77b;
     --color-red: #e51400;
-    --color-page-surface: #f1f0ee;
+    --color-page-surface: var(--color-identity-smoke);
     --color-footer-headline: #babcd5;
-    --link-color: var(--color-black);
+    --link-color: var(--color-blue);
 
     --screen-md: 1024px;
     --screen-lg: 1216px;
@@ -43,8 +45,9 @@
     --unit-lg: 3rem;
     --unit-xl: 5rem;
 
+    --font-size-xs: 12px;
     --font-size-sm: 14px;
-    --font-size: 18px;
+    --font-size: 16px;
     --font-size-large: 24px;
     --font-family: 'Lato', 'Helvetica', 'Arial', 'sans-serif';
 
@@ -59,4 +62,10 @@
     --navigation-height: 122px;
     --navigation-max-width: 1708px;
     --color-light-gray-navigation: #33333399;
+
+    /* Focus styles - accessibility */
+    --focus-outline-width: 2px;
+    --focus-outline-offset: 2px;
+    --focus-outline-color: var(--color-identity-blue);
+    --focus-outline: var(--focus-outline-width) solid var(--focus-outline-color);
 }

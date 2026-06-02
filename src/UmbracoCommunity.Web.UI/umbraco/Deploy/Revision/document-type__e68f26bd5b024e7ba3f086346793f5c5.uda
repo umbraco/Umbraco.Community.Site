@@ -21,12 +21,14 @@
           "Key": "1c5a61e8-13e4-45e6-8a62-74f61f4c1afe",
           "Alias": "header",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Name": "Header"
         },
         {
           "Key": "22e91287-3baa-4bb1-b195-14d807021d15",
           "Alias": "links",
           "DataType": "umb://data-type/b4e3535a175347e28568602cf8cfee6f",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
           "Mandatory": true,
           "Name": "Links",
           "SortOrder": 1
@@ -51,5 +53,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

@@ -22,6 +22,7 @@
           "Key": "93c6c29b-4d25-4665-836b-7683e991f5d8",
           "Alias": "title",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Mandatory": true,
           "Name": "Title",
           "SortOrder": 1
@@ -30,6 +31,7 @@
           "Key": "d925d71c-7314-4373-bad1-59003af49e54",
           "Alias": "text",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "Small text to the left-hand side of the title",
           "Name": "Text"
         }
@@ -49,5 +51,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

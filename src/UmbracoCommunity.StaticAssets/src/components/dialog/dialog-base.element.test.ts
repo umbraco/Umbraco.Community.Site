@@ -52,10 +52,9 @@ describe("DcDialogBaseElement", () => {
       expect(h2?.textContent).toBe("Dialog Title");
     });
 
-    it("should render empty header when not provided", async () => {
+    it("should not render header when not provided", async () => {
       const h2 = element.shadowRoot?.querySelector("h2");
-      expect(h2).toBeTruthy();
-      expect(h2?.textContent).toBe("");
+      expect(h2).toBeNull();
     });
   });
 
@@ -90,9 +89,16 @@ describe("DcDialogBaseElement", () => {
       expect(closeButton).toBeTruthy();
     });
 
-    it("should render header element", () => {
+    it("should render header element when header is set", async () => {
+      element.header = "Test";
+      await element.updateComplete;
       const header = element.shadowRoot?.querySelector("h2");
       expect(header).toBeTruthy();
+    });
+
+    it("should not render header element when header is not set", () => {
+      const header = element.shadowRoot?.querySelector("h2");
+      expect(header).toBeNull();
     });
 
     it("should render body content from abstract method", () => {
@@ -101,14 +107,23 @@ describe("DcDialogBaseElement", () => {
       expect(body?.textContent).toBe("Test Content");
     });
 
-    it("should maintain correct render order", () => {
+    it("should maintain correct render order when header is set", async () => {
+      element.header = "Title";
+      await element.updateComplete;
+
       const children = Array.from(element.shadowRoot?.children || []);
       expect(children.length).toBeGreaterThan(0);
-      
+
       // Close button should be first
       expect(children[0]?.id).toBe("close");
       // Header should be second
       expect(children[1]?.tagName.toLowerCase()).toBe("h2");
+    });
+
+    it("should render body directly after close button when no header", () => {
+      const children = Array.from(element.shadowRoot?.children || []);
+      expect(children[0]?.id).toBe("close");
+      expect(children[1]?.classList.contains("test-body")).toBe(true);
     });
   });
 

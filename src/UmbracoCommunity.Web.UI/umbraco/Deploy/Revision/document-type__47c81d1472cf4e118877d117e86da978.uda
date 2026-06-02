@@ -9,9 +9,7 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
-  "CompositionContentTypes": [
-    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
-  ],
+  "CompositionContentTypes": [],
   "PropertyGroups": [
     {
       "Key": "5407f0be-a8e0-4566-bbc0-778e2e136716",
@@ -23,6 +21,7 @@
           "Key": "85a396fa-ba08-4ffa-b22a-3777989239f9",
           "Alias": "headerNavigationItems",
           "DataType": "umb://data-type/60af5f142cfe48e3a441f88caf0103b4",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
           "Name": "Header navigation items",
           "LabelOnTop": true
         },
@@ -30,6 +29,7 @@
           "Key": "8e271aea-fb83-49e1-b242-07b09734e8f6",
           "Alias": "callToActionButton",
           "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
           "Name": "Call to action button",
           "SortOrder": 1
         }
@@ -46,6 +46,7 @@
           "Key": "94ea89c5-6222-4a1b-a8dc-753aaff45776",
           "Alias": "socialSharingLinks",
           "DataType": "umb://data-type/0130d85ac9d54a6696cbbed0de6bb3d3",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Social sharing links",
           "SortOrder": 2
         },
@@ -53,6 +54,7 @@
           "Key": "ba19a1fe-3dc6-4f87-959d-9e0e3f01f83c",
           "Alias": "bottomLinks",
           "DataType": "umb://data-type/b4e3535a175347e28568602cf8cfee6f",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
           "Description": "Shown in the bottom left of the page",
           "Name": "Bottom links",
           "SortOrder": 1
@@ -61,6 +63,7 @@
           "Key": "cc5e9678-13d7-4872-93e4-429f54518d3e",
           "Alias": "footerLinks",
           "DataType": "umb://data-type/45bfbb05838d4d289a7cf83babc05947",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Description": "Maximum 4 columns",
           "Name": "Footer links",
           "LabelOnTop": true
@@ -94,12 +97,8 @@
     {
       "Udi": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
       "Ordering": true
-    },
-    {
-      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-      "Ordering": true
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

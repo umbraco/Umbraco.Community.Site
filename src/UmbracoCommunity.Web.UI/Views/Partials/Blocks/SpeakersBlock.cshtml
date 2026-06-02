@@ -14,7 +14,15 @@
             </div>
         }
 
-        <div class="dc-speakers-grid">
+        @{
+            var columns = int.TryParse(Model.Settings?.SpeakersPerRow, out var parsed) ? parsed : 0;
+            if (columns <= 0)
+            {
+                columns = Math.Min(Model.Content.Speakers.Count(), 5);
+            }
+            var dataColumns = columns is > 0 and not 4 ? $" data-columns=\"{columns}\"" : string.Empty;
+        }
+        <div class="dc-speakers-grid"@Html.Raw(dataColumns)>
             @foreach (var item in Model.Content.Speakers)
             {
                 var speaker = item.Content as SpeakerItemBlock;

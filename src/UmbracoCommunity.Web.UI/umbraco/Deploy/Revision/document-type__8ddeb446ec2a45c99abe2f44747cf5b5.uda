@@ -8,13 +8,14 @@
   "Permissions": {
     "AllowedChildContentTypes": [
       "umb://document-type/47c81d1472cf4e118877d117e86da978",
-      "umb://document-type/0587e80766d04c9390116e361a741dd4"
+      "umb://document-type/0587e80766d04c9390116e361a741dd4",
+      "umb://document-type/d79047e31c8b4466bffec67a24bcd536",
+      "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
+      "umb://document-type/23f25b01e427405d8aced3e729d15318"
     ]
   },
   "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
-  "CompositionContentTypes": [
-    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
-  ],
+  "CompositionContentTypes": [],
   "PropertyGroups": [
     {
       "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
@@ -26,6 +27,7 @@
           "Key": "17c407e6-51e5-4823-8b81-03544b0ee799",
           "Alias": "siteName",
           "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
           "Description": "This will be displayed in the site title",
           "Mandatory": true,
           "Name": "Site name"
@@ -34,6 +36,7 @@
           "Key": "5ea21ec8-eb5c-480a-9ec3-c7d03ff7016f",
           "Alias": "favicon",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "Select a square image. A favicon is the tiny icon a website shows in your browser tab, bookmarks, and shortcuts; the site\u0027s miniature logo.",
           "Name": "Favicon",
           "SortOrder": 3
@@ -42,6 +45,7 @@
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "The header logo that will be featured on initial load. Note this needs to be a specially prepared SVG to work properly.",
           "Mandatory": true,
           "Name": "Header logo",
@@ -51,6 +55,7 @@
           "Key": "f7c32471-8614-4f4c-8e1d-261b91a57220",
           "Alias": "footerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Description": "If left blank, the main header logo will be used",
           "Name": "Footer logo",
           "SortOrder": 2
@@ -82,14 +87,22 @@
       "Mode": "Exist"
     },
     {
+      "Udi": "umb://document-type/23f25b01e427405d8aced3e729d15318",
+      "Mode": "Exist"
+    },
+    {
       "Udi": "umb://document-type/47c81d1472cf4e118877d117e86da978",
       "Mode": "Exist"
     },
     {
-      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-      "Ordering": true
+      "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://document-type/d79047e31c8b4466bffec67a24bcd536",
+      "Mode": "Exist"
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

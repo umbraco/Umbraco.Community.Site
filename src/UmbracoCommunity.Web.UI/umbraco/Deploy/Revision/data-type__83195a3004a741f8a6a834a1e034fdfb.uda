@@ -1,0 +1,15 @@
+{
+  "Name": "Numeric (min 3, step 1, max 12)",
+  "EditorAlias": "Umbraco.Integer",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Integer",
+  "DatabaseType": "Integer",
+  "Configuration": {
+    "min": 3,
+    "step": 1,
+    "max": 12
+  },
+  "Udi": "umb://data-type/83195a3004a741f8a6a834a1e034fdfb",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

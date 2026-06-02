@@ -3,7 +3,57 @@
   "EditorAlias": "Umbraco.MediaPicker3",
   "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
   "Configuration": {
-    "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c,cc07b313-0843-4aa8-bbda-871c8da728c8"
+    "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c,cc07b313-0843-4aa8-bbda-871c8da728c8",
+    "crops": [
+      {
+        "label": "Mobile",
+        "alias": "mobile",
+        "width": 480,
+        "height": 270
+      },
+      {
+        "label": "Mobile 2x",
+        "alias": "mobile2x",
+        "width": 960,
+        "height": 540
+      },
+      {
+        "label": "Desktop",
+        "alias": "desktop",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "label": "Desktop 2x",
+        "alias": "desktop2x",
+        "width": 2560,
+        "height": 1440
+      },
+      {
+        "label": "OG",
+        "alias": "og",
+        "width": 1200,
+        "height": 630
+      },
+      {
+        "label": "Card",
+        "alias": "card",
+        "width": 600,
+        "height": 400
+      },
+      {
+        "label": "Card 2x",
+        "alias": "card2x",
+        "width": 1200,
+        "height": 800
+      },
+      {
+        "label": "Logo",
+        "alias": "logo",
+        "width": 600,
+        "height": 200
+      }
+    ]
   },
   "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
   "Dependencies": [
@@ -17,5 +67,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

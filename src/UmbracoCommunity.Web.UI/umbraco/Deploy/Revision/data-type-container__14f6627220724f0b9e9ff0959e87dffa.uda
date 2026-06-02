@@ -4,5 +4,5 @@
   "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContainerArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

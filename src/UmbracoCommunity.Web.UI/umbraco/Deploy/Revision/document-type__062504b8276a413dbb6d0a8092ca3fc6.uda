@@ -21,9 +21,19 @@
           "Key": "785fc852-3c3e-4f41-b747-5a917c6a74b1",
           "Alias": "link",
           "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
           "Description": "Select a destination page for the navigation item.",
           "Mandatory": true,
           "Name": "Link"
+        },
+        {
+          "Key": "c16a903a-b02d-475b-844a-b0a632894081",
+          "Alias": "linkTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "If nothing entered, this will default to the page name",
+          "Name": "Link title",
+          "SortOrder": 1
         }
       ]
     }
@@ -31,6 +41,10 @@
   "PropertyTypes": [],
   "Udi": "umb://document-type/062504b8276a413dbb6d0a8092ca3fc6",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
       "Ordering": true
@@ -41,5 +55,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

@@ -1,0 +1,56 @@
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Extensions
+@model IReadOnlyList<IPublishedContent>
+
+@functions {
+    private static string? FirstNonEmpty(IPublishedContent content, params string[] aliases)
+    {
+        foreach (var alias in aliases)
+        {
+            var v = content.Value<string>(alias);
+            if (!string.IsNullOrWhiteSpace(v)) return v.Trim();
+        }
+        return null;
+    }
+}
+
+@if (Model is { Count: > 0 })
+{
+    <section class="dc-page-not-found-suggestions">
+        <h2 class="dc-page-not-found-suggestions__heading">Perhaps it was one of these?</h2>
+        <ul class="dc-page-not-found-suggestions__list">
+            @foreach (var item in Model)
+            {
+                var description = FirstNonEmpty(item, "metaDescription", "subtitle", "intro", "summary");
+                // Crumbs from tenant root → parent of item. We always prepend a "Home" label
+                // so the path is unambiguous regardless of nesting depth.
+                var crumbs = new List<string> { "Home" };
+                crumbs.AddRange(item.AncestorsOrSelf()
+                    .Reverse()
+                    .Skip(1)        // tenant root (its name is replaced by "Home")
+                    .SkipLast(1)    // the item itself — its name is the card title
+                    .Select(a => a.Name));
+
+                <li>
+                    <a class="dc-page-not-found-suggestions__link" href="@item.Url(mode: UrlMode.Relative)">
+                        <span class="dc-page-not-found-suggestions__title">@item.Name</span>
+                        <span class="dc-page-not-found-suggestions__breadcrumb">
+                            @for (var i = 0; i < crumbs.Count; i++)
+                            {
+                                if (i > 0)
+                                {
+                                    <span class="dc-page-not-found-suggestions__sep" aria-hidden="true">→</span>
+                                }
+                                <span>@crumbs[i]</span>
+                            }
+                        </span>
+                        @if (!string.IsNullOrEmpty(description))
+                        {
+                            <span class="dc-page-not-found-suggestions__description">@description</span>
+                        }
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}

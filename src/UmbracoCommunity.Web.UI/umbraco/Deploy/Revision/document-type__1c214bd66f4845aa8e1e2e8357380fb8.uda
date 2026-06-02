@@ -21,6 +21,7 @@
           "Key": "8fb0aa7c-9cbe-435b-94f9-c6a77e5f1185",
           "Alias": "columns",
           "DataType": "umb://data-type/29a83befe82e45e8a73792a2e242ea30",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
           "Description": "Minimum of 1 and maximum of 3 columns",
           "Name": "Columns",
           "SortOrder": 1,
@@ -30,6 +31,7 @@
           "Key": "de5780cf-24f4-471a-a135-9c3b69a4ac0b",
           "Alias": "sectionName",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Description": "Section headline (max 25 chars)",
           "Mandatory": true,
           "Name": "Section name"
@@ -54,5 +56,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

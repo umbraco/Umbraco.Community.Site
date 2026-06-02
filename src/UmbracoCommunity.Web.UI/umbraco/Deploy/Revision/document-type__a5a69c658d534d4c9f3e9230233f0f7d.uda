@@ -21,6 +21,7 @@
           "Key": "978632cc-9f5e-4300-a25c-e2b0018e7e33",
           "Alias": "quoteText",
           "DataType": "umb://data-type/49a56007fd464e5f9c244386d730a4dd",
+          "ValueType": "System.String",
           "Description": "Max length 235",
           "Mandatory": true,
           "Name": "Quote text"
@@ -29,6 +30,7 @@
           "Key": "ade0dae3-9966-4410-a034-e5c786f008b2",
           "Alias": "attribution",
           "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
           "Description": "Max length 25",
           "Name": "Attribution",
           "SortOrder": 1
@@ -53,5 +55,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

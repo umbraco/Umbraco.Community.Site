@@ -18,10 +18,99 @@
     "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
     "umb://document-type/7828752a59fa481e8d5c85c75de9455f"
   ],
-  "PropertyGroups": [],
+  "PropertyGroups": [
+    {
+      "Key": "6dcda17b-67ba-422b-801c-65eb3f5705f0",
+      "Name": "Settings",
+      "SortOrder": 1000,
+      "Type": 1,
+      "Alias": "settings",
+      "PropertyTypes": []
+    },
+    {
+      "Key": "767c9c37-13c3-4b41-84ce-1299902b1fef",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "db7ed1b5-fc12-4e9d-844e-d0b738829241",
+          "Alias": "featuredBlogPost",
+          "DataType": "umb://data-type/fd1e0da556064862b6795d0cf3a52a59",
+          "ValueType": "Umbraco.Cms.Core.Models.PublishedContent.IPublishedContent",
+          "Name": "Featured blog post"
+        }
+      ]
+    },
+    {
+      "Key": "a9e16379-0475-4b33-af3f-18726c8eb719",
+      "Name": "Paging",
+      "Alias": "settings/paging",
+      "PropertyTypes": [
+        {
+          "Key": "c038649e-3694-4e7b-ac9a-79056538d49b",
+          "Alias": "numberOfBlogArticlesPerPage",
+          "DataType": "umb://data-type/16475fdf08f14127be207dfad649583e",
+          "ValueType": "System.Int32",
+          "Name": "Number of blog articles per page"
+        }
+      ]
+    },
+    {
+      "Key": "b1a2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "Name": "RSS",
+      "SortOrder": 1,
+      "Type": 1,
+      "Alias": "rSS",
+      "PropertyTypes": [
+        {
+          "Key": "a1b2c3d4-1111-4a7b-8c9d-0e1f2a3b4c5d",
+          "Alias": "rssTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Title shown in the RSS feed channel. Defaults to the page name if empty.",
+          "Name": "Feed title"
+        },
+        {
+          "Key": "a1b2c3d4-2222-4a7b-8c9d-0e1f2a3b4c5d",
+          "Alias": "rssDescription",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Description": "Description shown in the RSS feed channel.",
+          "Name": "Feed description",
+          "SortOrder": 1
+        },
+        {
+          "Key": "a1b2c3d4-3333-4a7b-8c9d-0e1f2a3b4c5d",
+          "Alias": "rssItemCount",
+          "DataType": "umb://data-type/16475fdf08f14127be207dfad649583e",
+          "ValueType": "System.Int32",
+          "Description": "Maximum number of articles in the RSS feed. Defaults to 25 if empty.",
+          "Name": "Number of feed items",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
   "PropertyTypes": [],
   "Udi": "umb://document-type/8e1503b98fa94a84b3a6a3eba44f81e2",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/16475fdf08f14127be207dfad649583e",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/fd1e0da556064862b6795d0cf3a52a59",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
       "Ordering": true
@@ -45,5 +134,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.1"
+  "__version": "17.1.0"
 }

@@ -53,6 +53,16 @@
   text-decoration: none;
 }
 
+.card-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: var(--border-radius);
+}
+
+.card-link:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .card-content {
   position: relative;
   display: flex;

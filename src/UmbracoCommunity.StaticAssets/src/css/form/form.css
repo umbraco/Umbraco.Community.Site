@@ -2,16 +2,17 @@
 @import "./checkboxlist.css";
 @import "./validation.css";
 @import "./navigation.css";
+@import "./form-steps.css";
 
 /* matches max-width of inputs */
 .umbraco-forms-page {
   max-width: 400px;
   margin: 0 auto;
 
-  color: var(--block-text-color);
+  color: inherit;
 
   a {
-    color: var(--block-link-color);
+    color: inherit;
   }
 }
 

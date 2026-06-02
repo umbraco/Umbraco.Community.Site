@@ -1,0 +1,10 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<NavigationSectionColumn>>
+
+@{
+    var linkCount = Model.Content.NavigationColumnItems?.Count() ?? 0;
+}
+
+<div class="dc-navigation-section-preview__column">
+    <h4>@(string.IsNullOrWhiteSpace(Model.Content.Headline) ? "Untitled column" : Model.Content.Headline)</h4>
+    <p class="dc-navigation-section-preview__count">@linkCount link@(linkCount == 1 ? "" : "s")</p>
+</div>

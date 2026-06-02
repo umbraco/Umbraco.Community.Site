@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Content page</summary>
 	[PublishedModel("contentPage")]
-	public partial class ContentPage : PublishedContentModel, IBannerBlockGeneral, IContentBlocksContentPage, IPageConfiguration, ISeo
+	public partial class ContentPage : PublishedContentModel, ICompositionBannerBlock, ICompositionContentBlocks, ICompositionPageConfiguration, ICompositionSeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -55,7 +55,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("bannerContent")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BannerContent => global::UmbracoCommunity.Web.Models.PublishedModels.BannerBlockGeneral.GetBannerContent(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel BannerContent => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionBannerBlock.GetBannerContent(this, _publishedValueFallback);
 
 		///<summary>
 		/// Content blocks
@@ -63,14 +63,21 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("contentBlocks")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlocksContentPage.GetContentBlocks(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionContentBlocks.GetContentBlocks(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
 
 		///<summary>
 		/// Hide from sitemap
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("hideFromSitemap")]
-		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.PageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 
 		///<summary>
 		/// Custom schema: Here you can provide a custom schema for specific page. The schema is used for better indexing in search engines and serving rich search results. No script tags.
@@ -78,7 +85,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("customSchema")]
-		public virtual string CustomSchema => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetCustomSchema(this, _publishedValueFallback);
+		public virtual string CustomSchema => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionSeo.GetCustomSchema(this, _publishedValueFallback);
 
 		///<summary>
 		/// Meta description: Here you can provide a summary of the page. The summary is read by search engines to determine what the page is all about. Ideally 130-155 character
@@ -86,7 +93,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("metaDescription")]
-		public virtual string MetaDescription => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetMetaDescription(this, _publishedValueFallback);
+		public virtual string MetaDescription => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionSeo.GetMetaDescription(this, _publishedValueFallback);
 
 		///<summary>
 		/// Meta title: Here you can provide a title that will be used in the browser tab. The page name will be used as a fallback, in case you do not provide a title. Ideally 50-60 characters.
@@ -94,7 +101,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("metaTitle")]
-		public virtual string MetaTitle => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetMetaTitle(this, _publishedValueFallback);
+		public virtual string MetaTitle => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionSeo.GetMetaTitle(this, _publishedValueFallback);
 
 		///<summary>
 		/// OG Image: Here you can select an image that will be shown when the page is shared on social via open graph
@@ -102,7 +109,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("ogImage")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops OgImage => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetOgImage(this, _publishedValueFallback);
+		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops OgImage => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionSeo.GetOgImage(this, _publishedValueFallback);
 
 		///<summary>
 		/// Robots: Here you can override the robots meta tag on the current page to affect how search engines will crawl and index it.
@@ -110,6 +117,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("robots")]
-		public virtual string Robots => global::UmbracoCommunity.Web.Models.PublishedModels.Seo.GetRobots(this, _publishedValueFallback);
+		public virtual string Robots => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionSeo.GetRobots(this, _publishedValueFallback);
 	}
 }
