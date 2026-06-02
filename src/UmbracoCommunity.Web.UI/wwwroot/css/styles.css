@@ -291,6 +291,23 @@ ol.no-margin p {
     stroke: #283A97;
 }
 
+/* Give the transparent button a dark backdrop in the RTE editor so it's
+   visible against the light editor surface. Cancelled in contexts that
+   already provide a dark background. */
+.cta-link:has(.btn.is-transparent) {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #283A97;
+    border-radius: 8px;
+}
+
+.dc-text-block .cta-link:has(.btn.is-transparent) {
+    display: block;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+}
+
 .dc-big-cta-block__content h2 {
     font-size: 40px;
     font-style: normal;
