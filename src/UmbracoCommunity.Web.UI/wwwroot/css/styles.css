@@ -196,6 +196,16 @@ ol.no-margin p {
     background-color: #283A97;
 }
 
+.btn.is-transparent {
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.btn.is-transparent:hover {
+    background-color: #ffffff;
+    color: #283A97;
+}
+
 .btn.arrow {
     padding: 0 0 0 20px;
 }
@@ -225,7 +235,59 @@ ol.no-margin p {
     border-color: #283A97;
 }
 
-.btn.cta svg path {
+.btn.cta svg path,
+.btn.cta.is-white:hover svg path {
+    stroke: #283A97;
+}
+
+.btn.cta.is-transparentblue svg {
+    background-color: #283A97;
+    border-color: #283A97;
+}
+
+.btn.cta.is-transparentblue svg path {
+    stroke: #ffffff;
+}
+
+.btn.cta.is-transparentblue:hover svg {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn.cta.is-transparentblue:hover svg path {
+    stroke: #283A97;
+}
+
+.btn.cta.is-white svg {
+    background-color: #283A97;
+    border-color: #283A97;
+}
+
+.btn.cta.is-white svg path {
+    stroke: #ffffff;
+}
+
+.btn.cta.is-white:hover svg {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    border-radius: 50%;
+}
+
+.btn.cta.is-whitepink {
+    background-color: #ffffff;
+}
+
+.btn.cta.is-whitepink svg {
+    background-color: #f5c1bc;
+    border-color: #f5c1bc;
+}
+
+.btn.cta.is-whitepink:hover {
+    background-color: #f5c1bc;
+    color: #283A97;
+}
+
+.btn.cta.is-whitepink:hover svg path {
     stroke: #283A97;
 }
 
@@ -767,20 +829,26 @@ dc-image-slider img {
 
 .dc-text-block.has-image {
     position: relative;
+    padding: 0;
 }
 
-.dc-text-block.has-image img {
+.dc-text-block.has-image > picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.dc-text-block.has-image > picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 20px;
 }
 
 .dc-text-block.has-image .dc-text-block__content {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 20px;
+    position: relative;
     padding: 20px;
-    width: 100%;
-    color: #ffffff;
 }
 
 /* Slider block */

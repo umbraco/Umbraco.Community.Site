@@ -7,7 +7,7 @@
 
 @if (Model?.Content?.CallToActionLink != null)
 {
-    var linkColour = Context.Request.IsBlockPreviewRequest() || Model.Settings?.ButtonColour == null ? defaultLinkColour : Model.Settings?.ButtonColour;
+    var linkColour = Model.Settings?.ButtonColour ?? defaultLinkColour;
     var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
     var linkTarget = Model.Content.CallToActionLink.Target ?? "_self";
     <div class="cta-link">
