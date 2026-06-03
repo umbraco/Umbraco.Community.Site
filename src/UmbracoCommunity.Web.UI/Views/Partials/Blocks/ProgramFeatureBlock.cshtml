@@ -10,17 +10,6 @@
 }
 
 <section class="dc-program-feature" data-program-block="@Model.ContentKey" id="@settings?.BlockId">
-    @if (!string.IsNullOrEmpty(Model.Content.Title))
-    {
-        <h2 class="dc-program-feature__title">@Model.Content.Title</h2>
-    }
-    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
-    {
-        <div class="dc-program-feature__subtitle">
-            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
-        </div>
-    }
-
     <div class="dc-program-feature__body" data-program-body>
         @switch (configContent)
         {
