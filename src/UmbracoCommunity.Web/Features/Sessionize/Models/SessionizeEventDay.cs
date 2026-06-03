@@ -19,9 +19,4 @@ public class SessionizeEventDay
     /// A human-readable display name for the day (e.g., "Wednesday 5 March").
     /// </summary>
     public string DisplayName => Date.ToString("dddd d MMMM");
-
-    /// <summary>
-    /// Whether this is today's date.
-    /// </summary>
-    public bool IsToday => Date.Date == DateTime.Today;
 }

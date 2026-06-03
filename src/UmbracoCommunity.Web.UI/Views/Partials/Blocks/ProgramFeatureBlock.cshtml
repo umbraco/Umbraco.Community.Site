@@ -83,11 +83,14 @@
 @functions {
     private static DateTime? ParseNowOverride(Microsoft.Extensions.Primitives.StringValues raw)
     {
+        // The signage-now value is interpreted as Copenhagen wall-clock time
+        // (matching what's printed on the venue's clocks). Parse without timezone
+        // assumptions so server locale doesn't shift the value.
         if (raw.Count == 0) return null;
         var first = raw[0];
         if (string.IsNullOrWhiteSpace(first)) return null;
         return DateTime.TryParse(first, System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.AssumeLocal, out var parsed)
+            System.Globalization.DateTimeStyles.None, out var parsed)
             ? parsed
             : (DateTime?)null;
     }
