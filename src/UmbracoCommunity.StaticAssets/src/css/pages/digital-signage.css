@@ -1,0 +1,348 @@
+@import "../base/media-queries.css";
+@import "../root.css";
+
+.dc-signage {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-page-surface);
+  color: var(--color-identity-blue);
+  font-family: 'Lato', 'Helvetica', 'Arial', sans-serif;
+  font-size: clamp(18px, 1.5vw, 32px);
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+
+.dc-signage__main {
+  max-width: 2400px;
+  margin: 0 auto;
+  padding: 2.5rem 3rem;
+}
+
+.dc-program-feature {
+  margin-bottom: 3rem;
+}
+
+.dc-signage__clock {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 16px rgba(40, 58, 151, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+.dc-signage__clock-time {
+  font-size: clamp(1.5rem, 1.8vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
+
+.dc-signage__clock-date {
+  font-size: clamp(0.75rem, 0.7vw, 1.1rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-identity-yellow);
+}
+
+.dc-signage__clock.is-simulated::after {
+  content: "SIMULATED";
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  background: var(--color-identity-orange);
+  color: var(--color-identity-blue);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.dc-program-feature__title {
+  font-size: clamp(2.5rem, 5vw, 7rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-identity-blue);
+}
+
+.dc-program-feature__subtitle {
+  font-size: clamp(1.1rem, 1.3vw, 2rem);
+  color: var(--color-light-blue);
+  margin-bottom: 2.5rem;
+}
+
+.dc-program-feature__empty {
+  font-size: clamp(1.1rem, 1.3vw, 1.75rem);
+  color: var(--color-dark-grey);
+  font-style: italic;
+}
+
+.dc-program-rooms {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.dc-program-room {
+  background: var(--color-identity-white);
+  border-radius: var(--border-radius-xl);
+  padding: 1.75rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 2px 12px rgba(40, 58, 151, 0.08);
+}
+
+.dc-program-room__name {
+  font-size: clamp(1.1rem, 1.4vw, 2rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  border-bottom: 3px solid var(--color-identity-yellow);
+  padding-bottom: 0.75rem;
+}
+
+.dc-program-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dc-program-slot__label {
+  font-size: clamp(0.75rem, 0.8vw, 1.25rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.3rem;
+  align-self: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.dc-program-slot--current {
+  flex: 1;
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+  padding: 1.75rem 2rem;
+  border-radius: var(--border-radius-lg);
+  margin: 0 -0.5rem;
+}
+
+.dc-program-slot--current .dc-program-slot__label {
+  background: var(--color-identity-orange);
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(2rem, 4vw, 5rem);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-yellow);
+}
+
+.dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(1.35rem, 2vw, 2.75rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--color-identity-pink);
+}
+
+.dc-program-slot--next {
+  padding: 0 0.5rem;
+}
+
+.dc-program-slot--next .dc-program-slot__label {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+  border: 1px solid rgba(40, 58, 151, 0.15);
+}
+
+.dc-program-slot--next .dc-program-slot__title {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--next .dc-program-slot__time {
+  font-size: clamp(1rem, 1.2vw, 1.75rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-orange);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dc-program-slot--next .dc-program-slot__speakers {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  margin: 0;
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot__empty {
+  font-size: clamp(1rem, 1.1vw, 1.5rem);
+  margin: 0;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.dc-program-slot.is-empty {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot--current.is-empty {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot--current.is-empty .dc-program-slot__label {
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+}
+
+.dc-program-sessions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.dc-program-session {
+  background: var(--color-identity-white);
+  border-left: 8px solid var(--color-identity-orange);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 12px rgba(40, 58, 151, 0.06);
+}
+
+.dc-program-session__time {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  color: var(--color-identity-orange);
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.dc-program-session__title {
+  font-size: clamp(1.5rem, 2vw, 2.75rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+  color: var(--color-identity-blue);
+}
+
+.dc-program-session__room,
+.dc-program-session__speakers {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  margin: 0;
+  color: var(--color-light-blue);
+}
+
+.dc-program-rooms:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room {
+  padding: 2.5rem 3rem 3rem;
+  gap: 2rem;
+  min-height: calc(100vh - 12rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__name {
+  font-size: clamp(1.5rem, 2vw, 3rem);
+  padding-bottom: 1rem;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current {
+  padding: 3rem;
+  gap: 1.5rem;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__label {
+  font-size: clamp(1rem, 1.2vw, 1.75rem);
+  padding: 0.5rem 1.2rem;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(2.5rem, 5vw, 12rem);
+  line-height: 1.05;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(2rem, 3.5vw, 5rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(2rem, 4vw, 6rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__label {
+  font-size: clamp(0.9rem, 1vw, 1.5rem);
+  margin: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__title {
+  font-size: clamp(1.4rem, 1.8vw, 2.75rem);
+  line-height: 1.15;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__time {
+  font-size: clamp(1.1rem, 1.4vw, 2.25rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__speakers {
+  grid-column: 1 / -1;
+  font-size: clamp(1rem, 1.2vw, 1.75rem);
+}
+
+@media (--sm) {
+  .dc-program-rooms {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+
+  .dc-program-rooms:has(> :only-child) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (--lg) {
+  .dc-signage__main {
+    padding: 3rem 4rem;
+  }
+}

@@ -1,0 +1,31 @@
+@using UmbracoCommunity.Web.Models.Pages
+@inherits UmbracoViewPage<ContentPageViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.Name</title>
+    <link rel="stylesheet" vite-href="digital-signage" asp-add-nonce="true" />
+</head>
+<body class="dc-signage">
+    @{
+        var signageNowRaw = Context.Request.Query["signage-now"].ToString();
+    }
+    <div class="dc-signage__clock @(string.IsNullOrEmpty(signageNowRaw) ? string.Empty : "is-simulated")"
+         data-signage-clock
+         data-signage-now="@signageNowRaw">
+        <span class="dc-signage__clock-time" data-clock-time>--:--</span>
+        <span class="dc-signage__clock-date" data-clock-date>—</span>
+    </div>
+    <main class="dc-signage__main">
+        <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" for="BlockContent" />
+    </main>
+    <script vite-src="digital-signage" vite-client="true" asp-add-nonce="true"></script>
+</body>
+</html>
