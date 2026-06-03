@@ -1,0 +1,15 @@
+{
+  "Name": "Digital signage page",
+  "Alias": "digitalSignagePage",
+  "File": "umb://template-file/digitalSignagePage.cshtml",
+  "Udi": "umb://template/0bbe211b4b154c28a19092be76348181",
+  "Dependencies": [
+    {
+      "Udi": "umb://template-file/digitalSignagePage.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "17.1.0"
+}

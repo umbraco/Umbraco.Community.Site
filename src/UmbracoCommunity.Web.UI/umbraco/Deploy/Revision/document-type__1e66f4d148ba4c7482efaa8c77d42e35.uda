@@ -3,6 +3,7 @@
   "Alias": "contentPage",
   "DefaultTemplate": "umb://template/9ec150a01fee402ab085938a7ea2db97",
   "AllowedTemplates": [
+    "umb://template/0bbe211b4b154c28a19092be76348181",
     "umb://template/9ec150a01fee402ab085938a7ea2db97"
   ],
   "HistoryCleanup": {},
@@ -47,6 +48,11 @@
     {
       "Udi": "umb://document-type/7828752a59fa481e8d5c85c75de9455f",
       "Ordering": true
+    },
+    {
+      "Udi": "umb://template/0bbe211b4b154c28a19092be76348181",
+      "Ordering": true,
+      "Mode": "Exist"
     },
     {
       "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
