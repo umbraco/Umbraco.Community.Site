@@ -3,6 +3,19 @@ import "../css/pages/digital-signage.css";
 const REFRESH_INTERVAL_MS = 60_000;
 const EVENT_TIMEZONE = "Europe/Copenhagen";
 
+const initialClock = document.querySelector<HTMLElement>("[data-signage-clock]");
+const initialOverrideRaw = initialClock?.dataset.signageNow ?? "";
+const initialOverrideStart = initialOverrideRaw ? Date.parse(initialOverrideRaw) : NaN;
+const usingOverride = !Number.isNaN(initialOverrideStart);
+const overrideStart = usingOverride ? initialOverrideStart : 0;
+const pageLoadAt = Date.now();
+
+function currentSimulatedTime(): Date {
+  return usingOverride
+    ? new Date(overrideStart + (Date.now() - pageLoadAt))
+    : new Date();
+}
+
 function ordinalSuffix(n: number): string {
   const mod100 = n % 100;
   if (mod100 >= 11 && mod100 <= 13) return "th";
@@ -14,23 +27,24 @@ function ordinalSuffix(n: number): string {
   }
 }
 
-function startClock() {
+let clockInterval: number | undefined;
+
+function bindClock() {
+  if (clockInterval !== undefined) {
+    window.clearInterval(clockInterval);
+    clockInterval = undefined;
+  }
+
   const root = document.querySelector<HTMLElement>("[data-signage-clock]");
   if (!root) return;
-
   const timeEl = root.querySelector<HTMLElement>("[data-clock-time]");
   const dateEl = root.querySelector<HTMLElement>("[data-clock-date]");
   if (!timeEl || !dateEl) return;
 
-  const overrideRaw = root.dataset.signageNow ?? "";
-  const overrideStart = overrideRaw ? Date.parse(overrideRaw) : NaN;
-  const usingOverride = !Number.isNaN(overrideStart);
-  const pageLoadAt = Date.now();
+  let lastDateText = "";
 
   const tick = () => {
-    const now = usingOverride
-      ? new Date(overrideStart + (Date.now() - pageLoadAt))
-      : new Date();
+    const now = currentSimulatedTime();
 
     timeEl.textContent = now.toLocaleTimeString("en-GB", {
       timeZone: usingOverride ? undefined : EVENT_TIMEZONE,
@@ -39,9 +53,9 @@ function startClock() {
       second: "2-digit",
       hour12: false,
     });
-    const tz = usingOverride ? undefined : EVENT_TIMEZONE;
+
     const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: tz,
+      timeZone: usingOverride ? undefined : EVENT_TIMEZONE,
       weekday: "short",
       day: "numeric",
       month: "long",
@@ -49,14 +63,25 @@ function startClock() {
     const partOf = (type: Intl.DateTimeFormatPartTypes) =>
       parts.find((p) => p.type === type)?.value ?? "";
     const dayNum = parseInt(partOf("day"), 10);
-    dateEl.textContent = `${partOf("weekday")} ${dayNum}${ordinalSuffix(dayNum)} ${partOf("month")}`;
+    const dateText = `${partOf("weekday")} ${dayNum}${ordinalSuffix(dayNum)} ${partOf("month")}`;
+    if (dateText !== lastDateText) {
+      dateEl.textContent = dateText;
+      lastDateText = dateText;
+    }
   };
 
   tick();
-  window.setInterval(tick, 1000);
+  clockInterval = window.setInterval(tick, 1000);
 }
 
-startClock();
+bindClock();
+
+function buildRefreshUrl(): string {
+  if (!usingOverride) return window.location.href;
+  const url = new URL(window.location.href);
+  url.searchParams.set("signage-now", currentSimulatedTime().toISOString());
+  return url.toString();
+}
 
 async function refreshProgramBlocks() {
   if (document.hidden) {
@@ -64,7 +89,7 @@ async function refreshProgramBlocks() {
   }
 
   try {
-    const response = await fetch(window.location.href, {
+    const response = await fetch(buildRefreshUrl(), {
       cache: "no-cache",
       headers: { "X-Signage-Refresh": "1" },
     });
@@ -91,6 +116,8 @@ async function refreshProgramBlocks() {
         targetBody.replaceWith(freshBody);
       }
     });
+
+    bindClock();
   } catch (err) {
     console.warn("Signage refresh threw:", err);
   }

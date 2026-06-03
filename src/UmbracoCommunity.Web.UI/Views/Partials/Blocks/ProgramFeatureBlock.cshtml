@@ -151,8 +151,10 @@
     private static string FormatTimeRange(SessionizeSession session)
     {
         if (!session.StartsAt.HasValue) return string.Empty;
-        var start = session.StartsAt.Value.ToString("HH:mm");
-        var end = session.EndsAt?.ToString("HH:mm");
+        var start = ProgramSessionResolver.ToEventTime(session.StartsAt.Value).ToString("HH:mm");
+        var end = session.EndsAt.HasValue
+            ? ProgramSessionResolver.ToEventTime(session.EndsAt.Value).ToString("HH:mm")
+            : null;
         return string.IsNullOrEmpty(end) ? start : $"{start} – {end}";
     }
 

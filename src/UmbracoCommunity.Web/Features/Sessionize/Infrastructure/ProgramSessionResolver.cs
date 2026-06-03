@@ -36,10 +36,11 @@ public class ProgramSessionResolver
         {
             var roomSessions = byRoom.TryGetValue(roomId, out var rs) ? rs : new List<SessionizeSession>();
 
-            var current = roomSessions.FirstOrDefault(s => s.StartsAt!.Value <= now && now < s.EndsAt!.Value);
+            var current = roomSessions.FirstOrDefault(s =>
+                ToEventTime(s.StartsAt!.Value) <= now && now < ToEventTime(s.EndsAt!.Value));
             var next = current != null
-                ? roomSessions.FirstOrDefault(s => s.StartsAt > current.EndsAt)
-                : roomSessions.FirstOrDefault(s => s.StartsAt > now);
+                ? roomSessions.FirstOrDefault(s => ToEventTime(s.StartsAt!.Value) > ToEventTime(current.EndsAt!.Value))
+                : roomSessions.FirstOrDefault(s => ToEventTime(s.StartsAt!.Value) > now);
 
             result.Add(new RoomSessionStatus
             {
@@ -98,6 +99,21 @@ public class ProgramSessionResolver
     }
 
     private static DateTime EventNow() => TimeZoneInfo.ConvertTime(DateTime.UtcNow, EventTimeZone);
+
+    /// <summary>
+    /// Converts a Sessionize timestamp to event-local (Europe/Copenhagen) time.
+    /// Sessionize returns UTC ("…Z"); defensively treats Unspecified Kind as UTC too.
+    /// </summary>
+    public static DateTime ToEventTime(DateTime utc)
+    {
+        var asUtc = utc.Kind switch
+        {
+            DateTimeKind.Utc => utc,
+            DateTimeKind.Local => utc.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(utc, DateTimeKind.Utc),
+        };
+        return TimeZoneInfo.ConvertTimeFromUtc(asUtc, EventTimeZone);
+    }
 
     private static TimeZoneInfo ResolveCopenhagenTimeZone()
     {

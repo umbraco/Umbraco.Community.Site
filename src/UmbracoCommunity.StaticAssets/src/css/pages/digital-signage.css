@@ -54,23 +54,16 @@ html:has(.dc-signage) {
   color: var(--color-light-blue);
 }
 
+.dc-program-room__clock-date::before {
+  content: "/ ";
+  margin-right: 0.1em;
+}
+
 .dc-program-room__clock-time {
   font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.02em;
-}
-
-.dc-program-room__clock.is-simulated::after {
-  content: "SIMULATED";
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  background: var(--color-identity-orange);
-  color: var(--color-identity-blue);
-  padding: 0.2rem 0.5rem;
-  border-radius: 0.25rem;
-  align-self: center;
 }
 
 .dc-program-feature__title {
