@@ -1,6 +1,8 @@
 @import "../base/media-queries.css";
 @import "../root.css";
 
+/* ---------- Codegarden palette overrides ---------- */
+
 :root {
   --color-page-surface: #fff0ea;
   --color-identity-smoke: #fff0ea;
@@ -9,6 +11,8 @@
   --color-light-blue: rgba(40, 58, 151, 0.80);
   --color-dark-grey: rgba(40, 58, 151, 0.80);
 }
+
+/* ---------- Page chrome (full-screen container + outer wrapper) ---------- */
 
 html:has(.dc-signage) {
   height: 100%;
@@ -35,6 +39,8 @@ html:has(.dc-signage) {
 .dc-program-feature {
   margin-bottom: 3rem;
 }
+
+/* ---------- Clock (time + date displayed in single-room header) ---------- */
 
 .dc-program-room__clock {
   margin-left: auto;
@@ -66,6 +72,8 @@ html:has(.dc-signage) {
   letter-spacing: 0.02em;
 }
 
+/* ---------- Program feature intro (title, subtitle, empty fallback) ---------- */
+
 .dc-program-feature__title {
   font-size: clamp(1.75rem, min(4vw, 5vh), 5rem);
   font-weight: 800;
@@ -89,11 +97,15 @@ html:has(.dc-signage) {
   font-style: italic;
 }
 
+/* ---------- Rooms grid container ---------- */
+
 .dc-program-rooms {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
 }
+
+/* ---------- Room card (card surface, header bar, name, logo) ---------- */
 
 .dc-program-room {
   background: var(--color-identity-white);
@@ -135,6 +147,8 @@ html:has(.dc-signage) {
   width: auto;
 }
 
+/* ---------- Program slot — shared base ---------- */
+
 .dc-program-slot {
   display: flex;
   flex-direction: column;
@@ -152,6 +166,8 @@ html:has(.dc-signage) {
   align-self: flex-start;
   margin-bottom: 0.25rem;
 }
+
+/* ---------- Current session slot (with navy + pink triangle motif) ---------- */
 
 .dc-program-slot--current {
   flex: 1;
@@ -225,6 +241,8 @@ html:has(.dc-signage) {
   color: var(--color-identity-pink);
 }
 
+/* ---------- Up next slot ---------- */
+
 .dc-program-slot--next {
   padding: 0 0.5rem;
 }
@@ -258,6 +276,8 @@ html:has(.dc-signage) {
   color: var(--color-light-blue);
 }
 
+/* ---------- Empty / fallback slot states (no current session yet etc.) ---------- */
+
 .dc-program-slot__empty {
   font-size: clamp(1rem, 1.1vw, 1.5rem);
   margin: 0;
@@ -279,6 +299,8 @@ html:has(.dc-signage) {
   background: var(--color-identity-blue);
   color: var(--color-identity-white);
 }
+
+/* ---------- Session list (highlighted / filtered configs) ---------- */
 
 .dc-program-sessions {
   list-style: none;
@@ -320,6 +342,8 @@ html:has(.dc-signage) {
   margin: 0;
   color: var(--color-light-blue);
 }
+
+/* ---------- Single-room layout (pin card to viewport, scale everything up) ---------- */
 
 .dc-program-rooms:has(> :only-child) .dc-program-room {
   position: fixed;
@@ -406,6 +430,8 @@ html:has(.dc-signage) {
   font-size: clamp(1.1rem, min(1.6vw, 2.2vh), 2.25rem);
 }
 
+/* ---------- Base breakpoints ---------- */
+
 @media (--sm) {
   .dc-program-rooms {
     grid-template-columns: repeat(2, 1fr);
@@ -423,7 +449,7 @@ html:has(.dc-signage) {
   }
 }
 
-/* ---------- Multi-room layout (2–4 rooms) ---------- */
+/* ---------- Multi-room layout (2–4 rooms tiled across viewport) ---------- */
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-rooms {
   position: fixed;
