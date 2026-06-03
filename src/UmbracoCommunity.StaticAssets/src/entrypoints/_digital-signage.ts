@@ -3,11 +3,10 @@ import "../css/pages/digital-signage.css";
 const REFRESH_INTERVAL_MS = 60_000;
 const EVENT_TIMEZONE = "Europe/Copenhagen";
 
-const initialClock = document.querySelector<HTMLElement>("[data-signage-clock]");
-const initialOverrideRaw = initialClock?.dataset.signageNow ?? "";
-const initialOverrideStart = initialOverrideRaw ? Date.parse(initialOverrideRaw) : NaN;
-const usingOverride = !Number.isNaN(initialOverrideStart);
-const overrideStart = usingOverride ? initialOverrideStart : 0;
+const overrideRaw = new URLSearchParams(window.location.search).get("signage-now") ?? "";
+const parsedOverride = overrideRaw ? Date.parse(overrideRaw) : NaN;
+const usingOverride = !Number.isNaN(parsedOverride);
+const overrideStart = usingOverride ? parsedOverride : 0;
 const pageLoadAt = Date.now();
 
 function currentSimulatedTime(): Date {
