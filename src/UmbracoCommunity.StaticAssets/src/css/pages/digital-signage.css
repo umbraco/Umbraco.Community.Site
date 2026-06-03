@@ -1,9 +1,32 @@
 @import "../base/media-queries.css";
 @import "../root.css";
 
+:root {
+  --color-page-surface: #fff0ea;
+  --color-identity-smoke: #fff0ea;
+  --color-identity-orange: #f5c1bc;
+  --color-identity-yellow: #f5c1bc;
+  --color-light-blue: rgba(40, 58, 151, 0.80);
+  --color-dark-grey: rgba(40, 58, 151, 0.80);
+}
+
 html:has(.dc-signage) {
   height: 100%;
   overflow: hidden;
+}
+
+.dc-signage__logo {
+  position: fixed;
+  left: clamp(1.5rem, 3vw, 4rem);
+  bottom: clamp(1.5rem, 3vh, 3rem);
+  z-index: 8;
+  pointer-events: none;
+}
+
+.dc-signage__logo svg {
+  display: block;
+  height: clamp(2.5rem, 4vh, 5rem);
+  width: auto;
 }
 
 .dc-signage {
@@ -29,46 +52,41 @@ html:has(.dc-signage) {
 
 .dc-signage__clock {
   position: fixed;
-  top: 2rem;
-  right: 2rem;
+  top: 4rem;
+  right: 4rem;
   z-index: 10;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.15rem;
-  background: var(--color-identity-blue);
-  color: var(--color-identity-white);
-  padding: 0.65rem 1.1rem;
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 4px 16px rgba(40, 58, 151, 0.25);
+  align-items: baseline;
+  gap: 0.75rem;
+  color: var(--color-identity-blue);
   font-variant-numeric: tabular-nums;
 }
 
-.dc-signage__clock-time {
-  font-size: clamp(1.5rem, 1.8vw, 2.75rem);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.05em;
-}
-
 .dc-signage__clock-date {
-  font-size: clamp(0.75rem, 0.7vw, 1.1rem);
+  font-size: clamp(1rem, min(1.8vw, 2.5vh), 2.25rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--color-identity-yellow);
+  color: var(--color-light-blue);
+}
+
+.dc-signage__clock-time {
+  font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
 }
 
 .dc-signage__clock.is-simulated::after {
   content: "SIMULATED";
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.2em;
   background: var(--color-identity-orange);
   color: var(--color-identity-blue);
-  padding: 0.1rem 0.4rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 0.25rem;
-  margin-top: 0.25rem;
+  align-self: center;
 }
 
 .dc-program-feature__title {
@@ -102,12 +120,11 @@ html:has(.dc-signage) {
 
 .dc-program-room {
   background: var(--color-identity-white);
-  border-radius: var(--border-radius-xl);
+  border-radius: 32px;
   padding: 1.75rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  box-shadow: 0 2px 12px rgba(40, 58, 151, 0.08);
 }
 
 .dc-program-room__name {
@@ -143,9 +160,38 @@ html:has(.dc-signage) {
   flex: 1;
   background: var(--color-identity-blue);
   color: var(--color-identity-white);
-  padding: 1.75rem 2rem;
+  padding: 1.75rem 7rem 1.75rem 2rem;
   border-radius: var(--border-radius-lg);
   margin: 0 -0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dc-program-slot--current::before,
+.dc-program-slot--current::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: clamp(4rem, 11%, 6rem);
+  height: 50%;
+  pointer-events: none;
+}
+
+.dc-program-slot--current::before {
+  top: 0;
+  background: var(--color-identity-dark);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.dc-program-slot--current::after {
+  bottom: 0;
+  background: var(--color-identity-pink);
+  clip-path: polygon(0 100%, 100% 0, 100% 100%);
+}
+
+.dc-program-slot--current > * {
+  position: relative;
+  z-index: 1;
 }
 
 .dc-program-slot--current .dc-program-slot__label {
@@ -198,7 +244,7 @@ html:has(.dc-signage) {
   font-size: clamp(1rem, 1.2vw, 1.75rem);
   font-weight: 800;
   margin: 0;
-  color: var(--color-identity-orange);
+  color: var(--color-identity-blue);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -250,7 +296,7 @@ html:has(.dc-signage) {
 
 .dc-program-session__time {
   font-size: clamp(0.95rem, 1.1vw, 1.5rem);
-  color: var(--color-identity-orange);
+  color: var(--color-identity-blue);
   font-weight: 800;
   margin: 0 0 0.25rem;
   text-transform: uppercase;
@@ -288,7 +334,7 @@ html:has(.dc-signage) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 8rem 1.5rem 2rem;
   gap: 0.75rem;
 }
 
