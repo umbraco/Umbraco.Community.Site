@@ -783,6 +783,144 @@ dc-image-slider img {
     color: #ffffff;
 }
 
+/* Program feature block */
+.dc-program-feature {
+    padding: 20px;
+}
+
+.dc-program-feature__title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: #283A97;
+}
+
+.dc-program-feature__subtitle {
+    font-size: 16px;
+    color: #5e6279;
+    margin: 0 0 20px;
+}
+
+.dc-program-feature__empty {
+    font-size: 14px;
+    font-style: italic;
+    color: #707070;
+}
+
+.dc-program-rooms {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.dc-program-room {
+    background: #f1f0ee;
+    border-radius: 12px;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.dc-program-room__name {
+    grid-column: 1 / -1;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #283A97;
+    margin: 0;
+}
+
+.dc-program-slot {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dc-program-slot--current {
+    background: #283A97;
+    color: #ffffff;
+}
+
+.dc-program-slot.is-empty {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.dc-program-slot__label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+}
+
+.dc-program-slot__title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.dc-program-slot__time {
+    font-size: 12px;
+    margin: 0;
+    opacity: 0.85;
+}
+
+.dc-program-slot__speakers {
+    font-size: 12px;
+    margin: 0;
+}
+
+.dc-program-slot__empty {
+    font-size: 12px;
+    margin: 0;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.dc-program-sessions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.dc-program-session {
+    background: #f1f0ee;
+    border-left: 4px solid #283A97;
+    border-radius: 6px;
+    padding: 10px 14px;
+}
+
+.dc-program-session__time {
+    font-size: 11px;
+    font-weight: 700;
+    color: #283A97;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 2px;
+}
+
+.dc-program-session__title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.dc-program-session__room,
+.dc-program-session__speakers {
+    font-size: 12px;
+    margin: 0;
+    color: #5e6279;
+}
+
 /* Slider block */
 .dc-slider-block {
     padding: 20px;
