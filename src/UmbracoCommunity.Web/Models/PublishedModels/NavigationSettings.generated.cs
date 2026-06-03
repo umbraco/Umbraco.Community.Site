@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Navigation settings</summary>
 	[PublishedModel("navigationSettings")]
-	public partial class NavigationSettings : PublishedContentModel
+	public partial class NavigationSettings : PublishedContentModel, ICompositionPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -88,5 +88,19 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("socialSharingLinks")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel SocialSharingLinks => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "socialSharingLinks");
+
+		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from sitemap
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 	}
 }

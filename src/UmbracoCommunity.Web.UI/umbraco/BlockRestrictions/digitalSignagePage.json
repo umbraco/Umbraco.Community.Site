@@ -1,0 +1,6 @@
+{
+  "DocumentTypeAlias": "digitalSignagePage",
+  "AllowedBlocks": [
+    "programFeatureBlock"
+  ]
+}

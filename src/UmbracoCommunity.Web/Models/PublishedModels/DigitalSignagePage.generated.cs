@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Social settings</summary>
-	[PublishedModel("socialSettings")]
-	public partial class SocialSettings : PublishedContentModel, ICompositionPageConfiguration
+	/// <summary>Digital signage page</summary>
+	[PublishedModel("digitalSignagePage")]
+	public partial class DigitalSignagePage : PublishedContentModel, ICompositionContentBlocks, ICompositionPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "socialSettings";
+		public new const string ModelTypeAlias = "digitalSignagePage";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -34,14 +34,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<SocialSettings, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<DigitalSignagePage, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public SocialSettings(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+		public DigitalSignagePage(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,36 +50,12 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Organisation logo: Min 112x112px, recommended 1200x630px
+		/// Content blocks
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("organisationLogo")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops OrganisationLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "organisationLogo");
-
-		///<summary>
-		/// Organisation name
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("organisationName")]
-		public virtual string OrganisationName => this.Value<string>(_publishedValueFallback, "organisationName");
-
-		///<summary>
-		/// Organisation url
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("organisationUrl")]
-		public virtual string OrganisationUrl => this.Value<string>(_publishedValueFallback, "organisationUrl");
-
-		///<summary>
-		/// Site wide OG image: Base image which is used when a page is shared on a social platform in the case that there is no image defined on the page
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("siteWideOgImage")]
-		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops SiteWideOgImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "siteWideOgImage");
+		[ImplementPropertyType("contentBlocks")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionContentBlocks.GetContentBlocks(this, _publishedValueFallback);
 
 		///<summary>
 		/// Hide from search
