@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ClearSessionizeCacheData, ClearSessionizeCacheErrors, ClearSessionizeCacheResponses, CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RegenerateData, RegenerateErrors, RegenerateResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RefreshSessionizeCacheData, RefreshSessionizeCacheErrors, RefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -45,15 +45,15 @@ export class UmbracoCommunityExtensionsService {
         });
     }
     
-    public static clearSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<ClearSessionizeCacheData, ThrowOnError>) {
-        return (options?.client ?? client).post<ClearSessionizeCacheResponses, ClearSessionizeCacheErrors, ThrowOnError>({
+    public static refreshSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<RefreshSessionizeCacheData, ThrowOnError>) {
+        return (options?.client ?? client).post<RefreshSessionizeCacheResponses, RefreshSessionizeCacheErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache',
+            url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache',
             ...options
         });
     }

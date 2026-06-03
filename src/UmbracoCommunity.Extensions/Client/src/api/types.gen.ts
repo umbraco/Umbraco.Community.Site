@@ -9,6 +9,12 @@ export type CreateBlogArticleResponse = {
     articleName: string;
 };
 
+export type SessionizeCacheRefreshResult = {
+    success: boolean;
+    message: string;
+    refreshedAt: string;
+};
+
 export type SeedExportStatus = {
     isRunning: boolean;
     lastSuccessAt?: string | null;
@@ -76,28 +82,28 @@ export type IsBlogNodeResponses = {
 
 export type IsBlogNodeResponse = IsBlogNodeResponses[keyof IsBlogNodeResponses];
 
-export type ClearSessionizeCacheData = {
+export type RefreshSessionizeCacheData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache';
+    url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache';
 };
 
-export type ClearSessionizeCacheErrors = {
+export type RefreshSessionizeCacheErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type ClearSessionizeCacheResponses = {
+export type RefreshSessionizeCacheResponses = {
     /**
      * OK
      */
-    200: string;
+    200: SessionizeCacheRefreshResult;
 };
 
-export type ClearSessionizeCacheResponse = ClearSessionizeCacheResponses[keyof ClearSessionizeCacheResponses];
+export type RefreshSessionizeCacheResponse = RefreshSessionizeCacheResponses[keyof RefreshSessionizeCacheResponses];
 
 export type RegenerateData = {
     body?: never;

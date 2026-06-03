@@ -33,22 +33,4 @@ export const manifests: Array<UmbExtensionManifest> = [
       },
     ],
   },
-  {
-    type: "dashboard",
-    name: "Sessionize Settings Dashboard",
-    alias: "UmbracoCommunity.Extensions.SessionizeSettingsDashboard",
-    elementName: "sessionize-settings-dashboard",
-    js: () => import("./sessionize-settings-dashboard.element.js"),
-    weight: 90,
-    meta: {
-      label: "Sessionize",
-      pathname: "sessionize",
-    },
-    conditions: [
-      {
-        alias: "Umb.Condition.SectionAlias",
-        match: "Umb.Section.Settings",
-      },
-    ],
-  },
 ];
