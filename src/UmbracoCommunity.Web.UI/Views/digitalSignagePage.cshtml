@@ -3,8 +3,6 @@
 @{
     Layout = null;
 
-    var signageNowRaw = Context.Request.Query["signage-now"].ToString();
-    var siteLogo = Model.GetSiteSettings()?.HeaderLogo;
     var contentGrid = Model.ContentBlocks.ParseBlockGrid();
 }
 
@@ -17,18 +15,6 @@
     <link rel="stylesheet" vite-href="digital-signage" asp-add-nonce="true" />
 </head>
 <body class="dc-signage">
-    <div class="dc-signage__clock @(string.IsNullOrEmpty(signageNowRaw) ? string.Empty : "is-simulated")"
-         data-signage-clock
-         data-signage-now="@signageNowRaw">
-        <span class="dc-signage__clock-time" data-clock-time>--:--</span>
-        <span class="dc-signage__clock-date" data-clock-date>—</span>
-    </div>
-    @if (siteLogo != null)
-    {
-        <div class="dc-signage__logo">
-            <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
-        </div>
-    }
     <main class="dc-signage__main">
         <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" model="contentGrid" />
     </main>

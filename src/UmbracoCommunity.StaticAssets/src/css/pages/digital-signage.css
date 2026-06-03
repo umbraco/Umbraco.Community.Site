@@ -15,20 +15,6 @@ html:has(.dc-signage) {
   overflow: hidden;
 }
 
-.dc-signage__logo {
-  position: fixed;
-  left: clamp(1.5rem, 3vw, 4rem);
-  bottom: clamp(1.5rem, 3vh, 3rem);
-  z-index: 8;
-  pointer-events: none;
-}
-
-.dc-signage__logo svg {
-  display: block;
-  height: clamp(2.5rem, 4vh, 5rem);
-  width: auto;
-}
-
 .dc-signage {
   margin: 0;
   padding: 0;
@@ -50,34 +36,32 @@ html:has(.dc-signage) {
   margin-bottom: 3rem;
 }
 
-.dc-signage__clock {
-  position: fixed;
-  top: 4rem;
-  right: 4rem;
-  z-index: 10;
+.dc-program-room__clock {
+  margin-left: auto;
   display: flex;
   align-items: baseline;
   gap: 0.75rem;
   color: var(--color-identity-blue);
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
-.dc-signage__clock-date {
-  font-size: clamp(1rem, min(1.8vw, 2.5vh), 2.25rem);
+.dc-program-room__clock-date {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--color-light-blue);
 }
 
-.dc-signage__clock-time {
+.dc-program-room__clock-time {
   font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.02em;
 }
 
-.dc-signage__clock.is-simulated::after {
+.dc-program-room__clock.is-simulated::after {
   content: "SIMULATED";
   font-size: 0.7rem;
   font-weight: 800;
@@ -129,6 +113,14 @@ html:has(.dc-signage) {
   min-width: 0;
 }
 
+.dc-program-room__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 3px solid var(--color-identity-yellow);
+  padding-bottom: 0.75rem;
+}
+
 .dc-program-room__name {
   font-size: clamp(1.1rem, 1.4vw, 2rem);
   font-weight: 800;
@@ -136,8 +128,18 @@ html:has(.dc-signage) {
   color: var(--color-identity-blue);
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  border-bottom: 3px solid var(--color-identity-yellow);
-  padding-bottom: 0.75rem;
+}
+
+.dc-program-room__logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dc-program-room__logo svg {
+  display: block;
+  height: clamp(1.1rem, 1.4vw, 2rem);
+  width: auto;
 }
 
 .dc-program-slot {
@@ -340,10 +342,17 @@ html:has(.dc-signage) {
   gap: 0.75rem;
 }
 
-.dc-program-rooms:has(> :only-child) .dc-program-room__name {
-  font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+.dc-program-rooms:has(> :only-child) .dc-program-room__header {
   padding-bottom: 0.5rem;
   flex-shrink: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__name {
+  font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__logo svg {
+  height: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__label {
@@ -416,10 +425,6 @@ html:has(.dc-signage) {
 }
 
 /* ---------- Multi-room layout (2–4 rooms) ---------- */
-
-.dc-signage:has(.dc-program-rooms > :nth-child(2)) :is(.dc-signage__clock, .dc-signage__logo) {
-  display: none;
-}
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-rooms {
   position: fixed;

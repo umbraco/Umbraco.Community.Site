@@ -3,6 +3,17 @@ import "../css/pages/digital-signage.css";
 const REFRESH_INTERVAL_MS = 60_000;
 const EVENT_TIMEZONE = "Europe/Copenhagen";
 
+function ordinalSuffix(n: number): string {
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 13) return "th";
+  switch (n % 10) {
+    case 1: return "st";
+    case 2: return "nd";
+    case 3: return "rd";
+    default: return "th";
+  }
+}
+
 function startClock() {
   const root = document.querySelector<HTMLElement>("[data-signage-clock]");
   if (!root) return;
@@ -28,12 +39,17 @@ function startClock() {
       second: "2-digit",
       hour12: false,
     });
-    dateEl.textContent = now.toLocaleDateString("en-GB", {
-      timeZone: usingOverride ? undefined : EVENT_TIMEZONE,
-      weekday: "long",
+    const tz = usingOverride ? undefined : EVENT_TIMEZONE;
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: tz,
+      weekday: "short",
       day: "numeric",
       month: "long",
-    });
+    }).formatToParts(now);
+    const partOf = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((p) => p.type === type)?.value ?? "";
+    const dayNum = parseInt(partOf("day"), 10);
+    dateEl.textContent = `${partOf("weekday")} ${dayNum}${ordinalSuffix(dayNum)} ${partOf("month")}`;
   };
 
   tick();

@@ -22,11 +22,34 @@
                     }
                     else
                     {
+                        var isSingleRoom = statuses.Count == 1;
+                        var siteLogo = isSingleRoom
+                            ? Umbraco.AssignedContentItem?.GetSiteSettings()?.HeaderLogo
+                            : null;
+                        var signageNowRaw = Context.Request.Query["signage-now"].ToString();
+
                         <div class="dc-program-rooms">
                             @foreach (var room in statuses)
                             {
                                 <article class="dc-program-room">
-                                    <h3 class="dc-program-room__name">@room.RoomName</h3>
+                                    <header class="dc-program-room__header">
+                                        @if (siteLogo != null)
+                                        {
+                                            <span class="dc-program-room__logo">
+                                                <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
+                                            </span>
+                                        }
+                                        <h3 class="dc-program-room__name">@room.RoomName</h3>
+                                        @if (isSingleRoom)
+                                        {
+                                            <div class="dc-program-room__clock @(string.IsNullOrEmpty(signageNowRaw) ? string.Empty : "is-simulated")"
+                                                 data-signage-clock
+                                                 data-signage-now="@signageNowRaw">
+                                                <span class="dc-program-room__clock-time" data-clock-time>--:--</span>
+                                                <span class="dc-program-room__clock-date" data-clock-date>—</span>
+                                            </div>
+                                        }
+                                    </header>
                                     @RenderSlot("Now", room.Current, "dc-program-slot--current", "No session in progress")
                                     @RenderSlot("Up next", room.Next, "dc-program-slot--next", "No more sessions today")
                                 </article>
