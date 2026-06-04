@@ -1,7 +1,7 @@
-using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 using UmbracoCommunity.Web.Features.Sessionize.Models;
 
 namespace UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
@@ -127,6 +127,22 @@ public class SessionizeApiClient
     {
         var allData = await GetAllDataAsync(cancellationToken);
         return allData.Rooms;
+    }
+
+    /// <summary>
+    /// Gets all unique event days that have sessions scheduled
+    /// </summary>
+    public async Task<List<SessionizeEventDay>> GetEventDaysAsync(CancellationToken cancellationToken = default)
+    {
+        var allData = await GetAllDataAsync(cancellationToken);
+
+        return allData.Sessions
+            .Where(s => s.StartsAt.HasValue)
+            .Select(s => s.StartsAt!.Value.Date)
+            .Distinct()
+            .OrderBy(d => d)
+            .Select(d => new SessionizeEventDay { Date = d })
+            .ToList();
     }
 
     /// <summary>

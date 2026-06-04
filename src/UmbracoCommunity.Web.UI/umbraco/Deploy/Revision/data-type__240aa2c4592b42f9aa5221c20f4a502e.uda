@@ -91,6 +91,12 @@
         "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466"
       },
       {
+        "contentElementTypeKey": "81482d2a-2279-45ca-8730-2d91f65e0835",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "5b6a23c2-f363-4684-9ebc-fa49d0001aed"
+      },
+      {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -193,6 +199,9 @@
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
     },
     {
+      "Udi": "umb://document-type/5b6a23c2f36346849ebcfa49d0001aed"
+    },
+    {
       "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
     },
     {
@@ -203,6 +212,9 @@
     },
     {
       "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d"
+    },
+    {
+      "Udi": "umb://document-type/81482d2a227945ca87302d91f65e0835"
     },
     {
       "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"

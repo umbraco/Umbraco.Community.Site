@@ -18,14 +18,14 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Program feature block</summary>
-	[PublishedModel("programFeatureBlock")]
-	public partial class ProgramFeatureBlock : PublishedElementModel
+	/// <summary>Digital signage page</summary>
+	[PublishedModel("digitalSignagePage")]
+	public partial class DigitalSignagePage : PublishedContentModel, ICompositionContentBlocks, ICompositionPageConfiguration
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		public new const string ModelTypeAlias = "programFeatureBlock";
+		public new const string ModelTypeAlias = "digitalSignagePage";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
@@ -34,14 +34,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 			=> PublishedModelUtility.GetModelContentType(contentTypeCache, ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[return: global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<ProgramFeatureBlock, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(IPublishedContentTypeCache contentTypeCache, Expression<Func<DigitalSignagePage, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(contentTypeCache), selector);
 #pragma warning restore 0109
 
 		private IPublishedValueFallback _publishedValueFallback;
 
 		// ctor
-		public ProgramFeatureBlock(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+		public DigitalSignagePage(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
 			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
@@ -50,11 +50,25 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Program configuration: If no configuration is entered then nothing will display in the block
+		/// Content blocks
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("programConfiguration")]
-		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListItem ProgramConfiguration => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListItem>(_publishedValueFallback, "programConfiguration");
+		[ImplementPropertyType("contentBlocks")]
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionContentBlocks.GetContentBlocks(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from sitemap
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 	}
 }

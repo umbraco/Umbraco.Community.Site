@@ -164,6 +164,10 @@ Built assets go to:
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
+**Dialog System** (`src/components/dialog/`):
+- `dialog-base.element.ts` - Base class for modal dialogs
+- `dialog.handler.ts` - Opens/closes dialogs, manages body scroll lock with scrollbar width compensation to prevent content jump
+
 **Text Link Animation**: Inline text links within block content have an animated pink highlight (background-gradient that grows from a 2px underline to full highlight on hover). Defined globally in `typography.css`, scoped to text-only links via `:not(:has(img, svg, picture, video, div))`.
 
 **SVG Style Scoping**: Illustrator-exported SVGs ship an inline `<style>` block with auto-generated class names (`.st0`–`.stN`). Inline `<style>` is document-scoped (not SVG-scoped), so without intervention those class rules leak across every SVG on the page and the last-defined `.st0` rule wins for *all* SVGs. The `<svg-src>` TagHelper (`UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`) handles this automatically: it generates a unique scope class per SVG instance, adds it to the `<svg>` element, and prefixes every selector inside the SVG's `<style>` block with that class. The SVG's palette stays self-contained without any author-side CSS workarounds. External CSS that targets `.stN` (e.g. the hero-mode logo overrides in `header.css`) still works because it sits outside the SVG and the scoping only adds specificity to the *internal* rules.
@@ -198,10 +202,17 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - `GET /categories` - Event categories
 
 **Frontend Components** (`src/UmbracoCommunity.StaticAssets/src/components/sessionize/`):
-- `sessionize-program.element.ts` - Program grid display
+- `sessionize-program.element.ts` - Program grid display with deep linking support
 - `sessionize-speakers.element.ts` - Speakers grid with filtering
-- `sessionize-session-dialog.element.ts` - Session details modal
+- `sessionize-session-dialog.element.ts` - Session details modal with social sharing
 - `sessionize-speaker-dialog.element.ts` - Speaker details modal
+
+**Session Sharing & Deep Linking:**
+- URLs support `?session={sessionId}` parameter for direct session linking
+- When visiting a URL with session parameter, page scrolls to program and opens session dialog
+- Session dialog includes share buttons for LinkedIn, Bluesky, Mastodon, and copy link
+- Server-side Open Graph tags are generated for shared session URLs via `SeoMetaDataViewModelDecorator`
+- Social platforms receive session-specific `og:title`, `og:description`, and `og:url` meta tags
 
 **Configuration** (in `appsettings.json`):
 ```json
@@ -211,6 +222,30 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
   "CacheDurationInMinutes": 60
 }
 ```
+
+### Digital Signage
+
+A standalone kiosk view of the Sessionize program for big screens at the venue. The full-screen page intentionally bypasses the usual site chrome.
+
+**Document type & template**:
+- `digitalSignagePage` doctype (model: `DigitalSignagePage`) — separate from `contentPage`, composed of `ICompositionContentBlocks` + `ICompositionPageConfiguration` only (no banner, no SEO).
+- `Views/digitalSignagePage.cshtml` — `Layout = null`, inherits `UmbracoViewPage<DigitalSignagePage>` directly (no view-model/controller/builder — same pattern as `PageNotFound.cshtml`).
+- Editors add `ProgramFeatureBlock` entries to the page's `ContentBlocks` to drive what shows.
+
+**`ProgramFeatureBlock`** (`Views/Partials/Blocks/ProgramFeatureBlock.cshtml`) — picks one of three nested config element types via its `programConfiguration` BlockListItem:
+- `CurrentSessionConfig` — current + next per room. The most-used; drives the signage layout.
+- `HighlightedSessionsConfig` — explicit session ids picked by the editor.
+- `SessionsConfig` — day/room/tag filter intersection.
+
+**`ProgramSessionResolver`** (`Features/Sessionize/Infrastructure/`) — scoped service wrapping `SessionizeApiClient`. Three methods (`ResolveCurrentAsync` / `ResolveHighlightedAsync` / `ResolveFilteredAsync`). Sessionize stores timestamps as UTC; the resolver converts to `Europe/Copenhagen` via the public static `ToEventTime(DateTime)` helper before all comparisons and before display formatting, so a session at `2026-06-11T11:45:00Z` renders as `13:45` on the card. `ResolveCurrentAsync` takes an optional `nowOverride` for the `?signage-now=` testing flow.
+
+**Layout** (`StaticAssets/src/css/pages/digital-signage.css`, `entrypoints/_digital-signage.ts`):
+- Codegarden palette override at `:root` (overrides `--color-page-surface`, `--color-identity-orange/yellow`, etc. for the signage scope only).
+- Single-room (one room in `CurrentSessionConfig.Rooms`): card pins via `position: fixed; inset: 2rem`, hero-scale typography via `:has(> :only-child)` selectors; current pill features a navy + pink corner triangle motif (inline SVG via `data:` URL, polygons inset via `content-box` padding so the gap shows the pill background — which adapts automatically to the cream `is-empty` variant).
+- Multi-room (2-4 rooms): rooms container pins via `inset: 2rem` and tiles cards in a grid sized by `:has(.dc-program-rooms > :nth-child(N):last-child)` (2 → side-by-side, 3 → three cols, 4 → 2×2). Multi-room mode hides the logo and clock, and skips the triangle motif (too busy).
+- Card header is a flex row: logo (single-room only, from `Site Settings → HeaderLogo`), room name, clock — all DOM siblings inside the card, not separate fixed-positioned bits.
+
+**Testing the clock rollover**: `?signage-now=2026-06-11T09:55` on the page URL simulates that wall-clock time. The signage JS rebuilds the URL with the *current* simulated time on each 60s poll, so as time progresses past a session boundary the SSR'd state updates accordingly. The clock element is rebound after each poll because the polling swap replaces it.
 
 ### Block Restrictions
 
@@ -379,6 +414,7 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Nonce-based script security via `NonceTagHelper`
 - CSP can be disabled per-request via `DisableCspMiddleware`
 - HSTS enabled with preload and 1-year max age
+- Permissions-Policy configured in `Extensions/WebApplicationExtensions.cs` (includes `clipboard-write=(self)` for share functionality)
 
 ## Key Dependencies
 

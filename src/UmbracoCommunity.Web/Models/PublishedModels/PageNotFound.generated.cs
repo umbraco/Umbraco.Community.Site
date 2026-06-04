@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Page not found</summary>
 	[PublishedModel("pageNotFound")]
-	public partial class PageNotFound : PublishedContentModel, ICompositionBannerBlock, ICompositionContentBlocks, ICompositionSeo
+	public partial class PageNotFound : PublishedContentModel, ICompositionBannerBlock, ICompositionContentBlocks, ICompositionPageConfiguration, ICompositionSeo
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -64,6 +64,20 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("contentBlocks")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel ContentBlocks => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionContentBlocks.GetContentBlocks(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
+
+		///<summary>
+		/// Hide from sitemap
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 
 		///<summary>
 		/// Custom schema: Here you can provide a custom schema for specific page. The schema is used for better indexing in search engines and serving rich search results. No script tags.

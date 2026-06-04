@@ -1,0 +1,608 @@
+@import "../base/media-queries.css";
+@import "../root.css";
+
+/* ---------- Codegarden palette overrides ---------- */
+
+:root {
+  --color-page-surface: #fff0ea;
+  --color-identity-smoke: #fff0ea;
+  --color-identity-orange: #f5c1bc;
+  --color-identity-yellow: #f5c1bc;
+  --color-light-blue: rgba(40, 58, 151, 0.80);
+  --color-dark-grey: rgba(40, 58, 151, 0.80);
+}
+
+/* ---------- Page chrome (full-screen container + outer wrapper) ---------- */
+
+html:has(.dc-signage) {
+  height: 100%;
+  overflow: hidden;
+}
+
+.dc-signage {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--color-page-surface);
+  color: var(--color-identity-blue);
+  font-family: 'Lato', 'Helvetica', 'Arial', sans-serif;
+  font-size: clamp(18px, 1.5vw, 32px);
+  line-height: 1.25;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  box-sizing: border-box;
+}
+
+.dc-program-feature {
+  margin-bottom: 3rem;
+}
+
+/* ---------- Clock (time + date displayed in single-room header) ---------- */
+
+.dc-program-room__clock {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  color: var(--color-identity-blue);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.dc-program-room__clock-date {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-light-blue);
+}
+
+.dc-program-room__clock-date::before {
+  content: "/ ";
+  margin-right: 0.1em;
+}
+
+.dc-program-room__clock-time {
+  font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Program feature intro (title, subtitle, empty fallback) ---------- */
+
+.dc-program-feature__title {
+  font-size: clamp(1.75rem, min(4vw, 5vh), 5rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-identity-blue);
+  flex-shrink: 0;
+}
+
+.dc-program-feature__subtitle {
+  font-size: clamp(1rem, min(1.2vw, 2vh), 1.75rem);
+  color: var(--color-light-blue);
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.dc-program-feature__empty {
+  font-size: clamp(1.1rem, 1.3vw, 1.75rem);
+  color: var(--color-dark-grey);
+  font-style: italic;
+}
+
+/* ---------- Rooms grid container ---------- */
+
+.dc-program-rooms {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+/* ---------- Room card (card surface, header bar, name, logo) ---------- */
+
+.dc-program-room {
+  background: var(--color-identity-white);
+  border-radius: 32px;
+  padding: 1.75rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.dc-program-room__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 3px solid var(--color-identity-yellow);
+  padding-bottom: 0.75rem;
+}
+
+.dc-program-room__name {
+  font-size: clamp(1.1rem, 1.4vw, 2rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.dc-program-room__logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dc-program-room__logo svg {
+  display: block;
+  height: clamp(1.1rem, 1.4vw, 2rem);
+  width: auto;
+}
+
+/* ---------- Program slot — shared base ---------- */
+
+.dc-program-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dc-program-slot__label {
+  font-size: clamp(0.75rem, 0.8vw, 1.25rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.3rem;
+  align-self: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+/* ---------- Current session slot (with navy + pink triangle motif) ---------- */
+
+.dc-program-slot--current {
+  flex: 1;
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+  padding: 1.75rem clamp(11rem, 34%, 25rem) 1.75rem 2rem;
+  border-radius: var(--border-radius-lg);
+  margin: 0 -0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dc-program-slot--current::before,
+.dc-program-slot--current::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: clamp(10rem, 32%, 23rem);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-clip: content-box;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.dc-program-slot--current::before {
+  top: 0;
+  height: 60%;
+  padding: 1.25rem 1.25rem 0 1.25rem;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='100,0 100,100 0,0' fill='%231b264f' stroke='%231b264f' stroke-width='2' stroke-linejoin='round' vector-effect='non-scaling-stroke'/></svg>");
+}
+
+.dc-program-slot--current::after {
+  bottom: 0;
+  height: 40%;
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='0,100 100,0 100,100' fill='%23f5c1bc' stroke='%23f5c1bc' stroke-width='2' stroke-linejoin='round' vector-effect='non-scaling-stroke'/></svg>");
+}
+
+.dc-program-slot--current > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dc-program-slot--current .dc-program-slot__label {
+  background: var(--color-identity-orange);
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(2rem, 4vw, 5rem);
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-yellow);
+}
+
+.dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(1.35rem, 2vw, 2.75rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--color-identity-pink);
+}
+
+/* ---------- Up next slot ---------- */
+
+.dc-program-slot--next {
+  padding: 0 0.5rem;
+}
+
+.dc-program-slot--next .dc-program-slot__label {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+  border: 1px solid rgba(40, 58, 151, 0.15);
+}
+
+.dc-program-slot--next .dc-program-slot__title {
+  font-size: clamp(1.25rem, 1.6vw, 2.25rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--next .dc-program-slot__time {
+  font-size: clamp(1rem, 1.2vw, 1.75rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--color-identity-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dc-program-slot--next .dc-program-slot__speakers {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  margin: 0;
+  color: var(--color-light-blue);
+}
+
+/* ---------- Empty / fallback slot states (no current session yet etc.) ---------- */
+
+.dc-program-slot__empty {
+  font-size: clamp(1rem, 1.1vw, 1.5rem);
+  margin: 0;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.dc-program-slot.is-empty {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot--current.is-empty {
+  background: var(--color-identity-smoke);
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot--current.is-empty .dc-program-slot__label {
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+}
+
+/* ---------- Session list (highlighted / filtered configs) ---------- */
+
+.dc-program-sessions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.dc-program-session {
+  background: var(--color-identity-white);
+  border-left: 8px solid var(--color-identity-orange);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 12px rgba(40, 58, 151, 0.06);
+}
+
+.dc-program-session__time {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  color: var(--color-identity-blue);
+  font-weight: 800;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.dc-program-session__title {
+  font-size: clamp(1.5rem, 2vw, 2.75rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+  color: var(--color-identity-blue);
+}
+
+.dc-program-session__room,
+.dc-program-session__speakers {
+  font-size: clamp(0.95rem, 1.1vw, 1.5rem);
+  margin: 0;
+  color: var(--color-light-blue);
+}
+
+/* ---------- Single-room layout (pin card to viewport, scale everything up) ---------- */
+
+.dc-program-rooms:has(> :only-child) .dc-program-room {
+  position: fixed;
+  inset: 2rem;
+  box-sizing: border-box;
+  padding: 2rem;
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1.5rem clamp(12rem, 34%, 27rem) 1.5rem 2rem;
+  gap: 0.75rem;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__header {
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__name {
+  font-size: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-room__logo svg {
+  height: clamp(1.25rem, min(2.5vw, 3.75vh), 3.5rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__label {
+  font-size: clamp(0.9rem, min(1.4vw, 1.9vh), 1.75rem);
+  padding: 0.35rem 0.9rem;
+  flex-shrink: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(2rem, min(6vw, 9vh), 14rem);
+  line-height: 1.05;
+  margin: 0;
+  min-height: 0;
+  overflow-wrap: anywhere;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(1.5rem, min(3.5vw, 4.5vh), 5rem);
+  flex-shrink: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(1.5rem, min(4vw, 5.5vh), 6rem);
+  overflow-wrap: anywhere;
+  flex-shrink: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__label {
+  font-size: clamp(1rem, min(1.4vw, 2vh), 2rem);
+  margin: 0;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__title {
+  font-size: clamp(1.5rem, min(2.5vw, 3.5vh), 3.75rem);
+  line-height: 1.15;
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__time {
+  font-size: clamp(1.25rem, min(2vw, 2.8vh), 3rem);
+}
+
+.dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__speakers {
+  grid-column: 1 / -1;
+  font-size: clamp(1.1rem, min(1.6vw, 2.2vh), 2.25rem);
+}
+
+/* ---------- Base breakpoints ---------- */
+
+@media (--sm) {
+  .dc-program-rooms {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.75rem;
+  }
+
+  .dc-program-rooms:has(> :only-child) {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (--lg) {
+  .dc-signage__main {
+    padding: 3rem 4rem;
+  }
+}
+
+/* ---------- Multi-room layout (2–4 rooms tiled across viewport) ---------- */
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-rooms {
+  position: fixed;
+  inset: 2rem;
+  display: grid;
+  gap: clamp(1rem, 2vmin, 2.5rem);
+  margin: 0;
+  z-index: 5;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-room {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+  gap: 0.75rem;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-room__name {
+  font-size: clamp(0.85rem, min(1.4vw, 2.2vh), 1.5rem);
+  padding-bottom: 0.4rem;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  gap: 0.4rem;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current .dc-program-slot__label {
+  font-size: clamp(0.8rem, min(1.3vw, 2vh), 1.5rem);
+  padding: 0.4rem 0.9rem;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current::before,
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current::after {
+  display: none;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(1.5rem, min(3.2vw, 5.5vh), 4.5rem);
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  flex-shrink: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(0.85rem, min(1.3vw, 2vh), 1.5rem);
+  flex-shrink: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(1rem, min(1.7vw, 2.5vh), 2rem);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6rem;
+  row-gap: 0.1rem;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__label {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: clamp(0.65rem, min(0.85vw, 1.2vh), 0.95rem);
+  padding: 0.15rem 0.5rem;
+  margin: 0.1rem 0 0;
+  align-self: start;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__title {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: clamp(0.85rem, min(1.2vw, 1.7vh), 1.4rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__time {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: clamp(0.7rem, min(0.95vw, 1.35vh), 1.1rem);
+  margin: 0;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__speakers {
+  grid-column: 2;
+  grid-row: 3;
+  font-size: clamp(0.7rem, min(0.95vw, 1.35vh), 1.1rem);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2):last-child) .dc-program-rooms {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(3):last-child) .dc-program-rooms {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(4):last-child) .dc-program-rooms {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(3)) .dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(1.3rem, min(2.4vw, 4.5vh), 3.5rem);
+  -webkit-line-clamp: 4;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(3)) .dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(0.9rem, min(1.4vw, 2.2vh), 1.65rem);
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(3)) .dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(0.8rem, min(1.1vw, 1.6vh), 1.35rem);
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(4)) .dc-program-slot--current .dc-program-slot__title {
+  font-size: clamp(1.2rem, min(2vw, 3.8vh), 3rem);
+  -webkit-line-clamp: 5;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(4)) .dc-program-slot--current .dc-program-slot__speakers {
+  font-size: clamp(0.85rem, min(1.3vw, 2vh), 1.5rem);
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(4)) .dc-program-slot--current .dc-program-slot__time {
+  font-size: clamp(0.75rem, min(1vw, 1.5vh), 1.25rem);
+}

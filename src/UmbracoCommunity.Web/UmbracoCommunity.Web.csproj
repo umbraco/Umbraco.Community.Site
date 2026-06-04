@@ -19,6 +19,7 @@
     <PackageReference Include="Umbraco.AI.Search" />
     <PackageReference Include="Umbraco.AI.Search.Db.Sqlite" />
     <PackageReference Include="Umbraco.AI.Search.Db.SqlServer" />
+    <PackageReference Include="Umbraco.Community.Contentment" />
     <PackageReference Include="Umbraco.Deploy.Core" />
     <PackageReference Include="Umbraco.Deploy.Infrastructure" />
   </ItemGroup>

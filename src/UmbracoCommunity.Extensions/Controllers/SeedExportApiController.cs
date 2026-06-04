@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Web.Common.Authorization;
+using UmbracoCommunity.Extensions.Infrastructure;
 using UmbracoCommunity.Web.Features.Seed;
 
 namespace UmbracoCommunity.Extensions.Controllers;
