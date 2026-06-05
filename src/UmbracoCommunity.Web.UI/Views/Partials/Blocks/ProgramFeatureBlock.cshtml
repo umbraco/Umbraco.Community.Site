@@ -23,17 +23,22 @@
                     else
                     {
                         var isSingleRoom = statuses.Count == 1;
-                        var siteLogo = isSingleRoom
-                            ? Umbraco.AssignedContentItem?.GetSiteSettings()?.HeaderLogo
-                            : null;
+                        var siteLogo = Umbraco.AssignedContentItem?.GetSiteSettings()?.HeaderLogo;
                         var signageNowRaw = Context.Request.Query["signage-now"].ToString();
+
+                        if (!isSingleRoom && siteLogo != null)
+                        {
+                            <div class="dc-program-overview-logo">
+                                <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
+                            </div>
+                        }
 
                         <div class="dc-program-rooms">
                             @foreach (var room in statuses)
                             {
                                 <article class="dc-program-room">
                                     <header class="dc-program-room__header">
-                                        @if (siteLogo != null)
+                                        @if (isSingleRoom && siteLogo != null)
                                         {
                                             <span class="dc-program-room__logo">
                                                 <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
@@ -50,8 +55,15 @@
                                             </div>
                                         }
                                     </header>
-                                    @RenderSlot("Now", room.Current, "dc-program-slot--current", "No session in progress")
-                                    @RenderSlot("Up next", room.Next, "dc-program-slot--next", "No more sessions today")
+                                    @if (room.Current is not null)
+                                    {
+                                        @RenderSlot("Now", room.Current, "dc-program-slot--current", "No session in progress")
+                                        @RenderSlot("Up next", room.Next, "dc-program-slot--next", "No more sessions today")
+                                    }
+                                    else
+                                    {
+                                        @RenderNoCurrentHero(room.Next)
+                                    }
                                 </article>
                             }
                         </div>
@@ -122,6 +134,39 @@
             + "</div>";
 
         return new HtmlString(html);
+    }
+
+    // When a room has no live session, fill the hero with what's coming up next:
+    // a "No session in progress" note, an "Up next" badge, then the next session
+    // styled like the current-session slot. The bottom "Up next" bar is omitted so
+    // the hero fills the card.
+    private IHtmlContent RenderNoCurrentHero(SessionizeSession? next)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<div class=\"dc-program-slot dc-program-slot--current dc-program-slot--upcoming\">");
+        sb.Append($"<p class=\"dc-program-slot__no-session\">{HtmlEnc("No session in progress")}</p>");
+
+        if (next is not null)
+        {
+            // Wrapper is bottom-aligned (margin-top: auto) so the next session sits at
+            // the foot of the hero while the "No session" note stays up top.
+            sb.Append("<div class=\"dc-program-slot__upcoming-body\">");
+            sb.Append($"<span class=\"dc-program-slot__label\">{HtmlEnc("Up next")}</span>");
+            sb.Append($"<h4 class=\"dc-program-slot__title\">{HtmlEnc(next.Title)}</h4>");
+            sb.Append($"<p class=\"dc-program-slot__time\">{HtmlEnc(FormatTimeRange(next))}</p>");
+            if (next.Speakers.Count > 0)
+            {
+                sb.Append($"<p class=\"dc-program-slot__speakers\">{HtmlEnc(string.Join(", ", next.Speakers.Select(s => s.FullName)))}</p>");
+            }
+            sb.Append("</div>");
+        }
+        else
+        {
+            sb.Append($"<p class=\"dc-program-slot__empty\">{HtmlEnc("No more sessions today")}</p>");
+        }
+
+        sb.Append("</div>");
+        return new HtmlString(sb.ToString());
     }
 
     private IHtmlContent RenderSessionList(List<SessionizeSession> sessions)

@@ -218,6 +218,40 @@ html:has(.dc-signage) {
   color: var(--color-identity-blue);
 }
 
+/* Live "NOW" badge carries a pulsating dot to signal a session is in progress.
+   Scoped to the live current slot (not the pink --upcoming hero or empty states). */
+.dc-program-slot--current:not(.dc-program-slot--upcoming):not(.is-empty) .dc-program-slot__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.dc-program-slot--current:not(.dc-program-slot--upcoming):not(.is-empty) .dc-program-slot__label::before {
+  content: "";
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dc-now-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dc-now-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.65);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-program-slot--current:not(.dc-program-slot--upcoming):not(.is-empty) .dc-program-slot__label::before {
+    animation: none;
+  }
+}
+
 .dc-program-slot--current .dc-program-slot__title {
   font-size: clamp(2rem, 4vw, 5rem);
   font-weight: 800;
@@ -298,6 +332,64 @@ html:has(.dc-signage) {
 .dc-program-slot--current.is-empty .dc-program-slot__label {
   background: var(--color-identity-blue);
   color: var(--color-identity-white);
+}
+
+/* No live session: a prominent note at the top of the hero, above the bottom-aligned
+   "Up next" session. */
+.dc-program-slot__no-session {
+  font-size: clamp(1.5rem, 2.4vw, 3rem);
+  font-weight: 700;
+  font-style: italic;
+  margin: 0;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* The "No session" note stays pinned to the top; this wrapper pushes the promoted
+   "Up next" session to the foot of the hero. */
+.dc-program-slot__upcoming-body {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* No-session hero uses a PINK background (never navy — navy signals a live session)
+   with navy text. Overrides the live --current slot's white/yellow/pink-on-navy
+   palette, which would be unreadable on pink. */
+.dc-program-slot--current.dc-program-slot--upcoming {
+  background: var(--color-identity-pink-20opacity);
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--upcoming .dc-program-slot__title,
+.dc-program-slot--upcoming .dc-program-slot__time {
+  color: var(--color-identity-blue);
+}
+
+.dc-program-slot--upcoming .dc-program-slot__speakers {
+  color: var(--color-light-blue);
+}
+
+.dc-program-slot--upcoming .dc-program-slot__label {
+  background: var(--color-identity-blue);
+  color: var(--color-identity-white);
+}
+
+/* "Up next" badges (bottom bar + no-session hero) get a leading arrow. */
+.dc-program-slot--next .dc-program-slot__label,
+.dc-program-slot--upcoming .dc-program-slot__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.dc-program-slot--next .dc-program-slot__label::before,
+.dc-program-slot--upcoming .dc-program-slot__label::before {
+  content: "\2192"; /* → rightwards arrow */
+  font-weight: 900;
+  line-height: 1;
 }
 
 /* ---------- Session list (highlighted / filtered configs) ---------- */
@@ -384,6 +476,11 @@ html:has(.dc-signage) {
   flex-shrink: 0;
 }
 
+.dc-program-rooms:has(> :only-child) .dc-program-slot__no-session {
+  font-size: clamp(2rem, min(4.5vw, 6vh), 6rem);
+  flex-shrink: 0;
+}
+
 .dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__title {
   font-size: clamp(2rem, min(6vw, 9vh), 14rem);
   line-height: 1.05;
@@ -460,6 +557,29 @@ html:has(.dc-signage) {
   z-index: 5;
 }
 
+/* Codegarden logo banner centered above the multi-stage tiles. */
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-overview-logo {
+  position: fixed;
+  top: 1.75rem;
+  left: 2rem;
+  right: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 6;
+}
+
+.dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-overview-logo svg {
+  height: clamp(2rem, min(3.5vw, 6.5vh), 4.5rem);
+  width: auto;
+  display: block;
+}
+
+/* When the logo banner is present, push the tile grid down to clear it. */
+.dc-signage:has(.dc-program-rooms > :nth-child(2)):has(.dc-program-overview-logo) .dc-program-rooms {
+  top: clamp(6.5rem, 13vh, 10rem);
+}
+
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-room {
   height: 100%;
   min-height: 0;
@@ -470,7 +590,8 @@ html:has(.dc-signage) {
 }
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-room__name {
-  font-size: clamp(0.85rem, min(1.4vw, 2.2vh), 1.5rem);
+  font-size: clamp(1.1rem, min(2vw, 3vh), 2.25rem);
+  font-weight: 900;
   padding-bottom: 0.4rem;
 }
 
