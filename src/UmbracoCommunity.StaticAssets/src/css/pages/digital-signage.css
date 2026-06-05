@@ -285,6 +285,7 @@ html:has(.dc-signage) {
   background: var(--color-identity-smoke);
   color: var(--color-light-blue);
   border: 1px solid rgba(40, 58, 151, 0.15);
+  align-self: center;
 }
 
 .dc-program-slot--next .dc-program-slot__title {
@@ -503,17 +504,21 @@ html:has(.dc-signage) {
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next {
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1.5rem;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1.5rem;
   align-items: center;
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__label {
+  grid-column: 1;
+  grid-row: 1;
   font-size: clamp(1rem, min(1.4vw, 2vh), 2rem);
   margin: 0;
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__title {
+  grid-column: 2;
+  grid-row: 1;
   font-size: clamp(1.5rem, min(2.5vw, 3.5vh), 3.75rem);
   line-height: 1.15;
   min-width: 0;
@@ -523,11 +528,14 @@ html:has(.dc-signage) {
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__time {
+  grid-column: 1;
+  grid-row: 2;
   font-size: clamp(1.25rem, min(2vw, 2.8vh), 3rem);
+  white-space: nowrap;
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__speakers {
-  grid-column: 2 / -1;
+  grid-column: 2;
   grid-row: 2;
   font-size: clamp(1.1rem, min(1.6vw, 2.2vh), 2.25rem);
 }
@@ -645,15 +653,15 @@ html:has(.dc-signage) {
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next {
   display: grid;
-  grid-template-columns: auto auto 1fr;
-  column-gap: 0.6rem;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.75rem;
   row-gap: 0.1rem;
   padding: 0;
   flex-shrink: 0;
   align-items: center;
 }
 
-/* Row 1: "Up next" badge, time and title on a single line; speakers on row 2. */
+/* Left column: badge over time. Right column: title over speakers. */
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__label {
   grid-column: 1;
   grid-row: 1;
@@ -663,15 +671,15 @@ html:has(.dc-signage) {
 }
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__time {
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: 1;
+  grid-row: 2;
   font-size: clamp(0.7rem, min(0.95vw, 1.35vh), 1.1rem);
   margin: 0;
   white-space: nowrap;
 }
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__title {
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   font-size: clamp(0.85rem, min(1.2vw, 1.7vh), 1.4rem);
   font-weight: 700;
@@ -684,7 +692,7 @@ html:has(.dc-signage) {
 }
 
 .dc-signage:has(.dc-program-rooms > :nth-child(2)) .dc-program-slot--next .dc-program-slot__speakers {
-  grid-column: 3 / -1;
+  grid-column: 2;
   grid-row: 2;
   font-size: clamp(0.7rem, min(0.95vw, 1.35vh), 1.1rem);
   margin: 0;
