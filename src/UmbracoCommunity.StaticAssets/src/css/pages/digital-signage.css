@@ -516,6 +516,10 @@ html:has(.dc-signage) {
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__title {
   font-size: clamp(1.5rem, min(2.5vw, 3.5vh), 3.75rem);
   line-height: 1.15;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__time {
@@ -524,6 +528,7 @@ html:has(.dc-signage) {
 
 .dc-program-rooms:has(> :only-child) .dc-program-slot--next .dc-program-slot__speakers {
   grid-column: 2 / -1;
+  grid-row: 2;
   font-size: clamp(1.1rem, min(1.6vw, 2.2vh), 2.25rem);
 }
 
