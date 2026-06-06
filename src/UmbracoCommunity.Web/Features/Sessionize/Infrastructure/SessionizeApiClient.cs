@@ -32,7 +32,7 @@ public class SessionizeApiClient
         _cache = cache;
         _logger = logger;
 
-        var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "SessionizeCache");
+        var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "Data", "TEMP", "SessionizeCache");
         Directory.CreateDirectory(cacheDir);
         _cacheFilePath = Path.Combine(cacheDir, $"sessionize_{_options.EventId}.json");
     }
