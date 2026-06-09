@@ -179,6 +179,63 @@
   color: var(--color-dark);
 }
 
+/* Contributors footer — auto-generated from git history (see contributors.generated.json). */
+.documentation__contributors {
+  margin-top: var(--unit-lg);
+  padding-top: var(--unit-md);
+  border-top: 1px solid var(--color-light);
+}
+
+.documentation__contributors h2 {
+  margin: 0 0 var(--unit-xs);
+  font-size: 1.1rem;
+  color: var(--color-dark);
+}
+
+.documentation__contributors p {
+  margin: 0 0 var(--unit-sm);
+  font-size: 0.9rem;
+  color: var(--color-dark-grey);
+}
+
+.documentation__contributor-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+}
+
+.documentation__contributor-link {
+  display: block;
+  line-height: 0;
+  border-radius: 50%;
+}
+
+.documentation__contributor-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: var(--color-light);
+  transition: transform 0.15s ease;
+}
+
+.documentation__contributor-link:hover .documentation__contributor-avatar,
+.documentation__contributor-link:focus-visible .documentation__contributor-avatar {
+  transform: scale(1.08);
+}
+
+.documentation__contributor-name {
+  font-size: 0.85rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
 .documentation__empty {
   color: var(--color-dark-grey);
   font-style: italic;

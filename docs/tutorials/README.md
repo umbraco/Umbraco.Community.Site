@@ -47,3 +47,5 @@ When adding a new tutorial:
 3. Link to real files in this repo using paths relative to the tutorial file (e.g. `../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`).
 4. Credit prior art. If the code is adapted from a community project, lead with a "Credit where it's due" section linking the source and naming contributors.
 5. Move the tutorial out of "planned" and into the relevant section above: add it to **What's here**, and update its backlog entry in [`IDEAS.md`](./IDEAS.md) (either strike it through with a "shipped as ..." note, or remove the bullet entirely) — all in the same commit.
+
+You don't need to maintain a contributors list by hand. Each rendered doc shows a **Contributors** section generated from git history (`docs/contributors.generated.json`, produced by `npm run generate:doc-contributors` and refreshed in CI). Open a PR and you'll be credited automatically — with your GitHub avatar where your commit email is linked to your account.

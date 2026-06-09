@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Markdig;
 using Markdig.Extensions.Yaml;
@@ -38,6 +39,13 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     private FileSystemWatcher? _watcher;
     private string? _resolvedRoot;
     private string? _repositoryUrl;
+    private IReadOnlyDictionary<string, IReadOnlyList<DocumentationContributor>> _contributors =
+        new Dictionary<string, IReadOnlyList<DocumentationContributor>>();
+
+    private static readonly JsonSerializerOptions ContributorsJsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     public event EventHandler? IndexRebuilt;
 
@@ -124,6 +132,7 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
 
         _resolvedRoot = root;
         _repositoryUrl = _configuration["Documentation:RepositoryUrl"]?.TrimEnd('/');
+        _contributors = LoadContributors(root);
         EnsureWatcher(root);
 
         var sections = new List<DocumentationSection>();
@@ -241,7 +250,8 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                 LastModifiedUtc: File.GetLastWriteTimeUtc(filePath),
                 SectionPathSegments: sectionPathSegments,
                 IsSectionIntro: isReadme,
-                Tags: tags);
+                Tags: tags,
+                Contributors: ResolveContributors(filePath));
         }
         catch (Exception ex)
         {
@@ -549,6 +559,55 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         renderer.Render(document);
         writer.Flush();
         return writer.ToString();
+    }
+
+    /// <summary>
+    /// Loads contributors.generated.json (produced from git history at build/CI time) from the
+    /// docs root. Keyed by doc path relative to the root, e.g. "tutorials/foundations/x.md".
+    /// Missing or unreadable file is non-fatal — articles just render without a contributors list.
+    /// </summary>
+    private IReadOnlyDictionary<string, IReadOnlyList<DocumentationContributor>> LoadContributors(string root)
+    {
+        var empty = new Dictionary<string, IReadOnlyList<DocumentationContributor>>();
+        var path = Path.Combine(root, "contributors.generated.json");
+        if (!File.Exists(path))
+        {
+            return empty;
+        }
+
+        try
+        {
+            var json = File.ReadAllText(path);
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, List<DocumentationContributor>>>(
+                json, ContributorsJsonOptions);
+            if (parsed is null)
+            {
+                return empty;
+            }
+
+            return parsed.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (IReadOnlyList<DocumentationContributor>)kvp.Value,
+                StringComparer.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "DocumentationService: failed to read contributors from {Path}.", path);
+            return empty;
+        }
+    }
+
+    private IReadOnlyList<DocumentationContributor> ResolveContributors(string filePath)
+    {
+        if (_resolvedRoot is null)
+        {
+            return Array.Empty<DocumentationContributor>();
+        }
+
+        var key = Path.GetRelativePath(_resolvedRoot, filePath).Replace('\\', '/');
+        return _contributors.TryGetValue(key, out var contributors)
+            ? contributors
+            : Array.Empty<DocumentationContributor>();
     }
 
     private string? ResolveDocsRoot()

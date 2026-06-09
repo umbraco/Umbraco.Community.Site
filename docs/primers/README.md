@@ -25,3 +25,5 @@ A new primer earns its keep when an area of the codebase has:
 If the answer fits in a paragraph in CLAUDE.md, it doesn't need a primer. If you find yourself writing the same "let me explain how X works in this project" thread three times, it does.
 
 See [`IDEAS.md`](./IDEAS.md) for candidate primers worth writing. Each one already has a stub file in this folder — expand the stub in place rather than creating a new file, then move the entry out of the backlog and into the **What's here** list above in the same commit.
+
+You don't need to maintain a contributors list by hand. Each rendered doc shows a **Contributors** section generated from git history (`docs/contributors.generated.json`, produced by `npm run generate:doc-contributors` and refreshed in CI). Open a PR and you'll be credited automatically — with your GitHub avatar where your commit email is linked to your account.
