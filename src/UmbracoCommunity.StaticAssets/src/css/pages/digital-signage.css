@@ -805,27 +805,24 @@ html:has(.dc-signage) {
     font-size: clamp(1.5rem, min(5vw, 4vh), 4.5rem);
   }
 
-  /* For a live session, lift the speaker name + time out of flow into the bottom-left
-     corner so they read in front of the navy triangle — speaker above, time below.
-     (Scoped off the pink --upcoming no-session hero.) Both share a font size so the
-     em-based vertical offset stacks them cleanly at any screen size. */
-  .dc-program-rooms:has(> :only-child) .dc-program-slot--current:not(.dc-program-slot--upcoming) .dc-program-slot__time,
+  /* For a live session the speaker name + time sit at the bottom of the box, in front
+     of the triangle (now just a background behind them — no reserved band). The slot is
+     already a flex column, so margin-top:auto on the speaker pushes the pair to the
+     bottom and order puts the speaker above the time. Scoped off the pink --upcoming
+     no-session hero. */
+  .dc-program-rooms:has(> :only-child) .dc-program-slot--current:not(.dc-program-slot--upcoming) {
+    padding: 2rem;
+  }
+
   .dc-program-rooms:has(> :only-child) .dc-program-slot--current:not(.dc-program-slot--upcoming) .dc-program-slot__speakers {
-    position: absolute;
-    left: 2rem;
-    max-width: 58%;
-    margin: 0;
-    z-index: 1;
-    line-height: 1.1;
-    font-size: clamp(1.4rem, min(3.4vw, 2.8vh), 2.75rem);
+    order: 1;
+    margin-top: auto;
+    font-size: clamp(2rem, min(3.6vw, 3vh), 3rem);
   }
 
   .dc-program-rooms:has(> :only-child) .dc-program-slot--current:not(.dc-program-slot--upcoming) .dc-program-slot__time {
-    bottom: 1.75rem;
-  }
-
-  .dc-program-rooms:has(> :only-child) .dc-program-slot--current:not(.dc-program-slot--upcoming) .dc-program-slot__speakers {
-    bottom: calc(1.75rem + 1.4em);
+    order: 2;
+    font-size: clamp(1.4rem, min(3.4vw, 2.8vh), 2.75rem);
   }
 
   .dc-program-rooms:has(> :only-child) .dc-program-slot--current .dc-program-slot__speakers {
