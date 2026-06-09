@@ -13,7 +13,11 @@ public interface INotFoundHitService
 
 public sealed class HitListQuery
 {
-    public string? Hostname { get; init; }
+    /// <summary>
+    /// Empty/null = no hostname filter. Multiple values match any of the listed hostnames
+    /// (used by the grouped-hostname dropdown which can submit several aliases for one node).
+    /// </summary>
+    public IReadOnlyList<string>? Hostnames { get; init; }
     public HitStatus? Status { get; init; } = HitStatus.Active;
     public string? Search { get; init; }
     public HitSort Sort { get; init; } = HitSort.RecentlySeen;

@@ -4,7 +4,7 @@ import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UMB_MODAL_MANAGER_CONTEXT, type UmbModalManagerContext, umbConfirmModal } from "@umbraco-cms/backoffice/modal";
 import { UMB_DOCUMENT_PICKER_MODAL } from "@umbraco-cms/backoffice/document";
 import { NotFoundTrackerApi } from "../api/not-found-tracker-api.js";
-import type { HitListItem, HitListResponse } from "../api/types.js";
+import type { HitListItem, HitListResponse, HostnameGroup } from "../api/types.js";
 import { ADD_IGNORE_RULE_MODAL } from "./modals/add-ignore-rule-modal.token.js";
 import { HIT_DETAILS_MODAL } from "./modals/hit-details-modal.token.js";
 
@@ -23,8 +23,9 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
   @state() private loading = false;
   @state() private error: string | null = null;
 
-  @state() private hostnames: string[] = [];
-  @state() private hostnameFilter = "";
+  @state() private hostnameGroups: HostnameGroup[] = [];
+  // Index into hostnameGroups; "" = all sites
+  @state() private hostnameGroupFilter = "";
   @state() private statusFilter: number = 0;
   @state() private search = "";
   @state() private sort: number = 1;
@@ -86,15 +87,22 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
   connectedCallback() {
     super.connectedCallback();
     this.load();
-    this.loadHostnames();
+    this.loadHostnameGroups();
   }
 
-  private async loadHostnames() {
+  private async loadHostnameGroups() {
     try {
-      this.hostnames = await NotFoundTrackerApi.getHostnames();
+      this.hostnameGroups = await NotFoundTrackerApi.getHostnameGroups();
     } catch {
       // Non-fatal — dropdown stays empty if this fails.
     }
+  }
+
+  private get selectedHostnames(): string[] | undefined {
+    if (!this.hostnameGroupFilter) return undefined;
+    const idx = parseInt(this.hostnameGroupFilter, 10);
+    const group = this.hostnameGroups[idx];
+    return group?.hostnames.length ? group.hostnames : undefined;
   }
 
   private async load() {
@@ -102,7 +110,7 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     this.error = null;
     try {
       const result: HitListResponse = await NotFoundTrackerApi.listHits({
-        hostname: this.hostnameFilter || undefined,
+        hostnames: this.selectedHostnames,
         status: this.statusFilter,
         search: this.search || undefined,
         sort: this.sort,
@@ -156,6 +164,32 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
     await NotFoundTrackerApi.bulkDeleteHits([...this.selectedIds]);
     this.selectedIds.clear();
     await this.load();
+  }
+
+  private async ignoreSelected() {
+    if (this.selectedIds.size === 0) return;
+    const count = this.selectedIds.size;
+    try {
+      await umbConfirmModal(this, {
+        headline: `Ignore ${count} hit${count === 1 ? "" : "s"}?`,
+        content: html`
+          <p>
+            This creates an <strong>exact-match</strong> ignore rule for each selected path and
+            removes the row${count === 1 ? "" : "s"} from the list.
+          </p>
+          <p>Future hits on the same path${count === 1 ? "" : "s"} won't be tracked.</p>
+        `,
+        confirmLabel: count === 1 ? "Ignore hit" : `Ignore ${count} hits`,
+      });
+    } catch {
+      return; // cancelled
+    }
+    const result = await NotFoundTrackerApi.bulkIgnoreHits([...this.selectedIds], 0);
+    this.selectedIds.clear();
+    await this.load();
+    if (result.skipped > 0) {
+      this.error = `Ignored ${result.processed}; skipped ${result.skipped} (already covered by an existing rule).`;
+    }
   }
 
   private async deleteOne(item: HitListItem) {
@@ -233,8 +267,14 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
 
   render() {
     const hostnameOptions = [
-      { name: "All sites", value: "", selected: this.hostnameFilter === "" },
-      ...this.hostnames.map((h) => ({ name: h, value: h, selected: this.hostnameFilter === h })),
+      { name: "All sites", value: "", selected: this.hostnameGroupFilter === "" },
+      ...this.hostnameGroups.map((g, i) => {
+        const label = g.hostnames.length > 0
+          ? `${g.nodeName} (${g.hostnames.join(", ")})`
+          : g.nodeName;
+        const value = String(i);
+        return { name: label, value, selected: this.hostnameGroupFilter === value };
+      }),
     ];
     const statusOptions = [
       { name: "Active", value: "0", selected: this.statusFilter === 0 },
@@ -250,7 +290,7 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
           <uui-select
             .options=${hostnameOptions}
             @change=${(e: Event) => {
-              this.hostnameFilter = (e.target as HTMLSelectElement).value;
+              this.hostnameGroupFilter = (e.target as HTMLSelectElement).value;
               this.skip = 0;
               this.load();
             }}
@@ -296,6 +336,11 @@ export class HitsTabElement extends UmbElementMixin(LitElement) {
         ></uui-button>
         ${this.selectedIds.size > 0
           ? html`
+              <uui-button
+                look="primary"
+                label=${`Ignore selected (${this.selectedIds.size})`}
+                @click=${this.ignoreSelected}
+              ></uui-button>
               <uui-button
                 look="primary"
                 color="danger"

@@ -41,12 +41,26 @@ public static class NotFoundTrackerBuilderExtensions
             else
             {
                 options.UseSqlServer(connectionString, sql =>
-                    sql.MigrationsAssembly("Umbraco.Community.NotFoundTracker"));
+                {
+                    sql.MigrationsAssembly("Umbraco.Community.NotFoundTracker");
+
+                    // This context shares the Umbraco Azure SQL connection and writes on every
+                    // front-end 404, so it sits in the blast radius of traffic spikes and the
+                    // database's connection/DTU limits. Retry transient faults (connection
+                    // limit reached, timeouts, deadlocks) instead of dropping 404 records.
+                    // Safe to enable: no code path uses manual transactions, which a retrying
+                    // execution strategy would otherwise reject.
+                    sql.EnableRetryOnFailure(
+                        maxRetryCount: 3,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null);
+                });
             }
 
             options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
+        builder.Services.AddSingleton<HostnameNormalizationService>();
         builder.Services.AddHostedService<NotFoundTrackerMigrationHostedService>();
 
         // Recording pipeline.
@@ -64,6 +78,7 @@ public static class NotFoundTrackerBuilderExtensions
         builder.Services.AddScoped<INotFoundHitService, NotFoundHitService>();
         builder.Services.AddScoped<INotFoundIgnoreRuleService, NotFoundIgnoreRuleService>();
         builder.Services.AddScoped<INotFoundUserScopeService, NotFoundUserScopeService>();
+        builder.Services.AddScoped<NotFoundHostnameGroupService>();
         builder.Services.AddScoped<INotFoundRedirectService, NotFoundRedirectService>();
 
         // Fail-fast guard: if the host forgot to register an INotFoundPageResolver,

@@ -25,6 +25,14 @@
           "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
           "ValueType": "System.Boolean",
           "Name": "Hide from sitemap"
+        },
+        {
+          "Key": "fe8addc9-890d-40ed-9049-004e2af4d566",
+          "Alias": "hideFromSearch",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Name": "Hide from search",
+          "SortOrder": 1
         }
       ]
     }

@@ -15,9 +15,7 @@
     ]
   },
   "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
-  "CompositionContentTypes": [
-    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
-  ],
+  "CompositionContentTypes": [],
   "PropertyGroups": [
     {
       "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
@@ -95,10 +93,6 @@
     {
       "Udi": "umb://document-type/47c81d1472cf4e118877d117e86da978",
       "Mode": "Exist"
-    },
-    {
-      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-      "Ordering": true
     },
     {
       "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",

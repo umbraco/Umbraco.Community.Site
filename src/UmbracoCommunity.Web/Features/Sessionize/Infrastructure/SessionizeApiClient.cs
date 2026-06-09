@@ -1,7 +1,8 @@
-using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 using UmbracoCommunity.Web.Features.Sessionize.Models;
 
 namespace UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
@@ -12,6 +13,7 @@ public class SessionizeApiClient
     private readonly SessionizeOptions _options;
     private readonly IMemoryCache _cache;
     private readonly ILogger<SessionizeApiClient> _logger;
+    private readonly string _cacheFilePath;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -22,12 +24,17 @@ public class SessionizeApiClient
         IHttpClientFactory httpClientFactory,
         IOptions<SessionizeOptions> options,
         IMemoryCache cache,
+        IHostEnvironment hostEnvironment,
         ILogger<SessionizeApiClient> logger)
     {
         _httpClient = httpClientFactory.CreateClient("Sessionize");
         _options = options.Value;
         _cache = cache;
         _logger = logger;
+
+        var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "Data", "TEMP", "SessionizeCache");
+        Directory.CreateDirectory(cacheDir);
+        _cacheFilePath = Path.Combine(cacheDir, $"sessionize_{_options.EventId}.json");
     }
 
     /// <summary>
@@ -76,11 +83,22 @@ public class SessionizeApiClient
                 "Fetched Sessionize data: {SessionCount} sessions, {SpeakerCount} speakers, {CategoryCount} categories",
                 allData.Sessions.Count, allData.Speakers.Count, allData.Categories.Count);
 
+            await WriteCacheFileAsync(json, cancellationToken);
+
             return allData;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching data from Sessionize for event {EventId}", _options.EventId);
+
+            var stale = await TryReadCacheFileAsync(cancellationToken);
+            if (stale != null)
+            {
+                _logger.LogWarning("Returning stale Sessionize data from disk cache for event {EventId}", _options.EventId);
+                _cache.Set(cacheKey, stale, TimeSpan.FromMinutes(_options.CacheDurationInMinutes));
+                return stale;
+            }
+
             throw;
         }
     }
@@ -127,6 +145,22 @@ public class SessionizeApiClient
     {
         var allData = await GetAllDataAsync(cancellationToken);
         return allData.Rooms;
+    }
+
+    /// <summary>
+    /// Gets all unique event days that have sessions scheduled
+    /// </summary>
+    public async Task<List<SessionizeEventDay>> GetEventDaysAsync(CancellationToken cancellationToken = default)
+    {
+        var allData = await GetAllDataAsync(cancellationToken);
+
+        return allData.Sessions
+            .Where(s => s.StartsAt.HasValue)
+            .Select(s => s.StartsAt!.Value.Date)
+            .Distinct()
+            .OrderBy(d => d)
+            .Select(d => new SessionizeEventDay { Date = d })
+            .ToList();
     }
 
     /// <summary>
@@ -270,6 +304,43 @@ public class SessionizeApiClient
     {
         _cache.Remove($"sessionize_all_{_options.EventId}");
         _logger.LogInformation("Cleared Sessionize cache for event {EventId}", _options.EventId);
+    }
+
+    private async Task WriteCacheFileAsync(string json, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await File.WriteAllTextAsync(_cacheFilePath, json, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to write Sessionize disk cache to {Path}", _cacheFilePath);
+        }
+    }
+
+    private async Task<SessionizeAllData?> TryReadCacheFileAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (!File.Exists(_cacheFilePath))
+                return null;
+
+            var json = await File.ReadAllTextAsync(_cacheFilePath, cancellationToken);
+            var allData = JsonSerializer.Deserialize<SessionizeAllData>(json, JsonOptions);
+            if (allData != null)
+            {
+                allData.PronounsQuestionId = allData.Questions
+                    .FirstOrDefault(q => q.Question.Contains("Pronouns", StringComparison.OrdinalIgnoreCase))
+                    ?.Id;
+            }
+
+            return allData;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to read Sessionize disk cache from {Path}", _cacheFilePath);
+            return null;
+        }
     }
 
     private static SessionizeSpeaker MapToSpeaker(SessionizeSpeakerRaw raw, Dictionary<string, SessionizeSessionRaw> sessionLookup, int? pronounsQuestionId)

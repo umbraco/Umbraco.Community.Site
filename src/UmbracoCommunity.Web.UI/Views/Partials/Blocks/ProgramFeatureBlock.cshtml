@@ -1,0 +1,219 @@
+@using UmbracoCommunity.Web.Features.Sessionize.Infrastructure
+@using UmbracoCommunity.Web.Features.Sessionize.Models
+@inject ProgramSessionResolver Resolver
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ProgramFeatureBlock>>
+
+@{
+    var configContent = Model.Content.ProgramConfiguration?.Content;
+    var settings = Model.Settings as SettingsProgramFeatureBlock;
+    var nowOverride = ParseNowOverride(Context.Request.Query["signage-now"]);
+}
+
+<section class="dc-program-feature" data-program-block="@Model.ContentKey" id="@settings?.BlockId">
+    <div class="dc-program-feature__body" data-program-body>
+        @switch (configContent)
+        {
+            case CurrentSessionConfig current:
+                {
+                    var statuses = await Resolver.ResolveCurrentAsync(ParseInts(current.Rooms), nowOverride);
+                    if (statuses.Count == 0)
+                    {
+                        <p class="dc-program-feature__empty">No rooms configured.</p>
+                    }
+                    else
+                    {
+                        var isSingleRoom = statuses.Count == 1;
+                        var siteLogo = Umbraco.AssignedContentItem?.GetSiteSettings()?.HeaderLogo;
+                        var signageNowRaw = Context.Request.Query["signage-now"].ToString();
+
+                        if (!isSingleRoom && siteLogo != null)
+                        {
+                            <div class="dc-program-overview-logo">
+                                <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
+                            </div>
+                        }
+
+                        <div class="dc-program-rooms">
+                            @foreach (var room in statuses)
+                            {
+                                <article class="dc-program-room">
+                                    <header class="dc-program-room__header">
+                                        @if (isSingleRoom && siteLogo != null)
+                                        {
+                                            <span class="dc-program-room__logo">
+                                                <partial name="~/Views/Partials/Components/Logo.cshtml" model="siteLogo" />
+                                            </span>
+                                        }
+                                        <h3 class="dc-program-room__name">@room.RoomName</h3>
+                                        @if (isSingleRoom)
+                                        {
+                                            <div class="dc-program-room__clock @(string.IsNullOrEmpty(signageNowRaw) ? string.Empty : "is-simulated")"
+                                                 data-signage-clock
+                                                 data-signage-now="@signageNowRaw">
+                                                <span class="dc-program-room__clock-date" data-clock-date>—</span>
+                                                <span class="dc-program-room__clock-time" data-clock-time>--:--</span>
+                                            </div>
+                                        }
+                                    </header>
+                                    @if (room.Current is not null)
+                                    {
+                                        @RenderSlot("Now", room.Current, "dc-program-slot--current", "No session in progress")
+                                        @RenderSlot("Up next", room.Next, "dc-program-slot--next", "No more sessions today")
+                                    }
+                                    else
+                                    {
+                                        @RenderNoCurrentHero(room.Next)
+                                    }
+                                </article>
+                            }
+                        </div>
+                    }
+                    break;
+                }
+            case HighlightedSessionsConfig highlighted:
+                {
+                    var sessions = await Resolver.ResolveHighlightedAsync(highlighted.SessionsToHighlight ?? new List<string>());
+                    @RenderSessionList(sessions)
+                    break;
+                }
+            case SessionsConfig filtered:
+                {
+                    var sessions = await Resolver.ResolveFilteredAsync(
+                        filtered.Days,
+                        ParseInts(filtered.Rooms),
+                        ParseInts(filtered.Tags));
+                    @RenderSessionList(sessions)
+                    break;
+                }
+            default:
+                <p class="dc-program-feature__empty">No program configuration selected.</p>
+                break;
+        }
+    </div>
+</section>
+
+@functions {
+    private static DateTime? ParseNowOverride(Microsoft.Extensions.Primitives.StringValues raw)
+    {
+        // The signage-now value represents Copenhagen wall-clock time (matching what's
+        // printed on the venue's clocks). RoundtripKind preserves any timezone marker in
+        // the string rather than silently shifting it to the server's locale:
+        //   * naive value (no Z/offset)  -> already Copenhagen wall-clock, use as-is.
+        //   * value with Z or offset     -> an absolute instant; project it onto Copenhagen
+        //     wall-clock via ToEventTime so it resolves identically on any server timezone.
+        // The second case is defensive: the signage JS sends a naive value, but a stale
+        // cached bundle calling toISOString() (UTC + "Z") must not break on a UTC prod box.
+        if (raw.Count == 0) return null;
+        var first = raw[0];
+        if (string.IsNullOrWhiteSpace(first)) return null;
+        if (!DateTime.TryParse(first, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.RoundtripKind, out var parsed))
+        {
+            return null;
+        }
+        return parsed.Kind == DateTimeKind.Unspecified
+            ? parsed
+            : ProgramSessionResolver.ToEventTime(parsed);
+    }
+
+    private static IEnumerable<int> ParseInts(IEnumerable<string>? values)
+    {
+        if (values is null) yield break;
+        foreach (var v in values)
+        {
+            if (int.TryParse(v, out var id)) yield return id;
+        }
+    }
+
+    private IHtmlContent RenderSlot(string label, SessionizeSession? session, string slotModifier, string emptyText)
+    {
+        var emptyClass = session is null ? " is-empty" : string.Empty;
+        var titleHtml = session is null
+            ? $"<p class=\"dc-program-slot__empty\">{HtmlEnc(emptyText)}</p>"
+            : $"<h4 class=\"dc-program-slot__title\">{HtmlEnc(session.Title)}</h4>"
+              + $"<p class=\"dc-program-slot__time\">{HtmlEnc(FormatTimeRange(session))}</p>"
+              + (session.Speakers.Count > 0
+                  ? $"<p class=\"dc-program-slot__speakers\">{HtmlEnc(string.Join(", ", session.Speakers.Select(s => s.FullName)))}</p>"
+                  : string.Empty);
+
+        var html =
+            $"<div class=\"dc-program-slot {slotModifier}{emptyClass}\">"
+            + $"<span class=\"dc-program-slot__label\">{HtmlEnc(label)}</span>"
+            + titleHtml
+            + "</div>";
+
+        return new HtmlString(html);
+    }
+
+    // When a room has no live session, fill the hero with what's coming up next:
+    // a "No session in progress" note, an "Up next" badge, then the next session
+    // styled like the current-session slot. The bottom "Up next" bar is omitted so
+    // the hero fills the card.
+    private IHtmlContent RenderNoCurrentHero(SessionizeSession? next)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<div class=\"dc-program-slot dc-program-slot--current dc-program-slot--upcoming\">");
+        sb.Append($"<p class=\"dc-program-slot__no-session\">{HtmlEnc("No session in progress")}</p>");
+
+        if (next is not null)
+        {
+            // Wrapper is bottom-aligned (margin-top: auto) so the next session sits at
+            // the foot of the hero while the "No session" note stays up top.
+            sb.Append("<div class=\"dc-program-slot__upcoming-body\">");
+            sb.Append($"<span class=\"dc-program-slot__label\">{HtmlEnc("Up next")}</span>");
+            sb.Append($"<h4 class=\"dc-program-slot__title\">{HtmlEnc(next.Title)}</h4>");
+            sb.Append($"<p class=\"dc-program-slot__time\">{HtmlEnc(FormatTimeRange(next))}</p>");
+            if (next.Speakers.Count > 0)
+            {
+                sb.Append($"<p class=\"dc-program-slot__speakers\">{HtmlEnc(string.Join(", ", next.Speakers.Select(s => s.FullName)))}</p>");
+            }
+            sb.Append("</div>");
+        }
+        else
+        {
+            sb.Append($"<p class=\"dc-program-slot__empty\">{HtmlEnc("No more sessions today")}</p>");
+        }
+
+        sb.Append("</div>");
+        return new HtmlString(sb.ToString());
+    }
+
+    private IHtmlContent RenderSessionList(List<SessionizeSession> sessions)
+    {
+        if (sessions.Count == 0)
+        {
+            return new HtmlString("<p class=\"dc-program-feature__empty\">No sessions match this configuration.</p>");
+        }
+
+        var sb = new System.Text.StringBuilder("<ul class=\"dc-program-sessions\">");
+        foreach (var s in sessions)
+        {
+            sb.Append("<li class=\"dc-program-session\">");
+            sb.Append($"<p class=\"dc-program-session__time\">{HtmlEnc(FormatTimeRange(s))}</p>");
+            sb.Append($"<h3 class=\"dc-program-session__title\">{HtmlEnc(s.Title)}</h3>");
+            if (!string.IsNullOrEmpty(s.Room))
+            {
+                sb.Append($"<p class=\"dc-program-session__room\">{HtmlEnc(s.Room)}</p>");
+            }
+            if (s.Speakers.Count > 0)
+            {
+                sb.Append($"<p class=\"dc-program-session__speakers\">{HtmlEnc(string.Join(", ", s.Speakers.Select(sp => sp.FullName)))}</p>");
+            }
+            sb.Append("</li>");
+        }
+        sb.Append("</ul>");
+        return new HtmlString(sb.ToString());
+    }
+
+    private static string FormatTimeRange(SessionizeSession session)
+    {
+        if (!session.StartsAt.HasValue) return string.Empty;
+        var start = ProgramSessionResolver.ToEventTime(session.StartsAt.Value).ToString("HH:mm");
+        var end = session.EndsAt.HasValue
+            ? ProgramSessionResolver.ToEventTime(session.EndsAt.Value).ToString("HH:mm")
+            : null;
+        return string.IsNullOrEmpty(end) ? start : $"{start} – {end}";
+    }
+
+    private static string HtmlEnc(string value) => System.Net.WebUtility.HtmlEncode(value);
+}

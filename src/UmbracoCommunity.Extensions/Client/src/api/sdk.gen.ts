@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ClearSessionizeCacheData, ClearSessionizeCacheErrors, ClearSessionizeCacheResponses, CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, CreateHqMemberData, CreateHqMemberErrors, CreateHqMemberResponses, DeleteHqMemberData, DeleteHqMemberErrors, DeleteHqMemberResponses, DownloadGitHubDataData, DownloadGitHubDataErrors, DownloadGitHubDataResponses, DownloadHqMembersData, DownloadHqMembersErrors, DownloadHqMembersResponses, ExportGitHubDataData, ExportGitHubDataErrors, ExportGitHubDataResponses, GetContributionStatsData, GetContributionStatsErrors, GetContributionStatsResponses, GetHqMemberData, GetHqMemberErrors, GetHqMemberResponses, GetHqMembersData, GetHqMembersErrors, GetHqMembersResponses, GetReleasesData, GetReleasesErrors, GetReleasesResponses, ImportGitHubDataData, ImportGitHubDataErrors, ImportGitHubDataResponses, ImportHqMembersData, ImportHqMembersErrors, ImportHqMembersResponses, ImportSampleGitHubDataData, ImportSampleGitHubDataErrors, ImportSampleGitHubDataResponses, ImportSampleHqMembersData, ImportSampleHqMembersErrors, ImportSampleHqMembersResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, UpdateHqMemberData, UpdateHqMemberErrors, UpdateHqMemberResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RefreshSessionizeCacheData, RefreshSessionizeCacheErrors, RefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -45,201 +45,41 @@ export class UmbracoCommunityExtensionsService {
         });
     }
     
-    public static clearSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<ClearSessionizeCacheData, ThrowOnError>) {
-        return (options?.client ?? client).post<ClearSessionizeCacheResponses, ClearSessionizeCacheErrors, ThrowOnError>({
+    public static refreshSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<RefreshSessionizeCacheData, ThrowOnError>) {
+        return (options?.client ?? client).post<RefreshSessionizeCacheResponses, RefreshSessionizeCacheErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/clear-sessionize-cache',
+            url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache',
             ...options
         });
     }
     
-    public static getContributionStats<ThrowOnError extends boolean = false>(options?: Options<GetContributionStatsData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetContributionStatsResponses, GetContributionStatsErrors, ThrowOnError>({
+    public static regenerate<ThrowOnError extends boolean = false>(options?: Options<RegenerateData, ThrowOnError>) {
+        return (options?.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/contributions',
+            url: '/umbraco/umbracocommunityextensions/api/v1/seed/regenerate',
             ...options
         });
     }
     
-    public static downloadGitHubData<ThrowOnError extends boolean = false>(options?: Options<DownloadGitHubDataData, ThrowOnError>) {
-        return (options?.client ?? client).get<DownloadGitHubDataResponses, DownloadGitHubDataErrors, ThrowOnError>({
+    public static status<ThrowOnError extends boolean = false>(options?: Options<StatusData, ThrowOnError>) {
+        return (options?.client ?? client).get<StatusResponses, StatusErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/download-github-data',
-            ...options
-        });
-    }
-    
-    public static downloadHqMembers<ThrowOnError extends boolean = false>(options?: Options<DownloadHqMembersData, ThrowOnError>) {
-        return (options?.client ?? client).get<DownloadHqMembersResponses, DownloadHqMembersErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/download-hqmembers',
-            ...options
-        });
-    }
-    
-    public static exportGitHubData<ThrowOnError extends boolean = false>(options?: Options<ExportGitHubDataData, ThrowOnError>) {
-        return (options?.client ?? client).get<ExportGitHubDataResponses, ExportGitHubDataErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/export-github-data',
-            ...options
-        });
-    }
-    
-    public static getHqMembers<ThrowOnError extends boolean = false>(options?: Options<GetHqMembersData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetHqMembersResponses, GetHqMembersErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers',
-            ...options
-        });
-    }
-    
-    public static createHqMember<ThrowOnError extends boolean = false>(options?: Options<CreateHqMemberData, ThrowOnError>) {
-        return (options?.client ?? client).post<CreateHqMemberResponses, CreateHqMemberErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static deleteHqMember<ThrowOnError extends boolean = false>(options: Options<DeleteHqMemberData, ThrowOnError>) {
-        return (options.client ?? client).delete<DeleteHqMemberResponses, DeleteHqMemberErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options
-        });
-    }
-    
-    public static getHqMember<ThrowOnError extends boolean = false>(options: Options<GetHqMemberData, ThrowOnError>) {
-        return (options.client ?? client).get<GetHqMemberResponses, GetHqMemberErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options
-        });
-    }
-    
-    public static updateHqMember<ThrowOnError extends boolean = false>(options: Options<UpdateHqMemberData, ThrowOnError>) {
-        return (options.client ?? client).put<UpdateHqMemberResponses, UpdateHqMemberErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/{id}',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
-    public static importHqMembers<ThrowOnError extends boolean = false>(options?: Options<ImportHqMembersData, ThrowOnError>) {
-        return (options?.client ?? client).post<ImportHqMembersResponses, ImportHqMembersErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/hqmembers/import',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static importGitHubData<ThrowOnError extends boolean = false>(options?: Options<ImportGitHubDataData, ThrowOnError>) {
-        return (options?.client ?? client).post<ImportGitHubDataResponses, ImportGitHubDataErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-github-data',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options?.headers
-            }
-        });
-    }
-    
-    public static importSampleGitHubData<ThrowOnError extends boolean = false>(options?: Options<ImportSampleGitHubDataData, ThrowOnError>) {
-        return (options?.client ?? client).post<ImportSampleGitHubDataResponses, ImportSampleGitHubDataErrors, ThrowOnError>({
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-github-data',
-            ...options
-        });
-    }
-    
-    public static importSampleHqMembers<ThrowOnError extends boolean = false>(options?: Options<ImportSampleHqMembersData, ThrowOnError>) {
-        return (options?.client ?? client).post<ImportSampleHqMembersResponses, ImportSampleHqMembersErrors, ThrowOnError>({
-            url: '/umbraco/umbracocommunityextensions/api/v1/import-sample-hq-members',
-            ...options
-        });
-    }
-    
-    public static getReleases<ThrowOnError extends boolean = false>(options?: Options<GetReleasesData, ThrowOnError>) {
-        return (options?.client ?? client).get<GetReleasesResponses, GetReleasesErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/releases',
+            url: '/umbraco/umbracocommunityextensions/api/v1/seed/status',
             ...options
         });
     }

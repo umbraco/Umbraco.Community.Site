@@ -50,13 +50,17 @@ export class SessionizeDashboardElement extends UmbElementMixin(LitElement) {
     this._isClearingCache = true;
 
     try {
-      const { error } = await UmbracoCommunityExtensionsService.clearSessionizeCache();
+      const { data, error } = await UmbracoCommunityExtensionsService.refreshSessionizeCache();
 
       if (error) {
         throw new Error(String(error));
       }
 
-      this.#showNotification("positive", "Sessionize cache cleared", "The local Sessionize cache has been cleared. Fresh data will be fetched on the next request.");
+      this.#showNotification(
+        "positive",
+        "Sessionize cache cleared",
+        data?.message ?? "The local Sessionize cache has been cleared. Fresh data will be fetched on the next request."
+      );
     } catch (error) {
       console.error("Failed to clear Sessionize cache", error);
       this.#showNotification("danger", "Failed to clear Sessionize cache", String(error));

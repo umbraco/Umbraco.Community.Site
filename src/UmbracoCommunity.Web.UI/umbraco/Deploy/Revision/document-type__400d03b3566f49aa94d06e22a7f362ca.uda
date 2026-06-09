@@ -23,6 +23,7 @@
           "Key": "808ddf5a-4bcb-4178-9f34-2eb47d414242",
           "Alias": "showLatestYearOnly",
           "DataType": "umb://data-type/92897bc6a5f34ffeae27f2e7e33dda49",
+          "ValueType": "System.Boolean",
           "Description": "When enabled, only the most recent year of MVPs is shown and the year navigation is hidden.",
           "Name": "Show latest year only",
           "SortOrder": 101
@@ -47,5 +48,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }

@@ -1,4 +1,4 @@
-import type { HitListResponse, HitListQuery, HitDetail, IgnoreRuleItem, BulkOpResponse } from "./types";
+import type { HitListResponse, HitListQuery, HitDetail, IgnoreRuleItem, BulkOpResponse, HostnameGroup } from "./types";
 
 const BASE = "/umbraco/umbracocommunitynotfoundtracker/api/v1";
 
@@ -42,7 +42,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const NotFoundTrackerApi = {
   listHits(query: HitListQuery): Promise<HitListResponse> {
     const params = new URLSearchParams();
-    if (query.hostname) params.set("hostname", query.hostname);
+    if (query.hostnames?.length) {
+      for (const h of query.hostnames) params.append("hostname", h);
+    }
     if (query.status !== undefined) params.set("status", String(query.status));
     if (query.search) params.set("search", query.search);
     if (query.sort !== undefined) params.set("sort", String(query.sort));
@@ -57,6 +59,10 @@ export const NotFoundTrackerApi = {
 
   getHostnames(): Promise<string[]> {
     return request<string[]>(`/hits/hostnames`);
+  },
+
+  getHostnameGroups(): Promise<HostnameGroup[]> {
+    return request<HostnameGroup[]>(`/hits/hostname-groups`);
   },
 
   deleteHit(id: number): Promise<void> {

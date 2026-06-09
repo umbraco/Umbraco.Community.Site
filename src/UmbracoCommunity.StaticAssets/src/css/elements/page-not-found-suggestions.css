@@ -30,6 +30,11 @@
 }
 
 
+.dc-page-not-found-suggestions__heading {
+  margin: 0 auto var(--unit);
+  max-width: var(--narrow-width);
+}
+
 .dc-page-not-found-suggestions__list {
   list-style: none;
   padding: 0;

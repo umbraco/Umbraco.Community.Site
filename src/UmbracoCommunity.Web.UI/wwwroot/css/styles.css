@@ -196,6 +196,16 @@ ol.no-margin p {
     background-color: #283A97;
 }
 
+.btn.is-transparent {
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+.btn.is-transparent:hover {
+    background-color: #ffffff;
+    color: #283A97;
+}
+
 .btn.arrow {
     padding: 0 0 0 20px;
 }
@@ -225,8 +235,77 @@ ol.no-margin p {
     border-color: #283A97;
 }
 
-.btn.cta svg path {
+.btn.cta svg path,
+.btn.cta.is-white:hover svg path {
     stroke: #283A97;
+}
+
+.btn.cta.is-transparentblue svg {
+    background-color: #283A97;
+    border-color: #283A97;
+}
+
+.btn.cta.is-transparentblue svg path {
+    stroke: #ffffff;
+}
+
+.btn.cta.is-transparentblue:hover svg {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+.btn.cta.is-transparentblue:hover svg path {
+    stroke: #283A97;
+}
+
+.btn.cta.is-white svg {
+    background-color: #283A97;
+    border-color: #283A97;
+}
+
+.btn.cta.is-white svg path {
+    stroke: #ffffff;
+}
+
+.btn.cta.is-white:hover svg {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    border-radius: 50%;
+}
+
+.btn.cta.is-whitepink {
+    background-color: #ffffff;
+}
+
+.btn.cta.is-whitepink svg {
+    background-color: #f5c1bc;
+    border-color: #f5c1bc;
+}
+
+.btn.cta.is-whitepink:hover {
+    background-color: #f5c1bc;
+    color: #283A97;
+}
+
+.btn.cta.is-whitepink:hover svg path {
+    stroke: #283A97;
+}
+
+/* Give the transparent button a dark backdrop in the RTE editor so it's
+   visible against the light editor surface. Cancelled in contexts that
+   already provide a dark background. */
+.cta-link:has(.btn.is-transparent) {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #283A97;
+    border-radius: 8px;
+}
+
+.dc-text-block .cta-link:has(.btn.is-transparent) {
+    display: block;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .dc-big-cta-block__content h2 {
@@ -767,20 +846,254 @@ dc-image-slider img {
 
 .dc-text-block.has-image {
     position: relative;
+    padding: 0;
 }
 
-.dc-text-block.has-image img {
+.dc-text-block.has-image > picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.dc-text-block.has-image > picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 20px;
 }
 
 .dc-text-block.has-image .dc-text-block__content {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 20px;
+    position: relative;
     padding: 20px;
-    width: 100%;
+}
+
+/* Program feature block */
+.dc-program-feature {
+    padding: 16px;
+    background: #fff0ea;
+    border-radius: 12px;
+}
+
+.dc-program-feature__title {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #283A97;
+}
+
+.dc-program-feature__subtitle {
+    font-size: 14px;
+    color: #5e6279;
+    margin: 0 0 14px;
+}
+
+.dc-program-feature__empty {
+    font-size: 13px;
+    font-style: italic;
+    color: #707070;
+}
+
+.dc-program-rooms {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.dc-program-room {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dc-program-room__header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid rgba(40, 58, 151, 0.15);
+    padding-bottom: 8px;
+}
+
+.dc-program-room__logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.dc-program-room__logo svg {
+    display: block;
+    height: 16px;
+    width: auto;
+}
+
+/* Codegarden logo banner centered above the multi-stage tiles. */
+.dc-program-overview-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.dc-program-overview-logo svg {
+    display: block;
+    height: 28px;
+    width: auto;
+}
+
+.dc-program-room__name {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #283A97;
+    margin: 0;
+}
+
+.dc-program-room__clock {
+    margin-left: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: #5e6279;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.dc-program-room__clock-date::before {
+    content: "/ ";
+    margin-right: 2px;
+}
+
+.dc-program-slot {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dc-program-slot--current {
+    background: #283A97;
     color: #ffffff;
+    padding: 14px 16px;
+    border-radius: 10px;
+}
+
+.dc-program-slot--next {
+    padding: 0 4px;
+}
+
+.dc-program-slot.is-empty,
+.dc-program-slot--current.is-empty {
+    background: #fff0ea;
+    color: #5e6279;
+}
+
+.dc-program-slot__label {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    background: #fff0ea;
+    color: #283A97;
+    align-self: flex-start;
+    margin-bottom: 2px;
+}
+
+.dc-program-slot--next .dc-program-slot__label {
+    background: #fff0ea;
+    color: #5e6279;
+    border: 1px solid rgba(40, 58, 151, 0.15);
+}
+
+.dc-program-slot--current.is-empty .dc-program-slot__label {
+    background: #283A97;
+    color: #ffffff;
+}
+
+.dc-program-slot__title {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.15;
+}
+
+.dc-program-slot--next .dc-program-slot__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #283A97;
+}
+
+.dc-program-slot__time {
+    font-size: 12px;
+    font-weight: 800;
+    margin: 0;
+    color: #fff0ea;
+}
+
+.dc-program-slot--next .dc-program-slot__time {
+    color: #283A97;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dc-program-slot__speakers {
+    font-size: 13px;
+    margin: 0;
+    color: #fff0ea;
+}
+
+.dc-program-slot--next .dc-program-slot__speakers {
+    font-size: 12px;
+    color: #5e6279;
+}
+
+.dc-program-slot__empty {
+    font-size: 12px;
+    margin: 0;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.dc-program-sessions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.dc-program-session {
+    background: #f1f0ee;
+    border-left: 4px solid #283A97;
+    border-radius: 6px;
+    padding: 10px 14px;
+}
+
+.dc-program-session__time {
+    font-size: 11px;
+    font-weight: 700;
+    color: #283A97;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 2px;
+}
+
+.dc-program-session__title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px;
+}
+
+.dc-program-session__room,
+.dc-program-session__speakers {
+    font-size: 12px;
+    margin: 0;
+    color: #5e6279;
 }
 
 /* Slider block */

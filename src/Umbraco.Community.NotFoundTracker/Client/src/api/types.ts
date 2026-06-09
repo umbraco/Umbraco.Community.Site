@@ -42,10 +42,16 @@ export interface BulkOpResponse {
 }
 
 export interface HitListQuery {
-  hostname?: string;
+  hostnames?: string[];
   status?: number;
   search?: string;
   sort?: number;
   skip?: number;
   take?: number;
+}
+
+export interface HostnameGroup {
+  nodeKey: string | null;
+  nodeName: string;
+  hostnames: string[];
 }
