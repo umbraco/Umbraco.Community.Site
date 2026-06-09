@@ -929,6 +929,19 @@ dc-image-slider img {
     width: auto;
 }
 
+/* Codegarden logo banner centered above the multi-stage tiles. */
+.dc-program-overview-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.dc-program-overview-logo svg {
+    display: block;
+    height: 28px;
+    width: auto;
+}
+
 .dc-program-room__name {
     font-size: 12px;
     font-weight: 800;

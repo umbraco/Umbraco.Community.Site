@@ -75,10 +75,24 @@ function bindClock() {
 
 bindClock();
 
+// The server reads `signage-now` as a naive wall-clock value (no timezone marker),
+// matching what's printed on the venue's clocks. toISOString() would emit UTC with a
+// trailing "Z", which the server then re-interprets relative to *its* local timezone —
+// fine on a Copenhagen dev box, but a Z-shift on a UTC prod server, advancing the
+// simulated clock backwards across the offset. Emit the local wall-clock components
+// verbatim instead so the value round-trips unchanged regardless of server timezone.
+function toNaiveWallClock(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
+    `T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+  );
+}
+
 function buildRefreshUrl(): string {
   if (!usingOverride) return window.location.href;
   const url = new URL(window.location.href);
-  url.searchParams.set("signage-now", currentSimulatedTime().toISOString());
+  url.searchParams.set("signage-now", toNaiveWallClock(currentSimulatedTime()));
   return url.toString();
 }
 
