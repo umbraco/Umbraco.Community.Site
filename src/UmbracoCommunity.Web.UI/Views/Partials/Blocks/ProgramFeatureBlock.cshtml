@@ -95,16 +95,25 @@
 @functions {
     private static DateTime? ParseNowOverride(Microsoft.Extensions.Primitives.StringValues raw)
     {
-        // The signage-now value is interpreted as Copenhagen wall-clock time
-        // (matching what's printed on the venue's clocks). Parse without timezone
-        // assumptions so server locale doesn't shift the value.
+        // The signage-now value represents Copenhagen wall-clock time (matching what's
+        // printed on the venue's clocks). RoundtripKind preserves any timezone marker in
+        // the string rather than silently shifting it to the server's locale:
+        //   * naive value (no Z/offset)  -> already Copenhagen wall-clock, use as-is.
+        //   * value with Z or offset     -> an absolute instant; project it onto Copenhagen
+        //     wall-clock via ToEventTime so it resolves identically on any server timezone.
+        // The second case is defensive: the signage JS sends a naive value, but a stale
+        // cached bundle calling toISOString() (UTC + "Z") must not break on a UTC prod box.
         if (raw.Count == 0) return null;
         var first = raw[0];
         if (string.IsNullOrWhiteSpace(first)) return null;
-        return DateTime.TryParse(first, System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.None, out var parsed)
+        if (!DateTime.TryParse(first, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.RoundtripKind, out var parsed))
+        {
+            return null;
+        }
+        return parsed.Kind == DateTimeKind.Unspecified
             ? parsed
-            : (DateTime?)null;
+            : ProgramSessionResolver.ToEventTime(parsed);
     }
 
     private static IEnumerable<int> ParseInts(IEnumerable<string>? values)
