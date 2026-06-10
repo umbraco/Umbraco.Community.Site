@@ -75,7 +75,9 @@ namespace UmbracoCommunity.Web.Extensions
 
             csp.AllowBaseUri.FromSelf();
 
-            csp.AllowFrames.FromAll((builder, domain) => builder.From(domain), Constants.Security.DefaultAllowFrames);
+            csp.AllowFrames
+                .FromSelf()
+                .FromAll((builder, domain) => builder.From(domain), Constants.Security.DefaultAllowFrames);
 
             csp.AllowScripts
                 .FromSelf()
