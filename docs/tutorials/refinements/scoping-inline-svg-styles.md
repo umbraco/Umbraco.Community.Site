@@ -188,8 +188,8 @@ This one recolours the logo's blue path to white when the logo sits over a dark 
 
 ## Alternatives we considered
 
-- **CSS `@scope`** — wrap the SVG's `<style>` contents in `@scope (#unique-id) { ... }`. Native, clean syntax, works in Chrome 118+ / Firefox 128+ / Safari 17.4+ (all from 2024). Equivalent end result; we picked manual prefixing because it works in older browsers and the implementation is the same handful of lines either way.
-- **Shadow DOM** — render each SVG inside a custom element with a shadow root. Style encapsulation comes for free. Heavyweight for static SVGs, and breaks any author CSS that currently targets paths *across* the SVG boundary (like the hero override above).
+- **CSS [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope)** — wrap the SVG's `<style>` contents in `@scope (#unique-id) { ... }`. Native, clean syntax, works in Chrome 118+ / Firefox 128+ / Safari 17.4+ (all from 2024). Equivalent end result; we picked manual prefixing because it works in older browsers and the implementation is the same handful of lines either way.
+- **[Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM)** — render each SVG inside a custom element with a shadow root. Style encapsulation comes for free. Heavyweight for static SVGs, and breaks any author CSS that currently targets paths *across* the SVG boundary (like the hero override above).
 - **Editing each SVG to use unique class names** — find/replace `.st0` → `.community-logo-st0` etc. Works, but you need to do it every time a non-technical user uploads a new SVG through Umbraco, which means it isn't really a solution.
 - **Strip the `<style>` block, inline fills onto each path** — defeats the cascade entirely. Loses the per-class hooks that author CSS (and hero overrides) depend on.
 

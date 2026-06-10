@@ -57,7 +57,7 @@ If this is the first content-related code you're writing for this codebase, do t
 
 | Folder | Base class | Used for | Example |
 | --- | --- | --- | --- |
-| `Controllers/Render/` | `RenderController` | Route-hijacking — taking over the render path for a specific content type | [`HomeController`](../../src/UmbracoCommunity.Web/Controllers/Render/HomeController.cs), `BlogController`, `ArticleController` |
+| `Controllers/Render/` | `RenderController` | [Route-hijacking](https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/application-code/backend-and-custom-logic/routing/custom-controllers) — taking over the render path for a specific content type | [`HomeController`](../../src/UmbracoCommunity.Web/Controllers/Render/HomeController.cs), `BlogController`, `ArticleController` |
 | `Controllers/Api/` | `ControllerBase` + `[ApiController]` | JSON API endpoints called from frontend code | [`BlogApiController`](../../src/UmbracoCommunity.Web/Controllers/Api/BlogApiController.cs), `SeedController` |
 | `Controllers/` (root) | `Controller` | Plain MVC endpoints unrelated to Umbraco content — usually small (robots.txt, security.txt) | `RobotsController`, `SecurityTxtController` |
 
@@ -170,7 +170,7 @@ Under `UmbracoCommunity.Web/`:
 
 ## ViewComponents for layout slots
 
-Layout concerns — meta tags, menu, footer, favicon — are handled by [ViewComponents](../../src/UmbracoCommunity.Web/ViewComponents/), invoked from `Views/Shared/_Layout.cshtml`. A view component is an ASP.NET pattern that works like a mini-controller scoped to rendering one slice of layout: it has its own DI scope, pulls its own data, and renders its own partial view.
+Layout concerns — meta tags, menu, footer, favicon — are handled by [ViewComponents](../../src/UmbracoCommunity.Web/ViewComponents/), invoked from `Views/Shared/_Layout.cshtml`. A view component is an [ASP.NET pattern](https://learn.microsoft.com/aspnet/core/mvc/views/view-components) that works like a mini-controller scoped to rendering one slice of layout: it has its own DI scope, pulls its own data, and renders its own partial view.
 
 Use a view component when:
 

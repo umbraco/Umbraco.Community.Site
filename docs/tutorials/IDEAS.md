@@ -9,7 +9,7 @@ These don't follow the tutorial section template — that's for the actual write
 If you only write three more, these are the ones with the strongest "non-obvious problem, broad audience" shape:
 
 - ~~**`multi-tenant-content-resolution`**~~ — shipped as [foundations/multi-tenant-content-resolution.md](./foundations/multi-tenant-content-resolution.md).
-- **`vite-umbraco-manifest-integration`** ([stub →](./foundations/vite-umbraco-manifest-integration.md)) — modern frontend tooling talking to a server-rendered Razor view. Dev mode hits the Vite dev server on `:5123` for HMR; prod mode reads `manifest.json` and emits the right `<script>`/`<link>` tags via a TagHelper. Audience is much wider than this repo — every "I want Vite/React/Lit in my .NET project" tutorial online either skips this or gets it wrong.
+- ~~**`vite-umbraco-manifest-integration`**~~ — shipped as [foundations/vite-umbraco-manifest-integration.md](./foundations/vite-umbraco-manifest-integration.md).
 - **`mutation-observer-progressive-enhancement`** ([stub →](./foundations/mutation-observer-progressive-enhancement.md)) — the `<dc-form-steps>` problem: your enhancement runs before the thing it enhances exists. Umbraco Forms async-renders inside `<umb-forms-render>`, so the steps component uses a MutationObserver to wait for the field groups to appear, then converts them to steps. The pattern transfers anywhere you're enhancing async-rendered DOM.
 
 ## Foundations
@@ -17,7 +17,7 @@ If you only write three more, these are the ones with the strongest "non-obvious
 Reusable primitives that other tutorials can build on.
 
 - ~~**`multi-tenant-content-resolution`**~~ — shipped (see top picks).
-- **`vite-umbraco-manifest-integration`** ([stub →](./foundations/vite-umbraco-manifest-integration.md)) — see top picks. Foundation for the dual-build refinement below and anything else frontend-related.
+- ~~**`vite-umbraco-manifest-integration`**~~ — shipped as [foundations/vite-umbraco-manifest-integration.md](./foundations/vite-umbraco-manifest-integration.md). Foundation for the dual-build refinement and anything else frontend-related.
 - **`intersection-observer-paused-animation`** ([stub →](./foundations/intersection-observer-paused-animation.md)) — the `<dc-image-slider>` auto-scroll. `requestAnimationFrame` for the loop, `IntersectionObserver` to pause when off-screen, `visibilitychange` for tab switches, `prefers-reduced-motion` for accessibility. The general lesson: how to animate something cheaply *and* politely without leaning on a library.
 - **`drag-to-scroll-with-snap`** ([stub →](./foundations/drag-to-scroll-with-snap.md)) — the `<dc-slider>` component. Touch drag follows finger and snaps on release; desktop gets hover-zone navigation; explicit arrow buttons are an opt-in. Building a usable scroller in vanilla web components instead of pulling in Swiper / Embla.
 - **`content-tree-inherited-config`** ([stub →](./foundations/content-tree-inherited-config.md)) — Block Restrictions' core idea, but framed generally: attach rules to a doc type, let descendants inherit by ancestor walk, cache the resolution, fail open when nothing is configured. The pattern shows up anywhere you have "configure on a parent, apply on descendants" (CMS perms, feature flags by section, theming overrides).

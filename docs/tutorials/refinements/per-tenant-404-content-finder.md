@@ -35,7 +35,7 @@ A few approaches that don't actually get you there:
 
 ## Our approach
 
-Umbraco's request pipeline calls a chain of `IContentFinder` implementations in turn, asking each of them to match a URL to an `IPublishedContent`. When all of them fail to find anything, Umbraco calls a single `IContentLastChanceFinder` — exactly one, registered via `builder.SetContentLastChanceFinder<T>()`. That last-chance finder is the hook for "I'm about to serve a 404; would you like to serve content instead?", and it's exactly the right place for our per-tenant logic to live.
+Umbraco's request pipeline calls a chain of [`IContentFinder`](https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/application-code/backend-and-custom-logic/routing/request-pipeline/icontentfinder) implementations in turn, asking each of them to match a URL to an `IPublishedContent`. When all of them fail to find anything, Umbraco calls a single `IContentLastChanceFinder` — exactly one, registered via `builder.SetContentLastChanceFinder<T>()`. That last-chance finder is the hook for "I'm about to serve a 404; would you like to serve content instead?", and it's exactly the right place for our per-tenant logic to live.
 
 Inside `TryFindContent` you get an `IPublishedRequestBuilder` — think of it as Umbraco's mutable wrapper around the in-flight request, with hooks for "use this published content", "set this response status", and so on. It exposes `request.Domain?.ContentId`, which is the content ID of the root node bound to the request's domain. That's the tenancy signal you need: even though there's no current page, Umbraco *does* know which tenant the request belongs to, because it knew which domain was hit.
 
@@ -137,7 +137,7 @@ if (notFoundPage is null)
 
 Two things to flag.
 
-**Why `IServiceScopeFactory` instead of constructor-injecting `IPublishedContentQuery`?** `IPublishedContentQuery` is registered as scoped, and `IContentLastChanceFinder` implementations are resolved early in the request pipeline — early enough that the scoped-service captive-dependency rules can bite if you inject scoped services directly. Creating a fresh scope per call sidesteps the lifecycle question entirely. If you've been bitten by "cannot consume scoped service from singleton" errors in Umbraco's routing layer before, this is the workaround.
+**Why `IServiceScopeFactory` instead of constructor-injecting `IPublishedContentQuery`?** `IPublishedContentQuery` is registered as scoped, and `IContentLastChanceFinder` implementations are resolved early in the request pipeline — early enough that the scoped-service [captive-dependency](https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection#scope-validation) rules can bite if you inject scoped services directly. Creating a fresh scope per call sidesteps the lifecycle question entirely. If you've been bitten by "cannot consume scoped service from singleton" errors in Umbraco's routing layer before, this is the workaround.
 
 **Why a fallback at all?** Local dev and CI. When you run the site on `https://localhost:44389` with no hostname configured in the backoffice, there's no bound domain and `request.Domain` is null. You still want a 404 page to render rather than a Kestrel error page. Same for tests that bypass hostname routing. In production with hostnames configured, the fallback should essentially never fire — if it does, you've got a tenant without a `PageNotFound` page, which is worth catching in a deployment checklist.
 

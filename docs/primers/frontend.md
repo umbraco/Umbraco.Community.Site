@@ -106,11 +106,11 @@ Under `StaticAssets/src/`:
 
 ## Lit + PostCSS
 
-Components on the public site are **Lit 3.x** web components — Lit is a small (~6 KB) library for authoring standards-based custom elements with reactive properties and template literals, which gets us most of the developer ergonomics of a framework without the virtual DOM or any framework lock-in. A few conventions to bear in mind:
+Components on the public site are **Lit 3.x** web components — [Lit](https://lit.dev) is a small (~6 KB) library for authoring standards-based custom elements with reactive properties and template literals, which gets us most of the developer ergonomics of a framework without the virtual DOM or any framework lock-in. A few conventions to bear in mind:
 
 - Component file naming is `*.element.ts` (e.g. `dc-slider.element.ts`). The `dc-` prefix is a project naming convention with no special meaning.
 - Tests are colocated as `*.test.ts` next to the file they cover.
-- RxJS (Observable streams) is used where reactive composition of async data helps; Zod is used at API boundaries for runtime validation of fetched JSON.
+- [RxJS](https://rxjs.dev) (Observable streams) is used where reactive composition of async data helps; [Zod](https://zod.dev) is used at API boundaries for runtime validation of fetched JSON.
 
 The smallest possible component:
 
@@ -126,7 +126,7 @@ export class DcHello extends LitElement {
 
 Drop that in `src/components/dc-hello.element.ts`, import it from an entrypoint, and `<dc-hello></dc-hello>` works in any Razor view.
 
-CSS is **PostCSS** — a CSS post-processor pipeline (think Sass-style features, but the input is standard CSS plus opt-in next-gen syntax). The pipeline lives in [`vite.config.ts`](../../src/UmbracoCommunity.StaticAssets/vite.config.ts) and combines three plugins:
+CSS is **[PostCSS](https://postcss.org)** — a CSS post-processor pipeline (think Sass-style features, but the input is standard CSS plus opt-in next-gen syntax). The pipeline lives in [`vite.config.ts`](../../src/UmbracoCommunity.StaticAssets/vite.config.ts) and combines three plugins:
 
 - **`postcss-mixins`** with a custom `rhythm` mixin (see [`postcss-rhythm.mixin.ts`](../../src/UmbracoCommunity.StaticAssets/postcss-rhythm.mixin.ts)) — generates utility spacing classes like `.pt-md`, `.mx-xs`, `.m-lg` from CSS custom properties defined once in `root.css`. The point is design-token-driven spacing: one source of truth for the rem scale, used by hundreds of layouts, so spacing stays consistent without anyone having to remember individual values. Modifiers: `-xxs`, `-xs`, `-sm`, *(no suffix)*, `-md`, `-lg`, `-xl`, `-0`.
 - **`postcss-calc`** — pre-computes `calc()` expressions at build time where it can.
@@ -136,7 +136,7 @@ CSS is **PostCSS** — a CSS post-processor pipeline (think Sass-style features,
 
 ## Testing
 
-Tests use **Vitest** with `jsdom`, configured in [`vitest.config.ts`](../../src/UmbracoCommunity.StaticAssets/vitest.config.ts). Conventions:
+Tests use **[Vitest](https://vitest.dev)** with `jsdom`, configured in [`vitest.config.ts`](../../src/UmbracoCommunity.StaticAssets/vitest.config.ts). Conventions:
 
 - Test files match `src/**/*.{test,spec}.ts` — colocated next to the file they cover.
 - Coverage thresholds are 80% (branches, functions, lines, statements) across `util/`, `components/`, and `services/`; falling below them fails `npm run test:coverage` locally and CI.
