@@ -9,13 +9,13 @@ These aren't tutorials — see [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md
 If you only write three more, these are the ones with the strongest "broad area with scattered docs that need threading" shape:
 
 - ~~**`backend`**~~ — shipped as [backend.md](./backend.md).
-- **`multi-tenancy`** ([stub →](./multi-tenancy.md)) — the [multi-tenant content resolution tutorial](../tutorials/foundations/multi-tenant-content-resolution.md) is the foundation, and the two refinements (404, schema) layer on it, but there's no top-level "here's what tenancy looks like in this codebase" overview that someone unfamiliar can read in five minutes. Primer would frame the multi-root content tree, the `GetSiteSettings()` convention, the domain-binding rule for routing-level lookups, and link out to the tutorial suite for depth.
+- ~~**`multi-tenancy`**~~ — shipped as [multi-tenancy.md](./multi-tenancy.md).
 - **`backoffice`** ([stub →](./backoffice.md)) — the frontend primer punts on `UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, and `Umbraco.Community.NotFoundTracker/Client/`. A backoffice primer would cover them all: App_Plugins manifest format, the Umbraco backoffice design system (`@umbraco-cms/backoffice`), how property editors / workspace views / dashboards are registered, and the **separate-Vite-project setup** — each backoffice client is its own Vite project in library mode (`build.lib`), externalising `@umbraco/*` and emitting to its own `App_Plugins/<Name>/`, rather than sharing the public-site build. Worth covering *why* the backoffice gets separate projects (different module-loading conventions, host-provided `@umbraco/*`, no manifest/HMR story) vs. a shared toolchain. (The repo briefly built the backoffice from `StaticAssets` via a `BUILD_TARGET` switch before Extensions moved into their own project in commit `2a2b1a5`; those leftovers have since been removed.)
 
 ## The full list
 
 - ~~**`backend`**~~ — shipped (see top picks).
-- **`multi-tenancy`** ([stub →](./multi-tenancy.md)) — see top picks. Pulls together an existing tutorial suite.
+- ~~**`multi-tenancy`**~~ — shipped as [multi-tenancy.md](./multi-tenancy.md). Pulls together an existing tutorial suite.
 - **`backoffice`** ([stub →](./backoffice.md)) — see top picks. Covers the backoffice client codebases and why each is its own Vite project.
 - **`content-modelling`** ([stub →](./content-modelling.md)) — document types, element types, block types, compositions (`ICompositionPageConfiguration`, `ICompositionSeo`, …), the auto-generated `PublishedModels` namespace, and the view-model-builder pipeline that converts `IPublishedContent` into view-shaped models. Threads together the `Models/` folder structure and the `BUILDING_PAGES.md` / `BUILDING_BLOCKS.md` how-tos.
 - **`caching`** ([stub →](./caching.md)) — caching is everywhere in this codebase but scattered: `AppCaches.RuntimeCache` (SVG TagHelper), `MemoryCache` (Vite manifest), `OutputCachePolicies` (API endpoints), `RequestCache` (per-request memoisation), `IsolatedCaches`. A primer would map which cache to reach for in which situation and what invalidates each.

@@ -10,6 +10,7 @@ If you're new to the codebase, start here. If you've been here a while and someo
 
 - **[Frontend primer](frontend.md)** — the Vite-powered public-site frontend in `UmbracoCommunity.StaticAssets`. Covers the dual dev workflow, the manifest-driven Razor integration, the entrypoint convention, Lit + PostCSS, testing, and what builds for production. Backoffice frontends are signposted at the end.
 - **[Backend primer](backend.md)** — the C# side in `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI`. Covers the request flow (URL → render controller → view model builder → view), the three controller flavours, the builder pattern and DI registration, bootstrapping through composers, output caching policies, and the self-contained `Features/Sessionize/` module pattern.
+- **[Multi-tenancy primer](multi-tenancy.md)** — one Umbraco instance, several sites. The single invariant (scope every content lookup to the current request's tenant), the multi-root content tree, the `GetSiteSettings()` / `AncestorOrSelf<T>()` helpers, domain-binding for routing-level lookups with no current page, and the intentional cross-tenant exceptions. Threads together the multi-tenant tutorial suite.
 
 ### Planned
 

@@ -49,7 +49,7 @@ API endpoints (`Controllers/Api/`) skip the view-model and Razor steps entirely 
 
 Let us take a moment to talk about something that affects nearly everything you'll write here. This site runs multiple tenants from one Umbraco instance — each tenant has its own root content node and its own content tree underneath. The single invariant to hold in your head is this: **every content lookup must be scoped to the current request's tenant**. Never assume a single root, never use hardcoded content paths. The standard helpers (`currentPage.Root()`, `GetSiteSettings()`, the domain-binding pattern in custom content finders) all exist to make that scoping cheap. Forget it, and tenant A's navigation will end up leaking into tenant B before you know what's happened.
 
-If this is the first content-related code you're writing for this codebase, do take the time to read through the [multi-tenant content resolution tutorial](../tutorials/foundations/multi-tenant-content-resolution.md) before going much further — it's a small investment that will save you a class of bug.
+If this is the first content-related code you're writing for this codebase, do take the time to get oriented before going much further — the [multi-tenancy primer](multi-tenancy.md) is the five-minute version, and the [multi-tenant content resolution tutorial](../tutorials/foundations/multi-tenant-content-resolution.md) the deeper dive. It's a small investment that will save you a class of bug.
 
 ## Three controller flavours
 
