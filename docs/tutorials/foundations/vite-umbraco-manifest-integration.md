@@ -26,7 +26,7 @@ So the same view has to render two completely different `<script>`/`<link>` outp
 
 ## What we're building
 
-Two TagHelpers that let a view author write this, once, and forget about environments:
+The Razor view incorporates two TagHelpers, written once, that resolve correctly whatever the environment:
 
 ```cshtml
 <link rel="stylesheet" vite-href="index" asp-add-nonce="true" />
@@ -36,21 +36,21 @@ Two TagHelpers that let a view author write this, once, and forget about environ
 
 (Ignore `asp-add-nonce` for now — that's a separate Content-Security-Policy concern, not part of the Vite wiring. It stamps a security token on the tag so a strict CSP will allow it.)
 
-In **development** that pair expands to a *module script* (`type="module"` — an ES module the browser loads natively) pointing at the Vite dev server, which also injects the CSS, so the `<link>` renders nothing — plus a one-time `@vite/client` bootstrap that wires up HMR:
+In **development** that code resolves to a *module script* (`type="module"` — an ES module the browser loads natively) pointing at the Vite dev server, which also injects the CSS, so the `<link>` renders nothing — plus a one-time `@vite/client` bootstrap that wires up HMR:
 
 ```html
 <script type="module" src="https://localhost:5123/@vite/client"></script>
 <script type="module" src="https://localhost:5123/src/entrypoints/_index.ts"></script>
 ```
 
-In **production** the same pair reads `manifest.json` and emits the hashed asset and its stylesheet(s):
+In **production** the same code reads the `manifest.json` data and emits the hashed asset and its stylesheet(s):
 
 ```html
 <link rel="stylesheet" href="/assets/_index-Bf3kq9x2.css" />
 <script type="module" src="/assets/_index-Bf3kq9x2.js"></script>
 ```
 
-The view author never sees that difference. They name a logical entry — `index`, `blog`, or `@currentPage.ContentTypeAlias` for a per-page bundle — and the C# resolves it.
+The code never has to make that distinction. It references a logical entry — `index`, `blog`, or `@currentPage.ContentTypeAlias` for a per-page bundle — and the C# resolves it.
 
 The moving parts:
 
@@ -75,7 +75,7 @@ rollupOptions: {
 }
 ```
 
-Vite keys each manifest entry by its source path relative to the project root — so `_index.ts` becomes the manifest key `src/entrypoints/_index.ts`. Rather than make a view author type that whole path, `TryGetEntryName` in [`ViteTagHelperBase`](../../../src/UmbracoCommunity.Web/Vite/TagHelpers/ViteTagHelperBase.cs) reconstructs it from the short name:
+Vite keys each manifest entry by its source path relative to the project root — so `_index.ts` becomes the manifest key `src/entrypoints/_index.ts`. Rather than require that whole path in the markup, `TryGetEntryName` in [`ViteTagHelperBase`](../../../src/UmbracoCommunity.Web/Vite/TagHelpers/ViteTagHelperBase.cs) reconstructs it from the short name:
 
 ```csharp
 protected bool TryGetEntryName(string? contentPath, IUrlHelper urlHelper, [NotNullWhen(true)] out string? entryName)
@@ -108,7 +108,7 @@ protected bool TryGetEntryName(string? contentPath, IUrlHelper urlHelper, [NotNu
 }
 ```
 
-So `vite-src="index"` → `src/entrypoints/_index.ts`, which is exactly the manifest key. The author names a *bundle*, not a file, and the same name works for both the script and the stylesheet because one manifest entry carries both. This is also why `vite-href="@currentPage.ContentTypeAlias"` works as a per-page convention: every page type that has an `_<alias>.ts` entrypoint automatically gets its bundle, and the helper silently suppresses output for the ones that don't (more on that below).
+So `vite-src="index"` → `src/entrypoints/_index.ts`, which is exactly the manifest key. The view names a *bundle*, not a file, and the same name works for both the script and the stylesheet because one manifest entry carries both. This is also why `vite-href="@currentPage.ContentTypeAlias"` works as a per-page convention: every page type that has an `_<alias>.ts` entrypoint automatically gets its bundle, and the helper silently suppresses output for the ones that don't (more on that below).
 
 ### Step 2 — Config and the dev/prod switch
 
@@ -348,8 +348,8 @@ That's it — `vite-src` and `vite-href` are now available in every view under t
 - **The dev-server URL and port are convention, not coordination.** `vite.config.ts` runs Vite on `5123` (`"dev": "vite --port 5123"`) and the TagHelper defaults to `https://localhost:5123`. Change one and you must change the other (via `ViteDevServerUrl` config). There's no shared source of truth tying the two together.
 - **HTTPS in dev relies on `vite-plugin-mkcert`.** The default dev-server URL is `https://`, so Vite has to serve over TLS. The config uses `mkcert()` to generate a locally-trusted cert; without it (or with an untrusted cert) the browser blocks the module scripts as mixed/insecure content and you're back to the unstyled-page symptom.
 - **The manifest cache is process-local.** It's a static `IMemoryCache`, so each app instance reads and caches its own copy. That's fine — the `IFileProvider.Watch` token invalidates each instance independently when its own `wwwroot/assets/manifest.json` changes on deploy. On a platform where the manifest is swapped atomically this is exactly right; if a deploy left the manifest and the files it names briefly out of sync, a request landing in that window could 404 an asset until the file watcher catches up.
-- **`vite-client` correctness is on the author.** Exactly one tag per page must set `vite-client="true"`, and it's not enforced. Set it on two and you load the HMR client twice in dev (harmless but noisy); set it on none and HMR silently doesn't connect. The convention is "the shared `index` bundle owns it" — worth a comment in any new layout.
-- **Entry names are lowercased and `_`-prefixed implicitly.** `TryGetEntryName` lowercases the path and assumes the `src/entrypoints/_*.ts` layout. An entrypoint that doesn't follow that naming, or a name with meaningful casing, won't resolve. The convention is load-bearing; it's the cost of letting authors write `vite-src="index"` instead of a full path.
+- **`vite-client` correctness is a convention, not a guarantee.** Exactly one tag per page must set `vite-client="true"`, and nothing enforces it. Set it on two and you load the HMR client twice in dev (harmless but noisy); set it on none and HMR silently doesn't connect. The convention is "the shared `index` bundle owns it" — worth a comment in any new layout.
+- **Entry names are lowercased and `_`-prefixed implicitly.** `TryGetEntryName` lowercases the path and assumes the `src/entrypoints/_*.ts` layout. An entrypoint that doesn't follow that naming, or a name with meaningful casing, won't resolve. The convention is load-bearing; it's the cost of being able to write `vite-src="index"` instead of a full path.
 
 ## Where to go next
 

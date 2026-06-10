@@ -6,7 +6,7 @@ tags: [svg, css-scoping, style-isolation, tag-helper]
 
 > **Prerequisites:** This tutorial extends an existing inline-SVG TagHelper. If you don't have one yet (or want to understand the one we're modifying), start with [Building an inline SVG TagHelper for Umbraco](../foundations/inline-svg-tag-helper.md). The walkthrough below assumes you've read it.
 
-There's a surprisingly satisfying class of "the logo went the wrong colour" bugs that all trace back to the same root cause: inline `<style>` blocks inside SVGs aren't actually scoped to the SVG they live in, even though every fibre of your developer instinct says they ought to be. This tutorial walks through how we ran into the problem on the Umbraco Community site, why the obvious fixes don't quite hold up, and how we ended up solving it with a small change to a single TagHelper.
+There's a surprisingly satisfying class of "the logo went the wrong colour" bugs that all trace back to the same root cause: inline `<style>` blocks inside SVGs aren't actually scoped to the SVG they live in, even though every bit of your experience tells you they ought to be. This tutorial walks through how we ran into the problem on the Umbraco Community site, why the obvious fixes don't quite hold up, and how we ended up solving it with a small change to a single TagHelper.
 
 ## The problem
 

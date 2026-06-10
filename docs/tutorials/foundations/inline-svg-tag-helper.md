@@ -24,7 +24,7 @@ You have three obvious ways to put an SVG on a page:
 2. **`background-image: url(/media/.../logo.svg)`** — same limitations as `<img>`, plus you give up the SVG's intrinsic aspect ratio and need to manage dimensions in CSS.
 3. **Inline `<svg>...</svg>` in the HTML** — the entire SVG DOM becomes part of the page. CSS targets paths, JavaScript animates them, screen readers can read embedded `<title>` and `<desc>`. This is what you want for logos, icons, and any decorative artwork that should respond to design tokens.
 
-Inlining by hand means copying the SVG markup into your Razor view, which means the marketing team can't update the logo without a developer in the loop. A TagHelper bridges the two: editors upload an SVG to Umbraco media, the developer writes one line of Razor, and the SVG renders inline.
+Inlining by hand means copying the SVG markup into your Razor view — which means updating the logo always needs a code change. A TagHelper bridges the gap: editors upload an SVG to Umbraco media, a single line of Razor inlines it, and the SVG renders. Updating the logo becomes a content task rather than a code one.
 
 ## What we're building
 

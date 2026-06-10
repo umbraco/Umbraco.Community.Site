@@ -2,7 +2,7 @@
 
 Short, standalone tutorials covering specific problems we've hit on the Umbraco Community site and the approaches we took to solve them.
 
-Each tutorial is self-contained: it states the concrete problem, explains the trade-offs of our solution, and walks through the implementation file by file. They're written so a developer on a different Umbraco project (or no Umbraco project at all) can pick up the pattern — but they reference real code in this repo so anyone working *on* the site can jump straight to the source if they prefer to read code over prose.
+Each tutorial is self-contained: it states the concrete problem, explains the trade-offs of our solution, and walks through the implementation file by file. They're written to be picked up on a different Umbraco project (or no Umbraco project at all) — but they reference real code in this repo, so anyone working *on* the site can jump straight to the source if they prefer to read code over prose.
 
 These sit alongside the other docs in this folder rather than replacing them:
 
