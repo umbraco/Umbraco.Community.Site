@@ -6,7 +6,7 @@ tags: [vite, manifest, razor, tag-helper, hmr]
 
 Vite bundles your frontend and Umbraco renders your views, and sitting between the two is a single `<script>` tag that needs to behave completely differently depending on where it's running. Locally, you want the browser talking to the Vite dev server so you get hot module replacement (HMR — your edits to JS and CSS show up in the browser without a full page reload). In production, you want it loading a content-hashed file whose name changes with every build. Same tag, two different usecases. This tutorial walks through the pair of TagHelpers the Umbraco Community site uses to bridge them — `<script vite-src>` and `<link vite-href>` — so that you can write one stable line of Razor and lets the C# work out, per environment, whether to point at `localhost:5123` for HMR or at the hashed asset named in Vite's `manifest.json`.
 
-This is a *foundation* piece. The [dual frontend/backoffice build refinement](../refinements/dual-build-frontend-and-backoffice.md) builds on the same Vite project this sets up, and anything else frontend-flavoured in the codebase ultimately renders through these two TagHelpers. The pattern transfers to any ASP.NET Core project — there's nothing Umbraco-specific about the core idea — but it's the bit almost every "use Vite with .NET" guide online either skips or fumbles, so it earns a write-up.
+This is a *foundation* piece. Anything else frontend-flavoured in the codebase ultimately renders through these two TagHelpers — the one exception being the Umbraco backoffice extensions, which are built by [separate Vite projects](../../primers/frontend.md#other-frontend-codebases) rather than this one. The pattern transfers to any ASP.NET Core project — there's nothing Umbraco-specific about the core idea — but it's the bit almost every "use Vite with .NET" guide online either skips or fumbles, so it earns a write-up.
 
 If you've not written a TagHelper before: it's a small Razor extension that looks like an HTML element in your view but is expanded server-side, in C#, before the page is sent to the browser (Microsoft's [Introduction to Tag Helpers](https://learn.microsoft.com/aspnet/core/mvc/views/tag-helpers/intro) is the canonical primer if you want the fuller picture). We lean on that server-side step to make the dev/prod decision.
 
@@ -353,7 +353,7 @@ That's it — `vite-src` and `vite-href` are now available in every view under t
 
 ## Where to go next
 
-→ [Dual build: one Vite project, two bundles (frontend + backoffice)](../refinements/dual-build-frontend-and-backoffice.md) — the same Vite project that powers the public site also builds the Umbraco backoffice extensions, switching entry points and output paths on a `BUILD_TARGET` env var. It builds directly on the setup here.
+→ [Frontend primer — other frontend codebases](../../primers/frontend.md#other-frontend-codebases) — the Umbraco backoffice extensions don't share this build; each is its own Vite library-mode project that externalises `@umbraco/*`. The primer's closing section covers how those separate clients are set up.
 
 → [Building an inline SVG TagHelper for Umbraco](inline-svg-tag-helper.md) — another foundation TagHelper, if you want more practice with the server-side-expansion pattern before writing your own.
 

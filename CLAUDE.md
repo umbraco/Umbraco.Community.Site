@@ -96,9 +96,6 @@ dotnet build
 cd src/UmbracoCommunity.StaticAssets
 npm run build
 
-# Build backoffice extensions only
-npm run build:backoffice
-
 # Build for cloud deployment (copies files via devops/copy-for-cloud.js)
 npm run build:for:cloud
 
@@ -171,8 +168,9 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **test/** - Test utilities
 
 Built assets go to:
-- Frontend: `dist/` → referenced in views
-- Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
+- Frontend: `dist/` → copied to `../UmbracoCommunity.Web.UI/wwwroot/assets/` for production, referenced in views
+
+Backoffice extensions are **not** built from this project. Each lives in its own Vite project (`UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, `Umbraco.Community.NotFoundTracker/Client/`) and emits to its own `App_Plugins/<Name>/` folder.
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
@@ -403,7 +401,7 @@ Custom Vite integration for Umbraco:
 - Manifest-based asset loading in development and production
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
-- Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
+- Single build target here: the public website (`npm run build`). Backoffice extensions build separately, from each `*/Client/` Vite project (library mode, externalising `@umbraco/*`)
 
 ### SEO and Schema Markup
 
