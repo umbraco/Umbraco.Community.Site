@@ -1,0 +1,167 @@
+{
+  "primers/README.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/backend.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/backoffice.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/caching.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/content-modelling.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/deployment.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/frontend.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/integrations.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/multi-tenancy.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "primers/seo-and-structured-data.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/README.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/backoffice-management-api-with-auth-policies.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/content-tree-inherited-config.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/drag-to-scroll-with-snap.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/inline-svg-tag-helper.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/intersection-observer-paused-animation.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/multi-tenant-content-resolution.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/mutation-observer-progressive-enhancement.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/nonce-csp-with-razor.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/postcss-mixin-for-design-tokens.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/site-search-with-examine-externalindex.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/foundations/vite-umbraco-manifest-integration.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/caching-scoped-svg-output.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/closest-host-opt-in-for-shared-component.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/dual-build-frontend-and-backoffice.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/dual-persistence-db-and-json.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/output-cache-policies-for-slow-upstream-apis.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/per-tenant-404-content-finder.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/scoping-inline-svg-styles.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/sessionize-question-answer-resolution.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/shipping-ef-core-migrations-from-a-package.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/tenant-fallback-for-schema-and-seo.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ],
+  "tutorials/refinements/wrapping-umbraco-native-block-editor.md": [
+    {
+      "name": "Laura Weatherhead"
+    }
+  ]
+}
