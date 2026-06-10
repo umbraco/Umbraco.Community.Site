@@ -4,7 +4,7 @@ tags: [vite, manifest, razor, tag-helper, hmr]
 
 # Wiring Vite's manifest into Umbraco's Razor pipeline
 
-Vite bundles your frontend and Umbraco renders your views, and sitting between the two is a single `<script>` tag that needs to behave completely differently depending on where it's running. Locally, you want the browser talking to the Vite dev server so you get hot module replacement (HMR — your edits to JS and CSS show up in the browser without a full page reload). In production, you want it loading a content-hashed file whose name changes with every build. Same tag, two different usecases. This tutorial walks through the pair of TagHelpers the Umbraco Community site uses to bridge them — `<script vite-src>` and `<link vite-href>` — so that you can write one stable line of Razor and lets the C# work out, per environment, whether to point at `localhost:5123` for HMR or at the hashed asset named in Vite's `manifest.json`.
+Vite bundles your frontend and Umbraco renders your views, and sitting between the two is a single `<script>` tag that needs to behave completely differently depending on where it's running. Locally, you want the browser talking to the Vite dev server so you get hot module replacement (HMR — your edits to JS and CSS show up in the browser without a full page reload). In production, you want it loading a content-hashed file whose name changes with every build. Same tag, two different use cases. This tutorial walks through the pair of TagHelpers the Umbraco Community site uses to bridge them — `<script vite-src>` and `<link vite-href>` — so that you can write one stable line of Razor and let the C# work out, per environment, whether to point at `localhost:5123` for HMR or at the hashed asset named in Vite's `manifest.json`.
 
 This is a *foundation* piece. Anything else frontend-flavoured in the codebase ultimately renders through these two TagHelpers — the one exception being the Umbraco backoffice extensions, which are built by [separate Vite projects](../../primers/frontend.md#other-frontend-codebases) rather than this one. The pattern transfers to any ASP.NET Core project — there's nothing Umbraco-specific about the core idea — but it's the bit almost every "use Vite with .NET" guide online either skips or fumbles, so it earns a write-up.
 
@@ -18,7 +18,7 @@ The code shown here is **adapted from the Vite TagHelpers in [`Umbraco.Demo.Clou
 
 Why not just point the `<script>` straight at the file and have done with it? Because Vite's output is content-hashed. A production build doesn't emit `index.js`; it emits `_index-Bf3kq9x2.js`, and that hash changes whenever the source changes. That's exactly what you want for cache-busting — you can serve the file with a one-year `immutable` cache header and never worry about a stale bundle landing in someone's browser — but it does mean **you cannot hardcode the filename in your view.** You don't know the name until the build runs, and it'll be a different name next build.
 
-Vite solves the "what's the real filename?" problem with a `manifest.json` it writes at build time: a map from the source entry path you *do* know (`src/entrypoints/_index.ts`) to the hashed output file you *don't* (`assets/_index-Bf3kq9x2.js`), plus the CSS files and chunks that entry pulls in (the shape of that file, and this whole server-reads-the-manifest dance, is documented in Vite's [Backend Integration guide](https://vite.dev/guide/backend-integration.html)). So in production your server needs to read that manifest and emit the right `<script src>`.
+Vite solves the "what's the real filename?" problem with a `manifest.json` it writes at build time: a map from the source entry path you *do* know (`src/entrypoints/_index.ts`) to the hashed output file you *don't* (`assets/_index-Bf3kq9x2.js`), plus the CSS files and chunks that entry pulls in (Vite's [Backend Integration guide](https://vite.dev/guide/backend-integration.html) documents the shape of that file and this whole server-reads-the-manifest dance). So in production your server needs to read that manifest and emit the right `<script src>`.
 
 But in *development* you want none of that. You want the Vite dev server running with HMR, so editing a Lit component or a stylesheet updates the page without a reload. In dev there's no manifest and no hashed file — there's a long-running server on a port, and your `<script>` should point straight at it.
 
@@ -55,7 +55,7 @@ The code never has to make that distinction. It references a logical entry — `
 The moving parts:
 
 - **`ViteTagHelperBase`** — the shared base: holds config (dev-server URL, manifest path), the entry-name normaliser, and the cached manifest reader.
-- **`ViteScriptTagHelper`** (`<script vite-src>`) and **`ViteLinkTagHelper`** (`<link vite-href>`) — the two concrete helpers, each with a two-branch `ProcessAsync`: dev branch, prod branch.
+- **`ViteScriptTagHelper`** (`<script vite-src>`) and **`ViteLinkTagHelper`** (`<link vite-href>`) — the two concrete helpers, each with a `ProcessAsync` that splits into two code paths — one for development, one for production.
 - **`ViteManifest` / `ViteManifestEntry`** — the typed shape of Vite's `manifest.json`.
 - **A build step** (`vite.config.ts` + `copy-for-cloud.js`) that produces the manifest and lands the assets where the helpers expect them.
 
@@ -182,14 +182,14 @@ public class ViteScriptTagHelper : ViteTagHelperBase
 
 Two of the calls here live in the base class: `GetViteManifestAsync` reads the cached manifest (Step 5), and `EntryNameWithBase` prefixes the asset path (the third point below). With those parked, three things in this method are worth pausing on:
 
-**The `vite-client` flag and "exactly once per page".** Vite's HMR needs its own client script (`@vite/client`) loaded once — it's what opens the websocket back to the dev server and applies updates. But a page often pulls in *several* bundles (`index` plus a per-page bundle, say), and you only want one HMR client. Rather than track "have I emitted it yet?" across helper instances, the flag is explicit: exactly one `<script vite-src>` in the layout sets `vite-client="true"`, and only that one emits the bootstrap. In [`Layout.cshtml`](../../../src/UmbracoCommunity.Web.UI/Views/Layout.cshtml) it's the shared `index` bundle:
+**The `vite-client` flag emits the HMR client exactly once per page.** Vite's HMR needs its own client script (`@vite/client`) loaded once — it's what opens the websocket back to the dev server and applies updates. But a page often pulls in *several* bundles (`index` plus a per-page bundle, say), and you only want one HMR client. Rather than track "have I emitted it yet?" across helper instances, the flag is explicit: exactly one `<script vite-src>` in the layout sets `vite-client="true"`, and only that one emits the bootstrap. In [`Layout.cshtml`](../../../src/UmbracoCommunity.Web.UI/Views/Layout.cshtml) it's the shared `index` bundle:
 
 ```cshtml
 <script vite-src="index" vite-client="true" asp-add-nonce="true"></script>
 <script vite-src="@currentPage.ContentTypeAlias" asp-add-nonce="true"></script>
 ```
 
-The per-page bundle deliberately omits the flag. In production `vite-client` does nothing — the branch that reads it never runs — so it's a dev-only concern that's harmless to leave in the markup.
+The per-page bundle deliberately omits the flag. In production `vite-client` does nothing — the code path that reads it only runs in development — so it's a dev-only concern that's harmless to leave in the markup.
 
 **`SuppressOutput()` is the graceful-degradation path.** If the entry name can't be resolved, or the manifest has no matching entry, the helper removes itself from the output entirely rather than emitting a broken `<script src="">`. That's what makes `vite-src="@currentPage.ContentTypeAlias"` safe to put in the shared layout: a page type with no matching entrypoint simply renders no script tag instead of a 404'ing one.
 
@@ -239,7 +239,7 @@ The dev-mode no-op is the subtle part, and it's the source of a lot of confusion
 
 ### Step 5 — Reading and caching the manifest
 
-Both prod branches call `GetViteManifestAsync`, in the base class. This is where the "survives a deploy without an app restart" claim is earned:
+Both TagHelpers' production code paths call `GetViteManifestAsync`, the manifest reader on the base class. This is where the "survives a deploy without an app restart" claim is earned:
 
 ```csharp
 private static IMemoryCache Cache { get; } = new MemoryCache(new MemoryCacheOptions());

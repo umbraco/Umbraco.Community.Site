@@ -6,7 +6,7 @@ tags: [multi-tenant, 404, content-finder, routing]
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). That tutorial covers the `Root()` + `GetSiteSettings()` resolution pattern this one extends to a corner of Umbraco where there *is no current page* — the request 404'd before it got that far.
 
-Multi-tenant Umbraco sites need multi-tenant 404 pages — it goes to reason that if a request lands on Tenant A's domain and ends up at a missing URL, the user shouldn't suddenly be looking at Tenant B's header and footer just because we couldn't find the page they asked for. This tutorial walks through the small content finder that makes that work, and the subtlety that forces it to resolve the tenant from the domain binding rather than from the (non-existent) current page.
+Multi-tenant Umbraco sites need multi-tenant 404 pages — it stands to reason that if a request lands on Tenant A's domain and ends up at a missing URL, the user shouldn't suddenly be looking at Tenant B's header and footer just because we couldn't find the page they asked for. This tutorial walks through the small content finder that makes that work, and the subtlety that forces it to resolve the tenant from the domain binding rather than from the (non-existent) current page.
 
 ## The problem
 
