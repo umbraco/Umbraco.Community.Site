@@ -1,3 +1,4 @@
+using Examine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
@@ -54,6 +55,8 @@ public sealed class RegisterFeeds : IComposer
         });
 
         builder.Services.AddSingleton<CommunityBlogsImageDownloader>();
+        builder.Services.AddExamineLuceneIndex(CommunityBlogsSearchIndexer.IndexName);
+        builder.Services.AddSingleton<ICommunityBlogsIndexer, CommunityBlogsSearchIndexer>();
         builder.Services.AddSingleton<ICommunityBlogsService, CommunityBlogsService>();
         builder.Services.AddHostedService<CommunityBlogsBackgroundService>();
     }

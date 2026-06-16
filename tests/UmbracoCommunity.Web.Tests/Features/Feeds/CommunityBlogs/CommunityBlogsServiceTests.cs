@@ -13,7 +13,10 @@ public class CommunityBlogsServiceTests : IDisposable
     private readonly string _tempRoot =
         Path.Combine(Path.GetTempPath(), "cb-tests-" + Guid.NewGuid().ToString("N"));
 
-    private CommunityBlogsService CreateService(SphereApiClient client, CommunityBlogsOptions options)
+    private CommunityBlogsService CreateService(
+        SphereApiClient client,
+        CommunityBlogsOptions options,
+        ICommunityBlogsIndexer? indexer = null)
     {
         Directory.CreateDirectory(_tempRoot);
         var env = new Mock<IHostEnvironment>();
@@ -31,6 +34,7 @@ public class CommunityBlogsServiceTests : IDisposable
             new MemoryCache(new MemoryCacheOptions()),
             new TestOptionsMonitor<CommunityBlogsOptions>(options),
             env.Object,
+            indexer ?? Mock.Of<ICommunityBlogsIndexer>(),
             NullLogger<CommunityBlogsService>.Instance);
     }
 
@@ -129,7 +133,7 @@ public class CommunityBlogsServiceTests : IDisposable
             NullLogger<CommunityBlogsAggregator>.Instance);
         var service2 = new CommunityBlogsService(aggregator, CreateDownloader(), new MemoryCache(new MemoryCacheOptions()),
             new TestOptionsMonitor<CommunityBlogsOptions>(new CommunityBlogsOptions { ApiKey = "psk_test" }),
-            env.Object, NullLogger<CommunityBlogsService>.Instance);
+            env.Object, Mock.Of<ICommunityBlogsIndexer>(), NullLogger<CommunityBlogsService>.Instance);
 
         await service2.RefreshAsync(); // fails -> must not wipe disk
 
@@ -150,6 +154,33 @@ public class CommunityBlogsServiceTests : IDisposable
         page.PageSize.Should().Be(12);
         page.TotalItems.Should().Be(0);
         page.TotalPages.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_WhenDataAggregated_RebuildsSearchIndex()
+    {
+        var indexer = new Mock<ICommunityBlogsIndexer>();
+        var service = CreateService(ClientReturning(FivePosts()),
+            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+
+        await service.RefreshAsync();
+
+        indexer.Verify(i => i.Rebuild(It.Is<CommunityBlogsData>(d => d.Posts.Count > 0)), Times.Once);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_WhenNoData_DoesNotRebuildSearchIndex()
+    {
+        var indexer = new Mock<ICommunityBlogsIndexer>();
+        // A failing client makes the aggregator return null, so RefreshAsync no-ops.
+        var failing = new HttpClient(StubHandler.Throws()) { BaseAddress = new Uri("https://test.local/api/v1/") };
+        var failingClient = new SphereApiClient(new SphereHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+        var service = CreateService(failingClient,
+            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+
+        await service.RefreshAsync();
+
+        indexer.Verify(i => i.Rebuild(It.IsAny<CommunityBlogsData>()), Times.Never);
     }
 
     public void Dispose()

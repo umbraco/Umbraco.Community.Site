@@ -16,6 +16,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
     private readonly CommunityBlogsImageDownloader _imageDownloader;
     private readonly IMemoryCache _cache;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
+    private readonly ICommunityBlogsIndexer _indexer;
     private readonly ILogger<CommunityBlogsService> _logger;
     private readonly string _cacheFilePath;
 
@@ -25,12 +26,14 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         IMemoryCache cache,
         IOptionsMonitor<CommunityBlogsOptions> options,
         IHostEnvironment hostEnvironment,
+        ICommunityBlogsIndexer indexer,
         ILogger<CommunityBlogsService> logger)
     {
         _aggregator = aggregator;
         _imageDownloader = imageDownloader;
         _cache = cache;
         _options = options;
+        _indexer = indexer;
         _logger = logger;
 
         var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "Data", "TEMP", "CommunityBlogsCache");
@@ -54,6 +57,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         _cache.Set(StaleCacheKey, data, new MemoryCacheEntryOptions { SlidingExpiration = StaleFallbackDuration });
 
         await WriteCacheFileAsync(data, cancellationToken);
+        _indexer.Rebuild(data);
         _logger.LogInformation("Refreshed {Count} community blog posts.", data.Posts.Count);
     }
 
