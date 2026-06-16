@@ -128,6 +128,18 @@
   color: var(--color-dark-grey);
 }
 
+/* Dot separator between date and author, matching the blog cards. */
+.dc-community-blogs__author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dc-community-blogs__author::before {
+  content: "·";
+  color: var(--color-dark-grey);
+}
+
 /* Pagination */
 .dc-community-blogs__pagination {
   display: flex;
