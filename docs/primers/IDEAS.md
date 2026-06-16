@@ -21,7 +21,6 @@ If you only write three more, these are the ones with the strongest "broad area 
 - **`caching`** ([stub →](./caching.md)) — caching is everywhere in this codebase but scattered: `AppCaches.RuntimeCache` (SVG TagHelper), `MemoryCache` (Vite manifest), `OutputCachePolicies` (API endpoints), `RequestCache` (per-request memoisation), `IsolatedCaches`. A primer would map which cache to reach for in which situation and what invalidates each.
 - **`seo-and-structured-data`** ([stub →](./seo-and-structured-data.md)) — Schema.NET, the schema builders (`ArticleSchemaBuilder`, `OrganizationSchemaBuilder`, `BreadcrumbSchemaBuilder`), the `MetaTags` ViewComponent, OpenGraph and Twitter Cards in `Layout.cshtml`, sitemap generation, canonical URL handling. Cross-references the [tenant-aware schema fallback tutorial](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md).
 - **`integrations`** ([stub →](./integrations.md)) — Sessionize, GitHub release tracking, Google Maps, Matomo, Intercom, Cookiebot. Each has its own configuration shape, its own API client pattern, and its own dev-mode story. A primer would inventory them and link to their feature folders.
-- **`deployment`** ([stub →](./deployment.md)) — Umbraco Cloud deploys, the `copy-for-cloud.js` step, the staging-reset flow, the model-builder regen step. Probably overlaps heavily with `LESSONS_LEARNED.md` — primer would be the orientation layer, that doc remains the operational notes.
 
 ## How to use this list
 
