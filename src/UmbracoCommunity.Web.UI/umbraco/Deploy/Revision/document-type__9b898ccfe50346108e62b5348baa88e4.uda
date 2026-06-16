@@ -14,9 +14,22 @@
     "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
   ],
   "PropertyGroups": [],
-  "PropertyTypes": [],
+  "PropertyTypes": [
+    {
+      "Key": "dd6d7f1a-d716-4a36-9abe-a0d9bb2900b7",
+      "Alias": "readMoreLink",
+      "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "ValueType": "Umbraco.MultiUrlPicker",
+      "Name": "Read more link",
+      "Description": "Shown only in featured mode. Links to the full community blog listing page."
+    }
+  ],
   "Udi": "umb://document-type/9b898ccfe50346108e62b5348baa88e4",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
     {
       "Udi": "umb://document-type-container/8dcdcd6b2f0b491087882d31f81a9237",
       "Ordering": true

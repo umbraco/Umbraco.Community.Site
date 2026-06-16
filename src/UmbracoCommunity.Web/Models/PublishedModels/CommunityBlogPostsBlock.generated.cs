@@ -64,5 +64,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("title")]
 		public virtual string Title => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetTitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// Read more link
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("readMoreLink")]
+		public virtual global::Umbraco.Cms.Core.Models.Link ReadMoreLink => this.Value<global::Umbraco.Cms.Core.Models.Link>(_publishedValueFallback, "readMoreLink");
 	}
 }
