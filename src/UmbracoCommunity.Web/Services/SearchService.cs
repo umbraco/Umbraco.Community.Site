@@ -102,7 +102,10 @@ internal sealed class SearchService : ISearchService
             return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((Array.Empty<SearchResultItem>(), 0));
         }
 
-        var filtered = new List<ISearchResult>();
+        // Filter content hits and map each passing one to its result item in a single pass.
+        // Map every filtered content hit (not just the page slice) so the combined,
+        // score-ordered set can be paginated once across both sources.
+        var combined = new List<(double Score, SearchResultItem Item)>();
         foreach (var result in searchResults)
         {
             if (!int.TryParse(result.Id, out var id)) continue;
@@ -118,18 +121,6 @@ internal sealed class SearchService : ISearchService
             if (!content.TemplateId.HasValue) continue;
             if (content is not ICompositionPageConfiguration pageConfig) continue;
             if (pageConfig.HideFromSearch) continue;
-
-            filtered.Add(result);
-        }
-
-        // Map every filtered content hit (not just the page slice) so the combined,
-        // score-ordered set can be paginated once across both sources.
-        var combined = new List<(double Score, SearchResultItem Item)>();
-        foreach (var result in filtered)
-        {
-            var id = int.Parse(result.Id);
-            var content = umbracoContext.Content.GetById(id);
-            if (content is null) continue;
 
             combined.Add((result.Score, new SearchResultItem
             {
@@ -155,17 +146,17 @@ internal sealed class SearchService : ISearchService
                     .ManagedQuery(query, CommunitySearchFields)
                     .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
 
-                foreach (var r in communityResults)
+                foreach (var result in communityResults)
                 {
-                    var url = r.GetValues(CommunityBlogsSearchIndexer.FieldUrl).FirstOrDefault();
-                    var title = r.GetValues(CommunityBlogsSearchIndexer.FieldTitle).FirstOrDefault();
+                    var url = result.GetValues(CommunityBlogsSearchIndexer.FieldUrl).FirstOrDefault();
+                    var title = result.GetValues(CommunityBlogsSearchIndexer.FieldTitle).FirstOrDefault();
                     if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(title)) continue;
 
-                    combined.Add((r.Score, new SearchResultItem
+                    combined.Add((result.Score, new SearchResultItem
                     {
                         Name = title,
                         Url = url,
-                        Description = BuildExcerpt(r.GetValues(CommunityBlogsSearchIndexer.FieldExcerpt).FirstOrDefault()),
+                        Description = BuildExcerpt(result.GetValues(CommunityBlogsSearchIndexer.FieldExcerpt).FirstOrDefault()),
                         ContentTypeAlias = CommunityBlogsSearchIndexer.Category,
                         IsExternal = true,
                     }));
