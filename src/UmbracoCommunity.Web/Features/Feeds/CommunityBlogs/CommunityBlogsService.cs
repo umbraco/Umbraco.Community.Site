@@ -46,6 +46,16 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         var data = await _aggregator.BuildAsync(cancellationToken);
         if (data is null)
         {
+            // The aggregator produced nothing (e.g. the upstream API is down), but the
+            // block still serves posts from the disk/stale cache via GetData(). Rebuild the
+            // search index from that fallback so search results don't diverge from what the
+            // block renders. (Rebuild is idempotent and cheap — the set is capped at ~60.)
+            var fallback = GetData();
+            if (fallback.Posts.Count > 0)
+            {
+                _indexer.Rebuild(fallback);
+            }
+
             _logger.LogInformation("Community blogs refresh produced no data; keeping existing cache.");
             return;
         }

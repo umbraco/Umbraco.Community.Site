@@ -141,6 +141,8 @@ internal sealed class SearchService : ISearchService
         {
             try
             {
+                // MaxIndexFetch is a generous safety cap here: the community feed is expected
+                // to stay well under it (~60 posts), so this fetches the whole index in practice.
                 var communityResults = communityIndex.Searcher
                     .CreateQuery()
                     .ManagedQuery(query, CommunitySearchFields)
@@ -168,6 +170,9 @@ internal sealed class SearchService : ISearchService
             }
         }
 
+        // Merge content + community hits by raw Lucene score. Note: scores from two different
+        // indexes are not strictly comparable (different IDF/field norms/doc counts), so the
+        // interleave is approximate by design — acceptable for this feed's size.
         var ordered = combined
             .OrderByDescending(x => x.Score)
             .ToList();

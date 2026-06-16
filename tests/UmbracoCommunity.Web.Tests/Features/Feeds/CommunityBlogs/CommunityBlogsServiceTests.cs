@@ -55,6 +55,28 @@ public class CommunityBlogsServiceTests : IDisposable
         return new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
     }
 
+    // First request returns the given JSON; every later request throws (network error).
+    // Lets a single service instance exercise the success-then-failure refresh sequence.
+    private static SphereApiClient ClientSucceedingThenFailing(string json)
+    {
+        var firstCall = true;
+        var handler = new StubHandler(_ =>
+        {
+            if (firstCall)
+            {
+                firstCall = false;
+                return new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                {
+                    Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json"),
+                };
+            }
+
+            throw new HttpRequestException("simulated network error");
+        });
+        var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
+        return new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+    }
+
     private static string FivePosts() => """
     {
       "data": [
@@ -169,10 +191,11 @@ public class CommunityBlogsServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task RefreshAsync_WhenNoData_DoesNotRebuildSearchIndex()
+    public async Task RefreshAsync_WhenNoData_AndNoCache_DoesNotRebuildSearchIndex()
     {
         var indexer = new Mock<ICommunityBlogsIndexer>();
         // A failing client makes the aggregator return null, so RefreshAsync no-ops.
+        // With no prior cache, GetData() is empty (Posts.Count == 0) and Rebuild is NOT called.
         var failing = new HttpClient(StubHandler.Throws()) { BaseAddress = new Uri("https://test.local/api/v1/") };
         var failingClient = new SphereApiClient(new SphereHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
         var service = CreateService(failingClient,
@@ -181,6 +204,22 @@ public class CommunityBlogsServiceTests : IDisposable
         await service.RefreshAsync();
 
         indexer.Verify(i => i.Rebuild(It.IsAny<CommunityBlogsData>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task RefreshAsync_WhenNoData_ButCacheHasPosts_RebuildsIndexFromCache()
+    {
+        var indexer = new Mock<ICommunityBlogsIndexer>();
+        // One service instance: first refresh succeeds (populates cache + index),
+        // second refresh fails so the aggregator returns null but the cache still has posts.
+        var service = CreateService(ClientSucceedingThenFailing(FivePosts()),
+            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+
+        await service.RefreshAsync(); // success -> Rebuild #1
+        await service.RefreshAsync(); // failure -> Rebuild #2 from cached fallback
+
+        // Rebuilt exactly twice, and the fallback rebuild used the cached posts.
+        indexer.Verify(i => i.Rebuild(It.Is<CommunityBlogsData>(d => d.Posts.Count > 0)), Times.Exactly(2));
     }
 
     public void Dispose()
