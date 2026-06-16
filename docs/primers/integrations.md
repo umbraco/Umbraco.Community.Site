@@ -4,7 +4,7 @@ tags: [primer, integrations, sessionize, third-party, http-client]
 
 # Third-party integrations primer
 
-The external dependencies this site talks to fall into two groups, and the split is worth holding in your head: a handful of **server-side data feeds** that pull content from someone else's API, and a thin **frontend layer** for consent and analytics. The feeds are where the substance is, and the good news is they're all the same shape — learn one and you can read or add any of them.
+The external dependencies this site talks to are, almost entirely, a handful of **server-side data feeds** that pull content from someone else's API — and the good news is they're all the same shape, so learn one and you can read or add any of them. (There are also a couple of avatar / build-time odds and ends, covered at the end.)
 
 > Just want the inventory? Skip to [the map](#the-map).
 
@@ -25,13 +25,6 @@ The three feeds:
 
 Both Calendar and Community Blogs register through one composer, [`Features/Feeds/Configuration/RegisterFeeds.cs`](../../src/UmbracoCommunity.Web/Features/Feeds/Configuration/RegisterFeeds.cs).
 
-## The frontend layer
-
-Two browser-side integrations, both in [`StaticAssets/src/integrations/`](../../src/UmbracoCommunity.StaticAssets/src/integrations/) or the shared entrypoint:
-
-- **GTM (server-side tagging)** — analytics is live in production. [`Views/_ViewImports.cshtml`](../../src/UmbracoCommunity.Web.UI/Views/_ViewImports.cshtml) injects an Umbraco server-side-tagging GTM container (`load.sst.umbraco.com`, id `GTM-T6TKMT2`) under an `IsProduction()` guard, and [`entrypoints/_index.ts`](../../src/UmbracoCommunity.StaticAssets/src/entrypoints/_index.ts) feeds it — a global click handler that pushes `gtm.linkClick` events (the clicked element's url, text, classes, id) onto `window.dataLayer`. Nothing to enable locally: the container only loads in production.
-- **Cookiebot** ([`integrations/cookiebot.element.ts`](../../src/UmbracoCommunity.StaticAssets/src/integrations/cookiebot.element.ts)) — a consent-management custom element (`<dc-cookiebot>`, extending a small `script-loader.element.ts` base that injects the third-party script; the account id is hardcoded). **It's registered but not currently mounted in any view** — a dormant remnant from an earlier build, available to wire up if the site needs a consent banner, rather than active consent management today.
-
 ## Avatars and build-time
 
 Worth knowing they exist, though they're hot-linked CDN/build-time bits rather than configured services:
@@ -46,13 +39,11 @@ Worth knowing they exist, though they're hot-linked CDN/build-time bits rather t
 | Sessionize | `Features/Sessionize/` | backend feed + `/api/sessionize` + Lit | `Sessionize` section | `EventId` per env |
 | Calendar Feed | `Features/Feeds/Calendar/` | backend feed (server-rendered) | `CalendarFeed` section | none (public) |
 | Community Blogs | `Features/Feeds/CommunityBlogs/` | backend feed + background service | `CommunityBlogs` section | `ApiKey` (Local/portal) |
-| GTM (server-side tagging) | `_ViewImports.cshtml` (container) + `_index.ts` (data layer) | frontend analytics, prod-only | SST container `GTM-T6TKMT2` | — |
-| Cookiebot | `StaticAssets/.../integrations/` | frontend consent — *registered, not mounted* | hardcoded account id | — |
 | MVP / contributor avatars | `Features/Mvp/`, `devops/` | CDN hot-link / build-time | none / `GITHUB_TOKEN` (CI) | — |
 
 ## What isn't here (so you don't go looking)
 
-The project's top-level description and some older docs mention integrations that **aren't in this repo**: Matomo, Intercom, and a Google Maps community map were never wired up (or have been removed — the `integrations/` folder holds only Cookiebot today; the `@googlemaps/*` npm packages linger in `package.json` but no code uses them), and the **GitHub release-tracking** feature was extracted into a separate releases site. If you're hunting for any of those here, stop — they live elsewhere or not at all.
+The project's top-level description and some older docs mention integrations that **aren't in this repo**: Matomo, Intercom, and a Google Maps community map were never wired up or have been removed (the `@googlemaps/*` npm packages linger in `package.json` but no code uses them), and the **GitHub release-tracking** feature was extracted into a separate releases site. If you're hunting for any of those here, stop — they live elsewhere or not at all.
 
 ## Adding a new integration
 
@@ -64,4 +55,4 @@ For anything server-side that calls an external API, follow the feed pattern abo
 - **[Caching primer](caching.md)** — the stale-fallback caching that makes the feeds resilient (question 4).
 - **[`CLAUDE.md`](../../CLAUDE.md)** — the Sessionize feature in depth: endpoints, frontend components, deep-linking, and Open Graph.
 
-Learn the feed shape once and the rest of the server-side integrations read the same; the frontend layer is just consent plus a data-layer ping. Adding one is mostly a matter of not being clever — copy the pattern, keep the secret out of git, cache with a fallback.
+Learn the feed shape once and the rest of the server-side integrations read the same. Adding one is mostly a matter of not being clever — copy the pattern, keep the secret out of git, cache with a fallback.

@@ -158,7 +158,7 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
-- **integrations/** - Third-party integrations (Cookiebot consent element — present but not currently mounted; `script-loader` base element). Production analytics (GTM server-side tagging) is wired separately via `Views/_ViewImports.cshtml` + the `_index.ts` data layer.
+- **integrations/** - Small `script-loader`-based elements for injecting third-party scripts
 - **models/** - TypeScript data models
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions

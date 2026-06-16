@@ -96,7 +96,7 @@ Under `StaticAssets/src/`:
 | `components/` | Lit web components, including `sessionize/`, `form/`, `image-slider/`, and the slider family |
 | `css/` | PostCSS stylesheets, organised by area (`base/`, `layout/`, `blocks/`, `typography.css`, …) |
 | `services/` | Frontend services (fetch wrappers, logging, Sessionize, project/user services) |
-| `integrations/` | Third-party integrations — a Cookiebot consent element (present but not currently mounted) plus a `script-loader` base element (Intercom/Matomo/Maps are *not* wired up here despite older mentions) |
+| `integrations/` | Small `script-loader`-based elements for injecting third-party scripts (Intercom/Matomo/Maps are *not* wired up here despite older mentions) |
 | `types/` | TypeScript ambient declarations and shared type aliases |
 | `util/` | Pure utility functions — covered by the 80% coverage thresholds |
 | `assets/` | Static binary assets (images, map pins) imported through TS |
