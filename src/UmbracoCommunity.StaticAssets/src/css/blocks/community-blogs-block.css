@@ -154,10 +154,21 @@
   outline-offset: var(--focus-outline-offset);
 }
 
-.dc-community-blogs__page-link.is-current {
-  background: var(--color-blue);
+.dc-community-blogs__page-link.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.dc-community-blogs__page-current {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  font-weight: 600;
+  color: var(--color-dark-grey);
+}
+
+.dc-community-blogs.bg-dark .dc-community-blogs__page-current {
   color: var(--color-white);
-  border-color: var(--color-blue);
 }
 
 .dc-community-blogs.bg-dark .dc-community-blogs__page-link {
@@ -181,4 +192,15 @@
     gap: 1.75rem;
     margin-top: var(--unit-lg);
   }
+}
+
+/* "Read more" CTA (featured mode) — right-aligned plain text link;
+   picks up the global #main-content a:not(.btn) pink-underline animation. */
+.dc-community-blogs__cta {
+  margin-top: var(--unit-md);
+  text-align: right;
+}
+
+.dc-community-blogs.bg-dark .dc-community-blogs__cta a {
+  color: var(--color-white);
 }
