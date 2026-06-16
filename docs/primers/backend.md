@@ -158,8 +158,8 @@ Under `UmbracoCommunity.Web/`:
 | `ViewModelBuilders/` | The builder pipeline. Subfolders: `Pages/`, `Components/`, `Schema/` |
 | `ViewComponents/` | Layout-slot components (`MetaTagsViewComponent`, `MenuViewComponent`, `FooterViewComponent`, `FaviconViewComponent`) |
 | `Services/` | Reusable services (`ContentDataService`, `ContentContextService`, `SeoDataService`, `BlogService`) |
-| `Features/` | Self-contained feature modules — currently just `Sessionize/` |
-| `Routing/` | Custom content finders (`PageNotFoundContentFinder`) |
+| `Features/` | Self-contained feature modules (`Sessionize/`, `Feeds/`, `Mvp/`, `Seed/`) |
+| `Routing/` | Custom routing (`CommunitySitePageNotFoundResolver` for tenant-aware 404s, `DocumentationContentFinder`) |
 | `Middleware/` | Custom ASP.NET middleware (CSP disable, blog folder redirects, form validation) |
 | `Notifications/` | Umbraco notification handlers (cache invalidation tied to content events) |
 | `Extensions/` | `IUmbracoBuilder` + `IServiceCollection` extension methods, including the named-policy `OutputCachePolicies` static class |

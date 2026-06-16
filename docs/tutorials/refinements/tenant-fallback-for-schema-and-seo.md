@@ -264,7 +264,7 @@ Scoped (per-request) is fine — none of the builders hold per-request state, bu
 
 This is the last refinement in the multi-tenant suite. The other refinement built on the same foundation is:
 
-→ [Per-tenant 404 pages with `IContentLastChanceFinder`](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
+→ [Per-tenant 404 pages with a custom `INotFoundPageResolver`](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
 
 For the broader pattern these refinements extend:
 

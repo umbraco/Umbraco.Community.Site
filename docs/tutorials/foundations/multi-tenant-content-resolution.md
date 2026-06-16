@@ -208,7 +208,7 @@ var blogPage = publishedContentQuery.ContentAtRoot()
 
 This is the rare legitimate use of `ContentAtRoot()`. The middleware is, by design, not tenant-scoped — it's a URL-driven endpoint that could be hitting any tenant's blog.
 
-**The 404 content finder fallback** ([`PageNotFoundContentFinder.cs`](../../../src/UmbracoCommunity.Web/Routing/PageNotFoundContentFinder.cs)). When a request doesn't have a bound domain (local dev on `localhost`, or a stray IP-address hit), the finder falls back to the first `PageNotFound` it can find across all roots. This is covered in detail in the [per-tenant 404 finder refinement](../refinements/per-tenant-404-content-finder.md), which builds directly on this foundation.
+**The 404 resolver fallback** ([`CommunitySitePageNotFoundResolver.cs`](../../../src/UmbracoCommunity.Web/Routing/CommunitySitePageNotFoundResolver.cs)). When a request doesn't have a bound domain (local dev on `localhost`, or a stray IP-address hit), the resolver falls back to the first `PageNotFound` it can find across all roots. This is covered in detail in the [per-tenant 404 refinement](../refinements/per-tenant-404-content-finder.md), which builds directly on this foundation.
 
 If you find yourself writing a third place that crosses tenant boundaries, that's a smell worth a second look — but it isn't categorically wrong.
 
@@ -230,7 +230,7 @@ If you find yourself writing a third place that crosses tenant boundaries, that'
 
 Two refinements build directly on this foundation:
 
-→ [Per-tenant 404 pages with `IContentLastChanceFinder`](../refinements/per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off, because the request 404'd.
+→ [Per-tenant 404 pages with a custom `INotFoundPageResolver`](../refinements/per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off, because the request 404'd.
 
 → [Tenant-aware fallback for schema and SEO metadata](../refinements/tenant-fallback-for-schema-and-seo.md) — what to do when the tenant root exists but the editor hasn't filled in `SocialSettings` yet, and you still need to emit valid `Organization` schema.
 

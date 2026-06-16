@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring automated GitHub integration for release tracking, community data synchronization, and Sessionize event integration.
+This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring Sessionize event integration and aggregated community content feeds (blog posts, calendar). (Release tracking used to live here too but has been extracted to a separate releases site.)
 
 **Multi-tenancy**: The site runs multiple tenants from a single Umbraco instance, each with its own root content node. All content lookups (e.g., site settings, 404 pages, navigation) must be resolved **relative to the current request's content tree** — never assume a single root or use hardcoded paths. Traverse ancestors or use the current request's root node to find tenant-specific content.
 
@@ -12,7 +12,7 @@ This is the Umbraco Community Website - a replacement for [community.umbraco.com
 
 The repo carries a small library of conceptual and operational docs alongside the code:
 
-- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, plus planned stubs for backoffice, content modelling, caching, SEO, integrations, deployment, and multi-tenancy). Start here if you're new to the codebase.
+- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, and integrations are written; content modelling and SEO are still planned stubs). Start here if you're new to the codebase.
 - **[docs/tutorials/](docs/tutorials/)** — short, focused deep dives on specific problems we've hit and how we solved them. Split into [`foundations/`](docs/tutorials/foundations/) (standalone patterns) and [`refinements/`](docs/tutorials/refinements/) (improvements layered on a foundation).
 - **[docs/BUILDING_PAGES.md](docs/BUILDING_PAGES.md)** and **[docs/BUILDING_BLOCKS.md](docs/BUILDING_BLOCKS.md)** — how-tos for adding new pages and content blocks.
 - **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
@@ -22,17 +22,18 @@ Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of
 
 ## Solution Structure
 
-The solution consists of 5 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 6 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
 - **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **Umbraco.Community.NotFoundTracker** - 404 tracking with ignore rules and a dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 
 ### Key Directories in UmbracoCommunity.Web
 
-- **Features/** - Self-contained feature modules (Sessionize) with their own controllers, models, and infrastructure
+- **Features/** - Self-contained feature modules (Sessionize, Feeds, Mvp, Seed) with their own controllers, models, and infrastructure
 - **Controllers/** - MVC controllers organized by type:
   - `Controllers/Api/` - API controllers (inherit from `ControllerBase`, have `[ApiController]` attribute)
   - `Controllers/Render/` - Umbraco render controllers (inherit from `RenderController`)
@@ -50,11 +51,11 @@ The solution consists of 5 projects (uses Central Package Management via `Direct
   - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`, `ContentContextService`, `ISeoDataService`/`SeoDataService`)
 - **ViewComponents/** - ASP.NET Core View Components for layout concerns (MetaTags, Menu, Footer, Favicon)
-- **Routing/** - Custom content finders (e.g., `PageNotFoundContentFinder`)
+- **Routing/** - Custom routing (e.g., `CommunitySitePageNotFoundResolver` for tenant-aware 404s, `DocumentationContentFinder`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
-- **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
+- **Utilities/** - Helper classes (`StringUtilities`, `UrlUtilities`)
+- **Helpers/** - Domain helpers (ColourHelper, CountryFlagHelper, VideoHelper)
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
 - **Vite/** - Vite integration helpers and tag helpers
 
@@ -158,7 +159,7 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
-- **integrations/** - Third-party integrations (Cookiebot, Intercom, Matomo, Google Maps)
+- **integrations/** - Third-party integrations (Cookiebot consent; `script-loader` base element)
 - **models/** - TypeScript data models
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions
@@ -433,12 +434,12 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.2.2 on .NET 10
-- Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
+- Umbraco CMS 17.4.2 on .NET 10
+- Entity Framework Core 10.0.8 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
 - Schema.NET 13.0.0 - Structured data/schema markup
 - Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.1.1 - Extended content editors
+- Umbraco.Community.Contentment 6.1.4 - Extended content editors
 
 **Frontend:**
 - Lit 3.3.0 - Web components framework
