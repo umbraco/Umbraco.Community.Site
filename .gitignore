@@ -457,3 +457,6 @@ App_Data/
 .claude
 .mcp.json
 src/UmbracoCommunity.Web.UI/Hangfire.db*
+
+# Community blog post images (downloaded at runtime)
+/src/UmbracoCommunity.Web.UI/wwwroot/community-blog-images/

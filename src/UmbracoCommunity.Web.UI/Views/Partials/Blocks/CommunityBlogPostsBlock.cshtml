@@ -1,0 +1,127 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.WebUtilities
+@using Umbraco.Cms.Core.Models.Blocks
+@using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs
+@using UmbracoCommunity.Web.Models.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<CommunityBlogPostsBlock, SettingsCommunityBlogPostsBlock>>
+@inject ICommunityBlogsService CommunityBlogsService
+
+@{
+    const int DefaultPostsPerPage = 12;
+    var settingsPerPage = Model.Settings?.PostsPerPage ?? 0;
+    var pageSize = settingsPerPage > 0 ? settingsPerPage : DefaultPostsPerPage;
+
+    var requestedPage = 1;
+    if (int.TryParse(Context.Request.Query["page"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) && parsed > 0)
+    {
+        requestedPage = parsed;
+    }
+
+    var result = CommunityBlogsService.GetPage(requestedPage, pageSize);
+
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    var anchor = !string.IsNullOrEmpty(Model.Settings?.BlockId) ? Model.Settings!.BlockId : Model.Content.IdHash;
+}
+
+@functions {
+    string BuildPageUrl(int targetPage, string anchorId)
+    {
+        var request = Context.Request;
+        var query = QueryHelpers.ParseQuery(request.QueryString.Value);
+        var items = query
+            .Where(kvp => !string.Equals(kvp.Key, "page", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(kvp => kvp.Value, (kvp, v) => new KeyValuePair<string, string?>(kvp.Key, v))
+            .ToList();
+        items.Add(new KeyValuePair<string, string?>("page", targetPage.ToString(CultureInfo.InvariantCulture)));
+        var url = QueryHelpers.AddQueryString(request.Path, items);
+        return string.IsNullOrEmpty(anchorId) ? url : url + "#" + anchorId;
+    }
+}
+
+@if (hasBg)
+{
+    <style asp-add-nonce="true">
+        #@Model.Content.IdHash {
+            --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+        }
+    </style>
+}
+
+<section class="dc-community-blogs @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
+         id="@Model.Content.IdHash">
+    <div class="dc-community-blogs__intro align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+    </div>
+
+    @if (result.TotalItems == 0)
+    {
+        <p class="dc-community-blogs__empty">
+            Unfortunately we are currently unable to display the community blog posts. Please try again later.
+        </p>
+    }
+    else
+    {
+        <div class="dc-community-blogs__grid">
+            @foreach (var post in result.Items)
+            {
+                <a class="dc-community-blogs__card" href="@post.Url" target="_blank" rel="noopener noreferrer">
+                    <figure class="dc-community-blogs__media">
+                        <img src="@(string.IsNullOrEmpty(post.CoverImageUrl) ? "/img/community-blogs/placeholder-cover.svg" : post.CoverImageUrl)" alt="" loading="lazy" />
+                    </figure>
+                    <div class="dc-community-blogs__content">
+                        <img class="dc-community-blogs__avatar" src="@(string.IsNullOrEmpty(post.AuthorAvatarUrl) ? "/img/community-blogs/placeholder-avatar.svg" : post.AuthorAvatarUrl)" alt="" loading="lazy" />
+                        <h3 class="dc-community-blogs__title">@post.Title</h3>
+                        @if (!string.IsNullOrEmpty(post.Excerpt))
+                        {
+                            <p class="dc-community-blogs__teaser">@post.Excerpt</p>
+                        }
+                        <div class="dc-community-blogs__meta">
+                            <time datetime="@post.PublishedAt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)">
+                                @post.PublishedAt.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)
+                            </time>
+                            @if (!string.IsNullOrEmpty(post.AuthorName))
+                            {
+                                <span class="dc-community-blogs__author">by @post.AuthorName</span>
+                            }
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        @if (result.TotalPages > 1)
+        {
+            <nav class="dc-community-blogs__pagination" aria-label="Community blog posts pages">
+                @if (result.Page > 1)
+                {
+                    <a class="dc-community-blogs__page-link" rel="prev" href="@BuildPageUrl(result.Page - 1, anchor)">Previous</a>
+                }
+                @for (var p = 1; p <= result.TotalPages; p++)
+                {
+                    if (p == result.Page)
+                    {
+                        <span class="dc-community-blogs__page-link is-current" aria-current="page">@p</span>
+                    }
+                    else
+                    {
+                        <a class="dc-community-blogs__page-link" href="@BuildPageUrl(p, anchor)">@p</a>
+                    }
+                }
+                @if (result.Page < result.TotalPages)
+                {
+                    <a class="dc-community-blogs__page-link" rel="next" href="@BuildPageUrl(result.Page + 1, anchor)">Next</a>
+                }
+            </nav>
+        }
+    }
+</section>
