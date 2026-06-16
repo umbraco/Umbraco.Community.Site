@@ -56,6 +56,12 @@
         "settingsElementTypeKey": "0f95e9d4-c306-4a91-a754-b0b6e8427f24"
       },
       {
+        "contentElementTypeKey": "9b898ccf-e503-4610-8e62-b5348baa88e4",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "527ea1d7-8b30-4629-9695-b2f75e44448a"
+      },
+      {
         "contentElementTypeKey": "c735ca50-0612-4680-9525-c72449af1e75",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -103,7 +109,8 @@
       {
         "contentElementTypeKey": "81482d2a-2279-45ca-8730-2d91f65e0835",
         "allowAtRoot": true,
-        "allowInAreas": true
+        "allowInAreas": true,
+        "settingsElementTypeKey": "5b6a23c2-f363-4684-9ebc-fa49d0001aed"
       },
       {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
@@ -230,6 +237,9 @@
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
     },
     {
+      "Udi": "umb://document-type/527ea1d78b3046299695b2f75e44448a"
+    },
+    {
       "Udi": "umb://document-type/52cb8b7856ce47be90da6c08e4025527"
     },
     {
@@ -237,6 +247,9 @@
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
+    },
+    {
+      "Udi": "umb://document-type/5b6a23c2f36346849ebcfa49d0001aed"
     },
     {
       "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
@@ -252,6 +265,9 @@
     },
     {
       "Udi": "umb://document-type/81482d2a227945ca87302d91f65e0835"
+    },
+    {
+      "Udi": "umb://document-type/9b898ccfe50346108e62b5348baa88e4"
     },
     {
       "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"

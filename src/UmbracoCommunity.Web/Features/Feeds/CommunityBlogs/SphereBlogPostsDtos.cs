@@ -1,0 +1,32 @@
+using System.Text.Json;
+
+namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
+
+/// <summary>Response envelope from GET /v1/blog-posts.</summary>
+public sealed record PostsResponseDto(
+    IReadOnlyList<PublicPostDto> Data,
+    PaginationDto Pagination);
+
+public sealed record PublicPostDto(
+    string Id,
+    string Type,
+    string? Title,
+    string? Url,
+    string? Content,
+    string? CoverImageUrl,
+    DateTimeOffset PublishedAt,
+    PublicAuthorDto? Author);
+
+public sealed record PublicAuthorDto(
+    string? Name,
+    string? ProfileUrl,
+    string? AvatarUrl);
+
+public sealed record PaginationDto(
+    string? NextCursor,
+    bool HasMore);
+
+public static class SphereJsonOptions
+{
+    public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web);
+}
