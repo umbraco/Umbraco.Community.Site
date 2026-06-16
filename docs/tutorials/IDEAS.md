@@ -32,7 +32,6 @@ Reusable primitives that other tutorials can build on.
 
 Improvements layered on top of a foundation, in this repo or otherwise.
 
-- **`dual-persistence-db-and-json`** ([stub →](./refinements/dual-persistence-db-and-json.md)) *(builds on content-tree-inherited config, or stands alone)* — Block Restrictions stores rules in both EF Core and JSON files so they're version-controllable. Plus zip export/import for Umbraco Cloud environments where you can't ship files via deployment. The non-obvious bit: how to keep DB and disk in sync without an infinite save loop and how to make the JSON the source of truth on first boot.
 - ~~**`wrapping-umbraco-native-block-editor`**~~ — shipped as [refinements/wrapping-umbraco-native-block-editor.md](./refinements/wrapping-umbraco-native-block-editor.md).
 - ~~**`custom-content-finder-for-per-tenant-404`**~~ — shipped as [refinements/per-tenant-404-content-finder.md](./refinements/per-tenant-404-content-finder.md).
 - ~~**`schema-net-with-tenant-fallback`**~~ — shipped as [refinements/tenant-fallback-for-schema-and-seo.md](./refinements/tenant-fallback-for-schema-and-seo.md).

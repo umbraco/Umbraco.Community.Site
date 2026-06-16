@@ -42,7 +42,7 @@ A rule is keyed by document-type GUID and stores the allowed block **aliases** (
 
 (One vocabulary note before we go further: Umbraco's UI calls these *document types*, but its API calls them *content types* — the same thing — which is why the resolver below reaches for `IContentTypeService`.)
 
-Storing aliases rather than element-type keys is a deliberate choice — aliases are human-readable and produce clean git diffs in the JSON files (see the [dual-persistence refinement](../refinements/dual-persistence-db-and-json.md)). They're resolved at read time to **element-type** GUIDs (the content type behind each block) with a single batched lookup — where `aliasSet` is the rule's allowed aliases as a case-insensitive set — so the per-alias cost stays flat:
+Storing aliases rather than element-type keys is a deliberate choice — aliases are human-readable and produce clean git diffs in the JSON files (see [syncing config across environments](../refinements/syncing-config-across-environments.md)). They're resolved at read time to **element-type** GUIDs (the content type behind each block) with a single batched lookup — where `aliasSet` is the rule's allowed aliases as a case-insensitive set — so the per-alias cost stays flat:
 
 ```csharp
 var lookup = _contentTypeService.GetAll()

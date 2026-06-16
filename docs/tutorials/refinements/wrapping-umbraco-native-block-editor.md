@@ -282,7 +282,7 @@ Block Grid needs two clipboard formats (`block` and `gridBlock`), so it gets two
 ## Where to go next
 
 - The restriction *resolution* side — how the server turns a node key into an allowed-block set by walking the content tree and caching the result — is the [content-tree-inherited config](../foundations/content-tree-inherited-config.md) foundation.
-- How those rules are stored (database **and** version-controllable JSON, kept in sync) is the [dual-persistence](./dual-persistence-db-and-json.md) refinement.
+- How those rules are version-controlled and moved between environments (database, version-controllable JSON, and a zip path for Cloud) is [syncing config across environments](./syncing-config-across-environments.md).
 - For the package as a whole — workspace view, dashboard, EF Core migrations, import/export — the [`UmbracoCommunity.BlockRestrictions` README](../../../src/UmbracoCommunity.BlockRestrictions/README.md) is the end-to-end tour.
 
 If you've ever stared at a silently-failing paste wondering why the block just won't appear — now you know which translator went missing.
