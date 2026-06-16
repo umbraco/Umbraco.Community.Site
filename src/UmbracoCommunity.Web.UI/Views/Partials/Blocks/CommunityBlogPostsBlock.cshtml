@@ -145,9 +145,7 @@
         @if (featuredOnly && Model.Content.ReadMoreLink is { } readMore && !string.IsNullOrEmpty(readMore.Url))
         {
             <div class="dc-community-blogs__cta">
-                <a href="@readMore.Url" target="@(string.IsNullOrEmpty(readMore.Target) ? null : readMore.Target)">
-                    @(string.IsNullOrWhiteSpace(readMore.Name) ? "Read more on the blog" : readMore.Name)
-                </a>
+                See more <a href="@readMore.Url" target="@(string.IsNullOrEmpty(readMore.Target) ? null : readMore.Target)">@(string.IsNullOrWhiteSpace(readMore.Name) ? "Community blog posts" : readMore.Name)</a>
             </div>
         }
     }
