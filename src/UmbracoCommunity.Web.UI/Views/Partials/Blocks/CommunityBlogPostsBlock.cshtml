@@ -142,10 +142,10 @@
             </nav>
         }
 
-        @if (featuredOnly && Model.Content.ReadMoreLink is { } readMore && !string.IsNullOrEmpty(readMore.Url))
+        @if (featuredOnly && !Model.Content.ReadMoreText.IsEmptyHtmlString())
         {
             <div class="dc-community-blogs__cta">
-                See more <a href="@readMore.Url" target="@(string.IsNullOrEmpty(readMore.Target) ? null : readMore.Target)">@(string.IsNullOrWhiteSpace(readMore.Name) ? "Community blog posts" : readMore.Name)</a>
+                @Html.Raw(Model.Content.ReadMoreText?.ToHtmlString())
             </div>
         }
     }

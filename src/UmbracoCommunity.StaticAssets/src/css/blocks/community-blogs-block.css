@@ -213,6 +213,10 @@
   text-align: right;
 }
 
+.dc-community-blogs__cta p {
+  margin: 0;
+}
+
 .dc-community-blogs.bg-dark .dc-community-blogs__cta a {
   color: var(--color-white);
 }

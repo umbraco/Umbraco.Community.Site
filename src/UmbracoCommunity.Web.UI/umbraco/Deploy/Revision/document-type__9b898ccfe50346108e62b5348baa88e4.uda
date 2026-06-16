@@ -17,17 +17,17 @@
   "PropertyTypes": [
     {
       "Key": "dd6d7f1a-d716-4a36-9abe-a0d9bb2900b7",
-      "Alias": "readMoreLink",
-      "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
-      "ValueType": "Umbraco.MultiUrlPicker",
-      "Name": "Read more link",
-      "Description": "Shown only in featured mode. Links to the full community blog listing page."
+      "Alias": "readMoreText",
+      "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+      "Description": "Shown only in featured mode. Write the call-to-action wording and link it to the full community blog listing page.",
+      "Name": "Read more text"
     }
   ],
   "Udi": "umb://document-type/9b898ccfe50346108e62b5348baa88e4",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
       "Ordering": true
     },
     {
