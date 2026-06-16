@@ -13,17 +13,25 @@
   "CompositionContentTypes": [
     "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
   ],
-  "PropertyGroups": [],
-  "PropertyTypes": [
+  "PropertyGroups": [
     {
-      "Key": "dd6d7f1a-d716-4a36-9abe-a0d9bb2900b7",
-      "Alias": "readMoreText",
-      "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
-      "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
-      "Description": "Shown only in featured mode. Write the call-to-action wording and link it to the full community blog listing page.",
-      "Name": "Read more text"
+      "Key": "f66794a6-4419-45dc-a71c-1f4f11aa0c13",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "dd6d7f1a-d716-4a36-9abe-a0d9bb2900b7",
+          "Alias": "readMoreText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+          "Description": "Shown only in featured mode. Write the call-to-action wording and link it to the full community blog listing page.",
+          "Name": "Read more text"
+        }
+      ]
     }
   ],
+  "PropertyTypes": [],
   "Udi": "umb://document-type/9b898ccfe50346108e62b5348baa88e4",
   "Dependencies": [
     {
