@@ -29,8 +29,8 @@ Both Calendar and Community Blogs register through one composer, [`Features/Feed
 
 Two browser-side integrations, both in [`StaticAssets/src/integrations/`](../../src/UmbracoCommunity.StaticAssets/src/integrations/) or the shared entrypoint:
 
-- **Cookiebot** ([`integrations/cookiebot.element.ts`](../../src/UmbracoCommunity.StaticAssets/src/integrations/cookiebot.element.ts)) — consent management, and the intended gatekeeper for anything that sets tracking cookies. It's a custom element extending a small `script-loader.element.ts` base that injects the third-party script tag; the Cookiebot account id is currently hardcoded in the element.
-- **GTM data layer** ([`entrypoints/_index.ts`](../../src/UmbracoCommunity.StaticAssets/src/entrypoints/_index.ts)) — a global click handler that pushes `gtm.linkClick` events (with the clicked element's url, text, classes, id) onto `window.dataLayer`. Note what this *isn't*: the GTM container itself isn't configured in this repo — the code only feeds a data layer that an externally-injected container reads.
+- **GTM (server-side tagging)** — analytics is live in production. [`Views/_ViewImports.cshtml`](../../src/UmbracoCommunity.Web.UI/Views/_ViewImports.cshtml) injects an Umbraco server-side-tagging GTM container (`load.sst.umbraco.com`, id `GTM-T6TKMT2`) under an `IsProduction()` guard, and [`entrypoints/_index.ts`](../../src/UmbracoCommunity.StaticAssets/src/entrypoints/_index.ts) feeds it — a global click handler that pushes `gtm.linkClick` events (the clicked element's url, text, classes, id) onto `window.dataLayer`. Nothing to enable locally: the container only loads in production.
+- **Cookiebot** ([`integrations/cookiebot.element.ts`](../../src/UmbracoCommunity.StaticAssets/src/integrations/cookiebot.element.ts)) — a consent-management custom element (`<dc-cookiebot>`, extending a small `script-loader.element.ts` base that injects the third-party script; the account id is hardcoded). **It's registered but not currently mounted in any view** — a dormant remnant from an earlier build, available to wire up if the site needs a consent banner, rather than active consent management today.
 
 ## Avatars and build-time
 
@@ -46,8 +46,8 @@ Worth knowing they exist, though they're hot-linked CDN/build-time bits rather t
 | Sessionize | `Features/Sessionize/` | backend feed + `/api/sessionize` + Lit | `Sessionize` section | `EventId` per env |
 | Calendar Feed | `Features/Feeds/Calendar/` | backend feed (server-rendered) | `CalendarFeed` section | none (public) |
 | Community Blogs | `Features/Feeds/CommunityBlogs/` | backend feed + background service | `CommunityBlogs` section | `ApiKey` (Local/portal) |
-| Cookiebot | `StaticAssets/.../integrations/` | frontend consent | hardcoded account id | — |
-| GTM data layer | `StaticAssets/.../_index.ts` | frontend analytics | container injected externally | — |
+| GTM (server-side tagging) | `_ViewImports.cshtml` (container) + `_index.ts` (data layer) | frontend analytics, prod-only | SST container `GTM-T6TKMT2` | — |
+| Cookiebot | `StaticAssets/.../integrations/` | frontend consent — *registered, not mounted* | hardcoded account id | — |
 | MVP / contributor avatars | `Features/Mvp/`, `devops/` | CDN hot-link / build-time | none / `GITHUB_TOKEN` (CI) | — |
 
 ## What isn't here (so you don't go looking)
