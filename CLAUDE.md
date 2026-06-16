@@ -143,12 +143,11 @@ See `docs/BUILDING_PAGES.md` for detailed instructions.
 
 ### Content Blocks
 
-Reusable components using Umbraco's Block List editor:
-1. **Element Type** - Umbraco content structure
-2. **Settings Type** - optional configuration
-3. **Content Model** - strongly-typed model (in `Models/ContentModels/`)
-4. **View Model** - view-layer model (in `Models/ViewModels/Blocks/`)
-5. **View** - Razor partial (in `Views/Partials/Blocks/`)
+Reusable components using Umbraco's Block List / Block Grid editor:
+1. **Element Type** - Umbraco content structure (the block's properties)
+2. **Settings Type** - optional configuration (often composing `ISettingsColour`, `ISettingsBlockId`)
+3. **Content Model** - the Models Builder published model; optionally extended by a hand-written partial in `Models/ContentModels/` for view-only helpers (e.g. `IdHash`, computed properties)
+4. **View** - Razor partial in `Views/Partials/Blocks/{Alias}.cshtml` inheriting `BlockGridItem<TContent, TSettings>` and binding the content/settings models directly (there is **no** per-block view model or view-model builder)
 
 See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 
