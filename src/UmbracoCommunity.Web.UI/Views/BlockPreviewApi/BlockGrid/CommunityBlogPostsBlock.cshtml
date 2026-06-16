@@ -1,0 +1,23 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<CommunityBlogPostsBlock, SettingsCommunityBlogPostsBlock>>
+
+@{
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    var blockStyle = hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null;
+    var perPage = (Model.Settings?.PostsPerPage ?? 0) > 0 ? Model.Settings!.PostsPerPage : 12;
+}
+
+<div class="dc-community-blogs-preview @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@blockStyle">
+    <h3>@(string.IsNullOrWhiteSpace(Model.Content.Title) ? "Community Blog Posts" : Model.Content.Title)</h3>
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="dc-community-blogs-preview__subtitle">
+            @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+        </div>
+    }
+    <p class="dc-community-blogs-preview__note">
+        Live preview shows community blog posts from
+        <a href="https://sphere.umbraco.com" rel="noopener noreferrer" target="_blank">Umbraco Sphere</a>,
+        paginated at <strong>@perPage</strong> per page on the front end.
+    </p>
+</div>

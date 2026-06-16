@@ -1,0 +1,48 @@
+{
+  "Name": "[Settings] Community Blog Posts Block",
+  "Alias": "settingsCommunityBlogPostsBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/8dcdcd6b2f0b491087882d31f81a9237",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "ffdcb710-1567-4ff0-a306-1d397dc2f46c",
+      "Alias": "postsPerPage",
+      "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "ValueType": "System.Int32",
+      "Name": "Posts Per Page"
+    }
+  ],
+  "Udi": "umb://document-type/527ea1d78b3046299695b2f75e44448a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/8dcdcd6b2f0b491087882d31f81a9237",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}
