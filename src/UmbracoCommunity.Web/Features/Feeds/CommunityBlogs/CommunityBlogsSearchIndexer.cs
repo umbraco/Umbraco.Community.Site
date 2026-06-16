@@ -9,6 +9,12 @@ public sealed class CommunityBlogsSearchIndexer : ICommunityBlogsIndexer
     public const string IndexName = "CommunityBlogsIndex";
     public const string Category = "communityBlogPost";
 
+    public const string FieldTitle = "title";
+    public const string FieldExcerpt = "excerpt";
+    public const string FieldAuthor = "author";
+    public const string FieldUrl = "url";
+    public const string FieldPublishedAt = "publishedAt";
+
     private readonly IExamineManager _examineManager;
     private readonly ILogger<CommunityBlogsSearchIndexer> _logger;
 
@@ -24,11 +30,11 @@ public sealed class CommunityBlogsSearchIndexer : ICommunityBlogsIndexer
         {
             var values = new Dictionary<string, object>
             {
-                ["title"] = post.Title ?? string.Empty,
-                ["excerpt"] = post.Excerpt ?? string.Empty,
-                ["author"] = post.AuthorName ?? string.Empty,
-                ["url"] = post.Url ?? string.Empty,
-                ["publishedAt"] = post.PublishedAt.UtcDateTime.ToString("o", CultureInfo.InvariantCulture),
+                [FieldTitle] = post.Title ?? string.Empty,
+                [FieldExcerpt] = post.Excerpt ?? string.Empty,
+                [FieldAuthor] = post.AuthorName ?? string.Empty,
+                [FieldUrl] = post.Url ?? string.Empty,
+                [FieldPublishedAt] = post.PublishedAt.UtcDateTime.ToString("o", CultureInfo.InvariantCulture),
             };
             yield return new ValueSet(post.Id, Category, values);
         }
