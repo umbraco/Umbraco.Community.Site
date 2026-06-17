@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using UmbracoCommunity.Web.Abstract.Services;
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
@@ -28,6 +29,12 @@ internal sealed class SearchService : ISearchService
         "teaser",
         "bannerContent",
         "contentBlocks",
+    };
+    private static readonly string[] CommunitySearchFields =
+    {
+        CommunityBlogsSearchIndexer.FieldTitle,
+        CommunityBlogsSearchIndexer.FieldExcerpt,
+        CommunityBlogsSearchIndexer.FieldAuthor,
     };
     private static readonly Regex HtmlTagRegex = new("<[^>]+>", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
@@ -95,7 +102,10 @@ internal sealed class SearchService : ISearchService
             return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((Array.Empty<SearchResultItem>(), 0));
         }
 
-        var filtered = new List<ISearchResult>();
+        // Filter content hits and map each passing one to its result item in a single pass.
+        // Map every filtered content hit (not just the page slice) so the combined,
+        // score-ordered set can be paginated once across both sources.
+        var combined = new List<(double Score, SearchResultItem Item)>();
         foreach (var result in searchResults)
         {
             if (!int.TryParse(result.Id, out var id)) continue;
@@ -112,18 +122,7 @@ internal sealed class SearchService : ISearchService
             if (content is not ICompositionPageConfiguration pageConfig) continue;
             if (pageConfig.HideFromSearch) continue;
 
-            filtered.Add(result);
-        }
-
-        var total = filtered.Count;
-        var items = new List<SearchResultItem>(take);
-        foreach (var result in filtered.Skip(skip).Take(take))
-        {
-            var id = int.Parse(result.Id);
-            var content = umbracoContext.Content.GetById(id);
-            if (content is null) continue;
-
-            items.Add(new SearchResultItem
+            combined.Add((result.Score, new SearchResultItem
             {
                 Name = content.Name ?? string.Empty,
                 Url = content.Url(_publishedUrlProvider),
@@ -132,8 +131,54 @@ internal sealed class SearchService : ISearchService
                     ?? BuildExcerpt(result.GetValues("teaser").FirstOrDefault())
                     ?? BuildExcerpt(result.GetValues("contentBlocks").FirstOrDefault()),
                 ContentTypeAlias = content.ContentType.Alias,
-            });
+                IsExternal = false,
+            }));
         }
+
+        // Community blog posts are global (not tenant-filtered) and marked external.
+        // A missing index is not an error — it just contributes nothing.
+        if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))
+        {
+            try
+            {
+                // MaxIndexFetch is a generous safety cap here: the community feed is expected
+                // to stay well under it (~60 posts), so this fetches the whole index in practice.
+                var communityResults = communityIndex.Searcher
+                    .CreateQuery()
+                    .ManagedQuery(query, CommunitySearchFields)
+                    .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
+
+                foreach (var result in communityResults)
+                {
+                    var url = result.GetValues(CommunityBlogsSearchIndexer.FieldUrl).FirstOrDefault();
+                    var title = result.GetValues(CommunityBlogsSearchIndexer.FieldTitle).FirstOrDefault();
+                    if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(title)) continue;
+
+                    combined.Add((result.Score, new SearchResultItem
+                    {
+                        Name = title,
+                        Url = url,
+                        Description = BuildExcerpt(result.GetValues(CommunityBlogsSearchIndexer.FieldExcerpt).FirstOrDefault()),
+                        ContentTypeAlias = CommunityBlogsSearchIndexer.Category,
+                        IsExternal = true,
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Search: community blogs query failed for '{Query}'", query);
+            }
+        }
+
+        // Merge content + community hits by raw Lucene score. Note: scores from two different
+        // indexes are not strictly comparable (different IDF/field norms/doc counts), so the
+        // interleave is approximate by design — acceptable for this feed's size.
+        var ordered = combined
+            .OrderByDescending(x => x.Score)
+            .ToList();
+
+        var total = ordered.Count;
+        var items = ordered.Skip(skip).Take(take).Select(x => x.Item).ToList();
 
         return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((items, total));
     }

@@ -204,3 +204,15 @@
   font-size: 0.9375rem;
   color: var(--color-light-blue);
 }
+
+.search-page__result-external {
+  display: inline-block;
+  margin-left: var(--unit-xs);
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  background: var(--color-light);
+  color: var(--color-blue);
+}

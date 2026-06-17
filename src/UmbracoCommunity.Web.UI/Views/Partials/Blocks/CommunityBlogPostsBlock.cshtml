@@ -8,16 +8,30 @@
 
 @{
     const int DefaultPostsPerPage = 12;
-    var settingsPerPage = Model.Settings?.PostsPerPage ?? 0;
-    var pageSize = settingsPerPage > 0 ? settingsPerPage : DefaultPostsPerPage;
+    const int DefaultFeaturedPosts = 6;
+    const int MaxFeaturedPosts = 12;
 
-    var requestedPage = 1;
-    if (int.TryParse(Context.Request.Query["page"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) && parsed > 0)
+    var featuredOnly = Model.Settings?.FeaturedOnly ?? false;
+
+    int requestedPage = 1;
+    PagedCommunityBlogPosts result;
+    if (featuredOnly)
     {
-        requestedPage = parsed;
+        var featuredCount = Model.Settings?.NumberOfFeaturedPosts ?? 0;
+        if (featuredCount <= 0) featuredCount = DefaultFeaturedPosts;
+        featuredCount = Math.Clamp(featuredCount, 1, MaxFeaturedPosts);
+        result = CommunityBlogsService.GetPage(1, featuredCount);
     }
-
-    var result = CommunityBlogsService.GetPage(requestedPage, pageSize);
+    else
+    {
+        var settingsPerPage = Model.Settings?.PostsPerPage ?? 0;
+        var pageSize = settingsPerPage > 0 ? settingsPerPage : DefaultPostsPerPage;
+        if (int.TryParse(Context.Request.Query["page"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) && parsed > 0)
+        {
+            requestedPage = parsed;
+        }
+        result = CommunityBlogsService.GetPage(requestedPage, pageSize);
+    }
 
     var hasBg = Model.Settings.HasBg();
     var bgIsDark = hasBg && Model.Settings.IsDark();
@@ -99,29 +113,40 @@
             }
         </div>
 
-        @if (result.TotalPages > 1)
+        @if (!featuredOnly && result.TotalPages > 1)
         {
             <nav class="dc-community-blogs__pagination" aria-label="Community blog posts pages">
                 @if (result.Page > 1)
                 {
+                    <a class="dc-community-blogs__page-link" rel="first" href="@BuildPageUrl(1, anchor)">First</a>
                     <a class="dc-community-blogs__page-link" rel="prev" href="@BuildPageUrl(result.Page - 1, anchor)">Previous</a>
                 }
-                @for (var p = 1; p <= result.TotalPages; p++)
+                else
                 {
-                    if (p == result.Page)
-                    {
-                        <span class="dc-community-blogs__page-link is-current" aria-current="page">@p</span>
-                    }
-                    else
-                    {
-                        <a class="dc-community-blogs__page-link" href="@BuildPageUrl(p, anchor)">@p</a>
-                    }
+                    <span class="dc-community-blogs__page-link is-disabled" aria-disabled="true">First</span>
+                    <span class="dc-community-blogs__page-link is-disabled" aria-disabled="true">Previous</span>
                 }
+
+                <span class="dc-community-blogs__page-current" aria-current="page">Page @result.Page of @result.TotalPages</span>
+
                 @if (result.Page < result.TotalPages)
                 {
                     <a class="dc-community-blogs__page-link" rel="next" href="@BuildPageUrl(result.Page + 1, anchor)">Next</a>
+                    <a class="dc-community-blogs__page-link" rel="last" href="@BuildPageUrl(result.TotalPages, anchor)">Last</a>
+                }
+                else
+                {
+                    <span class="dc-community-blogs__page-link is-disabled" aria-disabled="true">Next</span>
+                    <span class="dc-community-blogs__page-link is-disabled" aria-disabled="true">Last</span>
                 }
             </nav>
+        }
+
+        @if (featuredOnly && !Model.Content.ReadMoreText.IsEmptyHtmlString())
+        {
+            <div class="dc-community-blogs__cta">
+                @Html.Raw(Model.Content.ReadMoreText?.ToHtmlString())
+            </div>
         }
     }
 </section>
