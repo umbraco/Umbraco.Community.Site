@@ -159,7 +159,10 @@ for (const section of SURFACED) {
     const contributors = gitContributors(file);
     if (contributors.length === 0) continue;
 
-    const avatars = await githubAvatarsForPath(key);
+    // The GitHub commits API expects a repo-root-relative path ("docs/tutorials/x.md"),
+    // not the docs-root-relative key ("tutorials/x.md") used for the output map.
+    const apiPath = relative(repoRoot, file).split(sep).join("/");
+    const avatars = await githubAvatarsForPath(apiPath);
     result[key] = contributors.map(({ name, email }) => {
       const gh = avatars.get(email);
       return gh

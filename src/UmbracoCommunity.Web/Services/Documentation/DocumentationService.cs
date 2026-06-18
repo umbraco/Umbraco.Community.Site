@@ -23,6 +23,18 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     /// </summary>
     public const string DocBaseToken = "/__docbase__";
 
+    /// <summary>Display title for the docs landing page (the node is named "Docs" for the short nav/breadcrumb label).</summary>
+    public const string RootDisplayTitle = "Community Site Documentation";
+
+    /// <summary>
+    /// Default base for rewriting in-repo doc links to GitHub source. Used when
+    /// <c>Documentation:RepositoryUrl</c> isn't configured; the setting still overrides it.
+    /// </summary>
+    public const string DefaultRepositoryUrl = "https://github.com/umbraco/Umbraco.Community.Site/blob/develop";
+
+    /// <summary>The docs folder name as it exists in the repository (it's "App_Docs" once published).</summary>
+    private const string RepoDocsFolder = "docs";
+
     private static readonly string[] TopLevelSections = ["primers", "tutorials"];
     private static readonly HashSet<string> ExcludedFileNames = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -131,7 +143,8 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         }
 
         _resolvedRoot = root;
-        _repositoryUrl = _configuration["Documentation:RepositoryUrl"]?.TrimEnd('/');
+        var configuredRepoUrl = _configuration["Documentation:RepositoryUrl"];
+        _repositoryUrl = (string.IsNullOrWhiteSpace(configuredRepoUrl) ? DefaultRepositoryUrl : configuredRepoUrl).TrimEnd('/');
         _contributors = LoadContributors(root);
         EnsureWatcher(root);
 
@@ -488,9 +501,22 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                 return LinkRewrite.Inert;
             }
 
-            var repoRelative = absolute[(repoRoot.Length + 1)..]
-                .Replace(Path.DirectorySeparatorChar, '/')
-                .Replace(Path.AltDirectorySeparatorChar, '/');
+            string repoRelative;
+            if (absolute.StartsWith(docsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            {
+                // File inside the docs folder. On disk that folder is "docs" (dev) or "App_Docs" (publish),
+                // but in the repo it's always "docs" — map it explicitly so the GitHub URL is correct in both.
+                var underDocs = absolute[(docsRoot.Length + 1)..]
+                    .Replace(Path.DirectorySeparatorChar, '/')
+                    .Replace(Path.AltDirectorySeparatorChar, '/');
+                repoRelative = $"{RepoDocsFolder}/{underDocs}";
+            }
+            else
+            {
+                repoRelative = absolute[(repoRoot.Length + 1)..]
+                    .Replace(Path.DirectorySeparatorChar, '/')
+                    .Replace(Path.AltDirectorySeparatorChar, '/');
+            }
             return LinkRewrite.External($"{_repositoryUrl}/{repoRelative}{suffix}");
         }
 

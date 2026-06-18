@@ -78,20 +78,30 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         // A single Documentation node serves every docs URL, so the node-derived title/canonical
         // above are identical for all of them. Override per resolved article/section.
-        ApplyDocumentationOverrides(viewModel);
+        ApplyDocumentationOverrides(viewModel, currentPage);
 
         return viewModel;
     }
 
-    private void ApplyDocumentationOverrides(MetaTagsViewModel viewModel)
+    private void ApplyDocumentationOverrides(MetaTagsViewModel viewModel, IPublishedContent currentPage)
     {
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext is null
-            || !httpContext.Items.TryGetValue(DocumentationContentFinder.PathSegmentsItemKey, out var raw)
-            || raw is not string[] segments)
+        // Every docs URL binds to the Documentation node — the root via normal routing, sub-paths via
+        // DocumentationContentFinder. Gate on the node type so the root (no path-segments item) is covered too.
+        if (currentPage is not UmbracoCommunity.Web.Models.PublishedModels.Documentation)
         {
             return;
         }
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return;
+        }
+
+        var segments = httpContext.Items.TryGetValue(DocumentationContentFinder.PathSegmentsItemKey, out var raw)
+            && raw is string[] s
+            ? s
+            : Array.Empty<string>();
 
         // Canonical is the actual request URL (the node URL would collapse every doc page onto
         // /docs/). Normalise to a trailing slash so /x and /x/ don't read as duplicate content.
@@ -106,7 +116,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         if (segments.Length == 0)
         {
-            // Root /docs/ — keep the node name ("Docs") as the title.
+            // Root /docs/ — the node is named "Docs"; present a fuller title for the landing page.
+            viewModel.MetaTitle = DocumentationService.RootDisplayTitle;
             return;
         }
 
