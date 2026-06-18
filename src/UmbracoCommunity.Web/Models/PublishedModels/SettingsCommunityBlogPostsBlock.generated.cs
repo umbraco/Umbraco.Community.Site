@@ -50,6 +50,20 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
+		/// Show featured posts only (no paging)
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("featuredOnly")]
+		public virtual bool FeaturedOnly => this.Value<bool>(_publishedValueFallback, "featuredOnly");
+
+		///<summary>
+		/// Number of featured posts
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("numberOfFeaturedPosts")]
+		public virtual int NumberOfFeaturedPosts => this.Value<int>(_publishedValueFallback, "numberOfFeaturedPosts");
+
+		///<summary>
 		/// Posts Per Page
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

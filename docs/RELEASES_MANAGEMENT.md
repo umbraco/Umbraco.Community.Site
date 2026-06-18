@@ -1,6 +1,8 @@
 # Releases Management Guide
 
-This guide explains how Umbraco CMS releases are tracked and displayed on the Community Site.
+This guide explains how Umbraco CMS release announcements are authored.
+
+> **Note:** Release tracking and display were extracted out of *this* repository into a separate releases site ([releases.umbraco.com](https://releases.umbraco.com)) — there is no release-syncing code in this codebase any more. This guide documents the upstream GitHub Action that creates the release discussions and the editorial workflow the releases site consumes; the consuming/syncing application lives in the separate releases repo.
 
 ## How Release Discussions Are Created
 
@@ -71,9 +73,9 @@ Check out these resources:
 
 **Note:** The `### Links` section at the bottom is only for the people who stumble upon the discussion on GitHub, it won't appear on releases.umbraco.com
 
-## How the Community Site Uses This Data
+## How the Releases Site Uses This Data
 
-The Community Site automatically syncs release discussions, and updates to issues and PRs **every hour, on the hour**. 
+The releases site (releases.umbraco.com) automatically syncs release discussions, and updates to issues and PRs **every hour, on the hour**. 
 
 The Discussion is where any manual content for a version goes, the release date, LTS status and a description if needed. 
 

@@ -4,23 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring automated GitHub integration for release tracking, community data synchronization, and Sessionize event integration.
+This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring Sessionize event integration and aggregated community content feeds (blog posts, calendar). (Release tracking used to live here too but has been extracted to a separate releases site.)
 
 **Multi-tenancy**: The site runs multiple tenants from a single Umbraco instance, each with its own root content node. All content lookups (e.g., site settings, 404 pages, navigation) must be resolved **relative to the current request's content tree** — never assume a single root or use hardcoded paths. Traverse ancestors or use the current request's root node to find tenant-specific content.
 
+## Documentation
+
+The repo carries a small library of conceptual and operational docs alongside the code:
+
+- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, and integrations are written; content modelling and SEO are still planned stubs). Start here if you're new to the codebase.
+- **[docs/tutorials/](docs/tutorials/)** — short, focused deep dives on specific problems we've hit and how we solved them. Split into [`foundations/`](docs/tutorials/foundations/) (standalone patterns) and [`refinements/`](docs/tutorials/refinements/) (improvements layered on a foundation).
+- **[docs/BUILDING_PAGES.md](docs/BUILDING_PAGES.md)** and **[docs/BUILDING_BLOCKS.md](docs/BUILDING_BLOCKS.md)** — how-tos for adding new pages and content blocks.
+- **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
+- **[CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)** and **[ACCESSIBILITY.md](ACCESSIBILITY.md)** — coding standards and WCAG conformance notes.
+
+Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of planned material, with a placeholder file under the relevant folder for each entry. When picking one up to write, expand the existing stub in place rather than creating a new file.
+
 ## Solution Structure
 
-The solution consists of 5 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 6 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
 - **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **Umbraco.Community.NotFoundTracker** - 404 tracking with ignore rules and a dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 
 ### Key Directories in UmbracoCommunity.Web
 
-- **Features/** - Self-contained feature modules (Sessionize) with their own controllers, models, and infrastructure
+- **Features/** - Self-contained feature modules (Sessionize, Feeds, Mvp, Seed) with their own controllers, models, and infrastructure
 - **Controllers/** - MVC controllers organized by type:
   - `Controllers/Api/` - API controllers (inherit from `ControllerBase`, have `[ApiController]` attribute)
   - `Controllers/Render/` - Umbraco render controllers (inherit from `RenderController`)
@@ -38,11 +51,11 @@ The solution consists of 5 projects (uses Central Package Management via `Direct
   - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`, `ContentContextService`, `ISeoDataService`/`SeoDataService`)
 - **ViewComponents/** - ASP.NET Core View Components for layout concerns (MetaTags, Menu, Footer, Favicon)
-- **Routing/** - Custom content finders (e.g., `PageNotFoundContentFinder`)
+- **Routing/** - Custom routing (e.g., `CommunitySitePageNotFoundResolver` for tenant-aware 404s, `DocumentationContentFinder`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
-- **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
+- **Utilities/** - Helper classes (`StringUtilities`, `UrlUtilities`)
+- **Helpers/** - Domain helpers (ColourHelper, CountryFlagHelper, VideoHelper)
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
 - **Vite/** - Vite integration helpers and tag helpers
 
@@ -83,9 +96,6 @@ dotnet build
 # Build frontend assets (production)
 cd src/UmbracoCommunity.StaticAssets
 npm run build
-
-# Build backoffice extensions only
-npm run build:backoffice
 
 # Build for cloud deployment (copies files via devops/copy-for-cloud.js)
 npm run build:for:cloud
@@ -133,12 +143,11 @@ See `docs/BUILDING_PAGES.md` for detailed instructions.
 
 ### Content Blocks
 
-Reusable components using Umbraco's Block List editor:
-1. **Element Type** - Umbraco content structure
-2. **Settings Type** - optional configuration
-3. **Content Model** - strongly-typed model (in `Models/ContentModels/`)
-4. **View Model** - view-layer model (in `Models/ViewModels/Blocks/`)
-5. **View** - Razor partial (in `Views/Partials/Blocks/`)
+Reusable components using Umbraco's Block List / Block Grid editor:
+1. **Element Type** - Umbraco content structure (the block's properties)
+2. **Settings Type** - optional configuration (often composing `ISettingsColour`, `ISettingsBlockId`)
+3. **Content Model** - the Models Builder published model; optionally extended by a hand-written partial in `Models/ContentModels/` for view-only helpers (e.g. `IdHash`, computed properties)
+4. **View** - Razor partial in `Views/Partials/Blocks/{Alias}.cshtml` inheriting `BlockGridItem<TContent, TSettings>` and binding the content/settings models directly (there is **no** per-block view model or view-model builder)
 
 See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 
@@ -149,7 +158,7 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
-- **integrations/** - Third-party integrations (Cookiebot, Intercom, Matomo, Google Maps)
+- **integrations/** - Small `script-loader`-based elements for injecting third-party scripts
 - **models/** - TypeScript data models
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions
@@ -159,8 +168,9 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **test/** - Test utilities
 
 Built assets go to:
-- Frontend: `dist/` → referenced in views
-- Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
+- Frontend: `dist/` → copied to `../UmbracoCommunity.Web.UI/wwwroot/assets/` for production, referenced in views
+
+Backoffice extensions are **not** built from this project. Each lives in its own Vite project (`UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, `Umbraco.Community.NotFoundTracker/Client/`) and emits to its own `App_Plugins/<Name>/` folder.
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
@@ -170,7 +180,7 @@ Built assets go to:
 
 **Text Link Animation**: Inline text links within block content have an animated pink highlight (background-gradient that grows from a 2px underline to full highlight on hover). Defined globally in `typography.css`, scoped to text-only links via `:not(:has(img, svg, picture, video, div))`.
 
-**SVG Style Scoping**: Illustrator-exported SVGs ship an inline `<style>` block with auto-generated class names (`.st0`–`.stN`). Inline `<style>` is document-scoped (not SVG-scoped), so without intervention those class rules leak across every SVG on the page and the last-defined `.st0` rule wins for *all* SVGs. The `<svg-src>` TagHelper (`UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`) handles this automatically: it generates a unique scope class per SVG instance, adds it to the `<svg>` element, and prefixes every selector inside the SVG's `<style>` block with that class. The SVG's palette stays self-contained without any author-side CSS workarounds. External CSS that targets `.stN` (e.g. the hero-mode logo overrides in `header.css`) still works because it sits outside the SVG and the scoping only adds specificity to the *internal* rules.
+**SVG Style Scoping**: Illustrator-exported SVGs ship an inline `<style>` block with auto-generated class names (`.st0`–`.stN`). Inline `<style>` is document-scoped (not SVG-scoped), so without intervention those class rules leak across every SVG on the page and the last-defined `.st0` rule wins for *all* SVGs. The `<svg-src>` TagHelper (`UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`) handles this automatically: it derives a deterministic scope class from the media path, adds it to the `<svg>` element, and prefixes every selector inside the SVG's `<style>` block with that class. The scoped output is cached in Umbraco's `RuntimeCache` for 60 minutes keyed by media path, so repeat renders skip the file read, sanitisation, parse, and selector-prefix work. External CSS that targets `.stN` (e.g. the hero-mode logo overrides in `header.css`) still works because it sits outside the SVG and the scoping only adds specificity to the *internal* rules.
 
 ### Models Builder
 
@@ -381,13 +391,17 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 
 A custom tiptap toolbar extension is defined in `App_Plugins/RichtextStyles/umbraco-package.json`. It provides a "Richtext styles" dropdown with grouped options for headings, inline formatting, blocks, and lists (including condensed list variants that apply a `no-margin` class to `ol`/`ul` tags).
 
+### Site Search
+
+The nav search icon is wired to a `SearchPage` doc type backed by Umbraco's Examine `ExternalIndex`. A typed `SearchService` (`Services/SearchService.cs`) queries the index with multi-tenant scoping — results are filtered to descendants of the current request's content root, so search on Site A doesn't leak Site B hits. HTML is stripped from excerpts before display. The render controller (`Controllers/Render/SearchPageController.cs`) hands the results off to a `SearchPageViewModel` for the `SearchPage.cshtml` view to render.
+
 ### Vite Integration
 
 Custom Vite integration for Umbraco:
 - Manifest-based asset loading in development and production
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
-- Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
+- Single build target here: the public website (`npm run build`). Backoffice extensions build separately, from each `*/Client/` Vite project (library mode, externalising `@umbraco/*`)
 
 ### SEO and Schema Markup
 
@@ -419,12 +433,12 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.2.2 on .NET 10
-- Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
+- Umbraco CMS 17.4.2 on .NET 10
+- Entity Framework Core 10.0.8 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
 - Schema.NET 13.0.0 - Structured data/schema markup
 - Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.1.1 - Extended content editors
+- Umbraco.Community.Contentment 6.1.4 - Extended content editors
 
 **Frontend:**
 - Lit 3.3.0 - Web components framework
@@ -453,3 +467,9 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 - **ViewComponents over filters**: Layout concerns (menu, footer, meta tags, favicon) are handled by ViewComponents, not action filter attributes
 - **Output Caching**: API endpoints use `[OutputCache]` with policy names from `OutputCachePolicies` class
 - **Upgrade Tool**: Use `tools/upgrade-umbraco/` for package version upgrades
+
+## Pending follow-ups
+
+Check intermittently and clear as conditions become true.
+
+- **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.

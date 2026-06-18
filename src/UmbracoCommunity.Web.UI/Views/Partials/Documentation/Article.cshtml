@@ -1,0 +1,64 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@model DocumentationPageViewModel
+
+@{
+    var article = Model.Article!;
+}
+
+<header class="documentation__header">
+    <h1>@article.Title</h1>
+    <p class="documentation__meta">
+        <time datetime="@article.LastModifiedUtc.ToString("o")">Updated @article.LastModifiedUtc.ToString("MMMM d, yyyy")</time>
+    </p>
+    @if (article.Tags.Count > 0)
+    {
+        <ul class="documentation__tags" aria-label="Tags">
+            @foreach (var tag in article.Tags)
+            {
+                <li class="documentation__tag">@tag</li>
+            }
+        </ul>
+    }
+</header>
+
+<div class="documentation-prose">
+    @Model.ArticleHtml
+</div>
+
+@if (article.Contributors.Count > 0)
+{
+    <footer class="documentation__contributors">
+        <h2>Contributors</h2>
+        <p>
+            Built and improved by the people who use these docs. Spot something out of date,
+            fix an error, or extend the pattern? Open a PR — you'll be credited here automatically.
+        </p>
+        <ul class="documentation__contributor-list">
+            @foreach (var contributor in article.Contributors)
+            {
+                <li class="documentation__contributor">
+                    @if (!string.IsNullOrEmpty(contributor.AvatarUrl))
+                    {
+                        <a class="documentation__contributor-link"
+                           href="@(contributor.ProfileUrl ?? "#")"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           title="@contributor.Name"
+                           aria-label="@contributor.Name">
+                            <img class="documentation__contributor-avatar"
+                                 src="@contributor.AvatarUrl"
+                                 alt="@contributor.Name"
+                                 width="40"
+                                 height="40"
+                                 loading="lazy" />
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="documentation__contributor-name">@contributor.Name</span>
+                    }
+                </li>
+            }
+        </ul>
+    </footer>
+}

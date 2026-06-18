@@ -17,6 +17,22 @@
   "PropertyGroups": [],
   "PropertyTypes": [
     {
+      "Key": "bfa1f240-35f1-4f16-b300-fcececf0c105",
+      "Alias": "featuredOnly",
+      "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "ValueType": "System.Boolean",
+      "Name": "Show featured posts only (no paging)",
+      "Description": "When on, shows the latest posts as a teaser with a 'Read more' link and no pagination."
+    },
+    {
+      "Key": "ef58c966-85c4-403f-b7c3-805fc2f51142",
+      "Alias": "numberOfFeaturedPosts",
+      "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "ValueType": "System.Int32",
+      "Name": "Number of featured posts",
+      "Description": "How many posts to show in featured mode (default 6, max 12)."
+    },
+    {
       "Key": "ffdcb710-1567-4ff0-a306-1d397dc2f46c",
       "Alias": "postsPerPage",
       "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
@@ -26,6 +42,10 @@
   ],
   "Udi": "umb://document-type/527ea1d78b3046299695b2f75e44448a",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "Ordering": true
