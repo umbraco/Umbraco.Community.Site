@@ -103,17 +103,20 @@ function gitContributors(absPath) {
   return order.map((email) => byEmail.get(email));
 }
 
-// email (lowercased) -> { login, avatarUrl, profileUrl } from the GitHub commits API.
-async function githubAvatarsForPath(relPath) {
-  if (!token || !repoSlug) return new Map();
-
+// Build a global email (lowercased) -> { login, avatarUrl, profileUrl } map from the repo's commit
+// history. The commits API only exposes a commit's *primary* author as `commit.author`; co-authors
+// (Co-authored-by trailers) never appear there. But a co-author's email almost always shows up as the
+// primary author on some *other* commit, so a global sweep resolves authors and co-authors alike.
+// We page until every needed email is found (or history / quota is exhausted).
+async function buildGlobalAvatarMap(neededEmails) {
   const map = new Map();
-  let page = 1;
+  if (!token || !repoSlug) return map;
+
+  const remaining = new Set(neededEmails);
+  const MAX_PAGES = 50; // safety cap (~5000 commits) for emails that are never a primary author
   try {
-    for (;;) {
-      const url =
-        `https://api.github.com/repos/${repoSlug}/commits` +
-        `?path=${encodeURIComponent(relPath)}&per_page=100&page=${page}`;
+    for (let page = 1; page <= MAX_PAGES && remaining.size > 0; page++) {
+      const url = `https://api.github.com/repos/${repoSlug}/commits?per_page=100&page=${page}`;
       const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -122,7 +125,7 @@ async function githubAvatarsForPath(relPath) {
         },
       });
       if (!res.ok) {
-        console.warn(`GitHub API ${res.status} for ${relPath}; falling back to name-only.`);
+        console.warn(`GitHub API ${res.status} while building avatar map; resolved ${map.size} so far.`);
         break;
       }
       const batch = await res.json();
@@ -135,17 +138,19 @@ async function githubAvatarsForPath(relPath) {
           avatarUrl: sizedAvatar(user.avatar_url),
           profileUrl: user.html_url,
         });
+        remaining.delete(email);
       }
       if (batch.length < 100) break;
-      page++;
     }
   } catch (err) {
-    console.warn(`GitHub API error for ${relPath}: ${err.message}; falling back to name-only.`);
+    console.warn(`GitHub API error building avatar map: ${err.message}; resolved ${map.size}.`);
   }
   return map;
 }
 
-const result = {};
+// Pass 1: collect each file's contributors (from git history) and the full set of emails to resolve.
+const fileContributors = [];
+const neededEmails = new Set();
 for (const section of SURFACED) {
   const dir = join(docsRoot, section);
   let files;
@@ -158,18 +163,23 @@ for (const section of SURFACED) {
     const key = relative(docsRoot, file).split(sep).join("/");
     const contributors = gitContributors(file);
     if (contributors.length === 0) continue;
-
-    // The GitHub commits API expects a repo-root-relative path ("docs/tutorials/x.md"),
-    // not the docs-root-relative key ("tutorials/x.md") used for the output map.
-    const apiPath = relative(repoRoot, file).split(sep).join("/");
-    const avatars = await githubAvatarsForPath(apiPath);
-    result[key] = contributors.map(({ name, email }) => {
-      const gh = avatars.get(email);
-      return gh
-        ? { name, login: gh.login, avatarUrl: gh.avatarUrl, profileUrl: gh.profileUrl }
-        : { name };
-    });
+    fileContributors.push({ key, contributors });
+    for (const c of contributors) neededEmails.add(c.email);
   }
+}
+
+// Resolve avatars for every contributor email in one global sweep (covers co-authors, not just
+// the per-file primary author the commits API would otherwise expose).
+const avatars = await buildGlobalAvatarMap(neededEmails);
+
+const result = {};
+for (const { key, contributors } of fileContributors) {
+  result[key] = contributors.map(({ name, email }) => {
+    const gh = avatars.get(email);
+    return gh
+      ? { name, login: gh.login, avatarUrl: gh.avatarUrl, profileUrl: gh.profileUrl }
+      : { name };
+  });
 }
 
 const ordered = Object.fromEntries(Object.keys(result).sort().map((k) => [k, result[k]]));
