@@ -37,4 +37,6 @@ public sealed class SearchResultItem
     public string? Description { get; init; }
 
     public string? ContentTypeAlias { get; init; }
+
+    public bool IsExternal { get; init; }
 }

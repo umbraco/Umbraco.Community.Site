@@ -47,13 +47,26 @@
             <ul class="search-page__results">
                 @foreach (var item in Model.Results)
                 {
-                    <li class="search-page__result">
-                        <h2 class="search-page__result-title">@item.Name</h2>
+                    <li class="search-page__result @(item.IsExternal ? "is-external" : "")">
+                        <h2 class="search-page__result-title">
+                            @item.Name
+                            @if (item.IsExternal)
+                            {
+                                <span class="search-page__result-external" aria-label="Opens an external site">External link ↗</span>
+                            }
+                        </h2>
                         @if (!string.IsNullOrWhiteSpace(item.Description))
                         {
                             <p class="search-page__result-description">@item.Description</p>
                         }
-                        <a class="search-page__result-url" href="@item.Url">@item.Url</a>
+                        @if (item.IsExternal)
+                        {
+                            <a class="search-page__result-url" href="@item.Url" target="_blank" rel="noopener noreferrer">@item.Url</a>
+                        }
+                        else
+                        {
+                            <a class="search-page__result-url" href="@item.Url">@item.Url</a>
+                        }
                     </li>
                 }
             </ul>
