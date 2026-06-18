@@ -28,6 +28,14 @@ function git(args) {
   return execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
 }
 
+// GitHub avatar URLs are full-size (~460px); the docs footer renders them at 40px.
+// Append a size param so only a small image is fetched (80 = 2x for retina).
+const AVATAR_SIZE = 80;
+function sizedAvatar(url) {
+  if (!url) return url;
+  return url + (url.includes("?") ? "&" : "?") + `s=${AVATAR_SIZE}`;
+}
+
 const repoRoot = git(["rev-parse", "--show-toplevel"]).trim();
 const docsRoot = join(repoRoot, "docs");
 
@@ -124,7 +132,7 @@ async function githubAvatarsForPath(relPath) {
         if (!email || !user || user.type === "Bot" || map.has(email)) continue;
         map.set(email, {
           login: user.login,
-          avatarUrl: user.avatar_url,
+          avatarUrl: sizedAvatar(user.avatar_url),
           profileUrl: user.html_url,
         });
       }
