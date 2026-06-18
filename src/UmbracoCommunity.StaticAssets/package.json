@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "vite --port 5123",
     "build": "tsc -p tsconfig.build.json && vite build",
-    "build:backoffice": "tsc && cross-env BUILD_TARGET=backoffice vite build",
     "build:for:cloud": "npm run build && node ./devops/copy-for-cloud.js",
+    "generate:doc-contributors": "node ./devops/generate-doc-contributors.js",
     "preview": "vite preview",
     "test": "cross-env NODE_NO_WARNINGS=1 vitest --run",
     "test:ui": "cross-env NODE_NO_WARNINGS=1 vitest --ui --run",

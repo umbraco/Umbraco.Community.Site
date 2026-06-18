@@ -27,3 +27,11 @@ If you delete something that you later realise you shouldn't have deleted (and t
 ## Adding secrets
 
 In order to add a secret that is being read from the appsettings.json file, add it in the Cloud Portal. This is using the default .NET secrets naming convention, [as documented](https://docs.umbraco.com/umbraco-cloud/begin-your-cloud-journey/project-features/secrets-management).
+
+## Package-Owned Database Migrations
+
+The Block Restrictions package (`UmbracoCommunity.BlockRestrictions`) owns its own EF Core `DbContext` and migrations rather than making the host project wire them up. The migrations are applied on startup by a notification handler, `BlockRestrictionMigrationNotificationHandler`, which runs on Umbraco's `UmbracoApplicationStartedNotification`.
+
+The footgun: the migrations must run *after* Umbraco has finished its own startup — and crucially **not** from an `IHostedService`. On a fresh install Umbraco runs its unattended installer during host startup to create and populate the SQLite database; a hosted service runs concurrently with that installer and can block on the SQLite write lock for several minutes (issue #132). Deferring to `UmbracoApplicationStartedNotification` guarantees Umbraco has finished its own database setup before the package touches the file.
+
+If you add another package that owns its own schema, follow the same pattern: `DbContext` + migrations inside the Razor Class Library, applied from `UmbracoApplicationStartedNotification`, so the host project consumes the package without wiring anything up — and without racing the installer.

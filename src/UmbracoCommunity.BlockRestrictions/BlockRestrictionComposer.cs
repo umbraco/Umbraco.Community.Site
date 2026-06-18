@@ -18,7 +18,7 @@ namespace UmbracoCommunity.BlockRestrictions;
 /// This composer sets up:
 ///   1. EF Core DbContext factory (supports both SQLite and SQL Server)
 ///   2. Swagger/OpenAPI documentation with backoffice auth
-///   3. Database migration hosted service
+///   3. Database migration notification handler (runs after Umbraco starts)
 ///   4. Scoped services (store + business logic)
 /// </summary>
 public class BlockRestrictionComposer : IComposer
@@ -59,7 +59,7 @@ public class BlockRestrictionComposer : IComposer
             }
 
             // Suppress the EF Core warning about pending model changes.
-            // Our migrations are applied by the hosted service on startup.
+            // Our migrations are applied by BlockRestrictionMigrationNotificationHandler after Umbraco starts.
             options.ConfigureWarnings(warnings =>
                 warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         });

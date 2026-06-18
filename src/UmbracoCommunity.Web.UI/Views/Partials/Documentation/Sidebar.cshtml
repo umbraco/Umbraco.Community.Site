@@ -1,0 +1,88 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@using UmbracoCommunity.Web.Services.Documentation
+@using UmbracoCommunity.Web.ViewModelBuilders.Pages
+@model DocumentationPageViewModel
+
+@functions {
+    bool IsActiveSection(DocumentationSection section)
+    {
+        if (Model.Section is not null && Equal(Model.Section.PathSegments, section.PathSegments))
+        {
+            return true;
+        }
+        if (Model.Article is not null && StartsWith(Model.Article.SectionPathSegments, section.PathSegments))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool IsActiveArticle(DocumentationArticle article)
+        => Model.Article is not null && Equal(Model.Article.PathSegments, article.PathSegments);
+
+    static bool Equal(IReadOnlyList<string> a, IReadOnlyList<string> b)
+    {
+        if (a.Count != b.Count) return false;
+        for (var i = 0; i < a.Count; i++)
+        {
+            if (!string.Equals(a[i], b[i], StringComparison.OrdinalIgnoreCase)) return false;
+        }
+        return true;
+    }
+
+    static bool StartsWith(IReadOnlyList<string> a, IReadOnlyList<string> prefix)
+    {
+        if (a.Count < prefix.Count) return false;
+        for (var i = 0; i < prefix.Count; i++)
+        {
+            if (!string.Equals(a[i], prefix[i], StringComparison.OrdinalIgnoreCase)) return false;
+        }
+        return true;
+    }
+
+    void RenderSection(DocumentationSection node, int depth)
+    {
+        var nodeUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, node.PathSegments);
+        var nodeClass = IsActiveSection(node) ? "is-active" : "";
+        <li class="documentation-nav__section documentation-nav__section--depth-@depth @nodeClass">
+            <a class="documentation-nav__section-link" href="@nodeUrl">@node.Title</a>
+            @if (node.Subsections.Count > 0 || node.Articles.Count > 0)
+            {
+                <ul class="documentation-nav__list">
+                    @foreach (var sub in node.Subsections)
+                    {
+                        RenderSection(sub, depth + 1);
+                    }
+                    @foreach (var article in node.Articles)
+                    {
+                        var articleUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, article.PathSegments);
+                        var activeClass = IsActiveArticle(article) ? "is-active" : "";
+                        <li class="documentation-nav__article @activeClass">
+                            <a class="documentation-nav__article-link" href="@articleUrl">@article.Title</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+    }
+}
+
+<aside class="documentation-nav" aria-label="Documentation navigation">
+    <p class="documentation-nav__title">@Model.DocRootTitle</p>
+    <dc-doc-search class="documentation-nav__search" doc-root-url="@Model.DocRootUrl"></dc-doc-search>
+    @if (Model.Index.HasContent)
+    {
+        <ul class="documentation-nav__list documentation-nav__list--root">
+            @foreach (var node in Model.Index.Sections)
+            {
+                RenderSection(node, 0);
+            }
+        </ul>
+    }
+    @if (Model.Mode != DocumentationViewMode.Root)
+    {
+        <a class="documentation-nav__back" href="@(Model.DocRootUrl + "/")">
+            <span aria-hidden="true">&larr;</span> Documentation home
+        </a>
+    }
+</aside>
