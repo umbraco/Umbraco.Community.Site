@@ -26,11 +26,14 @@
                 id="search-page-input"
                 name="q"
                 value="@Model.Query"
-                placeholder="Search"
-                autofocus />
+                placeholder="Search" />
             <button type="submit" class="btn is-blue">Search</button>
         </form>
     </header>
+
+    <script asp-add-nonce="true">
+        document.getElementById("search-page-input")?.focus({ preventScroll: true });
+    </script>
 
     @if (Model.HasQuery)
     {
