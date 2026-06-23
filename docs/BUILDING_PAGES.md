@@ -383,9 +383,9 @@ Layout-level concerns are handled automatically by ViewComponents invoked in `La
 
 See these existing implementations for reference:
 
-- **HomePage**: `HomePageController`, `HomePageViewModel`, `HomePageViewModelBuilder`
-- **BlogPost**: `BlogPostController`, `BlogPostPageViewModel`, `BlogPostPageViewModelBuilder`
-- **Search**: `SearchController`, `SearchPageViewModel`, `SearchPageViewModelBuilder`
+- **Home**: `HomeController`, `HomePageViewModel`, `HomePageViewModelBuilder`
+- **Blog**: `BlogController`, `BlogPageViewModel`, `BlogPageViewModelBuilder`
+- **Article**: `ArticleController`, `ArticlePageViewModel`, `ArticlePageViewModelBuilder`
 - **ContentPage**: `ContentPageController`, `ContentPageViewModel`, `ContentPageViewModelBuilder`
 
 ## Troubleshooting

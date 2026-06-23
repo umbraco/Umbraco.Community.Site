@@ -7,6 +7,8 @@ using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
+using UmbracoCommunity.Web.Routing;
+using UmbracoCommunity.Web.Services.Documentation;
 using UmbracoCommunity.Web.Utilities;
 using UmbracoCommunity.Web.ViewModelBuilders;
 using UmbracoCommunity.Web.ViewModelBuilders.Schema;
@@ -22,6 +24,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly ArticleSchemaBuilder _articleSchemaBuilder;
     private readonly BreadcrumbSchemaBuilder _breadcrumbSchemaBuilder;
     private readonly UrlUtilities _urlUtilities;
+    private readonly IDocumentationService _documentationService;
 
     public SeoDataService(
         IImageUrlBuilder imageUrlBuilder,
@@ -30,7 +33,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         OrganizationSchemaBuilder organizationSchemaBuilder,
         ArticleSchemaBuilder articleSchemaBuilder,
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
-        UrlUtilities urlUtilities)
+        UrlUtilities urlUtilities,
+        IDocumentationService documentationService)
     {
         _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
@@ -39,6 +43,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         _articleSchemaBuilder = articleSchemaBuilder;
         _breadcrumbSchemaBuilder = breadcrumbSchemaBuilder;
         _urlUtilities = urlUtilities;
+        _documentationService = documentationService;
     }
 
     public async Task<MetaTagsViewModel> BuildAsync(IPublishedContent currentPage)
@@ -71,7 +76,81 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
             viewModel.MetaTitle = currentPage.Name;
         }
 
+        // A single Documentation node serves every docs URL, so the node-derived title/canonical
+        // above are identical for all of them. Override per resolved article/section.
+        ApplyDocumentationOverrides(viewModel, currentPage);
+
         return viewModel;
+    }
+
+    private void ApplyDocumentationOverrides(MetaTagsViewModel viewModel, IPublishedContent currentPage)
+    {
+        // Every docs URL binds to the Documentation node — the root via normal routing, sub-paths via
+        // DocumentationContentFinder. Gate on the node type so the root (no path-segments item) is covered too.
+        if (currentPage is not UmbracoCommunity.Web.Models.PublishedModels.Documentation)
+        {
+            return;
+        }
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return;
+        }
+
+        var segments = httpContext.Items.TryGetValue(DocumentationContentFinder.PathSegmentsItemKey, out var raw)
+            && raw is string[] s
+            ? s
+            : Array.Empty<string>();
+
+        // Canonical is the actual request URL (the node URL would collapse every doc page onto
+        // /docs/). Normalise to a trailing slash so /x and /x/ don't read as duplicate content.
+        var request = httpContext.Request;
+        var path = request.Path.HasValue ? request.Path.Value! : "/";
+        if (!path.EndsWith('/'))
+        {
+            path += "/";
+        }
+
+        viewModel.CanonicalUrl = $"{request.Scheme}://{request.Host}{path}";
+
+        if (segments.Length == 0)
+        {
+            // Root /docs/ — the node is named "Docs"; present a fuller title for the landing page.
+            viewModel.MetaTitle = DocumentationService.RootDisplayTitle;
+            return;
+        }
+
+        var resolution = _documentationService.Resolve(segments);
+        if (resolution.IsNotFound)
+        {
+            return;
+        }
+
+        string? title = null;
+        string? description = null;
+        if (resolution.Article is { } article)
+        {
+            title = article.Title;
+            description = article.Excerpt;
+        }
+        else if (resolution.Section is { } section)
+        {
+            title = section.Title;
+            description = section.Intro?.Excerpt;
+        }
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            viewModel.MetaTitle = title!;
+        }
+
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            viewModel.MetaDescription = description!.Length > 200
+                ? description[..197] + "..."
+                : description;
+        }
     }
 
     private async Task ApplySessionOpenGraphOverridesAsync(MetaTagsViewModel viewModel)

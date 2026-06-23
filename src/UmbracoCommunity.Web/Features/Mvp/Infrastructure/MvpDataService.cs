@@ -48,14 +48,14 @@ internal sealed class MvpDataService : IMvpDataService
     {
         var handle = Normalise(m.GitHub);
         var (url, srcset) = ResolveAvatar(m, handle);
-        return new MvpMember(m.Id, m.Name, m.IsMvpRenewal, url, srcset, handle);
+        return new MvpMember(m.Name, m.IsMvpRenewal, url, srcset, handle);
     }
 
     /// <summary>
     /// Decide which avatar source to use. GitHub handle present? Hot-link to
     /// github.com/&lt;handle&gt;.png — always current, browser caches per URL.
     /// Otherwise generate a deterministic abstract avatar from DiceBear seeded
-    /// by the member's Id, so the same person gets the same placeholder every
+    /// by the member's name, so the same person gets the same placeholder every
     /// time without needing a real photo on file.
     /// </summary>
     private static (string Url, string? Srcset) ResolveAvatar(RawMember m, string? handle)
@@ -69,12 +69,12 @@ internal sealed class MvpDataService : IMvpDataService
         }
 
         // SVG scales freely, so a single source is fine — no srcset needed.
-        return ($"https://api.dicebear.com/9.x/shapes/svg?seed={m.Id}&size=200", null);
+        return ($"https://api.dicebear.com/9.x/shapes/svg?seed={m.Name}&size=200", null);
     }
 
     private static string? Normalise(string? handle) =>
         string.IsNullOrWhiteSpace(handle) ? null : handle!.Trim();
 
     private sealed record RawYear(int Year, RawMember[]? Members);
-    private sealed record RawMember(int Id, string Name, bool IsMvpRenewal, string? GitHub);
+    private sealed record RawMember(string Name, bool IsMvpRenewal, string? GitHub);
 }

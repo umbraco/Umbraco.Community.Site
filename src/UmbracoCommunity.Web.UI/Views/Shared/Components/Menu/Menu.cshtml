@@ -38,7 +38,7 @@
                         </button>
                         <form method="GET" action="@Model.SearchPageUrl" role="search">
                             <label for="desktop-search" class="sr-only">Search the site</label>
-                            <input type="text" id="desktop-search" name="q" placeholder="What are you looking for?" autofocus />
+                            <input type="text" id="desktop-search" name="q" placeholder="What are you looking for?" />
                             <button type="button" class="icon-btn" aria-label="Close search">
                                 @{
                                     RenderSearchCloseIcon();
@@ -69,7 +69,7 @@
                             </button>
                             <form method="GET" action="@Model.SearchPageUrl" role="search">
                                 <label for="mobile-search" class="sr-only">Search the site</label>
-                                <input type="text" id="mobile-search" name="q" placeholder="What are you looking for?" autofocus />
+                                <input type="text" id="mobile-search" name="q" placeholder="What are you looking for?" />
                                 <button type="button" class="icon-btn" aria-label="Close search">
                                     @{
                                         RenderSearchCloseIcon();
