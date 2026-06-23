@@ -1,0 +1,411 @@
+@inherits UmbracoViewPage<CommunityProfilePage>
+@using UmbracoCommunity.Web.Features.Profiles
+@using UmbracoCommunity.Web.Features.Profiles.Models
+@{
+    Layout = "Layout.cshtml";
+
+    // TEMPORARY — Phase 1 layout scaffolding only.
+    // The profile is pulled straight from the dummy provider so the page can be
+    // laid out before the real plumbing exists. This inline call is replaced by
+    // CommunityProfilePageController + IProfileDataProvider (DI) + the slug content
+    // finder in the next phase. See docs/COMMUNITY_PROFILES_SPEC.md.
+    // Switch profile with ?member=<slug>; ?member=not-found shows the empty state.
+    var slug = Context.Request.Query["member"].ToString();
+    if (string.IsNullOrWhiteSpace(slug))
+    {
+        slug = "alexpenrose";
+    }
+    var profile = await new DummyProfileDataProvider().GetProfileAsync(slug);
+}
+
+@functions {
+    static string Date(DateTimeOffset? value) => value?.ToString("d MMM yyyy") ?? string.Empty;
+
+    static string Relative(DateTimeOffset value)
+    {
+        var span = DateTimeOffset.UtcNow - value;
+        if (span.TotalDays >= 365) { var y = (int)(span.TotalDays / 365); return $"{y} year{(y == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 30) { var m = (int)(span.TotalDays / 30); return $"{m} month{(m == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 7) { var w = (int)(span.TotalDays / 7); return $"{w} week{(w == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 1) { var d = (int)span.TotalDays; return $"{d} day{(d == 1 ? "" : "s")} ago"; }
+        if (span.TotalHours >= 1) { var h = (int)span.TotalHours; return $"{h} hour{(h == 1 ? "" : "s")} ago"; }
+        return "just now";
+    }
+}
+
+@if (profile is null)
+{
+    <section class="community-profile community-profile--not-found">
+        <h1>Profile not found</h1>
+        <p>We couldn't find a community profile for that member.</p>
+    </section>
+}
+else
+{
+    var identity = profile.Identity;
+    var currentYear = DateTime.UtcNow.Year;
+
+    // "Featured" strip, shown above the fold. Phase 1 auto-selects the most recent item
+    // of each type (each list is assumed newest-first). Later this becomes member/editor
+    // curated — they choose which items to highlight here — see docs/COMMUNITY_PROFILES_SPEC.md.
+    // Stock placeholder images (Pexels, CSP-allowed) for the blog/video cards in the
+    // prototype. Real cover art / YouTube thumbnails arrive with the live data.
+    const string blogStockImage = "https://images.pexels.com/photos/7059/man-people-space-desk.jpg?auto=compress&cs=tinysrgb&w=600";
+    const string videoStockImage = "https://images.pexels.com/photos/8852720/pexels-photo-8852720.jpeg?auto=compress&cs=tinysrgb&w=600";
+    const string talkStockImage = "https://images.pexels.com/photos/9275222/pexels-photo-9275222.jpeg?auto=compress&cs=tinysrgb&w=600";
+
+    // Package cards get an abstract Umbraco-colours image (a data: SVG, CSP-allowed)
+    // rather than a photo — packages don't have natural cover art.
+    var packageSvg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 180'>"
+        + "<rect width='320' height='180' fill='#283a97'/>"
+        + "<circle cx='70' cy='55' r='85' fill='#f79c37' opacity='0.85'/>"
+        + "<circle cx='250' cy='140' r='100' fill='#fad634' opacity='0.5'/>"
+        + "<circle cx='275' cy='45' r='55' fill='#f5c1bc' opacity='0.75'/>"
+        + "</svg>";
+    var packageStockImage = "data:image/svg+xml," + Uri.EscapeDataString(packageSvg);
+
+    var highlights = new List<(string Kind, string Key, string Title, string? Meta, string? Desc, IReadOnlyList<string>? Chips, string? Url, string? Thumb)>();
+    if (profile.Packages.Count > 0)
+    {
+        var p = profile.Packages[0];
+        highlights.Add(("Package", "package", p.Name, null, p.Description, p.Versions, p.Url, packageStockImage));
+    }
+    if (profile.Talks.Count > 0)
+    {
+        var t = profile.Talks[0];
+        var meta = string.Join(" · ", new[] { t.EventName, t.Date is null ? null : Date(t.Date) }.Where(s => !string.IsNullOrEmpty(s)));
+        highlights.Add(("Talk", "talk", t.Title, meta, t.Description, null, t.Url, talkStockImage));
+    }
+    if (profile.BlogPosts.Count > 0)
+    {
+        var b = profile.BlogPosts[0];
+        var meta = string.Join(" · ", new[] { Date(b.PublishedAt), b.Source }.Where(s => !string.IsNullOrEmpty(s)));
+        highlights.Add(("Blog post", "blog", b.Title, meta, b.Excerpt, null, b.Url, blogStockImage));
+    }
+    if (profile.Videos.Count > 0)
+    {
+        var v = profile.Videos[0];
+        highlights.Add(("Video", "video", v.Title, v.PublishedAt is null ? null : Date(v.PublishedAt), v.Description, null, v.Url, videoStockImage));
+    }
+
+    <article class="community-profile">
+        <header class="community-profile__hero">
+            <div class="community-profile__hero-inner">
+                <div class="community-profile__portrait">
+                    @if (!string.IsNullOrEmpty(identity.AvatarUrl))
+                    {
+                        <img class="community-profile__avatar"
+                             src="@identity.AvatarUrl"
+                             alt="@identity.DisplayName"
+                             width="170" height="170" loading="eager" />
+                    }
+                    @if (identity.IsMvp && identity.MvpYears.Count > 0)
+                    {
+                        var mvpYears = identity.MvpYears.OrderByDescending(y => y).ToList();
+                        var mvpCount = mvpYears.Count;
+                        <ul class="community-profile__mvp" aria-label="Umbraco MVP awards by year">
+                            @for (var i = 0; i < mvpCount; i++)
+                            {
+                                var year = mvpYears[i];
+                                var isCurrent = year == currentYear;
+                                // Most recent (i = 0) sits at bottom centre (180°); the rest trail up the
+                                // right-hand side with a fixed step (~10px gap between 50px medals on the
+                                // 132px-radius ring), so spacing is uniform for any count.
+                                var stepDeg = 60d / 132d * (180d / System.Math.PI);
+                                var angle = 180d - i * stepDeg;
+                                var angleText = angle.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+                                var awardClass = isCurrent
+                                    ? "community-profile__mvp-award community-profile__mvp-award--current"
+                                    : "community-profile__mvp-award";
+                                var awardStyle = "transform: rotate(" + angleText + "deg) translateY(-132px) rotate(-" + angleText + "deg)";
+                                <li class="@awardClass" style="@awardStyle">
+                                    <span class="community-profile__mvp-medal">
+                                        <span class="community-profile__mvp-label">MVP</span>
+                                        <span class="community-profile__mvp-year">@year</span>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+
+                <div class="community-profile__identity">
+                    <h1 class="community-profile__name">
+                        @identity.DisplayName
+                        @if (!string.IsNullOrEmpty(identity.Pronouns))
+                        {
+                            <span class="community-profile__pronouns">@identity.Pronouns</span>
+                        }
+                    </h1>
+
+                    @if (!string.IsNullOrEmpty(identity.Headline))
+                    {
+                        <p class="community-profile__headline">@identity.Headline</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(identity.Bio))
+                    {
+                        <p class="community-profile__bio">@identity.Bio</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(identity.Location))
+                    {
+                        <ul class="community-profile__meta">
+                            <li class="community-profile__location">@identity.Location</li>
+                        </ul>
+                    }
+
+                    @if (identity.SocialLinks.Count > 0)
+                    {
+                        <ul class="community-profile__socials">
+                            @foreach (var link in identity.SocialLinks)
+                            {
+                                <li>
+                                    <a href="@link.Url" rel="me noopener" target="_blank">@link.Platform</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </header>
+
+        @if (profile.Badges.Count > 0)
+        {
+            <section class="community-profile__badges-bar" aria-label="Badges">
+                <ul class="community-profile__badges">
+                    @foreach (var badge in profile.Badges)
+                    {
+                        <li class="community-profile__award" title="@badge.Description">
+                            @if (!string.IsNullOrEmpty(badge.IconUrl))
+                            {
+                                <img class="community-profile__award-icon" src="@badge.IconUrl" alt="" loading="lazy" width="40" height="40" />
+                            }
+                            <span class="community-profile__award-name">@badge.Name</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+
+        @if (highlights.Count > 0)
+        {
+            <section class="community-profile__latest" aria-label="Featured">
+                <h2 class="community-profile__latest-title">Featured</h2>
+                <ul class="community-profile__highlights">
+                    @foreach (var highlight in highlights)
+                    {
+                        <li class="community-profile__highlight">
+                            @if (!string.IsNullOrEmpty(highlight.Thumb))
+                            {
+                                <a class="community-profile__highlight-media" href="@highlight.Url" target="_blank" rel="noopener">
+                                    <img src="@highlight.Thumb" alt="" loading="lazy" />
+                                    @if (highlight.Key == "video")
+                                    {
+                                        <span class="community-profile__play" aria-hidden="true">
+                                            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="8 5 19 12 8 19 8 5" /></svg>
+                                        </span>
+                                    }
+                                </a>
+                            }
+                            <span class="community-profile__highlight-kind">
+                                @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", highlight.Key)
+                                @highlight.Kind
+                            </span>
+                            <a class="community-profile__highlight-title" href="@highlight.Url" target="_blank" rel="noopener">@highlight.Title</a>
+                            @if (!string.IsNullOrEmpty(highlight.Desc))
+                            {
+                                <p class="community-profile__highlight-desc">@highlight.Desc</p>
+                            }
+                            @if (highlight.Chips is { Count: > 0 })
+                            {
+                                <ul class="community-profile__versions" aria-label="Versions">
+                                    @foreach (var chip in highlight.Chips)
+                                    {
+                                        <li class="community-profile__version">v@(chip)</li>
+                                    }
+                                </ul>
+                            }
+                            @if (!string.IsNullOrEmpty(highlight.Meta))
+                            {
+                                <span class="community-profile__highlight-meta">@highlight.Meta</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+
+        @if (profile.SocialPosts.Count > 0 || profile.ForumPosts.Count > 0)
+        {
+            <section class="community-profile__social" aria-label="Community activity">
+                <div class="community-profile__activity-grid">
+                    @if (profile.SocialPosts.Count > 0)
+                    {
+                        <div class="community-profile__activity-col">
+                            <h3 class="community-profile__social-subtitle">
+                                @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "social")
+                                Social activity
+                            </h3>
+                            <ul class="community-profile__activity-list">
+                                @foreach (var post in profile.SocialPosts)
+                                {
+                                    var platformKey = post.Platform.ToLowerInvariant();
+                                    <li class="community-profile__activity-item community-profile__social-item">
+                                        <span class="community-profile__social-badge community-profile__social-badge--@platformKey" aria-hidden="true">
+                                            @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", platformKey)
+                                        </span>
+                                        <div class="community-profile__social-body">
+                                            <span class="community-profile__social-head">
+                                                <span class="community-profile__social-name">@post.Platform</span>
+                                                <span class="community-profile__social-time">@Relative(post.PostedAt)</span>
+                                            </span>
+                                            <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Text</a>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @if (profile.ForumPosts.Count > 0)
+                    {
+                        <div class="community-profile__activity-col">
+                            <h3 class="community-profile__social-subtitle">
+                                @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "forum")
+                                Forum activity
+                            </h3>
+                            <ul class="community-profile__activity-list">
+                                @foreach (var post in profile.ForumPosts)
+                                {
+                                    <li class="community-profile__activity-item">
+                                        <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
+                                        <span class="community-profile__activity-meta">@Date(post.PostedAt)@(post.Replies is not null ? $" · {post.Replies} replies" : "")</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <div class="community-profile__departments">
+            @if (profile.Packages.Count > 1)
+            {
+                <section class="community-profile__section" aria-label="Packages">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "package") Packages</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var package in profile.Packages.Skip(1))
+                        {
+                            <li class="community-profile__dept-item">
+                                <a class="community-profile__dept-title" href="@package.Url" target="_blank" rel="noopener">@package.Name</a>
+                                @if (!string.IsNullOrEmpty(package.Description))
+                                {
+                                    <p class="community-profile__dept-desc">@package.Description</p>
+                                }
+                                <ul class="community-profile__versions" aria-label="Versions">
+                                    @foreach (var version in package.Versions)
+                                    {
+                                        <li class="community-profile__version">v@(version)</li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (profile.Talks.Count > 1)
+            {
+                <section class="community-profile__section" aria-label="Talks">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "talk") Talks</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var talk in profile.Talks.Skip(1))
+                        {
+                            <li class="community-profile__dept-item">
+                                @if (!string.IsNullOrEmpty(talk.Url))
+                                {
+                                    <a class="community-profile__dept-title" href="@talk.Url" target="_blank" rel="noopener">@talk.Title</a>
+                                }
+                                else
+                                {
+                                    <span class="community-profile__dept-title">@talk.Title</span>
+                                }
+                                @if (!string.IsNullOrEmpty(talk.Description))
+                                {
+                                    <p class="community-profile__dept-desc">@talk.Description</p>
+                                }
+                                <span class="community-profile__dept-meta">@talk.EventName@(talk.Date is not null ? $" · {Date(talk.Date)}" : "")</span>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (profile.BlogPosts.Count > 1)
+            {
+                <section class="community-profile__section" aria-label="Blog posts">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "blog") Blog posts</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var post in profile.BlogPosts.Skip(1))
+                        {
+                            <li class="community-profile__dept-item">
+                                <a class="community-profile__dept-title" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
+                                @if (!string.IsNullOrEmpty(post.Excerpt))
+                                {
+                                    <p class="community-profile__dept-desc">@post.Excerpt</p>
+                                }
+                                <span class="community-profile__dept-meta">@Date(post.PublishedAt)@(string.IsNullOrEmpty(post.Source) ? "" : $" · {post.Source}")</span>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (profile.Videos.Count > 1)
+            {
+                <section class="community-profile__section" aria-label="Videos">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "video") Videos</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var video in profile.Videos.Skip(1))
+                        {
+                            <li class="community-profile__dept-item">
+                                <a class="community-profile__dept-title" href="@video.Url" target="_blank" rel="noopener">@video.Title</a>
+                                @if (!string.IsNullOrEmpty(video.Description))
+                                {
+                                    <p class="community-profile__dept-desc">@video.Description</p>
+                                }
+                                @if (video.PublishedAt is not null)
+                                {
+                                    <span class="community-profile__dept-meta">@Date(video.PublishedAt)</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (profile.Meetups.Count > 0)
+            {
+                <section class="community-profile__section" aria-label="Meet-ups">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "meetup") Meet-ups</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var meetup in profile.Meetups)
+                        {
+                            var tail = string.IsNullOrEmpty(meetup.Group)
+                                ? ", " + Date(meetup.Date)
+                                : ", " + meetup.Group + ", " + Date(meetup.Date);
+                            <li class="community-profile__dept-item">
+                                <p class="community-profile__dept-meetup">@meetup.Action @if (!string.IsNullOrEmpty(meetup.Url))
+                                {<a class="community-profile__dept-title" href="@meetup.Url" target="_blank" rel="noopener">@meetup.EventName</a>}
+                                else
+                                {<strong class="community-profile__dept-title">@meetup.EventName</strong>}@tail</p>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+    </article>
+}

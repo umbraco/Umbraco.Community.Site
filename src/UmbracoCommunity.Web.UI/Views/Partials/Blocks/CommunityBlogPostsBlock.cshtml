@@ -11,13 +11,13 @@
     const int DefaultFeaturedPosts = 6;
     const int MaxFeaturedPosts = 12;
 
-    var featuredOnly = Model.Settings?.FeaturedOnly ?? false;
+    var featuredOnly = false;//Model.Settings?.FeaturedOnly ?? false;
 
     int requestedPage = 1;
     PagedCommunityBlogPosts result;
     if (featuredOnly)
     {
-        var featuredCount = Model.Settings?.NumberOfFeaturedPosts ?? 0;
+        var featuredCount = 0;//Model.Settings?.NumberOfFeaturedPosts ?? 0;
         if (featuredCount <= 0) featuredCount = DefaultFeaturedPosts;
         featuredCount = Math.Clamp(featuredCount, 1, MaxFeaturedPosts);
         result = CommunityBlogsService.GetPage(1, featuredCount);
@@ -142,11 +142,11 @@
             </nav>
         }
 
-        @if (featuredOnly && !Model.Content.ReadMoreText.IsEmptyHtmlString())
+@*         @if (featuredOnly && !Model.Content.ReadMoreText.IsEmptyHtmlString())
         {
             <div class="dc-community-blogs__cta">
                 @Html.Raw(Model.Content.ReadMoreText?.ToHtmlString())
             </div>
-        }
+        } *@
     }
 </section>
