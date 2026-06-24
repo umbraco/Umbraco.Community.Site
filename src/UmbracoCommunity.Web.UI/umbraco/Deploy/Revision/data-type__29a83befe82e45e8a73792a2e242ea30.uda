@@ -10,7 +10,7 @@
     "blocks": [
       {
         "contentElementTypeKey": "2818618f-5cce-4c23-9126-4649bfe27dbd",
-        "label": "{umbValue: headline}"
+        "label": "${headline || \u0022Untitled column\u0022}"
       }
     ]
   },

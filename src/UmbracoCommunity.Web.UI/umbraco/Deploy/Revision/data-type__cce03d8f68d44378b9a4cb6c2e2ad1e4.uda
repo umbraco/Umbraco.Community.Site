@@ -6,7 +6,7 @@
     "blocks": [
       {
         "contentElementTypeKey": "dd701bc6-8aad-4a1c-b67c-300f48ee948e",
-        "label": "${linkTitle || link[0].name || \u0022Link item\u0022}",
+        "label": "${linkTitle || (link \u0026\u0026 link[0] \u0026\u0026 link[0].name) || \u0022Link item\u0022}",
         "editorSize": "large"
       }
     ],
