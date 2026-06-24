@@ -1451,6 +1451,26 @@ dc-image-slider img {
     font-weight: 500;
 }
 
+/* Empty-state placeholder for link previews with no link picked.
+   Keeps the block visible and clickable in the backoffice so it can
+   still be edited or removed. */
+.dc-link-preview--empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px dashed #b5b5b5;
+    border-radius: 12px;
+    background-color: #f7f7f7;
+    color: #8a8a8a;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.dc-link-preview--empty svg {
+    opacity: 0.5;
+}
+
 /* Blog showcase block */
 .dc-blog-showcase-block {
     padding: 20px;

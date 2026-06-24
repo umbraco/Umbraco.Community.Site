@@ -9,7 +9,7 @@
         "contentElementTypeKey": "b28af919-ab91-4559-9a7d-41d5a78fa6f4",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "label": "Social sharing link",
+        "label": "${linkTitle || \u0022Social sharing link\u0022}",
         "columnSpanOptions": [
           {
             "columnSpan": 1
