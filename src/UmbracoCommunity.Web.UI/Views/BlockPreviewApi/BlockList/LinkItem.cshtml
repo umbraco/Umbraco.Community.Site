@@ -7,3 +7,9 @@
         @title
     </a>
 }
+else
+{
+    <span class="dc-link-item-preview dc-link-preview--empty">
+        @(string.IsNullOrWhiteSpace(Model.Content?.LinkTitle) ? "No link selected — click to edit" : Model.Content.LinkTitle)
+    </span>
+}
