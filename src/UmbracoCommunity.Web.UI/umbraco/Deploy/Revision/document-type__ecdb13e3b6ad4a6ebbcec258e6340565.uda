@@ -1,0 +1,50 @@
+{
+  "Name": "Timeline entry block",
+  "Alias": "timelineEntryBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-flag-alt",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5c473ee9fa4f4336a415f0e24c4865ab",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "a19e0905-1eb3-4613-a7f8-0b3f363bb227",
+      "Alias": "timelineGoalItems",
+      "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "ValueType": "System.String",
+      "Name": "Timeline goal items",
+      "SortOrder": 1
+    },
+    {
+      "Key": "ee37ba0d-6c12-4fcc-b707-f914b1b3016c",
+      "Alias": "entryTitle",
+      "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "ValueType": "System.String",
+      "Mandatory": true,
+      "Name": "Entry title"
+    }
+  ],
+  "Udi": "umb://document-type/ecdb13e3b6ad4a6ebbcec258e6340565",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5c473ee9fa4f4336a415f0e24c4865ab",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}
