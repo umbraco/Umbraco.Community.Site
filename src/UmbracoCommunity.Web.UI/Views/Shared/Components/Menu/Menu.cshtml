@@ -49,6 +49,7 @@
                 }
                 @{
                     RenderCtaButtons();
+                    RenderMemberButton();
                 }
             </div>
             <div class="nav-mobile">
@@ -111,6 +112,33 @@
         <div class="nav-mobile__item cta-btn">
             @Html.RenderButtonCTA(Model.CallToActionButton.Url, Model.CallToActionButton.Text, Model.CallToActionButton.Target, Model.CallToActionButton.Text)
         </div>
+    }
+
+    private void RenderMemberButton()
+    {
+        if (!Model.IsSignInEnabled) return;
+
+        if (Model.IsSignedIn)
+        {
+            <div class="nav-end__item member-btn">
+                <a href="/account" class="member-btn__avatar" aria-label="@Model.MemberDisplayName — account">
+                    @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
+                    {
+                        <img src="@Model.MemberAvatarUrl" alt="" width="32" height="32" />
+                    }
+                </a>
+                <form method="post" action="/logout" class="member-btn__logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="icon-btn" aria-label="Sign out">Sign out</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="nav-end__item member-btn">
+                <a href="/login" class="btn is-blue is-small">Sign in</a>
+            </div>
+        }
     }
 
     private void RenderSearchIcon()

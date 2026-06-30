@@ -1,0 +1,16 @@
+{
+  "Name": "Community Member",
+  "Alias": "communityMember",
+  "Icon": "icon-user",
+  "Thumbnail": "icon-user",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://member-type/26e87ec929b241d8be9233cbd7e9fc09",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MemberTypeArtifact",
+  "__version": "17.1.0"
+}

@@ -23,6 +23,11 @@ public class MenuViewModel
 
     public NavigationLink? CallToActionButton { get; set; }
 
+    public bool IsSignInEnabled { get; set; }
+    public bool IsSignedIn { get; set; }
+    public string? MemberDisplayName { get; set; }
+    public string? MemberAvatarUrl { get; set; }
+
     public IReadOnlyList<INavigationElement> TopLevelNavigationItems => _topLevelNavigationItems.AsReadOnly();
 
     public void AddTopLevelNavigationItem(INavigationElement navigationElement) => _topLevelNavigationItems.Add(navigationElement);

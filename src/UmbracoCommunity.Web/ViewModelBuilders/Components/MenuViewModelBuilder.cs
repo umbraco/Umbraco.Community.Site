@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
@@ -17,10 +19,14 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
     private const string SearchPageContentTypeAlias = "searchPage";
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IMemberManager _memberManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches)
+    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches, IMemberManager memberManager, IHttpContextAccessor httpContextAccessor)
     {
         _publishedUrlProvider = publishedUrlProvider;
+        _memberManager = memberManager;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public MenuViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -35,6 +41,18 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
         var siteSettings = currentPage.GetSiteSettings();
         viewModel.SiteName = siteSettings?.SiteName;
         viewModel.Logo = siteSettings?.HeaderLogo;
+
+        var signInEnabled = siteSettings?.EnableMemberSignIn ?? false;
+        viewModel.IsSignInEnabled = signInEnabled;
+
+        if (signInEnabled && _memberManager.IsSignedIn())
+        {
+            viewModel.IsSignedIn = true;
+            var user = _httpContextAccessor.HttpContext?.User;
+            var handle = user?.Identity?.Name;
+            viewModel.MemberDisplayName = user?.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? handle;
+            viewModel.MemberAvatarUrl = handle != null ? $"https://github.com/{handle}.png" : null;
+        }
 
         var searchPage = currentPage.Root()
             .DescendantsOrSelf()

@@ -22,7 +22,7 @@
 
             public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com"];
 
-            public static readonly string[] DefaultAllowFormActions = [];
+            public static readonly string[] DefaultAllowFormActions = ["github.com"];
 
             public static readonly string[] DefaultAllowMedia = [];
         }

@@ -82,6 +82,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string SiteName => this.Value<string>(_publishedValueFallback, "siteName");
 
 		///<summary>
+		/// Enable member sign-in: Show the GitHub sign-in button in the header and enable the account page for this site.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("enableMemberSignIn")]
+		public virtual bool EnableMemberSignIn => this.Value<bool>(_publishedValueFallback, "enableMemberSignIn");
+
+		///<summary>
 		/// Hide from search
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
