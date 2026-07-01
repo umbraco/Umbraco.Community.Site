@@ -1,0 +1,45 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TimelineEntryBlock>>
+
+@{
+    int goalIndex = 0;
+}
+
+<div class="dc-timeline-entry">
+    <div class="dc-timeline-entry__label">
+        <span class="dc-timeline-entry__pill">@Model.Content.EntryTitle</span>
+    </div>
+
+    @if (Model.Content.TimelineGoalItems != null && Model.Content.TimelineGoalItems.Any())
+    {
+        <div class="dc-timeline-goals">
+            @foreach (var goalItem in Model.Content.TimelineGoalItems)
+            {
+                if (goalItem.Content is TimelineGoalBlock goal)
+                {
+                    var goalClass = goalIndex % 2 == 0 ? "dc-timeline-goal dc-timeline-goal--left" : "dc-timeline-goal dc-timeline-goal--right";
+                    goalIndex++;
+                    var tags = goal.GoalTags != null ? string.Join(",", goal.GoalTags) : string.Empty;
+                    <div class="@goalClass" data-tags="@tags">
+                        <h4 class="dc-timeline-goal__title">@goal.GoalTitle</h4>
+                        @if (!goal.GoalDescription.IsEmptyHtmlString())
+                        {
+                            <div class="dc-timeline-goal__body">
+                                @Html.Raw(goal.GoalDescription?.ToHtmlString())
+                            </div>
+                        }
+                        @if (goal.GoalTags != null && goal.GoalTags.Any())
+                        {
+                            <ul class="dc-timeline-tags">
+                                @foreach (var tag in goal.GoalTags)
+                                {
+                                    <li class="dc-timeline-tag">@tag</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>

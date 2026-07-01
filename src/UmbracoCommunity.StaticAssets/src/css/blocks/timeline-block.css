@@ -1,101 +1,171 @@
+dc-timeline {
+    display: block;
+}
+
+.dc-timeline-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-xs);
+    margin-bottom: var(--unit-md);
+}
+
+.dc-timeline-filter label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-dark);
+    white-space: nowrap;
+}
+
+.dc-timeline-filter select {
+    text-transform: capitalize;
+    height: 40px;
+    padding: 0 2.5rem 0 1rem;
+    font-size: var(--font-size);
+    border-radius: 999px;
+    background: var(--color-white) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center / 16px;
+    border: 2px solid var(--color-pink);
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    color: var(--color-dark);
+}
+
 .dc-timeline {
-  --timeline-border-color: var(--color-pink);
-  --timeline-padding-left: var(--unit-sm);
-  --timeline-title-padding: var(--unit-sm) 0 var(--unit-sm) var(--unit);
-  --timeline-item-padding: 0 0 0 var(--unit);
-  --timeline-headline-marker-diameter: var(--unit);
-  --timeline-title-marker-diameter: var(--unit-sm);
-
-  position: relative;
-
-  &:before {
-    content: "";
-    border: 1px solid var(--timeline-border-color);
-    border-image-source: linear-gradient(
-      to bottom,
-      var(--timeline-border-color) 85%,
-      transparent
-    );
-    border-image-slice: 1;
-    position: absolute;
-    height: calc(100% - var(--unit-md));
-    top: var(--unit-md);
-  }
-
-  h2,
-  h3 {
-    margin: 0;
-  }
+    position: relative;
 }
 
-.dc-timeline-image {
-  padding-bottom: var(--unit);
+.dc-timeline-entry {
+    padding-bottom: var(--unit-md);
 }
 
-.dc-timeline-headline {
-  --marker-diameter: var(--timeline-headline-marker-diameter);
-  --marker-background-color: var(--color-blue);
+/* Entry label pill — sits on the vertical road line */
+.dc-timeline-entry__label {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    padding: var(--unit-sm) 0 var(--unit);
 }
 
-.dc-timeline-title {
-  --marker-diameter: var(--timeline-title-marker-diameter);
-  --marker-background-color: var(--color-dark);
+.dc-timeline-entry__pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--color-blue);
+    color: var(--color-white);
+    border-radius: 999px;
+    padding: 0.4em 1.2em;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
-.dc-timeline-headline,
-.dc-timeline-title {
-  padding: var(--timeline-title-padding);
-  position: relative;
-  display: flex;
-  align-items: center;
-  color: var(--color-dark);
-
-  &::before {
-    content: "";
-    width: var(--marker-diameter);
-    height: var(--marker-diameter);
-    border-radius: var(--marker-diameter);
-    background-color: var(--marker-background-color);
-    position: absolute;
-    left: 1px;
-    transform: translate(-50%);
-    border: 2px solid var(--timeline-border-color);
-  }
+/* Goals: flex column so align-self positions each card individually */
+.dc-timeline-goals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit);
 }
 
-.dc-timeline-item {
-  padding: var(--timeline-item-padding);
+.dc-timeline-goal {
+    position: relative;
+    background: var(--color-white);
+    border-radius: var(--border-radius-xl);
+    padding: var(--unit);
+    box-shadow: var(--base-box-shadow);
 }
 
-.dc-timeline select {
-  max-width: 250px;
-  margin: 0 0 10px -15px;
-  height: 36px;
-  padding: 0 35px 0 15px !important;
-  font-size: 16px;
-  border-radius: 20px;
-  background: var(--color-light) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center / 16px;
-  backdrop-filter: blur(50px);
-  border: var(--timeline-border-color) solid 2px;
-  outline: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
+.dc-timeline-goal__title {
+    margin: 0 0 var(--unit-xs);
+    font-size: var(--font-size);
+    color: var(--color-dark);
+    font-weight: 700;
+}
+
+.dc-timeline-goal__body {
+    font-size: var(--font-size-sm);
+    color: var(--color-dark);
+    line-height: 1.5;
+
+    & p {
+        margin: 0 0 var(--unit-xs);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.dc-timeline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--unit-xs);
+    list-style: none;
+    padding: 0;
+    margin: var(--unit-xs) 0 0;
+}
+
+.dc-timeline-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    padding: 0.2em 0.6em;
+    border-radius: 20px;
+    border: 1px solid var(--color-pink);
+    color: var(--color-blue);
 }
 
 @media (--sm) {
-  .dc-timeline {
-    --timeline-padding-left: var(--unit-md);
-    --timeline-title-padding: var(--unit-sm) var(--unit-md);
-    --timeline-item-padding: 0 var(--unit-md) var(--unit-sm);
-    --timeline-headline-marker-diameter: var(--unit-md);
-    --timeline-title-marker-diameter: var(--unit);
-  }
-}
+    /* Vertical center road */
+    .dc-timeline::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 4px;
+        background: var(--color-pink);
+        border-radius: 2px;
+    }
 
-@media (--md) {
-  .dc-timeline {
-    --timeline-item-padding: 0 0 var(--unit-sm) var(--unit-md);
-    max-width: calc(800px + 4rem) !important;
-  }
+    /* Two-column grid: left cards in col 1, right cards in col 2 */
+    /* Column gap spans the center road so each card sits ~half-width */
+    .dc-timeline-goals {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: calc(2 * var(--unit-md));
+        row-gap: var(--unit);
+    }
+
+    .dc-timeline-goal--left {
+        grid-column: 1;
+    }
+
+    .dc-timeline-goal--right {
+        grid-column: 2;
+    }
+
+    /* Connector: left card to road */
+    .dc-timeline-goal--left::after {
+        content: "";
+        position: absolute;
+        right: calc(-1 * var(--unit-md));
+        top: 1.5rem;
+        width: calc(var(--unit-md) - 2px);
+        height: 2px;
+        background: var(--color-pink);
+    }
+
+    /* Connector: road to right card */
+    .dc-timeline-goal--right::before {
+        content: "";
+        position: absolute;
+        left: calc(-1 * var(--unit-md));
+        top: 3.5rem;
+        width: calc(var(--unit-md) - 2px);
+        height: 2px;
+        background: var(--color-pink);
+    }
 }
