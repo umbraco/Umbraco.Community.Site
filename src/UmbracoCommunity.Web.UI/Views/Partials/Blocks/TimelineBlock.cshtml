@@ -71,7 +71,7 @@
                                         goalIndex++;
                                         var tags = goal.GoalTags != null ? string.Join(",", goal.GoalTags) : string.Empty;
                                         <div class="@goalClass" data-tags="@tags">
-                                            <h4 class="dc-timeline-goal__title">@goal.GoalTitle</h4>
+                                            <h3 class="dc-timeline-goal__title">@goal.GoalTitle</h3>
                                             @if (!goal.GoalDescription.IsEmptyHtmlString())
                                             {
                                                 <div class="dc-timeline-goal__body">
