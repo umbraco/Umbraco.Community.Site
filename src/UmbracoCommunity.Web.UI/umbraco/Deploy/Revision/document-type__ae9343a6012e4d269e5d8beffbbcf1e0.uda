@@ -23,8 +23,8 @@
         {
           "Key": "816b878e-202f-42f9-8555-cbc6f0fe46c7",
           "Alias": "timelineEntries",
-          "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-          "ValueType": "System.String",
+          "DataType": "umb://data-type/bfb1da8057174959998408ee34ee3bd4",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
           "Name": "Timeline entries"
         }
       ]
@@ -34,7 +34,7 @@
   "Udi": "umb://document-type/ae9343a6012e4d269e5d8beffbbcf1e0",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "Udi": "umb://data-type/bfb1da8057174959998408ee34ee3bd4",
       "Ordering": true
     },
     {

@@ -37,7 +37,7 @@
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="1.0.0" />
     <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="1.0.0" />
     <!-- Umbraco Community Packages -->
-    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.4.0" />
+    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="5.3.2" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="6.2.0" />
     <!-- Microsoft -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9" />

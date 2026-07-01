@@ -63,6 +63,6 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("timelineGoalItems")]
-		public virtual string TimelineGoalItems => this.Value<string>(_publishedValueFallback, "timelineGoalItems");
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListModel TimelineGoalItems => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListModel>(_publishedValueFallback, "timelineGoalItems");
 	}
 }

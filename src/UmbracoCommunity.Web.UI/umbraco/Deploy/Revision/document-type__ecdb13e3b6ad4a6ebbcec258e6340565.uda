@@ -16,8 +16,8 @@
     {
       "Key": "a19e0905-1eb3-4613-a7f8-0b3f363bb227",
       "Alias": "timelineGoalItems",
-      "DataType": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
-      "ValueType": "System.String",
+      "DataType": "umb://data-type/b060067d1a1042cd9347331a6d68def1",
+      "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
       "Name": "Timeline goal items",
       "SortOrder": 1
     },
@@ -37,7 +37,7 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/f0bc4bfbb49940d6ba86058885a5178c",
+      "Udi": "umb://data-type/b060067d1a1042cd9347331a6d68def1",
       "Ordering": true
     },
     {

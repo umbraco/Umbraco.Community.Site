@@ -16,13 +16,8 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "03989c3a-65f3-4bc5-bfdf-3d6e1bd35193"
-      },
-      {
-        "contentElementTypeKey": "52cb8b78-56ce-47be-90da-6c08e4025527",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "13bb5102-6cde-45ad-8b4d-716f6899b3e8"
+        "settingsElementTypeKey": "03989c3a-65f3-4bc5-bfdf-3d6e1bd35193",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "e5b3d356-89c0-4443-8fe4-5b26c52117a2",
@@ -30,7 +25,8 @@
         "allowInAreas": true,
         "label": "Cards",
         "settingsElementTypeKey": "c8450a20-087c-4597-8d55-9bf1c9408284",
-        "editorSize": "full"
+        "editorSize": "full",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "3c15228c-4591-4313-b75a-120cee63a699",
@@ -41,25 +37,15 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "a801c7a3-117e-488b-bf41-05185c16a3ba"
-      },
-      {
-        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "editorSize": "full"
+        "settingsElementTypeKey": "a801c7a3-117e-488b-bf41-05185c16a3ba",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "e6c6b0dc-d60d-480a-b06e-6e81febdac98",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "0f95e9d4-c306-4a91-a754-b0b6e8427f24"
-      },
-      {
-        "contentElementTypeKey": "9b898ccf-e503-4610-8e62-b5348baa88e4",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "527ea1d7-8b30-4629-9695-b2f75e44448a"
+        "settingsElementTypeKey": "0f95e9d4-c306-4a91-a754-b0b6e8427f24",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "c735ca50-0612-4680-9525-c72449af1e75",
@@ -70,7 +56,8 @@
           {
             "columnSpan": 12
           }
-        ]
+        ],
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "2f672eb5-28f9-48d5-ac11-1f805e3347d1",
@@ -84,7 +71,8 @@
             "columnSpan": 6
           }
         ],
-        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40"
+        "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "76b1f843-a56b-4e60-b216-5460b730ea5c",
@@ -98,55 +86,16 @@
           {
             "columnSpan": 12
           }
-        ]
-      },
-      {
-        "contentElementTypeKey": "ed42a0f1-1bf2-48ae-af07-c2227369aadf",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466"
-      },
-      {
-        "contentElementTypeKey": "81482d2a-2279-45ca-8730-2d91f65e0835",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "5b6a23c2-f363-4684-9ebc-fa49d0001aed"
-      },
-      {
-        "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "471d5207-9004-4bd5-98c9-db2351678562"
-      },
-      {
-        "contentElementTypeKey": "6f689d5b-3cd6-4b03-87f2-720f626cf50a",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850"
+        ],
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "f2a94d08-4ffc-495d-ab47-3a70d9d1869a",
         "allowAtRoot": true,
         "allowInAreas": true,
         "settingsElementTypeKey": "d772969a-c9e8-4809-b952-5d17ae4a899d",
-        "editorSize": "large"
-      },
-      {
-        "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "settingsElementTypeKey": "cc7a54a7-a94d-41c1-bb13-4dcc6f399d3f"
-      },
-      {
-        "contentElementTypeKey": "9e262942-ee5f-4a65-831e-9a94e487875b",
-        "allowAtRoot": true,
-        "allowInAreas": true,
-        "columnSpanOptions": [
-          {
-            "columnSpan": 12
-          }
-        ],
-        "settingsElementTypeKey": "c39783fb-08c3-4a34-88a4-30949d342c17"
+        "editorSize": "large",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "299b4e21-7d6b-4da6-8faf-4f281c104dcc",
@@ -162,7 +111,20 @@
           }
         ],
         "label": "Text block",
-        "areas": []
+        "areas": [],
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
+        "contentElementTypeKey": "9e262942-ee5f-4a65-831e-9a94e487875b",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "c39783fb-08c3-4a34-88a4-30949d342c17",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
         "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
@@ -173,25 +135,104 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
-        "contentElementTypeKey": "2e5758c0-a2fb-4a59-9d19-c7b994db0cef",
+        "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "settingsElementTypeKey": "cf29263f-836d-4c3c-9260-c408365fa346"
+        "settingsElementTypeKey": "471d5207-9004-4bd5-98c9-db2351678562",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
+        "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "editorSize": "full",
+        "groupKey": "64770165-a234-4608-8ad1-0954c0165f4f"
+      },
+      {
+        "contentElementTypeKey": "6f689d5b-3cd6-4b03-87f2-720f626cf50a",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "c8f5ee8c-3201-4c38-9b2d-8fdd93a91850",
+        "groupKey": "64770165-a234-4608-8ad1-0954c0165f4f"
+      },
+      {
+        "contentElementTypeKey": "7ea7f6d8-33f0-48d5-b0ef-dfb43b43fa4d",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cc7a54a7-a94d-41c1-bb13-4dcc6f399d3f",
+        "groupKey": "64770165-a234-4608-8ad1-0954c0165f4f"
+      },
+      {
+        "contentElementTypeKey": "ed42a0f1-1bf2-48ae-af07-c2227369aadf",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466",
+        "groupKey": "64770165-a234-4608-8ad1-0954c0165f4f"
+      },
+      {
+        "contentElementTypeKey": "81482d2a-2279-45ca-8730-2d91f65e0835",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "5b6a23c2-f363-4684-9ebc-fa49d0001aed",
+        "groupKey": "64770165-a234-4608-8ad1-0954c0165f4f"
+      },
+      {
+        "contentElementTypeKey": "52cb8b78-56ce-47be-90da-6c08e4025527",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "13bb5102-6cde-45ad-8b4d-716f6899b3e8",
+        "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
+      },
+      {
+        "contentElementTypeKey": "9b898ccf-e503-4610-8e62-b5348baa88e4",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "527ea1d7-8b30-4629-9695-b2f75e44448a",
+        "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
       },
       {
         "contentElementTypeKey": "58b66287-d573-4883-a87f-7e8efed122ed",
         "allowAtRoot": true,
         "allowInAreas": true,
         "label": "Lists Umbraco MVPs",
-        "settingsElementTypeKey": "400d03b3-566f-49aa-94d0-6e22a7f362ca"
+        "settingsElementTypeKey": "400d03b3-566f-49aa-94d0-6e22a7f362ca",
+        "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
+      },
+      {
+        "contentElementTypeKey": "ae9343a6-012e-4d26-9e5d-8beffbbcf1e0",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
+      },
+      {
+        "contentElementTypeKey": "2e5758c0-a2fb-4a59-9d19-c7b994db0cef",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "cf29263f-836d-4c3c-9260-c408365fa346",
+        "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
       }
     ],
     "useLiveEditing": true,
     "createLabel": "Add new content block",
-    "gridColumns": 12
+    "gridColumns": 12,
+    "blockGroups": [
+      {
+        "key": "0fb3559d-50a3-4e9d-befd-fee52c418208",
+        "name": "Basic blocks"
+      },
+      {
+        "key": "64770165-a234-4608-8ad1-0954c0165f4f",
+        "name": "Sessionize blocks"
+      },
+      {
+        "name": "Community blocks",
+        "key": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
+      }
+    ]
   },
   "Parent": "umb://data-type-container/559d47fa87174acdb8f11b79e434c7eb",
   "Udi": "umb://data-type/29dcf3a2f2ee441480b2f9b2442f5835",
@@ -277,6 +318,9 @@
     },
     {
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
+    },
+    {
+      "Udi": "umb://document-type/ae9343a6012e4d269e5d8beffbbcf1e0"
     },
     {
       "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"

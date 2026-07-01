@@ -55,7 +55,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("timelineEntries")]
-		public virtual string TimelineEntries => this.Value<string>(_publishedValueFallback, "timelineEntries");
+		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel TimelineEntries => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "timelineEntries");
 
 		///<summary>
 		/// Subtitle
