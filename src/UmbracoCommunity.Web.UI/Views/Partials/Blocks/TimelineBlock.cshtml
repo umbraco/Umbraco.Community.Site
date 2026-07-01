@@ -1,5 +1,5 @@
 @using Umbraco.Cms.Core.Models.Blocks
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TimelineBlock>>
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TimelineBlock, SettingsTimelineBlock>>
 
 @{
     var entries = Model.Content.TimelineEntries?
@@ -22,7 +22,7 @@
 
 @if (entries.Count > 0)
 {
-    <div class="dc-timeline-block">
+    <div class="dc-timeline-block" id="@(Model.Settings?.BlockId ?? string.Empty)">
         @if (!string.IsNullOrEmpty(Model.Content.Title))
         {
             <h2 class="block-title">@Model.Content.Title</h2>
