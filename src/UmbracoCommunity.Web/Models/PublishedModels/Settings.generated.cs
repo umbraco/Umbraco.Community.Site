@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Settings</summary>
 	[PublishedModel("settings")]
-	public partial class Settings : PublishedContentModel, ICompositionPageConfiguration
+	public partial class Settings : PublishedContentModel
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -48,6 +48,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Enable member sign-in: Show the GitHub sign-in button in the header and enable the account page for this site.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("enableMemberSignIn")]
+		public virtual bool EnableMemberSignIn => this.Value<bool>(_publishedValueFallback, "enableMemberSignIn");
 
 		///<summary>
 		/// Favicon: Select a square image. A favicon is the tiny icon a website shows in your browser tab, bookmarks, and shortcuts; the site's miniature logo.
@@ -80,26 +87,5 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("siteName")]
 		public virtual string SiteName => this.Value<string>(_publishedValueFallback, "siteName");
-
-		///<summary>
-		/// Enable member sign-in: Show the GitHub sign-in button in the header and enable the account page for this site.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[ImplementPropertyType("enableMemberSignIn")]
-		public virtual bool EnableMemberSignIn => this.Value<bool>(_publishedValueFallback, "enableMemberSignIn");
-
-		///<summary>
-		/// Hide from search
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[ImplementPropertyType("hideFromSearch")]
-		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
-
-		///<summary>
-		/// Hide from sitemap
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[ImplementPropertyType("hideFromSitemap")]
-		public virtual bool HideFromSitemap => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSitemap(this, _publishedValueFallback);
 	}
 }
