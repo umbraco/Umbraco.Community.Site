@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
@@ -19,13 +18,11 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
     private const string SearchPageContentTypeAlias = "searchPage";
 
     private readonly IPublishedUrlProvider _publishedUrlProvider;
-    private readonly IMemberManager _memberManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches, IMemberManager memberManager, IHttpContextAccessor httpContextAccessor)
+    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches, IHttpContextAccessor httpContextAccessor)
     {
         _publishedUrlProvider = publishedUrlProvider;
-        _memberManager = memberManager;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -45,7 +42,7 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
         var signInEnabled = siteSettings?.EnableMemberSignIn ?? false;
         viewModel.IsSignInEnabled = signInEnabled;
 
-        if (signInEnabled && _memberManager.IsSignedIn())
+        if (signInEnabled && _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
         {
             viewModel.IsSignedIn = true;
             var user = _httpContextAccessor.HttpContext?.User;

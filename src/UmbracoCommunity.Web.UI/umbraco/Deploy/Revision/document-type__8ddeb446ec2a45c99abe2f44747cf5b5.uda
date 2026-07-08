@@ -42,6 +42,15 @@
           "SortOrder": 3
         },
         {
+          "Key": "88a7dae1-3cd2-421e-a66c-c97eb50f6e2d",
+          "Alias": "enableMemberSignIn",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Description": "Show the GitHub sign-in button in the header and enable the account page for this site.",
+          "Name": "Enable member sign-in",
+          "SortOrder": 10
+        },
+        {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",
@@ -59,15 +68,6 @@
           "Description": "If left blank, the main header logo will be used",
           "Name": "Footer logo",
           "SortOrder": 2
-        },
-        {
-          "Key": "88a7dae1-3cd2-421e-a66c-c97eb50f6e2d",
-          "Alias": "enableMemberSignIn",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "ValueType": "System.Boolean",
-          "Description": "Show the GitHub sign-in button in the header and enable the account page for this site.",
-          "Name": "Enable member sign-in",
-          "SortOrder": 10
         }
       ]
     }
@@ -117,5 +117,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "17.2.0"
 }

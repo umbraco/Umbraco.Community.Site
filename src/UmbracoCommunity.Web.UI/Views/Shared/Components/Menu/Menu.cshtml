@@ -49,7 +49,7 @@
                 }
                 @{
                     RenderCtaButtons();
-                    RenderMemberButton();
+                    await RenderMemberButton();
                 }
             </div>
             <div class="nav-mobile">
@@ -114,29 +114,46 @@
         </div>
     }
 
-    private void RenderMemberButton()
+    private async Task RenderMemberButton()
     {
         if (!Model.IsSignInEnabled) return;
 
         if (Model.IsSignedIn)
         {
             <div class="nav-end__item member-btn">
-                <a href="/account" class="member-btn__avatar" aria-label="@Model.MemberDisplayName — account">
-                    @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
-                    {
-                        <img src="@Model.MemberAvatarUrl" alt="" width="32" height="32" />
-                    }
-                </a>
-                <form method="post" action="/logout" class="member-btn__logout">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="icon-btn" aria-label="Sign out">Sign out</button>
-                </form>
+                <div class="member-avatar">
+                    <a href="/account" class="member-avatar__trigger" aria-label="@Model.MemberDisplayName — account">
+                        @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
+                        {
+                            <img src="@Model.MemberAvatarUrl" alt="" width="36" height="36" />
+                        }
+                    </a>
+                    <div class="member-avatar__menu" role="menu">
+                        @if (!string.IsNullOrEmpty(Model.MemberDisplayName))
+                        {
+                            <span class="member-avatar__name">@Model.MemberDisplayName</span>
+                        }
+                        <form method="post" action="/logout">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="member-avatar__signout">Sign out</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         }
         else
         {
+            var returnUrl = (Context.Request.Path + Context.Request.QueryString).ToString();
             <div class="nav-end__item member-btn">
-                <a href="/login" class="btn is-blue is-small">Sign in</a>
+                @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
+                {
+                    <input type="hidden" name="provider" value="UmbracoMembers.GitHub" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                    <button type="submit" class="btn is-white member-signin__btn">
+                        <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                        Sign in
+                    </button>
+                }
             </div>
         }
     }

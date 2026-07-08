@@ -573,3 +573,123 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
     position: unset;
   }
 }
+
+/* Member sign-in button (signed-out state) */
+
+.nav-header .member-btn {
+  display: flex;
+  align-items: center;
+}
+
+.nav-header .member-btn form {
+  display: contents;
+}
+
+.nav-header .member-signin__btn {
+  gap: 8px;
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+.nav-header .member-signin__btn svg {
+  flex-shrink: 0;
+}
+
+/* Member avatar (signed-in state) */
+
+.nav-header .member-avatar {
+  position: relative;
+}
+
+.nav-header .member-avatar__trigger {
+  display: block;
+  border-radius: 50%;
+  line-height: 0;
+  height: auto;
+  padding: 0;
+}
+
+.nav-header .member-avatar__trigger img {
+  border-radius: 50%;
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  transition: opacity 0.15s ease;
+}
+
+body:not(.mobile) .nav-header .member-avatar:hover .member-avatar__trigger img,
+body:not(.mobile) .nav-header .member-avatar:focus-within .member-avatar__trigger img {
+  opacity: 0.8;
+}
+
+.nav-header .member-avatar__menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  padding: 10px 0 6px;
+  min-width: 150px;
+  z-index: 10;
+}
+
+.nav-header .member-avatar__menu::before {
+  content: '';
+  position: absolute;
+  inset: 10px 0 0;
+  background: var(--color-white);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(40, 58, 151, 0.14);
+  pointer-events: none;
+  z-index: -1;
+}
+
+body:not(.mobile) .nav-header .member-avatar:hover .member-avatar__menu,
+body:not(.mobile) .nav-header .member-avatar:focus-within .member-avatar__menu {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+.nav-header .member-avatar__name {
+  display: block;
+  padding: 8px 14px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-identity-blue);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.nav-header .member-avatar__menu form {
+  display: contents;
+}
+
+.nav-header .member-avatar__signout {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: var(--font-family);
+  color: var(--color-identity-blue);
+  opacity: 0.65;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+body:not(.mobile) .nav-header .member-avatar__signout:hover {
+  background-color: var(--color-identity-pink-20opacity);
+  opacity: 1;
+}
+
+.nav-header .member-avatar__signout:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: 10px;
+  opacity: 1;
+}

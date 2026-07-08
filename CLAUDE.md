@@ -391,6 +391,36 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 
 A custom tiptap toolbar extension is defined in `App_Plugins/RichtextStyles/umbraco-package.json`. It provides a "Richtext styles" dropdown with grouped options for headings, inline formatting, blocks, and lists (including condensed list variants that apply a `no-margin` class to `ol`/`ul` tags).
 
+### Member Authentication (GitHub OAuth)
+
+Community members sign in exclusively via GitHub OAuth — no username/password login. The flow is implemented on top of Umbraco's built-in external login infrastructure.
+
+**Files:**
+- `Features/Members/RegisterGitHubAuth.cs` — `IComposer` that registers the GitHub OAuth handler via `AddMemberExternalLogins` / `AddOAuth<GitHubAuthenticationOptions, GitHubAuthenticationHandler>`. Must use `AddOAuth` (not `AddRemoteScheme`) so `OAuthPostConfigureOptions` runs and initialises `StateDataFormat` — using `AddRemoteScheme` directly causes a `NullReferenceException` in `OAuthHandler.BuildChallengeUrl`.
+- `Features/Members/GitHubExternalLoginProviderOptions.cs` — configures Umbraco auto-linking: new members are created with the `communityMember` member type, auto-approved, auto-linked on each sign-in. The `OnCreatingTicket` handler in `RegisterGitHubAuth` fetches the member's primary verified email from the GitHub API (the OAuth `email` scope only exposes the public profile email; the `/user/emails` endpoint is needed for private addresses).
+- `Controllers/LoginController.cs` — single `POST /logout` action; calls `IMemberSignInManager.SignOutAsync()` which clears all four Umbraco auth cookies (member, external login, 2FA, 2FA remember-me). Plain `HttpContext.SignOutAsync()` is not sufficient.
+- `Controllers/Render/AccountPageController.cs` — renders the member's own account page; redirects unauthenticated visitors to `/`. Pulls the member via `IMemberManager.GetCurrentMemberAsync()` and constructs the avatar URL as `https://github.com/{username}.png`.
+- `Views/AccountPage.cshtml` + `css/pages/account-page.css` + `entrypoints/_accountpage.ts` — account page view and styles (contact-card layout: blue band, circular avatar, name, GitHub handle, email, sign-out).
+
+**OAuth flow:**
+1. Sign-in button in the header POSTs to `UmbExternalLoginController.ExternalLogin` (Umbraco's built-in surface controller) with `provider=UmbracoMembers.GitHub`.
+2. Umbraco redirects to GitHub, which calls back to `/signin-github`.
+3. `UmbExternalLoginController.ExternalLoginCallback` handles the callback, auto-links or creates the member, and signs them in.
+
+**Header integration:**
+- `MenuViewModelBuilder` calls `IMemberManager.IsLoggedIn()` and — when signed in — populates `MemberDisplayName` and `MemberAvatarUrl`.
+- `Menu.cshtml` renders a GitHub sign-in button (signed-out) or a circular avatar with a hover dropdown showing the display name and a sign-out form (signed-in). The `enableMemberSignIn` toggle on the tenant's Settings node controls visibility of both states.
+
+**Configuration:**
+```json
+// appsettings.Local.json (gitignored — never commit)
+"GitHub": {
+  "ClientId": "<your-app-client-id>",
+  "ClientSecret": "<your-app-client-secret>"
+}
+```
+The GitHub OAuth App's callback URL must be set to `https://<host>/signin-github`. If `ClientId` or `ClientSecret` is missing the composer early-returns and GitHub auth is simply not registered (safe for environments without credentials).
+
 ### Site Search
 
 The nav search icon is wired to a `SearchPage` doc type backed by Umbraco's Examine `ExternalIndex`. A typed `SearchService` (`Services/SearchService.cs`) queries the index with multi-tenant scoping — results are filtered to descendants of the current request's content root, so search on Site A doesn't leak Site B hits. HTML is stripped from excerpts before display. The render controller (`Controllers/Render/SearchPageController.cs`) hands the results off to a `SearchPageViewModel` for the `SearchPage.cshtml` view to render.

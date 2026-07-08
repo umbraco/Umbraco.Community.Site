@@ -25,20 +25,19 @@ public class AccountPageController : RenderController
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        if (!await _memberManager.IsSignedIn())
-            return Redirect("/login");
+        if (HttpContext.User.Identity?.IsAuthenticated != true)
+            return Redirect("/");
 
         var currentPage = CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null.");
         var member = await _memberManager.GetCurrentMemberAsync();
 
-        member?.AdditionalData.TryGetValue("avatarUrl", out var avatarObj);
-
+        var handle = member?.UserName;
         var viewModel = new AccountPageViewModel(currentPage)
         {
             DisplayName = member?.Name,
-            GitHubHandle = member?.UserName,
+            GitHubHandle = handle,
             Email = member?.Email,
-            AvatarUrl = avatarObj?.ToString() ?? (member?.UserName != null ? $"https://github.com/{member.UserName}.png" : null),
+            AvatarUrl = handle != null ? $"https://github.com/{handle}.png" : null,
         };
 
         return CurrentTemplate(viewModel);

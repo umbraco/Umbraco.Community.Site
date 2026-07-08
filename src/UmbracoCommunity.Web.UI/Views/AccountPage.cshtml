@@ -5,18 +5,21 @@
     Layout = "Layout.cshtml";
 }
 
-<section class="account-page">
-    <header class="account-page__header">
-        @if (!string.IsNullOrEmpty(Model.AvatarUrl))
-        {
-            <img class="account-page__avatar"
-                 src="@Model.AvatarUrl"
-                 alt="@Model.DisplayName"
-                 width="80"
-                 height="80" />
-        }
-        <div class="account-page__identity">
+<div class="account-page-wrapper">
+    <article class="account-page">
+        <div class="account-page__band"></div>
+        <div class="account-page__body">
+            @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+            {
+                <img class="account-page__avatar"
+                     src="@Model.AvatarUrl"
+                     alt="@Model.DisplayName"
+                     width="100"
+                     height="100" />
+            }
+
             <h1 class="account-page__name">@Model.DisplayName</h1>
+
             @if (!string.IsNullOrEmpty(Model.GitHubHandle))
             {
                 <p class="account-page__handle">
@@ -25,19 +28,19 @@
                     </a>
                 </p>
             }
+
+            @if (!string.IsNullOrEmpty(Model.Email))
+            {
+                <dl class="account-page__details">
+                    <dt>Email</dt>
+                    <dd>@Model.Email</dd>
+                </dl>
+            }
+
+            <form method="post" action="/logout" class="account-page__logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn is-transparent-blue">Sign out</button>
+            </form>
         </div>
-    </header>
-
-    @if (!string.IsNullOrEmpty(Model.Email))
-    {
-        <dl class="account-page__details">
-            <dt>Email</dt>
-            <dd>@Model.Email</dd>
-        </dl>
-    }
-
-    <form method="post" action="/logout" class="account-page__logout">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn is-transparent-blue">Sign out</button>
-    </form>
-</section>
+    </article>
+</div>
