@@ -36,6 +36,10 @@
     <PackageVersion Include="Umbraco.AI.Search" Version="18.0.0" />
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.0" />
     <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.0" />
+    <!-- Umbraco Automate -->
+    <PackageVersion Include="Umbraco.Automate" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.1" />
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.0" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="7.0.1" />

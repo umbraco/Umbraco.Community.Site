@@ -17,6 +17,7 @@
     <PackageReference Include="Umbraco.Cms.Web.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Common" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
+    <PackageReference Include="Umbraco.Automate.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all">
