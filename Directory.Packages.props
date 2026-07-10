@@ -14,7 +14,7 @@
     <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.0.2" />
     <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.0.2" />
     <!-- Umbraco Cloud & Deploy -->
-    <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="18.0.0" />
     <PackageVersion Include="Umbraco.Deploy.OnPrem" Version="18.0.0" />
     <PackageVersion Include="Umbraco.Deploy.Cloud" Version="18.0.0" />
@@ -37,7 +37,7 @@
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.0" />
     <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.0" />
     <!-- Umbraco Community Packages -->
-    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.0.2" />
+    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.0" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="7.0.1" />
     <!-- Microsoft -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9" />
