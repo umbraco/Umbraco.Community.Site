@@ -37,19 +37,34 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
 
     public async Task DetectAndAnnounceAsync(IReadOnlyCollection<AnnouncementCandidatePost> posts, CancellationToken cancellationToken = default)
     {
+        var poll = await PollAsync(posts, cancellationToken);
+        await AnnounceQueuedAsync(poll.Fetched, poll.New, poll.Skipped, cancellationToken);
+    }
+
+    public async Task<PollResult> PollAsync(IReadOnlyCollection<AnnouncementCandidatePost> posts, CancellationToken cancellationToken = default)
+    {
         var options = _options.CurrentValue;
         var nowUtc = _time.GetUtcNow().UtcDateTime;
         var windowStartUtc = nowUtc - TimeSpan.FromDays(Math.Max(0, options.RecencyWindowDays));
 
         await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
-
         var (newCount, skippedCount) = await IngestNewPostsAsync(db, posts, windowStartUtc, nowUtc, cancellationToken);
+
+        return new PollResult(posts.Count, newCount, skippedCount);
+    }
+
+    public async Task<AnnounceResult> AnnounceQueuedAsync(int fetched, int newCount, int skippedCount, CancellationToken cancellationToken = default)
+    {
+        var options = _options.CurrentValue;
+        var nowUtc = _time.GetUtcNow().UtcDateTime;
+
+        await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
         var (announcedCount, failedCount) = await DeliverQueueAsync(db, options, nowUtc, cancellationToken);
 
         db.AnnouncementRuns.Add(new AnnouncementRun
         {
             RunUtc = nowUtc,
-            Fetched = posts.Count,
+            Fetched = fetched,
             New = newCount,
             Announced = announcedCount,
             Skipped = skippedCount,
@@ -60,7 +75,9 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
 
         _logger.LogInformation(
             "BlogAnnouncements cycle: fetched {Fetched}, new {New}, announced {Announced}, skipped {Skipped}, failed {Failed}, dryRun {DryRun}.",
-            posts.Count, newCount, announcedCount, skippedCount, failedCount, options.DryRun);
+            fetched, newCount, announcedCount, skippedCount, failedCount, options.DryRun);
+
+        return new AnnounceResult(announcedCount, failedCount);
     }
 
     /// <summary>
