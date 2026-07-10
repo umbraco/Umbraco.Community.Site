@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using UmbracoCommunity.BlogAnnouncements.Detection;
 
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
@@ -17,6 +18,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
     private readonly IMemoryCache _cache;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
     private readonly ICommunityBlogsIndexer _indexer;
+    private readonly IBlogAnnouncementDetector? _announcementDetector;
     private readonly ILogger<CommunityBlogsService> _logger;
     private readonly string _cacheFilePath;
 
@@ -27,13 +29,15 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         IOptionsMonitor<CommunityBlogsOptions> options,
         IHostEnvironment hostEnvironment,
         ICommunityBlogsIndexer indexer,
-        ILogger<CommunityBlogsService> logger)
+        ILogger<CommunityBlogsService> logger,
+        IBlogAnnouncementDetector? announcementDetector = null)
     {
         _aggregator = aggregator;
         _imageDownloader = imageDownloader;
         _cache = cache;
         _options = options;
         _indexer = indexer;
+        _announcementDetector = announcementDetector;
         _logger = logger;
 
         var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "Data", "TEMP", "CommunityBlogsCache");
@@ -41,7 +45,25 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         _cacheFilePath = Path.Combine(cacheDir, "community-blogs.json");
     }
 
+    // Serialises refresh cycles: the periodic timer never overlaps itself (awaited loop), but the
+    // dashboard's manual "Poll now" can arrive mid-cycle — it then waits its turn instead of
+    // running the fetch/detection/localization pipeline concurrently.
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
+
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
+    {
+        await _refreshGate.WaitAsync(cancellationToken);
+        try
+        {
+            await RefreshCoreAsync(cancellationToken);
+        }
+        finally
+        {
+            _refreshGate.Release();
+        }
+    }
+
+    private async Task RefreshCoreAsync(CancellationToken cancellationToken)
     {
         var data = await _aggregator.BuildAsync(cancellationToken);
         if (data is null)
@@ -60,15 +82,55 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
             return;
         }
 
+        // Run announcement detection on the RAW (pre-localization) data so Discord receives the
+        // original remote image URLs — localization rewrites them to local paths Discord can't
+        // fetch (and drops SVG avatars). Isolated so a detection failure never aborts the refresh.
+        await DetectAnnouncementsSafelyAsync(data, cancellationToken);
+
         data = await _imageDownloader.LocalizeAsync(data, cancellationToken);
 
-        var primaryDuration = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.RefreshIntervalInHours));
+        var primaryDuration = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
         _cache.Set(PrimaryCacheKey, data, primaryDuration);
         _cache.Set(StaleCacheKey, data, new MemoryCacheEntryOptions { SlidingExpiration = StaleFallbackDuration });
 
         await WriteCacheFileAsync(data, cancellationToken);
         _indexer.Rebuild(data);
         _logger.LogInformation("Refreshed {Count} community blog posts.", data.Posts.Count);
+    }
+
+    /// <summary>
+    /// Runs Discord announcement detection, swallowing and logging any failure so the blog-posts
+    /// cache refresh always completes. No-ops when the detector isn't registered.
+    /// </summary>
+    private async Task DetectAnnouncementsSafelyAsync(CommunityBlogsData data, CancellationToken cancellationToken)
+    {
+        if (_announcementDetector is null)
+        {
+            return;
+        }
+
+        try
+        {
+            // Map the site's blog-post shape onto the announcement project's neutral input record so
+            // that project stays independent of UmbracoCommunity.Web. Field order mirrors the record.
+            var candidates = data.Posts
+                .Select(p => new AnnouncementCandidatePost(
+                    p.Id,
+                    p.Title,
+                    p.Url,
+                    p.Excerpt,
+                    p.CoverImageUrl,
+                    p.PublishedAt,
+                    p.AuthorName,
+                    p.AuthorAvatarUrl,
+                    p.AuthorProfileUrl))
+                .ToList();
+            await _announcementDetector.DetectAndAnnounceAsync(candidates, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Blog announcement detection failed; blog posts cache refresh continues.");
+        }
     }
 
     public CommunityBlogsData GetData()
@@ -86,7 +148,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         {
             // Reseed the primary cache too, so subsequent requests in this window don't each
             // re-read the file synchronously until the next background refresh runs.
-            var primaryDuration = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.RefreshIntervalInHours));
+            var primaryDuration = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
             _cache.Set(PrimaryCacheKey, disk, primaryDuration);
             _cache.Set(StaleCacheKey, disk, new MemoryCacheEntryOptions { SlidingExpiration = StaleFallbackDuration });
             return disk;

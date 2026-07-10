@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>UmbracoCommunity.BlogAnnouncements</PackageId>
+    <Product>UmbracoCommunity.BlogAnnouncements</Product>
+    <Title>UmbracoCommunity.BlogAnnouncements</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms.Web.Website" />
+    <PackageReference Include="Umbraco.Cms.Web.Common" />
+    <PackageReference Include="Umbraco.Cms.Api.Common" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UmbracoCommunity.BlogAnnouncements.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Client\**" />
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+  </ItemGroup>
+</Project>

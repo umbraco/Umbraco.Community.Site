@@ -10,8 +10,12 @@ public class CommunityBlogsOptions
     /// <summary>API key sent in the <c>Authorization</c> header (bare key, no "Bearer"). Supplied via appsettings.Local.json / env — never committed.</summary>
     public string ApiKey { get; set; } = string.Empty;
 
-    /// <summary>How often the background service re-aggregates posts.</summary>
-    public int RefreshIntervalInHours { get; set; } = 6;
+    /// <summary>
+    /// How often the background service re-aggregates posts, in minutes (floored at 5). This
+    /// interval also paces new-post announcement detection, the blog-posts cache refresh, and the
+    /// image downloader pass — the Sphere fetch is capped at ~60 posts, so short intervals are cheap.
+    /// </summary>
+    public int RefreshIntervalInMinutes { get; set; } = 15;
 
     /// <summary>Per-request HTTP timeout.</summary>
     public int RequestTimeoutSeconds { get; set; } = 15;

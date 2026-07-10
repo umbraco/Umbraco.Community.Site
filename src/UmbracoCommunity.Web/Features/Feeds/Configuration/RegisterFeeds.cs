@@ -58,6 +58,10 @@ public sealed class RegisterFeeds : IComposer
         builder.Services.AddExamineLuceneIndex(CommunityBlogsSearchIndexer.IndexName);
         builder.Services.AddSingleton<ICommunityBlogsIndexer, CommunityBlogsSearchIndexer>();
         builder.Services.AddSingleton<ICommunityBlogsService, CommunityBlogsService>();
+
+        // Lets the blog-announcements dashboard's "Poll now" button trigger the same full refresh
+        // cycle the periodic timer runs. The RCL resolves this optionally.
+        builder.Services.AddSingleton<UmbracoCommunity.BlogAnnouncements.ICommunityFeedPoller, CommunityBlogsFeedPoller>();
         builder.Services.AddHostedService<CommunityBlogsBackgroundService>();
     }
 }

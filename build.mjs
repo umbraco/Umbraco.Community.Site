@@ -42,6 +42,10 @@ const projects = {
     path: resolve(ROOT, "src/UmbracoCommunity.BlockRestrictions/Client"),
     color: "\x1b[36m", // cyan
   },
+  BlogAnnouncements: {
+    path: resolve(ROOT, "src/UmbracoCommunity.BlogAnnouncements/Client"),
+    color: "\x1b[94m", // bright blue
+  },
   Extensions: {
     path: resolve(ROOT, "src/UmbracoCommunity.Extensions/Client"),
     color: "\x1b[35m", // magenta
@@ -188,6 +192,7 @@ async function runLocal(withDotnet) {
 
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
+    buildProject("BlogAnnouncements", "build"),
     buildProject("Extensions", "build"),
     buildProject("NotFoundTracker", "build"),
     buildProject("StaticAssets", "build:for:cloud"),
@@ -227,6 +232,7 @@ async function runDev(withDotnet, firstTimeIntro = null) {
 
   await Promise.all([
     buildProject("BlockRestrictions", "build"),
+    buildProject("BlogAnnouncements", "build"),
     buildProject("Extensions", "build"),
     buildProject("NotFoundTracker", "build"),
   ]);
