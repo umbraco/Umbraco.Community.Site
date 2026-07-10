@@ -18,8 +18,10 @@ namespace UmbracoCommunity.BlogAnnouncements;
 /// <summary>
 /// Wires up the Discord blog-announcement pipeline: options, the EF Core tracking store
 /// (provider-switched on the Umbraco connection string), the startup migration service, the
-/// delivery leg, and the detection service. Detection is invoked from the CommunityBlogs refresh
-/// cycle (see <c>CommunityBlogsService.RefreshAsync</c>).
+/// delivery leg, and the detection service. Detection is invoked exclusively by the
+/// <c>PollBlogPostsAction</c> / <c>AnnounceBlogPostsAction</c> Umbraco Automate actions — not by
+/// the host's own CommunityBlogs refresh cycle, which only maintains the site's blog-listing
+/// cache/index.
 /// </summary>
 public sealed class RegisterBlogAnnouncements : IComposer
 {
@@ -27,16 +29,6 @@ public sealed class RegisterBlogAnnouncements : IComposer
     {
         builder.Services.Configure<BlogAnnouncementsOptions>(
             builder.Config.GetSection(BlogAnnouncementsOptions.SectionName));
-
-        // Surface the host's poll cadence (parent CommunityBlogs section) for the dashboard's
-        // Settings tab — read by key so this project needs no reference to the host's options.
-        builder.Services.Configure<BlogAnnouncementsOptions>(options =>
-        {
-            if (int.TryParse(builder.Config["CommunityBlogs:RefreshIntervalInMinutes"], out var minutes))
-            {
-                options.PollIntervalMinutes = minutes;
-            }
-        });
 
         builder.Services.AddDbContextFactory<BlogAnnouncementsDbContext>((sp, options) =>
         {
@@ -77,8 +69,8 @@ public sealed class RegisterBlogAnnouncements : IComposer
         });
         builder.Services.AddSingleton<IDiscordAnnouncer, DiscordWebhookAnnouncer>();
 
-        // Detection. Singleton so it can be consumed by the singleton CommunityBlogsService; it
-        // opens a fresh DbContext per cycle via the factory.
+        // Detection. Singleton; opens a fresh DbContext per cycle via the factory. Invoked
+        // exclusively by the PollBlogPostsAction / AnnounceBlogPostsAction Automate actions.
         builder.Services.AddSingleton<IBlogAnnouncementDetector, BlogAnnouncementDetector>();
 
         // Dashboard query + manual-dispatch service. Singleton so its in-flight guard is shared

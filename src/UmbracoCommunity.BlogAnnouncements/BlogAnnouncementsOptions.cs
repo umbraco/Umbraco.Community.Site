@@ -32,15 +32,6 @@ public sealed class BlogAnnouncementsOptions
 
     /// <summary>Discord delivery configuration.</summary>
     public DiscordAnnouncementOptions Discord { get; set; } = new();
-
-    /// <summary>
-    /// How often the host polls for new posts, in minutes — and therefore how often announcements
-    /// can go out. NOT a key of the Announcements section: the composer populates it from the
-    /// host's <c>CommunityBlogs:RefreshIntervalInMinutes</c> (default 15), keeping this project
-    /// decoupled from the host's own options types. Display-only; the host owns the timer (which
-    /// floors the effective interval at 5 minutes).
-    /// </summary>
-    public int PollIntervalMinutes { get; set; } = 15;
 }
 
 public sealed class DiscordAnnouncementOptions

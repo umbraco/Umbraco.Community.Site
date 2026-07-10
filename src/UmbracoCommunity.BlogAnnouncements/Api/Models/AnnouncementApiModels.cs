@@ -87,21 +87,6 @@ public sealed class SettingsResponse
     public int MaxAnnouncementsPerCycle { get; init; }
     public bool DryRun { get; init; }
     public bool WebhookConfigured { get; init; }
-
-    /// <summary>
-    /// Effective poll cadence in minutes (how often new posts are fetched and announcements can go
-    /// out) — the host's CommunityBlogs refresh interval with its 5-minute floor applied.
-    /// </summary>
-    public int PollIntervalMinutes { get; init; }
-
-    /// <summary>Whether the host registered an <c>ICommunityFeedPoller</c> — drives the "Poll now" button.</summary>
-    public bool PollNowAvailable { get; init; }
-}
-
-/// <summary>Result of a manual "poll now": the detection run recorded by the poll, when one was written.</summary>
-public sealed class PollNowResponse
-{
-    public RunListItem? Run { get; init; }
 }
 
 /// <summary>Body of the announce (repost / post-now) request.</summary>

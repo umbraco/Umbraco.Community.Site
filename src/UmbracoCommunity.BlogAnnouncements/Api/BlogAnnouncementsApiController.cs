@@ -117,26 +117,6 @@ public sealed class BlogAnnouncementsApiController : BlogAnnouncementsApiControl
     [ProducesResponseType<SettingsResponse>(StatusCodes.Status200OK)]
     public ActionResult<SettingsResponse> GetSettings() => Ok(_service.GetSettings());
 
-    /// <summary>
-    /// Triggers one full poll cycle on demand (fetch new posts, refresh caches, run announcement
-    /// detection) instead of waiting for the periodic timer.
-    /// </summary>
-    [HttpPost("poll")]
-    [ProducesResponseType<PollNowResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status501NotImplemented)]
-    public async Task<IActionResult> PollNow(CancellationToken ct)
-    {
-        var result = await _service.PollNowAsync(ct);
-        return result.Outcome switch
-        {
-            PollNowOutcome.Completed => Ok(new PollNowResponse { Run = result.Run }),
-            PollNowOutcome.InFlight => Conflict(new { reason = "A poll is already running." }),
-            _ => StatusCode(StatusCodes.Status501NotImplemented,
-                new { reason = "The host application has not registered a feed poller." }),
-        };
-    }
-
     [HttpPost("test-message")]
     [ProducesResponseType<DeliveryResultResponse>(StatusCodes.Status200OK)]
     public async Task<ActionResult<DeliveryResultResponse>> SendTestMessage(CancellationToken ct)

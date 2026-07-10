@@ -4,7 +4,6 @@ import type {
   RunListResponse,
   SettingsResponse,
   DeliveryResultResponse,
-  PollNowResponse,
   PostQuery,
 } from "./blog-announcements-types.js";
 
@@ -84,11 +83,6 @@ export const BlogAnnouncementsApi = {
 
   getSettings(): Promise<SettingsResponse> {
     return request<SettingsResponse>(`/settings`);
-  },
-
-  /** Triggers one full poll cycle (fetch + detection) on demand. */
-  pollNow(): Promise<PollNowResponse> {
-    return request<PollNowResponse>(`/poll`, { method: "POST" });
   },
 
   sendTestMessage(): Promise<DeliveryResultResponse> {

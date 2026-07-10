@@ -83,15 +83,6 @@ export interface SettingsResponse {
   maxAnnouncementsPerCycle: number;
   dryRun: boolean;
   webhookConfigured: boolean;
-  /** Effective poll cadence in minutes (fetch + announce cycle), floor already applied. */
-  pollIntervalMinutes: number;
-  /** Whether the host wired up on-demand polling — drives the "Poll now" button. */
-  pollNowAvailable: boolean;
-}
-
-/** Result of a manual "poll now": the detection run recorded by the poll, when one was written. */
-export interface PollNowResponse {
-  run: RunListItem | null;
 }
 
 export interface DeliveryResultResponse {

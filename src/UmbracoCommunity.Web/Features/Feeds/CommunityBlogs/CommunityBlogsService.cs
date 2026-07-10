@@ -3,7 +3,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using UmbracoCommunity.BlogAnnouncements.Detection;
 
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
@@ -18,7 +17,6 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
     private readonly IMemoryCache _cache;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
     private readonly ICommunityBlogsIndexer _indexer;
-    private readonly IBlogAnnouncementDetector? _announcementDetector;
     private readonly ILogger<CommunityBlogsService> _logger;
     private readonly string _cacheFilePath;
 
@@ -29,15 +27,13 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         IOptionsMonitor<CommunityBlogsOptions> options,
         IHostEnvironment hostEnvironment,
         ICommunityBlogsIndexer indexer,
-        ILogger<CommunityBlogsService> logger,
-        IBlogAnnouncementDetector? announcementDetector = null)
+        ILogger<CommunityBlogsService> logger)
     {
         _aggregator = aggregator;
         _imageDownloader = imageDownloader;
         _cache = cache;
         _options = options;
         _indexer = indexer;
-        _announcementDetector = announcementDetector;
         _logger = logger;
 
         var cacheDir = Path.Combine(hostEnvironment.ContentRootPath, "umbraco", "Data", "TEMP", "CommunityBlogsCache");
@@ -82,11 +78,6 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
             return;
         }
 
-        // Run announcement detection on the RAW (pre-localization) data so Discord receives the
-        // original remote image URLs — localization rewrites them to local paths Discord can't
-        // fetch (and drops SVG avatars). Isolated so a detection failure never aborts the refresh.
-        await DetectAnnouncementsSafelyAsync(data, cancellationToken);
-
         data = await _imageDownloader.LocalizeAsync(data, cancellationToken);
 
         var primaryDuration = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
@@ -96,41 +87,6 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         await WriteCacheFileAsync(data, cancellationToken);
         _indexer.Rebuild(data);
         _logger.LogInformation("Refreshed {Count} community blog posts.", data.Posts.Count);
-    }
-
-    /// <summary>
-    /// Runs Discord announcement detection, swallowing and logging any failure so the blog-posts
-    /// cache refresh always completes. No-ops when the detector isn't registered.
-    /// </summary>
-    private async Task DetectAnnouncementsSafelyAsync(CommunityBlogsData data, CancellationToken cancellationToken)
-    {
-        if (_announcementDetector is null)
-        {
-            return;
-        }
-
-        try
-        {
-            // Map the site's blog-post shape onto the announcement project's neutral input record so
-            // that project stays independent of UmbracoCommunity.Web. Field order mirrors the record.
-            var candidates = data.Posts
-                .Select(p => new AnnouncementCandidatePost(
-                    p.Id,
-                    p.Title,
-                    p.Url,
-                    p.Excerpt,
-                    p.CoverImageUrl,
-                    p.PublishedAt,
-                    p.AuthorName,
-                    p.AuthorAvatarUrl,
-                    p.AuthorProfileUrl))
-                .ToList();
-            await _announcementDetector.DetectAndAnnounceAsync(candidates, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Blog announcement detection failed; blog posts cache refresh continues.");
-        }
     }
 
     public CommunityBlogsData GetData()

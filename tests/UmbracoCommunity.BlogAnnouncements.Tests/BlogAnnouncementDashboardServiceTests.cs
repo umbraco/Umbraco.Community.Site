@@ -20,15 +20,13 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
 
     private BlogAnnouncementDashboardService CreateService(
         IDiscordAnnouncer announcer,
-        BlogAnnouncementsOptions? options = null,
-        ICommunityFeedPoller? poller = null)
+        BlogAnnouncementsOptions? options = null)
         => new(
             _factory,
             announcer,
             new OptionsMonitorStub<BlogAnnouncementsOptions>(options ?? new BlogAnnouncementsOptions()),
             new FrozenTime(Now),
-            NullLogger<BlogAnnouncementDashboardService>.Instance,
-            poller);
+            NullLogger<BlogAnnouncementDashboardService>.Instance);
 
     private AnnouncedBlogPost Seed(
         AnnouncementStatus status,
@@ -329,99 +327,6 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task PollNow_WithoutHostPoller_ReportsNotAvailable()
-    {
-        var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)));
-        (await service.PollNowAsync(default)).Outcome.Should().Be(PollNowOutcome.NotAvailable);
-        service.GetSettings().PollNowAvailable.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task PollNow_RunsPollerAndReturnsRecordedRun()
-    {
-        var poller = new StubPoller(onPoll: () =>
-        {
-            // Simulate the detection cycle writing its heartbeat row during the poll.
-            using var db = _factory.CreateDbContext();
-            db.AnnouncementRuns.Add(new AnnouncementRun
-            {
-                RunUtc = Now.UtcDateTime,
-                Fetched = 60,
-                New = 2,
-                Announced = 1,
-                Skipped = 1,
-                Failed = 0,
-                DryRun = false,
-            });
-            db.SaveChanges();
-        });
-        var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)), poller: poller);
-
-        var result = await service.PollNowAsync(default);
-
-        result.Outcome.Should().Be(PollNowOutcome.Completed);
-        poller.Calls.Should().Be(1);
-        result.Run.Should().NotBeNull();
-        result.Run!.Fetched.Should().Be(60);
-        result.Run.Announced.Should().Be(1);
-        service.GetSettings().PollNowAvailable.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task PollNow_WithoutRecordedRun_CompletesWithNullRun()
-    {
-        var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)), poller: new StubPoller());
-
-        var result = await service.PollNowAsync(default);
-
-        result.Outcome.Should().Be(PollNowOutcome.Completed);
-        result.Run.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task PollNow_ConcurrentManualPolls_AreGuarded()
-    {
-        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var poller = new StubPoller(waitFor: gate.Task, entered: entered);
-        var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)), poller: poller);
-
-        var first = service.PollNowAsync(default);
-        await entered.Task; // first poll holds the in-flight slot
-
-        (await service.PollNowAsync(default)).Outcome.Should().Be(PollNowOutcome.InFlight);
-
-        gate.SetResult();
-        (await first).Outcome.Should().Be(PollNowOutcome.Completed);
-    }
-
-    [Fact]
-    public void GetSettings_DefaultPollInterval_Is15Minutes()
-    {
-        var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)), new BlogAnnouncementsOptions());
-        service.GetSettings().PollIntervalMinutes.Should().Be(15);
-    }
-
-    [Fact]
-    public void GetSettings_ConfiguredPollInterval_IsReported()
-    {
-        var service = CreateService(
-            new RecordingAnnouncer(DeliveryResult.Ok(204)),
-            new BlogAnnouncementsOptions { PollIntervalMinutes = 15 });
-        service.GetSettings().PollIntervalMinutes.Should().Be(15);
-    }
-
-    [Fact]
-    public void GetSettings_PollIntervalBelowFloor_ReportsEffectiveFiveMinutes()
-    {
-        // The host timer floors the interval at 5 minutes — the dashboard must show the effective value.
-        var service = CreateService(
-            new RecordingAnnouncer(DeliveryResult.Ok(204)),
-            new BlogAnnouncementsOptions { PollIntervalMinutes = 2 });
-        service.GetSettings().PollIntervalMinutes.Should().Be(5);
-    }
-
-    [Fact]
     public void GetSettings_EmptyWebhook_ReportsNotConfigured()
     {
         var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)), new BlogAnnouncementsOptions());
@@ -444,29 +349,6 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
     public void Dispose() => _factory.Dispose();
 
     // --- test doubles ---
-
-    private sealed class StubPoller : ICommunityFeedPoller
-    {
-        private readonly Action? _onPoll;
-        private readonly Task? _waitFor;
-        private readonly TaskCompletionSource? _entered;
-        public int Calls { get; private set; }
-
-        public StubPoller(Action? onPoll = null, Task? waitFor = null, TaskCompletionSource? entered = null)
-        {
-            _onPoll = onPoll;
-            _waitFor = waitFor;
-            _entered = entered;
-        }
-
-        public async Task PollNowAsync(CancellationToken cancellationToken)
-        {
-            Calls++;
-            _entered?.TrySetResult();
-            if (_waitFor is not null) await _waitFor;
-            _onPoll?.Invoke();
-        }
-    }
 
     private sealed class RecordingAnnouncer : IDiscordAnnouncer
     {

@@ -28,17 +28,6 @@ public enum ManualAnnounceOutcome
     InvalidStatusForPostNow,
 }
 
-/// <summary>Outcome of a manual "poll now" request.</summary>
-public enum PollNowOutcome
-{
-    Completed,
-    NotAvailable,
-    InFlight,
-}
-
-/// <summary>Result of a manual poll — outcome plus (when recorded) the detection run's numbers.</summary>
-public sealed record PollNowResult(PollNowOutcome Outcome, RunListItem? Run = null);
-
 /// <summary>Outcome of a manual "mark as not announced" reset request.</summary>
 public enum ResetOutcome
 {
@@ -73,26 +62,19 @@ public sealed class BlogAnnouncementDashboardService
     private readonly IOptionsMonitor<BlogAnnouncementsOptions> _options;
     private readonly TimeProvider _time;
     private readonly ILogger<BlogAnnouncementDashboardService> _logger;
-    private readonly ICommunityFeedPoller? _feedPoller;
-
-    // Guards the manual "poll now" against a second concurrent manual poll. Overlap with the
-    // host's timer-driven cycle is serialised by the host's own refresh gate.
-    private int _pollInFlight;
 
     public BlogAnnouncementDashboardService(
         IDbContextFactory<BlogAnnouncementsDbContext> contextFactory,
         IDiscordAnnouncer announcer,
         IOptionsMonitor<BlogAnnouncementsOptions> options,
         TimeProvider time,
-        ILogger<BlogAnnouncementDashboardService> logger,
-        ICommunityFeedPoller? feedPoller = null)
+        ILogger<BlogAnnouncementDashboardService> logger)
     {
         _contextFactory = contextFactory;
         _announcer = announcer;
         _options = options;
         _time = time;
         _logger = logger;
-        _feedPoller = feedPoller;
     }
 
     public async Task<PostListResponse> ListPostsAsync(PostQuery query, CancellationToken ct)
@@ -225,9 +207,6 @@ public sealed class BlogAnnouncementDashboardService
             MaxAnnouncementsPerCycle = options.MaxAnnouncementsPerCycle,
             DryRun = options.DryRun,
             WebhookConfigured = !string.IsNullOrWhiteSpace(options.Discord.WebhookUrl),
-            // Mirror the host timer's floor so the dashboard shows the effective cadence.
-            PollIntervalMinutes = Math.Max(5, options.PollIntervalMinutes),
-            PollNowAvailable = _feedPoller is not null,
         };
     }
 
@@ -314,54 +293,6 @@ public sealed class BlogAnnouncementDashboardService
         finally
         {
             _inFlight.TryRemove(sphereId, out _);
-        }
-    }
-
-    /// <summary>
-    /// Runs one full feed poll cycle on demand via the host-provided
-    /// <see cref="ICommunityFeedPoller"/> (fetch, detection/announcement, cache refresh) and, when
-    /// the detection cycle recorded a run row during the poll, returns its numbers.
-    /// </summary>
-    public async Task<PollNowResult> PollNowAsync(CancellationToken ct)
-    {
-        if (_feedPoller is null)
-        {
-            return new PollNowResult(PollNowOutcome.NotAvailable);
-        }
-
-        if (Interlocked.CompareExchange(ref _pollInFlight, 1, 0) != 0)
-        {
-            return new PollNowResult(PollNowOutcome.InFlight);
-        }
-
-        try
-        {
-            var startedUtc = _time.GetUtcNow().UtcDateTime;
-            await _feedPoller.PollNowAsync(ct);
-
-            await using var db = await _contextFactory.CreateDbContextAsync(ct);
-            var run = await db.AnnouncementRuns.AsNoTracking()
-                .Where(r => r.RunUtc >= startedUtc)
-                .OrderByDescending(r => r.RunUtc)
-                .ThenByDescending(r => r.Id)
-                .Select(r => new RunListItem
-                {
-                    Id = r.Id,
-                    RunUtc = AsUtc(r.RunUtc),
-                    Fetched = r.Fetched,
-                    New = r.New,
-                    Announced = r.Announced,
-                    Skipped = r.Skipped,
-                    Failed = r.Failed,
-                    DryRun = r.DryRun,
-                })
-                .FirstOrDefaultAsync(ct);
-
-            return new PollNowResult(PollNowOutcome.Completed, run);
-        }
-        finally
-        {
-            Interlocked.Exchange(ref _pollInFlight, 0);
         }
     }
 

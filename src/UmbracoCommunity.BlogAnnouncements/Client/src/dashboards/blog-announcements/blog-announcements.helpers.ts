@@ -61,13 +61,3 @@ export function relativeTime(iso: string | null): string {
 export function absoluteTime(iso: string | null): string {
   return iso ? parseServerDate(iso).toLocaleString() : "";
 }
-
-/** e.g. 15 -> "15 minutes", 360 -> "6 hours", 90 -> "1 hour 30 minutes". */
-export function formatMinutes(minutes: number): string {
-  const minutePart = (m: number) => `${m} minute${m === 1 ? "" : "s"}`;
-  if (minutes < 60) return minutePart(minutes);
-  const h = Math.floor(minutes / 60);
-  const hourPart = `${h} hour${h === 1 ? "" : "s"}`;
-  const rest = minutes % 60;
-  return rest === 0 ? hourPart : `${hourPart} ${minutePart(rest)}`;
-}

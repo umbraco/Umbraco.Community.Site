@@ -1,4 +1,3 @@
-import { formatMinutes } from "./blog-announcements.helpers.js";
 import { LitElement, html, css, nothing, customElement, state } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
@@ -11,7 +10,6 @@ export class BlogAnnouncementsSettingsTabElement extends UmbElementMixin(LitElem
   @state() private loading = false;
   @state() private error: string | null = null;
   @state() private testing = false;
-  @state() private polling = false;
 
   private _notifications?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -57,28 +55,6 @@ export class BlogAnnouncementsSettingsTabElement extends UmbElementMixin(LitElem
     this._notifications?.peek(color, { data: { headline, message } });
   }
 
-  private async pollNow() {
-    this.polling = true;
-    try {
-      const result = await BlogAnnouncementsApi.pollNow();
-      if (result.run) {
-        const r = result.run;
-        this.notify(
-          "positive",
-          "Poll complete",
-          `Fetched ${r.fetched}, new ${r.new}, announced ${r.announced}, skipped ${r.skipped}, failed ${r.failed}${r.dryRun ? " (dry-run)" : ""}. See the Runs tab for history.`,
-        );
-      } else {
-        this.notify("positive", "Poll complete", "No detection run was recorded — see the Runs tab for history.");
-      }
-      await this.load();
-    } catch (e) {
-      this.notify("danger", "Poll failed", (e as Error).message);
-    } finally {
-      this.polling = false;
-    }
-  }
-
   private async sendTest() {
     this.testing = true;
     try {
@@ -112,24 +88,6 @@ export class BlogAnnouncementsSettingsTabElement extends UmbElementMixin(LitElem
             : nothing}
       </uui-box>
 
-      ${this.settings?.pollNowAvailable
-        ? html`
-            <uui-box headline="Poll now">
-              <p class="description">
-                Fetches new posts and runs announcement detection immediately, instead of waiting
-                for the next scheduled poll. Runs the exact same cycle as the timer.
-              </p>
-              <uui-button
-                look="primary"
-                label=${this.polling ? "Polling…" : "Poll now"}
-                state=${this.polling ? "waiting" : nothing}
-                ?disabled=${this.polling}
-                @click=${() => this.pollNow()}
-              ></uui-button>
-            </uui-box>
-          `
-        : nothing}
-
       <uui-box headline="Test message">
         <p class="description">
           Posts a canned embed to the configured Discord webhook — the first thing to reach for when
@@ -148,10 +106,6 @@ export class BlogAnnouncementsSettingsTabElement extends UmbElementMixin(LitElem
   private renderSettings(s: SettingsResponse) {
     return html`
       <dl class="settings">
-        <dt>Poll cadence</dt>
-        <dd title="How often new posts are fetched — and therefore how often announcements can go out.">
-          ${formatMinutes(s.pollIntervalMinutes)}
-        </dd>
         <dt>Recency window</dt>
         <dd>${s.recencyWindowDays} day${s.recencyWindowDays === 1 ? "" : "s"}</dd>
         <dt>Per-cycle cap</dt>
