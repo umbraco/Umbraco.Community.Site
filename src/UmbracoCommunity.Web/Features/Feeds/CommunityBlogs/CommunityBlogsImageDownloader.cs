@@ -15,7 +15,7 @@ public sealed class CommunityBlogsImageDownloader
 {
     /// <summary>Web-served subfolder under wwwroot. Served at "/community-blog-images/{file}".</summary>
     public const string SubFolder = "community-blog-images";
-    private const long MaxBytes = 10_000_000;
+    private const long MaxBytes = 20_000_000;
 
     private static readonly Dictionary<string, string> ExtByContentType = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -59,8 +59,13 @@ public sealed class CommunityBlogsImageDownloader
 
         foreach (var post in data.Posts)
         {
-            var cover = await EnsureLocalAsync(post.CoverImageUrl, dir, used, cancellationToken);
-            var avatar = await EnsureLocalAsync(post.AuthorAvatarUrl, dir, used, cancellationToken);
+            // Sphere sometimes returns image URLs relative to the post's own blog (e.g.
+            // "/images/2026/06/cover.webp" instead of "https://kjac.dev/images/2026/06/cover.webp").
+            // Resolve those against the post's URL so they aren't silently dropped below.
+            Uri.TryCreate(post.Url, UriKind.Absolute, out var postUri);
+
+            var cover = await EnsureLocalAsync(post.CoverImageUrl, postUri, dir, used, cancellationToken);
+            var avatar = await EnsureLocalAsync(post.AuthorAvatarUrl, postUri, dir, used, cancellationToken);
             localized.Add(post with { CoverImageUrl = cover, AuthorAvatarUrl = avatar });
         }
 
@@ -68,7 +73,7 @@ public sealed class CommunityBlogsImageDownloader
         return data with { Posts = localized };
     }
 
-    private async Task<string?> EnsureLocalAsync(string? url, string dir, HashSet<string> used, CancellationToken cancellationToken)
+    private async Task<string?> EnsureLocalAsync(string? url, Uri? baseUri, string dir, HashSet<string> used, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(url))
         {
@@ -83,11 +88,18 @@ public sealed class CommunityBlogsImageDownloader
             return url;
         }
 
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)
-            || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        // Uri.TryCreate(url, UriKind.Absolute, ...) is not a reliable "is this a full URL" check on
+        // its own: on Unix it happily parses a root-relative path like "/images/cover.webp" as an
+        // absolute file:// URI instead of failing. So the http(s)-scheme check below is load-bearing,
+        // not just defensive — it's what actually rejects that false-positive "absolute" parse and
+        // falls through to resolving the path against baseUri instead.
+        if (!IsHttpUri(url, UriKind.Absolute, out var resolved)
+            && !(baseUri is not null && IsHttpUri(baseUri, url, out resolved)))
         {
             return null;
         }
+
+        var uri = resolved!;
 
         try
         {
@@ -261,6 +273,31 @@ public sealed class CommunityBlogsImageDownloader
             // Best-effort; the process will be reaped by the OS regardless.
         }
     }
+
+    private static bool IsHttpUri(string url, UriKind kind, out Uri? uri)
+    {
+        if (Uri.TryCreate(url, kind, out uri) && IsHttpScheme(uri))
+        {
+            return true;
+        }
+
+        uri = null;
+        return false;
+    }
+
+    private static bool IsHttpUri(Uri baseUri, string relativeUrl, out Uri? uri)
+    {
+        if (Uri.TryCreate(baseUri, relativeUrl, out uri) && IsHttpScheme(uri))
+        {
+            return true;
+        }
+
+        uri = null;
+        return false;
+    }
+
+    private static bool IsHttpScheme(Uri? uri)
+        => uri is not null && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 
     private void Prune(string dir, HashSet<string> used)
     {

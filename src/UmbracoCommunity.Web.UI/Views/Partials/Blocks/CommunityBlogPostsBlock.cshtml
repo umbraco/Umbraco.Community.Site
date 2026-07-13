@@ -1,10 +1,12 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.WebUtilities
+@using SixLabors.ImageSharp.Web
 @using Umbraco.Cms.Core.Models.Blocks
 @using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs
 @using UmbracoCommunity.Web.Models.PublishedModels
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<CommunityBlogPostsBlock, SettingsCommunityBlogPostsBlock>>
 @inject ICommunityBlogsService CommunityBlogsService
+@inject RequestAuthorizationUtilities ImageAuth
 
 @{
     const int DefaultPostsPerPage = 12;
@@ -51,6 +53,17 @@
         var url = QueryHelpers.AddQueryString(request.Path, items);
         return string.IsNullOrEmpty(anchorId) ? url : url + "#" + anchorId;
     }
+
+    // ImageSharp.Web requires a signed "hmac" query command for every processing request (see
+    // Umbraco:CMS:Imaging:HMACSecretKey in appsettings.json) — unsigned resize commands 400.
+    // Media-picker images get this for free via GetCropUrl(); these images are plain files under
+    // wwwroot (downloaded by CommunityBlogsImageDownloader, not Umbraco media), so we sign them here.
+    string BuildSignedImageUrl(string path, string commands)
+    {
+        var urlWithCommands = path + "?" + commands;
+        var hmac = ImageAuth.ComputeHMAC(urlWithCommands, CommandHandling.Sanitize);
+        return string.IsNullOrEmpty(hmac) ? urlWithCommands : $"{urlWithCommands}&{HMACUtilities.TokenCommand}={hmac}";
+    }
 }
 
 @if (hasBg)
@@ -90,10 +103,10 @@
             {
                 <a class="dc-community-blogs__card" href="@post.Url" target="_blank" rel="noopener noreferrer">
                     <figure class="dc-community-blogs__media">
-                        <img src="@(string.IsNullOrEmpty(post.CoverImageUrl) ? "/img/community-blogs/placeholder-cover.svg" : post.CoverImageUrl)" alt="" loading="lazy" />
+                        <img src="@(string.IsNullOrEmpty(post.CoverImageUrl) ? "/img/community-blogs/placeholder-cover.svg" : BuildSignedImageUrl(post.CoverImageUrl, "width=800&format=webp"))" alt="" loading="lazy" />
                     </figure>
                     <div class="dc-community-blogs__content">
-                        <img class="dc-community-blogs__avatar" src="@(string.IsNullOrEmpty(post.AuthorAvatarUrl) ? "/img/community-blogs/placeholder-avatar.svg" : post.AuthorAvatarUrl)" alt="" loading="lazy" />
+                        <img class="dc-community-blogs__avatar" src="@(string.IsNullOrEmpty(post.AuthorAvatarUrl) ? "/img/community-blogs/placeholder-avatar.svg" : BuildSignedImageUrl(post.AuthorAvatarUrl, "width=88&height=88&format=webp"))" alt="" loading="lazy" />
                         <h3 class="dc-community-blogs__title">@post.Title</h3>
                         @if (!string.IsNullOrEmpty(post.Excerpt))
                         {
