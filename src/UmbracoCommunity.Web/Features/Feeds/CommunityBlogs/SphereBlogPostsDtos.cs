@@ -10,6 +10,7 @@ public sealed record PostsResponseDto(
 public sealed record PublicPostDto(
     string Id,
     string Type,
+    string? Platform,
     string? Title,
     string? Url,
     string? Content,
@@ -20,7 +21,8 @@ public sealed record PublicPostDto(
 public sealed record PublicAuthorDto(
     string? Name,
     string? ProfileUrl,
-    string? AvatarUrl);
+    string? AvatarUrl,
+    string? Type);
 
 public sealed record PaginationDto(
     string? NextCursor,

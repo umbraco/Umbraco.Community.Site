@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -64,19 +63,12 @@ public class BlockRestrictionComposer : IComposer
                 warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
         });
 
-        // Register a Swagger/OpenAPI document for this package's endpoints.
-        // The security filter enables the Umbraco backoffice "Authorize" button in Swagger UI,
+        // Register an OpenAPI document for this package's endpoints.
+        // WithBackOfficeAuthentication() wires up the Umbraco backoffice "Authorize" button in Swagger UI,
         // so you can test the API endpoints while authenticated.
-        builder.Services.Configure<SwaggerGenOptions>(opt =>
-        {
-            opt.SwaggerDoc(Constants.ApiName, new OpenApiInfo
-            {
-                Title = "Umbraco Community Block Restrictions Backoffice API",
-                Version = "1.0",
-            });
-
-            opt.OperationFilter<BlockRestrictionsOperationSecurityFilter>();
-        });
+        builder.AddBackOfficeOpenApiDocument(Constants.ApiName, doc => doc
+            .WithTitle("Umbraco Community Block Restrictions Backoffice API")
+            .WithBackOfficeAuthentication());
 
         // Apply database migrations after Umbraco has finished booting. Using a notification
         // handler (rather than an IHostedService) avoids racing Umbraco's unattended installer
@@ -91,15 +83,5 @@ public class BlockRestrictionComposer : IComposer
         // (one instance per HTTP request, matching Umbraco's service lifetime).
         builder.Services.AddScoped<BlockRestrictionStore>();
         builder.Services.AddScoped<BlockRestrictionService>();
-    }
-
-    /// <summary>
-    /// Security filter that associates our API endpoints with the Umbraco backoffice
-    /// authentication scheme. Extends Umbraco's base class to inherit the standard
-    /// backoffice OAuth2 security requirements for Swagger documentation.
-    /// </summary>
-    private class BlockRestrictionsOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
-    {
-        protected override string ApiName => Constants.ApiName;
     }
 }

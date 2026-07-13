@@ -1,0 +1,48 @@
+{
+  "Name": "Manually trigger blog post poller",
+  "Alias": "manually-trigger-blog-post-poller",
+  "WorkspaceUdi": "umb://umbraco-automate-workspace/d04d2a1ccfc84abbb8ba81082f504d57",
+  "Trigger": {
+    "TriggerAlias": "umbracoAutomate.manual",
+    "Settings": {}
+  },
+  "Steps": [
+    {
+      "Id": "bc05a820-1498-4836-b58c-2e66d4d7ec1c",
+      "ActionAlias": "umbracoCommunity.triggerAutomation",
+      "Name": "Trigger Automation",
+      "Alias": "triggerAutomation",
+      "ConnectionId": null,
+      "Settings": {
+        "automationId": "99c73cfe-6de7-4799-be7b-64576c0e6435"
+      },
+      "InputMappings": {},
+      "Position": {
+        "X": 250,
+        "Y": 230
+      },
+      "ErrorBehavior": 2,
+      "RetryInterval": null,
+      "MaxRetries": null
+    }
+  ],
+  "Connections": [
+    {
+      "SourceStepId": "00000000-0000-0000-0000-000000000000",
+      "SourceHandle": null,
+      "TargetStepId": "bc05a820-1498-4836-b58c-2e66d4d7ec1c",
+      "TargetHandle": null,
+      "Outcome": null,
+      "Filter": null
+    }
+  ],
+  "CanvasState": "{\u0022viewport\u0022:{\u0022x\u0022:685.5,\u0022y\u0022:525,\u0022zoom\u0022:0.85},\u0022triggerPosition\u0022:{\u0022x\u0022:250,\u0022y\u0022:50}}",
+  "Udi": "umb://umbraco-automate-automation/60463239833f406a9bb7af06cae9e824",
+  "Dependencies": [
+    {
+      "Udi": "umb://umbraco-automate-workspace/d04d2a1ccfc84abbb8ba81082f504d57"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Automate,Umbraco.Deploy.Automate.Artifacts.AutomateAutomationArtifact",
+  "__version": "18.0.0"
+}
