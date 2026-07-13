@@ -3,6 +3,7 @@
   "AllowedBlocks": [
     "accordionBlock",
     "banner",
+    "blogShowcaseBlock",
     "callToActionBlock",
     "cardsBlock",
     "columnsComparisonBlock",
@@ -19,6 +20,7 @@
     "sliderBlock",
     "speakersBlock",
     "textBlock",
+    "timelineBlock",
     "titleBlock",
     "upcomingEventsBlock",
     "videoBlock"

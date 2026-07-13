@@ -1,0 +1,100 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TimelineBlock, SettingsTimelineBlock>>
+
+@{
+    var entries = Model.Content.TimelineEntries?
+        .Select(item => item.Content)
+        .OfType<TimelineEntryBlock>()
+        .ToList() ?? new List<TimelineEntryBlock>();
+
+    var allTags = entries
+        .SelectMany(e => e.TimelineGoalItems ?? Enumerable.Empty<BlockListItem>())
+        .Select(item => item.Content)
+        .OfType<TimelineGoalBlock>()
+        .SelectMany(g => g.GoalTags ?? Enumerable.Empty<string>())
+        .Distinct()
+        .OrderBy(t => t)
+        .ToList();
+
+    bool hasTags = allTags.Count > 0;
+    var filterId = $"timeline-filter-{Model.Content.Key:N}";
+}
+
+@if (entries.Count > 0)
+{
+    <div class="dc-timeline-block" id="@(Model.Settings?.BlockId ?? string.Empty)">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        <dc-timeline>
+            @if (hasTags)
+            {
+                <div class="dc-timeline-filter">
+                    <label for="@filterId">Filter by tag</label>
+                    <select id="@filterId" data-timeline-filter>
+                        <option value="">All</option>
+                        @foreach (var tag in allTags)
+                        {
+                            <option value="@tag">@tag</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="dc-timeline">
+                @for (var i = 0; i < entries.Count; i++)
+                {
+                    var entry = entries[i];
+                    var goalIndex = 0;
+
+                    <div class="dc-timeline-entry">
+                        <div class="dc-timeline-entry__label">
+                            <span class="dc-timeline-entry__pill">@entry.EntryTitle</span>
+                        </div>
+
+                        @if (entry.TimelineGoalItems != null && entry.TimelineGoalItems.Any())
+                        {
+                            <div class="dc-timeline-goals">
+                                @foreach (var goalItem in entry.TimelineGoalItems)
+                                {
+                                    if (goalItem.Content is TimelineGoalBlock goal)
+                                    {
+                                        var goalClass = goalIndex % 2 == 0 ? "dc-timeline-goal dc-timeline-goal--left" : "dc-timeline-goal dc-timeline-goal--right";
+                                        goalIndex++;
+                                        var tags = goal.GoalTags != null ? string.Join(",", goal.GoalTags) : string.Empty;
+                                        <div class="@goalClass" data-tags="@tags">
+                                            <h3 class="dc-timeline-goal__title">@goal.GoalTitle</h3>
+                                            @if (!goal.GoalDescription.IsEmptyHtmlString())
+                                            {
+                                                <div class="dc-timeline-goal__body">
+                                                    @Html.Raw(goal.GoalDescription?.ToHtmlString())
+                                                </div>
+                                            }
+                                            @if (goal.GoalTags != null && goal.GoalTags.Any())
+                                            {
+                                                <ul class="dc-timeline-tags">
+                                                    @foreach (var tag in goal.GoalTags)
+                                                    {
+                                                        <li class="dc-timeline-tag">@tag</li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </dc-timeline>
+    </div>
+}
