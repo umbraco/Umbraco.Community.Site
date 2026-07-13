@@ -35,3 +35,16 @@ The Block Restrictions package (`UmbracoCommunity.BlockRestrictions`) owns its o
 The footgun: the migrations must run *after* Umbraco has finished its own startup — and crucially **not** from an `IHostedService`. On a fresh install Umbraco runs its unattended installer during host startup to create and populate the SQLite database; a hosted service runs concurrently with that installer and can block on the SQLite write lock for several minutes (issue #132). Deferring to `UmbracoApplicationStartedNotification` guarantees Umbraco has finished its own database setup before the package touches the file.
 
 If you add another package that owns its own schema, follow the same pattern: `DbContext` + migrations inside the Razor Class Library, applied from `UmbracoApplicationStartedNotification`, so the host project consumes the package without wiring anything up — and without racing the installer.
+
+## Registering a New Backoffice Client Project
+
+Every Razor Class Library with its own backoffice `Client/` folder (Vite project building a dashboard/property editor, e.g. `UmbracoCommunity.BlockRestrictions`, `Umbraco.Community.NotFoundTracker`, `UmbracoCommunity.Extensions`, `UmbracoCommunity.BlogAnnouncements`) must be registered in **multiple independent places**. Missing one is a silent failure: local dev, `dotnet build`, and even `node build.mjs local` can all succeed while the dashboard simply never reaches a real environment.
+
+1. **Root `build.mjs`** — add to the `projects` map, and add a `buildProject("Name", "build")` call in both `runDev` and `runLocal`. This drives local dev (`node build.mjs dev`) and the local cloud-build simulation (`node build.mjs local`).
+2. **`.github/workflows/cloud-artifact.yml`** — add a dedicated `npm ci && npm run build` step for the new `Client/` folder, mirroring the existing steps for the other packages. **This list is hand-written and does not read from `build.mjs`.** It's the actual Umbraco Cloud deployment artifact builder, so skipping this step means the dashboard JS is silently absent from every Cloud deploy even though the deploy itself reports success.
+3. **`.gitignore`** — add a `/src/<Project>/wwwroot/App_Plugins/` entry (see the existing entries for the other packages). The Vite build output shouldn't be committed; it's rebuilt by `build.mjs` locally and by the workflow step above for Cloud.
+4. **`BUILD.md`** — update the project count/table so the docs stay accurate.
+
+Found the hard way on 2026-07-13: `UmbracoCommunity.BlogAnnouncements/Client` was registered in `build.mjs` and `.gitignore` but not in `cloud-artifact.yml`. The Blog Announcements dashboard merged cleanly and "deployed successfully" to staging, but never appeared in the backoffice because its JS bundle was missing from the deployment zip.
+
+When adding a new project like this, it's fastest to grep both `build.mjs` and `cloud-artifact.yml` for an existing project name (e.g. `NotFoundTracker`) to find every place it's wired up, and mirror each one for the new project.

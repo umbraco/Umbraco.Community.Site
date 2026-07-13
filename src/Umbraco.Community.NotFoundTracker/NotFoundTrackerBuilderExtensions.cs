@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Community.NotFoundTracker.Configuration;
 using Umbraco.Community.NotFoundTracker.Controllers;
@@ -93,16 +93,10 @@ public static class NotFoundTrackerBuilderExtensions
         // Content finder. The host must register an INotFoundPageResolver.
         builder.SetContentLastChanceFinder<NotFoundTrackingContentFinder>();
 
-        // Swagger document for the management API.
-        builder.Services.Configure<SwaggerGenOptions>(opt =>
-        {
-            opt.SwaggerDoc(Constants.ApiName, new OpenApiInfo
-            {
-                Title = "Umbraco Community NotFoundTracker Backoffice API",
-                Version = "1.0",
-            });
-            opt.OperationFilter<NotFoundTrackerOperationSecurityFilter>();
-        });
+        // OpenAPI document for the management API.
+        builder.AddBackOfficeOpenApiDocument(Constants.ApiName, doc => doc
+            .WithTitle("Umbraco Community NotFoundTracker Backoffice API")
+            .WithBackOfficeAuthentication());
 
         return builder;
     }

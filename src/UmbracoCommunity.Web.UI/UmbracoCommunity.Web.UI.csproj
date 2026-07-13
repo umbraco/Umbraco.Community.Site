@@ -13,9 +13,11 @@
     <PackageReference Include="Flip.Umbraco" />
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" />
     <PackageReference Include="Umbraco.Cms" />
+    <PackageReference Include="Umbraco.Automate" />
     <PackageReference Include="Umbraco.Community.BlockPreview" />
     <PackageReference Include="Umbraco.Community.Contentment" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" />
+    <PackageReference Include="Umbraco.Deploy.Automate" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" /> -->
     <PackageReference Include="Umbraco.Forms" />
     <PackageReference Include="Umbraco.Forms.Deploy" />

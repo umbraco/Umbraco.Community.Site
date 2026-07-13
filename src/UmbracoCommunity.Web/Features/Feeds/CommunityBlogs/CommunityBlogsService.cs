@@ -41,7 +41,25 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         _cacheFilePath = Path.Combine(cacheDir, "community-blogs.json");
     }
 
+    // Serialises refresh cycles: the periodic timer never overlaps itself (awaited loop), but the
+    // dashboard's manual "Poll now" can arrive mid-cycle — it then waits its turn instead of
+    // running the fetch/detection/localization pipeline concurrently.
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
+
     public async Task RefreshAsync(CancellationToken cancellationToken = default)
+    {
+        await _refreshGate.WaitAsync(cancellationToken);
+        try
+        {
+            await RefreshCoreAsync(cancellationToken);
+        }
+        finally
+        {
+            _refreshGate.Release();
+        }
+    }
+
+    private async Task RefreshCoreAsync(CancellationToken cancellationToken)
     {
         var data = await _aggregator.BuildAsync(cancellationToken);
         if (data is null)
@@ -62,7 +80,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
 
         data = await _imageDownloader.LocalizeAsync(data, cancellationToken);
 
-        var primaryDuration = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.RefreshIntervalInHours));
+        var primaryDuration = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
         _cache.Set(PrimaryCacheKey, data, primaryDuration);
         _cache.Set(StaleCacheKey, data, new MemoryCacheEntryOptions { SlidingExpiration = StaleFallbackDuration });
 
@@ -86,7 +104,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
         {
             // Reseed the primary cache too, so subsequent requests in this window don't each
             // re-read the file synchronously until the next background refresh runs.
-            var primaryDuration = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.RefreshIntervalInHours));
+            var primaryDuration = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
             _cache.Set(PrimaryCacheKey, disk, primaryDuration);
             _cache.Set(StaleCacheKey, disk, new MemoryCacheEntryOptions { SlidingExpiration = StaleFallbackDuration });
             return disk;

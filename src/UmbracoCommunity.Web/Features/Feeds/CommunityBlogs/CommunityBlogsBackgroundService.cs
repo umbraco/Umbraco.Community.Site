@@ -25,7 +25,7 @@ public sealed class CommunityBlogsBackgroundService : BackgroundService
     {
         await RefreshSafelyAsync(stoppingToken);
 
-        var interval = TimeSpan.FromHours(Math.Max(1, _options.CurrentValue.RefreshIntervalInHours));
+        var interval = TimeSpan.FromMinutes(Math.Max(5, _options.CurrentValue.RefreshIntervalInMinutes));
         using var timer = new PeriodicTimer(interval);
 
         try

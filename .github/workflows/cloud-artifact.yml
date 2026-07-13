@@ -97,6 +97,12 @@ jobs:
         run: npm ci && npm run build
         shell: bash
 
+      # build the blog announcements client assets (backoffice dashboard)
+      - name: Build blog announcements client
+        working-directory: src/UmbracoCommunity.BlogAnnouncements/Client
+        run: npm ci && npm run build
+        shell: bash
+
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code
         run: |

@@ -9,13 +9,14 @@
         "contentElementTypeKey": "02b35132-a7d4-46eb-b6d5-feb87b228895",
         "allowAtRoot": true,
         "allowInAreas": true,
-        "inlineEditing": true
+        "inlineEditing": false,
+        "label": "${title || \u0022Accordion item\u0022}"
       }
     ],
     "validationLimit": {
       "min": 1
     },
-    "useLiveEditing": true
+    "useLiveEditing": false
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
   "Udi": "umb://data-type/d38f5bd232b64a4d90b5a55d68445a0f",
