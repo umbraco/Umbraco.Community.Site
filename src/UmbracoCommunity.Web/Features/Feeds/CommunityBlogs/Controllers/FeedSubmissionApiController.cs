@@ -54,18 +54,12 @@ public class FeedSubmissionApiController : ControllerBase
             var posts = (result?.Data ?? [])
                 .Select(post => post with
                 {
-                    CoverImageUrl = ResolveToAbsolute(post.CoverImageUrl),
+                    CoverImageUrl = _imageProxy.CreateProxyUrl(ResolveToAbsolute(post.CoverImageUrl)),
                     Author = post.Author is null
                         ? null
-                        : post.Author with { AvatarUrl = ResolveToAbsolute(post.Author.AvatarUrl) },
+                        : post.Author with { AvatarUrl = _imageProxy.CreateProxyUrl(ResolveToAbsolute(post.Author.AvatarUrl)) },
                 })
                 .ToList();
-
-            // The image proxy only serves URLs it's seen returned from a preview call for this client —
-            // register them here so the cards this response describes can actually load their images.
-            _imageProxy.RegisterAllowedUrls(
-                ClientKey,
-                posts.SelectMany(post => new[] { post.CoverImageUrl, post.Author?.AvatarUrl }));
 
             return Ok(posts);
         }
@@ -157,9 +151,9 @@ public class FeedSubmissionApiController : ControllerBase
     /// for the SSRF guard on the caller-supplied URL.
     /// </summary>
     [HttpGet("image-proxy")]
-    public async Task<IActionResult> ImageProxy([FromQuery] string url, CancellationToken cancellationToken)
+    public async Task<IActionResult> ImageProxy([FromQuery] string token, CancellationToken cancellationToken)
     {
-        var result = await _imageProxy.FetchAsync(ClientKey, url, cancellationToken);
+        var result = await _imageProxy.FetchAsync(token, cancellationToken);
         if (result is null)
         {
             return NotFound();
@@ -168,10 +162,6 @@ public class FeedSubmissionApiController : ControllerBase
         Response.Headers.CacheControl = "private, max-age=600";
         return File(result.Value.Bytes, result.Value.ContentType);
     }
-
-    /// <summary>Same per-IP identity the rate limiter partitions on — not spoof-proof, but consistent with the
-    /// existing precedent in this controller, and the image proxy's allowlist doesn't need to be stronger than that.</summary>
-    private string ClientKey => HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
     private static bool IsValidFeedUrl(string? feedUrl) =>
         Uri.TryCreate(feedUrl, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https";

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -13,70 +15,77 @@ namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 /// clicks and multiple cards from the same author don't re-fetch the same URL.
 ///
 /// This is a caller-supplied-URL proxy, so it's guarded against being turned into an open image relay or an
-/// SSRF probe: <see cref="IsAllowed"/> only permits a URL that was actually returned by a recent preview call
-/// for the same client (registered via <see cref="RegisterAllowedUrls"/>), plus a narrow trusted-domain
-/// exception for GitHub's own avatar CDN (the only client-constructed URL that never appears in a Sphere
-/// response). The actual fetch pins the connection to a pre-validated public IP via
-/// <see cref="PublicNetworkGuard"/> (both directly and via the ConnectCallback configured in
-/// <c>RegisterFeeds</c>) so there's no DNS-rebinding window, and redirects are disabled end-to-end (including
-/// in the curl fallback) so a same-request redirect to an internal address can't bypass the IP check either.
+/// SSRF probe. Authorization is a self-contained, tamper-proof <see cref="IDataProtector"/>-signed token
+/// (created via <see cref="CreateProxyUrl"/> at the moment a URL is put in front of a client, verified via
+/// <see cref="FetchAsync"/>) rather than a server-side "recently seen" allowlist keyed by client IP — behind a
+/// reverse proxy/CDN (e.g. Azure Front Door in front of Umbraco Cloud) or more than one app instance,
+/// <c>RemoteIpAddress</c> isn't reliably the same value across the preview call and the image requests it
+/// triggers, so an IP-keyed allowlist silently 404s every image in production even though it works locally.
+/// The actual fetch pins the connection to a pre-validated public IP via <see cref="PublicNetworkGuard"/>
+/// (both directly and via the ConnectCallback configured in <c>RegisterFeeds</c>) so there's no DNS-rebinding
+/// window, and redirects are disabled end-to-end (including in the curl fallback) so a same-request redirect
+/// to an internal address can't bypass the IP check either.
 /// </summary>
 public sealed class FeedSubmissionImageProxyService
 {
+    private const string DataProtectionPurpose = "UmbracoCommunity.FeedSubmissionImageProxy.v1";
     private const long MaxBytes = 5_000_000;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
-    private static readonly TimeSpan AllowlistDuration = TimeSpan.FromMinutes(15);
 
     private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/tiff", "image/svg+xml",
     };
 
-    private static readonly HashSet<string> TrustedAvatarHosts = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "github.com", "avatars.githubusercontent.com",
-    };
-
     private readonly HttpClient _http;
     private readonly IMemoryCache _cache;
+    private readonly IDataProtector _protector;
     private readonly ILogger<FeedSubmissionImageProxyService> _logger;
 
     public FeedSubmissionImageProxyService(
-        FeedSubmissionImageProxyHttpClient typedClient, IMemoryCache cache, ILogger<FeedSubmissionImageProxyService> logger)
+        FeedSubmissionImageProxyHttpClient typedClient,
+        IMemoryCache cache,
+        IDataProtectionProvider dataProtectionProvider,
+        ILogger<FeedSubmissionImageProxyService> logger)
     {
         _http = typedClient.Client;
         _cache = cache;
+        _protector = dataProtectionProvider.CreateProtector(DataProtectionPurpose);
         _logger = logger;
     }
 
-    /// <summary>Remembers the cover/avatar URLs a preview call returned for <paramref name="clientKey"/>, so the proxy will serve them.</summary>
-    public void RegisterAllowedUrls(string clientKey, IEnumerable<string?> urls)
+    /// <summary>
+    /// Builds the proxied URL for an absolute image URL that just appeared in a preview response — a signed
+    /// token carrying the source URL, so <see cref="FetchAsync"/> can later verify it without any shared state.
+    /// Returns null unchanged if <paramref name="absoluteUrl"/> is null/empty.
+    /// </summary>
+    public string? CreateProxyUrl(string? absoluteUrl)
     {
-        var cacheKey = AllowlistCacheKey(clientKey);
-        var set = _cache.GetOrCreate(cacheKey, _ => new HashSet<string>())!;
-        foreach (var url in urls)
-        {
-            if (!string.IsNullOrEmpty(url))
-            {
-                set.Add(url);
-            }
-        }
-
-        // Re-set to refresh the sliding expiration window on every preview call.
-        _cache.Set(cacheKey, set, new MemoryCacheEntryOptions { SlidingExpiration = AllowlistDuration });
-    }
-
-    /// <summary>Returns the image bytes and content type for <paramref name="url"/>, or null if it can't be safely fetched.</summary>
-    public async Task<(byte[] Bytes, string ContentType)?> FetchAsync(string clientKey, string url, CancellationToken cancellationToken)
-    {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
+        if (string.IsNullOrEmpty(absoluteUrl))
         {
             return null;
         }
 
-        if (!IsAllowed(clientKey, uri))
+        var token = _protector.Protect(absoluteUrl);
+        return $"/api/feed-submission/image-proxy?token={Uri.EscapeDataString(token)}";
+    }
+
+    /// <summary>Returns the image bytes and content type for the URL encoded in <paramref name="token"/>, or null if it can't be safely fetched.</summary>
+    public async Task<(byte[] Bytes, string ContentType)?> FetchAsync(string token, CancellationToken cancellationToken)
+    {
+        string url;
+        try
         {
-            _logger.LogWarning("Refusing to proxy {Uri}: not part of a recent preview response for this client.", uri);
+            url = _protector.Unprotect(token);
+        }
+        catch (CryptographicException)
+        {
+            _logger.LogWarning("Refusing to proxy: token failed to unprotect (tampered, expired key ring, or not ours).");
+            return null;
+        }
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
+        {
             return null;
         }
 
@@ -101,19 +110,6 @@ public sealed class FeedSubmissionImageProxyService
 
         return result;
     }
-
-    private bool IsAllowed(string clientKey, Uri uri)
-    {
-        if (TrustedAvatarHosts.Contains(uri.Host) && uri.Scheme == Uri.UriSchemeHttps)
-        {
-            return true;
-        }
-
-        return _cache.TryGetValue(AllowlistCacheKey(clientKey), out HashSet<string>? allowed)
-            && allowed!.Contains(uri.ToString());
-    }
-
-    private static string AllowlistCacheKey(string clientKey) => $"feed-submission-allowed-images:{clientKey}";
 
     private async Task<(byte[] Bytes, string ContentType)?> DownloadAsync(Uri uri, IPAddress address, CancellationToken cancellationToken)
     {
