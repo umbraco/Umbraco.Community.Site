@@ -32,3 +32,8 @@ public static class SphereJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web);
 }
+
+/// <summary>Error envelope Sphere returns on a non-success response, e.g. <c>{"error":{"code":"invalid_feed","message":"..."}}</c>.</summary>
+public sealed record SphereErrorEnvelope(SphereErrorDetail? Error);
+
+public sealed record SphereErrorDetail(string? Code, string? Message);

@@ -21,33 +21,35 @@
       "Alias": "featuredOnly",
       "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
       "ValueType": "System.Boolean",
-      "Name": "Show featured posts only (no paging)",
-      "Description": "When on, shows the latest posts as a teaser with a 'Read more' link and no pagination."
+      "Description": "When on, shows the latest posts as a teaser with a \u0027Read more\u0027 link and no pagination.",
+      "Name": "Show featured posts only (no paging)"
     },
     {
       "Key": "ef58c966-85c4-403f-b7c3-805fc2f51142",
       "Alias": "numberOfFeaturedPosts",
       "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "ValueType": "System.Int32",
+      "Description": "How many posts to show in featured mode (default 6, max 12).",
       "Name": "Number of featured posts",
-      "Description": "How many posts to show in featured mode (default 6, max 12)."
+      "SortOrder": 1
     },
     {
       "Key": "ffdcb710-1567-4ff0-a306-1d397dc2f46c",
       "Alias": "postsPerPage",
       "DataType": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "ValueType": "System.Int32",
-      "Name": "Posts Per Page"
+      "Name": "Posts Per Page",
+      "SortOrder": 2
     }
   ],
   "Udi": "umb://document-type/527ea1d78b3046299695b2f75e44448a",
   "Dependencies": [
     {
-      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/2e6d3631066e44b8aec496f09099b2b5",
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
       "Ordering": true
     },
     {
@@ -64,5 +66,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.0.0"
 }

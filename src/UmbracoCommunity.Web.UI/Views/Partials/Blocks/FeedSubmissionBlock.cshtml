@@ -1,0 +1,53 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@using UmbracoCommunity.Web.Models.PublishedModels
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridItem<FeedSubmissionBlock, SettingsFeedSubmissionBlock>>
+@*
+    Depends on Models Builder codegen: this view only compiles once the FeedSubmissionBlock element
+    type and SettingsFeedSubmissionBlock settings type have been created in the backoffice and models
+    regenerated.
+*@
+@{
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+}
+
+@if (hasBg)
+{
+    <style asp-add-nonce="true">
+        #@Model.Content.IdHash {
+            --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+        }
+    </style>
+}
+
+<section class="dc-feed-submission-block @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
+         id="@Model.Content.IdHash">
+    <div class="dc-feed-submission-block__intro align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+    </div>
+
+    @if (!Model.Content.Guidance.IsEmptyHtmlString())
+    {
+        <div class="dc-feed-submission-block__guidance">
+            @Html.Raw(Model.Content.Guidance?.ToHtmlString())
+        </div>
+    }
+
+    <dc-feed-submission></dc-feed-submission>
+
+    @if (Context.Request.IsBlockPreviewRequest())
+    {
+        <div class="dc-feed-submission-block__msg">
+            <p>-- Feed submission form renders on the live site --</p>
+        </div>
+    }
+</section>
