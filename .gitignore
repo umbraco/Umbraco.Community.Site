@@ -454,6 +454,7 @@ App_Data/
 /src/UmbracoCommunity.Extensions/wwwroot/App_Plugins/
 /src/UmbracoCommunity.BlockRestrictions/wwwroot/App_Plugins/
 /src/Umbraco.Community.NotFoundTracker/wwwroot/App_Plugins/
+/src/UmbracoCommunity.BlogAnnouncements/wwwroot/App_Plugins/
 .claude
 .mcp.json
 src/UmbracoCommunity.Web.UI/Hangfire.db*

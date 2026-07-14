@@ -1,14 +1,10 @@
-using Asp.Versioning;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Api.Management.OpenApi;
-using Umbraco.Cms.Api.Common.OpenApi;
 
 namespace UmbracoCommunity.Extensions.Composers
 {
@@ -16,58 +12,39 @@ namespace UmbracoCommunity.Extensions.Composers
     {
         public void Compose(IUmbracoBuilder builder)
         {
+            // Related documentation:
+            // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api
+            // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/adding-a-custom-swagger-document
+            // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/versioning-your-api
+            // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/access-policies
 
-            builder.Services.AddSingleton<IOperationIdHandler, CustomOperationHandler>();
-
-            builder.Services.Configure<SwaggerGenOptions>(opt =>
-            {
-                // Related documentation:
-                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api
-                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/adding-a-custom-swagger-document
-                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/versioning-your-api
-                // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/access-policies
-
-                // Configure the Swagger generation options
-                // Add in a new Swagger API document solely for our own package that can be browsed via Swagger UI
-                // Along with having a generated swagger JSON file that we can use to auto generate a TypeScript client
-                opt.SwaggerDoc(Constants.ApiName, new OpenApiInfo
-                {
-                    Title = "Umbraco Community Extensions Backoffice API",
-                    Version = "1.0",
-                    // Contact = new OpenApiContact
-                    // {
-                    //     Name = "Some Developer",
-                    //     Email = "you@company.com",
-                    //     Url = new Uri("https://company.com")
-                    // }
-                });
-
-                // Enable Umbraco authentication for the "Example" Swagger document
-                // PR: https://github.com/umbraco/Umbraco-CMS/pull/15699
-                opt.OperationFilter<UmbracoCommunityExtensionsOperationSecurityFilter>();
-            });
+            // Add a dedicated OpenAPI document for our own package that can be browsed via Swagger UI,
+            // along with a generated swagger JSON file used to auto-generate a TypeScript client.
+            // WithBackOfficeAuthentication() enables Umbraco backoffice auth for this document.
+            builder.AddBackOfficeOpenApiDocument(Constants.ApiName, doc => doc
+                .WithTitle("Umbraco Community Extensions Backoffice API")
+                .WithBackOfficeAuthentication()
+                .ConfigureOpenApiOptions(options =>
+                    // Registered after Umbraco's default UmbracoOperationIdTransformer so it wins,
+                    // giving our controllers concise operation IDs (just the action name).
+                    options.AddOperationTransformer<CustomOperationIdTransformer>()));
         }
 
-        public class UmbracoCommunityExtensionsOperationSecurityFilter : BackOfficeSecurityRequirementsOperationFilterBase
-        {
-            protected override string ApiName => Constants.ApiName;
-        }
-
-        // This is used to generate nice operation IDs in our swagger json file
-        // So that the gnerated TypeScript client has nice method names and not too verbose
+        // Generates nice, short operation IDs for our controllers so the generated TypeScript
+        // client has concise (not overly verbose) method names.
         // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
-        public class CustomOperationHandler : OperationIdHandler
+        private sealed class CustomOperationIdTransformer : IOpenApiOperationTransformer
         {
-            public CustomOperationHandler(IOptions<ApiVersioningOptions> apiVersioningOptions) : base(apiVersioningOptions)
+            public Task TransformAsync(OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellationToken)
             {
-            }
+                if (context.Description.ActionDescriptor is ControllerActionDescriptor descriptor &&
+                    descriptor.ControllerTypeInfo.Namespace?.StartsWith("UmbracoCommunity.Extensions.Controllers", StringComparison.InvariantCultureIgnoreCase) is true)
+                {
+                    operation.OperationId = descriptor.ActionName;
+                }
 
-            protected override bool CanHandle(ApiDescription apiDescription, ControllerActionDescriptor controllerActionDescriptor)
-            {
-                return controllerActionDescriptor.ControllerTypeInfo.Namespace?.StartsWith("UmbracoCommunity.Extensions.Controllers", comparisonType: StringComparison.InvariantCultureIgnoreCase) is true;
+                return Task.CompletedTask;
             }
-
-            public override string Handle(ApiDescription apiDescription) => $"{apiDescription.ActionDescriptor.RouteValues["action"]}";
         }
     }
 }

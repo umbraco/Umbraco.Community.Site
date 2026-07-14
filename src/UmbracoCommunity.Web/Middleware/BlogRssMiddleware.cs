@@ -1,4 +1,6 @@
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
@@ -142,9 +144,13 @@ public partial class BlogRssMiddleware
         context.Response.Headers.CacheControl = "public, max-age=3600";
         context.Response.StatusCode = 200;
 
-        using var writer = new StringWriter();
-        doc.Save(writer);
-        await context.Response.WriteAsync(writer.ToString());
+        using var stream = new MemoryStream();
+        using (var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Encoding = new UTF8Encoding(false) }))
+        {
+            doc.Save(xmlWriter);
+        }
+
+        await context.Response.Body.WriteAsync(stream.ToArray());
     }
 
     private static partial class HtmlTagPattern

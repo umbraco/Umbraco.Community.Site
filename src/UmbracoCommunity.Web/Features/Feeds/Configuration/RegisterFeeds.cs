@@ -58,6 +58,5 @@ public sealed class RegisterFeeds : IComposer
         builder.Services.AddExamineLuceneIndex(CommunityBlogsSearchIndexer.IndexName);
         builder.Services.AddSingleton<ICommunityBlogsIndexer, CommunityBlogsSearchIndexer>();
         builder.Services.AddSingleton<ICommunityBlogsService, CommunityBlogsService>();
-        builder.Services.AddHostedService<CommunityBlogsBackgroundService>();
     }
 }

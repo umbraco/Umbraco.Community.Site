@@ -22,7 +22,7 @@ Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of
 
 ## Solution Structure
 
-The solution consists of 6 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 7 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
@@ -30,6 +30,7 @@ The solution consists of 6 projects (uses Central Package Management via `Direct
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
 - **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 - **Umbraco.Community.NotFoundTracker** - 404 tracking with ignore rules and a dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **UmbracoCommunity.BlogAnnouncements** - Discord blog-post announcement pipeline (detection, delivery, tracking store) and its dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 
 ### Key Directories in UmbracoCommunity.Web
 
@@ -386,6 +387,34 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Slider variant defines `--blog-showcase-slide-width` per breakpoint (1 / 2 / 3 cards + 20% peek at base / `--sm` / `--md`), with column-gap of `var(--unit)`
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
+
+### Timeline Block
+
+A roadmap-style block for surfacing phased goals/milestones. Editors create one or more `TimelineEntryBlock` children (each representing a phase label such as "Now", "Next", "Future"), each containing a list of `TimelineGoalBlock` items with a title, optional rich text, and optional tags.
+
+**Content Properties** (`TimelineBlock`):
+- `Title` / `Subtitle` — via `IContentBlockIntro` mixin
+- `TimelineEntries` (BlockGridModel) — ordered list of `TimelineEntryBlock` children
+
+**Entry** (`TimelineEntryBlock`):
+- `EntryTitle` — phase label (rendered as a centred pill on the vertical road line)
+- `TimelineGoalItems` (BlockListModel) — ordered list of `TimelineGoalBlock` children
+
+**Goal** (`TimelineGoalBlock`):
+- `GoalTitle` (string) — card heading
+- `GoalDescription` (IHtmlEncodedString) — optional rich text body
+- `GoalTags` (List\<string\>) — optional tag pills; also drive the filter dropdown
+
+**Frontend** (`src/UmbracoCommunity.StaticAssets/src/components/timeline/dc-timeline.element.ts`):
+- `<dc-timeline>` — lightweight custom element; wires the `[data-timeline-filter]` select to show/hide `.dc-timeline-goal` cards by `data-tags` attribute
+
+**Layout** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/timeline-block.css`):
+- Mobile: single column, no road line
+- `--sm`+: vertical pink center line (`::before` on `.dc-timeline`), goals in a 2-column CSS grid (`grid-column: 1` / `2`), pink connector lines (`::after` / `::before` on goal cards) bridging each card to the road. Left connectors attach at `top: 1.5rem`, right connectors at `top: 3.5rem` so they don't join the road at the same point.
+- First goal in each entry always starts left (the `goalIndex` counter resets to 0 inside the `@for` loop, not outside it)
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/TimelineEntryBlock.cshtml`):
+- Renders a single entry (not the full block); always 2-column grid in the preview column, no road line or filter
 
 ### Rich Text Editor Style Menu
 

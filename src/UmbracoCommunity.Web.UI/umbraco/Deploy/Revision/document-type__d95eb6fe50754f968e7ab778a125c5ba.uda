@@ -1,0 +1,62 @@
+{
+  "Name": "Timeline goal block",
+  "Alias": "timelineGoalBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-check",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/5c473ee9fa4f4336a415f0e24c4865ab",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "246f9d1d-e081-40f4-9ed1-51ce30efdfc8",
+      "Alias": "goalTitle",
+      "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "ValueType": "System.String",
+      "Mandatory": true,
+      "Name": "Goal title"
+    },
+    {
+      "Key": "4e129bbd-1fe9-47af-be88-23ea79986215",
+      "Alias": "goalTags",
+      "DataType": "umb://data-type/c7543f5a63854f43a97d04019c765574",
+      "ValueType": "System.Collections.Generic.IEnumerable\u003CSystem.String\u003E",
+      "Name": "Goal tags",
+      "SortOrder": 2
+    },
+    {
+      "Key": "5b95c022-2d53-46c7-855d-674f3ba103d2",
+      "Alias": "goalDescription",
+      "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+      "Name": "Goal description",
+      "SortOrder": 1
+    }
+  ],
+  "Udi": "umb://document-type/d95eb6fe50754f968e7ab778a125c5ba",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c7543f5a63854f43a97d04019c765574",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/5c473ee9fa4f4336a415f0e24c4865ab",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

@@ -134,7 +134,6 @@
     color: var(--color-blue);
     border-left: none;
     margin: var(--unit-sm) 0;
-    min-height: 320px;
 
     .row-item-image {
         position: relative;
