@@ -211,14 +211,7 @@ export class FeedSubmissionElement extends LitElement {
     const { iso, display } = this.#formatDate(post.publishedAt);
     const excerpt = this.#excerpt(post.content);
     const authorName = post.author?.name;
-    // Sphere's preview endpoint accepts a `github` field but doesn't yet honour it in the returned
-    // avatarUrl (verified directly against the live API — same avatarUrl with or without it), so a
-    // submitted GitHub username is enforced client-side instead. Uses avatars.githubusercontent.com
-    // directly (not github.com/{user}.png, which 302s there) since the image proxy disables redirects.
-    const githubUsername = this._formValues.githubUsername;
-    const avatarUrl = githubUsername
-      ? `https://avatars.githubusercontent.com/${encodeURIComponent(githubUsername)}`
-      : post.author?.avatarUrl;
+    const avatarUrl = post.author?.avatarUrl;
     const coverPlaceholder = "/img/community-blogs/placeholder-cover.svg";
     const avatarPlaceholder = "/img/community-blogs/placeholder-avatar.svg";
     return html`
