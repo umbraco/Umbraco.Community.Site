@@ -50,7 +50,7 @@ public class FeedSubmissionApiController : ControllerBase
 
         try
         {
-            var result = await _sphereClient.PreviewFeedAsync(request.FeedUrl!, request.Name, PreviewPostLimit, cancellationToken);
+            var result = await _sphereClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
             var posts = (result?.Data ?? [])
                 .Select(post => post with
                 {
