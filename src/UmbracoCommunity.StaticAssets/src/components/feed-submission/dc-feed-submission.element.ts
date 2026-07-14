@@ -211,14 +211,7 @@ export class FeedSubmissionElement extends LitElement {
     const { iso, display } = this.#formatDate(post.publishedAt);
     const excerpt = this.#excerpt(post.content);
     const authorName = post.author?.name;
-    // Sphere's preview endpoint has no `github` parameter (unlike submit), so it can never return a GitHub
-    // avatar for a live preview — substitute it client-side from the form field so the preview reflects what
-    // the card will actually look like once the submission is accepted. Uses avatars.githubusercontent.com
-    // directly (not github.com/{user}.png, which 302s there) since the image proxy disables redirects.
-    const githubUsername = this._formValues.githubUsername;
-    const avatarUrl = githubUsername
-      ? `https://avatars.githubusercontent.com/${encodeURIComponent(githubUsername)}`
-      : post.author?.avatarUrl;
+    const avatarUrl = post.author?.avatarUrl;
     const coverPlaceholder = "/img/community-blogs/placeholder-cover.svg";
     const avatarPlaceholder = "/img/community-blogs/placeholder-avatar.svg";
     return html`

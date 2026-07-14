@@ -36,12 +36,12 @@ public sealed class SphereApiClient
     }
 
     /// <summary>Fetches-and-parses a feed URL without persisting, returning the posts it would produce.</summary>
-    public async Task<PostsResponseDto?> PreviewFeedAsync(string feedUrl, string? name, int limit, CancellationToken cancellationToken)
+    public async Task<PostsResponseDto?> PreviewFeedAsync(string feedUrl, string? name, string? github, int limit, CancellationToken cancellationToken)
     {
         using var response = await SendWithRetryAsync(
             () => new HttpRequestMessage(HttpMethod.Post, "blog-posts/preview")
             {
-                Content = CreateJsonContent(new { url = feedUrl, name = name ?? string.Empty, limit }),
+                Content = CreateJsonContent(new { url = feedUrl, name = name ?? string.Empty, github = github ?? string.Empty, limit }),
             },
             cancellationToken);
 
