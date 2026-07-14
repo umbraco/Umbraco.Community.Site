@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using AspNet.Security.OAuth.GitHub;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -14,12 +13,8 @@ public class RegisterGitHubAuth : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
-        var config = builder.Services
-            .BuildServiceProvider()
-            .GetRequiredService<IConfiguration>();
-
-        var clientId = config["GitHub:ClientId"] ?? string.Empty;
-        var clientSecret = config["GitHub:ClientSecret"] ?? string.Empty;
+        var clientId = builder.Config["GitHub:ClientId"] ?? string.Empty;
+        var clientSecret = builder.Config["GitHub:ClientSecret"] ?? string.Empty;
 
         if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             return;

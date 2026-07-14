@@ -437,7 +437,7 @@ Community members sign in exclusively via GitHub OAuth — no username/password 
 3. `UmbExternalLoginController.ExternalLoginCallback` handles the callback, auto-links or creates the member, and signs them in.
 
 **Header integration:**
-- `MenuViewModelBuilder` calls `IMemberManager.IsLoggedIn()` and — when signed in — populates `MemberDisplayName` and `MemberAvatarUrl`.
+- `MenuViewModelBuilder` checks `HttpContext.User.Identity.IsAuthenticated` via `IHttpContextAccessor` and — when signed in — populates `MemberDisplayName` and `MemberAvatarUrl` from the current user's claims.
 - `Menu.cshtml` renders a GitHub sign-in button (signed-out) or a circular avatar with a hover dropdown showing the display name and a sign-out form (signed-in). The `enableMemberSignIn` toggle on the tenant's Settings node controls visibility of both states.
 
 **Configuration:**

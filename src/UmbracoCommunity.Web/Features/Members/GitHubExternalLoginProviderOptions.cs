@@ -3,7 +3,7 @@ using Umbraco.Cms.Web.Common.Security;
 
 namespace UmbracoCommunity.Web.Features.Members;
 
-internal sealed class GitHubExternalLoginProviderOptions
+public sealed class GitHubExternalLoginProviderOptions
 {
     public const string SchemeName = "UmbracoMembers.GitHub";
     private const string MemberTypeAlias = "communityMember";

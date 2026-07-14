@@ -1,3 +1,4 @@
+@using UmbracoCommunity.Web.Features.Members
 @using UmbracoCommunity.Web.Models.ViewModels.Components
 @using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation
 @model MenuViewModel
@@ -147,7 +148,7 @@
             <div class="nav-end__item member-btn">
                 @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
                 {
-                    <input type="hidden" name="provider" value="UmbracoMembers.GitHub" />
+                    <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
                     <input type="hidden" name="returnUrl" value="@returnUrl" />
                     <button type="submit" class="btn is-white member-signin__btn">
                         <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
