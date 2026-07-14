@@ -192,14 +192,11 @@ export class FeedSubmissionElement extends LitElement {
     `;
   }
 
-  // Proxies a remote image through our own origin so it loads from 'self' with no CSP img-src relaxation —
-  // this is a live preview of an arbitrary feed's own domain, so the image can't be pre-localized like the
-  // persisted Community Blogs grid does. The proxy itself gracefully 404s (invalid host, oversized, non-image
-  // content-type, etc.); #onImageError below falls back to the placeholder when that happens.
-  #proxyImage(url: string): string {
-    return `/api/feed-submission/image-proxy?url=${encodeURIComponent(url)}`;
-  }
-
+  // coverImageUrl/avatarUrl already come back from the API as our own /image-proxy URLs (with a signed
+  // token) — the backend proxies the remote image through 'self' with no CSP img-src relaxation, since this
+  // is a live preview of an arbitrary feed's own domain and can't be pre-localized like the persisted
+  // Community Blogs grid. The proxy itself gracefully 404s (invalid host, oversized, non-image content-type,
+  // etc.); #onImageError below falls back to the placeholder when that happens.
   #onImageError(event: Event, placeholder: string) {
     const img = event.target as HTMLImageElement;
     if (img.src !== new URL(placeholder, location.href).href) {
@@ -223,7 +220,7 @@ export class FeedSubmissionElement extends LitElement {
       >
         <figure class="dc-community-blogs__media">
           <img
-            src=${post.coverImageUrl ? this.#proxyImage(post.coverImageUrl) : coverPlaceholder}
+            src=${post.coverImageUrl ?? coverPlaceholder}
             alt=""
             loading="lazy"
             @error=${(event: Event) => this.#onImageError(event, coverPlaceholder)}
@@ -232,7 +229,7 @@ export class FeedSubmissionElement extends LitElement {
         <div class="dc-community-blogs__content">
           <img
             class="dc-community-blogs__avatar"
-            src=${avatarUrl ? this.#proxyImage(avatarUrl) : avatarPlaceholder}
+            src=${avatarUrl ?? avatarPlaceholder}
             alt=""
             loading="lazy"
             @error=${(event: Event) => this.#onImageError(event, avatarPlaceholder)}
