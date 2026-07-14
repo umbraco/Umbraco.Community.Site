@@ -1,0 +1,122 @@
+.dc-feed-submission {
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+dc-feed-submission {
+  display: block;
+}
+
+.dc-feed-submission__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit);
+  max-width: 640px;
+  margin: var(--unit-md) auto 0;
+}
+
+.dc-feed-submission__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xxs);
+}
+
+.dc-feed-submission__field label {
+  font-weight: 600;
+  color: var(--color-blue);
+}
+
+.dc-feed-submission__optional {
+  font-weight: 400;
+  color: var(--color-dark-grey);
+}
+
+.dc-feed-submission__field input {
+  padding: 0.6rem 0.85rem;
+  font-size: 16px;
+  color: var(--color-dark);
+  background: var(--color-white);
+  border: 1px solid var(--color-light-grey);
+  border-radius: var(--border-radius-lg);
+  appearance: none;
+}
+
+.dc-feed-submission__field input:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-color: var(--color-identity-blue);
+}
+
+.dc-feed-submission__field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Honeypot: kept in the accessibility/tab flow visually off-screen (not display:none /
+   visibility:hidden) so naive bots that skip hidden fields still fall for it. */
+.dc-feed-submission__honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.dc-feed-submission__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--unit-xs);
+  margin-top: var(--unit-md);
+  margin-bottom: var(--unit-md);
+}
+
+.dc-feed-submission__empty {
+  text-align: center;
+  margin-top: var(--unit-md);
+  color: var(--color-light-blue);
+}
+
+.dc-feed-submission__status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--unit-xs);
+  padding: var(--unit-lg) var(--unit);
+}
+
+.dc-feed-submission__status h3 {
+  margin: 0;
+  color: var(--color-blue);
+}
+
+.dc-feed-submission__status p {
+  margin: 0;
+}
+
+.dc-feed-submission__status--error p,
+.dc-feed-submission__status--rejected p {
+  color: var(--color-red);
+}
+
+.dc-feed-submission__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-light-grey);
+  border-top-color: var(--color-identity-blue);
+  border-radius: 50%;
+  animation: dc-feed-submission-spin 0.8s linear infinite;
+}
+
+@keyframes dc-feed-submission-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-feed-submission__spinner {
+    animation-duration: 2s;
+  }
+}
