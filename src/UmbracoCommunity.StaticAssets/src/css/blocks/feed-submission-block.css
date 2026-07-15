@@ -77,8 +77,7 @@ dc-feed-submission {
   color: var(--color-blue);
 }
 
-.dc-feed-submission__preview-intro,
-.dc-feed-submission__note {
+.dc-feed-submission__preview-intro {
   text-align: center;
   margin: var(--unit-xs) auto 0;
   max-width: 640px;

@@ -260,18 +260,19 @@ export class FeedSubmissionElement extends LitElement {
 
   #renderPreview(): TemplateResult {
     const isListed = this._feedStatus === "listed";
+    const isPending = this._feedStatus === "pending";
     return html`
-      <h3 class="dc-feed-submission__preview-heading">Feed preview</h3>
-      <p class="dc-feed-submission__preview-intro">
-        Here's how your posts will look once imported — check they render the way you'd expect
-        before submitting.
-      </p>
       ${when(
         this._feedStatus === "pending",
-        () => html`<p class="dc-feed-submission__note">
-          This feed already has a pending submission — submitting again will update it with your
-          current name and GitHub username.
-        </p>`
+        () => html`<div
+          class="dc-feed-submission__status dc-feed-submission__status--callout"
+        >
+          <h3>Pending submission</h3>
+          <p>
+            This feed already has a pending submission. Submitting again will update it with your
+            current name and GitHub username.
+          </p>
+        </div>`
       )}
       ${when(
         isListed,
@@ -279,9 +280,13 @@ export class FeedSubmissionElement extends LitElement {
           class="dc-feed-submission__status dc-feed-submission__status--success dc-feed-submission__status--callout"
         >
           <h3>You're all set!</h3>
-          <p>This feed is already set up — we're pulling in its posts, so there's nothing left to do here.</p>
+          <p>This feed is already set up. We're pulling in its posts, so there's nothing left to do here.</p>
         </div>`
       )}
+      <h3 class="dc-feed-submission__preview-heading">Feed preview</h3>
+      <p class="dc-feed-submission__preview-intro">
+        Here's how your posts will look once imported. Check they render the way you'd expect.
+      </p>
       <div class="dc-feed-submission__actions">
         <button class="btn" type="button" @click=${this.#runPreview}>
           Check again
@@ -289,7 +294,7 @@ export class FeedSubmissionElement extends LitElement {
         ${when(
           !isListed,
           () => html`<button class="btn is-blue" type="button" @click=${this.#handleSubmitFeed}>
-            Submit for inclusion
+            ${isPending ? "Update my submission" : "Submit for inclusion"}
           </button>`
         )}
       </div>
