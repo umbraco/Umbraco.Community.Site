@@ -48,6 +48,17 @@ public sealed class SphereApiClient
         return await response.Content.ReadFromJsonAsync<PostsResponseDto>(SphereJsonOptions.Default, cancellationToken);
     }
 
+    /// <summary>Looks up whether a feed URL is already listed, has a pending submission, or neither.</summary>
+    public async Task<FeedSubmissionStatusResponseDto?> GetFeedSubmissionStatusAsync(string feedUrl, CancellationToken cancellationToken)
+    {
+        var requestUri = $"feed-submissions/status?url={Uri.EscapeDataString(feedUrl)}";
+        using var response = await SendWithRetryAsync(
+            () => new HttpRequestMessage(HttpMethod.Get, requestUri),
+            cancellationToken);
+
+        return await response.Content.ReadFromJsonAsync<FeedSubmissionStatusResponseDto>(SphereJsonOptions.Default, cancellationToken);
+    }
+
     /// <summary>Submits a feed URL for manual review (idempotent).</summary>
     public async Task<FeedSubmissionResponseDto?> SubmitFeedAsync(string feedUrl, string? name, string? github, CancellationToken cancellationToken)
     {

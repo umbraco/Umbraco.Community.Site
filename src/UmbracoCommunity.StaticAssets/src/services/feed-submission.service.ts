@@ -30,6 +30,14 @@ export interface FeedSubmissionResult {
   submittedAt: string | null;
 }
 
+/** Whether a feed URL is already listed, has a pending submission, or neither. */
+export type FeedListingStatus = "listed" | "pending" | "none";
+
+export interface FeedPreviewResult {
+  posts: FeedSubmissionPost[];
+  status: FeedListingStatus;
+}
+
 interface FeedSubmissionRequest {
   feedUrl: string;
   name?: string;
@@ -41,14 +49,15 @@ export class FeedSubmissionService extends ServiceBase {
   private static readonly BASE_URL = "/api/feed-submission";
 
   /**
-   * Fetches a preview of the posts a feed URL would produce, without persisting anything.
+   * Fetches a preview of the posts a feed URL would produce (without persisting anything), plus
+   * whether the feed is already listed, pending review, or neither.
    */
   static async preview(
     feedUrl: string,
     name?: string,
     githubUsername?: string,
     honeypot?: string
-  ): Promise<FeedSubmissionPost[]> {
+  ): Promise<FeedPreviewResult> {
     const response = await ServiceBase.post(
       `${this.BASE_URL}/preview`,
       this.#buildBody(feedUrl, name, githubUsername, honeypot)

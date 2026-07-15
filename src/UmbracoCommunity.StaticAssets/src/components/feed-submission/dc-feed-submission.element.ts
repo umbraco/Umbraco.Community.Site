@@ -6,6 +6,7 @@ import {
   type FeedSubmissionPost,
   type FeedSubmissionResult,
   type FeedSubmissionStatus,
+  type FeedListingStatus,
 } from "../../services/feed-submission.service.js";
 
 const elementName = "dc-feed-submission";
@@ -33,6 +34,9 @@ export class FeedSubmissionElement extends LitElement {
 
   @state()
   private _posts: FeedSubmissionPost[] = [];
+
+  @state()
+  private _feedStatus: FeedListingStatus = "none";
 
   @state()
   private _formValues: FeedSubmissionFormValues = { ...emptyForm };
@@ -71,12 +75,14 @@ export class FeedSubmissionElement extends LitElement {
     this._phase = "loading";
     this._errorMessage = "";
     try {
-      this._posts = await FeedSubmissionService.preview(
+      const result = await FeedSubmissionService.preview(
         feedUrl,
         name || undefined,
         githubUsername || undefined,
         honeypot
       );
+      this._posts = result.posts;
+      this._feedStatus = result.status;
       this._phase = "previewed";
     } catch (error) {
       this._errorMessage =
@@ -107,6 +113,7 @@ export class FeedSubmissionElement extends LitElement {
   #backToForm() {
     this._phase = "idle";
     this._errorMessage = "";
+    this._feedStatus = "none";
   }
 
   #formatDate(value: string): { iso: string; display: string } {
@@ -252,14 +259,39 @@ export class FeedSubmissionElement extends LitElement {
   }
 
   #renderPreview(): TemplateResult {
+    const isListed = this._feedStatus === "listed";
     return html`
+      <h3 class="dc-feed-submission__preview-heading">Feed preview</h3>
+      <p class="dc-feed-submission__preview-intro">
+        Here's how your posts will look once imported — check they render the way you'd expect
+        before submitting.
+      </p>
+      ${when(
+        this._feedStatus === "pending",
+        () => html`<p class="dc-feed-submission__note">
+          This feed already has a pending submission — submitting again will update it with your
+          current name and GitHub username.
+        </p>`
+      )}
+      ${when(
+        isListed,
+        () => html`<div
+          class="dc-feed-submission__status dc-feed-submission__status--success dc-feed-submission__status--callout"
+        >
+          <h3>You're all set!</h3>
+          <p>This feed is already set up — we're pulling in its posts, so there's nothing left to do here.</p>
+        </div>`
+      )}
       <div class="dc-feed-submission__actions">
         <button class="btn" type="button" @click=${this.#runPreview}>
           Check again
         </button>
-        <button class="btn is-blue" type="button" @click=${this.#handleSubmitFeed}>
-          Submit for inclusion
-        </button>
+        ${when(
+          !isListed,
+          () => html`<button class="btn is-blue" type="button" @click=${this.#handleSubmitFeed}>
+            Submit for inclusion
+          </button>`
+        )}
       </div>
       ${this._posts.length === 0
         ? html`<p class="dc-feed-submission__empty">

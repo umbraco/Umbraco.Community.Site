@@ -34,13 +34,13 @@ public class FeedSubmissionApiController : ControllerBase
 
     /// <summary>Previews how a feed URL would render as Community Blog cards, without persisting anything.</summary>
     [HttpPost("preview")]
-    [ProducesResponseType(typeof(IReadOnlyList<PublicPostDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FeedPreviewResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Preview([FromBody] FeedSubmissionRequest request, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrEmpty(request.Honeypot))
         {
-            return Ok(Array.Empty<PublicPostDto>());
+            return Ok(new FeedPreviewResponse(Array.Empty<PublicPostDto>(), "none"));
         }
 
         if (!IsValidFeedUrl(request.FeedUrl))
@@ -50,8 +50,11 @@ public class FeedSubmissionApiController : ControllerBase
 
         try
         {
-            var result = await _sphereClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
-            var posts = (result?.Data ?? [])
+            var previewTask = _sphereClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
+            var statusTask = GetFeedStatusAsync(request.FeedUrl!, cancellationToken);
+            await Task.WhenAll(previewTask, statusTask);
+
+            var posts = (previewTask.Result?.Data ?? [])
                 .Select(post => post with
                 {
                     CoverImageUrl = _imageProxy.CreateProxyUrl(ResolveToAbsolute(post.CoverImageUrl)),
@@ -61,7 +64,7 @@ public class FeedSubmissionApiController : ControllerBase
                 })
                 .ToList();
 
-            return Ok(posts);
+            return Ok(new FeedPreviewResponse(posts, statusTask.Result));
         }
         catch (SphereApiException ex) when (!ex.IsServerError)
         {
@@ -161,6 +164,24 @@ public class FeedSubmissionApiController : ControllerBase
 
         Response.Headers.CacheControl = "private, max-age=600";
         return File(result.Value.Bytes, result.Value.ContentType);
+    }
+
+    /// <summary>
+    /// Looks up the feed's current submission status, defaulting to "none" on failure — this is a best-effort
+    /// enhancement to the preview and shouldn't fail the whole preview if it errors.
+    /// </summary>
+    private async Task<string> GetFeedStatusAsync(string feedUrl, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _sphereClient.GetFeedSubmissionStatusAsync(feedUrl, cancellationToken);
+            return result?.Status ?? "none";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch feed submission status; defaulting to none");
+            return "none";
+        }
     }
 
     private static bool IsValidFeedUrl(string? feedUrl) =>
