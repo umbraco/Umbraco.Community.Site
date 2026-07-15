@@ -1,0 +1,86 @@
+.onboarding-page-wrapper {
+  max-width: 720px;
+  margin-inline: auto;
+  padding: var(--unit-lg) var(--unit);
+}
+
+dc-onboarding-wizard,
+.onboarding-page__signin {
+  display: block;
+  background: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--box-shadow-blue);
+  padding: var(--unit-md);
+}
+
+/* The sign-in prompt is just a centered message + button — keep it compact even
+   though the wizard/feed-manager below it needs the full wrapper width. */
+.onboarding-page__signin {
+  max-width: 480px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.onboarding-page__signin h1 {
+  margin: 0 0 var(--unit-sm);
+  color: var(--color-identity-blue);
+}
+
+.onboarding-page__signin .member-signin__btn {
+  margin-top: var(--unit-sm);
+}
+
+.dc-onboarding__step-indicator {
+  margin: 0 0 var(--unit-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-light-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dc-onboarding__step h2 {
+  margin: 0 0 var(--unit-sm);
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__handle-block,
+.dc-onboarding__avatar-block {
+  margin-bottom: var(--unit-md);
+  padding-bottom: var(--unit-md);
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-onboarding__handle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-onboarding__avatar-preview {
+  display: block;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: var(--unit-sm);
+}
+
+.dc-onboarding__actions {
+  display: flex;
+  gap: var(--unit-sm);
+  margin-top: var(--unit-md);
+}
+
+.dc-onboarding__status {
+  text-align: center;
+}
+
+.dc-onboarding__status--error {
+  color: var(--color-error, #c0392b);
+}
