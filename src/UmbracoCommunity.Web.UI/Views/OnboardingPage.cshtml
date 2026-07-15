@@ -1,0 +1,33 @@
+@using UmbracoCommunity.Web.Features.Members
+@using UmbracoCommunity.Web.Models.Pages
+@inherits UmbracoViewPage<OnboardingPageViewModel>
+@{
+    Layout = "Layout.cshtml";
+}
+
+<div class="onboarding-page-wrapper">
+    @if (Model.IsSignedIn)
+    {
+        <dc-onboarding-wizard
+            profile-base-url="@Model.ProfileBaseUrl"
+            devrel-contact-url="@Model.DevRelContactUrl"
+            devrel-contact-target="@Model.DevRelContactTarget"></dc-onboarding-wizard>
+    }
+    else
+    {
+        var returnUrl = (Context.Request.Path + Context.Request.QueryString).ToString();
+        <section class="onboarding-page__signin">
+            <h1>Get your community profile</h1>
+            <p>Sign in with GitHub to confirm your handle, avatar, bio, and feeds.</p>
+            @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
+            {
+                <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button type="submit" class="btn is-white member-signin__btn">
+                    <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                    Sign in with GitHub
+                </button>
+            }
+        </section>
+    }
+</div>

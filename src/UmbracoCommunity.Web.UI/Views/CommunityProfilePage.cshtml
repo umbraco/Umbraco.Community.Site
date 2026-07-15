@@ -1,21 +1,9 @@
-@inherits UmbracoViewPage<CommunityProfilePage>
-@using UmbracoCommunity.Web.Features.Profiles
-@using UmbracoCommunity.Web.Features.Profiles.Models
+@inherits UmbracoViewPage<CommunityProfilePageViewModel>
+@using UmbracoCommunity.Web.Features.Members
+@using UmbracoCommunity.Web.Models.Pages
 @{
     Layout = "Layout.cshtml";
-
-    // TEMPORARY — Phase 1 layout scaffolding only.
-    // The profile is pulled straight from the dummy provider so the page can be
-    // laid out before the real plumbing exists. This inline call is replaced by
-    // CommunityProfilePageController + IProfileDataProvider (DI) + the slug content
-    // finder in the next phase. See docs/COMMUNITY_PROFILES_SPEC.md.
-    // Switch profile with ?member=<slug>; ?member=not-found shows the empty state.
-    var slug = Context.Request.Query["member"].ToString();
-    if (string.IsNullOrWhiteSpace(slug))
-    {
-        slug = "alexpenrose";
-    }
-    var profile = await new DummyProfileDataProvider().GetProfileAsync(slug);
+    var profile = Model.Profile;
 }
 
 @functions {
@@ -35,9 +23,19 @@
 
 @if (profile is null)
 {
+    var returnUrl = (Context.Request.Path + Context.Request.QueryString).ToString();
     <section class="community-profile community-profile--not-found">
-        <h1>Profile not found</h1>
-        <p>We couldn't find a community profile for that member.</p>
+        <h1>Claim this profile</h1>
+        <p>This community profile hasn't been claimed yet. Sign in with GitHub to make it yours.</p>
+        @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
+        {
+            <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
+            <input type="hidden" name="returnUrl" value="@returnUrl" />
+            <button type="submit" class="btn is-white member-signin__btn">
+                <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                Sign in with GitHub
+            </button>
+        }
     </section>
 }
 else

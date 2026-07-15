@@ -8,4 +8,13 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     public string? GitHubHandle { get; set; }
     public string? Email { get; set; }
     public string? AvatarUrl { get; set; }
+
+    /// <summary>True once the member has completed onboarding — gates showing the public profile link.</summary>
+    public bool OnboardingCompleted { get; set; }
+
+    /// <summary>The member's public profile URL, once claimed.</summary>
+    public string? ProfileUrl { get; set; }
+
+    /// <summary>The onboarding page URL, shown as a nudge when onboarding isn't complete yet.</summary>
+    public string? OnboardingUrl { get; set; }
 }

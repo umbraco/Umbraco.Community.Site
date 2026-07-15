@@ -38,6 +38,24 @@
                 </dl>
             }
 
+            @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
+            {
+                <p class="account-page__profile-link">
+                    <a href="@Model.ProfileUrl">View your public profile</a>
+                </p>
+            }
+            else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
+            {
+                <p class="account-page__profile-link">
+                    <a href="@Model.OnboardingUrl">Finish setting up your profile</a>
+                </p>
+            }
+
+            <div class="account-page__feeds">
+                <h2>Your feeds</h2>
+                <dc-feed-manager></dc-feed-manager>
+            </div>
+
             <form method="post" action="/logout" class="account-page__logout">
                 @Html.AntiForgeryToken()
                 <button type="submit" class="btn is-transparent-blue">Sign out</button>

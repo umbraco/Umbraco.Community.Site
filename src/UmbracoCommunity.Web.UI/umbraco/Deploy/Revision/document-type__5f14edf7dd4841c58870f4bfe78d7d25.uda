@@ -1,0 +1,60 @@
+{
+  "Name": "Onboarding page",
+  "Alias": "onboardingPage",
+  "DefaultTemplate": "umb://template/019f672aacd170c5ba0027e568fd6970",
+  "AllowedTemplates": [
+    "umb://template/019f672aacd170c5ba0027e568fd6970"
+  ],
+  "HistoryCleanup": {},
+  "Icon": "icon-light-up",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+  "CompositionContentTypes": [
+    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "bbeff4af-8e34-4913-bf65-ff3a279c3d0c",
+      "Name": "Settings",
+      "SortOrder": 1000,
+      "Type": 1,
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "2d4c9432-1f9c-4b8f-b13b-a3203ad949e4",
+          "Alias": "devRelContactForm",
+          "DataType": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
+          "Name": "DevRel contact form",
+          "SortOrder": -1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5f14edf7dd4841c58870f4bfe78d7d25",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/4a9c826487ab4318b84625ab0a026a02",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://template/019f672aacd170c5ba0027e568fd6970",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.0"
+}
