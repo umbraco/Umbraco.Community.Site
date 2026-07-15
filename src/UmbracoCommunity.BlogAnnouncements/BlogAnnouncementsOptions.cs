@@ -30,6 +30,17 @@ public sealed class BlogAnnouncementsOptions
     /// </summary>
     public bool DryRun { get; set; } = true;
 
+    /// <summary>
+    /// Absolute origin of the public site (e.g. <c>https://community.umbraco.com</c>), used to
+    /// resolve root-relative image URLs (community blog cover images/avatars are localized to
+    /// <c>/community-blog-images/{file}</c> under the host's wwwroot — see
+    /// <c>CommunityBlogsImageDownloader</c>) into absolute URLs before they're sent to Discord.
+    /// Browsers resolve root-relative URLs against the page they're on; Discord's embed validator
+    /// requires a fully-qualified URL and returns 400 otherwise. Empty by default — a relative
+    /// image/avatar URL is dropped from the embed rather than sent broken.
+    /// </summary>
+    public string PublicBaseUrl { get; set; } = string.Empty;
+
     /// <summary>Discord delivery configuration.</summary>
     public DiscordAnnouncementOptions Discord { get; set; } = new();
 }
