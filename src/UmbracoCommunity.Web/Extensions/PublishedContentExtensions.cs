@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Extensions;
@@ -56,6 +57,12 @@ public static class PublishedContentExtensions
         }
         var socialSettings = settingsRoot?.Children(x => x.ContentType.Alias == SocialSettings.ModelTypeAlias)?.FirstOrDefault();
         return socialSettings?.As<SocialSettings>();
+    }
+
+    public static T? GetSingletonPage<T>(this IPublishedContent content) where T : class, IPublishedContent
+    {
+        var root = content.Root();
+        return root?.DescendantsOrSelf<T>().FirstOrDefault();
     }
 
     private static string GetElementDescription(IPublishedContent? element)

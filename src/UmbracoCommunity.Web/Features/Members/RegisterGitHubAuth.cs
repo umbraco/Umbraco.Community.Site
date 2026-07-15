@@ -49,7 +49,7 @@ public class RegisterGitHubAuth : IComposer
                             var primary = emails?.FirstOrDefault(e => e.Primary && e.Verified);
                             if (primary == null) return;
 
-                            context.Identity?.RemoveClaim(context.Identity.FindFirst(ClaimTypes.Email));
+                            context.Identity?.TryRemoveClaim(context.Identity.FindFirst(ClaimTypes.Email));
                             context.Identity?.AddClaim(new Claim(ClaimTypes.Email, primary.Email));
                         };
                     }),

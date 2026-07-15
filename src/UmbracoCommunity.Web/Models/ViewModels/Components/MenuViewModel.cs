@@ -17,6 +17,8 @@ public class MenuViewModel
 
     public string? SearchPageUrl { get; set; }
 
+    public string? AccountPageUrl { get; set; }
+
     public string? HeroLayout { get; set; }
 
     public MediaWithCrops? Logo { get; set; }

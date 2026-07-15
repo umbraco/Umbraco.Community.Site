@@ -189,6 +189,7 @@ Models are generated in **SourceCodeManual** mode (development) / **Nothing** mo
 - Namespace: `UmbracoCommunity.Web.Models.PublishedModels`
 - Directory: `src/UmbracoCommunity.Web/Models/PublishedModels/`
 - After creating document types in backoffice, manually generate models
+- **Never hardcode a content type alias as a string literal** (e.g. `"accountPage"`, `c.ContentType.Alias.Equals("searchPage")`). Always reference the generated model's `ModelTypeAlias` constant (e.g. `AccountPage.ModelTypeAlias`) so a doc type alias rename is a compile error, not a silent runtime failure. This is the existing convention throughout the codebase (`Settings.ModelTypeAlias`, `ImageBlock.ModelTypeAlias`, etc.) — apply it everywhere content type aliases are compared, including in Razor views.
 
 ## Key Features
 

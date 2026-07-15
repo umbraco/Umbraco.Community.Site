@@ -20,7 +20,7 @@
 
             public static readonly string[] DefaultAllowScripts = ["*.youtube.com"];
 
-            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com", "cdn.sessionize.com"];
+            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "api.dicebear.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com", "cdn.sessionize.com"];
 
             public static readonly string[] DefaultAllowFormActions = ["github.com"];
 

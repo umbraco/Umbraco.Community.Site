@@ -25,7 +25,7 @@ public class AccountPageController : RenderController
 
     public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        if (HttpContext.User.Identity?.IsAuthenticated != true)
+        if (!_memberManager.IsLoggedIn())
             return Redirect("/");
 
         var currentPage = CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null.");

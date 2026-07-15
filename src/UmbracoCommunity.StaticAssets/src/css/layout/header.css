@@ -609,6 +609,12 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
   padding: 0;
 }
 
+.nav-header .member-avatar__trigger:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-radius: 50%;
+}
+
 .nav-header .member-avatar__trigger img {
   border-radius: 50%;
   display: block;

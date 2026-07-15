@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
@@ -15,15 +16,15 @@ namespace UmbracoCommunity.Web.ViewModelBuilders.Components;
 
 internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
 {
-    private const string SearchPageContentTypeAlias = "searchPage";
-
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMemberManager _memberManager;
 
-    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches, IHttpContextAccessor httpContextAccessor)
+    public MenuViewModelBuilder(IPublishedContentQuery publishedContentQuery, IPublishedUrlProvider publishedUrlProvider, AppCaches appCaches, IHttpContextAccessor httpContextAccessor, IMemberManager memberManager)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _httpContextAccessor = httpContextAccessor;
+        _memberManager = memberManager;
     }
 
     public MenuViewModel Build(IPublishedContent currentPage, IUmbracoContext umbracoContext)
@@ -42,7 +43,7 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
         var signInEnabled = siteSettings?.EnableMemberSignIn ?? false;
         viewModel.IsSignInEnabled = signInEnabled;
 
-        if (signInEnabled && _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true)
+        if (signInEnabled && _memberManager.IsLoggedIn())
         {
             viewModel.IsSignedIn = true;
             var user = _httpContextAccessor.HttpContext?.User;
@@ -51,12 +52,19 @@ internal class MenuViewModelBuilder : IViewModelBuilder<MenuViewModel>
             viewModel.MemberAvatarUrl = handle != null ? $"https://github.com/{handle}.png" : null;
         }
 
-        var searchPage = currentPage.Root()
-            .DescendantsOrSelf()
-            .FirstOrDefault(c => c.ContentType.Alias.Equals(SearchPageContentTypeAlias, StringComparison.OrdinalIgnoreCase));
+        var searchPage = currentPage.GetSingletonPage<SearchPage>();
         if (searchPage != null)
         {
             viewModel.SearchPageUrl = searchPage.Url(_publishedUrlProvider);
+        }
+
+        if (viewModel.IsSignedIn)
+        {
+            var accountPage = currentPage.GetSingletonPage<AccountPage>();
+            if (accountPage != null)
+            {
+                viewModel.AccountPageUrl = accountPage.Url(_publishedUrlProvider);
+            }
         }
 
         var navSettings = currentPage.GetNavigationSettings(siteSettings);

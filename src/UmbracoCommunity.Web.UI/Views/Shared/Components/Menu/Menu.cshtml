@@ -123,13 +123,13 @@
         {
             <div class="nav-end__item member-btn">
                 <div class="member-avatar">
-                    <a href="/account" class="member-avatar__trigger" aria-label="@Model.MemberDisplayName — account">
+                    <a href="@Model.AccountPageUrl" class="member-avatar__trigger" aria-label="@Model.MemberDisplayName — account" tabindex="0">
                         @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
                         {
                             <img src="@Model.MemberAvatarUrl" alt="" width="36" height="36" />
                         }
                     </a>
-                    <div class="member-avatar__menu" role="menu">
+                    <div class="member-avatar__menu">
                         @if (!string.IsNullOrEmpty(Model.MemberDisplayName))
                         {
                             <span class="member-avatar__name">@Model.MemberDisplayName</span>
