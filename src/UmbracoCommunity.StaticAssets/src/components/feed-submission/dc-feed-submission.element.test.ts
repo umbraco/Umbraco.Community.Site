@@ -100,17 +100,17 @@ describe("FeedSubmissionElement", () => {
     );
   });
 
-  it("keeps the submit button and shows a note when the feed has a pending submission", async () => {
+  it("shows an update button and a note when the feed has a pending submission", async () => {
     vi.spyOn(FeedSubmissionService, "preview").mockResolvedValue({ posts: [], status: "pending" });
 
     const element = await mount();
     await submitForm(element, "https://example.com/rss.xml");
 
-    expect(element.querySelector(".dc-feed-submission__note")?.textContent).toContain(
-      "pending submission"
-    );
+    expect(
+      element.querySelector(".dc-feed-submission__status--callout")?.textContent
+    ).toContain("pending submission");
     const buttons = [...element.querySelectorAll(".dc-feed-submission__actions button")];
-    expect(buttons.some((button) => button.textContent?.includes("Submit for inclusion"))).toBe(
+    expect(buttons.some((button) => button.textContent?.includes("Update my submission"))).toBe(
       true
     );
   });
