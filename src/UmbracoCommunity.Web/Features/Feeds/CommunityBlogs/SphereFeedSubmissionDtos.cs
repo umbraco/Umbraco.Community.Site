@@ -11,3 +11,6 @@ public sealed record FeedSubmissionResponseDto(
     string? Github,
     string Status,
     DateTimeOffset? SubmittedAt);
+
+/// <summary>Response from GET /v1/feed-submissions/status. <c>Status</c> is one of "listed", "pending", "none".</summary>
+public sealed record FeedSubmissionStatusResponseDto(string Status);

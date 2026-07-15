@@ -64,7 +64,9 @@ describe("FeedSubmissionElement", () => {
         author: { name: "Jane Doe", avatarUrl: "https://example.com/avatar.png" },
       },
     ];
-    const spy = vi.spyOn(FeedSubmissionService, "preview").mockResolvedValue(posts);
+    const spy = vi
+      .spyOn(FeedSubmissionService, "preview")
+      .mockResolvedValue({ posts, status: "none" });
 
     const element = await mount();
     await submitForm(element, "https://example.com/rss.xml");
@@ -80,6 +82,36 @@ describe("FeedSubmissionElement", () => {
     expect(cards).toHaveLength(1);
     expect(element.querySelector(".dc-community-blogs__title")?.textContent).toContain(
       "Hello world"
+    );
+  });
+
+  it("hides the submit button and shows a prominent message when the feed is already listed", async () => {
+    vi.spyOn(FeedSubmissionService, "preview").mockResolvedValue({ posts: [], status: "listed" });
+
+    const element = await mount();
+    await submitForm(element, "https://example.com/rss.xml");
+
+    const callout = element.querySelector(".dc-feed-submission__status--success");
+    expect(callout?.textContent).toContain("You're all set");
+    expect(callout?.textContent).toContain("already set up");
+    const buttons = [...element.querySelectorAll(".dc-feed-submission__actions button")];
+    expect(buttons.some((button) => button.textContent?.includes("Submit for inclusion"))).toBe(
+      false
+    );
+  });
+
+  it("keeps the submit button and shows a note when the feed has a pending submission", async () => {
+    vi.spyOn(FeedSubmissionService, "preview").mockResolvedValue({ posts: [], status: "pending" });
+
+    const element = await mount();
+    await submitForm(element, "https://example.com/rss.xml");
+
+    expect(element.querySelector(".dc-feed-submission__note")?.textContent).toContain(
+      "pending submission"
+    );
+    const buttons = [...element.querySelectorAll(".dc-feed-submission__actions button")];
+    expect(buttons.some((button) => button.textContent?.includes("Submit for inclusion"))).toBe(
+      true
     );
   });
 
