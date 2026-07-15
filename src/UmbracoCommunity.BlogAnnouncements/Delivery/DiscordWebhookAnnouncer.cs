@@ -31,7 +31,7 @@ public sealed class DiscordWebhookAnnouncer : IDiscordAnnouncer
     public async Task<DeliveryResult> AnnounceAsync(AnnouncementPayload payload, CancellationToken cancellationToken)
     {
         var options = _options.CurrentValue;
-        var body = BuildBody(payload);
+        var body = BuildBody(payload, options.PublicBaseUrl);
 
         if (options.DryRun)
         {
@@ -59,13 +59,18 @@ public sealed class DiscordWebhookAnnouncer : IDiscordAnnouncer
                 return DeliveryResult.Ok(status);
             }
 
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogWarning(
-                "Discord webhook returned {Status} announcing '{Title}'.", status, payload.Title);
+                "Discord webhook returned {Status} announcing '{Title}'. Webhook: {WebhookUrl}. Payload: {Payload}. Response: {Response}",
+                status, payload.Title, webhookUrl, JsonSerializer.Serialize(body, JsonOptions), responseBody);
             return DeliveryResult.Fail(status);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to post '{Title}' to the Discord webhook.", payload.Title);
+            _logger.LogWarning(
+                ex,
+                "Failed to post '{Title}' to the Discord webhook. Webhook: {WebhookUrl}. Payload: {Payload}",
+                payload.Title, webhookUrl, JsonSerializer.Serialize(body, JsonOptions));
             return DeliveryResult.Fail(null);
         }
     }
@@ -83,9 +88,10 @@ public sealed class DiscordWebhookAnnouncer : IDiscordAnnouncer
     /// author row (<c>icon_url</c>), where Discord cannot render SVG avatars — any <c>.svg</c>
     /// avatar URL is dropped so the row degrades to the plain author name.
     /// </summary>
-    internal static object BuildBody(AnnouncementPayload payload)
+    internal static object BuildBody(AnnouncementPayload payload, string? publicBaseUrl = null)
     {
-        var avatar = UsableAvatar(payload.AvatarUrl);
+        var avatar = UsableAvatar(ResolveAbsoluteUrl(payload.AvatarUrl, publicBaseUrl));
+        var cover = ResolveAbsoluteUrl(payload.CoverImageUrl, publicBaseUrl);
 
         var embedAuthor = new Dictionary<string, object?>
         {
@@ -111,9 +117,9 @@ public sealed class DiscordWebhookAnnouncer : IDiscordAnnouncer
         {
             embed["description"] = payload.Excerpt;
         }
-        if (!string.IsNullOrWhiteSpace(payload.CoverImageUrl))
+        if (cover is not null)
         {
-            embed["image"] = new Dictionary<string, object?> { ["url"] = payload.CoverImageUrl };
+            embed["image"] = new Dictionary<string, object?> { ["url"] = cover };
         }
 
         return new Dictionary<string, object?>
@@ -134,4 +140,41 @@ public sealed class DiscordWebhookAnnouncer : IDiscordAnnouncer
         var withoutQuery = avatarUrl.Split('?', 2)[0];
         return withoutQuery.EndsWith(".svg", StringComparison.OrdinalIgnoreCase) ? null : avatarUrl;
     }
+
+    /// <summary>
+    /// Community blog cover images/avatars are localized to root-relative paths (e.g.
+    /// <c>/community-blog-images/{file}</c>) by <c>CommunityBlogsImageDownloader</c> so the site's
+    /// own pages can load them from 'self'. Discord's embed validator requires a fully-qualified
+    /// URL and returns 400 on a relative one, so any URL that isn't already absolute http(s) is
+    /// resolved against <paramref name="publicBaseUrl"/> — and dropped (not sent broken) if that
+    /// isn't configured or the result still isn't a valid absolute http(s) URL.
+    /// </summary>
+    private static string? ResolveAbsoluteUrl(string? url, string? publicBaseUrl)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return null;
+        }
+
+        if (IsHttpUri(url, UriKind.Absolute, out var absolute))
+        {
+            return absolute!.ToString();
+        }
+
+        if (!string.IsNullOrWhiteSpace(publicBaseUrl)
+            && IsHttpUri(publicBaseUrl, UriKind.Absolute, out var baseUri)
+            && Uri.TryCreate(baseUri, url, out var resolved)
+            && IsHttpScheme(resolved))
+        {
+            return resolved.ToString();
+        }
+
+        return null;
+    }
+
+    private static bool IsHttpUri(string url, UriKind kind, out Uri? uri)
+        => Uri.TryCreate(url, kind, out uri) && IsHttpScheme(uri);
+
+    private static bool IsHttpScheme(Uri? uri)
+        => uri is not null && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 }

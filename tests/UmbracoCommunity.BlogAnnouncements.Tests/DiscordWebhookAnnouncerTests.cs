@@ -7,9 +7,9 @@ namespace UmbracoCommunity.BlogAnnouncements.Tests;
 
 public class DiscordWebhookAnnouncerTests
 {
-    private static JsonElement BuildJson(AnnouncementPayload payload)
+    private static JsonElement BuildJson(AnnouncementPayload payload, string? publicBaseUrl = null)
     {
-        var body = DiscordWebhookAnnouncer.BuildBody(payload);
+        var body = DiscordWebhookAnnouncer.BuildBody(payload, publicBaseUrl);
         var json = JsonSerializer.Serialize(body, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         return JsonDocument.Parse(json).RootElement;
     }
@@ -82,4 +82,39 @@ public class DiscordWebhookAnnouncerTests
         root.GetProperty("embeds")[0].TryGetProperty("image", out _).Should().BeFalse();
     }
 
+    [Fact]
+    public void BuildBody_ResolvesRootRelativeCoverAgainstPublicBaseUrl()
+    {
+        var root = BuildJson(
+            Payload(cover: "/community-blog-images/abc123.png"),
+            publicBaseUrl: "https://community.umbraco.com");
+
+        root.GetProperty("embeds")[0].GetProperty("image").GetProperty("url").GetString()
+            .Should().Be("https://community.umbraco.com/community-blog-images/abc123.png");
+    }
+
+    [Fact]
+    public void BuildBody_ResolvesRootRelativeAvatarAgainstPublicBaseUrl()
+    {
+        var root = BuildJson(
+            Payload(avatar: "/community-blog-images/avatar456.jpg"),
+            publicBaseUrl: "https://community.umbraco.com");
+
+        root.GetProperty("embeds")[0].GetProperty("author").GetProperty("icon_url").GetString()
+            .Should().Be("https://community.umbraco.com/community-blog-images/avatar456.jpg");
+    }
+
+    [Fact]
+    public void BuildBody_DropsRootRelativeCoverWhenNoPublicBaseUrlConfigured()
+    {
+        var root = BuildJson(Payload(cover: "/community-blog-images/abc123.png"), publicBaseUrl: null);
+        root.GetProperty("embeds")[0].TryGetProperty("image", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public void BuildBody_DropsRootRelativeAvatarWhenNoPublicBaseUrlConfigured()
+    {
+        var root = BuildJson(Payload(avatar: "/community-blog-images/avatar456.jpg"), publicBaseUrl: null);
+        root.GetProperty("embeds")[0].GetProperty("author").TryGetProperty("icon_url", out _).Should().BeFalse();
+    }
 }
