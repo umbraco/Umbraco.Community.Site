@@ -1,0 +1,15 @@
+{
+  "Name": "Community profile page",
+  "Alias": "CommunityProfilePage",
+  "File": "umb://template-file/CommunityProfilePage.cshtml",
+  "Udi": "umb://template/019ed55303a770ca9e531becb851ca7f",
+  "Dependencies": [
+    {
+      "Udi": "umb://template-file/CommunityProfilePage.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "17.1.0"
+}

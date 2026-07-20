@@ -17,11 +17,18 @@ public class MenuViewModel
 
     public string? SearchPageUrl { get; set; }
 
+    public string? AccountPageUrl { get; set; }
+
     public string? HeroLayout { get; set; }
 
     public MediaWithCrops? Logo { get; set; }
 
     public NavigationLink? CallToActionButton { get; set; }
+
+    public bool IsSignInEnabled { get; set; }
+    public bool IsSignedIn { get; set; }
+    public string? MemberDisplayName { get; set; }
+    public string? MemberAvatarUrl { get; set; }
 
     public IReadOnlyList<INavigationElement> TopLevelNavigationItems => _topLevelNavigationItems.AsReadOnly();
 
