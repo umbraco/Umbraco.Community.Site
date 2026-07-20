@@ -50,14 +50,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Show featured posts only (no paging)
+		/// Show featured posts only (no paging): When on, shows the latest posts as a teaser with a 'Read more' link and no pagination.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("featuredOnly")]
 		public virtual bool FeaturedOnly => this.Value<bool>(_publishedValueFallback, "featuredOnly");
 
 		///<summary>
-		/// Number of featured posts
+		/// Number of featured posts: How many posts to show in featured mode (default 6, max 12).
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[ImplementPropertyType("numberOfFeaturedPosts")]

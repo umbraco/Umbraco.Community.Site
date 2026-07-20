@@ -1,12 +1,12 @@
 {
-  "Name": "Member login / logout",
-  "Alias": "memberLoginLogout",
-  "DefaultTemplate": "umb://template/019c6fe3b9d274d99c2e7292da657b37",
+  "Name": "Community profile page",
+  "Alias": "communityProfilePage",
+  "DefaultTemplate": "umb://template/019ed55303a770ca9e531becb851ca7f",
   "AllowedTemplates": [
-    "umb://template/019c6fe3b9d274d99c2e7292da657b37"
+    "umb://template/019ed55303a770ca9e531becb851ca7f"
   ],
   "HistoryCleanup": {},
-  "Icon": "icon-combination-lock-open",
+  "Icon": "icon-diamond",
   "Thumbnail": "folder.png",
   "Permissions": {
     "AllowedChildContentTypes": []
@@ -15,14 +15,14 @@
   "CompositionContentTypes": [],
   "PropertyGroups": [],
   "PropertyTypes": [],
-  "Udi": "umb://document-type/47d5651bf5bb45c785fcb4bad22cb13d",
+  "Udi": "umb://document-type/11e2043bb9c54b34800882d8cbc140f5",
   "Dependencies": [
     {
       "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
       "Ordering": true
     },
     {
-      "Udi": "umb://template/019c6fe3b9d274d99c2e7292da657b37",
+      "Udi": "umb://template/019ed55303a770ca9e531becb851ca7f",
       "Ordering": true,
       "Mode": "Exist"
     }

@@ -1,0 +1,688 @@
+/* Community profile page — bold magazine layout. */
+
+.community-profile {
+    max-width: var(--max-width);
+    margin-inline: auto;
+    padding-inline: var(--unit);
+    padding-bottom: var(--unit-lg);
+}
+
+/* Links here are standalone (titles, links), not in-text prose links — opt out of
+   the global #main-content pink-underline-grow animation and use a plain hover. */
+#main-content .community-profile a:not(.btn) {
+    background-image: none;
+    padding-bottom: 0;
+    text-decoration: none;
+}
+
+#main-content .community-profile a:not(.btn):hover {
+    text-decoration: underline;
+}
+
+/* Hero masthead — full-bleed banner */
+
+.community-profile__hero {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: var(--color-identity-blue);
+    color: var(--color-white);
+    padding-block: var(--unit-md);
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__hero-inner {
+    max-width: var(--max-width);
+    margin-inline: auto;
+    padding-inline: var(--unit);
+    display: grid;
+    gap: var(--unit-md);
+    justify-items: center;
+    text-align: center;
+}
+
+.community-profile__portrait {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 320px;
+    height: 320px;
+}
+
+.community-profile__avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12), 0 0 0 12px var(--color-identity-pink);
+}
+
+.community-profile__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--unit-xs);
+    margin: 0;
+    font-size: clamp(2.5rem, 6vw, 4.75rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+}
+
+.community-profile__pronouns {
+    font-size: var(--font-size);
+    font-weight: 400;
+    color: var(--color-identity-pink);
+}
+
+.community-profile__headline {
+    margin: var(--unit-xs) 0 0;
+    font-size: var(--font-size-large);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.community-profile__bio {
+    margin: var(--unit) 0 0;
+    max-width: 60ch;
+    font-size: var(--font-size-large);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.community-profile__meta,
+.community-profile__socials {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--unit-xs);
+    margin: var(--unit) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__location {
+    padding: var(--unit-xxs) var(--unit-sm);
+    border-radius: var(--border-radius-xl);
+    background: rgba(255, 255, 255, 0.12);
+    font-size: var(--font-size-sm);
+}
+
+.community-profile__socials {
+    gap: var(--unit);
+}
+
+.community-profile__socials a {
+    color: var(--color-white);
+    font-weight: 700;
+}
+
+/* MVP awards — a ring of medals orbiting the portrait. Each medal's angle is
+   set per-element via --angle (computed in the view), so the ring stays evenly
+   spaced for any number of awards. Most recent is at the top (angle 0). */
+
+.community-profile__mvp {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__mvp-award {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin: -25px;
+    /* transform (the ring placement) is set inline per medal in the view, because
+       PostCSS (preset-env, custom-properties preserve:false) would inline a var()
+       fallback at build time and break a runtime angle. */
+}
+
+.community-profile__mvp-medal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 26%, #fdeaa3, var(--color-identity-yellow) 58%, var(--color-identity-orange));
+    color: var(--color-identity-dark);
+    line-height: 1;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.community-profile__mvp-label {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+}
+
+.community-profile__mvp-year {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.community-profile__mvp-award--current .community-profile__mvp-medal {
+    background: radial-gradient(circle at 30% 24%, #fff6d6, var(--color-identity-yellow) 54%, var(--color-identity-orange));
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 0 3px rgba(250, 214, 52, 0.45), 0 0 14px rgba(250, 214, 52, 0.7);
+}
+
+.community-profile__mvp-award--current .community-profile__mvp-medal::after {
+    content: "\2726";
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    font-size: 14px;
+    color: var(--color-white);
+    text-shadow: 0 0 8px var(--color-identity-yellow);
+}
+
+/* Badges bar — directly below the hero */
+
+.community-profile__badges-bar {
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--unit-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Sew-on patch: an outer "merrow" edge colour with the fill inset inside it,
+   a centred emblem + name, and a jaunty applied-by-hand angle. Shape, colours
+   and emblem vary by position. */
+.community-profile__award {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 144px;
+    height: 144px;
+    padding: var(--unit-sm);
+    text-align: center;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.28));
+}
+
+.community-profile__award::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    z-index: 0;
+    background: var(--patch-fill, var(--color-identity-blue));
+    clip-path: inherit;
+}
+
+.community-profile__award-name {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding: 6px;
+    color: var(--patch-text, var(--color-white));
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.community-profile__award-icon {
+    position: relative;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+}
+
+.community-profile__award:nth-child(4n + 1) {
+    clip-path: circle(50%);
+    background: var(--color-identity-yellow);
+    --patch-fill: var(--color-identity-blue);
+    --patch-emblem: "\2605";
+    transform: rotate(-3deg);
+}
+
+.community-profile__award:nth-child(4n + 2) {
+    clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+    background: var(--color-identity-blue);
+    --patch-fill: var(--color-identity-orange);
+    --patch-text: var(--color-identity-dark);
+    --patch-emblem: "\2756";
+    transform: rotate(2.5deg);
+}
+
+.community-profile__award:nth-child(4n + 3) {
+    clip-path: polygon(50% 0, 100% 14%, 100% 56%, 50% 100%, 0 56%, 0 14%);
+    background: var(--color-identity-pink);
+    --patch-fill: var(--color-identity-blue);
+    --patch-emblem: "\2726";
+    transform: rotate(-1.5deg);
+}
+
+.community-profile__award:nth-child(4n + 4) {
+    clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+    background: var(--color-green);
+    --patch-fill: var(--color-identity-dark);
+    --patch-emblem: "\2742";
+    transform: rotate(3deg);
+}
+
+/* Latest strip — most recent of each type, above the fold */
+
+.community-profile__latest {
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__latest-title {
+    margin: 0 0 var(--unit);
+    font-size: var(--font-size-large);
+    font-weight: 800;
+}
+
+.community-profile__highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--unit);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__highlight {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit-xxs);
+    padding: var(--unit);
+    background: var(--color-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--base-box-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.community-profile__highlight:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--box-shadow-blue);
+}
+
+.community-profile__highlight-media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    margin-bottom: var(--unit-xs);
+}
+
+.community-profile__highlight-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.community-profile__play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(27, 38, 79, 0.8);
+    color: var(--color-white);
+}
+
+.community-profile__highlight-kind {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--unit-xxs);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: var(--font-size-xs);
+    font-weight: 800;
+    color: var(--color-identity-blue);
+}
+
+.community-profile__icon {
+    flex-shrink: 0;
+}
+
+.community-profile__highlight-title {
+    font-size: var(--font-size-large);
+    font-weight: 700;
+    color: var(--color-dark);
+    text-decoration: none;
+}
+
+.community-profile__highlight-desc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    color: var(--color-light-blue);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.community-profile__highlight-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-dark-grey);
+}
+
+/* Community activity — social posts + meet-ups, two columns of lists.
+   A distinct tinted panel so it pops out from the plain catalogue below. */
+
+.community-profile__social {
+    margin-bottom: var(--unit-lg);
+    padding: var(--unit-md);
+    border-radius: var(--border-radius-xl);
+    background: var(--color-identity-blue);
+    color: var(--color-white);
+}
+
+.community-profile__social-heading {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-xs);
+    margin: 0 0 var(--unit-md);
+    font-size: var(--font-size-large);
+    font-weight: 800;
+}
+
+.community-profile__live {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--unit-xxs);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-dark-grey);
+}
+
+.community-profile__live::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-green);
+}
+
+.community-profile__activity-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--unit-lg);
+}
+
+.community-profile__social-subtitle {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-xs);
+    margin: 0 0 var(--unit-sm);
+    padding-bottom: var(--unit-xs);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+    font-size: var(--font-size-large);
+    font-weight: 800;
+}
+
+.community-profile__social-subtitle .community-profile__icon {
+    color: var(--color-white);
+}
+
+.community-profile__activity-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__activity-item {
+    padding-block: var(--unit-sm);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.community-profile__activity-item:last-child {
+    border-bottom: none;
+}
+
+.community-profile__social-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--unit-sm);
+}
+
+.community-profile__social-badge {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-white);
+    color: var(--color-identity-blue);
+    font-size: 16px;
+}
+
+.community-profile__social-badge--linkedin {
+    color: #0a66c2;
+}
+
+.community-profile__social-badge--mastodon {
+    color: #6364ff;
+}
+
+.community-profile__social-badge--bluesky {
+    color: #0285ff;
+}
+
+.community-profile__social-body {
+    min-width: 0;
+}
+
+.community-profile__social-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--unit-xxs) var(--unit-xs);
+}
+
+.community-profile__social-name {
+    font-weight: 800;
+    color: var(--color-white);
+}
+
+.community-profile__social-time {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.community-profile__activity-text {
+    display: block;
+    margin: var(--unit-xxs) 0 0;
+    color: var(--color-white);
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.community-profile__activity-meta {
+    display: block;
+    margin-top: var(--unit-xxs);
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.community-profile__activity-action {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.community-profile__activity-event {
+    font-weight: 700;
+    color: var(--color-white);
+    text-decoration: none;
+}
+
+.community-profile__activity-tail {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Departments — compact sections, 2–3 abreast */
+
+.community-profile__departments {
+    columns: 1;
+    column-gap: var(--unit-lg);
+}
+
+.community-profile__section {
+    break-inside: avoid;
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-xs);
+    margin: 0 0 var(--unit-sm);
+    padding-bottom: var(--unit-xs);
+    border-bottom: 2px solid var(--color-identity-dark);
+    font-size: var(--font-size-large);
+    font-weight: 800;
+}
+
+.community-profile__section-title .community-profile__icon {
+    color: var(--color-identity-blue);
+}
+
+.community-profile__dept-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__dept-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit-xxs);
+    padding-block: var(--unit-sm);
+    border-bottom: 1px solid var(--color-light-grey);
+}
+
+.community-profile__dept-item:last-child {
+    border-bottom: none;
+}
+
+.community-profile__dept-meetup {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.community-profile__dept-title {
+    font-weight: 700;
+    color: var(--color-blue);
+    text-decoration: none;
+}
+
+.community-profile__dept-desc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    color: var(--color-light-blue);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.community-profile__dept-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-dark-grey);
+}
+
+.community-profile__versions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--unit-xxs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__version {
+    padding: 2px var(--unit-xs);
+    border-radius: var(--border-radius);
+    background: var(--color-light);
+    color: var(--color-light-blue);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+}
+
+@media (min-width: 1024px) {
+    .community-profile__hero {
+        padding-block: var(--unit-lg);
+    }
+
+    .community-profile__hero-inner {
+        grid-template-columns: 1fr auto;
+        grid-template-areas: "identity portrait";
+        align-items: center;
+        justify-items: start;
+        column-gap: var(--unit-lg);
+        text-align: left;
+    }
+
+    .community-profile__identity {
+        grid-area: identity;
+    }
+
+    .community-profile__portrait {
+        grid-area: portrait;
+    }
+
+    .community-profile__name,
+    .community-profile__meta,
+    .community-profile__socials {
+        justify-content: flex-start;
+    }
+
+    .community-profile__departments {
+        columns: 2;
+    }
+
+    .community-profile__activity-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1216px) {
+    .community-profile__departments {
+        columns: 3;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .community-profile__mvp-award--current .community-profile__mvp-medal {
+        animation: community-profile-shine 3s ease-in-out infinite;
+    }
+
+    @keyframes community-profile-shine {
+        0%, 100% {
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7), 0 0 0 4px rgba(250, 214, 52, 0.3), 0 6px 16px rgba(250, 214, 52, 0.45);
+        }
+        50% {
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.95), 0 0 0 6px rgba(250, 214, 52, 0.5), 0 8px 22px rgba(250, 214, 52, 0.7);
+        }
+    }
+
+    .community-profile__live::before {
+        animation: community-profile-pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes community-profile-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.25; }
+    }
+}
