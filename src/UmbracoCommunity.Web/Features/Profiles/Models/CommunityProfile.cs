@@ -40,7 +40,8 @@ public sealed record ProfileIdentity(
     IReadOnlyList<int> MvpYears,
     string? GitHubHandle,
     string? YouTubeChannelUrl,
-    IReadOnlyList<ProfileSocialLink> SocialLinks);
+    IReadOnlyList<ProfileSocialLink> SocialLinks,
+    bool HasCustomAvatar);
 
 /// <summary>A blog post or article the member has written, from any source.</summary>
 public sealed record ProfileBlogPost(

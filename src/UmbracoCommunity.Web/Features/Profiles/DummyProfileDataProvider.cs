@@ -52,7 +52,8 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
                 new ProfileSocialLink("Mastodon", "https://umbracocommunity.social/@alexpenrose"),
                 new ProfileSocialLink("LinkedIn", "https://www.linkedin.com/in/alexpenrose"),
                 new ProfileSocialLink("Bluesky", "https://bsky.app/profile/alexpenrose.bsky.social"),
-            }),
+            },
+            HasCustomAvatar: true),
         BlogPosts: new[]
         {
             new ProfileBlogPost(

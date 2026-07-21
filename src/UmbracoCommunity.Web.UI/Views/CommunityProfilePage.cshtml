@@ -24,19 +24,50 @@
 @if (profile is null)
 {
     var returnUrl = (Context.Request.Path + Context.Request.QueryString).ToString();
-    <section class="community-profile community-profile--not-found">
-        <h1>Claim this profile</h1>
-        <p>This community profile hasn't been claimed yet. Sign in with GitHub to make it yours.</p>
-        @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
-        {
-            <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
-            <input type="hidden" name="returnUrl" value="@returnUrl" />
-            <button type="submit" class="btn is-white member-signin__btn">
-                <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
-                Sign in with GitHub
-            </button>
-        }
-    </section>
+
+    // Reuses the real profile hero's own markup/classes — an empty silhouette avatar and
+    // ghost lines standing in for headline/bio — so a visitor sees the shape of the profile
+    // they'd be moving into, rather than a bare "not found" message.
+    <article class="community-profile community-profile--claim">
+        <header class="community-profile__hero">
+            <div class="community-profile__hero-inner">
+                <div class="community-profile__portrait">
+                    <div class="community-profile__avatar community-profile__avatar--empty" aria-hidden="true">
+                        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="community-profile__identity">
+                    <h1 class="community-profile__name">@@@Model.Handle</h1>
+
+                    <div class="community-profile__ghost-lines" aria-hidden="true">
+                        <span class="community-profile__ghost-line community-profile__ghost-line--headline"></span>
+                        <span class="community-profile__ghost-line"></span>
+                        <span class="community-profile__ghost-line community-profile__ghost-line--short"></span>
+                    </div>
+
+                    <div class="community-profile__claim">
+                        <p class="community-profile__claim-text">
+                            This profile is still waiting for @@@Model.Handle to move in — headline, bio,
+                            talks, packages, and more will all show up here once it's claimed.
+                        </p>
+                        @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
+                        {
+                            <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
+                            <input type="hidden" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="btn is-white member-signin__btn">
+                                <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                                Sign in with GitHub to claim this profile
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </header>
+    </article>
 }
 else
 {
@@ -90,7 +121,13 @@ else
         <header class="community-profile__hero">
             <div class="community-profile__hero-inner">
                 <div class="community-profile__portrait">
-                    @if (!string.IsNullOrEmpty(identity.AvatarUrl))
+                    @if (Model.IsOwnProfile)
+                    {
+                        <dc-profile-avatar-editor
+                            avatar-url="@identity.AvatarUrl"
+                            display-name="@identity.DisplayName"></dc-profile-avatar-editor>
+                    }
+                    else if (!string.IsNullOrEmpty(identity.AvatarUrl))
                     {
                         <img class="community-profile__avatar"
                              src="@identity.AvatarUrl"
@@ -141,7 +178,11 @@ else
                         <p class="community-profile__headline">@identity.Headline</p>
                     }
 
-                    @if (!string.IsNullOrEmpty(identity.Bio))
+                    @if (Model.IsOwnProfile)
+                    {
+                        <dc-profile-bio-editor bio="@identity.Bio"></dc-profile-bio-editor>
+                    }
+                    else if (!string.IsNullOrEmpty(identity.Bio))
                     {
                         <p class="community-profile__bio">@identity.Bio</p>
                     }

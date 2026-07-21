@@ -3,6 +3,9 @@ import { customElement, property, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import {
   ProfileOnboardingService,
+  MAX_AVATAR_BYTES,
+  MAX_AVATAR_MB,
+  MAX_BIO_LENGTH,
   type OnboardingState,
 } from "../../services/profile-onboarding.service.js";
 import { iconUpload, iconCopy, iconCheck } from "../../svg/lucide-icons.js";
@@ -14,15 +17,6 @@ type Phase = "loading" | "ready" | "saving" | "error" | "done";
 type Step = 1 | 2;
 
 const TOTAL_STEPS: Step = 2;
-
-// Keep in sync with AvatarUploadService.MaxBytes — checked client-side too so an oversized
-// file (very common straight off a phone camera) fails instantly instead of uploading in
-// full only to be rejected by the server.
-const MAX_AVATAR_BYTES = 5_000_000;
-const MAX_AVATAR_MB = MAX_AVATAR_BYTES / 1_000_000;
-
-// Keep in sync with ProfileApiController.MaxBioLength.
-const MAX_BIO_LENGTH = 280;
 
 @customElement(elementName)
 export class OnboardingWizardElement extends LitElement {

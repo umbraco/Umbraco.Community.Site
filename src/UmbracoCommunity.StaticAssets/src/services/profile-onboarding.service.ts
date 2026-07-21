@@ -1,5 +1,13 @@
 import { ServiceBase } from "./service-base";
 
+// Keep in sync with AvatarUploadService.MaxBytes — shared so the onboarding wizard and the
+// profile page's avatar editor both fail fast client-side with the same limit.
+export const MAX_AVATAR_BYTES = 5_000_000;
+export const MAX_AVATAR_MB = MAX_AVATAR_BYTES / 1_000_000;
+
+// Keep in sync with ProfileApiController.MaxBioLength.
+export const MAX_BIO_LENGTH = 280;
+
 export type OnboardingStatus = "NotStarted" | "InProgress" | "Completed";
 
 export interface OnboardingState {
