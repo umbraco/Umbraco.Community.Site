@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
+using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Models.Pages;
@@ -19,6 +21,7 @@ public class AccountPageController : RenderController
     private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -26,12 +29,14 @@ public class AccountPageController : RenderController
         IUmbracoContextAccessor umbracoContextAccessor,
         IMemberManager memberManager,
         MemberProfileStore store,
-        IPublishedUrlProvider publishedUrlProvider)
+        IPublishedUrlProvider publishedUrlProvider,
+        ProfileAvatarUrlResolver avatarUrlResolver)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
         _store = store;
         _publishedUrlProvider = publishedUrlProvider;
+        _avatarUrlResolver = avatarUrlResolver;
     }
 
     [NonAction]
@@ -54,7 +59,7 @@ public class AccountPageController : RenderController
             DisplayName = member?.Name,
             GitHubHandle = handle,
             Email = member?.Email,
-            AvatarUrl = handle != null ? $"https://github.com/{handle}.png" : null,
+            AvatarUrl = handle != null ? _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle) : null,
             OnboardingCompleted = onboardingCompleted,
         };
 
@@ -63,7 +68,9 @@ public class AccountPageController : RenderController
             var profilePage = currentPage.GetSingletonPage<CommunityProfilePage>();
             if (profilePage != null)
             {
-                viewModel.ProfileUrl = $"{profilePage.Url(_publishedUrlProvider).TrimEnd('/')}/{handle}";
+                // Absolute so the account page can show/copy the real link (scheme + host
+                // included) rather than a relative path.
+                viewModel.ProfileUrl = $"{profilePage.Url(_publishedUrlProvider, mode: UrlMode.Absolute).TrimEnd('/')}/{handle}";
             }
         }
         else

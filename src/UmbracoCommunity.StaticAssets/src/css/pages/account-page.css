@@ -1,5 +1,8 @@
+/* Matches the onboarding wizard's wrapper width (onboarding-page.css) — the card itself
+   isn't narrow, individual sections below (e.g. .account-page__profile-cta) cap their own
+   width instead where a narrower measure reads better. */
 .account-page-wrapper {
-  max-width: 480px;
+  max-width: 1040px;
   margin-inline: auto;
   padding: var(--unit-lg) var(--unit);
 }
@@ -76,11 +79,14 @@
   text-decoration: underline;
 }
 
-/* Details (email, etc.) */
+/* Details (email, etc.) — capped rather than stretched to the card's full width now that
+   the card itself is much wider (matches the onboarding wizard's width), so a single email
+   row doesn't sprawl across it. */
 
 .account-page__details {
   width: 100%;
-  margin: var(--unit-md) 0 0;
+  max-width: 480px;
+  margin: var(--unit-md) auto 0;
   padding-top: var(--unit-md);
   border-top: 1px solid var(--color-light-grey);
   display: grid;
@@ -105,21 +111,58 @@
   word-break: break-word;
 }
 
-/* Public profile / onboarding nudge link */
+/* Public profile — the headline moment of the account page once claimed: heading, a
+   friendly line, the copyable link chip, then a clear button through to it. Capped
+   narrower than the card so the chip/button don't stretch awkwardly across the full width. */
+
+.account-page__profile-cta {
+  width: 100%;
+  max-width: 480px;
+  margin: var(--unit-lg) auto 0;
+  padding-top: var(--unit-lg);
+  border-top: 1px solid var(--color-light-grey);
+  text-align: center;
+}
+
+.account-page__profile-cta h2 {
+  margin: 0 0 var(--unit-xxs);
+  font-size: 1.25rem;
+  color: var(--color-identity-blue);
+}
+
+.account-page__profile-cta > p {
+  margin: 0 0 var(--unit-sm);
+  color: var(--color-light-blue);
+}
+
+.account-page__profile-cta dc-profile-link {
+  display: block;
+  margin-bottom: var(--unit-sm);
+}
+
+.account-page__view-profile {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Onboarding nudge — shown instead of the profile CTA until onboarding is complete. */
 
 .account-page__profile-link {
   width: 100%;
-  margin: var(--unit-md) 0 0;
+  max-width: 480px;
+  margin: var(--unit-md) auto 0;
   padding-top: var(--unit-md);
   border-top: 1px solid var(--color-light-grey);
   text-align: center;
 }
 
-/* Feed management */
+/* Feed management — a bit wider than the other sections since the feed list and its
+   add-feed form (platform/url fields) genuinely benefit from the room. */
 
 .account-page__feeds {
   width: 100%;
-  margin: var(--unit-md) 0 0;
+  max-width: 700px;
+  margin: var(--unit-md) auto 0;
   padding-top: var(--unit-md);
   border-top: 1px solid var(--color-light-grey);
   text-align: left;
@@ -135,7 +178,8 @@
 
 .account-page__logout {
   width: 100%;
-  margin: var(--unit-md) 0 0;
+  max-width: 480px;
+  margin: var(--unit-md) auto 0;
   padding-top: var(--unit-md);
   border-top: 1px solid var(--color-light-grey);
 }

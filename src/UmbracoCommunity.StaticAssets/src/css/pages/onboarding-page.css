@@ -1,8 +1,8 @@
 @import "../base/media-queries.css";
 
 .onboarding-page-wrapper {
-  /* Wide enough that the profile URL + copy button reliably fit on one line
-     (see .dc-onboarding__handle's white-space: nowrap) rather than wrapping. */
+  /* Wide enough that the profile URL + copy button (see dc-profile-link,
+     css/elements/profile-link.css) reliably fit on one line rather than wrapping. */
   max-width: 1040px;
   margin-inline: auto;
   padding: var(--unit-lg) var(--unit);
@@ -164,88 +164,24 @@ dc-onboarding-wizard,
   min-width: 0;
 }
 
+.dc-onboarding__handle-block dc-profile-link {
+  display: block;
+  margin: var(--unit-xxs) 0;
+}
+
 .dc-onboarding__eyebrow {
   margin: 0;
   font-size: var(--font-size-sm);
   color: var(--color-light-blue);
 }
 
-/* Mobile-first sizing: a compact box at narrow widths, growing to the larger desktop
-   treatment only once the identity block itself has switched to the wider row layout. Solid
-   identity blue (the same fill as .btn.is-blue) so it reads as a bold, unmistakably
-   interactive chip rather than a flat, disabled-looking grey box. */
+/* Fallback for when the tenant hasn't set up a Community Profile page yet, so there's no
+   real link to build a <dc-profile-link> from — just the handle as plain text. */
 .dc-onboarding__handle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--unit-xs);
   margin: var(--unit-xxs) 0;
-  padding: var(--unit-xxs) var(--unit-xs);
-  border-radius: var(--border-radius-lg);
-  background: var(--color-identity-blue);
-  font-size: 1rem;
-  font-weight: 700;
-
-  @media (--md) {
-    gap: var(--unit-sm);
-    padding: var(--unit-xs) var(--unit-sm);
-    font-size: 1.5rem;
-  }
-}
-
-/* The URL itself stays on one line and scrolls horizontally rather than silently truncating
-   on the rare oversized domain — min-width: 0 lets it shrink below its content width inside
-   the flex row so that scrolling (not squeezing the copy button) is what absorbs the overflow. */
-.dc-onboarding__handle-url {
-  min-width: 0;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-/* The boilerplate part of the link (scheme, host, base path) recedes; the handle — the part
-   that's actually theirs — carries the emphasis. White-on-blue now, so the "recede" is done
-   with opacity rather than a different hue. */
-.dc-onboarding__handle-base {
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 400;
-}
-
-.dc-onboarding__handle-slug {
-  color: var(--color-white);
+  font-size: 1.5rem;
   font-weight: 800;
-}
-
-.dc-onboarding__handle-copy {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  line-height: 0;
-}
-
-.dc-onboarding__handle-copy:hover {
-  color: var(--color-white);
-}
-
-/* Overrides the site default focus ring colour (identity blue) since that would be invisible
-   against this box's own blue background. */
-.dc-onboarding__handle-copy:focus-visible {
-  outline: var(--focus-outline-width) solid var(--color-white);
-  outline-offset: var(--focus-outline-offset);
-}
-
-.dc-onboarding__handle-copy svg {
-  display: block;
-  width: 14px;
-  height: 14px;
-
-  @media (--md) {
-    width: 18px;
-    height: 18px;
-  }
+  color: var(--color-identity-blue);
 }
 
 .dc-onboarding__hint {

@@ -1,0 +1,77 @@
+/* Shared "here's your public profile link" chip — used by the onboarding wizard's "Your
+   details" step and the Account page's public-profile section (dc-profile-link). Solid
+   identity blue with white text so it reads as an unmistakably interactive element rather
+   than flat, disabled-looking grey. Mobile-first sizing: compact by default, growing to the
+   larger desktop treatment from --md up. */
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-xs);
+  margin: 0;
+  padding: var(--unit-xxs) var(--unit-xs);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-identity-blue);
+  font-size: 1rem;
+  font-weight: 700;
+
+  @media (--md) {
+    gap: var(--unit-sm);
+    padding: var(--unit-xs) var(--unit-sm);
+    font-size: 1.5rem;
+  }
+}
+
+/* Stays on one line and scrolls horizontally rather than silently truncating on a rare
+   oversized domain — min-width: 0 lets it shrink below its content width inside the flex row
+   so that scrolling (not squeezing the copy button) is what absorbs the overflow. */
+.profile-link__url {
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* The boilerplate part of the link (scheme, host, base path) recedes; the handle — the part
+   that's actually theirs — carries the emphasis. */
+.profile-link__base {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.profile-link__slug {
+  color: var(--color-white);
+  font-weight: 800;
+}
+
+.profile-link__copy {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.profile-link__copy:hover {
+  color: var(--color-white);
+}
+
+/* Overrides the site default focus ring colour (identity blue) since that would be invisible
+   against this chip's own blue background. */
+.profile-link__copy:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-white);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.profile-link__copy svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+
+  @media (--md) {
+    width: 18px;
+    height: 18px;
+  }
+}

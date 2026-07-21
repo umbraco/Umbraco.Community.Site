@@ -40,9 +40,12 @@
 
             @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
-                <p class="account-page__profile-link">
-                    <a href="@Model.ProfileUrl">View your public profile</a>
-                </p>
+                <div class="account-page__profile-cta">
+                    <h2>Your public profile</h2>
+                    <p>This is where the rest of the community finds you.</p>
+                    <dc-profile-link url="@Model.ProfileUrl"></dc-profile-link>
+                    <a class="btn is-blue account-page__view-profile" href="@Model.ProfileUrl">View your public profile</a>
+                </div>
             }
             else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
             {

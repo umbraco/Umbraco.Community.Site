@@ -8,8 +8,7 @@ import {
   MAX_BIO_LENGTH,
   type OnboardingState,
 } from "../../services/profile-onboarding.service.js";
-import { iconUpload, iconCopy, iconCheck } from "../../svg/lucide-icons.js";
-import { copyToClipboard } from "../../util/clipboard.js";
+import { iconUpload } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-onboarding-wizard";
 
@@ -50,15 +49,10 @@ export class OnboardingWizardElement extends LitElement {
   @state()
   private _errorMessage = "";
 
-  @state()
-  private _showCopiedFeedback = false;
-
   // Whatever action most recently failed — "Try again" re-runs exactly that, rather than
   // always restarting from the beginning (which would just reload the same draft state and
   // strand the member on whichever step they were on when the retry loop began).
   #retryAction: (() => void) | null = null;
-
-  #copiedTimeout?: ReturnType<typeof setTimeout>;
 
   // Render in light DOM so the site's existing form/button styles apply without duplication.
   protected createRenderRoot() {
@@ -68,13 +62,6 @@ export class OnboardingWizardElement extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     void this.#start();
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this.#copiedTimeout) {
-      clearTimeout(this.#copiedTimeout);
-    }
   }
 
   async #start() {
@@ -220,48 +207,20 @@ export class OnboardingWizardElement extends LitElement {
     return this.devrelContactTitle || "Email the DevRel team";
   }
 
-  // Trimmed once here since both the display and the copy handler need the same base.
-  #profileBaseUrl(): string | null {
-    return this.profileBaseUrl ? this.profileBaseUrl.replace(/\/$/, "") : null;
-  }
-
   /**
-   * Shows the actual link the member's profile will live at (scheme + host included, so it's
-   * obviously "https://localhost:xxxx/..." in dev vs the real domain elsewhere) rather than
-   * just their handle. Falls back to "@handle" if the tenant hasn't set up a Community
-   * Profile page yet, since there's no base URL to build a real link from.
+   * The full link the member's profile will live at (scheme + host included, so it's
+   * obviously "https://localhost:xxxx/..." in dev vs the real domain elsewhere). Null if the
+   * tenant hasn't set up a Community Profile page yet, since there's no base URL to build a
+   * real link from — the view falls back to showing just "@handle" in that case.
    */
-  #renderProfileUrl(handle: string): TemplateResult {
-    const base = this.#profileBaseUrl();
-    if (!base) {
-      return html`<span class="dc-onboarding__handle-slug">@${handle}</span>`;
-    }
-
-    return html`<span class="dc-onboarding__handle-base">${base}/</span><span
-        class="dc-onboarding__handle-slug"
-        >${handle}</span
-      >`;
-  }
-
-  async #handleCopyProfileUrl(handle: string) {
-    const base = this.#profileBaseUrl();
-    if (!base) return;
-
-    const copied = await copyToClipboard(`${base}/${handle}`);
-    if (!copied) return;
-
-    this._showCopiedFeedback = true;
-    if (this.#copiedTimeout) {
-      clearTimeout(this.#copiedTimeout);
-    }
-    this.#copiedTimeout = setTimeout(() => {
-      this._showCopiedFeedback = false;
-    }, 2000);
+  #profileUrl(handle: string): string | null {
+    return this.profileBaseUrl ? `${this.profileBaseUrl.replace(/\/$/, "")}/${handle}` : null;
   }
 
   #renderStepDetails(state: OnboardingState): TemplateResult {
     const target = this.devrelContactTarget || undefined;
     const rel = target === "_blank" ? "noopener noreferrer" : undefined;
+    const profileUrl = this.#profileUrl(state.handle);
     return html`
       <section class="dc-onboarding__step">
         ${this.#renderStepIndicator()}
@@ -291,20 +250,9 @@ export class OnboardingWizardElement extends LitElement {
 
           <div class="dc-onboarding__handle-block">
             <p class="dc-onboarding__eyebrow">Your community profile will live at</p>
-            <p class="dc-onboarding__handle">
-              <span class="dc-onboarding__handle-url">${this.#renderProfileUrl(state.handle)}</span>
-              ${this.#profileBaseUrl()
-                ? html`<button
-                    class="dc-onboarding__handle-copy"
-                    type="button"
-                    @click=${() => this.#handleCopyProfileUrl(state.handle)}
-                    title="${this._showCopiedFeedback ? 'Copied!' : 'Copy link'}"
-                    aria-label="${this._showCopiedFeedback ? 'Link copied to clipboard' : 'Copy profile link to clipboard'}"
-                  >
-                    ${this._showCopiedFeedback ? iconCheck : iconCopy}
-                  </button>`
-                : ""}
-            </p>
+            ${profileUrl
+              ? html`<dc-profile-link .url=${profileUrl}></dc-profile-link>`
+              : html`<p class="dc-onboarding__handle">@${state.handle}</p>`}
             <p class="dc-onboarding__hint">
               Need to change this?
               <a href=${this.#devrelContactHref()} target=${ifDefined(target)} rel=${ifDefined(rel)}>${this.#devrelContactLabel()}</a>
