@@ -15,7 +15,10 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 [Route("api/profile")]
 public class ProfileApiController : ControllerBase
 {
-    private const int MaxBioLength = 1000;
+    // Short by design — the bio renders in the profile page's hero band next to the headline
+    // (see community-profile.css .community-profile__bio, max-width: 60ch), not as a full
+    // "about me" section, so it needs to stay skimmable rather than wrapping for many lines.
+    private const int MaxBioLength = 280;
 
     private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
@@ -54,6 +57,7 @@ public class ProfileApiController : ControllerBase
             entity.DisplayName,
             entity.Bio,
             _avatarUrlResolver.Resolve(entity.AvatarMediaKey, entity.GitHubHandle),
+            entity.AvatarMediaKey.HasValue,
             entity.OnboardingStatus.ToString()));
     }
 
@@ -76,7 +80,7 @@ public class ProfileApiController : ControllerBase
     }
 
     [HttpPut("avatar")]
-    [RequestSizeLimit(5_000_000)]
+    [RequestSizeLimit(AvatarUploadService.MaxBytes)]
     public async Task<IActionResult> UpdateAvatar(IFormFile file, CancellationToken cancellationToken)
     {
         var member = await _memberManager.GetCurrentMemberAsync();
@@ -97,7 +101,22 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = result.Error });
         }
 
-        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, member.UserName ?? string.Empty)));
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, member.UserName ?? string.Empty), true));
+    }
+
+    /// <summary>Removes the member's uploaded avatar, reverting display to their GitHub default.</summary>
+    [HttpDelete("avatar")]
+    public async Task<IActionResult> RemoveAvatar(CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        await _avatarUploadService.RemoveAsync(member.Key, cancellationToken);
+
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, member.UserName ?? string.Empty), false));
     }
 
     /// <summary>Marks onboarding complete — this is what makes the profile publicly visible.</summary>

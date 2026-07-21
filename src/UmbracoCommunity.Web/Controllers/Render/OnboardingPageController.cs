@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
@@ -43,10 +44,14 @@ public class OnboardingPageController : RenderController
         var devRelContactLink = currentPage.As<OnboardingPage>().DevRelContactForm;
         var viewModel = new OnboardingPageViewModel(currentPage)
         {
-            ProfileBaseUrl = profilePage?.Url(_publishedUrlProvider),
+            // Absolute so the wizard can show the member the actual link their profile will
+            // live at (scheme + host included) — this varies per environment (localhost in
+            // dev, the real domain elsewhere), which a relative path wouldn't communicate.
+            ProfileBaseUrl = profilePage?.Url(_publishedUrlProvider, mode: UrlMode.Absolute),
             IsSignedIn = _memberManager.IsLoggedIn(),
             DevRelContactUrl = devRelContactLink?.Url,
             DevRelContactTarget = devRelContactLink?.Target,
+            DevRelContactTitle = devRelContactLink?.Name,
         };
 
         return CurrentTemplate(viewModel);

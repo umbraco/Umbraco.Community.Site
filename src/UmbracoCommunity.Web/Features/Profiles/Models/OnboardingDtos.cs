@@ -5,8 +5,9 @@ public sealed record OnboardingStateResponse(
     string DisplayName,
     string? Bio,
     string AvatarUrl,
+    bool HasCustomAvatar,
     string OnboardingStatus);
 
 public sealed record UpdateBioRequest(string? Bio);
 
-public sealed record UpdateAvatarResponse(string AvatarUrl);
+public sealed record UpdateAvatarResponse(string AvatarUrl, bool HasCustomAvatar);

@@ -5,9 +5,9 @@ namespace UmbracoCommunity.Web.Models.Pages;
 public class OnboardingPageViewModel(IPublishedContent currentPage) : PageViewModelBase(currentPage)
 {
     /// <summary>
-    /// The tenant's Community Profile page URL (without a handle segment), used by the
-    /// wizard to build the final redirect once onboarding completes. Null if the tenant
-    /// hasn't set one up yet.
+    /// The tenant's Community Profile page URL (absolute, without a handle segment) — used
+    /// both to build the final redirect once onboarding completes and to show the member the
+    /// real link their profile will live at. Null if the tenant hasn't set one up yet.
     /// </summary>
     public string? ProfileBaseUrl { get; init; }
 
@@ -22,4 +22,7 @@ public class OnboardingPageViewModel(IPublishedContent currentPage) : PageViewMo
     public string? DevRelContactUrl { get; init; }
 
     public string? DevRelContactTarget { get; init; }
+
+    /// <summary>The link's editor-set title — falls back to a sensible default in the wizard if not set.</summary>
+    public string? DevRelContactTitle { get; init; }
 }

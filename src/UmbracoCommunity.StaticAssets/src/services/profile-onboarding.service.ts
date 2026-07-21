@@ -7,6 +7,7 @@ export interface OnboardingState {
   displayName: string;
   bio: string | null;
   avatarUrl: string;
+  hasCustomAvatar: boolean;
   onboardingStatus: OnboardingStatus;
 }
 
@@ -25,7 +26,7 @@ export class ProfileOnboardingService extends ServiceBase {
     if (!response.ok) throw new Error(await this.#errorMessage(response));
   }
 
-  static async uploadAvatar(file: File): Promise<{ avatarUrl: string }> {
+  static async uploadAvatar(file: File): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
     const formData = new FormData();
     formData.append("file", file);
     // Not ServiceBase.put — that always JSON-encodes the body. A multipart file upload
@@ -34,6 +35,12 @@ export class ProfileOnboardingService extends ServiceBase {
       method: "put",
       body: formData,
     });
+    if (!response.ok) throw new Error(await this.#errorMessage(response));
+    return response.json();
+  }
+
+  static async removeAvatar(): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
+    const response = await fetch(`${this.BASE_URL}/avatar`, { method: "delete" });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
     return response.json();
   }

@@ -1,5 +1,9 @@
+@import "../base/media-queries.css";
+
 .onboarding-page-wrapper {
-  max-width: 720px;
+  /* Wide enough that the profile URL + copy button reliably fit on one line
+     (see .dc-onboarding__handle's white-space: nowrap) rather than wrapping. */
+  max-width: 1040px;
   margin-inline: auto;
   padding: var(--unit-lg) var(--unit);
 }
@@ -40,39 +44,230 @@ dc-onboarding-wizard,
 }
 
 .dc-onboarding__step h2 {
-  margin: 0 0 var(--unit-sm);
+  margin: 0 0 var(--unit-xxs);
   color: var(--color-identity-blue);
 }
 
-.dc-onboarding__handle-block,
-.dc-onboarding__avatar-block {
+.dc-onboarding__intro {
+  margin: 0 0 var(--unit-md);
+  color: var(--color-light-blue);
+}
+
+/* Avatar + handle read as one "who you are" unit, not two separate blocks. Stacked and
+   centered up to --md — the row/grid layout needs real room for both the avatar column and
+   the URL box, so it only switches on at a properly wide viewport rather than squeezing both
+   into the awkward --sm..--md range. */
+.dc-onboarding__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--unit-sm);
   margin-bottom: var(--unit-md);
   padding-bottom: var(--unit-md);
   border-bottom: 1px solid var(--color-light-grey);
+
+  @media (--md) {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) 1fr;
+    text-align: left;
+    gap: var(--unit-lg);
+  }
 }
 
-.dc-onboarding__handle {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-identity-blue);
-}
+/* Left-aligned rather than centered from --md up, and stretched to fill its grid column so
+   the avatar image can be sized off the column width rather than a fixed pixel size. The
+   bottom border is a delimiter between avatar and handle while they're stacked — removed
+   once they sit side by side, where a horizontal rule between them wouldn't make sense. */
+.dc-onboarding__avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--unit-xs);
+  width: 100%;
+  max-width: 220px;
+  padding-bottom: var(--unit-sm);
+  border-bottom: 1px solid var(--color-light-grey);
 
-.dc-onboarding__hint {
-  font-size: var(--font-size-sm);
-  color: var(--color-light-blue);
+  @media (--md) {
+    align-items: flex-start;
+    max-width: none;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
 }
 
 .dc-onboarding__avatar-preview {
   display: block;
-  width: 120px;
-  height: 120px;
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: var(--unit-sm);
+  box-shadow: 0 0 0 3px var(--color-identity-pink);
+}
+
+.dc-onboarding__avatar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-sm);
+}
+
+/* Smaller than the site's default .btn sizing so "Upload image" fits on one line within the
+   narrow avatar column instead of wrapping — scoped to this button only. */
+.dc-onboarding__avatar-actions .btn {
+  min-height: 32px;
+  padding: 0 var(--unit-sm);
+  gap: var(--unit-xxs);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.dc-onboarding__avatar-actions .btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Deliberately not a .btn — "Change photo" is the primary action here, so Remove stays a
+   quiet secondary link rather than a second competing pill button. */
+.dc-onboarding__avatar-remove {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dc-onboarding__avatar-remove:hover {
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__avatar-remove:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-onboarding__avatar-hint {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+  text-align: center;
+
+  @media (--md) {
+    text-align: left;
+  }
+}
+
+.dc-onboarding__handle-block {
+  min-width: 0;
+}
+
+.dc-onboarding__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+/* Mobile-first sizing: a compact box at narrow widths, growing to the larger desktop
+   treatment only once the identity block itself has switched to the wider row layout. Solid
+   identity blue (the same fill as .btn.is-blue) so it reads as a bold, unmistakably
+   interactive chip rather than a flat, disabled-looking grey box. */
+.dc-onboarding__handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-xs);
+  margin: var(--unit-xxs) 0;
+  padding: var(--unit-xxs) var(--unit-xs);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-identity-blue);
+  font-size: 1rem;
+  font-weight: 700;
+
+  @media (--md) {
+    gap: var(--unit-sm);
+    padding: var(--unit-xs) var(--unit-sm);
+    font-size: 1.5rem;
+  }
+}
+
+/* The URL itself stays on one line and scrolls horizontally rather than silently truncating
+   on the rare oversized domain — min-width: 0 lets it shrink below its content width inside
+   the flex row so that scrolling (not squeezing the copy button) is what absorbs the overflow. */
+.dc-onboarding__handle-url {
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* The boilerplate part of the link (scheme, host, base path) recedes; the handle — the part
+   that's actually theirs — carries the emphasis. White-on-blue now, so the "recede" is done
+   with opacity rather than a different hue. */
+.dc-onboarding__handle-base {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.dc-onboarding__handle-slug {
+  color: var(--color-white);
+  font-weight: 800;
+}
+
+.dc-onboarding__handle-copy {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.dc-onboarding__handle-copy:hover {
+  color: var(--color-white);
+}
+
+/* Overrides the site default focus ring colour (identity blue) since that would be invisible
+   against this box's own blue background. */
+.dc-onboarding__handle-copy:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-white);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-onboarding__handle-copy svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+
+  @media (--md) {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.dc-onboarding__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-onboarding__bio-count {
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+  text-align: right;
+}
+
+.dc-onboarding__bio-count--limit {
+  color: var(--color-error, #c0392b);
 }
 
 .dc-onboarding__actions {
   display: flex;
+  justify-content: flex-end;
   gap: var(--unit-sm);
   margin-top: var(--unit-md);
 }
