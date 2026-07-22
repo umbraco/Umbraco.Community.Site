@@ -79,40 +79,12 @@
 }
 
 /* Sign out — pushed flush right via margin-left: auto rather than justify-content: space-between,
-   since that would also split the avatar away from the identity block next to it. */
+   since that would also split the avatar away from the identity block next to it. Styling for
+   the link itself lives in the shared .link-action utility (elements/buttons.css). */
 .account-page__header-logout {
   margin-left: auto;
   flex-shrink: 0;
   align-self: flex-start;
-}
-
-.account-page__logout-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--unit-xxs);
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-light-blue);
-  cursor: pointer;
-}
-
-.account-page__logout-link:hover {
-  color: var(--color-identity-blue);
-  text-decoration: underline;
-}
-
-.account-page__logout-link:focus-visible {
-  outline: var(--focus-outline);
-  outline-offset: var(--focus-outline-offset);
-}
-
-.account-page__logout-link svg {
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
 }
 
 /* Sections — each a divider-separated block, left-aligned. Spacing around each divider is

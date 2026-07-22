@@ -112,9 +112,10 @@ export class FeedManagerElement extends LitElement {
     if (this._removingId === feed.id) {
       return html`
         <li class="dc-feed-manager__item dc-feed-manager__item--removing">
-          <p>This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):</p>
+          <p id="dc-feed-manager-reason-label-${feed.id}">This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):</p>
           <textarea
             rows="2"
+            aria-labelledby="dc-feed-manager-reason-label-${feed.id}"
             .value=${this._removeReasonDraft}
             @input=${(event: Event) => (this._removeReasonDraft = (event.target as HTMLTextAreaElement).value)}
           ></textarea>
@@ -132,17 +133,17 @@ export class FeedManagerElement extends LitElement {
       <li class="dc-feed-manager__item ${feed.isHidden ? "dc-feed-manager__item--hidden" : ""}">
         <div class="dc-feed-manager__item-info">
           <span class="dc-feed-manager__platform">${feed.platform}</span>
-          <a class="dc-feed-manager__url" href=${feed.url} target="_blank" rel="noopener">${feed.url}</a>
+          <a class="dc-feed-manager__url" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
           ${feed.isHidden ? html`<span class="dc-feed-manager__badge">Hidden from profile</span>` : ""}
         </div>
         <div class="dc-feed-manager__item-actions">
           ${this.#canHide(feed)
-            ? html`<button class="dc-feed-manager__link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
+            ? html`<button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
                 ${feed.isHidden ? iconEye : iconEyeOff}
                 ${feed.isHidden ? "Show on profile" : "Hide from profile"}
               </button>`
             : ""}
-          <button class="dc-feed-manager__link-action" type="button" @click=${() => this.#startRemove(feed)}>
+          <button class="link-action" type="button" @click=${() => this.#startRemove(feed)}>
             ${iconX} This isn't me
           </button>
         </div>

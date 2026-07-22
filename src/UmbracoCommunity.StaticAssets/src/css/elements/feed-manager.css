@@ -91,39 +91,6 @@ dc-feed-manager {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--unit-sm);
-  flex-shrink: 0;
-}
-
-/* Hide/show and "Not me" are secondary housekeeping actions, not calls to action — plain small
-   links with a leading icon rather than full buttons, so they don't compete visually with the
-   feed's own platform/URL text. */
-.dc-feed-manager__link-action {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--unit-xxs);
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-light-blue);
-  cursor: pointer;
-}
-
-.dc-feed-manager__link-action:hover {
-  color: var(--color-identity-blue);
-  text-decoration: underline;
-}
-
-.dc-feed-manager__link-action:focus-visible {
-  outline: var(--focus-outline);
-  outline-offset: var(--focus-outline-offset);
-}
-
-.dc-feed-manager__link-action svg {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
 }
 
 .dc-feed-manager__add-form {
