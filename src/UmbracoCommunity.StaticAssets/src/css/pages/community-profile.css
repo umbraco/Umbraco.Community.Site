@@ -57,6 +57,73 @@
     box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12), 0 0 0 12px var(--color-identity-pink);
 }
 
+/* Profile-owner avatar editing — a small upload badge overlaid on the avatar's corner,
+   only ever rendered for Model.IsOwnProfile (see dc-profile-avatar-editor). */
+
+.community-profile__avatar-editor {
+    position: relative;
+    display: inline-block;
+    width: 180px;
+    height: 180px;
+}
+
+.community-profile__avatar-editor .community-profile__avatar {
+    display: block;
+}
+
+.community-profile__avatar-upload {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid var(--color-white);
+    background: var(--color-identity-blue);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.community-profile__avatar-upload:hover {
+    background: var(--color-identity-dark);
+}
+
+.community-profile__avatar-upload.is-saving {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.community-profile__avatar-upload:focus-visible {
+    outline: var(--focus-outline-width) solid var(--color-white);
+    outline-offset: var(--focus-outline-offset);
+}
+
+.community-profile__avatar-upload svg {
+    width: 18px;
+    height: 18px;
+}
+
+.community-profile__avatar-error {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 220px;
+    margin-top: var(--unit-xs);
+    padding: var(--unit-xxs) var(--unit-sm);
+    border-radius: var(--border-radius);
+    background: var(--color-white);
+    color: var(--color-error, #c0392b);
+    font-size: var(--font-size-xs);
+    text-align: center;
+    box-shadow: var(--base-box-shadow);
+}
+
 .community-profile__name {
     display: flex;
     flex-wrap: wrap;
@@ -88,6 +155,89 @@
     font-size: var(--font-size-large);
     line-height: 1.5;
     color: rgba(255, 255, 255, 0.85);
+}
+
+/* Profile-owner bio editing — an edit badge at the top right of the bio box, revealing an
+   inline textarea in place. Only ever rendered for Model.IsOwnProfile (see
+   dc-profile-bio-editor). */
+
+.community-profile__bio-editor {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 100ch;
+    margin: var(--unit) 0 0;
+    padding-right: var(--unit-lg);
+}
+
+.community-profile__bio-editor .community-profile__bio {
+    margin: 0;
+}
+
+.community-profile__bio--empty {
+    color: rgba(255, 255, 255, 0.55);
+    font-style: italic;
+}
+
+.community-profile__bio-edit {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--color-white);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.community-profile__bio-edit:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.community-profile__bio-edit:focus-visible {
+    outline: var(--focus-outline-width) solid var(--color-white);
+    outline-offset: var(--focus-outline-offset);
+}
+
+.community-profile__bio-edit svg {
+    width: 16px;
+    height: 16px;
+}
+
+.community-profile__bio-editor--editing {
+    display: block;
+    padding-right: 0;
+}
+
+.community-profile__bio-editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--unit-sm);
+    margin-top: var(--unit-xs);
+}
+
+.community-profile__bio-count {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.community-profile__bio-actions {
+    display: flex;
+    gap: var(--unit-xs);
+}
+
+.community-profile__bio-error {
+    margin: var(--unit-xs) 0 0;
+    color: var(--color-identity-pink);
+    font-size: var(--font-size-sm);
 }
 
 .community-profile__meta,
@@ -181,6 +331,66 @@
     font-size: 14px;
     color: var(--color-white);
     text-shadow: 0 0 8px var(--color-identity-yellow);
+}
+
+/* "Claim this profile" state — same hero shell as a real profile, with an empty silhouette
+   avatar and ghost lines standing in for the headline/bio nobody has written yet. */
+
+.community-profile__avatar--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.community-profile__ghost-lines {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--unit-xs);
+    width: 100%;
+    max-width: 60ch;
+    margin: var(--unit) 0 0;
+}
+
+.community-profile__ghost-line {
+    display: block;
+    width: 100%;
+    height: 14px;
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.community-profile__ghost-line--headline {
+    max-width: 55%;
+    height: 20px;
+}
+
+.community-profile__ghost-line--short {
+    max-width: 70%;
+}
+
+.community-profile__claim {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--unit-sm);
+    margin-top: var(--unit-md);
+    text-align: center;
+}
+
+.community-profile__claim-text {
+    margin: 0;
+    max-width: 46ch;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* .btn.is-white:hover fills the button with identity blue but never overrides the base .btn
+   border colour (also identity blue), so on this blue hero the whole button — border
+   included — disappears into the background on hover. Keeping the border white here is what
+   .btn.is-transparent already does by default; this button just needs the same treatment. */
+.community-profile__claim .member-signin__btn:hover {
+    border-color: var(--color-white);
 }
 
 /* Badges bar — directly below the hero */
@@ -646,6 +856,17 @@
     .community-profile__meta,
     .community-profile__socials {
         justify-content: flex-start;
+    }
+
+    .community-profile__ghost-lines,
+    .community-profile__claim {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .community-profile__ghost-line--headline,
+    .community-profile__ghost-line--short {
+        max-width: 40%;
     }
 
     .community-profile__departments {

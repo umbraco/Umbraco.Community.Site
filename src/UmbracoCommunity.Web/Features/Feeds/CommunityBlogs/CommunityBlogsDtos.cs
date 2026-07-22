@@ -28,12 +28,12 @@ public sealed record PaginationDto(
     string? NextCursor,
     bool HasMore);
 
-public static class SphereJsonOptions
+public static class CommunityBlogsJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web);
 }
 
-/// <summary>Error envelope Sphere returns on a non-success response, e.g. <c>{"error":{"code":"invalid_feed","message":"..."}}</c>.</summary>
-public sealed record SphereErrorEnvelope(SphereErrorDetail? Error);
+/// <summary>Error envelope the content platform returns on a non-success response, e.g. <c>{"error":{"code":"invalid_feed","message":"..."}}</c>.</summary>
+public sealed record CommunityBlogsErrorEnvelope(CommunityBlogsErrorDetail? Error);
 
-public sealed record SphereErrorDetail(string? Code, string? Message);
+public sealed record CommunityBlogsErrorDetail(string? Code, string? Message);

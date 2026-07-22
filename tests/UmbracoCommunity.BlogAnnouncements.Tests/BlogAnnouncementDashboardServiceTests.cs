@@ -36,7 +36,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
     {
         var post = new AnnouncedBlogPost
         {
-            SphereId = Guid.NewGuid(),
+            PlatformPostId = Guid.NewGuid(),
             Url = "https://blog.example/a",
             Title = title,
             PublishedAtUtc = publishedAtUtc ?? Now.UtcDateTime.AddDays(-1),
@@ -92,7 +92,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
         var service = CreateService(announcer, new BlogAnnouncementsOptions { DryRun = false });
 
-        var result = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.Repost, default);
+        var result = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.Repost, default);
 
         result.Outcome.Should().Be(ManualAnnounceOutcome.Delivered);
         result.Status.Should().Be(AnnouncementStatus.Announced);
@@ -112,7 +112,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
         var service = CreateService(announcer, new BlogAnnouncementsOptions { DryRun = false });
 
-        var result = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.PostNow, default);
+        var result = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.PostNow, default);
 
         result.Outcome.Should().Be(ManualAnnounceOutcome.InvalidStatusForPostNow);
         announcer.Calls.Should().Be(0);
@@ -125,7 +125,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
         var service = CreateService(announcer, new BlogAnnouncementsOptions { DryRun = false });
 
-        var result = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.PostNow, default);
+        var result = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.PostNow, default);
 
         result.Outcome.Should().Be(ManualAnnounceOutcome.Delivered);
         result.Status.Should().Be(AnnouncementStatus.Announced);
@@ -138,7 +138,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var announcer = new RecordingAnnouncer(DeliveryResult.Dry);
         var service = CreateService(announcer, new BlogAnnouncementsOptions { DryRun = true });
 
-        var result = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.PostNow, default);
+        var result = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.PostNow, default);
 
         result.Outcome.Should().Be(ManualAnnounceOutcome.Delivered);
         result.Status.Should().Be(AnnouncementStatus.Pending);
@@ -164,7 +164,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var post = Seed(AnnouncementStatus.Announced);
         var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)));
 
-        var result = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.Auto, default);
+        var result = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.Auto, default);
 
         result.Outcome.Should().Be(ManualAnnounceOutcome.InvalidTrigger);
     }
@@ -177,11 +177,11 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var service = CreateService(gate, new BlogAnnouncementsOptions { DryRun = false });
 
         // First call enters the announcer and blocks on the gate.
-        var first = service.AnnounceAsync(post.SphereId, AnnouncementTrigger.Repost, default);
+        var first = service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.Repost, default);
         await gate.Entered.Task; // ensure the first call holds the in-flight slot
 
         // Second call for the same post while the first is in flight.
-        var second = await service.AnnounceAsync(post.SphereId, AnnouncementTrigger.Repost, default);
+        var second = await service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.Repost, default);
         second.Outcome.Should().Be(ManualAnnounceOutcome.InFlight);
 
         gate.Release.SetResult(DeliveryResult.Ok(204));
@@ -196,7 +196,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         {
             db.AnnouncementAttempts.Add(new AnnouncementAttempt
             {
-                SphereId = post.SphereId,
+                PlatformPostId = post.PlatformPostId,
                 AttemptedUtc = Now.UtcDateTime.AddHours(-1),
                 Outcome = "Success",
                 HttpStatus = 204,
@@ -206,7 +206,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         }
         var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)));
 
-        var outcome = await service.ResetAsync(post.SphereId, default);
+        var outcome = await service.ResetAsync(post.PlatformPostId, default);
 
         outcome.Should().Be(ResetOutcome.Reset);
         await using var verify = _factory.CreateDbContext();
@@ -228,7 +228,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var post = Seed(AnnouncementStatus.Failed);
         var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)));
 
-        (await service.ResetAsync(post.SphereId, default)).Should().Be(ResetOutcome.Reset);
+        (await service.ResetAsync(post.PlatformPostId, default)).Should().Be(ResetOutcome.Reset);
 
         await using var db = _factory.CreateDbContext();
         (await db.AnnouncedBlogPosts.SingleAsync()).Status.Should().Be(AnnouncementStatus.Pending);
@@ -243,7 +243,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var post = Seed(status);
         var service = CreateService(new RecordingAnnouncer(DeliveryResult.Ok(204)));
 
-        (await service.ResetAsync(post.SphereId, default)).Should().Be(ResetOutcome.InvalidStatus);
+        (await service.ResetAsync(post.PlatformPostId, default)).Should().Be(ResetOutcome.InvalidStatus);
 
         await using var db = _factory.CreateDbContext();
         (await db.AnnouncedBlogPosts.SingleAsync()).Status.Should().Be(status);
@@ -265,10 +265,10 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var service = CreateService(gate, new BlogAnnouncementsOptions { DryRun = false });
 
         // Hold a manual delivery in flight for the same post.
-        var delivery = service.AnnounceAsync(post.SphereId, AnnouncementTrigger.Repost, default);
+        var delivery = service.AnnounceAsync(post.PlatformPostId, AnnouncementTrigger.Repost, default);
         await gate.Entered.Task;
 
-        (await service.ResetAsync(post.SphereId, default)).Should().Be(ResetOutcome.InFlight);
+        (await service.ResetAsync(post.PlatformPostId, default)).Should().Be(ResetOutcome.InFlight);
 
         gate.Release.SetResult(DeliveryResult.Ok(204));
         (await delivery).Outcome.Should().Be(ManualAnnounceOutcome.Delivered);
@@ -304,7 +304,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         {
             db.AnnouncementAttempts.Add(new AnnouncementAttempt
             {
-                SphereId = post.SphereId,
+                PlatformPostId = post.PlatformPostId,
                 AttemptedUtc = Now.UtcDateTime,
                 Outcome = "Success",
                 Trigger = AnnouncementTrigger.Auto,
@@ -317,7 +317,7 @@ public class BlogAnnouncementDashboardServiceTests : IDisposable
         var listItem = (await service.ListPostsAsync(new PostQuery(null, null, null, null, 0, 25), default)).Items.Single();
         listItem.PublishedAtUtc.Kind.Should().Be(DateTimeKind.Utc);
 
-        var detail = (await service.GetPostAsync(post.SphereId, default))!;
+        var detail = (await service.GetPostAsync(post.PlatformPostId, default))!;
         detail.PublishedAtUtc.Kind.Should().Be(DateTimeKind.Utc);
         detail.FirstSeenUtc.Kind.Should().Be(DateTimeKind.Utc);
         detail.Attempts.Single().AttemptedUtc.Kind.Should().Be(DateTimeKind.Utc);

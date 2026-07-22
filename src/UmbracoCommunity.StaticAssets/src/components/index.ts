@@ -13,3 +13,8 @@ export * from "./sessionize/index.js";
 export * from "./event-schedule/index.js";
 export * from "./timeline/dc-timeline.element.js";
 export * from "./feed-submission/dc-feed-submission.element.js";
+export * from "./onboarding/dc-onboarding-wizard.element.js";
+export * from "./onboarding/dc-feed-manager.element.js";
+export * from "./profile/dc-profile-avatar-editor.element.js";
+export * from "./profile/dc-profile-bio-editor.element.js";
+export * from "./profile/dc-profile-link.element.js";

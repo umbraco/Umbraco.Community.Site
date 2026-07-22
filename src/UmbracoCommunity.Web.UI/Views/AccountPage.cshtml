@@ -1,4 +1,5 @@
 @using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Utilities
 @inherits UmbracoViewPage<AccountPageViewModel>
 
 @{
@@ -7,41 +8,77 @@
 
 <div class="account-page-wrapper">
     <article class="account-page">
-        <div class="account-page__band"></div>
-        <div class="account-page__body">
+        <header class="account-page__header">
             @if (!string.IsNullOrEmpty(Model.AvatarUrl))
             {
                 <img class="account-page__avatar"
                      src="@Model.AvatarUrl"
                      alt=""
-                     width="100"
-                     height="100" />
+                     width="108"
+                     height="108" />
             }
 
-            <h1 class="account-page__name">@Model.DisplayName</h1>
+            <div class="account-page__identity">
+                <h1 class="account-page__name">@Model.DisplayName</h1>
 
-            @if (!string.IsNullOrEmpty(Model.GitHubHandle))
+                @if (!string.IsNullOrEmpty(Model.GitHubHandle))
+                {
+                    <p class="account-page__handle">
+                        <a href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
+                            <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                            @@@Model.GitHubHandle
+                        </a>
+                    </p>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <p class="account-page__email">@Model.Email</p>
+                }
+            </div>
+
+            <form method="post" action="/logout" class="account-page__header-logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="link-action">
+                    <partial name="~/Views/Partials/Icons/LogOut.cshtml" />
+                    Sign out
+                </button>
+            </form>
+        </header>
+
+        <section class="account-page__section">
+            <h2>Your public profile</h2>
+
+            @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
-                <p class="account-page__handle">
-                    <a href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
-                        <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
-                        Signed in as @@@Model.GitHubHandle
-                    </a>
+                <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
+                <a class="account-page__profile-url no-link-animation" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
+
+                @if (Model.LastSyncedAt is not null)
+                {
+                    <p class="account-page__sync-status">
+                        Last synced @Model.LastSyncedAt.Value.ToRelativeTime()
+                    </p>
+                }
+                else
+                {
+                    <p class="account-page__sync-status account-page__sync-status--pending">
+                        Sync pending — your profile data hasn't synced yet.
+                    </p>
+                }
+            }
+            else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
+            {
+                <p class="account-page__section-hint">
+                    <a href="@Model.OnboardingUrl">Finish setting up your profile</a> to get a public page the community can find.
                 </p>
             }
+        </section>
 
-            @if (!string.IsNullOrEmpty(Model.Email))
-            {
-                <dl class="account-page__details">
-                    <dt>Email</dt>
-                    <dd>@Model.Email</dd>
-                </dl>
-            }
-
-            <form method="post" action="/logout" class="account-page__logout">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn is-transparent-blue">Sign out</button>
-            </form>
-        </div>
+        <section class="account-page__section">
+            <h2>Your feeds</h2>
+            <p class="account-page__section-hint">Manage the blogs and social profiles that feed your public profile.</p>
+            <dc-feed-manager></dc-feed-manager>
+        </section>
     </article>
 </div>

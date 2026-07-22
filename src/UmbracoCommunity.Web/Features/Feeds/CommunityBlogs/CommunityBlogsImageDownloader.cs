@@ -59,7 +59,7 @@ public sealed class CommunityBlogsImageDownloader
 
         foreach (var post in data.Posts)
         {
-            // Sphere sometimes returns image URLs relative to the post's own blog (e.g.
+            // The platform sometimes returns image URLs relative to the post's own blog (e.g.
             // "/images/2026/06/cover.webp" instead of "https://kjac.dev/images/2026/06/cover.webp").
             // Resolve those against the post's URL so they aren't silently dropped below.
             Uri.TryCreate(post.Url, UriKind.Absolute, out var postUri);

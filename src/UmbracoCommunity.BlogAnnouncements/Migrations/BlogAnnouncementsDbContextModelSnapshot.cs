@@ -19,7 +19,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Migrations
 
             modelBuilder.Entity("UmbracoCommunity.BlogAnnouncements.Models.Entities.AnnouncedBlogPost", b =>
                 {
-                    b.Property<Guid>("SphereId");
+                    b.Property<Guid>("PlatformPostId");
 
                     b.Property<DateTime?>("AnnouncedUtc");
 
@@ -55,7 +55,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Migrations
                         .IsRequired()
                         .HasMaxLength(2048);
 
-                    b.HasKey("SphereId");
+                    b.HasKey("PlatformPostId");
 
                     b.HasIndex("Fingerprint");
 
@@ -85,7 +85,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Migrations
                         .IsRequired()
                         .HasMaxLength(64);
 
-                    b.Property<Guid>("SphereId");
+                    b.Property<Guid>("PlatformPostId");
 
                     b.Property<byte>("Trigger");
 
@@ -93,7 +93,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Migrations
 
                     b.HasIndex("AttemptedUtc");
 
-                    b.HasIndex("SphereId");
+                    b.HasIndex("PlatformPostId");
 
                     b.ToTable("AnnouncementAttempts", (string)null);
                 });
@@ -128,7 +128,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Migrations
                 {
                     b.HasOne("UmbracoCommunity.BlogAnnouncements.Models.Entities.AnnouncedBlogPost", "Post")
                         .WithMany("Attempts")
-                        .HasForeignKey("SphereId")
+                        .HasForeignKey("PlatformPostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

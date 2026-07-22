@@ -27,12 +27,12 @@ public class CommunityBlogsAggregatorTests
     }
     """;
 
-    private static (SphereApiClient Client, StubHandler Handler) CreateClient(
+    private static (CommunityBlogsApiClient Client, StubHandler Handler) CreateClient(
         StubHandler handler, CommunityBlogsOptions options)
     {
         var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var typed = new SphereHttpClient(http);
-        var client = new SphereApiClient(typed, new TestOptionsMonitor<CommunityBlogsOptions>(options));
+        var typed = new CommunityBlogsHttpClient(http);
+        var client = new CommunityBlogsApiClient(typed, new TestOptionsMonitor<CommunityBlogsOptions>(options));
         return (client, handler);
     }
 
@@ -40,7 +40,7 @@ public class CommunityBlogsAggregatorTests
     public async Task Client_sends_authorization_header_and_cursor()
     {
         var handler = StubHandler.Json(Page("a", "2026-06-10T00:00:00Z", null, false));
-        var (client, h) = CreateClient(handler, new CommunityBlogsOptions { ApiKey = "psk_test" });
+        var (client, h) = CreateClient(handler, new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         await client.GetBlogPostsAsync("CUR123", 50, CancellationToken.None);
 
@@ -52,7 +52,7 @@ public class CommunityBlogsAggregatorTests
     private static CommunityBlogsAggregator CreateAggregator(StubHandler handler, CommunityBlogsOptions options)
     {
         var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var client = new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(options));
+        var client = new CommunityBlogsApiClient(new CommunityBlogsHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(options));
         return new CommunityBlogsAggregator(
             client,
             new TestOptionsMonitor<CommunityBlogsOptions>(options),
@@ -73,7 +73,7 @@ public class CommunityBlogsAggregatorTests
             { Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json") };
         });
         var aggregator = CreateAggregator(new StubHandler(responder),
-            new CommunityBlogsOptions { ApiKey = "psk_test", FetchBatchSize = 1, MaxPosts = 100 });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/", FetchBatchSize = 1, MaxPosts = 100 });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -102,7 +102,7 @@ public class CommunityBlogsAggregatorTests
             { Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json") };
         });
         var aggregator = CreateAggregator(new StubHandler(responder),
-            new CommunityBlogsOptions { ApiKey = "psk_test", FetchBatchSize = 1, MaxPosts = 3 });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/", FetchBatchSize = 1, MaxPosts = 3 });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -113,7 +113,7 @@ public class CommunityBlogsAggregatorTests
     public async Task Returns_null_when_first_page_fails()
     {
         var aggregator = CreateAggregator(StubHandler.Throws(),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -144,7 +144,7 @@ public class CommunityBlogsAggregatorTests
         }
         """;
         var aggregator = CreateAggregator(StubHandler.Json(body),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -169,7 +169,7 @@ public class CommunityBlogsAggregatorTests
             { Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json") };
         });
         var aggregator = CreateAggregator(new StubHandler(responder),
-            new CommunityBlogsOptions { ApiKey = "psk_test", FetchBatchSize = 1, MaxPosts = 100 });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/", FetchBatchSize = 1, MaxPosts = 100 });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -191,7 +191,7 @@ public class CommunityBlogsAggregatorTests
         });
         var handler = new StubHandler(responder);
         var aggregator = CreateAggregator(handler,
-            new CommunityBlogsOptions { ApiKey = "psk_test", FetchBatchSize = 1, MaxPosts = 100 });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/", FetchBatchSize = 1, MaxPosts = 100 });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 
@@ -220,7 +220,7 @@ public class CommunityBlogsAggregatorTests
         }
         """;
         var aggregator = CreateAggregator(StubHandler.Json(body),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         var data = await aggregator.BuildAsync(CancellationToken.None);
 

@@ -1,0 +1,217 @@
+@import "../base/media-queries.css";
+
+.onboarding-page-wrapper {
+  /* Wide enough that the profile URL + copy button (see dc-profile-link,
+     css/elements/profile-link.css) reliably fit on one line rather than wrapping. */
+  max-width: 1040px;
+  margin-inline: auto;
+  padding: var(--unit-lg) var(--unit);
+}
+
+dc-onboarding-wizard,
+.onboarding-page__signin {
+  display: block;
+  background: var(--color-white);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--box-shadow-blue);
+  padding: var(--unit-md);
+}
+
+/* The sign-in prompt is just a centered message + button — keep it compact even
+   though the wizard/feed-manager below it needs the full wrapper width. */
+.onboarding-page__signin {
+  max-width: 480px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.onboarding-page__signin h1 {
+  margin: 0 0 var(--unit-sm);
+  color: var(--color-identity-blue);
+}
+
+.onboarding-page__signin .member-signin__btn {
+  margin-top: var(--unit-sm);
+}
+
+.dc-onboarding__step-indicator {
+  margin: 0 0 var(--unit-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-light-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dc-onboarding__step h2 {
+  margin: 0 0 var(--unit-xxs);
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__intro {
+  margin: 0 0 var(--unit-md);
+  color: var(--color-light-blue);
+}
+
+/* Avatar + handle read as one "who you are" unit, not two separate blocks. Stacked and
+   centered up to --md — the row/grid layout needs real room for both the avatar column and
+   the URL box, so it only switches on at a properly wide viewport rather than squeezing both
+   into the awkward --sm..--md range. */
+.dc-onboarding__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--unit-sm);
+  margin-bottom: var(--unit-md);
+  padding-bottom: var(--unit-md);
+  border-bottom: 1px solid var(--color-light-grey);
+
+  @media (--md) {
+    display: grid;
+    grid-template-columns: minmax(140px, 220px) 1fr;
+    text-align: left;
+    gap: var(--unit-lg);
+  }
+}
+
+/* Left-aligned rather than centered from --md up, and stretched to fill its grid column so
+   the avatar image can be sized off the column width rather than a fixed pixel size. The
+   bottom border is a delimiter between avatar and handle while they're stacked — removed
+   once they sit side by side, where a horizontal rule between them wouldn't make sense. */
+.dc-onboarding__avatar-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--unit-xs);
+  width: 100%;
+  max-width: 220px;
+  padding-bottom: var(--unit-sm);
+  border-bottom: 1px solid var(--color-light-grey);
+
+  @media (--md) {
+    align-items: flex-start;
+    max-width: none;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.dc-onboarding__avatar-preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--color-identity-pink);
+}
+
+.dc-onboarding__avatar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-sm);
+}
+
+/* Smaller than the site's default .btn sizing so "Upload image" fits on one line within the
+   narrow avatar column instead of wrapping — scoped to this button only. */
+.dc-onboarding__avatar-actions .btn {
+  min-height: 32px;
+  padding: 0 var(--unit-sm);
+  gap: var(--unit-xxs);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.dc-onboarding__avatar-actions .btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Deliberately not a .btn — "Change photo" is the primary action here, so Remove stays a
+   quiet secondary link rather than a second competing pill button. */
+.dc-onboarding__avatar-remove {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dc-onboarding__avatar-remove:hover {
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__avatar-remove:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-onboarding__avatar-hint {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+  text-align: center;
+
+  @media (--md) {
+    text-align: left;
+  }
+}
+
+.dc-onboarding__handle-block {
+  min-width: 0;
+}
+
+.dc-onboarding__handle-block dc-profile-link {
+  display: block;
+  margin: var(--unit-xxs) 0;
+}
+
+.dc-onboarding__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+/* Fallback for when the tenant hasn't set up a Community Profile page yet, so there's no
+   real link to build a <dc-profile-link> from — just the handle as plain text. */
+.dc-onboarding__handle {
+  margin: var(--unit-xxs) 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-identity-blue);
+}
+
+.dc-onboarding__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-onboarding__bio-count {
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+  text-align: right;
+}
+
+.dc-onboarding__bio-count--limit {
+  color: var(--color-error, #c0392b);
+}
+
+.dc-onboarding__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--unit-sm);
+  margin-top: var(--unit-md);
+}
+
+.dc-onboarding__status {
+  text-align: center;
+}
+
+.dc-onboarding__status--error {
+  color: var(--color-error, #c0392b);
+}

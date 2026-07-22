@@ -100,6 +100,13 @@ a {
   }
 }
 
+/* Opt-out for utility links (raw URLs etc). :not(.btn) just matches specificity above. */
+#main-content .no-link-animation:not(.btn) {
+  background-image: none;
+  padding-bottom: 0;
+  text-decoration: none;
+}
+
 .lead {
   font-size: 1.1rem;
   text-align: center;

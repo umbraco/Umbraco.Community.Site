@@ -8,7 +8,7 @@ using UmbracoCommunity.BlogAnnouncements.Models.Entities;
 namespace UmbracoCommunity.BlogAnnouncements.Detection;
 
 /// <summary>
-/// Diffs fresh Sphere posts against the tracking store, records never-seen posts, and delivers the
+/// Diffs fresh upstream posts against the tracking store, records never-seen posts, and delivers the
 /// eligible ones via <see cref="IDiscordAnnouncer"/> — respecting the recency window and per-cycle
 /// cap. Marks a post <c>Announced</c> only after delivery confirms success, so failures retry next
 /// cycle. Writes one <see cref="AnnouncementRun"/> heartbeat row per cycle.
@@ -83,7 +83,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
     /// <summary>
     /// Records never-seen posts as Pending (within window) or SkippedTooOld (older), and refreshes
     /// the denormalised metadata of already-tracked posts from the fresh feed (the feed is the
-    /// source of truth — e.g. Sphere correcting a broken avatar URL after we first saw the post).
+    /// source of truth — e.g. the platform correcting a broken avatar URL after we first saw the post).
     /// Runs before delivery, so Pending/Failed posts deliver with current data. Returns
     /// (new, skippedTooOld).
     /// </summary>
@@ -95,27 +95,27 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
         CancellationToken cancellationToken)
     {
         var known = await db.AnnouncedBlogPosts
-            .Select(p => new { p.SphereId, p.Fingerprint })
+            .Select(p => new { p.PlatformPostId, p.Fingerprint })
             .ToListAsync(cancellationToken);
-        var knownIds = known.Select(k => k.SphereId).ToHashSet();
+        var knownIds = known.Select(k => k.PlatformPostId).ToHashSet();
         var knownFingerprints = known.Select(k => k.Fingerprint).ToHashSet(StringComparer.Ordinal);
 
         var newCount = 0;
         var skippedCount = 0;
-        var trackedCandidates = new List<(Guid SphereId, AnnouncementCandidatePost Post)>();
+        var trackedCandidates = new List<(Guid PlatformPostId, AnnouncementCandidatePost Post)>();
 
         foreach (var post in posts)
         {
-            if (!Guid.TryParse(post.Id, out var sphereId))
+            if (!Guid.TryParse(post.Id, out var platformPostId))
             {
                 _logger.LogWarning("Skipping community blog post with non-GUID id '{Id}'.", post.Id);
                 continue;
             }
 
-            // Already tracked by Sphere id — refresh its snapshotted metadata below.
-            if (knownIds.Contains(sphereId))
+            // Already tracked by platform post id — refresh its snapshotted metadata below.
+            if (knownIds.Contains(platformPostId))
             {
-                trackedCandidates.Add((sphereId, post));
+                trackedCandidates.Add((platformPostId, post));
                 continue;
             }
 
@@ -130,7 +130,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
             var withinWindow = publishedAtUtc >= windowStartUtc;
             db.AnnouncedBlogPosts.Add(new AnnouncedBlogPost
             {
-                SphereId = sphereId,
+                PlatformPostId = platformPostId,
                 Url = post.Url,
                 Title = post.Title,
                 PublishedAtUtc = publishedAtUtc,
@@ -144,7 +144,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
                 CoverImageUrl = post.CoverImageUrl,
             });
 
-            knownIds.Add(sphereId);
+            knownIds.Add(platformPostId);
             knownFingerprints.Add(fingerprint);
             newCount++;
             if (!withinWindow)
@@ -167,7 +167,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
     /// </summary>
     private async Task RefreshTrackedMetadataAsync(
         BlogAnnouncementsDbContext db,
-        IReadOnlyCollection<(Guid SphereId, AnnouncementCandidatePost Post)> trackedCandidates,
+        IReadOnlyCollection<(Guid PlatformPostId, AnnouncementCandidatePost Post)> trackedCandidates,
         CancellationToken cancellationToken)
     {
         if (trackedCandidates.Count == 0)
@@ -175,14 +175,14 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
             return;
         }
 
-        var ids = trackedCandidates.Select(c => c.SphereId).ToList();
+        var ids = trackedCandidates.Select(c => c.PlatformPostId).ToList();
         var rows = await db.AnnouncedBlogPosts
-            .Where(p => ids.Contains(p.SphereId))
-            .ToDictionaryAsync(p => p.SphereId, cancellationToken);
+            .Where(p => ids.Contains(p.PlatformPostId))
+            .ToDictionaryAsync(p => p.PlatformPostId, cancellationToken);
 
-        foreach (var (sphereId, post) in trackedCandidates)
+        foreach (var (platformPostId, post) in trackedCandidates)
         {
-            if (!rows.TryGetValue(sphereId, out var row))
+            if (!rows.TryGetValue(platformPostId, out var row))
             {
                 continue;
             }
@@ -224,7 +224,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
     /// <summary>
     /// Delivers Pending + Failed posts. Selection keeps the cap's guardrail semantics (the
     /// <em>newest</em> posts win a slot when over cap); delivery then runs strictly sequentially,
-    /// oldest first with SphereId as a tie-break (Sphere publish times are often date-only
+    /// oldest first with PlatformPostId as a tie-break (upstream publish times are often date-only
     /// midnights), so the channel reads chronologically and the order is deterministic.
     /// Returns (announced, failed).
     /// </summary>
@@ -243,13 +243,13 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
         var selected = await db.AnnouncedBlogPosts
             .Where(p => p.Status == AnnouncementStatus.Pending || p.Status == AnnouncementStatus.Failed)
             .OrderByDescending(p => p.PublishedAtUtc)
-            .ThenBy(p => p.SphereId)
+            .ThenBy(p => p.PlatformPostId)
             .Take(cap)
             .ToListAsync(cancellationToken);
 
         var queue = selected
             .OrderBy(p => p.PublishedAtUtc)
-            .ThenBy(p => p.SphereId)
+            .ThenBy(p => p.PlatformPostId)
             .ToList();
 
         var announcedCount = 0;
@@ -273,7 +273,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
 
             db.AnnouncementAttempts.Add(new AnnouncementAttempt
             {
-                SphereId = post.SphereId,
+                PlatformPostId = post.PlatformPostId,
                 AttemptedUtc = nowUtc,
                 HttpStatus = result.HttpStatus,
                 Trigger = AnnouncementTrigger.Auto,
