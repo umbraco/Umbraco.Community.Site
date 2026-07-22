@@ -19,17 +19,18 @@
 
 .account-page__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--unit-sm);
-  padding-bottom: var(--unit-md);
+  padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light-grey);
 }
 
 .account-page__avatar {
   display: block;
   flex-shrink: 0;
-  width: 72px;
-  height: 72px;
+  width: 108px;
+  height: 108px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -77,15 +78,58 @@
   word-break: break-word;
 }
 
-/* Sections — each a divider-separated block, left-aligned */
+/* Sign out — pushed flush right via margin-left: auto rather than justify-content: space-between,
+   since that would also split the avatar away from the identity block next to it. */
+.account-page__header-logout {
+  margin-left: auto;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.account-page__logout-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--unit-xxs);
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+  cursor: pointer;
+}
+
+.account-page__logout-link:hover {
+  color: var(--color-identity-blue);
+  text-decoration: underline;
+}
+
+.account-page__logout-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.account-page__logout-link svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* Sections — each a divider-separated block, left-aligned. Spacing around each divider is
+   deliberately one-sided (generous above the next heading, tight above the divider itself)
+   rather than stacking a full gap on both sides of every border, which is what made the space
+   above each heading feel arbitrarily large. */
 
 .account-page__section {
-  padding: var(--unit-md) 0;
+  padding-top: var(--unit-sm);
+  padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light-grey);
+  margin-top: var(--unit-sm);
 }
 
 .account-page__section:last-of-type {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .account-page__section h2 {
@@ -100,9 +144,16 @@
   color: var(--color-light-blue);
 }
 
-/* Public profile link — a plain, prominent URL rather than a button. Opts out of the global
-   #main-content pink-underline-grow animation (typography.css) since this is a utility URL,
-   not in-text prose. */
+/* dc-feed-manager carries its own top margin for contexts without a preceding hint paragraph
+   (e.g. the onboarding wizard) — here the hint's own margin-bottom above already provides that
+   gap, so the component's margin would just double it up. */
+.account-page__section dc-feed-manager {
+  margin-top: 0;
+}
+
+/* Public profile link — a plain, prominent URL rather than a button or an in-text prose link.
+   Opts out of the global #main-content pink-underline-grow animation (typography.css) and any
+   hover-underline entirely — this is a utility URL to click or copy, not a sentence link. */
 .account-page__profile-url {
   display: block;
   font-weight: 700;
@@ -110,14 +161,15 @@
   word-break: break-all;
 }
 
-#main-content .account-page__profile-url {
+/* The :not(.btn) here isn't excluding anything — .account-page__profile-url is never a .btn —
+   it's there purely so this selector matches the global rule's own specificity technique
+   (#main-content a:not(.btn):not(:has(...))). Without it the two rules tie on class-count and
+   the global one wins on its extra type-selector, so the animation silently survives. */
+#main-content .account-page__profile-url:not(.btn),
+#main-content .account-page__profile-url:not(.btn):hover {
   background-image: none;
   padding-bottom: 0;
   text-decoration: none;
-}
-
-#main-content .account-page__profile-url:hover {
-  text-decoration: underline;
 }
 
 /* Sync status — a quiet system-status line, not a headline moment */
@@ -142,10 +194,4 @@
 
 .account-page__sync-status--pending::before {
   background: var(--color-identity-orange);
-}
-
-/* Sign-out */
-
-.account-page__logout {
-  padding-top: var(--unit-md);
 }

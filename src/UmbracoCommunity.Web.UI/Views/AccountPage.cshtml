@@ -27,8 +27,8 @@
                 <img class="account-page__avatar"
                      src="@Model.AvatarUrl"
                      alt=""
-                     width="72"
-                     height="72" />
+                     width="108"
+                     height="108" />
             }
 
             <div class="account-page__identity">
@@ -49,6 +49,14 @@
                     <p class="account-page__email">@Model.Email</p>
                 }
             </div>
+
+            <form method="post" action="/logout" class="account-page__header-logout">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="account-page__logout-link">
+                    <partial name="~/Views/Partials/Icons/LogOut.cshtml" />
+                    Sign out
+                </button>
+            </form>
         </header>
 
         <section class="account-page__section">
@@ -57,7 +65,7 @@
             @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
                 <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
-                <a class="account-page__profile-url" href="@Model.ProfileUrl">@Model.ProfileUrl</a>
+                <a class="account-page__profile-url" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
 
                 @if (Model.LastSyncedAt is not null)
                 {
@@ -85,10 +93,5 @@
             <p class="account-page__section-hint">Manage the blogs and social profiles that feed your public profile.</p>
             <dc-feed-manager></dc-feed-manager>
         </section>
-
-        <form method="post" action="/logout" class="account-page__logout">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn">Sign out</button>
-        </form>
     </article>
 </div>

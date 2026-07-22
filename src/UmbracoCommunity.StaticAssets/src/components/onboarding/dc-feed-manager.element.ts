@@ -1,6 +1,7 @@
 import { LitElement, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { MemberFeedsService, type MemberFeed } from "../../services/member-feeds.service.js";
+import { iconEye, iconEyeOff, iconX } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-feed-manager";
 
@@ -107,27 +108,11 @@ export class FeedManagerElement extends LitElement {
     return !this.restrictHideToPlatform || feed.source === "Platform";
   }
 
-  /**
-   * Platform-sourced feeds were matched to this member automatically, so removing one can mean
-   * "that's a mismatch, not mine" rather than "I don't want this here" — the button and confirm
-   * copy reflect that so the flag is meaningful when it's reported back. Member-added feeds were
-   * added deliberately, so they keep the plain "Remove" framing.
-   */
-  #isNotMeFlag(feed: MemberFeed): boolean {
-    return feed.source === "Platform";
-  }
-
   #renderFeed(feed: MemberFeed): TemplateResult {
-    const isNotMeFlag = this.#isNotMeFlag(feed);
-
     if (this._removingId === feed.id) {
       return html`
         <li class="dc-feed-manager__item dc-feed-manager__item--removing">
-          <p>
-            ${isNotMeFlag
-              ? html`Flag <strong>${feed.platform}</strong> as not you? We'll report this match as wrong so it can be corrected. Add any detail (optional):`
-              : html`Remove <strong>${feed.platform}</strong>? Let us know why (optional):`}
-          </p>
+          <p>This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):</p>
           <textarea
             rows="2"
             .value=${this._removeReasonDraft}
@@ -136,7 +121,7 @@ export class FeedManagerElement extends LitElement {
           <div class="dc-feed-manager__item-actions">
             <button class="btn" type="button" @click=${this.#cancelRemove}>Cancel</button>
             <button class="btn is-blue" type="button" @click=${() => this.#confirmRemove(feed.id)}>
-              ${isNotMeFlag ? "Confirm — not me" : "Confirm removal"}
+              Confirm — this isn't me
             </button>
           </div>
         </li>
@@ -152,12 +137,13 @@ export class FeedManagerElement extends LitElement {
         </div>
         <div class="dc-feed-manager__item-actions">
           ${this.#canHide(feed)
-            ? html`<button class="btn" type="button" @click=${() => this.#toggleHidden(feed)}>
+            ? html`<button class="dc-feed-manager__link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
+                ${feed.isHidden ? iconEye : iconEyeOff}
                 ${feed.isHidden ? "Show on profile" : "Hide from profile"}
               </button>`
             : ""}
-          <button class="btn" type="button" @click=${() => this.#startRemove(feed)}>
-            ${isNotMeFlag ? "This is not me" : "Remove"}
+          <button class="dc-feed-manager__link-action" type="button" @click=${() => this.#startRemove(feed)}>
+            ${iconX} This isn't me
           </button>
         </div>
       </li>
