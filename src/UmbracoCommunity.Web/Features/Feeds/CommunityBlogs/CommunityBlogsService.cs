@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
@@ -137,19 +138,8 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
 
     private async Task WriteCacheFileAsync(CommunityBlogsData data, CancellationToken cancellationToken)
     {
-        try
-        {
-            var json = JsonSerializer.Serialize(data, SphereJsonOptions.Default);
-            var tempPath = _cacheFilePath + ".tmp";
-            await File.WriteAllTextAsync(tempPath, json, cancellationToken);
-            // Atomic on the same filesystem: a concurrent reader sees either the old
-            // file or the fully-written new one, never a partial write.
-            File.Move(tempPath, _cacheFilePath, overwrite: true);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to write community blogs disk cache to {Path}.", _cacheFilePath);
-        }
+        var json = JsonSerializer.Serialize(data, SphereJsonOptions.Default);
+        await AtomicFile.WriteAllTextAsync(_cacheFilePath, json, _logger, cancellationToken);
     }
 
     private CommunityBlogsData? TryReadCacheFile()

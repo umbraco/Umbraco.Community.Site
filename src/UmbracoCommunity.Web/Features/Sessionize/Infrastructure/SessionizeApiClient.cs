@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using UmbracoCommunity.Web.Features.Sessionize.Models;
+using UmbracoCommunity.Web.Utilities;
 
 namespace UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 
@@ -306,17 +307,8 @@ public class SessionizeApiClient
         _logger.LogInformation("Cleared Sessionize cache for event {EventId}", _options.EventId);
     }
 
-    private async Task WriteCacheFileAsync(string json, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await File.WriteAllTextAsync(_cacheFilePath, json, cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Failed to write Sessionize disk cache to {Path}", _cacheFilePath);
-        }
-    }
+    private Task WriteCacheFileAsync(string json, CancellationToken cancellationToken)
+        => AtomicFile.WriteAllTextAsync(_cacheFilePath, json, _logger, cancellationToken);
 
     private async Task<SessionizeAllData?> TryReadCacheFileAsync(CancellationToken cancellationToken)
     {
