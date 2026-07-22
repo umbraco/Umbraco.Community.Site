@@ -109,11 +109,11 @@ public class BlogAnnouncementDetectorTests : IDisposable
     {
         var id = Guid.NewGuid().ToString();
 
-        // Cycle 1 (dry-run) records the post as Pending with the broken avatar Sphere served then.
+        // Cycle 1 (dry-run) records the post as Pending with the broken avatar the platform served then.
         var dryRun = CreateDetector(new RecordingAnnouncer(DeliveryResult.Dry), new BlogAnnouncementsOptions { DryRun = true });
         await dryRun.DetectAndAnnounceAsync(Data(Post(id, Now.AddDays(-1), avatar: "https://linkedin.example/broken.jpg")));
 
-        // Cycle 2 (live): Sphere has corrected the avatar; delivery must carry the fresh one.
+        // Cycle 2 (live): the platform has corrected the avatar; delivery must carry the fresh one.
         var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
         var live = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = false });
         await live.DetectAndAnnounceAsync(Data(Post(id, Now.AddDays(-1), avatar: "https://github.example/fixed.png")));
@@ -186,7 +186,7 @@ public class BlogAnnouncementDetectorTests : IDisposable
     }
 
     [Fact]
-    public async Task SameSphereId_NotReinserted_AndNotReannounced()
+    public async Task SamePlatformPostId_NotReinserted_AndNotReannounced()
     {
         var id = Guid.NewGuid().ToString();
         var detector1 = CreateDetector(new RecordingAnnouncer(DeliveryResult.Ok(204)), new BlogAnnouncementsOptions { DryRun = false });
@@ -208,7 +208,7 @@ public class BlogAnnouncementDetectorTests : IDisposable
         var detector = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = false });
 
         var day = Now.AddDays(-1);
-        // Same author + title + day, different Sphere id and URL (the two-domain case).
+        // Same author + title + day, different platform post id and URL (the two-domain case).
         var a = Post(Guid.NewGuid().ToString(), day, title: "Same", url: "https://custom.example/p");
         var b = Post(Guid.NewGuid().ToString(), day, title: "Same", url: "https://app.azurewebsites.net/p");
         await detector.DetectAndAnnounceAsync(Data(a, b));

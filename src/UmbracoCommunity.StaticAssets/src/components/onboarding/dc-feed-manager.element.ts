@@ -7,13 +7,13 @@ const elementName = "dc-feed-manager";
 @customElement(elementName)
 export class FeedManagerElement extends LitElement {
   /**
-   * When set, only Sphere-supplied feeds can be hidden — member-added feeds can only be
+   * When set, only platform-supplied feeds can be hidden — member-added feeds can only be
    * removed. Used during onboarding, where hiding something you just added yourself (before
    * you've even seen your profile) is a confusing first impression; the Account page doesn't
    * set this, so once a member has seen their profile they can hide any feed.
    */
-  @property({ attribute: "restrict-hide-to-sphere", type: Boolean })
-  restrictHideToSphere = false;
+  @property({ attribute: "restrict-hide-to-platform", type: Boolean })
+  restrictHideToPlatform = false;
 
   @state()
   private _feeds: MemberFeed[] = [];
@@ -104,14 +104,30 @@ export class FeedManagerElement extends LitElement {
   }
 
   #canHide(feed: MemberFeed): boolean {
-    return !this.restrictHideToSphere || feed.source === "Sphere";
+    return !this.restrictHideToPlatform || feed.source === "Platform";
+  }
+
+  /**
+   * Platform-sourced feeds were matched to this member automatically, so removing one can mean
+   * "that's a mismatch, not mine" rather than "I don't want this here" — the button and confirm
+   * copy reflect that so the flag is meaningful when it's reported back. Member-added feeds were
+   * added deliberately, so they keep the plain "Remove" framing.
+   */
+  #isNotMeFlag(feed: MemberFeed): boolean {
+    return feed.source === "Platform";
   }
 
   #renderFeed(feed: MemberFeed): TemplateResult {
+    const isNotMeFlag = this.#isNotMeFlag(feed);
+
     if (this._removingId === feed.id) {
       return html`
         <li class="dc-feed-manager__item dc-feed-manager__item--removing">
-          <p>Remove <strong>${feed.platform}</strong>? Let us know why (optional):</p>
+          <p>
+            ${isNotMeFlag
+              ? html`Flag <strong>${feed.platform}</strong> as not you? We'll report this match as wrong so it can be corrected. Add any detail (optional):`
+              : html`Remove <strong>${feed.platform}</strong>? Let us know why (optional):`}
+          </p>
           <textarea
             rows="2"
             .value=${this._removeReasonDraft}
@@ -120,7 +136,7 @@ export class FeedManagerElement extends LitElement {
           <div class="dc-feed-manager__item-actions">
             <button class="btn" type="button" @click=${this.#cancelRemove}>Cancel</button>
             <button class="btn is-blue" type="button" @click=${() => this.#confirmRemove(feed.id)}>
-              Confirm removal
+              ${isNotMeFlag ? "Confirm — not me" : "Confirm removal"}
             </button>
           </div>
         </li>
@@ -140,9 +156,24 @@ export class FeedManagerElement extends LitElement {
                 ${feed.isHidden ? "Show on profile" : "Hide from profile"}
               </button>`
             : ""}
-          <button class="btn" type="button" @click=${() => this.#startRemove(feed)}>Remove</button>
+          <button class="btn" type="button" @click=${() => this.#startRemove(feed)}>
+            ${isNotMeFlag ? "This is not me" : "Remove"}
+          </button>
         </div>
       </li>
+    `;
+  }
+
+  #renderGroup(title: string, feeds: MemberFeed[]): TemplateResult | string {
+    if (feeds.length === 0) return "";
+
+    return html`
+      <div class="dc-feed-manager__group">
+        <h3 class="dc-feed-manager__group-title">${title}</h3>
+        <ul class="dc-feed-manager__list">
+          ${feeds.map((feed) => this.#renderFeed(feed))}
+        </ul>
+      </div>
     `;
   }
 
@@ -181,6 +212,9 @@ export class FeedManagerElement extends LitElement {
       return html`<p role="status">Loading your feeds…</p>`;
     }
 
+    const platformFeeds = this._feeds.filter((feed) => feed.source === "Platform");
+    const memberFeeds = this._feeds.filter((feed) => feed.source === "Member");
+
     return html`
       ${this._errorMessage ? html`<p class="dc-feed-manager__error" role="alert">${this._errorMessage}</p>` : ""}
       ${this._feeds.length === 0
@@ -191,9 +225,8 @@ export class FeedManagerElement extends LitElement {
             <p class="dc-feed-manager__hint">
               Hiding a feed keeps it here for you to manage, but removes it from your public profile.
             </p>
-            <ul class="dc-feed-manager__list">
-              ${this._feeds.map((feed) => this.#renderFeed(feed))}
-            </ul>
+            ${this.#renderGroup("Synced automatically", platformFeeds)}
+            ${this.#renderGroup("Added by you", memberFeeds)}
           `}
       ${this.#renderAddForm()}
     `;

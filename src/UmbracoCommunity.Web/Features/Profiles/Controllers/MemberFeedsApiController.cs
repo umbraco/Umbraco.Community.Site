@@ -17,16 +17,16 @@ public class MemberFeedsApiController : ControllerBase
 {
     private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
-    private readonly ISphereProfileSyncClient _sphereSyncClient;
+    private readonly IProfileSyncClient _profileSyncClient;
 
     public MemberFeedsApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
-        ISphereProfileSyncClient sphereSyncClient)
+        IProfileSyncClient profileSyncClient)
     {
         _memberManager = memberManager;
         _store = store;
-        _sphereSyncClient = sphereSyncClient;
+        _profileSyncClient = profileSyncClient;
     }
 
     [HttpGet]
@@ -67,7 +67,7 @@ public class MemberFeedsApiController : ControllerBase
             return BadRequest(new { error = "Start onboarding before adding feeds." });
         }
 
-        await _sphereSyncClient.NotifyFeedAddedAsync(member.UserName ?? string.Empty, feed.Platform, feed.Url, cancellationToken);
+        await _profileSyncClient.NotifyFeedAddedAsync(member.UserName ?? string.Empty, feed.Platform, feed.Url, cancellationToken);
 
         return Ok(ToResponse(feed));
     }
@@ -100,7 +100,7 @@ public class MemberFeedsApiController : ControllerBase
             return NotFound();
         }
 
-        await _sphereSyncClient.NotifyFeedRemovedAsync(member.UserName ?? string.Empty, feed.Url, request?.Reason, cancellationToken);
+        await _profileSyncClient.NotifyFeedRemovedAsync(member.UserName ?? string.Empty, feed.Url, request?.Reason, cancellationToken);
 
         return Ok();
     }
@@ -126,7 +126,7 @@ public class MemberFeedsApiController : ControllerBase
             return NotFound();
         }
 
-        await _sphereSyncClient.NotifyFeedHiddenAsync(member.UserName ?? string.Empty, feed.Url, isHidden, cancellationToken);
+        await _profileSyncClient.NotifyFeedHiddenAsync(member.UserName ?? string.Empty, feed.Url, isHidden, cancellationToken);
 
         return Ok();
     }

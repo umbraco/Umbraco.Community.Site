@@ -47,7 +47,7 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.AddScoped<ProfileAvatarUrlResolver>();
         builder.Services.AddScoped<AvatarUploadService>();
         builder.Services.AddScoped<IProfileDataProvider, MemberProfileDataProvider>();
-        builder.Services.AddScoped<ISphereProfileSyncClient, StubSphereProfileSyncClient>();
+        builder.Services.AddScoped<IProfileSyncClient, StubProfileSyncClient>();
 
         // Append so built-in content finders match first. Ours only fires under the tenant's
         // Community Profile page for a plausible-handle trailing segment (e.g. /community/profiles/octocat).

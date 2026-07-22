@@ -1,6 +1,6 @@
 import { ServiceBase } from "./service-base";
 
-export type MemberFeedSource = "Member" | "Sphere";
+export type MemberFeedSource = "Member" | "Platform";
 
 export interface MemberFeed {
   id: number;

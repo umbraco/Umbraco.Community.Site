@@ -17,4 +17,7 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
 
     /// <summary>The onboarding page URL, shown as a nudge when onboarding isn't complete yet.</summary>
     public string? OnboardingUrl { get; set; }
+
+    /// <summary>When the external platform last synced this member's profile data, if known.</summary>
+    public DateTimeOffset? LastSyncedAt { get; set; }
 }

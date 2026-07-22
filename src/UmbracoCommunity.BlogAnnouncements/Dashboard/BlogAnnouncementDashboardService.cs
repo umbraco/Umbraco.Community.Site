@@ -114,7 +114,7 @@ public sealed class BlogAnnouncementDashboardService
             .Take(Math.Clamp(query.Take, 1, 200))
             .Select(p => new PostListItem
             {
-                SphereId = p.SphereId,
+                PlatformPostId = p.PlatformPostId,
                 Title = p.Title,
                 Url = p.Url,
                 AuthorName = p.AuthorName,
@@ -130,13 +130,13 @@ public sealed class BlogAnnouncementDashboardService
         return new PostListResponse { Total = total, Items = items };
     }
 
-    public async Task<PostDetail?> GetPostAsync(Guid sphereId, CancellationToken ct)
+    public async Task<PostDetail?> GetPostAsync(Guid platformPostId, CancellationToken ct)
     {
         await using var db = await _contextFactory.CreateDbContextAsync(ct);
 
         var post = await db.AnnouncedBlogPosts.AsNoTracking()
             .Include(p => p.Attempts)
-            .FirstOrDefaultAsync(p => p.SphereId == sphereId, ct);
+            .FirstOrDefaultAsync(p => p.PlatformPostId == platformPostId, ct);
 
         if (post is null)
         {
@@ -145,7 +145,7 @@ public sealed class BlogAnnouncementDashboardService
 
         return new PostDetail
         {
-            SphereId = post.SphereId,
+            PlatformPostId = post.PlatformPostId,
             Title = post.Title,
             Url = post.Url,
             Excerpt = post.Excerpt,
@@ -215,7 +215,7 @@ public sealed class BlogAnnouncementDashboardService
     /// supplied trigger and, on success, marks the post Announced. Post-now is only valid for posts
     /// that were never announced (Pending / SkippedTooOld).
     /// </summary>
-    public async Task<ManualAnnounceResult> AnnounceAsync(Guid sphereId, AnnouncementTrigger trigger, CancellationToken ct)
+    public async Task<ManualAnnounceResult> AnnounceAsync(Guid platformPostId, AnnouncementTrigger trigger, CancellationToken ct)
     {
         if (trigger != AnnouncementTrigger.Repost && trigger != AnnouncementTrigger.PostNow)
         {
@@ -223,7 +223,7 @@ public sealed class BlogAnnouncementDashboardService
         }
 
         // Guard against a second manual delivery for the same post while one is in flight.
-        if (!_inFlight.TryAdd(sphereId, 0))
+        if (!_inFlight.TryAdd(platformPostId, 0))
         {
             return new ManualAnnounceResult(ManualAnnounceOutcome.InFlight);
         }
@@ -232,7 +232,7 @@ public sealed class BlogAnnouncementDashboardService
         {
             await using var db = await _contextFactory.CreateDbContextAsync(ct);
 
-            var post = await db.AnnouncedBlogPosts.FirstOrDefaultAsync(p => p.SphereId == sphereId, ct);
+            var post = await db.AnnouncedBlogPosts.FirstOrDefaultAsync(p => p.PlatformPostId == platformPostId, ct);
             if (post is null)
             {
                 return new ManualAnnounceResult(ManualAnnounceOutcome.PostNotFound);
@@ -260,7 +260,7 @@ public sealed class BlogAnnouncementDashboardService
 
             db.AnnouncementAttempts.Add(new AnnouncementAttempt
             {
-                SphereId = post.SphereId,
+                PlatformPostId = post.PlatformPostId,
                 AttemptedUtc = nowUtc,
                 HttpStatus = result.HttpStatus,
                 Trigger = trigger,
@@ -292,7 +292,7 @@ public sealed class BlogAnnouncementDashboardService
         }
         finally
         {
-            _inFlight.TryRemove(sphereId, out _);
+            _inFlight.TryRemove(platformPostId, out _);
         }
     }
 
@@ -304,9 +304,9 @@ public sealed class BlogAnnouncementDashboardService
     /// delivery. Note: a reset post older than the recency window is re-evaluated by the next
     /// cycle under the normal rules and counts toward the per-cycle cap.
     /// </summary>
-    public async Task<ResetOutcome> ResetAsync(Guid sphereId, CancellationToken ct)
+    public async Task<ResetOutcome> ResetAsync(Guid platformPostId, CancellationToken ct)
     {
-        if (!_inFlight.TryAdd(sphereId, 0))
+        if (!_inFlight.TryAdd(platformPostId, 0))
         {
             return ResetOutcome.InFlight;
         }
@@ -315,7 +315,7 @@ public sealed class BlogAnnouncementDashboardService
         {
             await using var db = await _contextFactory.CreateDbContextAsync(ct);
 
-            var post = await db.AnnouncedBlogPosts.FirstOrDefaultAsync(p => p.SphereId == sphereId, ct);
+            var post = await db.AnnouncedBlogPosts.FirstOrDefaultAsync(p => p.PlatformPostId == platformPostId, ct);
             if (post is null)
             {
                 return ResetOutcome.PostNotFound;
@@ -331,7 +331,7 @@ public sealed class BlogAnnouncementDashboardService
 
             db.AnnouncementAttempts.Add(new AnnouncementAttempt
             {
-                SphereId = post.SphereId,
+                PlatformPostId = post.PlatformPostId,
                 AttemptedUtc = _time.GetUtcNow().UtcDateTime,
                 HttpStatus = null,
                 Trigger = AnnouncementTrigger.Reset,
@@ -345,7 +345,7 @@ public sealed class BlogAnnouncementDashboardService
         }
         finally
         {
-            _inFlight.TryRemove(sphereId, out _);
+            _inFlight.TryRemove(platformPostId, out _);
         }
     }
 

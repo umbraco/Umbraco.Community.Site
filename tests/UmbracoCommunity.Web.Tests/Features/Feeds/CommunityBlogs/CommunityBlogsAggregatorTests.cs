@@ -27,12 +27,12 @@ public class CommunityBlogsAggregatorTests
     }
     """;
 
-    private static (SphereApiClient Client, StubHandler Handler) CreateClient(
+    private static (CommunityBlogsApiClient Client, StubHandler Handler) CreateClient(
         StubHandler handler, CommunityBlogsOptions options)
     {
         var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var typed = new SphereHttpClient(http);
-        var client = new SphereApiClient(typed, new TestOptionsMonitor<CommunityBlogsOptions>(options));
+        var typed = new CommunityBlogsHttpClient(http);
+        var client = new CommunityBlogsApiClient(typed, new TestOptionsMonitor<CommunityBlogsOptions>(options));
         return (client, handler);
     }
 
@@ -52,7 +52,7 @@ public class CommunityBlogsAggregatorTests
     private static CommunityBlogsAggregator CreateAggregator(StubHandler handler, CommunityBlogsOptions options)
     {
         var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var client = new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(options));
+        var client = new CommunityBlogsApiClient(new CommunityBlogsHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(options));
         return new CommunityBlogsAggregator(
             client,
             new TestOptionsMonitor<CommunityBlogsOptions>(options),

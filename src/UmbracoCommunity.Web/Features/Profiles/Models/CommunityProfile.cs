@@ -3,18 +3,18 @@ namespace UmbracoCommunity.Web.Features.Profiles.Models;
 /// <summary>
 /// A community member's public profile, aggregated from curated/external data.
 /// Source-agnostic: the same shape is produced by the Phase 1 dummy provider and
-/// the later Sphere-backed provider, so the view never changes between phases.
+/// the later platform-backed provider, so the view never changes between phases.
 /// </summary>
 /// <remarks>
 /// <para><see cref="Slug"/> is the member's GitHub handle (the public URL token).
-/// <see cref="SphereId"/> is Sphere's internal GUID, kept for linking back and the
-/// later claim flow.</para>
+/// <see cref="PlatformId"/> is the external platform's internal GUID, kept for linking back and
+/// the later claim flow.</para>
 /// <para>All collections are non-null (empty when absent) so the view can render
 /// "nothing here yet" states without null checks.</para>
 /// </remarks>
 public sealed record CommunityProfile(
     string Slug,
-    string? SphereId,
+    string? PlatformId,
     ProfileIdentity Identity,
     IReadOnlyList<ProfileBlogPost> BlogPosts,
     IReadOnlyList<ProfileVideo> Videos,
@@ -28,7 +28,7 @@ public sealed record CommunityProfile(
 /// <summary>Core identity and "about" details shown in the profile header.</summary>
 /// <remarks><see cref="AvatarUrl"/> is resolved by the provider from
 /// <see cref="GitHubHandle"/> (<c>https://github.com/{handle}.png</c>), falling back
-/// to a Sphere-supplied value, then to a default placeholder in the view.</remarks>
+/// to a platform-supplied value, then to a default placeholder in the view.</remarks>
 public sealed record ProfileIdentity(
     string DisplayName,
     string? Headline,
@@ -51,7 +51,7 @@ public sealed record ProfileBlogPost(
     string? Source,
     string? Excerpt = null);
 
-/// <summary>A YouTube video. May be sourced from Sphere or derived from the channel link.</summary>
+/// <summary>A YouTube video. May be sourced from the external platform or derived from the channel link.</summary>
 public sealed record ProfileVideo(
     string Title,
     string Url,

@@ -14,7 +14,7 @@ public class CommunityBlogsServiceTests : IDisposable
         Path.Combine(Path.GetTempPath(), "cb-tests-" + Guid.NewGuid().ToString("N"));
 
     private CommunityBlogsService CreateService(
-        SphereApiClient client,
+        CommunityBlogsApiClient client,
         CommunityBlogsOptions options,
         ICommunityBlogsIndexer? indexer = null)
     {
@@ -49,15 +49,15 @@ public class CommunityBlogsServiceTests : IDisposable
             NullLogger<CommunityBlogsImageDownloader>.Instance);
     }
 
-    private static SphereApiClient ClientReturning(string json)
+    private static CommunityBlogsApiClient ClientReturning(string json)
     {
         var http = new HttpClient(StubHandler.Json(json)) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        return new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+        return new CommunityBlogsApiClient(new CommunityBlogsHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
     }
 
     // First request returns the given JSON; every later request throws (network error).
     // Lets a single service instance exercise the success-then-failure refresh sequence.
-    private static SphereApiClient ClientSucceedingThenFailing(string json)
+    private static CommunityBlogsApiClient ClientSucceedingThenFailing(string json)
     {
         var firstCall = true;
         var handler = new StubHandler(_ =>
@@ -74,7 +74,7 @@ public class CommunityBlogsServiceTests : IDisposable
             throw new HttpRequestException("simulated network error");
         });
         var http = new HttpClient(handler) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        return new SphereApiClient(new SphereHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+        return new CommunityBlogsApiClient(new CommunityBlogsHttpClient(http), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
     }
 
     private static string FivePosts() => """
@@ -146,7 +146,7 @@ public class CommunityBlogsServiceTests : IDisposable
 
         // Build a fresh service over the SAME temp root with a failing client (so it reads disk).
         var failing = new HttpClient(StubHandler.Throws()) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var failingClient = new SphereApiClient(new SphereHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+        var failingClient = new CommunityBlogsApiClient(new CommunityBlogsHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
         var env = new Mock<IHostEnvironment>();
         env.SetupGet(e => e.ContentRootPath).Returns(_tempRoot);
         var aggregator = new CommunityBlogsAggregator(failingClient,
@@ -197,7 +197,7 @@ public class CommunityBlogsServiceTests : IDisposable
         // A failing client makes the aggregator return null, so RefreshAsync no-ops.
         // With no prior cache, GetData() is empty (Posts.Count == 0) and Rebuild is NOT called.
         var failing = new HttpClient(StubHandler.Throws()) { BaseAddress = new Uri("https://test.local/api/v1/") };
-        var failingClient = new SphereApiClient(new SphereHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
+        var failingClient = new CommunityBlogsApiClient(new CommunityBlogsHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
         var service = CreateService(failingClient,
             new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
 

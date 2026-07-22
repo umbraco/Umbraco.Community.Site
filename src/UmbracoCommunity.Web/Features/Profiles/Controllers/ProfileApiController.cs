@@ -24,20 +24,20 @@ public class ProfileApiController : ControllerBase
     private readonly MemberProfileStore _store;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly AvatarUploadService _avatarUploadService;
-    private readonly ISphereProfileSyncClient _sphereSyncClient;
+    private readonly IProfileSyncClient _profileSyncClient;
 
     public ProfileApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
         ProfileAvatarUrlResolver avatarUrlResolver,
         AvatarUploadService avatarUploadService,
-        ISphereProfileSyncClient sphereSyncClient)
+        IProfileSyncClient profileSyncClient)
     {
         _memberManager = memberManager;
         _store = store;
         _avatarUrlResolver = avatarUrlResolver;
         _avatarUploadService = avatarUploadService;
-        _sphereSyncClient = sphereSyncClient;
+        _profileSyncClient = profileSyncClient;
     }
 
     /// <summary>Idempotently creates/fetches the current member's profile row and returns its current draft state.</summary>
@@ -136,8 +136,8 @@ public class ProfileApiController : ControllerBase
         }
 
         // Best-effort — the local write above is always the source of truth and already
-        // committed regardless of whether Sphere's (currently stubbed) sync succeeds.
-        await _sphereSyncClient.NotifyProfileClaimedAsync(entity.GitHubHandle, entity.SphereProfileId, cancellationToken);
+        // committed regardless of whether the platform's (currently stubbed) sync succeeds.
+        await _profileSyncClient.NotifyProfileClaimedAsync(entity.GitHubHandle, entity.PlatformProfileId, cancellationToken);
 
         return Ok();
     }

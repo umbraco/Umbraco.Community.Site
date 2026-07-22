@@ -23,7 +23,7 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.GitHubHandle).IsRequired().HasMaxLength(100);
             entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Bio).HasMaxLength(1000);
-            entity.Property(e => e.SphereProfileId).HasMaxLength(100);
+            entity.Property(e => e.PlatformProfileId).HasMaxLength(100);
 
             entity.HasIndex(e => e.MemberKey).IsUnique();
             entity.HasIndex(e => e.GitHubHandle);
@@ -42,7 +42,7 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.Platform).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Url).IsRequired().HasMaxLength(2048);
             entity.Property(e => e.RemovedReason).HasMaxLength(500);
-            entity.Property(e => e.LastSphereSyncError).HasMaxLength(1000);
+            entity.Property(e => e.LastPlatformSyncError).HasMaxLength(1000);
 
             entity.HasIndex(e => e.MemberProfileId);
         });

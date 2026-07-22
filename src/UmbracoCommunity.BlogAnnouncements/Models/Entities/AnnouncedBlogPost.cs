@@ -1,14 +1,14 @@
 namespace UmbracoCommunity.BlogAnnouncements.Models.Entities;
 
 /// <summary>
-/// A community blog post tracked by the announcement pipeline. Keyed on Sphere's stable post GUID.
-/// Author/excerpt/image fields are denormalised so the dashboard survives posts falling out of the
-/// transient Sphere cache window.
+/// A community blog post tracked by the announcement pipeline. Keyed on the external platform's
+/// stable post GUID. Author/excerpt/image fields are denormalised so the dashboard survives posts
+/// falling out of the transient upstream cache window.
 /// </summary>
 public class AnnouncedBlogPost
 {
-    /// <summary>Sphere post GUID — the primary dedup key.</summary>
-    public Guid SphereId { get; set; }
+    /// <summary>The external platform's post GUID — the primary dedup key.</summary>
+    public Guid PlatformPostId { get; set; }
 
     public string Url { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
@@ -16,7 +16,7 @@ public class AnnouncedBlogPost
     /// <summary>
     /// Publish time in UTC. Stored as <see cref="DateTime"/> (not <see cref="DateTimeOffset"/>)
     /// because SQLite — this site's default provider — cannot ORDER BY / range-filter a
-    /// DateTimeOffset column. Sphere publish times are effectively UTC (often bare midnight).
+    /// DateTimeOffset column. Upstream publish times are effectively UTC (often bare midnight).
     /// </summary>
     public DateTime PublishedAtUtc { get; set; }
 

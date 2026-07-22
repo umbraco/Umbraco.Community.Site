@@ -5,7 +5,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Api.Models;
 /// <summary>A single row in the Posts tab table.</summary>
 public sealed class PostListItem
 {
-    public Guid SphereId { get; init; }
+    public Guid PlatformPostId { get; init; }
     public string Title { get; init; } = string.Empty;
     public string Url { get; init; } = string.Empty;
     public string? AuthorName { get; init; }
@@ -44,7 +44,7 @@ public sealed class AttemptItem
 /// <summary>Full details for one tracked post plus its attempt history.</summary>
 public sealed class PostDetail
 {
-    public Guid SphereId { get; init; }
+    public Guid PlatformPostId { get; init; }
     public string Title { get; init; } = string.Empty;
     public string Url { get; init; } = string.Empty;
     public string? Excerpt { get; init; }

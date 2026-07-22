@@ -5,12 +5,12 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// Phase 1 profile source: returns a single, completely fictional profile
 /// ("Alex Penrose") for any slug, so the page can be designed and styled against
-/// realistic data before the live Sphere integration exists. One reserved slug
+/// realistic data before the live external platform integration exists. One reserved slug
 /// (<see cref="NotFoundSlug"/>) returns <c>null</c> to exercise the 404 path.
 /// </summary>
 /// <remarks>
 /// Nothing here represents a real community member. The shape mirrors the proposed
-/// Sphere contract (see <c>docs/COMMUNITY_PROFILES_SPEC.md</c> §5.1) so the fixture
+/// external platform contract (see <c>docs/COMMUNITY_PROFILES_SPEC.md</c> §5.1) so the fixture
 /// and the future live payload stay byte-compatible.
 /// </remarks>
 public sealed class DummyProfileDataProvider : IProfileDataProvider
@@ -32,7 +32,7 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
 
     private static readonly CommunityProfile AlexPenrose = new(
         Slug: Handle,
-        SphereId: "9a35e0df-abcd-496f-a7e7-68aca0d03ea2",
+        PlatformId: "9a35e0df-abcd-496f-a7e7-68aca0d03ea2",
         Identity: new ProfileIdentity(
             DisplayName: "Alex Penrose",
             Headline: "Full-stack Umbraco developer & package author",

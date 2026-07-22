@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
-/// <summary>Serves the aggregated community blog posts (Sphere-sourced) as a global RSS feed at /feeds/community-blogs.xml.</summary>
+/// <summary>Serves the aggregated community blog posts as a global RSS feed at /feeds/community-blogs.xml.</summary>
 public partial class CommunityBlogsFeedController : Controller
 {
     private readonly ICommunityBlogsService _communityBlogsService;

@@ -22,6 +22,7 @@ public class AccountPageController : RenderController
     private readonly MemberProfileStore _store;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
+    private readonly IProfileSyncClient _profileSyncClient;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -30,13 +31,15 @@ public class AccountPageController : RenderController
         IMemberManager memberManager,
         MemberProfileStore store,
         IPublishedUrlProvider publishedUrlProvider,
-        ProfileAvatarUrlResolver avatarUrlResolver)
+        ProfileAvatarUrlResolver avatarUrlResolver,
+        IProfileSyncClient profileSyncClient)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
         _store = store;
         _publishedUrlProvider = publishedUrlProvider;
         _avatarUrlResolver = avatarUrlResolver;
+        _profileSyncClient = profileSyncClient;
     }
 
     [NonAction]
@@ -77,6 +80,11 @@ public class AccountPageController : RenderController
         {
             var onboardingPage = currentPage.GetSingletonPage<OnboardingPage>();
             viewModel.OnboardingUrl = onboardingPage?.Url(_publishedUrlProvider);
+        }
+
+        if (handle != null)
+        {
+            viewModel.LastSyncedAt = await _profileSyncClient.GetLastSyncedAtAsync(handle, cancellationToken);
         }
 
         return CurrentTemplate(viewModel);

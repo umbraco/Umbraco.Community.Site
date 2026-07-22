@@ -77,7 +77,7 @@ export class BlogAnnouncementsPostDetailsModalElement extends UmbModalBaseElemen
     this.loading = true;
     this.error = null;
     try {
-      this.detail = await BlogAnnouncementsApi.getPost(this.data.sphereId);
+      this.detail = await BlogAnnouncementsApi.getPost(this.data.platformPostId);
     } catch (e) {
       this.error = (e as Error).message;
     } finally {
@@ -104,7 +104,7 @@ export class BlogAnnouncementsPostDetailsModalElement extends UmbModalBaseElemen
     this.resetting = true;
     this.error = null;
     try {
-      await BlogAnnouncementsApi.resetPost(this.data.sphereId);
+      await BlogAnnouncementsApi.resetPost(this.data.platformPostId);
       const notifications = await this.getContext(UMB_NOTIFICATION_CONTEXT);
       notifications?.peek("positive", {
         data: { headline: "Marked as not announced", message: "The post is pending again and eligible for the next automatic cycle." },
@@ -174,8 +174,8 @@ export class BlogAnnouncementsPostDetailsModalElement extends UmbModalBaseElemen
         <dd>
           <uui-tag color=${statusColor(d.status)} look="primary">${STATUS_LABELS[d.status] ?? d.status}</uui-tag>
         </dd>
-        <dt>Sphere id</dt>
-        <dd>${d.sphereId}</dd>
+        <dt>Post id</dt>
+        <dd>${d.platformPostId}</dd>
         <dt>URL</dt>
         <dd><a href=${d.url} target="_blank" rel="noopener noreferrer">${d.url}</a></dd>
         <dt>Published</dt>

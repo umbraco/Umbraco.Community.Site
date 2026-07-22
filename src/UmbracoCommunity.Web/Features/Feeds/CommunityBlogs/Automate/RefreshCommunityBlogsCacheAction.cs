@@ -15,16 +15,16 @@ public sealed class RefreshCommunityBlogsCacheOutput
 }
 
 /// <summary>
-/// Umbraco Automate action that re-aggregates community blog posts from Sphere and persists them
-/// (memory + disk cache + search index) via <see cref="ICommunityBlogsService"/> — the single
-/// fetch step other automations (e.g. the Discord announcement pipeline in
-/// <c>UmbracoCommunity.BlogAnnouncements</c>) rely on by reading the resulting disk cache file
-/// instead of calling Sphere themselves.
+/// Umbraco Automate action that re-aggregates community blog posts from the external content
+/// platform and persists them (memory + disk cache + search index) via
+/// <see cref="ICommunityBlogsService"/> — the single fetch step other automations (e.g. the
+/// Discord announcement pipeline in <c>UmbracoCommunity.BlogAnnouncements</c>) rely on by reading
+/// the resulting disk cache file instead of calling the upstream API themselves.
 /// </summary>
 [Action(
     "umbracoCommunity.refreshCommunityBlogsCache",
     "Refresh Community Blogs Cache",
-    Description = "Re-aggregates community blog posts from Sphere and refreshes the memory/disk cache and search index used by the blog showcase and RSS feed.",
+    Description = "Re-aggregates community blog posts and refreshes the memory/disk cache and search index used by the blog showcase and RSS feed.",
     Group = "Community Blogs",
     Icon = "icon-rss")]
 public sealed class RefreshCommunityBlogsCacheAction : ActionBase<RefreshCommunityBlogsCacheSettings, RefreshCommunityBlogsCacheOutput>

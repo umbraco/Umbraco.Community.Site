@@ -1,6 +1,6 @@
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
-/// <summary>A community blog post, mapped from the Sphere API for rendering.</summary>
+/// <summary>A community blog post, mapped from the external content API for rendering.</summary>
 public sealed record CommunityBlogPost(
     string Id,
     string Title,

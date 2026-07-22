@@ -13,7 +13,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <remarks>
 /// The community-activity collections (blog posts, videos, talks, badges, forum posts,
 /// packages, meetups) are always returned empty — populating those requires a real
-/// Sphere content-aggregation integration, which is out of scope for this provider.
+/// external content-aggregation integration, which is out of scope for this provider.
 /// Only <see cref="ProfileIdentity"/> (bio, avatar, handle, feeds-as-social-links) is real.
 /// </remarks>
 public sealed class MemberProfileDataProvider : IProfileDataProvider
@@ -42,7 +42,7 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
 
         return new CommunityProfile(
             Slug: entity.GitHubHandle,
-            SphereId: entity.SphereProfileId,
+            PlatformId: entity.PlatformProfileId,
             Identity: new ProfileIdentity(
                 DisplayName: entity.DisplayName,
                 Headline: null,

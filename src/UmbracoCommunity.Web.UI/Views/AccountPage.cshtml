@@ -5,64 +5,90 @@
     Layout = "Layout.cshtml";
 }
 
+@functions {
+    static string Relative(DateTimeOffset value)
+    {
+        var span = DateTimeOffset.UtcNow - value;
+        if (span.TotalDays >= 365) { var y = (int)(span.TotalDays / 365); return $"{y} year{(y == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 30) { var m = (int)(span.TotalDays / 30); return $"{m} month{(m == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 7) { var w = (int)(span.TotalDays / 7); return $"{w} week{(w == 1 ? "" : "s")} ago"; }
+        if (span.TotalDays >= 1) { var d = (int)span.TotalDays; return $"{d} day{(d == 1 ? "" : "s")} ago"; }
+        if (span.TotalHours >= 1) { var h = (int)span.TotalHours; return $"{h} hour{(h == 1 ? "" : "s")} ago"; }
+        var mins = Math.Max(1, (int)span.TotalMinutes);
+        return $"{mins} minute{(mins == 1 ? "" : "s")} ago";
+    }
+}
+
 <div class="account-page-wrapper">
     <article class="account-page">
-        <div class="account-page__band"></div>
-        <div class="account-page__body">
+        <header class="account-page__header">
             @if (!string.IsNullOrEmpty(Model.AvatarUrl))
             {
                 <img class="account-page__avatar"
                      src="@Model.AvatarUrl"
                      alt=""
-                     width="100"
-                     height="100" />
+                     width="72"
+                     height="72" />
             }
 
-            <h1 class="account-page__name">@Model.DisplayName</h1>
+            <div class="account-page__identity">
+                <h1 class="account-page__name">@Model.DisplayName</h1>
 
-            @if (!string.IsNullOrEmpty(Model.GitHubHandle))
-            {
-                <p class="account-page__handle">
-                    <a href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
-                        <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
-                        Signed in as @@@Model.GitHubHandle
-                    </a>
-                </p>
-            }
+                @if (!string.IsNullOrEmpty(Model.GitHubHandle))
+                {
+                    <p class="account-page__handle">
+                        <a href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
+                            <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                            @@@Model.GitHubHandle
+                        </a>
+                    </p>
+                }
 
-            @if (!string.IsNullOrEmpty(Model.Email))
-            {
-                <dl class="account-page__details">
-                    <dt>Email</dt>
-                    <dd>@Model.Email</dd>
-                </dl>
-            }
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <p class="account-page__email">@Model.Email</p>
+                }
+            </div>
+        </header>
+
+        <section class="account-page__section">
+            <h2>Your public profile</h2>
 
             @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
-                <div class="account-page__profile-cta">
-                    <h2>Your public profile</h2>
-                    <p>This is where the rest of the community finds you.</p>
-                    <dc-profile-link url="@Model.ProfileUrl"></dc-profile-link>
-                    <a class="btn is-blue account-page__view-profile" href="@Model.ProfileUrl">View your public profile</a>
-                </div>
+                <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
+                <a class="account-page__profile-url" href="@Model.ProfileUrl">@Model.ProfileUrl</a>
+
+                @if (Model.LastSyncedAt is not null)
+                {
+                    <p class="account-page__sync-status">
+                        Last synced @Relative(Model.LastSyncedAt.Value)
+                    </p>
+                }
+                else
+                {
+                    <p class="account-page__sync-status account-page__sync-status--pending">
+                        Sync pending — your profile data hasn't synced yet.
+                    </p>
+                }
             }
             else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
             {
-                <p class="account-page__profile-link">
-                    <a href="@Model.OnboardingUrl">Finish setting up your profile</a>
+                <p class="account-page__section-hint">
+                    <a href="@Model.OnboardingUrl">Finish setting up your profile</a> to get a public page the community can find.
                 </p>
             }
+        </section>
 
-            <div class="account-page__feeds">
-                <h2>Your feeds</h2>
-                <dc-feed-manager></dc-feed-manager>
-            </div>
+        <section class="account-page__section">
+            <h2>Your feeds</h2>
+            <p class="account-page__section-hint">Manage the blogs and social profiles that feed your public profile.</p>
+            <dc-feed-manager></dc-feed-manager>
+        </section>
 
-            <form method="post" action="/logout" class="account-page__logout">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn is-transparent-blue">Sign out</button>
-            </form>
-        </div>
+        <form method="post" action="/logout" class="account-page__logout">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn">Sign out</button>
+        </form>
     </article>
 </div>

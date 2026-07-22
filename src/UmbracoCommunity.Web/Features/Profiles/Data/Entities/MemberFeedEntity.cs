@@ -1,6 +1,6 @@
 namespace UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 
-public enum SphereFeedSyncStatus
+public enum FeedSyncStatus
 {
     Pending = 0,
     Synced = 1,
@@ -8,14 +8,15 @@ public enum SphereFeedSyncStatus
 }
 
 /// <summary>
-/// Where a feed came from. Sphere has no profile/feed API yet, so every feed is
-/// <see cref="Member"/>-added today — this exists so the UI can already distinguish them
-/// once Sphere-supplied feeds are a real possibility (see <see cref="MemberFeedEntity.Source"/>).
+/// Where a feed came from. The external content platform has no profile/feed API yet, so
+/// every feed is <see cref="Member"/>-added today — this exists so the UI can already
+/// distinguish them once platform-supplied feeds are a real possibility (see
+/// <see cref="MemberFeedEntity.Source"/>).
 /// </summary>
 public enum FeedSource
 {
     Member = 0,
-    Sphere = 1
+    Platform = 1
 }
 
 /// <summary>
@@ -53,11 +54,12 @@ public class MemberFeedEntity
 
     /// <summary>
     /// Lightweight sync-state tracking so a future reconciliation job can find feeds that
-    /// never made it to Sphere, without needing a full delivery/tracking pipeline today.
+    /// never made it to the external platform, without needing a full delivery/tracking
+    /// pipeline today.
     /// </summary>
-    public SphereFeedSyncStatus SphereSyncStatus { get; set; } = SphereFeedSyncStatus.Pending;
+    public FeedSyncStatus PlatformSyncStatus { get; set; } = FeedSyncStatus.Pending;
 
-    public DateTime? LastSphereSyncAttemptUtc { get; set; }
+    public DateTime? LastPlatformSyncAttemptUtc { get; set; }
 
-    public string? LastSphereSyncError { get; set; }
+    public string? LastPlatformSyncError { get; set; }
 }

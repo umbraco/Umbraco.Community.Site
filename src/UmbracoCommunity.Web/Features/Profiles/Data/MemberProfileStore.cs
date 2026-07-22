@@ -150,15 +150,15 @@ public class MemberProfileStore
         return true;
     }
 
-    public async Task MarkFeedSphereSyncResultAsync(int feedId, bool succeeded, string? error, CancellationToken ct = default)
+    public async Task MarkFeedPlatformSyncResultAsync(int feedId, bool succeeded, string? error, CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         var feed = await context.MemberFeeds.FirstOrDefaultAsync(f => f.Id == feedId, ct);
         if (feed == null) return;
 
-        feed.SphereSyncStatus = succeeded ? SphereFeedSyncStatus.Synced : SphereFeedSyncStatus.Failed;
-        feed.LastSphereSyncAttemptUtc = DateTime.UtcNow;
-        feed.LastSphereSyncError = succeeded ? null : error;
+        feed.PlatformSyncStatus = succeeded ? FeedSyncStatus.Synced : FeedSyncStatus.Failed;
+        feed.LastPlatformSyncAttemptUtc = DateTime.UtcNow;
+        feed.LastPlatformSyncError = succeeded ? null : error;
         await context.SaveChangesAsync(ct);
     }
 }

@@ -15,18 +15,18 @@ public class FeedSubmissionApiController : ControllerBase
 {
     private const int PreviewPostLimit = 6;
 
-    private readonly SphereApiClient _sphereClient;
+    private readonly CommunityBlogsApiClient _blogsApiClient;
     private readonly FeedSubmissionImageProxyService _imageProxy;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
     private readonly ILogger<FeedSubmissionApiController> _logger;
 
     public FeedSubmissionApiController(
-        SphereApiClient sphereClient,
+        CommunityBlogsApiClient blogsApiClient,
         FeedSubmissionImageProxyService imageProxy,
         IOptionsMonitor<CommunityBlogsOptions> options,
         ILogger<FeedSubmissionApiController> logger)
     {
-        _sphereClient = sphereClient;
+        _blogsApiClient = blogsApiClient;
         _imageProxy = imageProxy;
         _options = options;
         _logger = logger;
@@ -50,7 +50,7 @@ public class FeedSubmissionApiController : ControllerBase
 
         try
         {
-            var previewTask = _sphereClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
+            var previewTask = _blogsApiClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
             var statusTask = GetFeedStatusAsync(request.FeedUrl!, cancellationToken);
             await Task.WhenAll(previewTask, statusTask);
 
@@ -66,32 +66,32 @@ public class FeedSubmissionApiController : ControllerBase
 
             return Ok(new FeedPreviewResponse(posts, statusTask.Result));
         }
-        catch (SphereApiException ex) when (!ex.IsServerError)
+        catch (CommunityBlogsApiException ex) when (!ex.IsServerError)
         {
-            // Sphere rejected the feed itself (e.g. invalid_feed) — relay its message, it's actionable by the user.
+            // The platform rejected the feed itself (e.g. invalid_feed) — relay its message, it's actionable by the user.
             return BadRequest(new { error = ex.Message });
         }
-        catch (SphereApiException ex)
+        catch (CommunityBlogsApiException ex)
         {
-            _logger.LogWarning(ex, "Sphere returned a server error previewing feed");
+            _logger.LogWarning(ex, "The content platform returned a server error previewing feed");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
                 new { error = "Unable to reach the preview service. Please try again later." });
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogWarning(ex, "HTTP error previewing feed via Sphere");
+            _logger.LogWarning(ex, "HTTP error previewing feed via the content platform");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
                 new { error = "Unable to reach the preview service. Please try again later." });
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Failed to parse Sphere feed preview response");
+            _logger.LogError(ex, "Failed to parse feed preview response from the content platform");
             return StatusCode(StatusCodes.Status502BadGateway,
                 new { error = "Received invalid data from the preview service." });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error previewing feed via Sphere");
+            _logger.LogError(ex, "Unexpected error previewing feed via the content platform");
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new { error = "An unexpected error occurred. Please try again." });
         }
@@ -115,34 +115,34 @@ public class FeedSubmissionApiController : ControllerBase
 
         try
         {
-            var result = await _sphereClient.SubmitFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, cancellationToken);
+            var result = await _blogsApiClient.SubmitFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, cancellationToken);
             return Ok(result);
         }
-        catch (SphereApiException ex) when (!ex.IsServerError)
+        catch (CommunityBlogsApiException ex) when (!ex.IsServerError)
         {
             return BadRequest(new { error = ex.Message });
         }
-        catch (SphereApiException ex)
+        catch (CommunityBlogsApiException ex)
         {
-            _logger.LogWarning(ex, "Sphere returned a server error submitting feed");
+            _logger.LogWarning(ex, "The content platform returned a server error submitting feed");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
                 new { error = "Unable to reach the submission service. Please try again later." });
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogWarning(ex, "HTTP error submitting feed via Sphere");
+            _logger.LogWarning(ex, "HTTP error submitting feed via the content platform");
             return StatusCode(StatusCodes.Status503ServiceUnavailable,
                 new { error = "Unable to reach the submission service. Please try again later." });
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Failed to parse Sphere feed submission response");
+            _logger.LogError(ex, "Failed to parse feed submission response from the content platform");
             return StatusCode(StatusCodes.Status502BadGateway,
                 new { error = "Received invalid data from the submission service." });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error submitting feed via Sphere");
+            _logger.LogError(ex, "Unexpected error submitting feed via the content platform");
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new { error = "An unexpected error occurred. Please try again." });
         }
@@ -174,7 +174,7 @@ public class FeedSubmissionApiController : ControllerBase
     {
         try
         {
-            var result = await _sphereClient.GetFeedSubmissionStatusAsync(feedUrl, cancellationToken);
+            var result = await _blogsApiClient.GetFeedSubmissionStatusAsync(feedUrl, cancellationToken);
             return result?.Status ?? "none";
         }
         catch (Exception ex)

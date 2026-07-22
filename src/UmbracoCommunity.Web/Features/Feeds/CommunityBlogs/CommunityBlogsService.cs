@@ -139,7 +139,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
     {
         try
         {
-            var json = JsonSerializer.Serialize(data, SphereJsonOptions.Default);
+            var json = JsonSerializer.Serialize(data, CommunityBlogsJsonOptions.Default);
             var tempPath = _cacheFilePath + ".tmp";
             await File.WriteAllTextAsync(tempPath, json, cancellationToken);
             // Atomic on the same filesystem: a concurrent reader sees either the old
@@ -162,7 +162,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
             }
 
             var json = File.ReadAllText(_cacheFilePath);
-            return JsonSerializer.Deserialize<CommunityBlogsData>(json, SphereJsonOptions.Default);
+            return JsonSerializer.Deserialize<CommunityBlogsData>(json, CommunityBlogsJsonOptions.Default);
         }
         catch (Exception ex)
         {

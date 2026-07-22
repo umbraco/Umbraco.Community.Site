@@ -40,8 +40,8 @@ public class MemberProfileEntity
 
     public DateTime? OnboardingCompletedUtc { get; set; }
 
-    /// <summary>Sphere's internal profile id, once Sphere has a real claim endpoint. Null today.</summary>
-    public string? SphereProfileId { get; set; }
+    /// <summary>The external platform's internal profile id, once it has a real claim endpoint. Null today.</summary>
+    public string? PlatformProfileId { get; set; }
 
     public DateTime CreatedUtc { get; set; }
 

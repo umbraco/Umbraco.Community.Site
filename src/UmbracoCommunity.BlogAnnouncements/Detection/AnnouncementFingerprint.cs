@@ -6,7 +6,7 @@ namespace UmbracoCommunity.BlogAnnouncements.Detection;
 /// <summary>
 /// Builds the secondary dedup key: normalized author + normalized title + publish date
 /// (day-granular). Catches the same post surfacing under a different domain (e.g. an Azure
-/// *.azurewebsites.net URL alongside the custom domain), where the Sphere GUID differs.
+/// *.azurewebsites.net URL alongside the custom domain), where the platform's GUID differs.
 /// </summary>
 public static partial class AnnouncementFingerprint
 {

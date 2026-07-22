@@ -24,8 +24,8 @@ public class BlogAnnouncementsDbContext : DbContext
         modelBuilder.Entity<AnnouncedBlogPost>(entity =>
         {
             entity.ToTable("AnnouncedBlogPosts");
-            entity.HasKey(e => e.SphereId);
-            entity.Property(e => e.SphereId).ValueGeneratedNever();
+            entity.HasKey(e => e.PlatformPostId);
+            entity.Property(e => e.PlatformPostId).ValueGeneratedNever();
 
             entity.Property(e => e.Url).IsRequired().HasMaxLength(2048);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(1024);
@@ -43,7 +43,7 @@ public class BlogAnnouncementsDbContext : DbContext
 
             entity.HasMany(e => e.Attempts)
                 .WithOne(a => a.Post!)
-                .HasForeignKey(a => a.SphereId)
+                .HasForeignKey(a => a.PlatformPostId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -55,7 +55,7 @@ public class BlogAnnouncementsDbContext : DbContext
             entity.Property(e => e.Outcome).IsRequired().HasMaxLength(64);
             entity.Property(e => e.Destination).IsRequired().HasMaxLength(64).HasDefaultValue("Discord");
 
-            entity.HasIndex(e => e.SphereId);
+            entity.HasIndex(e => e.PlatformPostId);
             entity.HasIndex(e => e.AttemptedUtc);
         });
 

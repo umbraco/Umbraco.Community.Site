@@ -5,19 +5,19 @@ using Microsoft.Extensions.Options;
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
 /// <summary>
-/// Walks the cursor-paginated Sphere blog-posts API, maps to <see cref="CommunityBlogPost"/>,
+/// Walks the cursor-paginated external blog-posts API, maps to <see cref="CommunityBlogPost"/>,
 /// and returns the newest-first set. Returns null when nothing could be fetched (so callers
 /// keep any previously-persisted data).
 /// </summary>
 public sealed class CommunityBlogsAggregator
 {
-    private readonly SphereApiClient _client;
+    private readonly CommunityBlogsApiClient _client;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
     private readonly TimeProvider _time;
     private readonly ILogger<CommunityBlogsAggregator> _logger;
 
     public CommunityBlogsAggregator(
-        SphereApiClient client,
+        CommunityBlogsApiClient client,
         IOptionsMonitor<CommunityBlogsOptions> options,
         TimeProvider time,
         ILogger<CommunityBlogsAggregator> logger)
@@ -86,7 +86,7 @@ public sealed class CommunityBlogsAggregator
 
             if (!seenCursors.Add(page.Pagination.NextCursor))
             {
-                _logger.LogWarning("Repeated cursor {Cursor} from Sphere API; stopping walk.", page.Pagination.NextCursor);
+                _logger.LogWarning("Repeated cursor {Cursor} from the external API; stopping walk.", page.Pagination.NextCursor);
                 break;
             }
 
@@ -128,7 +128,7 @@ public sealed class CommunityBlogsAggregator
     }
 
     /// <summary>
-    /// Trims display text and HTML-decodes it. The Sphere feed sometimes returns
+    /// Trims display text and HTML-decodes it. The upstream feed sometimes returns
     /// entity-encoded text (e.g. "Here&amp;#x27;s"); decoding here means the Razor view's
     /// automatic encoding renders it correctly instead of showing the raw entity.
     /// </summary>

@@ -289,7 +289,7 @@ export class OnboardingWizardElement extends LitElement {
         ${this.#renderStepIndicator()}
         <h2>Your feeds</h2>
         <p>Add your blog, LinkedIn, or other social links — you can always change these later from your account page.</p>
-        <dc-feed-manager restrict-hide-to-sphere></dc-feed-manager>
+        <dc-feed-manager restrict-hide-to-platform></dc-feed-manager>
         <div class="dc-onboarding__actions">
           <button class="btn" type="button" @click=${this.#back}>Back</button>
           <button class="btn is-blue" type="button" @click=${this.#finish}>Finish</button>
