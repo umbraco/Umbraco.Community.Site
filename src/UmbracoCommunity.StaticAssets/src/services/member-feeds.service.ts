@@ -10,6 +10,15 @@ export interface MemberFeed {
   source: MemberFeedSource;
 }
 
+/**
+ * Platform-synced feeds were matched to this member automatically by the external content
+ * platform; member feeds were added by the member themselves. The single "Platform" comparison
+ * lives here so callers never compare against the raw string themselves.
+ */
+export function isPlatformSourced(feed: Pick<MemberFeed, "source">): boolean {
+  return feed.source === "Platform";
+}
+
 export class MemberFeedsService extends ServiceBase {
   private static readonly BASE_URL = "/api/member-feeds";
 

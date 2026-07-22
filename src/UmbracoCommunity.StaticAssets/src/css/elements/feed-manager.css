@@ -31,9 +31,7 @@ dc-feed-manager {
   gap: var(--unit-sm);
 }
 
-/* A single stacked column — platform/URL, then its actions directly underneath — rather than
-   actions floated off to the opposite corner, which read as disconnected from the link they
-   act on once they became small inline links instead of full-width buttons. */
+/* Column stack keeps actions under the link, not floated to the corner. */
 .dc-feed-manager__item {
   display: flex;
   flex-direction: column;
@@ -57,23 +55,11 @@ dc-feed-manager {
   display: flex;
   flex-direction: column;
   gap: var(--unit-xxs);
-  min-width: 0;
 }
 
 .dc-feed-manager__url {
   overflow-wrap: anywhere;
   color: var(--color-dark-grey);
-}
-
-/* Opt out of the global #main-content pink-underline-grow animation (typography.css) and any
-   hover-underline entirely — these are utility URLs, not in-text prose. The :not(.btn) matches
-   the global rule's own specificity technique (#main-content a:not(.btn):not(:has(...))); without
-   it the two rules tie on class-count and the global one wins on its extra type-selector. */
-#main-content .dc-feed-manager__url:not(.btn),
-#main-content .dc-feed-manager__url:not(.btn):hover {
-  background-image: none;
-  padding-bottom: 0;
-  text-decoration: none;
 }
 
 .dc-feed-manager__platform {

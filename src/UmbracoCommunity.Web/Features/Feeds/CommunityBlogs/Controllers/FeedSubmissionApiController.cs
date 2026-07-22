@@ -48,6 +48,12 @@ public class FeedSubmissionApiController : ControllerBase
             return BadRequest(new { error = "Please provide a valid absolute http or https feed URL." });
         }
 
+        if (!IsConfigured())
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = "Feed preview isn't available right now. Please try again later." });
+        }
+
         try
         {
             var previewTask = _blogsApiClient.PreviewFeedAsync(request.FeedUrl!, request.Name, request.GithubUsername, PreviewPostLimit, cancellationToken);
@@ -111,6 +117,12 @@ public class FeedSubmissionApiController : ControllerBase
         if (!IsValidFeedUrl(request.FeedUrl))
         {
             return BadRequest(new { error = "Please provide a valid absolute http or https feed URL." });
+        }
+
+        if (!IsConfigured())
+        {
+            return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                new { error = "Feed submission isn't available right now. Please try again later." });
         }
 
         try
@@ -186,6 +198,14 @@ public class FeedSubmissionApiController : ControllerBase
 
     private static bool IsValidFeedUrl(string? feedUrl) =>
         Uri.TryCreate(feedUrl, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https";
+
+    /// <summary>
+    /// ApiBaseUrl/ApiKey have no defaults (see CommunityBlogsOptions) — without this check, a
+    /// missing ApiBaseUrl surfaces as an unhandled InvalidOperationException from HttpClient
+    /// (no BaseAddress set) that falls into the generic catch below as an opaque 500.
+    /// </summary>
+    private bool IsConfigured() =>
+        !string.IsNullOrWhiteSpace(_options.CurrentValue.ApiBaseUrl) && !string.IsNullOrWhiteSpace(_options.CurrentValue.ApiKey);
 
     private string? ResolveToAbsolute(string? url)
     {

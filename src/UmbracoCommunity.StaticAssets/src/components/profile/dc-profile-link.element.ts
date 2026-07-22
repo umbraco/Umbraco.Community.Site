@@ -70,7 +70,7 @@ export class ProfileLinkElement extends LitElement {
           ><span class="profile-link__slug">${this.#slug()}</span>
         </span>
         <button
-          class="profile-link__copy"
+          class="link-action profile-link__copy"
           type="button"
           @click=${this.#handleCopy}
           title="${this._showCopiedFeedback ? "Copied!" : "Copy link"}"

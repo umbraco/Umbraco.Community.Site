@@ -158,9 +158,7 @@
   }
 }
 
-/* A lighter-weight alternative to .btn for secondary housekeeping actions (hide/show toggles,
-   sign out, flag-as-wrong) that shouldn't compete visually with primary content — plain text
-   with a small leading icon rather than button chrome. */
+/* Lighter alternative to .btn for secondary actions (hide, sign out). */
 .link-action {
   display: inline-flex;
   align-items: center;

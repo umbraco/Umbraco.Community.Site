@@ -1,22 +1,9 @@
 @using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Utilities
 @inherits UmbracoViewPage<AccountPageViewModel>
 
 @{
     Layout = "Layout.cshtml";
-}
-
-@functions {
-    static string Relative(DateTimeOffset value)
-    {
-        var span = DateTimeOffset.UtcNow - value;
-        if (span.TotalDays >= 365) { var y = (int)(span.TotalDays / 365); return $"{y} year{(y == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 30) { var m = (int)(span.TotalDays / 30); return $"{m} month{(m == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 7) { var w = (int)(span.TotalDays / 7); return $"{w} week{(w == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 1) { var d = (int)span.TotalDays; return $"{d} day{(d == 1 ? "" : "s")} ago"; }
-        if (span.TotalHours >= 1) { var h = (int)span.TotalHours; return $"{h} hour{(h == 1 ? "" : "s")} ago"; }
-        var mins = Math.Max(1, (int)span.TotalMinutes);
-        return $"{mins} minute{(mins == 1 ? "" : "s")} ago";
-    }
 }
 
 <div class="account-page-wrapper">
@@ -65,12 +52,12 @@
             @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
                 <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
-                <a class="account-page__profile-url" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
+                <a class="account-page__profile-url no-link-animation" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
 
                 @if (Model.LastSyncedAt is not null)
                 {
                     <p class="account-page__sync-status">
-                        Last synced @Relative(Model.LastSyncedAt.Value)
+                        Last synced @Model.LastSyncedAt.Value.ToRelativeTime()
                     </p>
                 }
                 else

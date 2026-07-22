@@ -31,9 +31,9 @@ public sealed class CommunityBlogsAggregator
     public async Task<CommunityBlogsData?> BuildAsync(CancellationToken cancellationToken)
     {
         var options = _options.CurrentValue;
-        if (string.IsNullOrWhiteSpace(options.ApiKey))
+        if (string.IsNullOrWhiteSpace(options.ApiKey) || string.IsNullOrWhiteSpace(options.ApiBaseUrl))
         {
-            _logger.LogWarning("CommunityBlogsOptions.ApiKey is not configured; skipping refresh.");
+            _logger.LogWarning("CommunityBlogsOptions.ApiKey or ApiBaseUrl is not configured; skipping refresh.");
             return null;
         }
 

@@ -1,6 +1,6 @@
 import { LitElement, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { MemberFeedsService, type MemberFeed } from "../../services/member-feeds.service.js";
+import { isPlatformSourced, MemberFeedsService, type MemberFeed } from "../../services/member-feeds.service.js";
 import { iconEye, iconEyeOff, iconX } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-feed-manager";
@@ -105,14 +105,24 @@ export class FeedManagerElement extends LitElement {
   }
 
   #canHide(feed: MemberFeed): boolean {
-    return !this.restrictHideToPlatform || feed.source === "Platform";
+    return !this.restrictHideToPlatform || isPlatformSourced(feed);
   }
 
   #renderFeed(feed: MemberFeed): TemplateResult {
+    // Platform-synced feeds were matched to this member automatically, so removing one can mean
+    // "that's a mismatch, not mine" — the copy reflects that so the flag is meaningful when it's
+    // reported back. Member-added feeds were added deliberately, so removing one is just tidying
+    // up, not disputing an identity match.
+    const isThisFeedPlatformSourced = isPlatformSourced(feed);
+
     if (this._removingId === feed.id) {
       return html`
         <li class="dc-feed-manager__item dc-feed-manager__item--removing">
-          <p id="dc-feed-manager-reason-label-${feed.id}">This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):</p>
+          <p id="dc-feed-manager-reason-label-${feed.id}">
+            ${isThisFeedPlatformSourced
+              ? html`This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):`
+              : html`Remove <strong>${feed.platform}</strong>? Let us know why (optional):`}
+          </p>
           <textarea
             rows="2"
             aria-labelledby="dc-feed-manager-reason-label-${feed.id}"
@@ -122,7 +132,7 @@ export class FeedManagerElement extends LitElement {
           <div class="dc-feed-manager__item-actions">
             <button class="btn" type="button" @click=${this.#cancelRemove}>Cancel</button>
             <button class="btn is-blue" type="button" @click=${() => this.#confirmRemove(feed.id)}>
-              Confirm — this isn't me
+              ${isThisFeedPlatformSourced ? "Confirm — this isn't me" : "Confirm removal"}
             </button>
           </div>
         </li>
@@ -133,7 +143,7 @@ export class FeedManagerElement extends LitElement {
       <li class="dc-feed-manager__item ${feed.isHidden ? "dc-feed-manager__item--hidden" : ""}">
         <div class="dc-feed-manager__item-info">
           <span class="dc-feed-manager__platform">${feed.platform}</span>
-          <a class="dc-feed-manager__url" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
+          <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
           ${feed.isHidden ? html`<span class="dc-feed-manager__badge">Hidden from profile</span>` : ""}
         </div>
         <div class="dc-feed-manager__item-actions">
@@ -144,7 +154,7 @@ export class FeedManagerElement extends LitElement {
               </button>`
             : ""}
           <button class="link-action" type="button" @click=${() => this.#startRemove(feed)}>
-            ${iconX} This isn't me
+            ${iconX} ${isThisFeedPlatformSourced ? "This isn't me" : "Remove"}
           </button>
         </div>
       </li>
@@ -199,8 +209,8 @@ export class FeedManagerElement extends LitElement {
       return html`<p role="status">Loading your feeds…</p>`;
     }
 
-    const platformFeeds = this._feeds.filter((feed) => feed.source === "Platform");
-    const memberFeeds = this._feeds.filter((feed) => feed.source === "Member");
+    const platformFeeds = this._feeds.filter((feed) => isPlatformSourced(feed));
+    const memberFeeds = this._feeds.filter((feed) => !isPlatformSourced(feed));
 
     return html`
       ${this._errorMessage ? html`<p class="dc-feed-manager__error" role="alert">${this._errorMessage}</p>` : ""}

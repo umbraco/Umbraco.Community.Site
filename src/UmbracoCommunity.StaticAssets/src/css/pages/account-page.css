@@ -1,7 +1,4 @@
-/* Deliberately plain and settings-like — this is a management page (manage your feeds,
-   check your sync status, sign out), not a public-facing branding moment, so it stays
-   neutral where the Community Profile page (community-profile.css) goes bold. Matches the
-   onboarding wizard's wrapper width (onboarding-page.css). */
+/* Settings-page style, not the bold public-profile look. */
 .account-page-wrapper {
   max-width: 1040px;
   margin-inline: auto;
@@ -14,8 +11,6 @@
   box-shadow: var(--base-box-shadow);
   padding: var(--unit-md);
 }
-
-/* Header — avatar and identity side by side, left-aligned like a settings page */
 
 .account-page__header {
   display: flex;
@@ -78,20 +73,14 @@
   word-break: break-word;
 }
 
-/* Sign out — pushed flush right via margin-left: auto rather than justify-content: space-between,
-   since that would also split the avatar away from the identity block next to it. Styling for
-   the link itself lives in the shared .link-action utility (elements/buttons.css). */
+/* margin-left: auto keeps avatar+identity grouped on the left. */
 .account-page__header-logout {
   margin-left: auto;
   flex-shrink: 0;
   align-self: flex-start;
 }
 
-/* Sections — each a divider-separated block, left-aligned. Spacing around each divider is
-   deliberately one-sided (generous above the next heading, tight above the divider itself)
-   rather than stacking a full gap on both sides of every border, which is what made the space
-   above each heading feel arbitrarily large. */
-
+/* One-sided divider spacing — avoids doubling the gap. */
 .account-page__section {
   padding-top: var(--unit-sm);
   padding-bottom: var(--unit-sm);
@@ -116,35 +105,17 @@
   color: var(--color-light-blue);
 }
 
-/* dc-feed-manager carries its own top margin for contexts without a preceding hint paragraph
-   (e.g. the onboarding wizard) — here the hint's own margin-bottom above already provides that
-   gap, so the component's margin would just double it up. */
+/* Avoid doubling the gap above (hint already provides it). */
 .account-page__section dc-feed-manager {
   margin-top: 0;
 }
 
-/* Public profile link — a plain, prominent URL rather than a button or an in-text prose link.
-   Opts out of the global #main-content pink-underline-grow animation (typography.css) and any
-   hover-underline entirely — this is a utility URL to click or copy, not a sentence link. */
 .account-page__profile-url {
   display: block;
   font-weight: 700;
   color: var(--color-identity-blue);
   word-break: break-all;
 }
-
-/* The :not(.btn) here isn't excluding anything — .account-page__profile-url is never a .btn —
-   it's there purely so this selector matches the global rule's own specificity technique
-   (#main-content a:not(.btn):not(:has(...))). Without it the two rules tie on class-count and
-   the global one wins on its extra type-selector, so the animation silently survives. */
-#main-content .account-page__profile-url:not(.btn),
-#main-content .account-page__profile-url:not(.btn):hover {
-  background-image: none;
-  padding-bottom: 0;
-  text-decoration: none;
-}
-
-/* Sync status — a quiet system-status line, not a headline moment */
 
 .account-page__sync-status {
   display: flex;

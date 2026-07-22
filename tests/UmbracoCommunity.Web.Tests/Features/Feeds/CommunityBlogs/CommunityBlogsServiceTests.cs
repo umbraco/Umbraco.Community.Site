@@ -94,7 +94,7 @@ public class CommunityBlogsServiceTests : IDisposable
     public async Task Refresh_then_GetData_returns_posts()
     {
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         await service.RefreshAsync();
 
@@ -105,7 +105,7 @@ public class CommunityBlogsServiceTests : IDisposable
     public async Task GetPage_slices_and_reports_totals()
     {
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
         await service.RefreshAsync();
 
         var page2 = service.GetPage(2, 2);
@@ -121,7 +121,7 @@ public class CommunityBlogsServiceTests : IDisposable
     public async Task GetPage_clamps_out_of_range_page()
     {
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
         await service.RefreshAsync();
 
         service.GetPage(99, 2).Page.Should().Be(3);
@@ -132,7 +132,7 @@ public class CommunityBlogsServiceTests : IDisposable
     public void GetData_returns_empty_when_nothing_cached_or_on_disk()
     {
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         service.GetData().Should().BeSameAs(CommunityBlogsData.Empty);
     }
@@ -141,7 +141,7 @@ public class CommunityBlogsServiceTests : IDisposable
     public async Task Refresh_keeps_existing_data_when_fetch_fails()
     {
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
         await service.RefreshAsync(); // 5 posts now cached + on disk
 
         // Build a fresh service over the SAME temp root with a failing client (so it reads disk).
@@ -150,11 +150,11 @@ public class CommunityBlogsServiceTests : IDisposable
         var env = new Mock<IHostEnvironment>();
         env.SetupGet(e => e.ContentRootPath).Returns(_tempRoot);
         var aggregator = new CommunityBlogsAggregator(failingClient,
-            new TestOptionsMonitor<CommunityBlogsOptions>(new CommunityBlogsOptions { ApiKey = "psk_test" }),
+            new TestOptionsMonitor<CommunityBlogsOptions>(new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" }),
             new FixedTimeProvider(DateTimeOffset.Parse("2026-06-15T10:00:00Z")),
             NullLogger<CommunityBlogsAggregator>.Instance);
         var service2 = new CommunityBlogsService(aggregator, CreateDownloader(), new MemoryCache(new MemoryCacheOptions()),
-            new TestOptionsMonitor<CommunityBlogsOptions>(new CommunityBlogsOptions { ApiKey = "psk_test" }),
+            new TestOptionsMonitor<CommunityBlogsOptions>(new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" }),
             env.Object, Mock.Of<ICommunityBlogsIndexer>(), NullLogger<CommunityBlogsService>.Instance);
 
         await service2.RefreshAsync(); // fails -> must not wipe disk
@@ -167,7 +167,7 @@ public class CommunityBlogsServiceTests : IDisposable
     {
         // No RefreshAsync has run, so GetData() is empty.
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" });
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
 
         var page = service.GetPage(1, 12);
 
@@ -183,7 +183,7 @@ public class CommunityBlogsServiceTests : IDisposable
     {
         var indexer = new Mock<ICommunityBlogsIndexer>();
         var service = CreateService(ClientReturning(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" }, indexer.Object);
 
         await service.RefreshAsync();
 
@@ -199,7 +199,7 @@ public class CommunityBlogsServiceTests : IDisposable
         var failing = new HttpClient(StubHandler.Throws()) { BaseAddress = new Uri("https://test.local/api/v1/") };
         var failingClient = new CommunityBlogsApiClient(new CommunityBlogsHttpClient(failing), new TestOptionsMonitor<CommunityBlogsOptions>(new()));
         var service = CreateService(failingClient,
-            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" }, indexer.Object);
 
         await service.RefreshAsync();
 
@@ -213,7 +213,7 @@ public class CommunityBlogsServiceTests : IDisposable
         // One service instance: first refresh succeeds (populates cache + index),
         // second refresh fails so the aggregator returns null but the cache still has posts.
         var service = CreateService(ClientSucceedingThenFailing(FivePosts()),
-            new CommunityBlogsOptions { ApiKey = "psk_test" }, indexer.Object);
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" }, indexer.Object);
 
         await service.RefreshAsync(); // success -> Rebuild #1
         await service.RefreshAsync(); // failure -> Rebuild #2 from cached fallback

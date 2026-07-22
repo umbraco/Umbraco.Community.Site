@@ -1,8 +1,4 @@
-/* Shared "here's your public profile link" chip — used by the onboarding wizard's "Your
-   details" step and the Account page's public-profile section (dc-profile-link). Solid
-   identity blue with white text so it reads as an unmistakably interactive element rather
-   than flat, disabled-looking grey. Mobile-first sizing: compact by default, growing to the
-   larger desktop treatment from --md up. */
+/* Shared "public profile link" chip (dc-profile-link). */
 .profile-link {
   display: flex;
   align-items: center;
@@ -22,17 +18,13 @@
   }
 }
 
-/* Stays on one line and scrolls horizontally rather than silently truncating on a rare
-   oversized domain — min-width: 0 lets it shrink below its content width inside the flex row
-   so that scrolling (not squeezing the copy button) is what absorbs the overflow. */
+/* min-width: 0 lets long URLs scroll instead of squeezing the copy button. */
 .profile-link__url {
   min-width: 0;
   overflow-x: auto;
   white-space: nowrap;
 }
 
-/* The boilerplate part of the link (scheme, host, base path) recedes; the handle — the part
-   that's actually theirs — carries the emphasis. */
 .profile-link__base {
   color: rgba(255, 255, 255, 0.7);
   font-weight: 400;
@@ -43,14 +35,10 @@
   font-weight: 800;
 }
 
+/* Base reset comes from .link-action; this is just the dark-chip overrides. */
 .profile-link__copy {
-  appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
   flex-shrink: 0;
   color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
   line-height: 0;
 }
 
@@ -58,8 +46,6 @@
   color: var(--color-white);
 }
 
-/* Overrides the site default focus ring colour (identity blue) since that would be invisible
-   against this chip's own blue background. */
 .profile-link__copy:focus-visible {
   outline: var(--focus-outline-width) solid var(--color-white);
   outline-offset: var(--focus-outline-offset);

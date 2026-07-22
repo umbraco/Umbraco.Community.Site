@@ -54,7 +54,14 @@ public class AccountPageController : RenderController
         var member = await _memberManager.GetCurrentMemberAsync();
 
         var handle = member?.UserName;
-        var profile = member != null ? await _store.GetByMemberKeyAsync(member.Key, cancellationToken) : null;
+
+        // Neither depends on the other's result (both only need handle/member.Key, resolved
+        // above), so they run concurrently rather than as two serialized round-trips.
+        var profileTask = member != null ? _store.GetByMemberKeyAsync(member.Key, cancellationToken) : Task.FromResult<MemberProfileEntity?>(null);
+        var lastSyncedTask = handle != null ? _profileSyncClient.GetLastSyncedAtAsync(handle, cancellationToken) : Task.FromResult<DateTimeOffset?>(null);
+        await Task.WhenAll(profileTask, lastSyncedTask);
+
+        var profile = profileTask.Result;
         var onboardingCompleted = profile?.OnboardingStatus == OnboardingStatus.Completed;
 
         var viewModel = new AccountPageViewModel(currentPage)
@@ -82,10 +89,7 @@ public class AccountPageController : RenderController
             viewModel.OnboardingUrl = onboardingPage?.Url(_publishedUrlProvider);
         }
 
-        if (handle != null)
-        {
-            viewModel.LastSyncedAt = await _profileSyncClient.GetLastSyncedAtAsync(handle, cancellationToken);
-        }
+        viewModel.LastSyncedAt = lastSyncedTask.Result;
 
         return CurrentTemplate(viewModel);
     }

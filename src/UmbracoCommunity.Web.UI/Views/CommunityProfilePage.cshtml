@@ -1,6 +1,7 @@
 @inherits UmbracoViewPage<CommunityProfilePageViewModel>
 @using UmbracoCommunity.Web.Features.Members
 @using UmbracoCommunity.Web.Models.Pages
+@using UmbracoCommunity.Web.Utilities
 @{
     Layout = "Layout.cshtml";
     var profile = Model.Profile;
@@ -8,17 +9,6 @@
 
 @functions {
     static string Date(DateTimeOffset? value) => value?.ToString("d MMM yyyy") ?? string.Empty;
-
-    static string Relative(DateTimeOffset value)
-    {
-        var span = DateTimeOffset.UtcNow - value;
-        if (span.TotalDays >= 365) { var y = (int)(span.TotalDays / 365); return $"{y} year{(y == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 30) { var m = (int)(span.TotalDays / 30); return $"{m} month{(m == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 7) { var w = (int)(span.TotalDays / 7); return $"{w} week{(w == 1 ? "" : "s")} ago"; }
-        if (span.TotalDays >= 1) { var d = (int)span.TotalDays; return $"{d} day{(d == 1 ? "" : "s")} ago"; }
-        if (span.TotalHours >= 1) { var h = (int)span.TotalHours; return $"{h} hour{(h == 1 ? "" : "s")} ago"; }
-        return "just now";
-    }
 }
 
 @if (profile is null)
@@ -297,7 +287,7 @@ else
                                         <div class="community-profile__social-body">
                                             <span class="community-profile__social-head">
                                                 <span class="community-profile__social-name">@post.Platform</span>
-                                                <span class="community-profile__social-time">@Relative(post.PostedAt)</span>
+                                                <span class="community-profile__social-time">@post.PostedAt.ToRelativeTime()</span>
                                             </span>
                                             <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Text</a>
                                         </div>
