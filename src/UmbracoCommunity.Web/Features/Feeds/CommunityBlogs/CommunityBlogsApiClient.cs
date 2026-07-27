@@ -6,12 +6,12 @@ using Microsoft.Extensions.Options;
 
 namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 
-public sealed class SphereApiClient
+public sealed class CommunityBlogsApiClient
 {
     private readonly HttpClient _http;
     private readonly IOptionsMonitor<CommunityBlogsOptions> _options;
 
-    public SphereApiClient(SphereHttpClient typedClient, IOptionsMonitor<CommunityBlogsOptions> options)
+    public CommunityBlogsApiClient(CommunityBlogsHttpClient typedClient, IOptionsMonitor<CommunityBlogsOptions> options)
     {
         _http = typedClient.Client;
         _options = options;
@@ -32,7 +32,7 @@ public sealed class SphereApiClient
         using var response = await _http.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<PostsResponseDto>(SphereJsonOptions.Default, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<PostsResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
     }
 
     /// <summary>Fetches-and-parses a feed URL without persisting, returning the posts it would produce.</summary>
@@ -45,7 +45,7 @@ public sealed class SphereApiClient
             },
             cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<PostsResponseDto>(SphereJsonOptions.Default, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<PostsResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
     }
 
     /// <summary>Looks up whether a feed URL is already listed, has a pending submission, or neither.</summary>
@@ -56,7 +56,7 @@ public sealed class SphereApiClient
             () => new HttpRequestMessage(HttpMethod.Get, requestUri),
             cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<FeedSubmissionStatusResponseDto>(SphereJsonOptions.Default, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<FeedSubmissionStatusResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
     }
 
     /// <summary>Submits a feed URL for manual review (idempotent).</summary>
@@ -69,19 +69,19 @@ public sealed class SphereApiClient
             },
             cancellationToken);
 
-        return await response.Content.ReadFromJsonAsync<FeedSubmissionResponseDto>(SphereJsonOptions.Default, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<FeedSubmissionResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
     }
 
     /// <summary>
-    /// Builds a JSON request body via <see cref="StringContent"/> rather than <see cref="JsonContent"/>. Sphere's
-    /// API 500s on a chunked-encoded request body, and <see cref="JsonContent"/> never sets Content-Length (it has
+    /// Builds a JSON request body via <see cref="StringContent"/> rather than <see cref="JsonContent"/>. The
+    /// upstream API 500s on a chunked-encoded request body, and <see cref="JsonContent"/> never sets Content-Length (it has
     /// no <c>TryComputeLength</c> override), which forces HTTP/1.1 to fall back to Transfer-Encoding: chunked.
     /// </summary>
     private static StringContent CreateJsonContent<T>(T value) =>
-        new(JsonSerializer.Serialize(value, SphereJsonOptions.Default), Encoding.UTF8, "application/json");
+        new(JsonSerializer.Serialize(value, CommunityBlogsJsonOptions.Default), Encoding.UTF8, "application/json");
 
     /// <summary>
-    /// Sends a request, retrying once after a short delay on a 5xx response. Sphere's API has been observed to
+    /// Sends a request, retrying once after a short delay on a 5xx response. The upstream API has been observed to
     /// intermittently return a transient 500 that succeeds on an immediate retry; 4xx responses are not retried
     /// since they indicate a genuine client-side problem (e.g. an invalid feed URL).
     /// </summary>
@@ -114,18 +114,18 @@ public sealed class SphereApiClient
             response.Dispose();
 
             var detail = TryParseErrorDetail(errorBody);
-            var message = detail?.Message ?? $"Sphere request failed with {(int)statusCode} {statusCode}. Body: {errorBody}";
-            throw new SphereApiException(statusCode, detail?.Code, message);
+            var message = detail?.Message ?? $"Request to the content platform failed with {(int)statusCode} {statusCode}. Body: {errorBody}";
+            throw new CommunityBlogsApiException(statusCode, detail?.Code, message);
         }
 
         return response;
     }
 
-    private static SphereErrorDetail? TryParseErrorDetail(string body)
+    private static CommunityBlogsErrorDetail? TryParseErrorDetail(string body)
     {
         try
         {
-            return JsonSerializer.Deserialize<SphereErrorEnvelope>(body, SphereJsonOptions.Default)?.Error;
+            return JsonSerializer.Deserialize<CommunityBlogsErrorEnvelope>(body, CommunityBlogsJsonOptions.Default)?.Error;
         }
         catch (JsonException)
         {

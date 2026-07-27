@@ -1,7 +1,7 @@
 import { UmbModalToken } from "@umbraco-cms/backoffice/modal";
 
 export interface PostDetailsModalData {
-  sphereId: string;
+  platformPostId: string;
 }
 
 export type PostDetailsModalValue = undefined;

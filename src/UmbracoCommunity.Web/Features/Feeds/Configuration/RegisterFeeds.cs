@@ -29,7 +29,7 @@ public sealed class RegisterFeeds : IComposer
 
         builder.Services.AddSingleton<ICalendarFeedService, CalendarFeedService>();
 
-        // --- Community blog posts (Umbraco Sphere API) ---
+        // --- Community blog posts (aggregated from an external content platform) ---
         builder.Services.Configure<CommunityBlogsOptions>(
             builder.Config.GetSection(CommunityBlogsOptions.SectionName));
 
@@ -37,9 +37,16 @@ public sealed class RegisterFeeds : IComposer
             builder.Config.GetSection(CommunityBlogsOptions.SectionName).Get<CommunityBlogsOptions>()
             ?? new CommunityBlogsOptions();
 
-        builder.Services.AddHttpClient<SphereHttpClient>(client =>
+        builder.Services.AddHttpClient<CommunityBlogsHttpClient>(client =>
         {
-            client.BaseAddress = new Uri(communityBlogsOptions.ApiBaseUrl);
+            // ApiBaseUrl has no default (see CommunityBlogsOptions) — an environment without it
+            // configured just leaves BaseAddress unset; CommunityBlogsAggregator already no-ops
+            // when ApiKey is missing, so no request is ever attempted against it.
+            if (!string.IsNullOrWhiteSpace(communityBlogsOptions.ApiBaseUrl))
+            {
+                client.BaseAddress = new Uri(communityBlogsOptions.ApiBaseUrl);
+            }
+
             client.Timeout = TimeSpan.FromSeconds(Math.Max(5, communityBlogsOptions.RequestTimeoutSeconds));
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
@@ -47,7 +54,7 @@ public sealed class RegisterFeeds : IComposer
             client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
         }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { UseCookies = false });
 
-        builder.Services.AddSingleton<SphereApiClient>();
+        builder.Services.AddSingleton<CommunityBlogsApiClient>();
         builder.Services.AddSingleton<CommunityBlogsAggregator>();
 
         builder.Services.AddHttpClient<CommunityBlogsImageHttpClient>(client =>

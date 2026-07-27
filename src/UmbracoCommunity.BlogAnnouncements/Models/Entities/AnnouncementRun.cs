@@ -6,7 +6,7 @@ public class AnnouncementRun
     public int Id { get; set; }
     public DateTime RunUtc { get; set; }
 
-    /// <summary>Posts returned by the fresh Sphere fetch this cycle.</summary>
+    /// <summary>Posts returned by the fresh upstream fetch this cycle.</summary>
     public int Fetched { get; set; }
 
     /// <summary>Never-seen posts recorded this cycle (announced + skipped-too-old).</summary>

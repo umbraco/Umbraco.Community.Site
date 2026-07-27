@@ -85,7 +85,7 @@ public class AnnouncementPayloadFactoryTests
 
     private static AnnouncedBlogPost Post(string? excerpt) => new()
     {
-        SphereId = Guid.NewGuid(),
+        PlatformPostId = Guid.NewGuid(),
         Url = "https://blog.example/a",
         Title = "A Post",
         PublishedAtUtc = new DateTime(2026, 6, 15, 10, 0, 0, DateTimeKind.Utc),

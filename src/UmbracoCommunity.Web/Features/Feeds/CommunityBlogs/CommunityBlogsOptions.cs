@@ -4,8 +4,12 @@ public class CommunityBlogsOptions
 {
     public const string SectionName = "CommunityBlogs";
 
-    /// <summary>Base URL of the Umbraco Sphere public API (must end with a trailing slash).</summary>
-    public string ApiBaseUrl { get; set; } = "https://sphere.umbraco.com/api/v1/";
+    /// <summary>
+    /// Base URL of the external content aggregation API (must end with a trailing slash). No
+    /// default — must be supplied via <c>appsettings.Local.json</c> or environment config in every
+    /// environment; deliberately not hardcoded here.
+    /// </summary>
+    public string ApiBaseUrl { get; set; } = string.Empty;
 
     /// <summary>API key sent in the <c>Authorization</c> header (bare key, no "Bearer"). Supplied via appsettings.Local.json / env — never committed.</summary>
     public string ApiKey { get; set; } = string.Empty;
@@ -13,7 +17,7 @@ public class CommunityBlogsOptions
     /// <summary>
     /// How often the background service re-aggregates posts, in minutes (floored at 5). This
     /// interval also paces new-post announcement detection, the blog-posts cache refresh, and the
-    /// image downloader pass — the Sphere fetch is capped at ~60 posts, so short intervals are cheap.
+    /// image downloader pass — the upstream fetch is capped at ~60 posts, so short intervals are cheap.
     /// </summary>
     public int RefreshIntervalInMinutes { get; set; } = 15;
 
@@ -21,7 +25,7 @@ public class CommunityBlogsOptions
     public int RequestTimeoutSeconds { get; set; } = 15;
 
     /// <summary>
-    /// How many posts to request from the Sphere API per cursor call (its "limit", max 100).
+    /// How many posts to request from the external API per cursor call (its "limit", max 100).
     /// This is the fetch batch size, NOT the number of posts shown on a page — that is the
     /// block's PostsPerPage setting.
     /// </summary>

@@ -138,7 +138,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
 
     private async Task WriteCacheFileAsync(CommunityBlogsData data, CancellationToken cancellationToken)
     {
-        var json = JsonSerializer.Serialize(data, SphereJsonOptions.Default);
+        var json = JsonSerializer.Serialize(data, CommunityBlogsJsonOptions.Default);
         await AtomicFile.WriteAllTextAsync(_cacheFilePath, json, _logger, cancellationToken);
     }
 
@@ -152,7 +152,7 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
             }
 
             var json = File.ReadAllText(_cacheFilePath);
-            return JsonSerializer.Deserialize<CommunityBlogsData>(json, SphereJsonOptions.Default);
+            return JsonSerializer.Deserialize<CommunityBlogsData>(json, CommunityBlogsJsonOptions.Default);
         }
         catch (Exception ex)
         {

@@ -19,7 +19,7 @@ export const enum AnnouncementTrigger {
 }
 
 export interface PostListItem {
-  sphereId: string;
+  platformPostId: string;
   title: string;
   url: string;
   authorName: string | null;
@@ -46,7 +46,7 @@ export interface AttemptItem {
 }
 
 export interface PostDetail {
-  sphereId: string;
+  platformPostId: string;
   title: string;
   url: string;
   excerpt: string | null;
