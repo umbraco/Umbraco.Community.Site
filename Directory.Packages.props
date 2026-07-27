@@ -22,23 +22,23 @@
     <PackageVersion Include="Umbraco.Deploy.Core" Version="18.0.1" />
     <!-- Umbraco Forms -->
     <PackageVersion Include="Umbraco.Forms" Version="18.0.4" />
-    <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
-    <PackageVersion Include="Umbraco.AI" Version="18.1.1" />
-    <PackageVersion Include="Umbraco.AI.Agent" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.Google" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.AI.Prompt" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.AI" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.AI.Agent" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.0.2" />
+    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.Google" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.AI.Prompt" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.1" />
     <!-- Umbraco Automate -->
-    <PackageVersion Include="Umbraco.Automate" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="18.0.0" />
+    <PackageVersion Include="Umbraco.Automate" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="18.1.0" />
     <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.1" />
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.0" />
