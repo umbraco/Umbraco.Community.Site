@@ -157,3 +157,33 @@
     text-align: inherit;
   }
 }
+
+/* Lighter alternative to .btn for secondary actions (hide, sign out). */
+.link-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--unit-xxs);
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+  cursor: pointer;
+}
+
+.link-action:hover {
+  color: var(--color-identity-blue);
+  text-decoration: underline;
+}
+
+.link-action:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.link-action svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}

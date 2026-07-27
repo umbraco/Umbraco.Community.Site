@@ -5,7 +5,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// Supplies a <see cref="CommunityProfile"/> for a given slug (the member's GitHub
 /// handle). Phase 1 is backed by an in-repo fixture (<see cref="DummyProfileDataProvider"/>);
-/// a later phase swaps in a Sphere-backed implementation with no change to callers.
+/// a later phase swaps in an external-platform-backed implementation with no change to callers.
 /// </summary>
 public interface IProfileDataProvider
 {

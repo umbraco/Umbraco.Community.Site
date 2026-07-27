@@ -1,7 +1,7 @@
 namespace UmbracoCommunity.BlogAnnouncements.Delivery;
 
 /// <summary>
-/// Destination-agnostic view of a post to announce. Carries the original (remote) Sphere image
+/// Destination-agnostic view of a post to announce. Carries the original (remote) upstream image
 /// URLs, not the site's localized copies — the destination fetches them itself.
 /// </summary>
 public sealed record AnnouncementPayload(

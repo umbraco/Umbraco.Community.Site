@@ -5,8 +5,8 @@ public class AnnouncementAttempt
 {
     public int Id { get; set; }
 
-    /// <summary>FK to <see cref="AnnouncedBlogPost.SphereId"/>.</summary>
-    public Guid SphereId { get; set; }
+    /// <summary>FK to <see cref="AnnouncedBlogPost.PlatformPostId"/>.</summary>
+    public Guid PlatformPostId { get; set; }
 
     public DateTime AttemptedUtc { get; set; }
 

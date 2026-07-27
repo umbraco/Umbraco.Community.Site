@@ -121,7 +121,7 @@ export class BlogAnnouncementsPostsTabElement extends UmbElementMixin(LitElement
   }
 
   private async openDetails(item: PostListItem) {
-    const modal = this._modalManager?.open(this, POST_DETAILS_MODAL, { data: { sphereId: item.sphereId } });
+    const modal = this._modalManager?.open(this, POST_DETAILS_MODAL, { data: { platformPostId: item.platformPostId } });
     try {
       await modal?.onSubmit();
     } catch {
@@ -158,9 +158,9 @@ export class BlogAnnouncementsPostsTabElement extends UmbElementMixin(LitElement
   }
 
   private async deliver(item: PostListItem, trigger: "Repost" | "PostNow") {
-    this.setBusy(item.sphereId, true);
+    this.setBusy(item.platformPostId, true);
     try {
-      const result = await BlogAnnouncementsApi.announce(item.sphereId, trigger);
+      const result = await BlogAnnouncementsApi.announce(item.platformPostId, trigger);
       if (result.dryRun) {
         this.notify("warning", "Dry-run: nothing posted", "Dry-run mode is on — the payload was logged but not sent to Discord.");
       } else if (result.outcome === "Success") {
@@ -172,7 +172,7 @@ export class BlogAnnouncementsPostsTabElement extends UmbElementMixin(LitElement
     } catch (e) {
       this.notify("danger", "Delivery failed", (e as Error).message);
     } finally {
-      this.setBusy(item.sphereId, false);
+      this.setBusy(item.platformPostId, false);
     }
   }
 
@@ -270,7 +270,7 @@ export class BlogAnnouncementsPostsTabElement extends UmbElementMixin(LitElement
   }
 
   private renderRow(item: PostListItem) {
-    const busy = this.busyIds.has(item.sphereId);
+    const busy = this.busyIds.has(item.platformPostId);
     const canPostNow = item.status === PostStatus.Pending || item.status === PostStatus.SkippedTooOld;
     return html`
       <uui-table-row>
