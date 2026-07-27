@@ -13,7 +13,6 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
             migrationBuilder.AddColumn<int>(
                 name: "Source",
                 table: "MemberFeeds",
-                type: "INTEGER",
                 nullable: false,
                 defaultValue: 0);
         }

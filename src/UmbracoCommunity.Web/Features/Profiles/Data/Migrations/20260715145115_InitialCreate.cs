@@ -15,19 +15,20 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                 name: "MemberProfiles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    MemberKey = table.Column<Guid>(type: "TEXT", nullable: false),
-                    GitHubHandle = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    DisplayName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Bio = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    AvatarMediaKey = table.Column<Guid>(type: "TEXT", nullable: true),
-                    OnboardingStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    OnboardingStartedUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    OnboardingCompletedUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    SphereProfileId = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    CreatedUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedUtc = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MemberKey = table.Column<Guid>(nullable: false),
+                    GitHubHandle = table.Column<string>(maxLength: 100, nullable: false),
+                    DisplayName = table.Column<string>(maxLength: 200, nullable: false),
+                    Bio = table.Column<string>(maxLength: 1000, nullable: true),
+                    AvatarMediaKey = table.Column<Guid>(nullable: true),
+                    OnboardingStatus = table.Column<int>(nullable: false),
+                    OnboardingStartedUtc = table.Column<DateTime>(nullable: true),
+                    OnboardingCompletedUtc = table.Column<DateTime>(nullable: true),
+                    SphereProfileId = table.Column<string>(maxLength: 100, nullable: true),
+                    CreatedUtc = table.Column<DateTime>(nullable: false),
+                    UpdatedUtc = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,19 +39,20 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                 name: "MemberFeeds",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    MemberProfileId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Platform = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Url = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
-                    IsHidden = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsRemoved = table.Column<bool>(type: "INTEGER", nullable: false),
-                    RemovedReason = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    RemovedUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AddedUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    SphereSyncStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastSphereSyncAttemptUtc = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    LastSphereSyncError = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true)
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MemberProfileId = table.Column<int>(nullable: false),
+                    Platform = table.Column<string>(maxLength: 100, nullable: false),
+                    Url = table.Column<string>(maxLength: 2048, nullable: false),
+                    IsHidden = table.Column<bool>(nullable: false),
+                    IsRemoved = table.Column<bool>(nullable: false),
+                    RemovedReason = table.Column<string>(maxLength: 500, nullable: true),
+                    RemovedUtc = table.Column<DateTime>(nullable: true),
+                    AddedUtc = table.Column<DateTime>(nullable: false),
+                    SphereSyncStatus = table.Column<int>(nullable: false),
+                    LastSphereSyncAttemptUtc = table.Column<DateTime>(nullable: true),
+                    LastSphereSyncError = table.Column<string>(maxLength: 1000, nullable: true)
                 },
                 constraints: table =>
                 {

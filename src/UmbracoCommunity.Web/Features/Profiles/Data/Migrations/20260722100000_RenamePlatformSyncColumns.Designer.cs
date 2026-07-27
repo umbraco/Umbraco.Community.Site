@@ -23,50 +23,37 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("AddedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("AddedUtc");
 
-                    b.Property<bool>("IsHidden")
-                        .HasColumnType("INTEGER");
+                    b.Property<bool>("IsHidden");
 
-                    b.Property<bool>("IsRemoved")
-                        .HasColumnType("INTEGER");
+                    b.Property<bool>("IsRemoved");
 
-                    b.Property<DateTime?>("LastPlatformSyncAttemptUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("LastPlatformSyncAttemptUtc");
 
                     b.Property<string>("LastPlatformSyncError")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(1000);
 
-                    b.Property<int>("MemberProfileId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("MemberProfileId");
 
                     b.Property<string>("Platform")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<int>("PlatformSyncStatus")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("PlatformSyncStatus");
 
                     b.Property<string>("RemovedReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(500);
 
-                    b.Property<DateTime?>("RemovedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("RemovedUtc");
 
-                    b.Property<int>("Source")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Source");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(2048);
 
                     b.HasKey("Id");
 
@@ -78,47 +65,35 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<Guid?>("AvatarMediaKey")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("AvatarMediaKey");
 
                     b.Property<string>("Bio")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(1000);
 
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedUtc");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(200);
 
                     b.Property<string>("GitHubHandle")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<Guid>("MemberKey")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("MemberKey");
 
-                    b.Property<DateTime?>("OnboardingCompletedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("OnboardingCompletedUtc");
 
-                    b.Property<DateTime?>("OnboardingStartedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime?>("OnboardingStartedUtc");
 
-                    b.Property<int>("OnboardingStatus")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("OnboardingStatus");
 
                     b.Property<string>("PlatformProfileId")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
-                    b.Property<DateTime>("UpdatedUtc")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("UpdatedUtc");
 
                     b.HasKey("Id");
 
