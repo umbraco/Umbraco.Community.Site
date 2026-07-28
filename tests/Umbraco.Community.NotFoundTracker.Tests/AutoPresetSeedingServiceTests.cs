@@ -44,7 +44,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
     {
         var (service, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
 
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         using var verify = Ctx();
         var rows = await verify.NotFoundIgnoreRules.ToListAsync();
@@ -58,13 +58,13 @@ public class AutoPresetSeedingServiceTests : IDisposable
     {
         // Seed once.
         var (service1, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
-        await service1.StartAsync(CancellationToken.None);
+        await service1.SeedAndReconcileAsync(CancellationToken.None);
 
         var initialCount = await Ctx().NotFoundIgnoreRules.CountAsync();
 
         // Seed again — same defaults, should be no-ops.
         var (service2, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
-        await service2.StartAsync(CancellationToken.None);
+        await service2.SeedAndReconcileAsync(CancellationToken.None);
 
         (await Ctx().NotFoundIgnoreRules.CountAsync()).Should().Be(initialCount);
     }
@@ -74,7 +74,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
     {
         // Seed first run.
         var (service1, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
-        await service1.StartAsync(CancellationToken.None);
+        await service1.SeedAndReconcileAsync(CancellationToken.None);
 
         // Editor deletes /wp-admin from the dashboard.
         using (var ctx = Ctx())
@@ -86,7 +86,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
 
         // Restart: seeding runs again. /wp-admin must stay deleted.
         var (service2, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
-        await service2.StartAsync(CancellationToken.None);
+        await service2.SeedAndReconcileAsync(CancellationToken.None);
 
         using var verify = Ctx();
         (await verify.NotFoundIgnoreRules.AnyAsync(r => r.Path == "/wp-admin")).Should().BeFalse();
@@ -97,7 +97,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
     {
         var (service, _) = Build(new NotFoundTrackerOptions { SeedAutoPreset = false });
 
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         (await Ctx().NotFoundIgnoreRules.CountAsync()).Should().Be(0);
     }
@@ -107,7 +107,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
     {
         var (service, matcher) = Build(new NotFoundTrackerOptions { SeedAutoPreset = true });
 
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         // Built-in preset includes /wp-admin as a PathPrefix rule.
         matcher.IsIgnored("any-host", "/wp-admin").Should().BeTrue();
@@ -129,7 +129,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
         };
         var (service, _) = Build(opts);
 
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         using var verify = Ctx();
         var rows = await verify.NotFoundIgnoreRules.ToListAsync();
@@ -149,7 +149,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
             SeedAutoPreset = false,
             AdditionalAutoPresetRules = { new AutoPresetRuleConfig { Path = "/legacy", MatchType = "PathPrefix" } }
         });
-        await service1.StartAsync(CancellationToken.None);
+        await service1.SeedAndReconcileAsync(CancellationToken.None);
 
         (await Ctx().NotFoundIgnoreRules.AnyAsync(r => r.Path == "/legacy")).Should().BeTrue();
 
@@ -159,7 +159,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
             SeedAutoPreset = false,
             AdditionalAutoPresetRules = { }  // empty
         });
-        await service2.StartAsync(CancellationToken.None);
+        await service2.SeedAndReconcileAsync(CancellationToken.None);
 
         (await Ctx().NotFoundIgnoreRules.AnyAsync(r => r.Path == "/legacy")).Should().BeFalse();
     }
@@ -190,7 +190,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
                 new AutoPresetRuleConfig { Path = "/shared", MatchType = "PathPrefix" }
             }
         });
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         using var verify = Ctx();
         var rows = await verify.NotFoundIgnoreRules.Where(r => r.Path == "/shared").ToListAsync();
@@ -211,7 +211,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
                 new AutoPresetRuleConfig { Path = "/wp-admin", MatchType = "PathPrefix" }
             }
         });
-        await service.StartAsync(CancellationToken.None);
+        await service.SeedAndReconcileAsync(CancellationToken.None);
 
         using var verify = Ctx();
         var rows = await verify.NotFoundIgnoreRules.Where(r => r.Path == "/wp-admin").ToListAsync();
@@ -232,7 +232,7 @@ public class AutoPresetSeedingServiceTests : IDisposable
             }
         });
 
-        var act = async () => await service.StartAsync(CancellationToken.None);
+        var act = async () => await service.SeedAndReconcileAsync(CancellationToken.None);
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*Regex*Exact*PathPrefix*");

@@ -1,32 +1,43 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Community.NotFoundTracker.Infrastructure;
 
 /// <summary>
-/// Applies pending EF Core migrations for the NotFoundTracker schema on application startup.
-/// Mirrors the pattern in <c>BlockRestrictionMigrationHostedService</c> — ensures the SQLite
-/// data directory exists before connecting, then applies any pending migrations.
+/// Applies pending EF Core migrations for the NotFoundTracker schema once Umbraco has finished
+/// booting, then runs auto-preset seeding and hostname-normalization backfill.
+///
+/// Why a notification handler instead of <see cref="Microsoft.Extensions.Hosting.IHostedService"/>:
+/// on a fresh install Umbraco runs its unattended installer during host startup, which creates
+/// and populates the SQLite database. A hosted service runs concurrently with that installer and
+/// can block on a SQLite write lock for well over 30s, throwing "database table is locked".
+/// Deferring to <see cref="UmbracoApplicationStartedNotification"/> guarantees Umbraco has
+/// finished its own database setup before we touch the file (mirrors
+/// <c>BlockRestrictionMigrationNotificationHandler</c>, which fixed the same issue there).
 /// </summary>
-public class NotFoundTrackerMigrationHostedService : IHostedService
+public class NotFoundTrackerMigrationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDbContextFactory<NotFoundTrackerDbContext> _contextFactory;
     private readonly HostnameNormalizationService _normalizer;
-    private readonly ILogger<NotFoundTrackerMigrationHostedService> _logger;
+    private readonly AutoPresetSeedingService _autoPresetSeeding;
+    private readonly ILogger<NotFoundTrackerMigrationNotificationHandler> _logger;
 
-    public NotFoundTrackerMigrationHostedService(
+    public NotFoundTrackerMigrationNotificationHandler(
         IDbContextFactory<NotFoundTrackerDbContext> contextFactory,
         HostnameNormalizationService normalizer,
-        ILogger<NotFoundTrackerMigrationHostedService> logger)
+        AutoPresetSeedingService autoPresetSeeding,
+        ILogger<NotFoundTrackerMigrationNotificationHandler> logger)
     {
         _contextFactory = contextFactory;
         _normalizer = normalizer;
+        _autoPresetSeeding = autoPresetSeeding;
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
     {
         try
         {
@@ -61,13 +72,14 @@ public class NotFoundTrackerMigrationHostedService : IHostedService
             // Backfill normalization for rows recorded before UrlNormalizer stripped schemes
             // and trailing slashes. Idempotent: skips rows already in canonical form.
             await _normalizer.NormalizeAsync(cancellationToken);
+
+            // Auto-preset seeding depends on the tables created above, so it runs here rather
+            // than as its own hosted service (which could otherwise start before migrations do).
+            await _autoPresetSeeding.SeedAndReconcileAsync(cancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to apply NotFoundTracker migrations");
-            throw;
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

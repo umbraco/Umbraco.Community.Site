@@ -1,29 +1,37 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace UmbracoCommunity.Web.Features.Profiles.Data;
 
 /// <summary>
-/// Applies pending EF Core migrations for the MemberProfiles schema on application startup.
-/// Mirrors the pattern in <c>NotFoundTrackerMigrationHostedService</c> — ensures the SQLite
-/// data directory exists before connecting, then applies any pending migrations.
+/// Applies pending EF Core migrations for the MemberProfiles schema once Umbraco has finished
+/// booting.
+///
+/// Why a notification handler instead of <see cref="Microsoft.Extensions.Hosting.IHostedService"/>:
+/// on a fresh install Umbraco runs its unattended installer during host startup, which creates
+/// and populates the SQLite database. A hosted service runs concurrently with that installer and
+/// can block on a SQLite write lock for well over 30s, throwing "database table is locked".
+/// Deferring to <see cref="UmbracoApplicationStartedNotification"/> guarantees Umbraco has
+/// finished its own database setup before we touch the file (mirrors
+/// <c>BlockRestrictionMigrationNotificationHandler</c>, which fixed the same issue there).
 /// </summary>
-public class MemberProfilesMigrationHostedService : IHostedService
+public class MemberProfilesMigrationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDbContextFactory<MemberProfilesDbContext> _contextFactory;
-    private readonly ILogger<MemberProfilesMigrationHostedService> _logger;
+    private readonly ILogger<MemberProfilesMigrationNotificationHandler> _logger;
 
-    public MemberProfilesMigrationHostedService(
+    public MemberProfilesMigrationNotificationHandler(
         IDbContextFactory<MemberProfilesDbContext> contextFactory,
-        ILogger<MemberProfilesMigrationHostedService> logger)
+        ILogger<MemberProfilesMigrationNotificationHandler> logger)
     {
         _contextFactory = contextFactory;
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
     {
         try
         {
@@ -58,9 +66,6 @@ public class MemberProfilesMigrationHostedService : IHostedService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to apply MemberProfiles migrations");
-            throw;
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

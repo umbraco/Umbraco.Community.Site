@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Community.NotFoundTracker.Configuration;
@@ -19,8 +18,11 @@ namespace Umbraco.Community.NotFoundTracker.Infrastructure;
 ///
 /// After both branches run, refreshes <see cref="IgnoreRuleMatcher"/> so the first request
 /// sees the up-to-date rule set.
+///
+/// Invoked by <see cref="NotFoundTrackerMigrationNotificationHandler"/> after migrations apply
+/// (rather than running as its own hosted service) so it never races the tables it depends on.
 /// </summary>
-public sealed class AutoPresetSeedingService : IHostedService
+public sealed class AutoPresetSeedingService
 {
     private readonly IDbContextFactory<NotFoundTrackerDbContext> _contextFactory;
     private readonly INotFoundIgnoreRuleMatcher _matcher;
@@ -39,27 +41,10 @@ public sealed class AutoPresetSeedingService : IHostedService
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await SeedAutoPresetAsync(cancellationToken);
-            await ReconcileConfigSeededAsync(cancellationToken);
-            await _matcher.RefreshAsync(cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "NotFoundTracker auto-preset seeding failed");
-            throw;
-        }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-
     /// <summary>
-    /// Re-runs the seeding pass on demand (used by the management API). Equivalent to what
-    /// StartAsync does on boot: inserts any missing auto-preset entries (respecting tombstones),
-    /// reconciles config-seeded rows, refreshes the matcher.
+    /// Runs the seeding pass: inserts any missing auto-preset entries (respecting tombstones),
+    /// reconciles config-seeded rows, refreshes the matcher. Called both on boot (after
+    /// migrations) and on demand (used by the management API).
     /// </summary>
     public async Task SeedAndReconcileAsync(CancellationToken ct)
     {
