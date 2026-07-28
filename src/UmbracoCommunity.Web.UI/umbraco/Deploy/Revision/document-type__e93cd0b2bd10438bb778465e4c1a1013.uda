@@ -1,0 +1,49 @@
+{
+  "Name": "Digital signage page",
+  "Alias": "digitalSignagePage",
+  "DefaultTemplate": "umb://template/0bbe211b4b154c28a19092be76348181",
+  "AllowedTemplates": [
+    "umb://template/0bbe211b4b154c28a19092be76348181"
+  ],
+  "HistoryCleanup": {},
+  "Icon": "icon-directions",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "AllowedChildContentTypes": [
+      "umb://document-type/e93cd0b2bd10438bb778465e4c1a1013"
+    ]
+  },
+  "Parent": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+  "CompositionContentTypes": [
+    "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
+    "umb://document-type/6a43376f286643dc98b23844efec4c49"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/e93cd0b2bd10438bb778465e4c1a1013",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/3644fa0d2e7a4413a914be0a50599e32",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/6a43376f286643dc98b23844efec4c49",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/e93cd0b2bd10438bb778465e4c1a1013",
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://template/0bbe211b4b154c28a19092be76348181",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

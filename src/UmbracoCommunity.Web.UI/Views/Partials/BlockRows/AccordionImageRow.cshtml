@@ -1,28 +1,53 @@
-﻿@using UmbracoCommunity.Web.Models.ViewModels.Blocks
+@using UmbracoCommunity.Web.Models.ViewModels.Blocks
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<BlockGridRow>
+
+@{
+    var accordionBlock = Model.Blocks
+        .Select(block => block.Content as AccordionBlock)
+        .FirstOrDefault(block => block != null);
+    var hasTitle = accordionBlock != null && !string.IsNullOrEmpty(accordionBlock.Title);
+    var hasSubtitle = accordionBlock != null && !accordionBlock.Subtitle.IsEmptyHtmlString();
+}
 
 <div class="dc-faqs-and-image-block @(Model.Blocks.FirstOrDefault()?.Content.ContentType.Alias == ImageBlock.ModelTypeAlias ? "image-left" : "image-right")"
      id="@Model.IdHash">
-    @foreach (var block in Model.Blocks)
+    @if (hasTitle || hasSubtitle)
     {
-        switch (block.Content.ContentType.Alias)
-        {
-            case ImageBlock.ModelTypeAlias:
-                var imageBlock = block.Content as ImageBlock;
-                if (imageBlock != null)
-                {
-                    RenderImageBlock(imageBlock);
-                }
-                break;
-            case AccordionBlock.ModelTypeAlias:
-                var accordionBlock = block.Content as AccordionBlock;
-                if (accordionBlock != null)
-                {
-                    RenderAccordionBlock(accordionBlock);
-                }
-                break;
-        }        
+        <div class="dc-faqs-and-image-block__header">
+            @if (hasTitle)
+            {
+                <h2 class="block-title">@accordionBlock!.Title</h2>
+            }
+            @if (hasSubtitle)
+            {
+                <div class="block-subtitle">
+                    @Html.Raw(accordionBlock!.Subtitle?.ToHtmlString())
+                </div>
+            }
+        </div>
     }
+    <div class="dc-faqs-and-image-block__row">
+        @foreach (var block in Model.Blocks)
+        {
+            switch (block.Content.ContentType.Alias)
+            {
+                case ImageBlock.ModelTypeAlias:
+                    var imageBlock = block.Content as ImageBlock;
+                    if (imageBlock != null)
+                    {
+                        RenderImageBlock(imageBlock);
+                    }
+                    break;
+                case AccordionBlock.ModelTypeAlias:
+                    var accordion = block.Content as AccordionBlock;
+                    if (accordion != null)
+                    {
+                        RenderAccordionBlock(accordion);
+                    }
+                    break;
+            }
+        }
+    </div>
 </div>
 
 @functions {

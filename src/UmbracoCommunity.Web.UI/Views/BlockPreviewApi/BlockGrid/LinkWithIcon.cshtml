@@ -13,3 +13,16 @@
         }
     </a>
 }
+else
+{
+    <span class="dc-link-preview--empty">
+        @if (Model.Content?.Icon != null)
+        {
+            <svg-src media="@Model.Content.Icon" width="24" height="24" alt-text="No link selected"></svg-src>
+        }
+        else
+        {
+            <text>No link selected — click to edit</text>
+        }
+    </span>
+}

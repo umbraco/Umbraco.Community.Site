@@ -1,0 +1,49 @@
+name: Update doc contributors
+
+# Regenerates docs/contributors.generated.json from git history whenever a
+# documentation article changes on develop, and commits the result back. The
+# deployed app has no .git, so contributor data must be baked in here. The path
+# filter deliberately omits the generated file itself, so the bot's commit
+# (which only touches that file) can't re-trigger this workflow.
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "docs/tutorials/**"
+      - "docs/primers/**"
+      - "src/UmbracoCommunity.StaticAssets/devops/generate-doc-contributors.js"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    name: Regenerate contributors.generated.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # full history so `git log --follow` sees every commit
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Generate contributor data from git history
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node src/UmbracoCommunity.StaticAssets/devops/generate-doc-contributors.js
+
+      - name: Commit if changed
+        run: |
+          if [[ -n "$(git status --porcelain docs/contributors.generated.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add docs/contributors.generated.json
+            git commit -m "Update doc contributors from git history"
+            git push
+          else
+            echo "No contributor changes."
+          fi

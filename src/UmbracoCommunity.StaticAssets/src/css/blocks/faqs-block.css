@@ -1,7 +1,12 @@
 .dc-faqs {
-    h2 {
-        margin: 0 auto var(--unit);
-        text-align: center;
+    .block-title,
+    .block-subtitle {
+        max-width: var(--narrow-width);
+        margin-inline: auto;
+    }
+
+    .block-subtitle {
+        margin-bottom: var(--unit-md);
     }
 
     .block-subtitle h2 {

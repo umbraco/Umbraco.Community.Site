@@ -32,6 +32,16 @@ namespace UmbracoCommunity.Web.Extensions
                   action = "Index"
               });
 
+            // Register route for the aggregated community blogs RSS feed
+            builder.EndpointRouteBuilder.MapControllerRoute(
+              "CommunityBlogsFeed",
+              "feeds/community-blogs.xml",
+              new
+              {
+                  controller = "CommunityBlogsFeed",
+                  action = "Index"
+              });
+
             return builder;
         }
     }

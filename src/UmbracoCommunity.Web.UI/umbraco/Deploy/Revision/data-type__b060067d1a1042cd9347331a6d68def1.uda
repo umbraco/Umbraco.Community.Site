@@ -1,0 +1,28 @@
+{
+  "Name": "Timeline entry goals",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "d95eb6fe-5075-4f96-8e7a-b778a125c5ba",
+        "label": "${goalTitle || \u0022Timeline goal\u0022}"
+      }
+    ],
+    "useLiveEditing": false,
+    "useInlineEditingAsDefault": true
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/b060067d1a1042cd9347331a6d68def1",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/d95eb6fe50754f968e7ab778a125c5ba"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

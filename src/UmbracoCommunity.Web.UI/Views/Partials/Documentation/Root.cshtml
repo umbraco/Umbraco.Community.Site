@@ -1,0 +1,69 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@using UmbracoCommunity.Web.Services.Documentation
+@using UmbracoCommunity.Web.ViewModelBuilders.Pages
+@model DocumentationPageViewModel
+
+@functions {
+    void RenderArticleCard(DocumentationArticle article, DocumentationSection container, DocumentationSection topLevel)
+    {
+        var url = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, article.PathSegments);
+        var pillLabel = container.Slug == topLevel.Slug ? topLevel.Title : container.Title;
+        <a class="documentation-article-card documentation-article-card--@topLevel.Slug" href="@url">
+            <div class="documentation-article-card__pill">@pillLabel</div>
+            <h3 class="documentation-article-card__title">@article.Title</h3>
+            @if (!string.IsNullOrWhiteSpace(article.Excerpt))
+            {
+                <p class="documentation-article-card__excerpt">@article.Excerpt</p>
+            }
+            @if (article.Tags.Count > 0)
+            {
+                <ul class="documentation-article-card__tags" aria-label="Tags">
+                    @foreach (var tag in article.Tags)
+                    {
+                        <li class="documentation-article-card__tag">@tag</li>
+                    }
+                </ul>
+            }
+        </a>
+    }
+}
+
+<header class="documentation__header">
+    <h1>@DocumentationService.RootDisplayTitle</h1>
+</header>
+
+@if (!Model.Index.HasContent)
+{
+    <p class="documentation__empty">No documentation has been published yet.</p>
+    return;
+}
+
+@foreach (var topNode in Model.Index.Sections)
+{
+    var nodeUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, topNode.PathSegments);
+    <div class="documentation-section-block">
+        <div class="documentation-section-block__header">
+            <h2 class="documentation-section-block__title">
+                <a href="@nodeUrl">@topNode.Title</a>
+            </h2>
+            @if (!string.IsNullOrWhiteSpace(topNode.Intro?.Excerpt))
+            {
+                <p class="documentation-section-block__intro">@topNode.Intro.Excerpt</p>
+            }
+        </div>
+
+        <div class="documentation-article-grid">
+            @foreach (var article in topNode.Articles)
+            {
+                RenderArticleCard(article, topNode, topNode);
+            }
+            @foreach (var sub in topNode.Subsections)
+            {
+                @foreach (var article in sub.Articles)
+                {
+                    RenderArticleCard(article, sub, topNode);
+                }
+            }
+        </div>
+    </div>
+}

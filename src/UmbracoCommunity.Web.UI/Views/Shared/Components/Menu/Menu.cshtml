@@ -1,3 +1,4 @@
+@using UmbracoCommunity.Web.Features.Members
 @using UmbracoCommunity.Web.Models.ViewModels.Components
 @using UmbracoCommunity.Web.Models.ViewModels.Components.Navigation
 @model MenuViewModel
@@ -38,7 +39,7 @@
                         </button>
                         <form method="GET" action="@Model.SearchPageUrl" role="search">
                             <label for="desktop-search" class="sr-only">Search the site</label>
-                            <input type="text" id="desktop-search" name="q" placeholder="What are you looking for?" autofocus />
+                            <input type="text" id="desktop-search" name="q" placeholder="What are you looking for?" />
                             <button type="button" class="icon-btn" aria-label="Close search">
                                 @{
                                     RenderSearchCloseIcon();
@@ -49,6 +50,7 @@
                 }
                 @{
                     RenderCtaButtons();
+                    await RenderMemberButton();
                 }
             </div>
             <div class="nav-mobile">
@@ -69,7 +71,7 @@
                             </button>
                             <form method="GET" action="@Model.SearchPageUrl" role="search">
                                 <label for="mobile-search" class="sr-only">Search the site</label>
-                                <input type="text" id="mobile-search" name="q" placeholder="What are you looking for?" autofocus />
+                                <input type="text" id="mobile-search" name="q" placeholder="What are you looking for?" />
                                 <button type="button" class="icon-btn" aria-label="Close search">
                                     @{
                                         RenderSearchCloseIcon();
@@ -111,6 +113,50 @@
         <div class="nav-mobile__item cta-btn">
             @Html.RenderButtonCTA(Model.CallToActionButton.Url, Model.CallToActionButton.Text, Model.CallToActionButton.Target, Model.CallToActionButton.Text)
         </div>
+    }
+
+    private async Task RenderMemberButton()
+    {
+        if (!Model.IsSignInEnabled) return;
+
+        if (Model.IsSignedIn)
+        {
+            <div class="nav-end__item member-btn">
+                <div class="member-avatar">
+                    <a href="@Model.AccountPageUrl" class="member-avatar__trigger" aria-label="@Model.MemberDisplayName — account" tabindex="0">
+                        @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
+                        {
+                            <img src="@Model.MemberAvatarUrl" alt="" width="36" height="36" />
+                        }
+                    </a>
+                    <div class="member-avatar__menu">
+                        @if (!string.IsNullOrEmpty(Model.MemberDisplayName))
+                        {
+                            <span class="member-avatar__name">@Model.MemberDisplayName</span>
+                        }
+                        <form method="post" action="/logout">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="member-avatar__signout">Sign out</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            var returnUrl = (Context.Request.Path + Context.Request.QueryString).ToString();
+            <div class="nav-end__item member-btn">
+                @using (Html.BeginUmbracoForm("ExternalLogin", "UmbExternalLogin"))
+                {
+                    <input type="hidden" name="provider" value="@GitHubExternalLoginProviderOptions.SchemeName" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                    <button type="submit" class="btn is-white member-signin__btn">
+                        <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                        Sign in
+                    </button>
+                }
+            </div>
+        }
     }
 
     private void RenderSearchIcon()
@@ -177,7 +223,7 @@
     private void RenderNavigationItem(NavigationItem item)
     {
         <li class="nav-item">
-            <a href="@item.Url" title="@item.Text">@item.Text</a>
+            <a href="@item.Url" title="@item.Text" target="@item.Target" rel="@item.Target.NewTabRel()">@item.Text</a>
         </li>
     }
 
@@ -215,6 +261,8 @@
                                 {
                                     var hasCaption = !string.IsNullOrEmpty(sectionItem.Caption);
                                     <a href="@sectionItem.Url" title="@sectionItem.Text"
+                                       target="@sectionItem.Target"
+                                       rel="@sectionItem.Target.NewTabRel()"
                                        class="@(hasCaption ? "has-caption" : "")">
                                         <section>
                                             @if (!string.IsNullOrEmpty(sectionItem.IconUrl))

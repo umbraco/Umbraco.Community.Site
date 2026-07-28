@@ -1,0 +1,20 @@
+{
+  "name": "umbraco-community-blog-announcements",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "watch": "tsc && vite build --watch",
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@umbraco-cms/backoffice": "^*",
+    "jsdom": "^27.3.0",
+    "lit": "^3.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
+    "vitest": "^4.0.15"
+  }
+}

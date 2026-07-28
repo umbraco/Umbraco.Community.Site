@@ -74,7 +74,7 @@ Infrastructure/
   BlockRestrictionEntity.cs            — Database entity
   BlockRestrictionStore.cs             — Data access layer with caching
   BlockRestrictionFileService.cs       — JSON file read/write/delete
-  BlockRestrictionMigrationHostedService.cs — Auto-migration on startup
+  BlockRestrictionMigrationNotificationHandler.cs — Auto-migration after Umbraco starts
 Models/
   AllowedBlocksResponse.cs             — Resolution result DTO
   BlockRestrictionFileModel.cs         — JSON file format ({alias}.json)
@@ -174,5 +174,5 @@ Tests use Vitest and are colocated with source files (`.test.ts` suffix).
 ### Database
 
 - Uses EF Core with SQLite (dev) / SQL Server (production) via `IDbContextFactory`
-- Migrations run automatically on startup via `BlockRestrictionMigrationHostedService`
+- Migrations run automatically via `BlockRestrictionMigrationNotificationHandler` (on `UmbracoApplicationStartedNotification`)
 - The database provider is determined by the Umbraco connection string configuration

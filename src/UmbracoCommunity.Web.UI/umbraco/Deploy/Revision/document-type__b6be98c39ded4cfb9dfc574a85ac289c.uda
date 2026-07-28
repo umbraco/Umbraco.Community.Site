@@ -1,0 +1,43 @@
+{
+  "Name": "Feed submission block",
+  "Alias": "feedSubmissionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-rss",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/79121ac2b1d14f57b3f1b1b76e2a61fa",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "a050d48d-8970-4bf4-a2bd-10f720e59058",
+      "Alias": "guidance",
+      "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+      "Name": "Guidance"
+    }
+  ],
+  "Udi": "umb://document-type/b6be98c39ded4cfb9dfc574a85ac289c",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/79121ac2b1d14f57b3f1b1b76e2a61fa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.0"
+}

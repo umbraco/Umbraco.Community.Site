@@ -15,6 +15,7 @@ public class RegisterSessionize : IComposer
 
         // Register the Sessionize API client as scoped (one per request)
         builder.Services.AddScoped<SessionizeApiClient>();
+        builder.Services.AddScoped<ProgramSessionResolver>();
         
         builder.Services.AddHttpClient("Sessionize", (sp, client) => 
         {

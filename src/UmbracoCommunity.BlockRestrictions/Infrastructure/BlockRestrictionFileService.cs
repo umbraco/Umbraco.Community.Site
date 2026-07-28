@@ -8,7 +8,8 @@ namespace UmbracoCommunity.BlockRestrictions.Infrastructure;
 /// <summary>
 /// Handles read/write/delete of block restriction rule JSON files in umbraco/BlockRestrictions/.
 /// Files are the version-controlled source of truth — they travel with the codebase and are
-/// imported into the database on startup by <see cref="BlockRestrictionFileImportHostedService"/>.
+/// imported into the database on demand from the backoffice dashboard (via
+/// <see cref="BlockRestrictionService"/>'s file-import endpoints), not automatically on startup.
 ///
 /// Registered as a singleton because it only depends on the content root path (immutable)
 /// and a logger. Thread safety is not critical — concurrent writes to different files are

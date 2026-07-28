@@ -15,9 +15,7 @@
     ]
   },
   "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
-  "CompositionContentTypes": [
-    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
-  ],
+  "CompositionContentTypes": [],
   "PropertyGroups": [
     {
       "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
@@ -42,6 +40,15 @@
           "Description": "Select a square image. A favicon is the tiny icon a website shows in your browser tab, bookmarks, and shortcuts; the site\u0027s miniature logo.",
           "Name": "Favicon",
           "SortOrder": 3
+        },
+        {
+          "Key": "88a7dae1-3cd2-421e-a66c-c97eb50f6e2d",
+          "Alias": "enableMemberSignIn",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Description": "Show the GitHub sign-in button in the header and enable the account page for this site.",
+          "Name": "Enable member sign-in",
+          "SortOrder": 10
         },
         {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
@@ -81,6 +88,10 @@
       "Ordering": true
     },
     {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
       "Udi": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
       "Ordering": true
     },
@@ -97,10 +108,6 @@
       "Mode": "Exist"
     },
     {
-      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
       "Mode": "Exist"
     },
@@ -110,5 +117,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "17.2.0"
 }

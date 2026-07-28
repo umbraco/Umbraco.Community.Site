@@ -1,0 +1,28 @@
+{
+  "Name": "Timeline entries grid",
+  "EditorAlias": "Umbraco.BlockGrid",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockGrid",
+  "Configuration": {
+    "gridColumns": 12,
+    "blocks": [
+      {
+        "contentElementTypeKey": "ecdb13e3-b6ad-4a6e-bbce-c258e6340565",
+        "allowAtRoot": true,
+        "allowInAreas": true
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+  "Udi": "umb://data-type/bfb1da8057174959998408ee34ee3bd4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/ecdb13e3b6ad4a6ebbcec258e6340565"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

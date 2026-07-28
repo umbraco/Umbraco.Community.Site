@@ -17,3 +17,20 @@
         </span>
     </a>
 }
+else
+{
+    var fallbackTitle = !string.IsNullOrWhiteSpace(Model.Content?.LinkTitle) ? Model.Content.LinkTitle : "No link selected — click to edit";
+    <span class="dc-link-with-icon-and-caption-preview dc-link-preview--empty">
+        @if (Model.Content?.Icon != null)
+        {
+            <svg-src media="@Model.Content.Icon" width="24" height="24" alt-text="@fallbackTitle"></svg-src>
+        }
+        <span class="dc-link-with-icon-and-caption-preview__body">
+            <span class="dc-link-with-icon-and-caption-preview__title">@fallbackTitle</span>
+            @if (!string.IsNullOrWhiteSpace(Model.Content?.Caption))
+            {
+                <span class="dc-link-with-icon-and-caption-preview__caption">@Model.Content.Caption</span>
+            }
+        </span>
+    </span>
+}

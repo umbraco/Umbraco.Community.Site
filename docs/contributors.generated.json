@@ -1,0 +1,408 @@
+{
+  "primers/README.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/backend.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/backoffice.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/caching.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/content-modelling.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/frontend.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/integrations.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/multi-tenancy.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "primers/seo-and-structured-data.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/README.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/backoffice-management-api-with-auth-policies.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/content-tree-inherited-config.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/drag-to-scroll-with-snap.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/inline-svg-tag-helper.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/intersection-observer-paused-animation.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/multi-tenant-content-resolution.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/mutation-observer-progressive-enhancement.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/nonce-csp-with-razor.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/one-master-block-datatype.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/postcss-mixin-for-design-tokens.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/site-search-with-examine-externalindex.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/foundations/vite-umbraco-manifest-integration.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/caching-scoped-svg-output.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/output-cache-policies-for-slow-upstream-apis.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/per-tenant-404-content-finder.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/scoping-inline-svg-styles.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/syncing-config-across-environments.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/tenant-fallback-for-schema-and-seo.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ],
+  "tutorials/refinements/wrapping-umbraco-native-block-editor.md": [
+    {
+      "name": "Laura Weatherhead",
+      "login": "lssweatherhead",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+      "profileUrl": "https://github.com/lssweatherhead"
+    },
+    {
+      "name": "Sebastiaan Janssen",
+      "login": "nul800sebastiaan",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+      "profileUrl": "https://github.com/nul800sebastiaan"
+    }
+  ]
+}

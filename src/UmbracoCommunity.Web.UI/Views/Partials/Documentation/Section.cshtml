@@ -1,0 +1,65 @@
+@using UmbracoCommunity.Web.Models.Pages.Documentation
+@using UmbracoCommunity.Web.Services.Documentation
+@using UmbracoCommunity.Web.ViewModelBuilders.Pages
+@model DocumentationPageViewModel
+
+@{
+    var currentSection = Model.Section!;
+}
+
+<header class="documentation__header">
+    <h1>@currentSection.Title</h1>
+</header>
+
+@if (Model.SectionIntroHtml is not null)
+{
+    <div class="documentation-prose documentation__intro">
+        @Model.SectionIntroHtml
+    </div>
+}
+
+@if (currentSection.Subsections.Count > 0)
+{
+    foreach (var sub in currentSection.Subsections)
+    {
+        var subUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, sub.PathSegments);
+        <div class="documentation-subcurrentSection">
+            <h2 class="documentation-subcurrentSection__title">
+                <a href="@subUrl">@sub.Title</a>
+            </h2>
+            @if (sub.Articles.Count > 0)
+            {
+                <ul class="documentation-list">
+                    @foreach (var article in sub.Articles)
+                    {
+                        var url = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, article.PathSegments);
+                        <li class="documentation-list__item">
+                            <a class="documentation-list__link" href="@url">@article.Title</a>
+                            @if (!string.IsNullOrWhiteSpace(article.Excerpt))
+                            {
+                                <p class="documentation-list__excerpt">@article.Excerpt</p>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+}
+
+@if (currentSection.Articles.Count > 0)
+{
+    <ul class="documentation-list">
+        @foreach (var article in currentSection.Articles)
+        {
+            var url = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, article.PathSegments);
+            <li class="documentation-list__item">
+                <a class="documentation-list__link" href="@url">@article.Title</a>
+                @if (!string.IsNullOrWhiteSpace(article.Excerpt))
+                {
+                    <p class="documentation-list__excerpt">@article.Excerpt</p>
+                }
+            </li>
+        }
+    </ul>
+}

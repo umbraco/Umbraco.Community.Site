@@ -1,0 +1,23 @@
+@inherits UmbracoViewPage<DigitalSignagePage>
+
+@{
+    Layout = null;
+
+    var contentGrid = Model.ContentBlocks.ParseBlockGrid();
+}
+
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Model.Name</title>
+    <link rel="stylesheet" vite-href="digital-signage" asp-add-nonce="true" />
+</head>
+<body class="dc-signage">
+    <main class="dc-signage__main">
+        <partial name="~/Views/Partials/Components/ContentBlocks.cshtml" model="contentGrid" />
+    </main>
+    <script vite-src="digital-signage" vite-client="true" asp-add-nonce="true"></script>
+</body>
+</html>

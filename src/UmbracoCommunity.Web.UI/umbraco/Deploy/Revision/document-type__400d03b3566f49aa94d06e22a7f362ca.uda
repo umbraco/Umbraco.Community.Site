@@ -1,0 +1,52 @@
+{
+  "Name": "[Settings] MVP block",
+  "Alias": "settingsMvpBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/684eb93dd1b5454b87118d7c468e2e99",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "f7802a64-d3c2-47eb-a7d5-672f21fa4aa1",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "808ddf5a-4bcb-4178-9f34-2eb47d414242",
+          "Alias": "showLatestYearOnly",
+          "DataType": "umb://data-type/92897bc6a5f34ffeae27f2e7e33dda49",
+          "ValueType": "System.Boolean",
+          "Description": "When enabled, only the most recent year of MVPs is shown and the year navigation is hidden.",
+          "Name": "Show latest year only",
+          "SortOrder": 101
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/400d03b3566f49aa94d06e22a7f362ca",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/92897bc6a5f34ffeae27f2e7e33dda49",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/684eb93dd1b5454b87118d7c468e2e99",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "17.1.0"
+}

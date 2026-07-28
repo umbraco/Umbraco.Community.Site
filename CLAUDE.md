@@ -4,23 +4,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring automated GitHub integration for release tracking, community data synchronization, and Sessionize event integration.
+This is the Umbraco Community Website - a replacement for [community.umbraco.com](https://community.umbraco.com). It's a **multi-tenant** ASP.NET Core application built on Umbraco CMS with a Vite-powered frontend, featuring Sessionize event integration and aggregated community content feeds (blog posts, calendar). (Release tracking used to live here too but has been extracted to a separate releases site.)
 
 **Multi-tenancy**: The site runs multiple tenants from a single Umbraco instance, each with its own root content node. All content lookups (e.g., site settings, 404 pages, navigation) must be resolved **relative to the current request's content tree** — never assume a single root or use hardcoded paths. Traverse ancestors or use the current request's root node to find tenant-specific content.
 
+## Documentation
+
+The repo carries a small library of conceptual and operational docs alongside the code:
+
+- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, and integrations are written; content modelling and SEO are still planned stubs). Start here if you're new to the codebase.
+- **[docs/tutorials/](docs/tutorials/)** — short, focused deep dives on specific problems we've hit and how we solved them. Split into [`foundations/`](docs/tutorials/foundations/) (standalone patterns) and [`refinements/`](docs/tutorials/refinements/) (improvements layered on a foundation).
+- **[docs/BUILDING_PAGES.md](docs/BUILDING_PAGES.md)** and **[docs/BUILDING_BLOCKS.md](docs/BUILDING_BLOCKS.md)** — how-tos for adding new pages and content blocks.
+- **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
+- **[CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)** and **[ACCESSIBILITY.md](ACCESSIBILITY.md)** — coding standards and WCAG conformance notes.
+
+Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of planned material, with a placeholder file under the relevant folder for each entry. When picking one up to write, expand the existing stub in place rather than creating a new file.
+
 ## Solution Structure
 
-The solution consists of 5 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 7 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
 - **UmbracoCommunity.StaticAssets** - Frontend assets built with Vite (TypeScript, Lit web components)
 - **UmbracoCommunity.Extensions** - Umbraco backoffice extensions (Razor Class Library with TypeScript client in `Client/` folder)
 - **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **Umbraco.Community.NotFoundTracker** - 404 tracking with ignore rules and a dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **UmbracoCommunity.BlogAnnouncements** - Discord blog-post announcement pipeline (detection, delivery, tracking store) and its dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 
 ### Key Directories in UmbracoCommunity.Web
 
-- **Features/** - Self-contained feature modules (Sessionize) with their own controllers, models, and infrastructure
+- **Features/** - Self-contained feature modules (Sessionize, Feeds, Mvp, Seed) with their own controllers, models, and infrastructure
 - **Controllers/** - MVC controllers organized by type:
   - `Controllers/Api/` - API controllers (inherit from `ControllerBase`, have `[ApiController]` attribute)
   - `Controllers/Render/` - Umbraco render controllers (inherit from `RenderController`)
@@ -38,11 +52,11 @@ The solution consists of 5 projects (uses Central Package Management via `Direct
   - `ViewModelBuilders/Schema/` - SEO schema builders (`ArticleSchemaBuilder`, `BreadcrumbSchemaBuilder`, `OrganizationSchemaBuilder`)
 - **Services/** - Application services (`ContentDataService`, `ContentContextService`, `ISeoDataService`/`SeoDataService`)
 - **ViewComponents/** - ASP.NET Core View Components for layout concerns (MetaTags, Menu, Footer, Favicon)
-- **Routing/** - Custom content finders (e.g., `PageNotFoundContentFinder`)
+- **Routing/** - Custom routing (e.g., `CommunitySitePageNotFoundResolver` for tenant-aware 404s, `DocumentationContentFinder`)
 - **Extensions/** - Extension methods for ASP.NET Core builders, Umbraco helpers, CSP, and HTML helpers
 - **Middleware/** - Custom middleware (CSP handling)
-- **Utilities/** - Helper classes (`ReleaseDiscussionParser`, `ReleaseLabelHelper`, `SemVerHelper`, `StringUtilities`, `UrlUtilities`)
-- **Helpers/** - Domain helpers (ColourHelper, ImageHelper, VideoHelper)
+- **Utilities/** - Helper classes (`StringUtilities`, `UrlUtilities`)
+- **Helpers/** - Domain helpers (ColourHelper, CountryFlagHelper, VideoHelper)
 - **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
 - **Vite/** - Vite integration helpers and tag helpers
 
@@ -84,14 +98,15 @@ dotnet build
 cd src/UmbracoCommunity.StaticAssets
 npm run build
 
-# Build backoffice extensions only
-npm run build:backoffice
-
 # Build for cloud deployment (copies files via devops/copy-for-cloud.js)
 npm run build:for:cloud
 
 # Build Extensions backoffice client (separate build)
 cd src/UmbracoCommunity.Extensions/Client
+npm run build
+
+# Build NotFoundTracker backoffice client (separate build)
+cd src/Umbraco.Community.NotFoundTracker/Client
 npm run build
 ```
 
@@ -129,12 +144,11 @@ See `docs/BUILDING_PAGES.md` for detailed instructions.
 
 ### Content Blocks
 
-Reusable components using Umbraco's Block List editor:
-1. **Element Type** - Umbraco content structure
-2. **Settings Type** - optional configuration
-3. **Content Model** - strongly-typed model (in `Models/ContentModels/`)
-4. **View Model** - view-layer model (in `Models/ViewModels/Blocks/`)
-5. **View** - Razor partial (in `Views/Partials/Blocks/`)
+Reusable components using Umbraco's Block List / Block Grid editor:
+1. **Element Type** - Umbraco content structure (the block's properties)
+2. **Settings Type** - optional configuration (often composing `ISettingsColour`, `ISettingsBlockId`)
+3. **Content Model** - the Models Builder published model; optionally extended by a hand-written partial in `Models/ContentModels/` for view-only helpers (e.g. `IdHash`, computed properties)
+4. **View** - Razor partial in `Views/Partials/Blocks/{Alias}.cshtml` inheriting `BlockGridItem<TContent, TSettings>` and binding the content/settings models directly (there is **no** per-block view model or view-model builder)
 
 See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 
@@ -145,7 +159,7 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
-- **integrations/** - Third-party integrations (Cookiebot, Intercom, Matomo, Google Maps)
+- **integrations/** - Small `script-loader`-based elements for injecting third-party scripts
 - **models/** - TypeScript data models
 - **types/** - TypeScript type definitions
 - **util/** - Utility functions
@@ -155,10 +169,15 @@ Located in `src/UmbracoCommunity.StaticAssets/src/`:
 - **test/** - Test utilities
 
 Built assets go to:
-- Frontend: `dist/` → referenced in views
-- Backoffice: `../UmbracoCommunity.Web.UI/wwwroot/App_Plugins/UmbracoCommunityGitHubUsers/`
+- Frontend: `dist/` → copied to `../UmbracoCommunity.Web.UI/wwwroot/assets/` for production, referenced in views
+
+Backoffice extensions are **not** built from this project. Each lives in its own Vite project (`UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, `Umbraco.Community.NotFoundTracker/Client/`) and emits to its own `App_Plugins/<Name>/` folder.
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
+
+**Dialog System** (`src/components/dialog/`):
+- `dialog-base.element.ts` - Base class for modal dialogs
+- `dialog.handler.ts` - Opens/closes dialogs, manages body scroll lock with scrollbar width compensation to prevent content jump
 
 **Text Link Animation**: Inline text links within block content have an animated pink highlight (background-gradient that grows from a 2px underline to full highlight on hover). Defined globally in `typography.css`, scoped to text-only links via `:not(:has(img, svg, picture, video, div))`.
 
@@ -170,6 +189,7 @@ Models are generated in **SourceCodeManual** mode (development) / **Nothing** mo
 - Namespace: `UmbracoCommunity.Web.Models.PublishedModels`
 - Directory: `src/UmbracoCommunity.Web/Models/PublishedModels/`
 - After creating document types in backoffice, manually generate models
+- **Never hardcode a content type alias as a string literal** (e.g. `"accountPage"`, `c.ContentType.Alias.Equals("searchPage")`). Always reference the generated model's `ModelTypeAlias` constant (e.g. `AccountPage.ModelTypeAlias`) so a doc type alias rename is a compile error, not a silent runtime failure. This is the existing convention throughout the codebase (`Settings.ModelTypeAlias`, `ImageBlock.ModelTypeAlias`, etc.) — apply it everywhere content type aliases are compared, including in Razor views.
 
 ## Key Features
 
@@ -194,10 +214,17 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - `GET /categories` - Event categories
 
 **Frontend Components** (`src/UmbracoCommunity.StaticAssets/src/components/sessionize/`):
-- `sessionize-program.element.ts` - Program grid display
+- `sessionize-program.element.ts` - Program grid display with deep linking support
 - `sessionize-speakers.element.ts` - Speakers grid with filtering
-- `sessionize-session-dialog.element.ts` - Session details modal
+- `sessionize-session-dialog.element.ts` - Session details modal with social sharing
 - `sessionize-speaker-dialog.element.ts` - Speaker details modal
+
+**Session Sharing & Deep Linking:**
+- URLs support `?session={sessionId}` parameter for direct session linking
+- When visiting a URL with session parameter, page scrolls to program and opens session dialog
+- Session dialog includes share buttons for LinkedIn, Bluesky, Mastodon, and copy link
+- Server-side Open Graph tags are generated for shared session URLs via `SeoMetaDataViewModelDecorator`
+- Social platforms receive session-specific `og:title`, `og:description`, and `og:url` meta tags
 
 **Configuration** (in `appsettings.json`):
 ```json
@@ -207,6 +234,30 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
   "CacheDurationInMinutes": 60
 }
 ```
+
+### Digital Signage
+
+A standalone kiosk view of the Sessionize program for big screens at the venue. The full-screen page intentionally bypasses the usual site chrome.
+
+**Document type & template**:
+- `digitalSignagePage` doctype (model: `DigitalSignagePage`) — separate from `contentPage`, composed of `ICompositionContentBlocks` + `ICompositionPageConfiguration` only (no banner, no SEO).
+- `Views/digitalSignagePage.cshtml` — `Layout = null`, inherits `UmbracoViewPage<DigitalSignagePage>` directly (no view-model/controller/builder — same pattern as `PageNotFound.cshtml`).
+- Editors add `ProgramFeatureBlock` entries to the page's `ContentBlocks` to drive what shows.
+
+**`ProgramFeatureBlock`** (`Views/Partials/Blocks/ProgramFeatureBlock.cshtml`) — picks one of three nested config element types via its `programConfiguration` BlockListItem:
+- `CurrentSessionConfig` — current + next per room. The most-used; drives the signage layout.
+- `HighlightedSessionsConfig` — explicit session ids picked by the editor.
+- `SessionsConfig` — day/room/tag filter intersection.
+
+**`ProgramSessionResolver`** (`Features/Sessionize/Infrastructure/`) — scoped service wrapping `SessionizeApiClient`. Three methods (`ResolveCurrentAsync` / `ResolveHighlightedAsync` / `ResolveFilteredAsync`). Sessionize stores timestamps as UTC; the resolver converts to `Europe/Copenhagen` via the public static `ToEventTime(DateTime)` helper before all comparisons and before display formatting, so a session at `2026-06-11T11:45:00Z` renders as `13:45` on the card. `ResolveCurrentAsync` takes an optional `nowOverride` for the `?signage-now=` testing flow.
+
+**Layout** (`StaticAssets/src/css/pages/digital-signage.css`, `entrypoints/_digital-signage.ts`):
+- Codegarden palette override at `:root` (overrides `--color-page-surface`, `--color-identity-orange/yellow`, etc. for the signage scope only).
+- Single-room (one room in `CurrentSessionConfig.Rooms`): card pins via `position: fixed; inset: 2rem`, hero-scale typography via `:has(> :only-child)` selectors; current pill features a navy + pink corner triangle motif (inline SVG via `data:` URL, polygons inset via `content-box` padding so the gap shows the pill background — which adapts automatically to the cream `is-empty` variant).
+- Multi-room (2-4 rooms): rooms container pins via `inset: 2rem` and tiles cards in a grid sized by `:has(.dc-program-rooms > :nth-child(N):last-child)` (2 → side-by-side, 3 → three cols, 4 → 2×2). Multi-room mode hides the logo and clock, and skips the triangle motif (too busy).
+- Card header is a flex row: logo (single-room only, from `Site Settings → HeaderLogo`), room name, clock — all DOM siblings inside the card, not separate fixed-positioned bits.
+
+**Testing the clock rollover**: `?signage-now=2026-06-11T09:55` on the page URL simulates that wall-clock time. The signage JS rebuilds the URL with the *current* simulated time on each 60s poll, so as time progresses past a session boundary the SSR'd state updates accordingly. The clock element is rebound after each poll because the polling swap replaces it.
 
 ### Block Restrictions
 
@@ -338,9 +389,71 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
 
+### Timeline Block
+
+A roadmap-style block for surfacing phased goals/milestones. Editors create one or more `TimelineEntryBlock` children (each representing a phase label such as "Now", "Next", "Future"), each containing a list of `TimelineGoalBlock` items with a title, optional rich text, and optional tags.
+
+**Content Properties** (`TimelineBlock`):
+- `Title` / `Subtitle` — via `IContentBlockIntro` mixin
+- `TimelineEntries` (BlockGridModel) — ordered list of `TimelineEntryBlock` children
+
+**Entry** (`TimelineEntryBlock`):
+- `EntryTitle` — phase label (rendered as a centred pill on the vertical road line)
+- `TimelineGoalItems` (BlockListModel) — ordered list of `TimelineGoalBlock` children
+
+**Goal** (`TimelineGoalBlock`):
+- `GoalTitle` (string) — card heading
+- `GoalDescription` (IHtmlEncodedString) — optional rich text body
+- `GoalTags` (List\<string\>) — optional tag pills; also drive the filter dropdown
+
+**Frontend** (`src/UmbracoCommunity.StaticAssets/src/components/timeline/dc-timeline.element.ts`):
+- `<dc-timeline>` — lightweight custom element; wires the `[data-timeline-filter]` select to show/hide `.dc-timeline-goal` cards by `data-tags` attribute
+
+**Layout** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/timeline-block.css`):
+- Mobile: single column, no road line
+- `--sm`+: vertical pink center line (`::before` on `.dc-timeline`), goals in a 2-column CSS grid (`grid-column: 1` / `2`), pink connector lines (`::after` / `::before` on goal cards) bridging each card to the road. Left connectors attach at `top: 1.5rem`, right connectors at `top: 3.5rem` so they don't join the road at the same point.
+- First goal in each entry always starts left (the `goalIndex` counter resets to 0 inside the `@for` loop, not outside it)
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/TimelineEntryBlock.cshtml`):
+- Renders a single entry (not the full block); always 2-column grid in the preview column, no road line or filter
+
 ### Rich Text Editor Style Menu
 
 A custom tiptap toolbar extension is defined in `App_Plugins/RichtextStyles/umbraco-package.json`. It provides a "Richtext styles" dropdown with grouped options for headings, inline formatting, blocks, and lists (including condensed list variants that apply a `no-margin` class to `ol`/`ul` tags).
+
+### Member Authentication (GitHub OAuth)
+
+Community members sign in exclusively via GitHub OAuth — no username/password login. The flow is implemented on top of Umbraco's built-in external login infrastructure.
+
+**Files:**
+- `Features/Members/RegisterGitHubAuth.cs` — `IComposer` that registers the GitHub OAuth handler via `AddMemberExternalLogins` / `AddOAuth<GitHubAuthenticationOptions, GitHubAuthenticationHandler>`. Must use `AddOAuth` (not `AddRemoteScheme`) so `OAuthPostConfigureOptions` runs and initialises `StateDataFormat` — using `AddRemoteScheme` directly causes a `NullReferenceException` in `OAuthHandler.BuildChallengeUrl`.
+- `Features/Members/GitHubExternalLoginProviderOptions.cs` — configures Umbraco auto-linking: new members are created with the `communityMember` member type, auto-approved, auto-linked on each sign-in. The `OnCreatingTicket` handler in `RegisterGitHubAuth` fetches the member's primary verified email from the GitHub API (the OAuth `email` scope only exposes the public profile email; the `/user/emails` endpoint is needed for private addresses).
+- `Controllers/LoginController.cs` — single `POST /logout` action; calls `IMemberSignInManager.SignOutAsync()` which clears all four Umbraco auth cookies (member, external login, 2FA, 2FA remember-me). Plain `HttpContext.SignOutAsync()` is not sufficient.
+- `Controllers/Render/AccountPageController.cs` — renders the member's own account page; redirects unauthenticated visitors to `/`. Pulls the member via `IMemberManager.GetCurrentMemberAsync()` and constructs the avatar URL as `https://github.com/{username}.png`.
+- `Views/AccountPage.cshtml` + `css/pages/account-page.css` + `entrypoints/_accountpage.ts` — account page view and styles (contact-card layout: blue band, circular avatar, name, GitHub handle, email, sign-out).
+
+**OAuth flow:**
+1. Sign-in button in the header POSTs to `UmbExternalLoginController.ExternalLogin` (Umbraco's built-in surface controller) with `provider=UmbracoMembers.GitHub`.
+2. Umbraco redirects to GitHub, which calls back to `/signin-github`.
+3. `UmbExternalLoginController.ExternalLoginCallback` handles the callback, auto-links or creates the member, and signs them in.
+
+**Header integration:**
+- `MenuViewModelBuilder` checks `HttpContext.User.Identity.IsAuthenticated` via `IHttpContextAccessor` and — when signed in — populates `MemberDisplayName` and `MemberAvatarUrl` from the current user's claims.
+- `Menu.cshtml` renders a GitHub sign-in button (signed-out) or a circular avatar with a hover dropdown showing the display name and a sign-out form (signed-in). The `enableMemberSignIn` toggle on the tenant's Settings node controls visibility of both states.
+
+**Configuration:**
+```json
+// appsettings.Local.json (gitignored — never commit)
+"GitHub": {
+  "ClientId": "<your-app-client-id>",
+  "ClientSecret": "<your-app-client-secret>"
+}
+```
+The GitHub OAuth App's callback URL must be set to `https://<host>/signin-github`. If `ClientId` or `ClientSecret` is missing the composer early-returns and GitHub auth is simply not registered (safe for environments without credentials).
+
+### Site Search
+
+The nav search icon is wired to a `SearchPage` doc type backed by Umbraco's Examine `ExternalIndex`. A typed `SearchService` (`Services/SearchService.cs`) queries the index with multi-tenant scoping — results are filtered to descendants of the current request's content root, so search on Site A doesn't leak Site B hits. HTML is stripped from excerpts before display. The render controller (`Controllers/Render/SearchPageController.cs`) hands the results off to a `SearchPageViewModel` for the `SearchPage.cshtml` view to render.
 
 ### Vite Integration
 
@@ -348,7 +461,7 @@ Custom Vite integration for Umbraco:
 - Manifest-based asset loading in development and production
 - Helper in `Vite/` directory for generating script/style tags
 - PostCSS with custom rhythm mixin for consistent spacing
-- Dual build modes: frontend website (`npm run build`) + backoffice extensions (`BUILD_TARGET=backoffice`)
+- Single build target here: the public website (`npm run build`). Backoffice extensions build separately, from each `*/Client/` Vite project (library mode, externalising `@umbraco/*`)
 
 ### SEO and Schema Markup
 
@@ -375,16 +488,17 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Nonce-based script security via `NonceTagHelper`
 - CSP can be disabled per-request via `DisableCspMiddleware`
 - HSTS enabled with preload and 1-year max age
+- Permissions-Policy configured in `Extensions/WebApplicationExtensions.cs` (includes `clipboard-write=(self)` for share functionality)
 
 ## Key Dependencies
 
 **Backend:**
-- Umbraco CMS 17.2.2 on .NET 10
-- Entity Framework Core 10.0.3 (SQLite + SQL Server providers)
+- Umbraco CMS 17.4.2 on .NET 10
+- Entity Framework Core 10.0.8 (SQLite + SQL Server providers)
 - Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
 - Schema.NET 13.0.0 - Structured data/schema markup
 - Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.1.1 - Extended content editors
+- Umbraco.Community.Contentment 6.1.4 - Extended content editors
 
 **Frontend:**
 - Lit 3.3.0 - Web components framework
@@ -413,3 +527,9 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 - **ViewComponents over filters**: Layout concerns (menu, footer, meta tags, favicon) are handled by ViewComponents, not action filter attributes
 - **Output Caching**: API endpoints use `[OutputCache]` with policy names from `OutputCachePolicies` class
 - **Upgrade Tool**: Use `tools/upgrade-umbraco/` for package version upgrades
+
+## Pending follow-ups
+
+Check intermittently and clear as conditions become true.
+
+- **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.

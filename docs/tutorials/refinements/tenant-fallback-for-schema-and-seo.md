@@ -1,8 +1,14 @@
+---
+tags: [seo, schema-org, multi-tenant, social-settings]
+---
+
 # Tenant-aware fallback for schema and SEO metadata
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). The fallback chain below leans on the `GetSocialSettings()` extension method established there. If you haven't read the foundation, the resolution side of this tutorial will look like magic.
 
-Structured data (Schema.org JSON-LD) needs a publisher: an `Organization` with a name, a URL, and a logo. On a multi-tenant Umbraco site, that publisher is *per tenant* — Site A's publisher is the Umbraco Community brand, Site B's is the events microsite, and so on. The challenge is that tenant brand metadata is editor-configurable, which means it's also editor-forgettable. This tutorial walks through the small pattern that produces valid `Organization` schema whether the tenant's brand fields are filled in, partially filled in, or entirely absent.
+Structured data — the small blocks of [Schema.org](https://schema.org/) JSON-LD that crawlers like Google and Bing look for in your page head — needs a publisher: an `Organization` with a name, a URL, and a logo, that they can attribute the content to. On a multi-tenant Umbraco site, that publisher is naturally *per tenant* — Site A's publisher is the Umbraco Community brand, Site B's is the events microsite, and so on. The challenge is that tenant brand metadata is editor-configurable, which means (let us be honest with each other here) that it's also editor-forgettable. This tutorial walks through the small pattern that produces valid `Organization` schema whether the tenant's brand fields are filled in, partially filled in, or entirely absent.
+
+> A quick gloss for anyone reading cold: **Schema.org** is a shared vocabulary for describing structured data on the web, and **JSON-LD** is the format (a flavour of JSON) that search engines prefer it embedded in. The C# library we use to build it is **[Schema.NET](https://github.com/RehanSaeed/Schema.NET)** — typed wrappers around the same vocabulary, so you get compile-time help instead of stringly-typed JSON.
 
 ## The problem
 
@@ -37,7 +43,7 @@ A few approaches that miss the mark in subtle ways:
 
 **Emit an empty `Organization` (no name, no URL, no logo).** Validators reject it. Crawlers ignore it. Lighthouse drops your SEO score. No improvement over not emitting the schema at all.
 
-**Read fallback values from `IGlobalSettings` (Umbraco's `Umbraco:CMS:Global` options).** Tempting, because `IGlobalSettings.SiteName` exists and feels like the right default. But Umbraco's global settings are the *instance* defaults — set once at deployment, shared across all tenants. On a multi-tenant site they're either generic ("Umbraco Community Sites") or set to one tenant's brand (which then leaks into all the others). Neither is what you want.
+**Read fallback values from `IGlobalSettings` (Umbraco's `Umbraco:CMS:Global` options).** `IGlobalSettings` is Umbraco's strongly-typed wrapper over the `Umbraco:CMS:Global` section of `appsettings.json` — `SiteName`, default time zone, request handling defaults, and so on. Tempting to lean on, because `IGlobalSettings.SiteName` exists and feels like the right default. But these are the *instance* defaults — set once at deployment, shared across all tenants. On a multi-tenant site they're either generic ("Umbraco Community Sites") or set to one tenant's brand (which then leaks into all the others). Neither is what we want.
 
 **Per-tenant `appsettings.json` config keys.** "If `SocialSettings` is missing for tenant A, use `MultiTenant:TenantA:OrgName` from config." Now you've split tenant config across the backoffice *and* a JSON file. The whole point of having editor-configurable brand fields is so editors can update them. A deploy-time JSON fallback defeats that.
 
@@ -45,7 +51,7 @@ A few approaches that miss the mark in subtle ways:
 
 ## Our approach
 
-Three pieces, each doing one thing:
+There is no need for us to reinvent the wheel here — the foundation pattern already does the tenant resolution part for us, so all we really need on top is a way of saying "and if the tenant hasn't configured itself yet, here's what we'll fall back to instead". Three pieces, each doing one thing:
 
 1. **`SeoDataService`** is the resolver. It's the layer that knows about tenants, calls `currentPage.GetSocialSettings()`, and hands the result (possibly null) down to the schema builders.
 2. **`OrganizationSchemaBuilder`** is the only builder that knows about the fallback. It accepts a nullable `SocialSettings` and produces a valid `Organization` either from the configured fields or from a small set of constants at the top of the class.
@@ -183,7 +189,7 @@ internal class OrganizationSchemaBuilder
 
 A few decisions in there worth flagging:
 
-**The fallback is constants, not config.** Hardcoded into the class file. Changing the fallback "Umbraco" name to something else requires a code change and a deploy — but that's *correct* for this codebase, because the fallback is the safety net for unconfigured tenants, not a thing editors should be able to swap out. If your project needs configurable fallbacks (e.g. white-label deployments where the safety net itself varies), lift the three constants to an `IOptions<…>`-bound config section.
+**The fallback is constants, not config.** Hardcoded into the class file. Changing the fallback "Umbraco" name to something else requires a code change and a deploy — but that's *correct* for this codebase, because the fallback is the safety net for unconfigured tenants, not a thing editors should be able to swap out. If your project needs configurable fallbacks (e.g. white-label deployments where the safety net itself varies), lift the three constants to an `IOptions<…>`-bound config section. ([`IOptions<T>`](https://learn.microsoft.com/aspnet/core/fundamentals/configuration/options) is ASP.NET Core's standard pattern for "bind a section of `appsettings.json` to a typed C# class and inject it"; you'll see it used elsewhere in this codebase for the Sessionize and output-cache settings.)
 
 **`hasCustomSettings` is a single boolean derived from `OrganisationName`.** Once the editor has set the name, we trust the whole settings object — name, URL, logo. We don't independently check whether each field is filled in. The reasoning: a half-filled `SocialSettings` (name set, URL empty) is an editor mistake worth surfacing as a clearly-wrong schema, not papering over with partial fallbacks. If you want the opposite — per-field fallback chains — replace `hasCustomSettings` with per-field null checks.
 
@@ -258,8 +264,10 @@ Scoped (per-request) is fine — none of the builders hold per-request state, bu
 
 This is the last refinement in the multi-tenant suite. The other refinement built on the same foundation is:
 
-→ [Per-tenant 404 pages with `IContentLastChanceFinder`](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
+→ [Per-tenant 404 pages with a custom `INotFoundPageResolver`](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
 
 For the broader pattern these refinements extend:
 
 → [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md)
+
+Hopefully that gives you a clean way of keeping the editor flow forgiving while still emitting structured data that the search engines will actually accept.

@@ -22,6 +22,10 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 	/// <summary>[Composition] Page configuration</summary>
 	public partial interface ICompositionPageConfiguration : IPublishedElement
 	{
+		/// <summary>Hide from search</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		bool HideFromSearch { get; }
+
 		/// <summary>Hide from sitemap</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		bool HideFromSitemap { get; }
@@ -57,6 +61,17 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => GetHideFromSearch(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Hide from search</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		public static bool GetHideFromSearch(ICompositionPageConfiguration that, IPublishedValueFallback publishedValueFallback) => that.Value<bool>(publishedValueFallback, "hideFromSearch");
 
 		///<summary>
 		/// Hide from sitemap

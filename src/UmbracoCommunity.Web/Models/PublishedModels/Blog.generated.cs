@@ -88,6 +88,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string RssTitle => this.Value<string>(_publishedValueFallback, "rssTitle");
 
 		///<summary>
+		/// Hide from search
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("hideFromSearch")]
+		public virtual bool HideFromSearch => global::UmbracoCommunity.Web.Models.PublishedModels.CompositionPageConfiguration.GetHideFromSearch(this, _publishedValueFallback);
+
+		///<summary>
 		/// Hide from sitemap
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

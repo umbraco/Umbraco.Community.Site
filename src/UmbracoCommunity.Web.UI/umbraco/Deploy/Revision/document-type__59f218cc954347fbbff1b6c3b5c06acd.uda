@@ -1,0 +1,36 @@
+{
+  "Name": "[Settings] Feed submission block",
+  "Alias": "settingsFeedSubmissionBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/79121ac2b1d14f57b3f1b1b76e2a61fa",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/59f218cc954347fbbff1b6c3b5c06acd",
+  "Dependencies": [
+    {
+      "Udi": "umb://document-type-container/79121ac2b1d14f57b3f1b1b76e2a61fa",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.0"
+}

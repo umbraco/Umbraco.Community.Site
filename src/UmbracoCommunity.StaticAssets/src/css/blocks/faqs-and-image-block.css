@@ -10,6 +10,21 @@
   gap: 1rem;
 }
 
+.dc-faqs-and-image-block__header {
+  text-align: center;
+}
+
+.dc-faqs-and-image-block__header .block-subtitle {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.dc-faqs-and-image-block__row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .dc-faqs-and-image-block__image-container {
   order: 1;
 }
@@ -54,10 +69,10 @@
   align-items: center;
   padding: 1rem;
   cursor: pointer;
-  font-size: 22px;
+  font-size: 1.25rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 27px;
+  line-height: 1.4;
   color: var(--color-blue);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -131,10 +146,10 @@
   overflow: hidden;
   padding: 0 1rem;
   color: var(--color-blue);
-  font-size: 16px;
+  font-size: 1rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 21px;
+  line-height: 1.6;
   opacity: 0;
   transform: translateY(-10px);
   transition: max-height 0.3s ease-out, padding 0.3s ease-out, opacity 0.3s ease-out, transform 0.3s ease-out;
@@ -152,7 +167,7 @@
 }
 
 @media (--md) {
-  .dc-faqs-and-image-block {
+  .dc-faqs-and-image-block__row {
     flex-direction: row;
     align-items: flex-start;
     gap: 1.25rem;
@@ -162,6 +177,11 @@
   .dc-faqs-and-image-block__content-container {
     flex: 1;
     width: 50%;
+  }
+
+  .dc-faqs-and-image-block__image-container img {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
   }
 
   .dc-faqs-and-image-block.image-left .dc-faqs-and-image-block__image-container {
@@ -182,13 +202,9 @@
 
   .dc-faqs__question {
     padding: 1.5rem 2rem;
-    font-size: 30px;
-    line-height: 35px;
   }
 
   .dc-faqs__answer {
     padding: 0 2rem;
-    font-size: 20px;
-    line-height: 25px;
   }
 }

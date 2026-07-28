@@ -20,7 +20,7 @@ UmbracoCommunity.BlockRestrictions/
 │   ├── BlockRestrictionEntity.cs             # EF Core entity
 │   ├── BlockRestrictionDbContext.cs           # DbContext with table mapping
 │   ├── BlockRestrictionDbContextFactory.cs    # Design-time factory for EF migrations
-│   ├── BlockRestrictionMigrationHostedService.cs  # Auto-applies migrations on startup
+│   ├── BlockRestrictionMigrationNotificationHandler.cs  # Auto-applies migrations after Umbraco starts
 │   └── BlockRestrictionStore.cs              # Data access layer with IMemoryCache
 ├── Migrations/                        # EF Core migrations (SQLite + SQL Server)
 ├── Models/
@@ -66,7 +66,7 @@ Implements `IComposer` to register all services on startup:
 
 - **EF Core DbContext factory** — configured for both SQLite and SQL Server using `umbracoDbDSN` connection string. Shares the Umbraco database.
 - **Swagger/OpenAPI** — registers a dedicated API document (`umbracocommunityblockrestrictions`) with a security filter extending `BackOfficeSecurityRequirementsOperationFilterBase` to enable backoffice token auth.
-- **Hosted service** — `BlockRestrictionMigrationHostedService` applies pending EF Core migrations on app start.
+- **Migration notification handler** — `BlockRestrictionMigrationNotificationHandler` applies pending EF Core migrations once Umbraco has started (on `UmbracoApplicationStartedNotification`), not from an `IHostedService` — this avoids racing the unattended installer for the SQLite write lock (issue #132).
 - **Scoped services** — `BlockRestrictionStore` (data access) and `BlockRestrictionService` (business logic).
 
 ### Database (`Infrastructure/`)

@@ -9,6 +9,16 @@ export class ServiceBase {
     });
   }
 
+  static put(url: string, body: any) {
+    return fetch(url, {
+      method: "put",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   static get(url: string) {
      return fetch(url);
   }

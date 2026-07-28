@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoCommunity.BlogAnnouncements",
+  "name": "Blog Announcements",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "UmbracoCommunity.BlogAnnouncements.Bundle",
+      "name": "Blog Announcements Bundle",
+      "js": "/App_Plugins/UmbracoCommunityBlogAnnouncements/blog-announcements.js"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+/* Shared "public profile link" chip (dc-profile-link). */
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-xs);
+  margin: 0;
+  padding: var(--unit-xxs) var(--unit-xs);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-identity-blue);
+  font-size: 1rem;
+  font-weight: 700;
+
+  @media (--md) {
+    gap: var(--unit-sm);
+    padding: var(--unit-xs) var(--unit-sm);
+    font-size: 1.5rem;
+  }
+}
+
+/* min-width: 0 lets long URLs scroll instead of squeezing the copy button. */
+.profile-link__url {
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.profile-link__base {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.profile-link__slug {
+  color: var(--color-white);
+  font-weight: 800;
+}
+
+/* Base reset comes from .link-action; this is just the dark-chip overrides. */
+.profile-link__copy {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 0;
+}
+
+.profile-link__copy:hover {
+  color: var(--color-white);
+}
+
+.profile-link__copy:focus-visible {
+  outline: var(--focus-outline-width) solid var(--color-white);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.profile-link__copy svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+
+  @media (--md) {
+    width: 18px;
+    height: 18px;
+  }
+}

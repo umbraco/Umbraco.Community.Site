@@ -9,9 +9,7 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
-  "CompositionContentTypes": [
-    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
-  ],
+  "CompositionContentTypes": [],
   "PropertyGroups": [
     {
       "Key": "5407f0be-a8e0-4566-bbc0-778e2e136716",
@@ -98,10 +96,6 @@
     },
     {
       "Udi": "umb://document-type-container/5c34b325699f4c1eba7e0c5e474fa4a7",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
       "Ordering": true
     }
   ],

@@ -128,6 +128,11 @@ public static class HtmlHelperExtensions
         if (!string.IsNullOrEmpty(target))
         {
             attributes.Add("target", target);
+
+            if (target.OpensInNewTab())
+            {
+                attributes.Add("rel", LinkExtensions.NewTabRelValue);
+            }
         }
 
         if (!string.IsNullOrEmpty(title))

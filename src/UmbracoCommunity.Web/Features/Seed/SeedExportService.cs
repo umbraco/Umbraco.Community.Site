@@ -1,8 +1,9 @@
 using System.IO.Compression;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Deploy.Core;
 using Umbraco.Deploy.Core.Connectors.ServiceConnectors;
 using Umbraco.Deploy.Infrastructure;
@@ -25,7 +26,7 @@ public sealed class SeedExportService : ISeedExportService
     private readonly IArtifactImportExportService _artifactImportExportService;
     private readonly IServiceConnectorFactory _serviceConnectorFactory;
     private readonly IFileTypeCollection _fileTypeCollection;
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostEnvironment;
     private readonly ILogger<SeedExportService> _logger;
     private readonly TimeProvider _time;
 
@@ -42,20 +43,20 @@ public sealed class SeedExportService : ISeedExportService
         IArtifactImportExportService artifactImportExportService,
         IServiceConnectorFactory serviceConnectorFactory,
         IFileTypeCollection fileTypeCollection,
-        IHostingEnvironment hostingEnvironment,
+        IHostEnvironment hostEnvironment,
         ILogger<SeedExportService> logger,
         TimeProvider time)
     {
         _artifactImportExportService = artifactImportExportService;
         _serviceConnectorFactory = serviceConnectorFactory;
         _fileTypeCollection = fileTypeCollection;
-        _hostingEnvironment = hostingEnvironment;
+        _hostEnvironment = hostEnvironment;
         _logger = logger;
         _time = time;
     }
 
     public string GetLatestZipPath() =>
-        Path.Combine(_hostingEnvironment.MapPathContentRoot("~/" + ExportSubdirectory), ZipFileName);
+        Path.Combine(_hostEnvironment.MapPathContentRoot("~/" + ExportSubdirectory), ZipFileName);
 
     public SeedExportStatus GetStatus() => _status;
 
@@ -71,7 +72,7 @@ public sealed class SeedExportService : ISeedExportService
 
         try
         {
-            var directory = _hostingEnvironment.MapPathContentRoot("~/" + ExportSubdirectory);
+            var directory = _hostEnvironment.MapPathContentRoot("~/" + ExportSubdirectory);
             Directory.CreateDirectory(directory);
 
             var finalPath = Path.Combine(directory, ZipFileName);

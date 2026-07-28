@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using UmbracoCommunity.Extensions.Infrastructure;
 using UmbracoCommunity.Extensions.Models;
 
 namespace UmbracoCommunity.Extensions.Controllers;

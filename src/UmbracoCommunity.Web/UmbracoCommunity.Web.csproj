@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" />
     <PackageReference Include="Joonasw.AspNetCore.SecurityHeaders" />
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -15,13 +17,31 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Schema.NET" />
+    <PackageReference Include="Umbraco.Automate.Core" />
     <PackageReference Include="Umbraco.Cms" />
+    <PackageReference Include="Umbraco.AI.Search" />
+    <PackageReference Include="Umbraco.AI.Search.Db.Sqlite" />
+    <PackageReference Include="Umbraco.AI.Search.Db.SqlServer" />
+    <PackageReference Include="Umbraco.Community.Contentment" />
     <PackageReference Include="Umbraco.Deploy.Core" />
     <PackageReference Include="Umbraco.Deploy.Infrastructure" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Models\PublishedModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Features\Mvp\Data\mvp.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UmbracoCommunity.Web.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Community.NotFoundTracker\Umbraco.Community.NotFoundTracker.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.BlogAnnouncements\UmbracoCommunity.BlogAnnouncements.csproj" />
   </ItemGroup>
 
 </Project>

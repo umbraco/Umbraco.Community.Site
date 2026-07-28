@@ -19,6 +19,7 @@ namespace UmbracoCommunity.Web.Extensions
                 options.AddFilter(new UmbracoPipelineFilter("DisableCspFilter", postPipeline: app => app.UseMiddleware<DisableCspMiddleware>()));
                 options.AddFilter(new UmbracoPipelineFilter("BlogFolderRedirect", postPipeline: app => app.UseMiddleware<BlogFolderRedirectMiddleware>()));
                 options.AddFilter(new UmbracoPipelineFilter("BlogRss", prePipeline: app => app.UseMiddleware<BlogRssMiddleware>()));
+                options.AddFilter(new UmbracoPipelineFilter("OnboardingRedirect", postPipeline: app => app.UseMiddleware<OnboardingRedirectMiddleware>()));
             });
 
             return builder;
@@ -75,7 +76,9 @@ namespace UmbracoCommunity.Web.Extensions
 
             csp.AllowBaseUri.FromSelf();
 
-            csp.AllowFrames.FromAll((builder, domain) => builder.From(domain), Constants.Security.DefaultAllowFrames);
+            csp.AllowFrames
+                .FromSelf()
+                .FromAll((builder, domain) => builder.From(domain), Constants.Security.DefaultAllowFrames);
 
             csp.AllowScripts
                 .FromSelf()

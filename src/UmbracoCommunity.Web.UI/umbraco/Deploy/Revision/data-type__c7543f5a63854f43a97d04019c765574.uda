@@ -1,0 +1,13 @@
+{
+  "Name": "Timeline goal tags",
+  "EditorAlias": "Umbraco.Tags",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Tags",
+  "Configuration": {
+    "group": "timelineGoalTags",
+    "storageType": "Json"
+  },
+  "Udi": "umb://data-type/c7543f5a63854f43a97d04019c765574",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "17.1.0"
+}

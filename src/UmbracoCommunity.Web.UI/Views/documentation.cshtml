@@ -1,0 +1,29 @@
+﻿@using UmbracoCommunity.Web.Models.Pages.Documentation
+@inherits UmbracoViewPage<DocumentationPageViewModel>
+
+@{
+    Layout = "Layout.cshtml";
+}
+
+<section class="documentation">
+    <div class="documentation__container">
+        <partial name="~/Views/Partials/Documentation/Sidebar.cshtml" model="Model" />
+
+        <article class="documentation__main">
+            <partial name="~/Views/Partials/Documentation/Crumbs.cshtml" model="Model.Crumbs" />
+
+            @switch (Model.Mode)
+            {
+                case DocumentationViewMode.Root:
+                    <partial name="~/Views/Partials/Documentation/Root.cshtml" model="Model" />
+                    break;
+                case DocumentationViewMode.Section:
+                    <partial name="~/Views/Partials/Documentation/Section.cshtml" model="Model" />
+                    break;
+                case DocumentationViewMode.Article:
+                    <partial name="~/Views/Partials/Documentation/Article.cshtml" model="Model" />
+                    break;
+            }
+        </article>
+    </div>
+</section>

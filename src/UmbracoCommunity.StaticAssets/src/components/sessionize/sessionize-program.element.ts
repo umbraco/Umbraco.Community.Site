@@ -1806,6 +1806,7 @@ export class SessionizeProgramElement extends LitElement {
       text-align: center;
       border-right: 1px solid rgba(255, 255, 255, 0.2);
       min-width: 150px;
+      box-sizing: border-box;
     }
 
     .timeline-room-header:last-child {
@@ -1847,6 +1848,7 @@ export class SessionizeProgramElement extends LitElement {
       position: relative;
       border-right: 1px solid var(--color-grey-light, #e5e7eb);
       min-width: 150px;
+      box-sizing: border-box;
     }
 
     .timeline-room-column:last-child {

@@ -13,9 +13,11 @@
     <PackageReference Include="Flip.Umbraco" />
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" />
     <PackageReference Include="Umbraco.Cms" />
+    <PackageReference Include="Umbraco.Automate" />
     <PackageReference Include="Umbraco.Community.BlockPreview" />
     <PackageReference Include="Umbraco.Community.Contentment" />
     <PackageReference Include="Umbraco.Deploy.OnPrem" />
+    <PackageReference Include="Umbraco.Deploy.Automate" />
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" /> -->
     <PackageReference Include="Umbraco.Forms" />
     <PackageReference Include="Umbraco.Forms.Deploy" />
@@ -40,6 +42,29 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\App_Plugins\BlockListThumbs\Cards\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Surface repo-root /docs/{tutorials,primers} to the running app as App_Docs/.
+      Linked so the same relative layout works in dev (ContentRoot = project dir) and publish output.
+    -->
+    <Content Include="..\..\docs\tutorials\**\*.md">
+      <Link>App_Docs\tutorials\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\docs\primers\**\*.md">
+      <Link>App_Docs\primers\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <!-- Contributor data generated from git history (devops/generate-doc-contributors.js). -->
+    <Content Include="..\..\docs\contributors.generated.json">
+      <Link>App_Docs\contributors.generated.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

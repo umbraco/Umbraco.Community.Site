@@ -10,7 +10,7 @@
     "blocks": [
       {
         "contentElementTypeKey": "2818618f-5cce-4c23-9126-4649bfe27dbd",
-        "label": "{umbValue: headline}"
+        "label": "${headline || \u0022Untitled column\u0022}"
       }
     ]
   },
@@ -26,5 +26,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "17.1.0"
 }
