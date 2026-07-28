@@ -26,7 +26,7 @@ Reusable primitives that other tutorials can build on.
 - **`postcss-mixin-for-design-tokens`** ([stub →](./foundations/postcss-mixin-for-design-tokens.md)) — the rhythm mixin. Generates `.pt-md`, `.mx-xs`, `.m-lg`, etc. from CSS custom properties at build time. Foundation for "I want utility classes but driven by my design system, not Tailwind." Worth pairing with a tiny section on the CSS media query grouping convention (already in memory).
 - ~~**`nonce-csp-with-razor`**~~ — shipped as [foundations/nonce-csp-with-razor.md](./foundations/nonce-csp-with-razor.md).
 - ~~**`site-search-with-examine-externalindex`**~~ — shipped as [foundations/site-search-with-examine-externalindex.md](./foundations/site-search-with-examine-externalindex.md).
-- **`backoffice-management-api-with-auth-policies`** ([stub →](./foundations/backoffice-management-api-with-auth-policies.md)) — the `BlockRestrictionApiController` pattern: routing under `/umbraco/.../api/v1`, `[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]` for backoffice-only endpoints, Swagger doc registration, and a typed fetch wrapper on the client that pulls the user's backoffice bearer token. Community content on the new backoffice almost exclusively covers the property-editor UI; the secured C# side that the UI actually calls is consistently under-documented.
+- ~~**`backoffice-management-api-with-auth-policies`**~~ — shipped as [foundations/backoffice-management-api-with-auth-policies.md](./foundations/backoffice-management-api-with-auth-policies.md).
 - ~~**`github-oauth-member-authentication`**~~ — shipped as [foundations/github-oauth-member-authentication.md](./foundations/github-oauth-member-authentication.md).
 
 ## Refinements
