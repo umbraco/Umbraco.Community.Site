@@ -162,14 +162,14 @@ Plain `autofocus` makes the browser scroll the focused element into view on load
 - **The 500-document fetch cap plus in-memory filtering** (Step 3) — a popular-enough term across all tenants combined could silently drop same-tenant hits.
 - **Cross-index score comparison is approximate**, by the code's own admission — ordering between tenant-content hits and community-blog hits isn't a calibrated relevance ranking.
 - **No query-term highlighting** in excerpts.
-- **Pagination and canonical URLs don't agree.** `SeoDataService.AddPageQuery` — the same mechanism the [SEO primer](../../primers/seo-and-structured-data.md#canonical-urls-and-pagination) documents — builds `<link rel="canonical">`/`prev`/`next` tags from `?page=` alone, with no awareness of `?q=`. On `/search?q=umbraco&page=2`, the generated tags become `canonical=/search?page=2`, `prev=/search` (bare — page 2's previous page omits the `?page=1` suffix entirely), `next=/search?page=3` — every one of them silently missing `q=umbraco`. This is a real, verifiable gap between two features that were each built correctly in isolation but never reconciled with each other.
 - **No automated tests** for `SearchService` or `SearchPageController`.
-- **A stale XML doc comment.** `ISearchService`'s doc comment claims the implementation is "backed by Umbraco.AI.Search" — it isn't; `SearchService` is entirely Examine-based and has no dependency on that package at all (which *is* real and used elsewhere, for 404-page suggestions — this reads like a copy-pasted comment from that other service, not a deliberate note). Don't trust it over the code.
+
+Two things this tutorial found and fixed rather than just documented: `SeoDataService.AddPageQuery` — the mechanism the [SEO primer](../../primers/seo-and-structured-data.md#canonical-urls-and-pagination) documents — used to build `<link rel="canonical">`/`prev`/`next` tags from `?page=` alone, silently dropping every other query parameter (`?q=` on this exact page, on `/search?q=umbraco&page=2`) from all three. It now preserves them. And `ISearchService`'s XML doc comment used to claim the implementation was "backed by Umbraco.AI.Search" — a copy-pasted artifact from an unrelated service; it's corrected to describe the real Examine-based implementation.
 
 ## Where to go next
 
 - **[Multi-tenancy primer](../../primers/multi-tenancy.md)** — the `Root()` pattern this service leans on, and the class of bug it exists to prevent.
 - **[Content modelling primer](../../primers/content-modelling.md)** — `ICompositionPageConfiguration` and why `HideFromSearch` can't always be filtered at the index level.
-- **[SEO and structured data primer](../../primers/seo-and-structured-data.md)** — the pagination/canonical mechanism that, on this specific page, drops the search term.
+- **[SEO and structured data primer](../../primers/seo-and-structured-data.md)** — the pagination/canonical mechanism this page's `?q=` fix (Trade-offs, above) landed in.
 
 Hopefully that's the version of "add search to your Umbraco site" that survives a second tenant — welcome aboard!
