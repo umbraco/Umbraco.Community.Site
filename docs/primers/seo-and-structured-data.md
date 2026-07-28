@@ -4,7 +4,7 @@ tags: [primer, seo, schema-org, meta-tags]
 
 # SEO and structured data primer
 
-The [content-modelling primer](content-modelling.md#compositions-sharing-fields-without-inheritance) covers `ICompositionSeo` — the mixin that gives a page `MetaTitle`, `MetaDescription`, `OgImage`, `Robots`, and `CustomSchema`. This primer picks up from there: what happens to those fields between an editor filling them in and a `<meta>` tag or JSON-LD `<script>` landing in the rendered page. The whole pipeline funnels through one service and one view, which makes it a short primer — the point is mostly to save you from having to trace it yourself the first time.
+The [content-modelling primer](content-modelling.md#compositions-sharing-fields-without-inheritance) covers `ICompositionSeo` — the mixin that gives a page `MetaTitle`, `MetaDescription`, `OgImage`, `Robots`, and `CustomSchema`. This primer picks up from there: what happens to those fields between an editor filling them in and a `<meta>` tag or [JSON-LD](https://schema.org/) `<script>` landing in the rendered page. The whole pipeline funnels through one service and one view, which makes it a short primer — the point is mostly to save you from having to trace it yourself the first time.
 
 > Just want the tag inventory? Skip to [OpenGraph, Twitter Cards, and the Sessionize deep-link override](#opengraph-twitter-cards-and-the-sessionize-deep-link-override).
 
@@ -45,7 +45,7 @@ The "Page Title | Site Name" title format isn't built here, though — `MetaTitl
 
 An editor-authored escape hatch sits alongside all three: `ICompositionSeo.CustomSchema` is a raw string that gets added to the page's schema markup untouched — no Schema.NET processing, no validation, straight passthrough. A single article page can end up with several JSON-LD blocks at once (custom schema, Article-or-WebPage, and Breadcrumb, all independently opted in).
 
-Every built object is serialized with Schema.NET's own `.ToHtmlEscapedString()` and collected onto the view model; `MetaTags.cshtml` loops that collection and emits one `<script type="application/ld+json" asp-add-nonce="true">` per entry — the `asp-add-nonce` is what keeps JSON-LD compliant with the site's CSP (see `NonceTagHelper` in the [backend primer](backend.md)).
+Every built object is serialised with Schema.NET's own `.ToHtmlEscapedString()` and collected onto the view model; `MetaTags.cshtml` loops that collection and emits one `<script type="application/ld+json" asp-add-nonce="true">` per entry — the `asp-add-nonce` is what keeps JSON-LD compliant with the site's CSP (see `NonceTagHelper` in the [backend primer](backend.md)).
 
 ## OpenGraph, Twitter Cards, and the Sessionize deep-link override
 

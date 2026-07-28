@@ -72,7 +72,7 @@ A settings type composes whichever mix it needs — `SettingsTextBlock` is `ISet
 
 ## Models Builder: from backoffice to C#
 
-Every content type change you make in the backoffice needs a matching pass through Models Builder before it exists as C#. The mode differs by environment (`Umbraco:CMS:ModelsBuilder` in `appsettings*.json`):
+Every content type change you make in the backoffice needs a matching pass through [Models Builder](https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/templating-and-rendering/templating/modelsbuilder) before it exists as C#. The mode differs by environment (`Umbraco:CMS:ModelsBuilder` in `appsettings*.json`):
 
 - **Development** (`appsettings.Development.json` / `appsettings.Local.json`) — `"ModelsMode": "SourceCodeManual"`, writing to `~/../UmbracoCommunity.Web/Models/PublishedModels/` under the `UmbracoCommunity.Web.Models.PublishedModels` namespace, with `"FlagOutOfDateModels": true`.
 - **Production** (`appsettings.json`) — `"ModelsMode": "Nothing"`. Production never generates models; it just runs whatever was committed.
@@ -129,7 +129,7 @@ Content modelling touches three of the subfolders under `src/UmbracoCommunity.We
 
 Everything above gets you a typed `IPublishedContent`-backed model — `currentPage.As<ContentPage>()`, say. That's not yet what a Razor view renders against for a *page*: a view-model-builder converts the content model into a view-shaped model first, decoupling the view from Umbraco's content API. (Blocks skip this step entirely and bind the content model directly — see [`BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md).) That pipeline — `IViewModelBuilder<T>`, `PageViewModelBase`, where builders get registered — is the backend primer's territory; see its [view model builder pattern](backend.md#the-view-model-builder-pattern) section for the rest of the journey.
 
-The SEO composition deserves the same signpost: `ICompositionSeo` is where a page becomes SEO-capable, but the pipeline that turns it into meta tags, Open Graph data, and Schema.NET structured data is bigger than one composition — that's a future [SEO and structured data primer](seo-and-structured-data.md) (see [`IDEAS.md`](IDEAS.md)) to cover in full.
+The SEO composition deserves the same signpost: `ICompositionSeo` is where a page becomes SEO-capable, but the pipeline that turns it into meta tags, Open Graph data, and Schema.NET structured data is bigger than one composition — see the [SEO and structured data primer](seo-and-structured-data.md) for that in full.
 
 ## Where to go next
 
