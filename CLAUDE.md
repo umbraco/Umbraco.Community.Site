@@ -530,7 +530,4 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 
 ## Pending follow-ups
 
-Check intermittently and clear as conditions become true.
-
-- **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.
-- **Review the article contributors mechanism**: Revisit how the docs' auto-generated "Contributors" section works — `docs/contributors.generated.json`, produced by `npm run generate:doc-contributors`, refreshed in CI (see `docs/tutorials/README.md`'s "Contributing a new tutorial" section). Worth checking generation/refresh timing and attribution accuracy before relying on it further.
+Check intermittently and clear as conditions become true. Nothing outstanding right now — both former entries here (documentation repository links; the article contributors mechanism) turned out to already be resolved on inspection: `DocumentationService.DefaultRepositoryUrl` already defaults to a live, public GitHub URL (`https://github.com/umbraco/Umbraco.Community.Site/blob/develop`), so `ClassifyRelativeLink`'s inert-`<code>` fallback is currently unreachable; and `generate-doc-contributors.js` already attributes per-file from `git log --follow --no-merges`, not "who merged".
