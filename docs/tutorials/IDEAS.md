@@ -36,7 +36,7 @@ Improvements layered on top of a foundation, in this repo or otherwise.
 - ~~**`wrapping-umbraco-native-block-editor`**~~ — shipped as [refinements/wrapping-umbraco-native-block-editor.md](./refinements/wrapping-umbraco-native-block-editor.md).
 - ~~**`custom-content-finder-for-per-tenant-404`**~~ — shipped as [refinements/per-tenant-404-content-finder.md](./refinements/per-tenant-404-content-finder.md).
 - ~~**`schema-net-with-tenant-fallback`**~~ — shipped as [refinements/tenant-fallback-for-schema-and-seo.md](./refinements/tenant-fallback-for-schema-and-seo.md).
-- **`output-cache-policies-for-slow-upstream-apis`** ([stub →](./refinements/output-cache-policies-for-slow-upstream-apis.md)) — the `OutputCachePolicies` class wrapping the Sessionize endpoints. When `[OutputCache]` beats `ResponseCaching` (you control the key, you can vary by query, it survives across instances with a distributed store), what cache-key shapes make sense for tenant-scoped data, and how to fail gracefully when the upstream is rate-limited or 500s. The general lesson: how to be a polite consumer of a slow third-party API without making *your* page slow.
+- ~~**`output-cache-policies-for-slow-upstream-apis`**~~ — shipped as [refinements/output-cache-policies-for-slow-upstream-apis.md](./refinements/output-cache-policies-for-slow-upstream-apis.md).
 
 ## How to use this list
 
