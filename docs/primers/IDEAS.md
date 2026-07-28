@@ -17,9 +17,9 @@ If you only write three more, these are the ones with the strongest "broad area 
 - ~~**`backend`**~~ — shipped (see top picks).
 - ~~**`multi-tenancy`**~~ — shipped as [multi-tenancy.md](./multi-tenancy.md). Pulls together an existing tutorial suite.
 - ~~**`backoffice`**~~ — shipped as [backoffice.md](./backoffice.md). Covers the backoffice client codebases and why each is its own Vite project.
-- **`content-modelling`** ([stub →](./content-modelling.md)) — document types, element types, block types, compositions (`ICompositionPageConfiguration`, `ICompositionSeo`, …), the auto-generated `PublishedModels` namespace, and the view-model-builder pipeline that converts `IPublishedContent` into view-shaped models. Threads together the `Models/` folder structure and the `BUILDING_PAGES.md` / `BUILDING_BLOCKS.md` how-tos.
+- ~~**`content-modelling`**~~ — shipped as [content-modelling.md](./content-modelling.md).
 - ~~**`caching`**~~ — shipped as [caching.md](./caching.md).
-- **`seo-and-structured-data`** ([stub →](./seo-and-structured-data.md)) — Schema.NET, the schema builders (`ArticleSchemaBuilder`, `OrganizationSchemaBuilder`, `BreadcrumbSchemaBuilder`), the `MetaTags` ViewComponent, OpenGraph and Twitter Cards in `Layout.cshtml`, sitemap generation, canonical URL handling. Cross-references the [tenant-aware schema fallback tutorial](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md).
+- ~~**`seo-and-structured-data`**~~ — shipped as [seo-and-structured-data.md](./seo-and-structured-data.md).
 - ~~**`integrations`**~~ — shipped as [integrations.md](./integrations.md).
 
 ## How to use this list
