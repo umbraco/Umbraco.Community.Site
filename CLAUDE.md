@@ -12,7 +12,7 @@ This is the Umbraco Community Website - a replacement for [community.umbraco.com
 
 The repo carries a small library of conceptual and operational docs alongside the code:
 
-- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, and integrations are written; content modelling and SEO are still planned stubs). Start here if you're new to the codebase.
+- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, integrations, content modelling, and SEO are all written). Start with [`getting-started.md`](docs/primers/getting-started.md) if you're new to the codebase.
 - **[docs/tutorials/](docs/tutorials/)** — short, focused deep dives on specific problems we've hit and how we solved them. Split into [`foundations/`](docs/tutorials/foundations/) (standalone patterns) and [`refinements/`](docs/tutorials/refinements/) (improvements layered on a foundation).
 - **[docs/BUILDING_PAGES.md](docs/BUILDING_PAGES.md)** and **[docs/BUILDING_BLOCKS.md](docs/BUILDING_BLOCKS.md)** — how-tos for adding new pages and content blocks.
 - **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
@@ -533,3 +533,4 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 Check intermittently and clear as conditions become true.
 
 - **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.
+- **Review the article contributors mechanism**: Revisit how the docs' auto-generated "Contributors" section works — `docs/contributors.generated.json`, produced by `npm run generate:doc-contributors`, refreshed in CI (see `docs/tutorials/README.md`'s "Contributing a new tutorial" section). Worth checking generation/refresh timing and attribution accuracy before relying on it further.
