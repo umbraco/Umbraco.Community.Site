@@ -17,7 +17,7 @@ Everything in `Models/PublishedModels/` is generated from a backoffice content t
 | **Document type** | `PublishedContentModel` | `IPublishedContent` | Pages that live in the content tree and have a URL — `Home`, `ContentPage`, `Article`, `Blog` |
 | **Element type** | `PublishedElementModel` | `IPublishedElement` | Content that only exists nested inside something else — a block's properties, or a block's settings |
 
-There's no third base class for "block type" — a block is just an element type that's been added to a Block Grid or Block List data type in the backoffice (see [`BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md) for that wiring). The document-vs-element distinction is the one that actually shows up in code: it decides which base class the generated partial inherits and which content interface (`IPublishedContent` vs `IPublishedElement`) gets passed to its constructor. For example:
+There's no third base class for "block type" — a block is just an element type that's been added to a [Block Grid or Block List](https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/block-editor) data type in the backoffice (see [`BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md) for that wiring). The document-vs-element distinction is the one that actually shows up in code: it decides which base class the generated partial inherits and which content interface (`IPublishedContent` vs `IPublishedElement`) gets passed to its constructor. For example:
 
 ```csharp
 // Document type — src/UmbracoCommunity.Web/Models/PublishedModels/ContentPage.generated.cs
@@ -42,7 +42,7 @@ A settings element type (e.g. `SettingsTextBlock`) is structurally identical to 
 
 ## Compositions: sharing fields without inheritance
 
-C# doesn't let a class inherit from more than one base, but a backoffice content type can *compose* several others — Umbraco's way of mixing shared fields into unrelated content types. Models Builder turns each composed mixin into a generated interface the content type's class implements, so `ICompositionSeo` (say) is both a backoffice composition and a C# interface with the same shape.
+C# doesn't let a class inherit from more than one base, but a backoffice content type can [*compose*](https://docs.umbraco.com/umbraco-cms/model-your-content/content-types-and-structure) several others — Umbraco's way of mixing shared fields into unrelated content types. Models Builder turns each composed mixin into a generated interface the content type's class implements, so `ICompositionSeo` (say) is both a backoffice composition and a C# interface with the same shape.
 
 **Page-level compositions** — composed directly onto document types:
 

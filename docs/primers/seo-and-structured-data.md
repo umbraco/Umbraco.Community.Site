@@ -49,7 +49,7 @@ Every built object is serialised with Schema.NET's own `.ToHtmlEscapedString()` 
 
 ## OpenGraph, Twitter Cards, and the Sessionize deep-link override
 
-`MetaTags.cshtml` emits, in order: `og:title`/`twitter:title`, `description`/`og:description`/`twitter:description`, a hardcoded `og:type` of `"website"` (there's no `article` branch, even for `Article` pages — worth knowing if you ever go looking for one and can't find it), `og:site_name`, `og:locale`, `twitter:card` (`summary_large_image`), a hardcoded `twitter:site` handle, then conditionally `og:image`/`twitter:image` (with explicit `1200×628` dimensions) and the canonical/prev/next links covered below.
+`MetaTags.cshtml` emits, in order: [`og:title`](https://ogp.me/)/`twitter:title`, `description`/`og:description`/`twitter:description`, a hardcoded `og:type` of `"website"` (there's no `article` branch, even for `Article` pages — worth knowing if you ever go looking for one and can't find it), `og:site_name`, `og:locale`, `twitter:card` (`summary_large_image`), a hardcoded `twitter:site` handle, then conditionally `og:image`/`twitter:image` (with explicit `1200×628` dimensions) and the canonical/prev/next links covered below.
 
 Sessionize session sharing overrides several of those tags server-side for one specific case: a URL visited with `?session={sessionId}` (see the Sessionize section of [CLAUDE.md](../../CLAUDE.md) for the deep-linking feature this serves). The override lives inline in `SeoDataService` as a private method, `ApplySessionOpenGraphOverridesAsync` — if you've seen a `SeoMetaDataViewModelDecorator` mentioned elsewhere, that class doesn't exist; this method is the real implementation. It looks up the session via the same `SessionizeApiClient` the Sessionize feature already uses, and on a hit overwrites `MetaTitle` (`"{session title} by {speakers}"`), `MetaDescription`, and appends `?session={id}` onto the canonical/`og:url` — so a link shared to LinkedIn, Bluesky, or Mastodon unfurls with that session's own preview instead of the generic program page's. A failed lookup is swallowed silently and the page's default tags stand.
 
@@ -61,7 +61,7 @@ Pagination reads a `?page=` query parameter and, when present, sets `PrevUrl` (o
 
 ## Robots directives
 
-`ICompositionSeo.Robots` is a free-ish string field, and `MetaTags.cshtml` matches it with exact string equality against a small known set: empty in development renders `noindex, nofollow` as a blanket safety net; empty in production renders a permissive default (`index, follow` plus rich-snippet directives); `"noindex, follow"` and `"noindex, nofollow"` render as-is; `"index, nofollow"` gets the same rich-snippet directives appended as the default case. Anything else — a typo, an unexpected value — falls through every branch and **emits no robots tag at all**, silently. If you're adding a new robots option, it needs its own branch here or it'll be a no-op.
+`ICompositionSeo.Robots` is a free-ish string field, and `MetaTags.cshtml` matches it with exact string equality against a small known set of [robots meta tag directives](https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag): empty in development renders `noindex, nofollow` as a blanket safety net; empty in production renders a permissive default (`index, follow` plus rich-snippet directives); `"noindex, follow"` and `"noindex, nofollow"` render as-is; `"index, nofollow"` gets the same rich-snippet directives appended as the default case. Anything else — a typo, an unexpected value — falls through every branch and **emits no robots tag at all**, silently. If you're adding a new robots option, it needs its own branch here or it'll be a no-op.
 
 ## Sitemap generation
 
@@ -71,7 +71,7 @@ Pagination reads a `?page=` query parameter and, when present, sets `PrevUrl` (o
 - **`HideFromSitemap`** (from `ICompositionPageConfiguration`, the sibling of `HideFromSearch`) skips the entire branch when set — children are never visited, so it's inherited by exclusion.
 - A node is only emitted as a `<url>` entry when it has a template *and* composes `ICompositionPageConfiguration` — so non-routable structural nodes (a Blog year/month folder, say) are traversed but never listed themselves, while their routable descendants (articles) still are.
 
-The output is a bare-bones `sitemaps.org/schemas/sitemap/0.9` document — `<loc>` and `<lastmod>` only, no `changefreq`/`priority`.
+The output is a bare-bones [`sitemaps.org` protocol](https://www.sitemaps.org/protocol.html) document — `<loc>` and `<lastmod>` only, no `changefreq`/`priority`.
 
 ## Where to go next
 
