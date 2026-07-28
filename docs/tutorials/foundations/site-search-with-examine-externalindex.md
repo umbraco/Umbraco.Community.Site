@@ -164,12 +164,10 @@ Plain `autofocus` makes the browser scroll the focused element into view on load
 - **No query-term highlighting** in excerpts.
 - **No automated tests** for `SearchService` or `SearchPageController`.
 
-Two things this tutorial found and fixed rather than just documented: `SeoDataService.AddPageQuery` — the mechanism the [SEO primer](../../primers/seo-and-structured-data.md#canonical-urls-and-pagination) documents — used to build `<link rel="canonical">`/`prev`/`next` tags from `?page=` alone, silently dropping every other query parameter (`?q=` on this exact page, on `/search?q=umbraco&page=2`) from all three. It now preserves them. And `ISearchService`'s XML doc comment used to claim the implementation was "backed by Umbraco.AI.Search" — a copy-pasted artifact from an unrelated service; it's corrected to describe the real Examine-based implementation.
-
 ## Where to go next
 
 - **[Multi-tenancy primer](../../primers/multi-tenancy.md)** — the `Root()` pattern this service leans on, and the class of bug it exists to prevent.
 - **[Content modelling primer](../../primers/content-modelling.md)** — `ICompositionPageConfiguration` and why `HideFromSearch` can't always be filtered at the index level.
-- **[SEO and structured data primer](../../primers/seo-and-structured-data.md)** — the pagination/canonical mechanism this page's `?q=` fix (Trade-offs, above) landed in.
+- **[SEO and structured data primer](../../primers/seo-and-structured-data.md#canonical-urls-and-pagination)** — the pagination/canonical mechanism this page's results feed into, including how it keeps `?q=` and other query parameters intact across `PrevUrl`/`NextUrl`/`CanonicalUrl`.
 
 Hopefully that's the version of "add search to your Umbraco site" that survives a second tenant — welcome aboard!
