@@ -223,7 +223,7 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - URLs support `?session={sessionId}` parameter for direct session linking
 - When visiting a URL with session parameter, page scrolls to program and opens session dialog
 - Session dialog includes share buttons for LinkedIn, Bluesky, Mastodon, and copy link
-- Server-side Open Graph tags are generated for shared session URLs via `SeoMetaDataViewModelDecorator`
+- Server-side Open Graph tags are generated for shared session URLs via `SeoDataService.ApplySessionOpenGraphOverridesAsync`
 - Social platforms receive session-specific `og:title`, `og:description`, and `og:url` meta tags
 
 **Configuration** (in `appsettings.json`):
