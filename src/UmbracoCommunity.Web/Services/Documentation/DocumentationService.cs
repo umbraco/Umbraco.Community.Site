@@ -51,13 +51,18 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     private FileSystemWatcher? _watcher;
     private string? _resolvedRoot;
     private string? _repositoryUrl;
-    private IReadOnlyDictionary<string, IReadOnlyList<DocumentationContributor>> _contributors =
-        new Dictionary<string, IReadOnlyList<DocumentationContributor>>();
+    private IReadOnlyDictionary<string, DocGitInfo> _gitInfo = new Dictionary<string, DocGitInfo>();
 
     private static readonly JsonSerializerOptions ContributorsJsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
     };
+
+    /// <summary>
+    /// The per-file slice of contributors.generated.json: when the article was last actually
+    /// edited (per git history, not filesystem mtime) and who's touched it.
+    /// </summary>
+    private sealed record DocGitInfo(DateTime? LastEditedAt, IReadOnlyList<DocumentationContributor> Contributors);
 
     public event EventHandler? IndexRebuilt;
 
@@ -145,7 +150,7 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         _resolvedRoot = root;
         var configuredRepoUrl = _configuration["Documentation:RepositoryUrl"];
         _repositoryUrl = (string.IsNullOrWhiteSpace(configuredRepoUrl) ? DefaultRepositoryUrl : configuredRepoUrl).TrimEnd('/');
-        _contributors = LoadContributors(root);
+        _gitInfo = LoadGitInfo(root);
         EnsureWatcher(root);
 
         var sections = new List<DocumentationSection>();
@@ -252,6 +257,7 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                 : sectionPathSegments.Concat(new[] { slug }).ToArray();
 
             var url = "/" + string.Join("/", pathSegments);
+            var gitInfo = ResolveGitInfo(filePath);
 
             return new DocumentationArticle(
                 Title: string.IsNullOrWhiteSpace(title) ? Humanise(slug) : title!,
@@ -260,11 +266,15 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                 Url: url,
                 HtmlContent: html,
                 Excerpt: excerpt,
-                LastModifiedUtc: File.GetLastWriteTimeUtc(filePath),
+                // Prefer the git-derived date: filesystem mtime reflects whenever the file was last
+                // written to disk (checkout, deploy, extraction), not when it was actually edited —
+                // it's a reasonable fallback for a doc git history hasn't caught up with yet, not a
+                // trustworthy primary source.
+                LastModifiedUtc: gitInfo.LastEditedAt ?? File.GetLastWriteTimeUtc(filePath),
                 SectionPathSegments: sectionPathSegments,
                 IsSectionIntro: isReadme,
                 Tags: tags,
-                Contributors: ResolveContributors(filePath));
+                Contributors: gitInfo.Contributors);
         }
         catch (Exception ex)
         {
@@ -592,11 +602,12 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     /// <summary>
     /// Loads contributors.generated.json (produced from git history at build/CI time) from the
     /// docs root. Keyed by doc path relative to the root, e.g. "tutorials/foundations/x.md".
-    /// Missing or unreadable file is non-fatal — articles just render without a contributors list.
+    /// Missing or unreadable file is non-fatal — articles just render without a contributors list
+    /// and fall back to filesystem mtime for the last-edited date.
     /// </summary>
-    private IReadOnlyDictionary<string, IReadOnlyList<DocumentationContributor>> LoadContributors(string root)
+    private IReadOnlyDictionary<string, DocGitInfo> LoadGitInfo(string root)
     {
-        var empty = new Dictionary<string, IReadOnlyList<DocumentationContributor>>();
+        var empty = new Dictionary<string, DocGitInfo>();
         var path = Path.Combine(root, "contributors.generated.json");
         if (!File.Exists(path))
         {
@@ -606,17 +617,13 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         try
         {
             var json = File.ReadAllText(path);
-            var parsed = JsonSerializer.Deserialize<Dictionary<string, List<DocumentationContributor>>>(
-                json, ContributorsJsonOptions);
+            var parsed = JsonSerializer.Deserialize<Dictionary<string, DocGitInfo>>(json, ContributorsJsonOptions);
             if (parsed is null)
             {
                 return empty;
             }
 
-            return parsed.ToDictionary(
-                kvp => kvp.Key,
-                kvp => (IReadOnlyList<DocumentationContributor>)kvp.Value,
-                StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, DocGitInfo>(parsed, StringComparer.OrdinalIgnoreCase);
         }
         catch (Exception ex)
         {
@@ -625,17 +632,16 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
         }
     }
 
-    private IReadOnlyList<DocumentationContributor> ResolveContributors(string filePath)
+    private DocGitInfo ResolveGitInfo(string filePath)
     {
+        var empty = new DocGitInfo(null, Array.Empty<DocumentationContributor>());
         if (_resolvedRoot is null)
         {
-            return Array.Empty<DocumentationContributor>();
+            return empty;
         }
 
         var key = Path.GetRelativePath(_resolvedRoot, filePath).Replace('\\', '/');
-        return _contributors.TryGetValue(key, out var contributors)
-            ? contributors
-            : Array.Empty<DocumentationContributor>();
+        return _gitInfo.TryGetValue(key, out var info) ? info : empty;
     }
 
     private string? ResolveDocsRoot()

@@ -3,11 +3,14 @@
 //
 // For every documentation article (docs/tutorials/**, docs/primers/**) it reads the
 // per-file git log — following renames — for the commit authors and any real
-// Co-authored-by people (oldest contribution first; AI/bot identities filtered). When a
-// GitHub token is present (CI) it also calls the commits API to map each author's email
-// to their GitHub account, attaching `login`, `avatarUrl`, and `profileUrl`. Without a
-// token (or for authors GitHub can't match) entries are name-only — the view falls back
-// to a name chip. This must run at build/CI time; the deployed app has no .git.
+// Co-authored-by people (oldest contribution first; AI/bot identities filtered), plus the
+// date of the most recent real (non-merge) commit that touched the file, for a
+// last-edited timestamp that survives a deploy (file mtimes don't: the deployed app has
+// no .git, and copying/extracting build output resets them to deploy time, not edit
+// time). When a GitHub token is present (CI) it also calls the commits API to map each
+// author's email to their GitHub account, attaching `login`, `avatarUrl`, and
+// `profileUrl`. Without a token (or for authors GitHub can't match) entries are
+// name-only — the view falls back to a name chip. This must run at build/CI time.
 //
 // Run via `npm run generate:doc-contributors`.
 
@@ -103,6 +106,14 @@ function gitContributors(absPath) {
   return order.map((email) => byEmail.get(email));
 }
 
+// ISO-8601 committer date of the most recent non-merge commit that touched this file
+// (following renames), or null if the file has no such commit (e.g. added and never
+// edited, or only ever touched by merge commits).
+function gitLastEditedAt(absPath) {
+  const out = git(["log", "-1", "--follow", "--no-merges", "--pretty=format:%cI", "--", absPath]).trim();
+  return out.length > 0 ? out : null;
+}
+
 // Build a global email (lowercased) -> { login, avatarUrl, profileUrl } map from the repo's commit
 // history. The commits API only exposes a commit's *primary* author as `commit.author`; co-authors
 // (Co-authored-by trailers) never appear there. But a co-author's email almost always shows up as the
@@ -163,7 +174,7 @@ for (const section of SURFACED) {
     const key = relative(docsRoot, file).split(sep).join("/");
     const contributors = gitContributors(file);
     if (contributors.length === 0) continue;
-    fileContributors.push({ key, contributors });
+    fileContributors.push({ key, contributors, lastEditedAt: gitLastEditedAt(file) });
     for (const c of contributors) neededEmails.add(c.email);
   }
 }
@@ -173,20 +184,23 @@ for (const section of SURFACED) {
 const avatars = await buildGlobalAvatarMap(neededEmails);
 
 const result = {};
-for (const { key, contributors } of fileContributors) {
-  result[key] = contributors.map(({ name, email }) => {
-    const gh = avatars.get(email);
-    return gh
-      ? { name, login: gh.login, avatarUrl: gh.avatarUrl, profileUrl: gh.profileUrl }
-      : { name };
-  });
+for (const { key, contributors, lastEditedAt } of fileContributors) {
+  result[key] = {
+    lastEditedAt,
+    contributors: contributors.map(({ name, email }) => {
+      const gh = avatars.get(email);
+      return gh
+        ? { name, login: gh.login, avatarUrl: gh.avatarUrl, profileUrl: gh.profileUrl }
+        : { name };
+    }),
+  };
 }
 
 const ordered = Object.fromEntries(Object.keys(result).sort().map((k) => [k, result[k]]));
 const outPath = join(docsRoot, "contributors.generated.json");
 writeFileSync(outPath, JSON.stringify(ordered, null, 2) + "\n", "utf8");
 
-const withAvatars = Object.values(ordered).flat().filter((c) => c.avatarUrl).length;
+const withAvatars = Object.values(ordered).flatMap((e) => e.contributors).filter((c) => c.avatarUrl).length;
 console.log(
   `Wrote ${Object.keys(ordered).length} doc entries to ${relative(repoRoot, outPath)} ` +
   `(${withAvatars} contributor(s) with avatars${token ? "" : "; no token — name-only"}).`
