@@ -78,8 +78,8 @@ The whole pattern rests on **document-type structure being uniform**: every tena
 ## Where to go next
 
 - **[Resolving content in a multi-tenant Umbraco site](../tutorials/foundations/multi-tenant-content-resolution.md)** — the foundation: the `Root()` + `GetSiteSettings()` helpers in code, the document-tree assumptions, and the consumer pattern.
-- **[Per-tenant 404 pages with a custom `INotFoundPageResolver`](../tutorials/refinements/per-tenant-404-content-finder.md)** — tenancy resolution when there's no current page to start from.
-- **[Tenant-aware fallback for schema and SEO metadata](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md)** — emitting valid structured data when a tenant hasn't filled in its brand fields.
+- **[How to serve a different 404 page per tenant](../tutorials/refinements/per-tenant-404-content-finder.md)** — tenancy resolution when there's no current page to start from.
+- **[How to keep SEO schema valid when a tenant hasn't configured their brand settings](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md)** — emitting valid structured data when a tenant hasn't filled in its brand fields.
 - **[Backend primer](backend.md)** — where multi-tenancy sits in the wider request flow ("Multi-tenancy is the air").
 
 Hold the one rule in your head and the rest follows — welcome aboard!

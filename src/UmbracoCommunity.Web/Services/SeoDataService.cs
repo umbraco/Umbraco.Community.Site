@@ -300,7 +300,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
             return;
         }
 
-        var pageParam = _httpContextAccessor.HttpContext.Request.Query["page"].ToString();
+        var requestQuery = _httpContextAccessor.HttpContext.Request.Query;
+        var pageParam = requestQuery["page"].ToString();
 
         if (string.IsNullOrEmpty(pageParam))
         {
@@ -312,17 +313,30 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
             return;
         }
 
+        // Preserve every other query parameter (e.g. the search page's "q") across the
+        // canonical/prev/next URLs - only the "page" value itself should differ between them.
+        var otherQuery = string.Join("&", requestQuery
+            .Where(kvp => !string.Equals(kvp.Key, "page", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(kvp => kvp.Value.Select(v => $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(v ?? string.Empty)}")));
+
+        string WithPage(int? pageNumber)
+        {
+            var pagePart = pageNumber.HasValue ? $"page={pageNumber}" : null;
+            var queryString = string.Join("&", new[] { otherQuery, pagePart }.Where(p => !string.IsNullOrEmpty(p)));
+            return queryString.Length > 0 ? $"{viewModel.CanonicalUrl}?{queryString}" : viewModel.CanonicalUrl;
+        }
+
         var nextPageInt = page + 1;
 
         if (page > 1)
         {
             var prevPageInt = page - 1;
             var isSecondPage = prevPageInt == 1;
-            viewModel.PrevUrl = $"{viewModel.CanonicalUrl}{(isSecondPage ? string.Empty : "?page=" + prevPageInt)}";
+            viewModel.PrevUrl = WithPage(isSecondPage ? null : prevPageInt);
         }
 
-        viewModel.NextUrl = $"{viewModel.CanonicalUrl}?page={nextPageInt}";
+        viewModel.NextUrl = WithPage(nextPageInt);
 
-        viewModel.CanonicalUrl += $"?page={pageParam}";
+        viewModel.CanonicalUrl = WithPage(page);
     }
 }

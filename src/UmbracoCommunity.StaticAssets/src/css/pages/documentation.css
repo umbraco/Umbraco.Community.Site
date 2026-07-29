@@ -5,20 +5,24 @@
  * chrome (nav, crumbs, list items, section blocks). The animation stays active on
  * prose links inside `.documentation-prose` because that selector is more specific.
  */
-#main-content :is(.documentation-nav, .documentation-crumbs, .documentation-section-block, .documentation-list, .documentation-subsection) a:not(.btn):not(:has(img, svg, picture, video, div)) {
+#main-content :is(.documentation-nav, .documentation-crumbs, .documentation-list, .documentation-subsection, .documentation-quickstart) a:not(.btn):not(:has(img, svg, picture, video, div)) {
   background-image: none;
   transition: none;
 }
 
 .documentation {
   background-color: var(--color-page-surface);
-  padding-block: var(--unit-lg);
+  padding-block: var(--unit-sm);
+
+  @media (--sm) {
+    padding-block: var(--unit-lg);
+  }
 }
 
 .documentation__container {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--unit-md);
+  gap: var(--unit-sm);
   max-width: var(--max-width);
   margin-inline: auto;
 
@@ -36,14 +40,20 @@
 
 .documentation-nav {
   position: sticky;
-  top: var(--unit-md);
+  top: var(--unit-sm);
   align-self: start;
   background-color: var(--color-white);
   border-radius: var(--border-radius, 12px);
-  padding: var(--unit-md);
+  padding: var(--unit-sm);
   font-size: 0.95rem;
-  max-height: calc(100vh - 2 * var(--unit-md));
+  max-height: calc(100vh - 2 * var(--unit-sm));
   overflow-y: auto;
+
+  @media (--md) {
+    top: var(--unit-md);
+    padding: var(--unit-md);
+    max-height: calc(100vh - 2 * var(--unit-md));
+  }
 }
 
 .documentation-nav__title {
@@ -84,6 +94,10 @@
   margin-top: var(--unit-sm);
 }
 
+.documentation-nav__section {
+  position: relative;
+}
+
 .documentation-nav__section-link {
   display: block;
   text-decoration: none;
@@ -112,6 +126,43 @@
   margin-top: var(--unit-xxs);
 }
 
+/* <dc-nav-accordion> only ever inserts this button (and the --has-toggle class below)
+   below the --md breakpoint (see its own comments for why); at --md+ nothing is added
+   and neither rule ever matches. */
+
+.documentation-nav__section-link--has-toggle {
+  padding-right: var(--unit-md);
+}
+
+.documentation-nav__section-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.75rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.documentation-nav__section-toggle span {
+  font-size: 0.7rem;
+  color: var(--color-dark-grey);
+  transition: transform 0.15s ease;
+}
+
+.documentation-nav__section-toggle span::before {
+  content: "\25B8";
+}
+
+.documentation-nav__section-toggle[aria-expanded="true"] span {
+  transform: rotate(90deg);
+}
+
 .documentation-nav__article {
   margin: 0;
 }
@@ -138,14 +189,27 @@
 .documentation__main {
   background-color: var(--color-white);
   border-radius: var(--border-radius, 12px);
-  padding: var(--unit-lg);
+  padding: var(--unit-sm);
   min-width: 0;
+
+  @media (--sm) {
+    padding: var(--unit-md);
+  }
+
+  @media (--md) {
+    padding: var(--unit-lg);
+  }
 }
 
 .documentation__header {
-  margin-bottom: var(--unit-lg);
-  padding-bottom: var(--unit-md);
+  margin-bottom: var(--unit-xs);
+  padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-sm);
+    padding-bottom: var(--unit-md);
+  }
 }
 
 .documentation__header h1 {
@@ -244,8 +308,12 @@
 /* ---------- Breadcrumbs ---------- */
 
 .documentation-crumbs {
-  margin-bottom: var(--unit-md);
+  margin-bottom: var(--unit-sm);
   font-size: 0.85rem;
+
+  @media (--sm) {
+    margin-bottom: var(--unit-md);
+  }
 }
 
 .documentation-crumbs__list {
@@ -277,43 +345,94 @@
   font-weight: 600;
 }
 
-/* ---------- Root: section blocks + article grid ---------- */
+/* ---------- Quick start ---------- */
 
-.documentation-section-block + .documentation-section-block {
-  margin-top: var(--unit-lg);
+.documentation-quickstart {
+  margin-bottom: var(--unit-sm);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-md);
+  }
 }
 
-.documentation-section-block__header {
-  margin-bottom: var(--unit-md);
+.documentation-quickstart[hidden] {
+  display: none;
 }
 
-.documentation-section-block__title {
-  margin: 0 0 var(--unit-xxs);
-  font-size: 1.5rem;
+.documentation-quickstart__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-sm);
+  margin-bottom: var(--unit-sm);
+}
+
+.documentation-quickstart__title {
+  margin: 0;
+  font-size: 1.15rem;
   color: var(--color-dark);
 }
 
-.documentation-section-block__title a {
-  color: inherit;
+.documentation-quickstart__cols {
+  display: grid;
+  gap: var(--unit-sm);
+
+  @media (--sm) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.documentation-quickstart__col--tags {
+  padding: var(--unit-sm);
+  border: 1px solid var(--color-light);
+  border-radius: var(--border-radius, 12px);
+  background-color: var(--color-page-surface);
+}
+
+.documentation-quickstart__label {
+  margin: 0 0 var(--unit-xs);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-dark-grey);
+}
+
+.documentation-quickstart__tag-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: var(--unit-xxs);
+}
+
+.documentation-quickstart__tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-grey);
+  color: var(--color-blue);
   text-decoration: none;
 }
 
-.documentation-section-block__title a:hover {
-  color: var(--color-blue);
+.documentation-quickstart__tag:hover {
+  background-color: var(--color-blue);
+  border-color: var(--color-blue);
+  color: var(--color-white);
 }
 
-.documentation-section-block__intro {
-  margin: 0;
-  color: var(--color-light-blue);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
+/* ---------- Article grid (rendered by <dc-doc-explorer>) ---------- */
 
 .documentation-article-grid {
   display: grid;
-  gap: var(--unit-md);
+  gap: var(--unit-sm);
 
   @media (--sm) {
+    gap: var(--unit-md);
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -322,13 +441,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--unit-xs);
-  padding: var(--unit-md);
+  padding: var(--unit-sm);
   border: 1px solid var(--color-light);
   border-radius: var(--border-radius, 12px);
   text-decoration: none;
   color: var(--color-dark);
   background-color: var(--color-white);
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+
+  @media (--sm) {
+    padding: var(--unit-md);
+  }
 }
 
 .documentation-article-card:hover {
@@ -349,8 +472,13 @@
   color: var(--color-dark-grey);
 }
 
-.documentation-article-card--tutorials .documentation-article-card__pill {
+.documentation-article-card--foundations .documentation-article-card__pill {
   background-color: var(--color-identity-pink);
+  color: var(--color-dark);
+}
+
+.documentation-article-card--refinements .documentation-article-card__pill {
+  background-color: var(--color-identity-orange);
   color: var(--color-dark);
 }
 
@@ -451,6 +579,129 @@
   font-size: 0.9rem;
   line-height: 1.5;
   margin: var(--unit-xxs) 0 0;
+}
+
+/* ---------- Explorer (tag/kind/text filtering, rendered by <dc-doc-explorer>) ---------- */
+
+.documentation-explorer {
+  margin-bottom: var(--unit-sm);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-lg);
+  }
+}
+
+.documentation-explorer__admin {
+  margin-bottom: var(--unit-sm);
+  padding: var(--unit-sm);
+  border: 1px solid var(--color-light);
+  border-radius: var(--border-radius, 12px);
+  background-color: var(--color-page-surface);
+}
+
+.documentation-explorer__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+}
+
+.documentation-explorer__row + .documentation-explorer__row {
+  margin-top: var(--unit-xs);
+  padding-top: var(--unit-xs);
+  border-top: 1px solid var(--color-grey);
+}
+
+.documentation-explorer__text,
+.documentation-explorer__select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-grey);
+  border-radius: 6px;
+  background-color: var(--color-white);
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--color-dark);
+}
+
+.documentation-explorer__text {
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.documentation-explorer__select {
+  flex: 0 1 auto;
+  max-width: 200px;
+}
+
+.documentation-explorer__text:focus,
+.documentation-explorer__select:focus {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -1px;
+  border-color: var(--color-blue);
+}
+
+.documentation-explorer__clear {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--color-blue);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.documentation-explorer__clear:hover {
+  color: var(--color-dark);
+}
+
+.documentation-explorer__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-dark-grey);
+  flex: 0 0 auto;
+}
+
+.documentation-explorer__chip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xxs);
+}
+
+.documentation-explorer__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-grey);
+  background-color: var(--color-white);
+  color: var(--color-dark);
+  cursor: pointer;
+}
+
+.documentation-explorer__chip:hover {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.documentation-explorer__chip.is-selected {
+  background-color: var(--color-blue);
+  border-color: var(--color-blue);
+  color: var(--color-white);
+}
+
+.documentation-explorer__count {
+  margin: 0 0 var(--unit-sm);
+  font-size: 0.85rem;
+  color: var(--color-dark-grey);
 }
 
 /* ---------- Prose typography (parsed markdown) ---------- */
