@@ -2,7 +2,7 @@
 tags: [search, examine, multi-tenant, lucene]
 ---
 
-# Site search backed by Umbraco's Examine ExternalIndex
+# How to add multi-tenant site search using Umbraco's built-in Examine index
 
 "How do I add search to my Umbraco site?" is a perennial community question, and most answers stop at the single-tenant happy path: query `ExternalIndex`, render the hits, done. This tutorial walks through what that answer actually looks like once you add a second tenant, a second content source, and a page full of results that need to paginate cleanly — the site search on the Umbraco Community site, built entirely on Umbraco's own zero-config Examine index. It's a *foundation* piece: nothing else in this suite builds on it, but it's a self-contained answer to a question that comes up on every multi-page Umbraco site sooner or later.
 

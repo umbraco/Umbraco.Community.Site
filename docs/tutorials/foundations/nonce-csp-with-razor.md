@@ -2,7 +2,7 @@
 tags: [csp, security, razor, nonce, tag-helper]
 ---
 
-# A nonce-based Content Security Policy in ASP.NET Core Razor
+# How to keep inline scripts and styles working under a strict Content Security Policy
 
 A strict [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy) that bans inline scripts catches most XSS vectors at the browser level — the browser simply refuses to run a `<script>` tag that isn't on an approved list. The trouble is that a real site *has* inline scripts and styles: build-tool bootstrap snippets, per-instance background colours an editor picked in the backoffice, structured-data JSON-LD. Ban all of them and half the site breaks; allow `'unsafe-inline'` and you've defeated the point of having a CSP at all. The standard middle ground is a **nonce** — a random token generated once per request, stamped onto both the CSP header and every inline tag you actually trust, so the browser runs only the ones whose token matches. This is a *foundation* piece: nothing else in this suite builds on it, but it underpins every inline `<script>` and `<style>` in the codebase.
 

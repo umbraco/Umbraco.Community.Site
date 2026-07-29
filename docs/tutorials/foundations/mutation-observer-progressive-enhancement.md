@@ -2,7 +2,7 @@
 tags: [progressive-enhancement, mutation-observer, forms, web-components]
 ---
 
-# Progressive enhancement of async-rendered DOM with MutationObserver
+# Turning a form that renders asynchronously into a multi-step flow
 
 Progressive enhancement has a tidy mental model: the server sends working HTML, and your JavaScript layers extra behaviour on top once it loads. That model quietly assumes the HTML you want to enhance is *there* when your code runs. But what happens when it isn't yet — when the very thing you mean to enhance is rendered, asynchronously, by some other component that owns its own timing? Your enhancement runs, finds nothing to do, and gives up. This tutorial walks through the small `MutationObserver` pattern the Umbraco Community site uses to solve exactly that: the `<dc-form-steps>` element waits for an Umbraco Forms form to finish rendering, turns it into a multi-step form once it appears, and then disconnects cleanly.
 
@@ -215,7 +215,7 @@ This is the progressive-enhancement contract kept honest: when stepping is off �
 
 The same "do something cheaply and politely in response to the DOM, then stop" instinct shows up in its sibling browser observer:
 
-→ [Intersection-observer-driven pausing of off-screen animation](intersection-observer-paused-animation.md) *(planned)* — `IntersectionObserver` instead of `MutationObserver`, but the same discipline: react to the platform telling you when something changed, rather than polling, and tear down cleanly.
+→ [How to pause an animation when it's off-screen, the tab is hidden, or the user prefers less motion](intersection-observer-paused-animation.md) *(planned)* — `IntersectionObserver` instead of `MutationObserver`, but the same discipline: react to the platform telling you when something changed, rather than polling, and tear down cleanly.
 
 For the wider picture of how components like this fit into the site's frontend, see the [frontend primer](../../primers/frontend.md).
 

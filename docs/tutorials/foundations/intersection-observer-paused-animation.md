@@ -2,7 +2,7 @@
 tags: [animation, intersection-observer, performance, accessibility]
 ---
 
-# Polite animation with IntersectionObserver, requestAnimationFrame, and reduced-motion
+# How to pause an animation when it's off-screen, the tab is hidden, or the user prefers less motion
 
 > **Status:** Planned — this page is a stub. The full tutorial hasn't been written yet.
 

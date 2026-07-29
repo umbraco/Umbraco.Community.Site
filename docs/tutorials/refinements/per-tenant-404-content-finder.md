@@ -2,7 +2,7 @@
 tags: [multi-tenant, 404, not-found-resolver, routing]
 ---
 
-# Per-tenant 404 pages with a custom `INotFoundPageResolver`
+# How to serve a different 404 page per tenant
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). That tutorial covers the `Root()` + `GetSiteSettings()` resolution pattern this one extends to a corner of Umbraco where there *is no current page* — the request 404'd before it got that far.
 
@@ -219,6 +219,6 @@ public class NotFoundTrackerHostComposer : IComposer
 
 The other refinement that builds on the multi-tenant resolution foundation handles a related question: what happens when the tenant root exists but the editor hasn't configured the brand metadata yet, and you still need to emit valid `Organization` schema in the page head?
 
-→ [Tenant-aware fallback for schema and SEO metadata](./tenant-fallback-for-schema-and-seo.md)
+→ [How to keep SEO schema valid when a tenant hasn't configured their brand settings](./tenant-fallback-for-schema-and-seo.md)
 
 Hopefully that takes the "but where do I hook the 404 in?" head-scratching off your plate the next time you set up a multi-tenant site.

@@ -76,7 +76,7 @@ A note on what we *don't* use: Umbraco also offers `AppCaches.RequestCache` (per
 ## Related docs
 
 - **[Caching the scoped SVG output](../tutorials/refinements/caching-scoped-svg-output.md)** — `RuntimeCache` keyed by media path, and why the output is deterministic enough to cache.
-- **[Configuration that inherits down the content tree](../tutorials/foundations/content-tree-inherited-config.md)** — the two-tier cache and the generation-counter invalidation trick, in full.
+- **[How to make configuration cascade down a content tree, with document type overrides](../tutorials/foundations/content-tree-inherited-config.md)** — the two-tier cache and the generation-counter invalidation trick, in full.
 - **[Backend primer → Output caching](backend.md#output-caching)** — where the policies sit in the bootstrap and request flow.
 - **[Integrations primer](integrations.md)** — the third-party feeds whose stale-fallback caching appears under question 4.
 

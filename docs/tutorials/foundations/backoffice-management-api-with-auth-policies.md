@@ -2,7 +2,7 @@
 tags: [backoffice, api, authorization, swagger]
 ---
 
-# Secured backoffice Management API endpoints
+# How to secure a custom backoffice Management API endpoint
 
 Community content on the new Umbraco backoffice almost exclusively covers the UI side — property editors, dashboards, workspace views. The C# endpoints those UIs actually call are consistently under-documented. This tutorial is the other half: how `BlockRestrictionApiController` — and its three near-identical siblings elsewhere in this repo — routes under the backoffice, locks itself down to users with the right section access, registers itself in the API docs, and gets called from a typed client. It's a *foundation* piece, and a direct sequel to the [backoffice extensions primer](../../primers/backoffice.md#talking-to-the-c-apis), which sketches the client side in a few paragraphs and explicitly defers the backend half to here.
 

@@ -64,7 +64,6 @@ cd src/UmbracoCommunity.StaticAssets && npm run test # frontend, Vitest
 
 ## Making a contribution
 
-- **Contributions here are overwhelmingly code, not docs.** The docs suite (primers, tutorials, `BUILDING_*` guides) exists to explain the code, not as a contribution surface in its own right — if you're looking for something to pick up, look for code-shaped work first. The two tutorial stubs still waiting to be written under `docs/tutorials/foundations/` are a reasonable low-risk first PR if nothing code-side is calling to you, but treat that as the exception, not the norm.
 - **Branch against `develop`**, not `main` — that's this repo's base branch.
 - **[`CODE_CONVENTIONS.md`](../../CODE_CONVENTIONS.md)** and **[`ACCESSIBILITY.md`](../../ACCESSIBILITY.md)** are the coding and WCAG standards this codebase holds itself to; skim them before your first PR.
 - **[`docs/LESSONS_LEARNED.md`](../LESSONS_LEARNED.md)** covers workflow gotchas — Umbraco upgrades, schema management, urgent fixes — worth a read if something about the deploy or upgrade process feels surprising.

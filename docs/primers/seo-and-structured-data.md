@@ -76,7 +76,7 @@ The output is a bare-bones [`sitemaps.org` protocol](https://www.sitemaps.org/pr
 ## Where to go next
 
 - **[Content modelling primer](content-modelling.md)** — `ICompositionSeo` and the other compositions this pipeline consumes.
-- **[Tenant-aware fallback for schema and SEO metadata](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md)** — the full walkthrough of `OrganizationSchemaBuilder`'s all-or-nothing fallback, including alternatives considered.
+- **[How to keep SEO schema valid when a tenant hasn't configured their brand settings](../tutorials/refinements/tenant-fallback-for-schema-and-seo.md)** — the full walkthrough of `OrganizationSchemaBuilder`'s all-or-nothing fallback, including alternatives considered.
 - **[Multi-tenancy primer](multi-tenancy.md)** — why canonical URLs and sitemaps come out tenant-correct without any SEO-specific tenant logic.
 - **[Backend primer](backend.md)** — where `MetaTagsViewComponent` sits among the other layout-slot ViewComponents, and the CSP nonce system JSON-LD scripts rely on.
 

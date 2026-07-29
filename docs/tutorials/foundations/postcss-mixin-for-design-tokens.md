@@ -2,7 +2,7 @@
 tags: [css, postcss, design-tokens, utility-classes]
 ---
 
-# Generating utility classes from design tokens with a custom PostCSS mixin
+# How to generate spacing utility classes from your own design tokens
 
 > **Status:** Planned — this page is a stub. The full tutorial hasn't been written yet.
 

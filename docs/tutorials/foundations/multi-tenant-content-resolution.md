@@ -229,8 +229,8 @@ If you find yourself writing a third place that crosses tenant boundaries, that'
 
 Two refinements build directly on this foundation:
 
-→ [Per-tenant 404 pages with a custom `INotFoundPageResolver`](../refinements/per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off, because the request 404'd.
+→ [How to serve a different 404 page per tenant](../refinements/per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off, because the request 404'd.
 
-→ [Tenant-aware fallback for schema and SEO metadata](../refinements/tenant-fallback-for-schema-and-seo.md) — what to do when the tenant root exists but the editor hasn't filled in `SocialSettings` yet, and you still need to emit valid `Organization` schema.
+→ [How to keep SEO schema valid when a tenant hasn't configured their brand settings](../refinements/tenant-fallback-for-schema-and-seo.md) — what to do when the tenant root exists but the editor hasn't filled in `SocialSettings` yet, and you still need to emit valid `Organization` schema.
 
 Hopefully this saves you a class of bug that's surprisingly easy to write and equally annoying to track down later on.
