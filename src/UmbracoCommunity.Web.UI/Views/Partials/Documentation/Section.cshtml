@@ -23,8 +23,8 @@
     foreach (var sub in currentSection.Subsections)
     {
         var subUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, sub.PathSegments);
-        <div class="documentation-subcurrentSection">
-            <h2 class="documentation-subcurrentSection__title">
+        <div class="documentation-subsection">
+            <h2 class="documentation-subsection__title">
                 <a href="@subUrl">@sub.Title</a>
             </h2>
             @if (sub.Articles.Count > 0)

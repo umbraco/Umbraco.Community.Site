@@ -12,13 +12,17 @@
 
 .documentation {
   background-color: var(--color-page-surface);
-  padding-block: var(--unit-lg);
+  padding-block: var(--unit-sm);
+
+  @media (--sm) {
+    padding-block: var(--unit-lg);
+  }
 }
 
 .documentation__container {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--unit-md);
+  gap: var(--unit-sm);
   max-width: var(--max-width);
   margin-inline: auto;
 
@@ -36,14 +40,20 @@
 
 .documentation-nav {
   position: sticky;
-  top: var(--unit-md);
+  top: var(--unit-sm);
   align-self: start;
   background-color: var(--color-white);
   border-radius: var(--border-radius, 12px);
-  padding: var(--unit-md);
+  padding: var(--unit-sm);
   font-size: 0.95rem;
-  max-height: calc(100vh - 2 * var(--unit-md));
+  max-height: calc(100vh - 2 * var(--unit-sm));
   overflow-y: auto;
+
+  @media (--md) {
+    top: var(--unit-md);
+    padding: var(--unit-md);
+    max-height: calc(100vh - 2 * var(--unit-md));
+  }
 }
 
 .documentation-nav__title {
@@ -84,6 +94,10 @@
   margin-top: var(--unit-sm);
 }
 
+.documentation-nav__section {
+  position: relative;
+}
+
 .documentation-nav__section-link {
   display: block;
   text-decoration: none;
@@ -112,6 +126,43 @@
   margin-top: var(--unit-xxs);
 }
 
+/* <dc-nav-accordion> only ever inserts this button (and the --has-toggle class below)
+   below the --md breakpoint (see its own comments for why); at --md+ nothing is added
+   and neither rule ever matches. */
+
+.documentation-nav__section-link--has-toggle {
+  padding-right: var(--unit-md);
+}
+
+.documentation-nav__section-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.75rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.documentation-nav__section-toggle span {
+  font-size: 0.7rem;
+  color: var(--color-dark-grey);
+  transition: transform 0.15s ease;
+}
+
+.documentation-nav__section-toggle span::before {
+  content: "\25B8";
+}
+
+.documentation-nav__section-toggle[aria-expanded="true"] span {
+  transform: rotate(90deg);
+}
+
 .documentation-nav__article {
   margin: 0;
 }
@@ -138,14 +189,27 @@
 .documentation__main {
   background-color: var(--color-white);
   border-radius: var(--border-radius, 12px);
-  padding: var(--unit-lg);
+  padding: var(--unit-sm);
   min-width: 0;
+
+  @media (--sm) {
+    padding: var(--unit-md);
+  }
+
+  @media (--md) {
+    padding: var(--unit-lg);
+  }
 }
 
 .documentation__header {
-  margin-bottom: var(--unit-sm);
-  padding-bottom: var(--unit-md);
+  margin-bottom: var(--unit-xs);
+  padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-sm);
+    padding-bottom: var(--unit-md);
+  }
 }
 
 .documentation__header h1 {
@@ -244,8 +308,12 @@
 /* ---------- Breadcrumbs ---------- */
 
 .documentation-crumbs {
-  margin-bottom: var(--unit-md);
+  margin-bottom: var(--unit-sm);
   font-size: 0.85rem;
+
+  @media (--sm) {
+    margin-bottom: var(--unit-md);
+  }
 }
 
 .documentation-crumbs__list {
@@ -280,7 +348,11 @@
 /* ---------- Quick start ---------- */
 
 .documentation-quickstart {
-  margin-bottom: var(--unit-md);
+  margin-bottom: var(--unit-sm);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-md);
+  }
 }
 
 .documentation-quickstart[hidden] {
@@ -357,9 +429,10 @@
 
 .documentation-article-grid {
   display: grid;
-  gap: var(--unit-md);
+  gap: var(--unit-sm);
 
   @media (--sm) {
+    gap: var(--unit-md);
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -368,13 +441,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--unit-xs);
-  padding: var(--unit-md);
+  padding: var(--unit-sm);
   border: 1px solid var(--color-light);
   border-radius: var(--border-radius, 12px);
   text-decoration: none;
   color: var(--color-dark);
   background-color: var(--color-white);
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+
+  @media (--sm) {
+    padding: var(--unit-md);
+  }
 }
 
 .documentation-article-card:hover {
@@ -507,7 +584,11 @@
 /* ---------- Explorer (tag/kind/text filtering, rendered by <dc-doc-explorer>) ---------- */
 
 .documentation-explorer {
-  margin-bottom: var(--unit-lg);
+  margin-bottom: var(--unit-sm);
+
+  @media (--sm) {
+    margin-bottom: var(--unit-lg);
+  }
 }
 
 .documentation-explorer__admin {

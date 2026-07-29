@@ -110,12 +110,12 @@
             <dc-quickstart-dismiss target="documentation-quickstart"></dc-quickstart-dismiss>
         </div>
         <div class="documentation-quickstart__cols">
-            <div class="documentation-quickstart__col documentation-quickstart__col--primary">
+            <div>
                 @{ RenderArticleCard(gettingStarted, "primers", "Primers", showTags: false); }
             </div>
             @if (topTechTags.Count > 0)
             {
-                <div class="documentation-quickstart__col documentation-quickstart__col--tags">
+                <div class="documentation-quickstart__col--tags">
                     <p class="documentation-quickstart__label">Explore by topic</p>
                     <ul class="documentation-quickstart__tag-list">
                         @foreach (var tag in topTechTags)
