@@ -7,6 +7,7 @@ using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using UmbracoCommunity.BlogAnnouncements.Api;
 using UmbracoCommunity.BlogAnnouncements.Dashboard;
 using UmbracoCommunity.BlogAnnouncements.Delivery;
@@ -58,7 +59,10 @@ public sealed class RegisterBlogAnnouncements : IComposer
             options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
-        builder.Services.AddHostedService<BlogAnnouncementsMigrationHostedService>();
+        // Runs after Umbraco finishes booting — see BlogAnnouncementsMigrationNotificationHandler
+        // for why (mirrors BlockRestrictions' fix for the same fresh-install SQLite lock race,
+        // issue #132).
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, BlogAnnouncementsMigrationNotificationHandler>();
 
         // Delivery leg (fallback path). Behind IDiscordAnnouncer so an Automate trigger can
         // replace it later without touching detection.

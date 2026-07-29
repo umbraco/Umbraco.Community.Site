@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Community.NotFoundTracker.Configuration;
 using Umbraco.Community.NotFoundTracker.Controllers;
 using Umbraco.Extensions;
@@ -61,7 +62,6 @@ public static class NotFoundTrackerBuilderExtensions
         });
 
         builder.Services.AddSingleton<HostnameNormalizationService>();
-        builder.Services.AddHostedService<NotFoundTrackerMigrationHostedService>();
 
         // Recording pipeline.
         builder.Services.AddSingleton<NotFoundHitChannel>();
@@ -72,7 +72,11 @@ public static class NotFoundTrackerBuilderExtensions
         builder.Services.AddSingleton<IgnoreRuleLoader>();
         builder.Services.AddSingleton<INotFoundIgnoreRuleMatcher, IgnoreRuleMatcher>();
         builder.Services.AddSingleton<AutoPresetSeedingService>();
-        builder.Services.AddHostedService(sp => sp.GetRequiredService<AutoPresetSeedingService>());
+
+        // Migrations + auto-preset seeding run after Umbraco finishes booting — see
+        // NotFoundTrackerMigrationNotificationHandler for why (mirrors BlockRestrictions' fix
+        // for the same fresh-install SQLite lock race, issue #132).
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, NotFoundTrackerMigrationNotificationHandler>();
 
         // Management services.
         builder.Services.AddScoped<INotFoundHitService, NotFoundHitService>();

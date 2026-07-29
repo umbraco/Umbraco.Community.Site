@@ -2,7 +2,7 @@
 
 import { spawn } from "node:child_process";
 import { copyFileSync, createWriteStream, existsSync, statSync } from "node:fs";
-import { mkdir, rename, copyFile, unlink, open, readFile, writeFile } from "node:fs/promises";
+import { mkdir, rename, copyFile, unlink, open, readFile, writeFile, readdir } from "node:fs/promises";
 import { createInterface } from "node:readline";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,6 +22,12 @@ const DEPLOY_PROGRESS_MARKER = resolve(DEPLOY_DIR, "deploy-progress");
 const DEPLOY_COMPLETE_MARKER = resolve(DEPLOY_DIR, "deploy-complete");
 const DEPLOY_FAILED_MARKER = resolve(DEPLOY_DIR, "deploy-failed");
 const SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.sqlite.db");
+// Umbraco.Deploy.Automate keeps its own EF Core-migrated SQLite database,
+// separate from the main Umbraco content DB. On a truly fresh checkout its
+// migrations race against Deploy's schema-review step (see
+// runPhase1SchemaSync's retry loop below), so build.mjs needs to know about
+// it too — both to back it up on reset and to size up "is this a fresh repo".
+const AUTOMATE_SQLITE_DB = resolve(WEB_UI, "umbraco/Data/Umbraco.Automate.sqlite.db");
 
 // Phase 1 (schema sync) waits for the deploy-complete marker to appear.
 // Configurable for slow CI / large schemas; 10 minutes is comfortable for a
@@ -161,6 +167,90 @@ function runProcess(name, cmd, args, cwd) {
   });
 }
 
+// Spawns `dotnet run` directly (rather than via runProcess) so the caller gets
+// the raw `proc` handle back — needed to kill *this* process specifically
+// without calling the global killAll(), which would also tear down whatever
+// else is running alongside it (e.g. the Vite dev server).
+function spawnDotnetRun(launchProfile) {
+  const project = projects["Web.UI"];
+  const prefix = `${project.color}[Web.UI]${RESET} `;
+
+  const proc = spawn("dotnet", ["run", "--launch-profile", launchProfile], {
+    cwd: project.path,
+    stdio: ["ignore", "pipe", "pipe"],
+    env: {
+      ...process.env,
+      FORCE_COLOR: "1",
+      DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: "1",
+    },
+  });
+
+  runningProcesses.push(proc);
+
+  proc.stdout.on("data", (data) => {
+    for (const line of data.toString().split("\n")) if (line) process.stdout.write(`${prefix}${line}\n`);
+  });
+  proc.stderr.on("data", (data) => {
+    for (const line of data.toString().split("\n")) if (line) process.stderr.write(`${prefix}${line}\n`);
+  });
+
+  const exited = new Promise((resolve) => {
+    proc.on("close", (code) => {
+      const idx = runningProcesses.indexOf(proc);
+      if (idx !== -1) runningProcesses.splice(idx, 1);
+      resolve(code);
+    });
+    proc.on("error", () => resolve(-1));
+  });
+
+  return { proc, exited };
+}
+
+const UMBRACO_LOGS_DIR = resolve(WEB_UI, "umbraco/Logs");
+const UMBRACO_LOG_FILE_PATTERN = /^UmbracoTraceLog\..*\.json$/i;
+const LOG_WATCH_POLL_INTERVAL_MS = 750;
+
+// Watches every UmbracoTraceLog*.json file for newly-appended content matching
+// `signature`, ignoring anything already in the file when watching starts (so a
+// failure logged by an earlier run today never causes a false positive here).
+// Resolves true as soon as a match appears, or false once `timeoutMs` elapses.
+// This reads the actual structured log rather than scraping stdout because not
+// every error Umbraco logs to file is guaranteed to reach the console sink —
+// scraping stdout for this specific failure proved unreliable in practice.
+async function watchLogForSignature(signature, timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  const offsets = new Map();
+  while (Date.now() < deadline) {
+    if (existsSync(UMBRACO_LOGS_DIR)) {
+      const files = (await readdir(UMBRACO_LOGS_DIR)).filter((f) => UMBRACO_LOG_FILE_PATTERN.test(f));
+      for (const f of files) {
+        const p = resolve(UMBRACO_LOGS_DIR, f);
+        let size;
+        try {
+          size = statSync(p).size;
+        } catch {
+          continue;
+        }
+        const prevOffset = offsets.has(p) ? offsets.get(p) : size;
+        if (size > prevOffset) {
+          const fd = await open(p, "r");
+          try {
+            const len = size - prevOffset;
+            const buf = Buffer.alloc(len);
+            await fd.read(buf, 0, len, prevOffset);
+            if (signature.test(buf.toString("utf8"))) return true;
+          } finally {
+            await fd.close();
+          }
+        }
+        offsets.set(p, size);
+      }
+    }
+    await new Promise((r) => setTimeout(r, LOG_WATCH_POLL_INTERVAL_MS));
+  }
+  return false;
+}
+
 function killAll() {
   for (const proc of runningProcesses) {
     proc.kill("SIGTERM");
@@ -188,6 +278,7 @@ async function runLocal(withDotnet) {
   const label = withDotnet ? "local:dotnet" : "local";
   log(`Mode: ${label} (building all projects for cloud deployment${withDotnet ? " + dotnet run" : ""})\n`);
 
+  const isFirstBoot = !existsSync(SQLITE_DB);
   await offerFirstTimeSeed(withDotnet, LAUNCH_PROFILE_LOCAL);
 
   await Promise.all([
@@ -204,7 +295,9 @@ async function runLocal(withDotnet) {
 
   if (withDotnet) {
     console.log(`\n${BOLD}Starting dotnet run...${RESET}\n`);
-    await runProcess("Web.UI", "dotnet", ["run", "--launch-profile", LAUNCH_PROFILE_LOCAL], projects["Web.UI"].path);
+    await (isFirstBoot
+      ? runDotnetWithBootRaceRetry(LAUNCH_PROFILE_LOCAL)
+      : runProcess("Web.UI", "dotnet", ["run", "--launch-profile", LAUNCH_PROFILE_LOCAL], projects["Web.UI"].path));
   }
 }
 
@@ -228,6 +321,7 @@ async function runDev(withDotnet, firstTimeIntro = null) {
   const label = withDotnet ? "dev:dotnet" : "dev";
   log(`Mode: ${label} (building backoffice extensions, then starting dev servers)\n`);
 
+  const isFirstBoot = !existsSync(SQLITE_DB);
   await offerFirstTimeSeed(withDotnet, LAUNCH_PROFILE_DEV, firstTimeIntro);
 
   await Promise.all([
@@ -245,7 +339,11 @@ async function runDev(withDotnet, firstTimeIntro = null) {
 
   const tasks = [runProcess("StaticAssets", "npm", ["run", "dev"], sa.path)];
   if (withDotnet) {
-    tasks.push(runProcess("Web.UI", "dotnet", ["run", "--launch-profile", LAUNCH_PROFILE_DEV], projects["Web.UI"].path));
+    tasks.push(
+      isFirstBoot
+        ? runDotnetWithBootRaceRetry(LAUNCH_PROFILE_DEV)
+        : runProcess("Web.UI", "dotnet", ["run", "--launch-profile", LAUNCH_PROFILE_DEV], projects["Web.UI"].path),
+    );
   }
 
   await Promise.all(tasks);
@@ -370,7 +468,10 @@ async function obtainSeedZip(targetPath = SEED_TARGET) {
 
 async function backupSqlite() {
   const ts = utcTimestamp();
-  const candidates = [SQLITE_DB, `${SQLITE_DB}-shm`, `${SQLITE_DB}-wal`];
+  const candidates = [
+    SQLITE_DB, `${SQLITE_DB}-shm`, `${SQLITE_DB}-wal`,
+    AUTOMATE_SQLITE_DB, `${AUTOMATE_SQLITE_DB}-shm`, `${AUTOMATE_SQLITE_DB}-wal`,
+  ];
   let renamed = 0;
   for (const src of candidates) {
     if (!existsSync(src)) continue;
@@ -439,26 +540,40 @@ async function readDeployFailedMessage() {
   }
 }
 
-async function runPhase1SchemaSync(launchProfile) {
-  log("[Phase 1/2] Starting Umbraco to install the database and sync schema from git.");
+// On a truly fresh checkout, two independent first-boot races can hit the
+// same SQLite databases:
+//  1. Umbraco.Deploy.Automate's own EF Core migrations (creating tables like
+//     umbracoAutomateAutomation in Umbraco.Automate.sqlite.db) race against
+//     Deploy's schema-review step, which reads from that same table — logged
+//     to the deploy-failed marker as a "no such table" SqliteException.
+//  2. Several hosted services (the main content DB install, plus the
+//     NotFoundTracker/MemberProfiles/BlogAnnouncements EF Core migrations) all
+//     open connections concurrently against Cache=Shared;Pooling=True
+//     databases. That thundering herd occasionally corrupts a pooled
+//     connection's native handle, surfacing as an ArgumentOutOfRangeException
+//     from sqlite3_prepare_v2 deep in SQLitePCLRaw — logged as "Unattended
+//     upgrade failed." in Umbraco's own log file (not always mirrored to the
+//     console, so we tail the log file itself via watchLogForSignature rather
+//     than scraping stdout).
+// Neither is a real problem — the tables/migrations exist by the time of a
+// retry — so both are retried transparently instead of surfacing to the user.
+const PHASE1_MAX_ATTEMPTS = 3;
+const BOOT_RACE_LOG_SIGNATURE = /Unattended upgrade failed\.|sqlite3_prepare_v2/;
+
+async function runPhase1SchemaSync(launchProfile, attempt = 1) {
+  log(`[Phase 1/2] Starting Umbraco to install the database and sync schema from git.${attempt > 1 ? ` (attempt ${attempt}/${PHASE1_MAX_ATTEMPTS})` : ""}`);
   log("[Phase 1/2] Watching for deploy-complete marker. This typically takes 30-90 seconds.\n");
 
-  const dotnetTask = runProcess(
-    "Web.UI",
-    "dotnet",
-    ["run", "--launch-profile", launchProfile],
-    projects["Web.UI"].path,
-  );
-  // dotnet will be killed by signal once schema sync completes — swallow that
-  // non-zero exit so it doesn't surface as an unhandled rejection.
-  dotnetTask.catch(() => {});
+  const { proc, exited } = spawnDotnetRun(launchProfile);
 
   const outcome = await Promise.race([
     waitForSchemaSync(PHASE1_TIMEOUT_MS),
-    dotnetTask.then(() => "exited", () => "exited"),
+    exited.then(() => "exited"),
+    watchLogForSignature(BOOT_RACE_LOG_SIGNATURE, PHASE1_TIMEOUT_MS).then((matched) => (matched ? "boot-race" : "timeout")),
   ]);
 
-  killAll();
+  proc.kill("SIGTERM");
+  await exited;
   // Give dotnet a moment to release file locks before phase 2 boots.
   await new Promise((r) => setTimeout(r, 3000));
 
@@ -466,8 +581,21 @@ async function runPhase1SchemaSync(launchProfile) {
     log("\n[Phase 1/2] Schema sync complete. Proceeding to Phase 2.\n");
     return;
   }
+  if (outcome === "boot-race") {
+    if (attempt < PHASE1_MAX_ATTEMPTS) {
+      log(`\n[Phase 1/2] Hit a known first-boot SQLite concurrency race. Retrying...\n`);
+      await writeDeployStartMarker();
+      return runPhase1SchemaSync(launchProfile, attempt + 1);
+    }
+    throw new Error(`[Phase 1/2] Hit the known first-boot SQLite concurrency race ${PHASE1_MAX_ATTEMPTS} times in a row. Check umbraco/Logs for details.`);
+  }
   if (outcome === "failed") {
     const detail = await readDeployFailedMessage();
+    if (/no such table/i.test(detail) && attempt < PHASE1_MAX_ATTEMPTS) {
+      log(`\n[Phase 1/2] Schema sync hit a known first-boot migration race (${detail.split("\n")[0]}). Retrying...\n`);
+      await writeDeployStartMarker();
+      return runPhase1SchemaSync(launchProfile, attempt + 1);
+    }
     throw new Error(`Schema sync reported failure (deploy-failed marker):\n${detail}`);
   }
   if (outcome === "timeout") {
@@ -477,6 +605,48 @@ async function runPhase1SchemaSync(launchProfile) {
     );
   }
   throw new Error("dotnet exited before schema sync completed. Check the dotnet output above for the cause.");
+}
+
+const BOOT_RACE_MAX_ATTEMPTS = 3;
+// How long to watch a freshly-spawned boot before treating it as healthy.
+// Generous relative to the ~5-25s window the race has actually surfaced in —
+// after this, the process is assumed stable and just left running.
+const BOOT_RACE_WATCH_WINDOW_MS = 90_000;
+
+async function runDotnetWithBootRaceRetry(launchProfile) {
+  for (let attempt = 1; attempt <= BOOT_RACE_MAX_ATTEMPTS; attempt++) {
+    if (attempt > 1) {
+      log(`[Web.UI] Retrying after a known first-boot SQLite concurrency race (attempt ${attempt}/${BOOT_RACE_MAX_ATTEMPTS})...`);
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+
+    const { proc, exited } = spawnDotnetRun(launchProfile);
+
+    const raceMatched = await Promise.race([
+      watchLogForSignature(BOOT_RACE_LOG_SIGNATURE, BOOT_RACE_WATCH_WINDOW_MS),
+      exited.then(() => false), // process exited on its own before we found anything (e.g. Ctrl-C, or an unrelated crash)
+    ]);
+
+    if (raceMatched) {
+      log(`[Web.UI] Detected the known first-boot SQLite concurrency race in the Umbraco log. Restarting before you hit it in the browser...`);
+      proc.kill("SIGTERM");
+      await exited;
+      if (attempt === BOOT_RACE_MAX_ATTEMPTS) {
+        throw new Error(`[Web.UI] Hit the known first-boot SQLite race ${BOOT_RACE_MAX_ATTEMPTS} times in a row. Check umbraco/Logs for details.`);
+      }
+      continue;
+    }
+
+    // Either the watch window closed cleanly (healthy, still running — the
+    // normal case) or the process exited on its own. Either way, wait for it
+    // to actually finish so this behaves like a normal long-running dev
+    // process to the caller.
+    const code = await exited;
+    if (code !== 0 && code !== null) {
+      throw new Error(`[Web.UI] exited with code ${code}`);
+    }
+    return;
+  }
 }
 
 async function activateStagedSeedZip() {

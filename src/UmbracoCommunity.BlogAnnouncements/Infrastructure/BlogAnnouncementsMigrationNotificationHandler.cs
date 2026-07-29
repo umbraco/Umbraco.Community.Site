@@ -1,29 +1,37 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace UmbracoCommunity.BlogAnnouncements.Infrastructure;
 
 /// <summary>
-/// Applies pending EF Core migrations for the blog-announcements schema on startup. Mirrors the
-/// NotFoundTracker pattern: ensures the SQLite data directory exists before connecting, then
-/// applies any pending migrations.
+/// Applies pending EF Core migrations for the blog-announcements schema once Umbraco has
+/// finished booting.
+///
+/// Why a notification handler instead of <see cref="Microsoft.Extensions.Hosting.IHostedService"/>:
+/// on a fresh install Umbraco runs its unattended installer during host startup, which creates
+/// and populates the SQLite database. A hosted service runs concurrently with that installer and
+/// can block on a SQLite write lock for well over 30s, throwing "database table is locked".
+/// Deferring to <see cref="UmbracoApplicationStartedNotification"/> guarantees Umbraco has
+/// finished its own database setup before we touch the file (mirrors
+/// <c>BlockRestrictionMigrationNotificationHandler</c>, which fixed the same issue there).
 /// </summary>
-public class BlogAnnouncementsMigrationHostedService : IHostedService
+public class BlogAnnouncementsMigrationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartedNotification>
 {
     private readonly IDbContextFactory<BlogAnnouncementsDbContext> _contextFactory;
-    private readonly ILogger<BlogAnnouncementsMigrationHostedService> _logger;
+    private readonly ILogger<BlogAnnouncementsMigrationNotificationHandler> _logger;
 
-    public BlogAnnouncementsMigrationHostedService(
+    public BlogAnnouncementsMigrationNotificationHandler(
         IDbContextFactory<BlogAnnouncementsDbContext> contextFactory,
-        ILogger<BlogAnnouncementsMigrationHostedService> logger)
+        ILogger<BlogAnnouncementsMigrationNotificationHandler> logger)
     {
         _contextFactory = contextFactory;
         _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task HandleAsync(UmbracoApplicationStartedNotification notification, CancellationToken cancellationToken)
     {
         try
         {
@@ -58,9 +66,6 @@ public class BlogAnnouncementsMigrationHostedService : IHostedService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to apply BlogAnnouncements migrations");
-            throw;
         }
     }
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

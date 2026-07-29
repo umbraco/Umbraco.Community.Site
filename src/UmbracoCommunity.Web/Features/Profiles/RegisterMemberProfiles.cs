@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Routing;
 
@@ -41,7 +42,10 @@ public sealed class RegisterMemberProfiles : IComposer
             options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         });
 
-        builder.Services.AddHostedService<MemberProfilesMigrationHostedService>();
+        // Runs after Umbraco finishes booting — see MemberProfilesMigrationNotificationHandler
+        // for why (mirrors BlockRestrictions' fix for the same fresh-install SQLite lock race,
+        // issue #132).
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, MemberProfilesMigrationNotificationHandler>();
 
         builder.Services.AddScoped<MemberProfileStore>();
         builder.Services.AddScoped<ProfileAvatarUrlResolver>();
