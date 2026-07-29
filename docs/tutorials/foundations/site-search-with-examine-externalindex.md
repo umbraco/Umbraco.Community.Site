@@ -16,7 +16,7 @@ One typed service, `SearchService`, sitting behind `ISearchService`, doing four 
 
 1. **Query `ExternalIndex`** — Umbraco's own default index, entirely unconfigured in this repo — using Examine's *managed* query API rather than raw Lucene syntax.
 2. **Scope to the current tenant**, in code, after the query runs.
-3. **Merge in a second, unrelated index** — the community blog feed — so results can span "this tenant's own pages" and "aggregated external content" in one ranked list.
+3. **Merge in two more, unrelated indexes** — the community blog feed and the documentation site's own Lucene index — so results can span "this tenant's own pages," "aggregated external content," and "primers/tutorials" in one ranked list.
 4. **Paginate and excerpt** the combined, filtered set for a render controller to hand to a view.
 
 ## Why the obvious fix doesn't work
@@ -73,7 +73,7 @@ This is the same `currentPage.Root()` idiom the [multi-tenancy primer](../../pri
 
 Worth knowing before you lean on this: because the tenant/visibility filtering happens *after* a capped 500-document fetch, a search term popular enough to return more than 500 raw hits across *every* tenant combined could drop legitimate same-tenant matches that ranked below that cutoff, before tenant filtering even runs. That's a real trade-off of filtering in memory rather than in the index — acceptable while result volumes stay well under the cap, worth revisiting if they don't.
 
-### Step 4 — Merge in a second, unrelated index
+### Step 4 — Merge in two more, unrelated indexes
 
 ```csharp
 if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))
@@ -85,13 +85,30 @@ if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var c
     // ...mapped into the same combined list, IsExternal = true
 }
 
-// Merge content + community hits by raw Lucene score. Note: scores from two different
+if (_examineManager.TryGetIndex(DocumentationLuceneIndex.IndexName, out var docsIndex))
+{
+    var docsRoot = currentPage.Root().DescendantsOrSelf<Models.PublishedModels.Documentation>().FirstOrDefault();
+    if (docsRoot is not null)
+    {
+        var docsResults = docsIndex.Searcher
+            .CreateQuery()
+            .ManagedQuery(query, DocumentationSearchFields)
+            .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
+        // ...mapped into the same combined list, IsExternal = false
+    }
+}
+
+// Merge content + community + documentation hits by raw Lucene score. Note: scores from different
 // indexes are not strictly comparable (different IDF/field norms/doc counts), so the
 // interleave is approximate by design — acceptable for this feed's size.
 var ordered = combined.OrderByDescending(x => x.Score).ToList();
 ```
 
-The community blog index is deliberately *not* tenant-filtered — it's global content, marked `IsExternal = true` on the result so the view can badge it differently. Sorting both sources together by raw Lucene `Score` is a pragmatic choice the code names honestly in its own comment: scores from two different indexes aren't calibrated against each other (different document counts and field statistics mean the same score doesn't mean the same relevance), so the interleaved order is approximate, not a rigorous cross-index ranking. Good enough at this feed's size; worth re-examining if either source grows enough for the approximation to start showing.
+The community blog index is deliberately *not* tenant-filtered — it's global content, marked `IsExternal = true` on the result so the view can badge it differently. Documentation articles are the opposite case: same-site content that just doesn't live in Umbraco's content tree, so it's marked `IsExternal = false` but still needs tenant scoping — the code resolves the current tenant's single `Documentation` node the same way [`DocumentationContentFinder`](../../../src/UmbracoCommunity.Web/Routing/DocumentationContentFinder.cs) does, then prefixes that node's URL onto the article's stored path (which is relative to the docs root, with no tenant prefix baked in). A missing index or an unresolvable `Documentation` node for the tenant just contributes nothing, the same fail-open shape as the community blog merge.
+
+Sorting all three sources together by raw Lucene `Score` is a pragmatic choice the code names honestly in its own comment: scores from different indexes aren't calibrated against each other (different document counts and field statistics mean the same score doesn't mean the same relevance), so the interleaved order is approximate, not a rigorous cross-index ranking. Good enough at this feed's size; worth re-examining if any source grows enough for the approximation to start showing.
+
+Note that this merge uses the same `ManagedQuery` approach as the tenant-content query in Step 2, not the boosted `NativeQuery` that [`DocumentationSearchService`](../../../src/UmbracoCommunity.Web/Services/Documentation/Search/DocumentationSearchService.cs) uses for the docs section's own search box — consistency with the rest of `SearchService` won out over the extra ranking control, since the boosted query exists already for whoever specifically wants docs search.
 
 ### Step 5 — Excerpts: strip, don't parse
 
@@ -160,7 +177,7 @@ Plain `autofocus` makes the browser scroll the focused element into view on load
 ## Trade-offs and known limits
 
 - **The 500-document fetch cap plus in-memory filtering** (Step 3) — a popular-enough term across all tenants combined could silently drop same-tenant hits.
-- **Cross-index score comparison is approximate**, by the code's own admission — ordering between tenant-content hits and community-blog hits isn't a calibrated relevance ranking.
+- **Cross-index score comparison is approximate**, by the code's own admission — ordering between tenant-content, community-blog, and documentation hits isn't a calibrated relevance ranking.
 - **No query-term highlighting** in excerpts.
 - **No automated tests** for `SearchService` or `SearchPageController`.
 
