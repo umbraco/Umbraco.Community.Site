@@ -25,7 +25,6 @@ const EMAIL_DENYLIST = [/^noreply@anthropic\.com$/i];
 const NAME_DENYLIST = [/\[bot\]$/i, /^dependabot/i, /^github-actions/i];
 
 const SURFACED = ["tutorials", "primers"];
-const EXCLUDED_FILES = new Set(["IDEAS.md"]);
 
 function git(args) {
   return execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -62,7 +61,7 @@ function walkMarkdown(dir) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
       out.push(...walkMarkdown(full));
-    } else if (entry.toLowerCase().endsWith(".md") && !EXCLUDED_FILES.has(entry)) {
+    } else if (entry.toLowerCase().endsWith(".md")) {
       out.push(full);
     }
   }

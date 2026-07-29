@@ -36,10 +36,6 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
     private const string RepoDocsFolder = "docs";
 
     private static readonly string[] TopLevelSections = ["primers", "tutorials"];
-    private static readonly HashSet<string> ExcludedFileNames = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "IDEAS.md",
-    };
 
     private readonly IHostEnvironment _hostEnvironment;
     private readonly IConfiguration _configuration;
@@ -183,11 +179,6 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
                      .OrderBy(f => f, StringComparer.OrdinalIgnoreCase))
         {
             var fileName = Path.GetFileName(file);
-            if (ExcludedFileNames.Contains(fileName))
-            {
-                continue;
-            }
-
             var article = BuildArticle(file, pathSegments);
             if (article is null)
             {
@@ -475,12 +466,10 @@ public sealed class DocumentationService : IDocumentationService, IDisposable
             return LinkRewrite.NoChange;
         }
 
-        // 1. Inside the docs root AND under a known surfaced section (tutorials/primers) AND .md AND
-        //    not an excluded file. Files like docs/BUILDING_PAGES.md (outside a section) and excluded
-        //    files like IDEAS.md (inside a section but never indexed) aren't part of the surfaced site —
+        // 1. Inside the docs root AND under a known surfaced section (tutorials/primers) AND .md.
+        //    Files like docs/BUILDING_PAGES.md (outside a section) aren't part of the surfaced site —
         //    they fall through to the repo-relative path below so they link to source rather than 404.
         if (pathPart.EndsWith(".md", StringComparison.OrdinalIgnoreCase)
-            && !ExcludedFileNames.Contains(Path.GetFileName(absolute))
             && absolute.StartsWith(docsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
         {
             var relative = absolute[docsRoot.Length..].TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);

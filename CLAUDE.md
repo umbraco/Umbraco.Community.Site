@@ -18,7 +18,7 @@ The repo carries a small library of conceptual and operational docs alongside th
 - **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
 - **[CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)** and **[ACCESSIBILITY.md](ACCESSIBILITY.md)** — coding standards and WCAG conformance notes.
 
-Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of planned material, with a placeholder file under the relevant folder for each entry. When picking one up to write, expand the existing stub in place rather than creating a new file.
+Planned-but-unwritten primers or tutorials live as stub files directly under the relevant folder — a `> **Status:** Planned` callout at the top plus a "what this will cover" sketch (e.g. `docs/tutorials/foundations/postcss-mixin-for-design-tokens.md`). When picking one up to write, expand the existing stub in place rather than creating a new file.
 
 ## Solution Structure
 
@@ -57,8 +57,8 @@ The solution consists of 7 projects (uses Central Package Management via `Direct
 - **Middleware/** - Custom middleware (CSP handling)
 - **Utilities/** - Helper classes (`StringUtilities`, `UrlUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, CountryFlagHelper, VideoHelper)
-- **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
-- **Vite/** - Vite integration helpers and tag helpers
+- **TagHelpers/** - Custom tag helpers (SvgTagHelper)
+- **Vite/** - Vite integration helpers and tag helpers, including `NonceTagHelper`
 
 ## Development Setup
 

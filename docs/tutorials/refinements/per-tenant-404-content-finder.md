@@ -153,7 +153,7 @@ return Task.FromResult<IPublishedContent?>(notFoundPage);
 
 Returning a page tells the NotFoundTracker package to render it through Umbraco's normal pipeline — your `Render` controllers, view models, layout, the lot — and to serve it with HTTP status 404. The response body looks identical to any other content page on the site, which is what you want for the user, while the status code stays truthful for crawlers and uptime monitors. Returning `null` (no `PageNotFound` anywhere) lets the package fall through to Umbraco's built-in no-content behaviour. Crucially, *we* don't touch the response status or the published content — the package owns that half, which is the whole reason we get to write one short method.
 
-The full `ResolveAsync` body, end to end:
+The `ResolveAsync` body, with logging trimmed for brevity:
 
 ```csharp
 public Task<IPublishedContent?> ResolveAsync(IPublishedRequestBuilder request)

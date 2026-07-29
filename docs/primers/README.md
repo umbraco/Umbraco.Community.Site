@@ -8,7 +8,7 @@ If you're new to the codebase, start here. If you've been here a while and someo
 
 ## What's here
 
-- **[Getting started primer](getting-started.md)** — the on-ramp before any of the others are useful: what to install, the one-command quick start (`node build.mjs`), local secrets, the shape of the solution, and how to make your first contribution (including picking up an idea from this backlog).
+- **[Getting started primer](getting-started.md)** — the on-ramp before any of the others are useful: what to install, the one-command quick start (`node build.mjs`), local secrets, the shape of the solution, and how to make your first contribution (including picking up one of the tutorial stubs still waiting to be written).
 - **[Frontend primer](frontend.md)** — the Vite-powered public-site frontend in `UmbracoCommunity.StaticAssets`. Covers the dual dev workflow, the manifest-driven Razor integration, the entrypoint convention, Lit + PostCSS, testing, and what builds for production. Backoffice frontends are signposted at the end.
 - **[Backend primer](backend.md)** — the C# side in `UmbracoCommunity.Web` and `UmbracoCommunity.Web.UI`. Covers the request flow (URL → render controller → view model builder → view), the three controller flavours, the builder pattern and DI registration, bootstrapping through composers, output caching policies, and the self-contained `Features/Sessionize/` module pattern.
 - **[Multi-tenancy primer](multi-tenancy.md)** — one Umbraco instance, several sites. The single invariant (scope every content lookup to the current request's tenant), the multi-root content tree, the `GetSiteSettings()` / `AncestorOrSelf<T>()` helpers, domain-binding for routing-level lookups with no current page, and the intentional cross-tenant exceptions. Threads together the multi-tenant tutorial suite.
@@ -18,9 +18,7 @@ If you're new to the codebase, start here. If you've been here a while and someo
 - **[Content modelling primer](content-modelling.md)** — the three shapes a content type can take (document, element, settings), how compositions (`ICompositionSeo`, `IContentBlockIntro`, …) share fields across unrelated content types, how Models Builder turns backoffice configuration into generated C#, and the `ModelTypeAlias` convention. Threads together the `Models/` folder structure and the `BUILDING_PAGES.md` / `BUILDING_BLOCKS.md` how-tos.
 - **[SEO and structured data primer](seo-and-structured-data.md)** — the pipeline from `ICompositionSeo` to rendered tags: `SeoDataService` assembling the view model, the three Schema.NET builders, OpenGraph/Twitter Cards and the Sessionize session deep-link override, canonical URLs and pagination, robots directives, and per-tenant sitemap generation.
 
-### Planned
-
-The backlog in [`IDEAS.md`](./IDEAS.md) lists primers that haven't been written yet. Each idea there also has a placeholder file in this folder with a status callout and a "what this will cover" sketch — useful if you're picking one up to write, or just want to scan what's coming without reading the backlog index.
+Every primer in the original backlog has now been written — there's currently nothing planned.
 
 ## Adding a new primer
 
@@ -31,6 +29,6 @@ A new primer earns its keep when an area of the codebase has:
 
 If the answer fits in a paragraph in CLAUDE.md, it doesn't need a primer. If you find yourself writing the same "let me explain how X works in this project" thread three times, it does.
 
-See [`IDEAS.md`](./IDEAS.md) for candidate primers worth writing. Each one already has a stub file in this folder — expand the stub in place rather than creating a new file, then move the entry out of the backlog and into the **What's here** list above in the same commit.
+Start it directly in this folder as `<topic>.md` with a kebab-case filename and add it to **What's here** above in the same commit. If it's not ready to finish in one sitting, leave a `> **Status:** Planned` stub the way `docs/tutorials/` does for its remaining stubs, rather than a separate backlog entry.
 
 You don't need to maintain a contributors list by hand. Each rendered doc shows a **Contributors** section generated from git history (`docs/contributors.generated.json`, produced by `npm run generate:doc-contributors` and refreshed in CI). Open a PR and you'll be credited automatically — with your GitHub avatar where your commit email is linked to your account.

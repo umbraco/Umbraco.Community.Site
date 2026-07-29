@@ -50,8 +50,8 @@ C# doesn't let a class inherit from more than one base, but a backoffice content
 | --- | --- | --- |
 | `ICompositionSeo` | `MetaTitle`, `MetaDescription`, `OgImage`, `Robots`, `CustomSchema` | Most pages — `Home`, `ContentPage`, `Article`, `Blog`, `AccountPage`, `SearchPage`, `EventsHome`, `PageNotFound`, `Documentation` |
 | `ICompositionPageConfiguration` | `HideFromSearch`, `HideFromSitemap` | Same set as above, plus `OnboardingPage` and `DigitalSignagePage` |
-| `ICompositionContentBlocks` | `ContentBlocks` (`BlockGridModel`) | Pages with a general block-grid content area — `Home`, `ContentPage`, `Article`, `PageNotFound`, `DigitalSignagePage` |
-| `ICompositionBannerBlock` | `BannerContent` (`BlockGridModel`) — a *separate* block-grid slot from `ContentBlocks`, for hero/banner-only blocks | `Home`, `ContentPage`, `Article`, `PageNotFound`, `Documentation` |
+| `ICompositionContentBlocks` | `ContentBlocks` (`BlockGridModel`) | Pages with a general block-grid content area — `Home`, `ContentPage`, `Article`, `PageNotFound`, `DigitalSignagePage`, `EventsHome` |
+| `ICompositionBannerBlock` | `BannerContent` (`BlockGridModel`) — a *separate* block-grid slot from `ContentBlocks`, for hero/banner-only blocks | `Home`, `ContentPage`, `Article`, `PageNotFound`, `Documentation`, `EventsHome` |
 
 Not every page composes every mixin — `Blog` is a listing page, so it skips `ICompositionContentBlocks` and `ICompositionBannerBlock` entirely; `DigitalSignagePage` skips `ICompositionSeo` and the banner slot because it's a kiosk view with no SEO surface and no chrome (see the Digital Signage section of [CLAUDE.md](../../CLAUDE.md)). Reach for `Services/SeoDataService.cs`'s pattern — `if (currentPage is ICompositionSeo contentModel)` — as the model for consuming a composition: check the *interface*, not a list of document types, so new page types get the behaviour automatically the moment they compose it.
 
@@ -96,7 +96,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 }
 ```
 
-Thirteen of the fifteen files in `ContentModels/` are exactly this shape — one `IdHash` property, added to whichever block needs to anchor a scoped inline style. `BlogShowcaseBlock.cs` goes a step further and adds `ResolvedNumberOfPostsToShow`, a `switch` expression that clamps the generated `NumberOfPostsToShow` to a sane range (default 3, capped at 12) before any view or service reads it.
+Fourteen of the fifteen files in `ContentModels/` are exactly this shape — one `IdHash` property, added to whichever block needs to anchor a scoped inline style. `BlogShowcaseBlock.cs` goes a step further and adds `ResolvedNumberOfPostsToShow`, a `switch` expression that clamps the generated `NumberOfPostsToShow` to a sane range (default 3, capped at 12) before any view or service reads it.
 
 The line to hold: **these partials are for presentation-only helpers**, values a Razor view would otherwise have to compute inline. The moment a helper needs to call a service, hit the database, or branch on business rules, it doesn't belong here — it belongs in a proper service in `Services/` (see the [backend primer](backend.md)).
 

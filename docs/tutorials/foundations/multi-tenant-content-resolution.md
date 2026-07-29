@@ -67,13 +67,12 @@ The actual code is small. Three extension methods, one service that uses them, a
 
 `Root()` is an extension method Umbraco ships on `IPublishedContent`. It walks ancestors until it hits the topmost content node — the tenant root, in our terms. You don't have to implement it; you just have to use it.
 
-For most of this codebase, the only direct `Root()` calls live inside three places:
+Direct `Root()` calls are still rare and deliberate, but the set has grown since this pattern was first written down. Two flavours show up:
 
-- **`PublishedContentExtensions.GetSiteSettings()`** — the centralised helper described below.
-- **`BlogService.GetBlogPage()`** — `currentPage.Root()?.DescendantsOrSelf<Blog>().FirstOrDefault()` to find the tenant's Blog page from any content node within that tenant.
-- **`SitemapController.Index()`** — `context.PublishedRequest?.PublishedContent?.Root()` to get the tenant root, then hand it to the sitemap service which walks downward.
+- **Finding a tenant's singleton page from any content node**, via the generalised `PublishedContentExtensions.GetSingletonPage<T>()` helper (`content.Root()?.DescendantsOrSelf<T>().FirstOrDefault()`) — `BlogService.GetBlogPage()` was the original motivating case; `MenuViewModelBuilder`, `AccountPageController`, `OnboardingPageController`, and `OnboardingRedirectMiddleware` now all resolve their own singleton pages through the same helper.
+- **Scoping a batch of results to the tenant after a query that doesn't know tenants exist** — `SitemapController.Index()`, `SearchService.SearchAsync()` (filtering raw Examine hits, and again to resolve the tenant's `Documentation` node), and `PageNotFoundSuggestionService` all call `Root()` directly for this reason, plus one Razor view (`SessionizeSpeakersBlock.cshtml`).
 
-Everything else uses the wrapper extension methods or the `AncestorOrSelf<T>()` pattern (described below). Direct `Root()` calls are rare, deliberate, and read as "I need the tenant root for an unusual reason that isn't in `Get<Setting>()`".
+Everything else uses `GetSiteSettings()` / `GetSocialSettings()` / `GetSingletonPage<T>()` or the `AncestorOrSelf<T>()` pattern (described below). The rule of thumb still holds: a direct `Root()` call should read as "I need the tenant root for a reason that isn't covered by an existing wrapper," not as the default way to reach it.
 
 ### Step 2 — The `GetSiteSettings()` helper
 

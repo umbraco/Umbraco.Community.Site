@@ -302,7 +302,10 @@ build: {
         input: glob.sync("src/entrypoints/_*.ts").map((file) => file),
         output: {
             entryFileNames: "[name]-[hash].js",
-            assetFileNames: "[name]-[hash][extname]",
+            assetFileNames: (chunkInfo) => {
+                if (chunkInfo.name?.indexOf("errorpage") !== -1) return "errorpage[extname]";
+                return "[name]-[hash][extname]"; // the general case
+            },
             // …
         },
     },

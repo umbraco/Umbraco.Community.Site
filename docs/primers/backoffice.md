@@ -91,7 +91,7 @@ A few things worth internalising from that one object:
 
 The extension `type`s in use across the four packages: `dashboard`, `workspaceView`, `propertyEditorUi`, `propertyContext`, `propertyAction`, `clipboardCopy`/`clipboardPastePropertyValueTranslator`, `entityAction`, `condition`, and `modal`. The [Umbraco extension-types docs](https://docs.umbraco.com/umbraco-cms/customizing/extending-overview/extension-types) list the full catalogue; these are the ones this repo actually reaches for.
 
-> Wrapping a native editor is rarely one manifest. The restricted Block Grid/List editors need *six* manifests each (the editor UI, plus clipboard + sort-mode contexts, plus copy/paste/sort actions) and a set of clipboard value translators, because the native block editor's own contexts are filtered by `forPropertyEditorUis` and won't load for a custom UI alias. That whole dance is its own story — see the [wrapping-the-native-block-editor tutorial stub](../tutorials/refinements/wrapping-umbraco-native-block-editor.md).
+> Wrapping a native editor is rarely one manifest. The restricted Block Grid/List editors need *six* manifests each (the editor UI, plus clipboard + sort-mode contexts, plus copy/paste/sort actions) and a set of clipboard value translators, because the native block editor's own contexts are filtered by `forPropertyEditorUis` and won't load for a custom UI alias. That whole dance is its own story — see the [wrapping-the-native-block-editor tutorial](../tutorials/refinements/wrapping-umbraco-native-block-editor.md).
 
 ## The design system and element shape
 
@@ -140,7 +140,7 @@ There are two flavours of client in the repo, and the difference is worth knowin
 - **Hand-written** ([BlockRestrictions `api/client.ts`](../../src/UmbracoCommunity.BlockRestrictions/Client/src/api/client.ts), [NotFoundTracker `api/not-found-tracker-api.ts`](../../src/Umbraco.Community.NotFoundTracker/Client/src/api/not-found-tracker-api.ts)) — typed functions and DTO interfaces written by hand. Simple, no codegen step, but the types can drift from the C# DTOs if you forget to update both.
 - **Generated** ([Extensions `api/*.gen.ts`](../../src/UmbracoCommunity.Extensions/Client/src/api/)) — produced by `@hey-api/openapi-ts` from the controller's Swagger document via `npm run generate-client`. The C# side is the source of truth; you re-run the generator after changing a controller.
 
-→ The secured-API side — routing under `/umbraco`, the `AuthorizationPolicies` you decorate with, Swagger registration, and the token-bearing fetch wrapper — is the subject of a planned [backoffice Management API tutorial](../tutorials/foundations/backoffice-management-api-with-auth-policies.md). Community content on the new backoffice almost always stops at the property-editor UI; the C# it calls is consistently under-documented, so that one's worth writing.
+→ The secured-API side — routing under `/umbraco`, the `AuthorizationPolicies` you decorate with, Swagger registration, and the token-bearing fetch wrapper — is covered by the [backoffice Management API tutorial](../tutorials/foundations/backoffice-management-api-with-auth-policies.md).
 
 ## Why a separate Vite project each
 
@@ -203,6 +203,6 @@ A `Client/` folder follows this layout (Block Restrictions shown — the others 
 - **[Frontend primer](frontend.md)** — the public-site Vite project, for contrast with the backoffice builds.
 - **[`docs/BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md)** — adding a content block (the *content* side; this primer is the *editor-UI* side).
 
-For *why* specific backoffice pieces are shaped the way they are — wrapping the native block editor, shipping EF Core migrations from a package, the secured Management API — see the [tutorials suite](../tutorials/README.md). Several of those are still stubs in [`IDEAS.md`](../tutorials/IDEAS.md); if you've just been spelunking in one of these `Client/` folders, you're in a good position to write one.
+For *why* specific backoffice pieces are shaped the way they are — wrapping the native block editor, the secured Management API — see the [tutorials suite](../tutorials/README.md).
 
 Hopefully that's enough to find your way around the admin side — happy extending!

@@ -65,7 +65,7 @@ A third attribute, **`vite-client="true"`**, emits the `@vite/client` script tha
 
 The manifest is cached in memory and invalidated via `IFileProvider.Watch`, so a deploy that swaps `manifest.json` invalidates the cache without restarting the app. The lookup logic lives in [`ViteTagHelperBase.cs`](../../src/UmbracoCommunity.Web/Vite/TagHelpers/ViteTagHelperBase.cs); the per-asset behaviour is in [`ViteScriptTagHelper.cs`](../../src/UmbracoCommunity.Web/Vite/TagHelpers/ViteScriptTagHelper.cs) and [`ViteLinkTagHelper.cs`](../../src/UmbracoCommunity.Web/Vite/TagHelpers/ViteLinkTagHelper.cs).
 
-→ A deeper tutorial on the dev/prod handover (and what to do when it breaks) is planned — see [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md).
+→ See the [Vite manifest integration tutorial](../tutorials/foundations/vite-umbraco-manifest-integration.md) for the full dev/prod handover, including the `IFileProvider.Watch`-based cache invalidation that survives a deploy without an app restart.
 
 ## Entry points
 
@@ -75,7 +75,7 @@ Every file in **`src/entrypoints/`** whose name starts with `_` is a Vite entry 
 input: glob.sync("src/entrypoints/_*.ts").map((file) => file)
 ```
 
-Current entries are `_index.ts` (the shared bundle loaded from `Layout.cshtml` on every page), `_home.ts`, and `_blog.ts`. Adding a new page-specific bundle is a matter of creating `src/entrypoints/_<alias>.ts` and referencing it from a Razor view.
+Current entries are `_index.ts` (the shared bundle loaded from `Layout.cshtml` on every page) plus one per page type that needs its own bundle: `_home.ts`, `_blog.ts`, `_accountpage.ts`, `_communityprofilepage.ts`, `_digital-signage.ts`, `_documentation.ts`, `_onboardingpage.ts`, and `_searchpage.ts`. Adding a new page-specific bundle is a matter of creating `src/entrypoints/_<alias>.ts` and referencing it from a Razor view.
 
 `Layout.cshtml` resolves the per-page bundle dynamically off the current page's content type alias:
 
@@ -132,7 +132,7 @@ CSS is **[PostCSS](https://postcss.org)** — a CSS post-processor pipeline (thi
 - **`postcss-calc`** — pre-computes `calc()` expressions at build time where it can.
 - **`postcss-preset-env`** — opts in to upcoming CSS syntax (nesting, color functions, etc.) and inlines custom-property defaults.
 
-→ A tutorial on the rhythm mixin pattern is planned — see [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md).
+→ A tutorial on the rhythm mixin pattern is planned — see the stub at [`docs/tutorials/foundations/postcss-mixin-for-design-tokens.md`](../tutorials/foundations/postcss-mixin-for-design-tokens.md).
 
 ## Testing
 

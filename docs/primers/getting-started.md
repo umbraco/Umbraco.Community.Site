@@ -69,7 +69,7 @@ cd src/UmbracoCommunity.StaticAssets && npm run test # frontend, Vitest
 - **[`docs/LESSONS_LEARNED.md`](../LESSONS_LEARNED.md)** covers workflow gotchas — Umbraco upgrades, schema management, urgent fixes — worth a read if something about the deploy or upgrade process feels surprising.
 - There's no formal contribution template or CI gate beyond what's already covered above — this is a small-team project, and PRs are reviewed by hand.
 - You don't need to add yourself to a contributors list anywhere. Every rendered doc in `docs/primers/` and `docs/tutorials/` shows a **Contributors** section generated from git history — open a PR and you're credited automatically.
-- **Looking for a first contribution that's low-risk and genuinely useful?** The docs suite maintains its own backlog: [`docs/primers/IDEAS.md`](IDEAS.md) and [`docs/tutorials/IDEAS.md`](../tutorials/IDEAS.md) list candidate primers and tutorials, each with a placeholder stub file already scaffolded — pick one, expand the stub in place, and you've shipped something real without having to invent the topic yourself.
+- **Looking for a first contribution that's low-risk and genuinely useful?** [`docs/tutorials/foundations/`](../tutorials/foundations/) has two placeholder stubs waiting to be written — [`intersection-observer-paused-animation.md`](../tutorials/foundations/intersection-observer-paused-animation.md) and [`postcss-mixin-for-design-tokens.md`](../tutorials/foundations/postcss-mixin-for-design-tokens.md) — each scaffolded with a status callout and a "what this will cover" sketch. Pick one, expand the stub in place, and you've shipped something real without having to invent the topic yourself.
 
 ## Where to go next
 
