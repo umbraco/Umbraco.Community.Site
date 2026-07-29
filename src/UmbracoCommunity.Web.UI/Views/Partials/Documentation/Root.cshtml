@@ -1,21 +1,35 @@
+@using System.Text.Json
 @using UmbracoCommunity.Web.Models.Pages.Documentation
 @using UmbracoCommunity.Web.Services.Documentation
 @using UmbracoCommunity.Web.ViewModelBuilders.Pages
 @model DocumentationPageViewModel
 
+@{
+    // Tags that name an actual technology/tool/spec, as opposed to a structural or
+    // discipline label (e.g. "primer", "architecture", "performance"). Used only to
+    // pick which tags surface in the quick-start box — the explorer's own "add a tag"
+    // list below is unfiltered, since narrowing by any real tag is useful there.
+    var technologyTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "vite", "lit", "postcss", "css", "svg", "razor", "tag-helper", "web-components",
+        "examine", "lucene", "csp", "oauth", "github", "swagger", "ef-core", "sessionize",
+        "schema-org", "forms", "hmr", "api", "block-editor", "mutation-observer",
+        "intersection-observer", "umbraco-cloud", "clipboard",
+    };
+}
+
 @functions {
-    void RenderArticleCard(DocumentationArticle article, DocumentationSection container, DocumentationSection topLevel)
+    void RenderArticleCard(DocumentationArticle article, string groupSlug, string pillLabel, bool showTags = true)
     {
         var url = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, article.PathSegments);
-        var pillLabel = container.Slug == topLevel.Slug ? topLevel.Title : container.Title;
-        <a class="documentation-article-card documentation-article-card--@topLevel.Slug" href="@url">
+        <a class="documentation-article-card documentation-article-card--@groupSlug" href="@url">
             <div class="documentation-article-card__pill">@pillLabel</div>
             <h3 class="documentation-article-card__title">@article.Title</h3>
             @if (!string.IsNullOrWhiteSpace(article.Excerpt))
             {
                 <p class="documentation-article-card__excerpt">@article.Excerpt</p>
             }
-            @if (article.Tags.Count > 0)
+            @if (showTags && article.Tags.Count > 0)
             {
                 <ul class="documentation-article-card__tags" aria-label="Tags">
                     @foreach (var tag in article.Tags)
@@ -28,42 +42,94 @@
     }
 }
 
-<header class="documentation__header">
-    <h1>@DocumentationService.RootDisplayTitle</h1>
-</header>
-
 @if (!Model.Index.HasContent)
 {
+    <header class="documentation__header">
+        <h1>@DocumentationService.RootDisplayTitle</h1>
+    </header>
     <p class="documentation__empty">No documentation has been published yet.</p>
     return;
 }
 
-@foreach (var topNode in Model.Index.Sections)
-{
-    var nodeUrl = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, topNode.PathSegments);
-    <div class="documentation-section-block">
-        <div class="documentation-section-block__header">
-            <h2 class="documentation-section-block__title">
-                <a href="@nodeUrl">@topNode.Title</a>
-            </h2>
-            @if (!string.IsNullOrWhiteSpace(topNode.Intro?.Excerpt))
-            {
-                <p class="documentation-section-block__intro">@topNode.Intro.Excerpt</p>
-            }
-        </div>
+@{
+    var primersSection = Model.Index.Sections.FirstOrDefault(s => string.Equals(s.Slug, "primers", StringComparison.OrdinalIgnoreCase));
+    var gettingStarted = primersSection?.Articles.FirstOrDefault(a => string.Equals(a.Slug, "getting-started", StringComparison.OrdinalIgnoreCase));
 
-        <div class="documentation-article-grid">
-            @foreach (var article in topNode.Articles)
+    // Flat (article, type-slug) pairs — "type" is Primers/Foundations/Refinements, used
+    // for the card pill colour, the explorer's type filter, and picking quick-start tags.
+    var typedArticles = new List<(DocumentationArticle Article, string Type)>();
+    foreach (var topNode in Model.Index.Sections)
+    {
+        if (topNode.Subsections.Count > 0)
+        {
+            foreach (var sub in topNode.Subsections)
             {
-                RenderArticleCard(article, topNode, topNode);
+                typedArticles.AddRange(sub.Articles.Select(a => (a, sub.Slug)));
             }
-            @foreach (var sub in topNode.Subsections)
+        }
+        else
+        {
+            foreach (var article in topNode.Articles)
             {
-                @foreach (var article in sub.Articles)
-                {
-                    RenderArticleCard(article, sub, topNode);
-                }
+                if (gettingStarted is not null && article.Slug == gettingStarted.Slug) continue;
+                typedArticles.Add((article, topNode.Slug));
+            }
+        }
+    }
+
+    var topTechTags = typedArticles
+        .SelectMany(x => x.Article.Tags)
+        .Where(t => technologyTags.Contains(t))
+        .GroupBy(t => t, StringComparer.OrdinalIgnoreCase)
+        .OrderByDescending(g => g.Count())
+        .ThenBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
+        .Take(10)
+        .Select(g => g.Key)
+        .ToList();
+
+    var explorerData = typedArticles.Select(x => new
+    {
+        title = x.Article.Title,
+        excerpt = x.Article.Excerpt,
+        url = DocumentationPageViewModelBuilder.ComposeUrl(Model.DocRootUrl, x.Article.PathSegments),
+        tags = x.Article.Tags,
+        type = x.Type,
+    });
+    var explorerJson = JsonSerializer.Serialize(explorerData);
+}
+
+<header class="documentation__header">
+    <h1>@DocumentationService.RootDisplayTitle</h1>
+</header>
+
+@if (gettingStarted is not null)
+{
+    <section id="documentation-quickstart" class="documentation-quickstart" aria-label="Quick start">
+        <div class="documentation-quickstart__header">
+            <h2 class="documentation-quickstart__title">Quick start</h2>
+            <dc-quickstart-dismiss target="documentation-quickstart"></dc-quickstart-dismiss>
+        </div>
+        <div class="documentation-quickstart__cols">
+            <div class="documentation-quickstart__col documentation-quickstart__col--primary">
+                @{ RenderArticleCard(gettingStarted, "primers", "Primers", showTags: false); }
+            </div>
+            @if (topTechTags.Count > 0)
+            {
+                <div class="documentation-quickstart__col documentation-quickstart__col--tags">
+                    <p class="documentation-quickstart__label">Explore by topic</p>
+                    <ul class="documentation-quickstart__tag-list">
+                        @foreach (var tag in topTechTags)
+                        {
+                            <li>
+                                <a class="documentation-quickstart__tag" href="@(Model.DocRootUrl + "/?tags=" + Uri.EscapeDataString(tag))">#@tag</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
             }
         </div>
-    </div>
+    </section>
 }
+
+<script type="application/json" id="documentation-explorer-data">@Html.Raw(explorerJson)</script>
+<dc-doc-explorer></dc-doc-explorer>
