@@ -22,7 +22,7 @@ One thing you *don't* need for day-to-day work, despite `.config/dotnet-tools.js
 node build.mjs
 ```
 
-On a fresh clone this detects there's no database, offers to download the latest community content snapshot, and runs first-time setup — say yes, and a few minutes later you have a fully working site with real content, running against SQLite, with Umbraco's unattended-install credentials (`community@umbraco.com` / `community!`) ready to sign in with. Subsequent runs detect the existing database and skip straight to starting the dev servers.
+On a fresh clone this detects there's no database, offers to download the latest community content snapshot, and runs first-time setup — say yes, and a few minutes later you have a fully working site with real content, running against SQLite, with Umbraco's unattended-install credentials ready to sign in with (see these in appsettings). Subsequent runs detect the existing database and skip straight to starting the dev servers.
 
 `node build.mjs seed` queues a fresh content snapshot for the next boot, keeping your existing DB schema; `node build.mjs reset` renames your local database aside (timestamped, not deleted) and re-runs first-time setup as if from a clean clone. Both are also available from the same interactive menu you get by running `node build.mjs` with no arguments.
 
@@ -64,12 +64,10 @@ cd src/UmbracoCommunity.StaticAssets && npm run test # frontend, Vitest
 
 ## Making a contribution
 
+- **Contributions here are overwhelmingly code, not docs.** The docs suite (primers, tutorials, `BUILDING_*` guides) exists to explain the code, not as a contribution surface in its own right — if you're looking for something to pick up, look for code-shaped work first. The two tutorial stubs still waiting to be written under `docs/tutorials/foundations/` are a reasonable low-risk first PR if nothing code-side is calling to you, but treat that as the exception, not the norm.
 - **Branch against `develop`**, not `main` — that's this repo's base branch.
 - **[`CODE_CONVENTIONS.md`](../../CODE_CONVENTIONS.md)** and **[`ACCESSIBILITY.md`](../../ACCESSIBILITY.md)** are the coding and WCAG standards this codebase holds itself to; skim them before your first PR.
 - **[`docs/LESSONS_LEARNED.md`](../LESSONS_LEARNED.md)** covers workflow gotchas — Umbraco upgrades, schema management, urgent fixes — worth a read if something about the deploy or upgrade process feels surprising.
-- There's no formal contribution template or CI gate beyond what's already covered above — this is a small-team project, and PRs are reviewed by hand.
-- You don't need to add yourself to a contributors list anywhere. Every rendered doc in `docs/primers/` and `docs/tutorials/` shows a **Contributors** section generated from git history — open a PR and you're credited automatically.
-- **Looking for a first contribution that's low-risk and genuinely useful?** [`docs/tutorials/foundations/`](../tutorials/foundations/) has two placeholder stubs waiting to be written — [`intersection-observer-paused-animation.md`](../tutorials/foundations/intersection-observer-paused-animation.md) and [`postcss-mixin-for-design-tokens.md`](../tutorials/foundations/postcss-mixin-for-design-tokens.md) — each scaffolded with a status callout and a "what this will cover" sketch. Pick one, expand the stub in place, and you've shipped something real without having to invent the topic yourself.
 
 ## Where to go next
 
