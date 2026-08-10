@@ -1,0 +1,43 @@
+{
+  "Name": "Settings - icon link cards block",
+  "Alias": "settingsIconLinkCardsBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "aece7d3d-074a-4ec4-ab23-36ba1beeea44",
+      "Alias": "itemsPerRow",
+      "DataType": "umb://data-type/e82ff2fec4b841ad957fd28f060191a3",
+      "ValueType": "System.String",
+      "Name": "Items per row"
+    }
+  ],
+  "Udi": "umb://document-type/0ac6f64c6c6a4ebe90a59c06e7ad1b61",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/e82ff2fec4b841ad957fd28f060191a3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.1"
+}

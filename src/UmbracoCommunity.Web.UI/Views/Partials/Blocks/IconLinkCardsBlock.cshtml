@@ -1,0 +1,58 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<IconLinkCardsBlock, SettingsIconLinkCardsBlock>>
+
+@if (Model.Content.CardItems != null && Model.Content.CardItems.Any())
+{
+    <div class="dc-icon-link-cards align-center" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        @{
+            var columns = int.TryParse(Model.Settings?.ItemsPerRow, out var parsed) ? parsed : 0;
+            if (columns <= 0)
+            {
+                columns = Math.Min(Model.Content.CardItems.Count(), 5);
+            }
+            var dataColumns = columns is > 0 and not 4 ? $" data-columns=\"{columns}\"" : string.Empty;
+        }
+        <div class="dc-icon-link-cards-grid"@Html.Raw(dataColumns)>
+            @foreach (var item in Model.Content.CardItems)
+            {
+                var card = item.Content as IconLinkCardItemBlock;
+                if (card == null) continue;
+                var hasLink = card.CardLink != null && !string.IsNullOrEmpty(card.CardLink.Url);
+                if (hasLink)
+                {
+                    <a class="dc-icon-link-cards-grid__item" href="@card.CardLink.Url" target="@card.CardLink.Target" title="@card.CardLink.Name">
+                        @{ RenderCardContent(card); }
+                    </a>
+                }
+                else
+                {
+                    <div class="dc-icon-link-cards-grid__item">
+                        @{ RenderCardContent(card); }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+}
+
+@functions {
+    void RenderCardContent(IconLinkCardItemBlock card)
+    {
+        <img class="dc-image is-circle" src="@card.CardIcon?.GetCropUrl(width: 150, height: 150)" alt="@card.CardTitle" loading="lazy" />
+        <p class="card-title">@card.CardTitle</p>
+        @if (!string.IsNullOrEmpty(card.CardDescription))
+        {
+            <p class="card-description">@card.CardDescription</p>
+        }
+    }
+}

@@ -1,0 +1,75 @@
+{
+  "Name": "Icon link card item block",
+  "Alias": "iconLinkCardItemBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-link",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "2164bae6-9230-483d-b593-d60ab30f2dfd",
+      "Alias": "cardTitle",
+      "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "ValueType": "System.String",
+      "Mandatory": true,
+      "Name": "Card title",
+      "SortOrder": 1
+    },
+    {
+      "Key": "97e569a9-97d7-4325-a638-9b06516651c5",
+      "Alias": "cardLink",
+      "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "ValueType": "Umbraco.Cms.Core.Models.Link",
+      "Name": "Card link",
+      "SortOrder": 3
+    },
+    {
+      "Key": "98313c32-e5ad-410b-9ce3-cc73745d7234",
+      "Alias": "cardDescription",
+      "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "ValueType": "System.String",
+      "Name": "Card description",
+      "SortOrder": 2
+    },
+    {
+      "Key": "ed5c3424-2205-4e10-8b34-d95c303da8fe",
+      "Alias": "cardIcon",
+      "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+      "Mandatory": true,
+      "Name": "Card icon"
+    }
+  ],
+  "Udi": "umb://document-type/c096bbaac69443e182eee382c90a7011",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.1"
+}
