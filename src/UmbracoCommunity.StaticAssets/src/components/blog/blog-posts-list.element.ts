@@ -762,15 +762,21 @@ export class BlogPostsListElement extends LitElement {
 
     .card-meta-info {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
       gap: 0.5rem 0.75rem;
+      min-width: 0;
     }
 
     .card-meta-info span:not(:first-child) {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .card-meta-info span:first-child {
+      flex-shrink: 0;
     }
 
     .card-meta-info span:not(:first-child)::before {
@@ -778,11 +784,13 @@ export class BlogPostsListElement extends LitElement {
       color: var(--color-dark-grey, #707070);
     }
 
-    /* Long author names truncate with an ellipsis instead of wrapping onto
-       their own line (which would otherwise leave a dangling "·" separator). */
+    /* Long author names shrink and truncate with an ellipsis to whatever
+       space is left, instead of wrapping onto their own line (which would
+       otherwise leave a dangling "·" separator before the read time). */
     .card-meta-info span.card-author:not(:first-child) {
       display: inline-block;
-      max-width: 200px;
+      flex-shrink: 1;
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
