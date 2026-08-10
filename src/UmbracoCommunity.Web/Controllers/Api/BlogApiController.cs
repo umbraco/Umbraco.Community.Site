@@ -125,13 +125,20 @@ public class BlogApiController : ControllerBase
         });
     }
 
-    private static BlogPostDto MapToDto(Article article) => new()
+    private static BlogPostDto MapToDto(Article article)
     {
-        Title = article.Name ?? string.Empty,
-        Url = article.Url() ?? string.Empty,
-        Teaser = article.Teaser?.ToHtmlString(),
-        PublishDate = article.PublishDate != default ? article.PublishDate : article.CreateDate,
-        ReadTime = article.ReadTime,
-        ImageUrl = article.ThumbnailImage?.GetCropUrl("card")
-    };
+        var author = article.Author as Author;
+
+        return new BlogPostDto
+        {
+            Title = article.Name ?? string.Empty,
+            Url = article.Url() ?? string.Empty,
+            Teaser = article.Teaser?.ToHtmlString(),
+            PublishDate = article.PublishDate != default ? article.PublishDate : article.CreateDate,
+            ReadTime = article.ReadTime,
+            ImageUrl = article.ThumbnailImage?.GetCropUrl("card"),
+            Author = author?.Name,
+            AuthorAvatarUrl = author?.Avatar?.GetCropUrl(width: 88, height: 88)
+        };
+    }
 }

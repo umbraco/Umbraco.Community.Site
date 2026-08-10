@@ -150,11 +150,26 @@
 }
 
 .dc-blog-showcase-block__content {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.25rem 1.5rem 1.5rem;
   flex: 1;
+}
+
+/* Author avatar "owner" badge, overlapping the media/content boundary. */
+.dc-blog-showcase-block__avatar {
+  position: absolute;
+  top: -22px;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-white);
+  border: 2px solid var(--color-white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .dc-blog-showcase-block__title {
@@ -185,12 +200,14 @@
   color: var(--color-dark-grey);
 }
 
+.dc-blog-showcase-block__author,
 .dc-blog-showcase-block__readtime {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+.dc-blog-showcase-block__author::before,
 .dc-blog-showcase-block__readtime::before {
   content: "·";
   color: var(--color-dark-grey);
