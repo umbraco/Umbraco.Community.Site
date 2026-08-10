@@ -112,6 +112,7 @@
     {
         var date = article.PublishDate != default ? article.PublishDate : article.CreateDate;
         var hasTeaser = article.Teaser != null && !article.Teaser.IsEmptyHtmlString();
+        var authorName = (article.Author as Author)?.Name;
         <a class="dc-blog-showcase-block__card" href="@article.Url()">
             @if (article.ThumbnailImage != null)
             {
@@ -133,6 +134,10 @@
                 }
                 <div class="dc-blog-showcase-block__meta">
                     <time datetime="@date.ToString("yyyy-MM-dd")">@date.ToString("d MMMM yyyy", CultureInfo.CurrentCulture)</time>
+                    @if (!string.IsNullOrEmpty(authorName))
+                    {
+                        <span class="dc-blog-showcase-block__author">by @authorName</span>
+                    }
                     @if (article.ReadTime > 0)
                     {
                         <span class="dc-blog-showcase-block__readtime">@article.ReadTime min read</span>

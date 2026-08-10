@@ -132,6 +132,7 @@ public class BlogApiController : ControllerBase
         Teaser = article.Teaser?.ToHtmlString(),
         PublishDate = article.PublishDate != default ? article.PublishDate : article.CreateDate,
         ReadTime = article.ReadTime,
-        ImageUrl = article.ThumbnailImage?.GetCropUrl("card")
+        ImageUrl = article.ThumbnailImage?.GetCropUrl("card"),
+        Author = (article.Author as Author)?.Name
     };
 }

@@ -281,7 +281,11 @@ export class BlogPostsListElement extends LitElement {
               () => html`<div class="card-teaser">${unsafeHTML(post.teaser)}</div>`
             )}
             <div class="card-meta">
-              <div>${this.#formatDate(post.publishDate)}</div>
+              <div class="card-meta-info">
+                <span>${this.#formatDate(post.publishDate)}</span>
+                ${when(post.author, () => html`<span>by ${post.author}</span>`)}
+                ${when(post.readTime > 0, () => html`<span>${post.readTime} min read</span>`)}
+              </div>
               ${when(
                 isFeatured,
                 () => html`<div class="card-extra"><span class="font-bold">Top story</span></div>`
@@ -734,6 +738,24 @@ export class BlogPostsListElement extends LitElement {
       align-items: center;
       margin-top: var(--unit-sm, 0.5rem);
       font-size: var(--font-size-sm, 0.875rem);
+      color: var(--color-dark-grey, #707070);
+    }
+
+    .card-meta-info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+    }
+
+    .card-meta-info span:not(:first-child) {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-meta-info span:not(:first-child)::before {
+      content: "·";
       color: var(--color-dark-grey, #707070);
     }
 

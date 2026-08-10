@@ -185,12 +185,14 @@
   color: var(--color-dark-grey);
 }
 
+.dc-blog-showcase-block__author,
 .dc-blog-showcase-block__readtime {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }
 
+.dc-blog-showcase-block__author::before,
 .dc-blog-showcase-block__readtime::before {
   content: "·";
   color: var(--color-dark-grey);

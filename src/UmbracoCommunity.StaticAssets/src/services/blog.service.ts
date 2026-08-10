@@ -7,6 +7,7 @@ export interface BlogPost {
   publishDate: string;
   readTime: number;
   imageUrl?: string;
+  author?: string;
 }
 
 export interface BlogCategory {
