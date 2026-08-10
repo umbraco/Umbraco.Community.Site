@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using UmbracoCommunity.Web.Extensions;
+using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
@@ -25,6 +26,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly BreadcrumbSchemaBuilder _breadcrumbSchemaBuilder;
     private readonly UrlUtilities _urlUtilities;
     private readonly IDocumentationService _documentationService;
+    private readonly IProfileDataProvider _profileDataProvider;
 
     public SeoDataService(
         IImageUrlBuilder imageUrlBuilder,
@@ -34,7 +36,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         ArticleSchemaBuilder articleSchemaBuilder,
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
         UrlUtilities urlUtilities,
-        IDocumentationService documentationService)
+        IDocumentationService documentationService,
+        IProfileDataProvider profileDataProvider)
     {
         _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
@@ -44,6 +47,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         _breadcrumbSchemaBuilder = breadcrumbSchemaBuilder;
         _urlUtilities = urlUtilities;
         _documentationService = documentationService;
+        _profileDataProvider = profileDataProvider;
     }
 
     public async Task<MetaTagsViewModel> BuildAsync(IPublishedContent currentPage)
@@ -79,6 +83,10 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         // A single Documentation node serves every docs URL, so the node-derived title/canonical
         // above are identical for all of them. Override per resolved article/section.
         ApplyDocumentationOverrides(viewModel, currentPage);
+
+        // Same story for the single CommunityProfilePage node — every member's profile URL
+        // binds to it, so the node-derived title above is identical for all of them too.
+        await ApplyCommunityProfileOverridesAsync(viewModel, currentPage);
 
         return viewModel;
     }
@@ -151,6 +159,45 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
                 ? description[..197] + "..."
                 : description;
         }
+    }
+
+    private async Task ApplyCommunityProfileOverridesAsync(MetaTagsViewModel viewModel, IPublishedContent currentPage)
+    {
+        if (currentPage is not CommunityProfilePage)
+        {
+            return;
+        }
+
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext is null)
+        {
+            return;
+        }
+
+        if (httpContext.Items[CommunityProfileContentFinder.HandleItemKey] is not string handle)
+        {
+            return;
+        }
+
+        // Canonical is the actual request URL (the node URL would collapse every profile onto
+        // the same bare page URL). Normalise to a trailing slash so /x and /x/ don't read as
+        // duplicate content — same convention as the Documentation override above.
+        var request = httpContext.Request;
+        var path = request.Path.HasValue ? request.Path.Value! : "/";
+        if (!path.EndsWith('/'))
+        {
+            path += "/";
+        }
+
+        viewModel.CanonicalUrl = $"{request.Scheme}://{request.Host}{path}";
+
+        var profile = await _profileDataProvider.GetProfileAsync(handle);
+        if (profile is null)
+        {
+            return;
+        }
+
+        viewModel.MetaTitle = profile.Identity.DisplayName;
     }
 
     private async Task ApplySessionOpenGraphOverridesAsync(MetaTagsViewModel viewModel)
