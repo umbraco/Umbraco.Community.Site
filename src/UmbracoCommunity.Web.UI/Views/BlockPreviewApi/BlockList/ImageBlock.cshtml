@@ -4,10 +4,23 @@
 {
     var settings = Model.Settings as SettingsImageBlock;
     var imgIsCircle = settings?.ImageIsCircular ?? false;
+    bool hasCaption = !string.IsNullOrWhiteSpace(Model.Content.ImageCaption);
 
     <div class="dc-image-block">
-        <div class="dc-image-wrapper">
-            <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
-        </div>
+        @if (hasCaption)
+        {
+            <figure>
+                <div class="dc-image-wrapper">
+                    <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+                </div>
+                <figcaption>@Model.Content.ImageCaption</figcaption>
+            </figure>
+        }
+        else
+        {
+            <div class="dc-image-wrapper">
+                <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+            </div>
+        }
     </div>
 }
