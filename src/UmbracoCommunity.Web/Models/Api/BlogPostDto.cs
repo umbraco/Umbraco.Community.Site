@@ -8,4 +8,6 @@ public class BlogPostDto
     public DateTime PublishDate { get; set; }
     public int ReadTime { get; set; }
     public string? ImageUrl { get; set; }
+    public string? Author { get; set; }
+    public string? AuthorAvatarUrl { get; set; }
 }

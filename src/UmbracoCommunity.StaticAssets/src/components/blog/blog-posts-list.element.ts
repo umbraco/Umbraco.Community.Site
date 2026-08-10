@@ -275,13 +275,21 @@ export class BlogPostsListElement extends LitElement {
             `
           )}
           <div class="card-content">
+            ${when(
+              post.imageUrl && post.authorAvatarUrl,
+              () => html`<img class="card-avatar" src="${post.authorAvatarUrl}" alt="" loading="lazy" />`
+            )}
             <h3>${post.title}</h3>
             ${when(
               post.teaser,
               () => html`<div class="card-teaser">${unsafeHTML(post.teaser)}</div>`
             )}
             <div class="card-meta">
-              <div>${this.#formatDate(post.publishDate)}</div>
+              <div class="card-meta-info">
+                <span>${this.#formatDate(post.publishDate)}</span>
+                ${when(post.author, () => html`<span>by ${post.author}</span>`)}
+                ${when(post.readTime > 0, () => html`<span>${post.readTime} min read</span>`)}
+              </div>
               ${when(
                 isFeatured,
                 () => html`<div class="card-extra"><span class="font-bold">Top story</span></div>`
@@ -594,7 +602,7 @@ export class BlogPostsListElement extends LitElement {
 
     .sidebar-card {
       background: var(--color-white, #fff);
-      border-radius: var(--border-radius, 6px);
+      border-radius: var(--border-radius-lg, 15px);
       padding: var(--unit-md, 1.5rem);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
@@ -643,7 +651,7 @@ export class BlogPostsListElement extends LitElement {
       display: inline-block;
       padding: var(--unit-xs, 0.25rem) var(--unit-sm, 0.5rem);
       background: var(--color-grey-light, #f3f4f6);
-      border-radius: var(--border-radius-sm, 4px);
+      border-radius: 20px;
       color: var(--color-text, #4a4a4a);
       text-decoration: none;
       font-size: var(--font-size-sm, 0.875rem);
@@ -670,7 +678,7 @@ export class BlogPostsListElement extends LitElement {
 
     .card {
       background: var(--color-white, #fff);
-      border-radius: var(--border-radius, 6px);
+      border-radius: var(--border-radius-lg, 15px);
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: box-shadow 0.2s ease, transform 0.2s ease;
@@ -712,8 +720,23 @@ export class BlogPostsListElement extends LitElement {
     }
 
     .card-content {
+      position: relative;
       padding: var(--unit, 1rem);
       row-gap: var(--unit);
+    }
+
+    /* Author avatar "owner" badge, overlapping the image/content boundary. */
+    .card-avatar {
+      position: absolute;
+      top: -22px;
+      right: 1rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--color-white, #fff);
+      border: 2px solid var(--color-white, #fff);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     }
 
     .card-content h3 {
@@ -734,6 +757,24 @@ export class BlogPostsListElement extends LitElement {
       align-items: center;
       margin-top: var(--unit-sm, 0.5rem);
       font-size: var(--font-size-sm, 0.875rem);
+      color: var(--color-dark-grey, #707070);
+    }
+
+    .card-meta-info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+    }
+
+    .card-meta-info span:not(:first-child) {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-meta-info span:not(:first-child)::before {
+      content: "·";
       color: var(--color-dark-grey, #707070);
     }
 
