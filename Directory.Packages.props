@@ -6,13 +6,13 @@
   <ItemGroup>
     <!-- Umbraco -->
     <PackageVersion Include="Flip.Umbraco" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.Cms" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.0.2" />
+    <PackageVersion Include="Umbraco.Cms" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.1.0" />
     <!-- Umbraco Cloud & Deploy -->
     <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="18.0.0" />
@@ -21,17 +21,17 @@
     <PackageVersion Include="Umbraco.Deploy.Infrastructure" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Core" Version="18.0.1" />
     <!-- Umbraco Forms -->
-    <PackageVersion Include="Umbraco.Forms" Version="18.0.4" />
+    <PackageVersion Include="Umbraco.Forms" Version="18.0.5" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
     <PackageVersion Include="Umbraco.AI" Version="18.2.0" />
     <PackageVersion Include="Umbraco.AI.Agent" Version="18.1.1" />
     <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.0.2" />
+    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.0.2" />
     <PackageVersion Include="Umbraco.AI.Google" Version="18.0.1" />
     <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.1.2" />
     <PackageVersion Include="Umbraco.AI.Prompt" Version="18.2.0" />
     <PackageVersion Include="Umbraco.AI.Search" Version="18.0.1" />
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.1" />
