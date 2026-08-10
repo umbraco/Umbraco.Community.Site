@@ -200,7 +200,6 @@
   color: var(--color-dark-grey);
 }
 
-.dc-blog-showcase-block__author,
 .dc-blog-showcase-block__readtime {
   display: inline-flex;
   align-items: center;
@@ -211,6 +210,21 @@
 .dc-blog-showcase-block__readtime::before {
   content: "·";
   color: var(--color-dark-grey);
+}
+
+.dc-blog-showcase-block__author::before {
+  margin-right: 0.5rem;
+}
+
+/* Long author names truncate with an ellipsis instead of wrapping onto
+   their own line (which would otherwise leave a dangling "·" separator). */
+.dc-blog-showcase-block__author {
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 @media (--sm) {

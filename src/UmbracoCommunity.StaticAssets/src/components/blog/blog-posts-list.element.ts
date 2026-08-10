@@ -287,7 +287,7 @@ export class BlogPostsListElement extends LitElement {
             <div class="card-meta">
               <div class="card-meta-info">
                 <span>${this.#formatDate(post.publishDate)}</span>
-                ${when(post.author, () => html`<span>by ${post.author}</span>`)}
+                ${when(post.author, () => html`<span class="card-author">by ${post.author}</span>`)}
                 ${when(post.readTime > 0, () => html`<span>${post.readTime} min read</span>`)}
               </div>
               ${when(
@@ -776,6 +776,21 @@ export class BlogPostsListElement extends LitElement {
     .card-meta-info span:not(:first-child)::before {
       content: "·";
       color: var(--color-dark-grey, #707070);
+    }
+
+    /* Long author names truncate with an ellipsis instead of wrapping onto
+       their own line (which would otherwise leave a dangling "·" separator). */
+    .card-meta-info span.card-author:not(:first-child) {
+      display: inline-block;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+
+    .card-author::before {
+      margin-right: 0.5rem;
     }
 
     .card-extra {
