@@ -275,6 +275,10 @@ export class BlogPostsListElement extends LitElement {
             `
           )}
           <div class="card-content">
+            ${when(
+              post.imageUrl && post.authorAvatarUrl,
+              () => html`<img class="card-avatar" src="${post.authorAvatarUrl}" alt="" loading="lazy" />`
+            )}
             <h3>${post.title}</h3>
             ${when(
               post.teaser,
@@ -716,8 +720,23 @@ export class BlogPostsListElement extends LitElement {
     }
 
     .card-content {
+      position: relative;
       padding: var(--unit, 1rem);
       row-gap: var(--unit);
+    }
+
+    /* Author avatar "owner" badge, overlapping the image/content boundary. */
+    .card-avatar {
+      position: absolute;
+      top: -22px;
+      right: 1rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--color-white, #fff);
+      border: 2px solid var(--color-white, #fff);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     }
 
     .card-content h3 {

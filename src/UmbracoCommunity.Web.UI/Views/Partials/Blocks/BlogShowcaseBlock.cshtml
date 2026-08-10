@@ -112,7 +112,9 @@
     {
         var date = article.PublishDate != default ? article.PublishDate : article.CreateDate;
         var hasTeaser = article.Teaser != null && !article.Teaser.IsEmptyHtmlString();
-        var authorName = (article.Author as Author)?.Name;
+        var authorContent = article.Author as Author;
+        var authorName = authorContent?.Name;
+        var authorAvatarUrl = authorContent?.Avatar?.GetCropUrl(width: 88, height: 88);
         <a class="dc-blog-showcase-block__card" href="@article.Url()">
             @if (article.ThumbnailImage != null)
             {
@@ -125,6 +127,10 @@
                 </figure>
             }
             <div class="dc-blog-showcase-block__content">
+                @if (article.ThumbnailImage != null && !string.IsNullOrEmpty(authorAvatarUrl))
+                {
+                    <img class="dc-blog-showcase-block__avatar" src="@authorAvatarUrl" alt="" loading="lazy" />
+                }
                 <h3 class="dc-blog-showcase-block__title">@article.Name</h3>
                 @if (hasTeaser)
                 {

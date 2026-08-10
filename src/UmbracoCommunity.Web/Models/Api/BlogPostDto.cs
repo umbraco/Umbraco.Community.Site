@@ -9,4 +9,5 @@ public class BlogPostDto
     public int ReadTime { get; set; }
     public string? ImageUrl { get; set; }
     public string? Author { get; set; }
+    public string? AuthorAvatarUrl { get; set; }
 }

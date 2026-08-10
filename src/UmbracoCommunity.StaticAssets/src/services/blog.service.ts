@@ -8,6 +8,7 @@ export interface BlogPost {
   readTime: number;
   imageUrl?: string;
   author?: string;
+  authorAvatarUrl?: string;
 }
 
 export interface BlogCategory {
