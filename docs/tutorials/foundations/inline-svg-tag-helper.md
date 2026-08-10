@@ -70,7 +70,7 @@ This tutorial covers the **foundational** TagHelper — the read-from-media + sa
 
 ## Walkthrough
 
-The full file lives at [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs). We'll build it up in roughly the order Warren did, so you can see what each piece is for.
+The full file lives at [`src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs`](../../../src/UmbracoCommunity.Web/TagHelpers/SvgTagHelper.cs). We'll build it up in roughly the order Warren did, so you can see what each piece is for — note that the live file has since folded the caching and scoping refinements directly into the same constructor and `Process` method shown below (a fourth constructor parameter for `AppCaches`, and the read/sanitise/scope steps collapsed into one helper), rather than keeping them as separate steps; the behaviour each step below describes is still accurate, just no longer laid out 1:1 in the file the way it is here.
 
 ### Step 1 — Declare the TagHelper
 

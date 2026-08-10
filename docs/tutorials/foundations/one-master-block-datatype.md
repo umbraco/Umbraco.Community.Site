@@ -2,7 +2,7 @@
 tags: [content-modelling, block-editor, data-types, architecture]
 ---
 
-# One master block data type, restricted per consumer
+# How to create and use a master block list that you can filter per tenant
 
 This is the content-modelling decision that the whole Block Restrictions package exists to serve, written down on its own because it's the *why* behind two other tutorials and it's easy to lose under their mechanics. The short version: keep a single Block Grid (or Block List) data type that holds every block the site could ever use, point every document type at that one data type, and then narrow the offered set *per consumer* — per document type, and by inheritance the content nodes beneath it — with a restriction rule, rather than building a separate data type for every document type that wants a different subset of blocks.
 
@@ -50,7 +50,7 @@ One data type holds the union of every block. Every document type reuses it. The
 
 Two pieces of machinery make this work, and each has its own tutorial:
 
-- **Resolving** which subset applies to the node being edited — a rule attached to a document type, inherited down the content tree, cached. See [Configuration that inherits down the content tree](./content-tree-inherited-config.md).
+- **Resolving** which subset applies to the node being edited — a rule attached to a document type, inherited down the content tree, cached. See [How to make configuration cascade down a content tree, with document type overrides](./content-tree-inherited-config.md).
 - **Enforcing** that subset in the editor — a custom property editor that wraps the native block editor and filters its "add block" catalogue to the allowed set. See [Wrapping Umbraco's native block editor](../refinements/wrapping-umbraco-native-block-editor.md).
 
 This article is just the modelling choice that makes both worth building.
@@ -100,7 +100,7 @@ There's nothing to configure for this step — it happens automatically once the
 
 ## Where to go next
 
-- **[Configuration that inherits down the content tree](./content-tree-inherited-config.md)** — how a rule attached to a document type resolves for any node, inherited by ancestor walk and cached.
+- **[How to make configuration cascade down a content tree, with document type overrides](./content-tree-inherited-config.md)** — how a rule attached to a document type resolves for any node, inherited by ancestor walk and cached.
 - **[Wrapping Umbraco's native block editor](../refinements/wrapping-umbraco-native-block-editor.md)** — how the editor enforces the resolved subset without forking the native block editor.
 - **[The `UmbracoCommunity.BlockRestrictions` README](../../../src/UmbracoCommunity.BlockRestrictions/README.md)** — the whole package end to end: workspace tab, dashboard, dual DB/JSON persistence, import/export.
 

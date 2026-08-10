@@ -72,12 +72,18 @@
     <dc-doc-search class="documentation-nav__search" doc-root-url="@Model.DocRootUrl"></dc-doc-search>
     @if (Model.Index.HasContent)
     {
-        <ul class="documentation-nav__list documentation-nav__list--root">
-            @foreach (var node in Model.Index.Sections)
-            {
-                RenderSection(node, 0);
-            }
-        </ul>
+        // Server-rendered fully expanded, same as always — <dc-nav-accordion> only touches
+        // this at connect time, and only below the --md breakpoint (see its own comments for
+        // why a plain hidden-attribute + JS toggle was used over <details>/<summary>). With
+        // JS disabled, or at --md+, this list is untouched: identical to pre-accordion markup.
+        <dc-nav-accordion>
+            <ul class="documentation-nav__list documentation-nav__list--root">
+                @foreach (var node in Model.Index.Sections)
+                {
+                    RenderSection(node, 0);
+                }
+            </ul>
+        </dc-nav-accordion>
     }
     @if (Model.Mode != DocumentationViewMode.Root)
     {

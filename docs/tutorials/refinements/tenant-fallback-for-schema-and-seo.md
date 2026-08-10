@@ -2,7 +2,7 @@
 tags: [seo, schema-org, multi-tenant, social-settings]
 ---
 
-# Tenant-aware fallback for schema and SEO metadata
+# How to keep SEO schema valid when a tenant hasn't configured their brand settings
 
 > **Prerequisites:** This refinement builds on [Resolving content in a multi-tenant Umbraco site](../foundations/multi-tenant-content-resolution.md). The fallback chain below leans on the `GetSocialSettings()` extension method established there. If you haven't read the foundation, the resolution side of this tutorial will look like magic.
 
@@ -264,7 +264,7 @@ Scoped (per-request) is fine — none of the builders hold per-request state, bu
 
 This is the last refinement in the multi-tenant suite. The other refinement built on the same foundation is:
 
-→ [Per-tenant 404 pages with a custom `INotFoundPageResolver`](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
+→ [How to serve a different 404 page per tenant](./per-tenant-404-content-finder.md) — the tenancy resolution problem when there *is* no current page to anchor off because the request 404'd.
 
 For the broader pattern these refinements extend:
 

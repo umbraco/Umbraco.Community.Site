@@ -12,13 +12,13 @@ This is the Umbraco Community Website - a replacement for [community.umbraco.com
 
 The repo carries a small library of conceptual and operational docs alongside the code:
 
-- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, and integrations are written; content modelling and SEO are still planned stubs). Start here if you're new to the codebase.
+- **[docs/primers/](docs/primers/)** — concept-oriented overviews that give the lay of the land for an area (frontend, backend, multi-tenancy, backoffice, caching, integrations, content modelling, and SEO are all written). Start with [`getting-started.md`](docs/primers/getting-started.md) if you're new to the codebase.
 - **[docs/tutorials/](docs/tutorials/)** — short, focused deep dives on specific problems we've hit and how we solved them. Split into [`foundations/`](docs/tutorials/foundations/) (standalone patterns) and [`refinements/`](docs/tutorials/refinements/) (improvements layered on a foundation).
 - **[docs/BUILDING_PAGES.md](docs/BUILDING_PAGES.md)** and **[docs/BUILDING_BLOCKS.md](docs/BUILDING_BLOCKS.md)** — how-tos for adding new pages and content blocks.
 - **[docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)** — workflow gotchas (Umbraco upgrades, schema management, urgent fixes).
 - **[CODE_CONVENTIONS.md](CODE_CONVENTIONS.md)** and **[ACCESSIBILITY.md](ACCESSIBILITY.md)** — coding standards and WCAG conformance notes.
 
-Both `docs/primers/` and `docs/tutorials/` carry their own `IDEAS.md` backlog of planned material, with a placeholder file under the relevant folder for each entry. When picking one up to write, expand the existing stub in place rather than creating a new file.
+Planned-but-unwritten primers or tutorials live as stub files directly under the relevant folder — a `> **Status:** Planned` callout at the top plus a "what this will cover" sketch (e.g. `docs/tutorials/foundations/postcss-mixin-for-design-tokens.md`). When picking one up to write, expand the existing stub in place rather than creating a new file.
 
 ## Solution Structure
 
@@ -57,8 +57,8 @@ The solution consists of 7 projects (uses Central Package Management via `Direct
 - **Middleware/** - Custom middleware (CSP handling)
 - **Utilities/** - Helper classes (`StringUtilities`, `UrlUtilities`)
 - **Helpers/** - Domain helpers (ColourHelper, CountryFlagHelper, VideoHelper)
-- **TagHelpers/** - Custom tag helpers (SvgTagHelper, NonceTagHelper)
-- **Vite/** - Vite integration helpers and tag helpers
+- **TagHelpers/** - Custom tag helpers (SvgTagHelper)
+- **Vite/** - Vite integration helpers and tag helpers, including `NonceTagHelper`
 
 ## Development Setup
 
@@ -223,7 +223,7 @@ Located in `Features/Sessionize/`, this feature integrates with the Sessionize p
 - URLs support `?session={sessionId}` parameter for direct session linking
 - When visiting a URL with session parameter, page scrolls to program and opens session dialog
 - Session dialog includes share buttons for LinkedIn, Bluesky, Mastodon, and copy link
-- Server-side Open Graph tags are generated for shared session URLs via `SeoMetaDataViewModelDecorator`
+- Server-side Open Graph tags are generated for shared session URLs via `SeoDataService.ApplySessionOpenGraphOverridesAsync`
 - Social platforms receive session-specific `og:title`, `og:description`, and `og:url` meta tags
 
 **Configuration** (in `appsettings.json`):
@@ -530,6 +530,4 @@ See [ACCESSIBILITY.md](./ACCESSIBILITY.md) for accessibility standards, implemen
 
 ## Pending follow-ups
 
-Check intermittently and clear as conditions become true.
-
-- **Documentation repository links**: When this repo is made public, set `Documentation:RepositoryUrl` in `appsettings.json` (e.g. `"https://github.com/<owner>/<repo>/blob/develop"`). Until then, repo-relative links from the rendered docs to non-surfaced files (`CODE_CONVENTIONS.md`, `src/...`) render as inert `<code>` rather than dead anchors. Once the config is set, those links rewrite to live GitHub URLs. Source: `DocumentationService.ClassifyRelativeLink` in `src/UmbracoCommunity.Web/Services/Documentation/DocumentationService.cs`.
+Check intermittently and clear as conditions become true. Nothing outstanding right now — both former entries here (documentation repository links; the article contributors mechanism) turned out to already be resolved on inspection: `DocumentationService.DefaultRepositoryUrl` already defaults to a live, public GitHub URL (`https://github.com/umbraco/Umbraco.Community.Site/blob/develop`), so `ClassifyRelativeLink`'s inert-`<code>` fallback is currently unreachable; and `generate-doc-contributors.js` already attributes per-file from `git log --follow --no-merges`, not "who merged".

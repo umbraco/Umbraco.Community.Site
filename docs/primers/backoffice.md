@@ -4,21 +4,22 @@ tags: [primer, backoffice, extensions, app-plugins, vite]
 
 # Backoffice extensions primer
 
-The [frontend primer](frontend.md) covers the public site and deliberately punts on the *backoffice* — the Umbraco admin UI at `/umbraco`. This repo ships three separate backoffice extension codebases, and this primer threads them together: how an extension reaches the backoffice at all (the App_Plugins manifest), how individual pieces of UI register themselves, how those pieces talk to the secured C# APIs behind them, and why each one is its own little Vite project rather than part of the public-site build.
+The [frontend primer](frontend.md) covers the public site and deliberately punts on the *backoffice* — the Umbraco admin UI at `/umbraco`. This repo ships four separate backoffice extension codebases, and this primer threads them together: how an extension reaches the backoffice at all (the App_Plugins manifest), how individual pieces of UI register themselves, how those pieces talk to the secured C# APIs behind them, and why each one is its own little Vite project rather than part of the public-site build.
 
 > Just looking for the folder map? Skip to [Where things live](#where-things-live).
 
-## Three packages, same shape
+## Four packages, same shape
 
-The backoffice code lives in three Razor Class Libraries, each with a `Client/` folder holding its own TypeScript/Vite project:
+The backoffice code lives in four Razor Class Libraries, each with a `Client/` folder holding its own TypeScript/Vite project:
 
 | Package | What its backoffice UI does | Built output (`App_Plugins/…`) |
 | --- | --- | --- |
 | [`UmbracoCommunity.Extensions`](../../src/UmbracoCommunity.Extensions/Client/) | Sessionize dashboard, snapshot-export dashboard, the blog-article entity action, and the event-schedule property editor | `UmbracoCommunityExtensions/` |
 | [`UmbracoCommunity.BlockRestrictions`](../../src/UmbracoCommunity.BlockRestrictions/Client/) | The "Blocks" workspace tab on document types, the restricted Block Grid/List property editors, and the file-import dashboard | `UmbracoCommunityBlockRestrictions/` |
 | [`Umbraco.Community.NotFoundTracker`](../../src/Umbraco.Community.NotFoundTracker/Client/) | The 404 Tracker dashboard with hit-list and ignore-rule tabs and their modals | `UmbracoCommunityNotFoundTracker/` |
+| [`UmbracoCommunity.BlogAnnouncements`](../../src/UmbracoCommunity.BlogAnnouncements/Client/) | The Blog Announcements dashboard — posts/runs/settings tabs and a post-details modal for the Discord announcement pipeline | `UmbracoCommunityBlogAnnouncements/` |
 
-They don't share a build, a `package.json`, or a `node_modules`. Each is self-contained. That's deliberate — see [Why a separate Vite project each](#why-a-separate-vite-project-each) below. The pay-off is that the three follow an almost identical shape, so once you've read one `Client/` folder you can find your way around the others.
+They don't share a build, a `package.json`, or a `node_modules`. Each is self-contained. That's deliberate — see [Why a separate Vite project each](#why-a-separate-vite-project-each) below. The pay-off is that the four follow an almost identical shape, so once you've read one `Client/` folder you can find your way around the others.
 
 ## How an extension reaches the backoffice
 
@@ -88,9 +89,9 @@ A few things worth internalising from that one object:
 - **`conditions` are how you scope an extension.** `Umb.Condition.SectionAlias` pins a dashboard to a section (Content, Settings, …); `Umb.Condition.WorkspaceAlias` (used by the Block Restrictions "Blocks" tab) pins a workspace view to `Umb.Workspace.DocumentType` so it doesn't appear on Media or Member types. Conditions can also be custom — Extensions ships an [`is-blog-node` condition](../../src/UmbracoCommunity.Extensions/Client/src/conditions/) that gates the "create blog article" entity action.
 - **`alias` must be globally unique** across every extension in the backoffice, hence the reverse-DNS-ish prefixes (`UmbracoCommunity.*`, `Umbraco.Community.NotFoundTracker.*`).
 
-The extension `type`s in use across the three packages: `dashboard`, `workspaceView`, `propertyEditorUi`, `propertyContext`, `propertyAction`, `clipboardCopy`/`clipboardPastePropertyValueTranslator`, `entityAction`, `condition`, and `modal`. The [Umbraco extension-types docs](https://docs.umbraco.com/umbraco-cms/customizing/extending-overview/extension-types) list the full catalogue; these are the ones this repo actually reaches for.
+The extension `type`s in use across the four packages: `dashboard`, `workspaceView`, `propertyEditorUi`, `propertyContext`, `propertyAction`, `clipboardCopy`/`clipboardPastePropertyValueTranslator`, `entityAction`, `condition`, and `modal`. The [Umbraco extension-types docs](https://docs.umbraco.com/umbraco-cms/customizing/extending-overview/extension-types) list the full catalogue; these are the ones this repo actually reaches for.
 
-> Wrapping a native editor is rarely one manifest. The restricted Block Grid/List editors need *six* manifests each (the editor UI, plus clipboard + sort-mode contexts, plus copy/paste/sort actions) and a set of clipboard value translators, because the native block editor's own contexts are filtered by `forPropertyEditorUis` and won't load for a custom UI alias. That whole dance is its own story — see the [wrapping-the-native-block-editor tutorial stub](../tutorials/refinements/wrapping-umbraco-native-block-editor.md).
+> Wrapping a native editor is rarely one manifest. The restricted Block Grid/List editors need *six* manifests each (the editor UI, plus clipboard + sort-mode contexts, plus copy/paste/sort actions) and a set of clipboard value translators, because the native block editor's own contexts are filtered by `forPropertyEditorUis` and won't load for a custom UI alias. That whole dance is its own story — see the [wrapping-the-native-block-editor tutorial](../tutorials/refinements/wrapping-umbraco-native-block-editor.md).
 
 ## The design system and element shape
 
@@ -139,7 +140,7 @@ There are two flavours of client in the repo, and the difference is worth knowin
 - **Hand-written** ([BlockRestrictions `api/client.ts`](../../src/UmbracoCommunity.BlockRestrictions/Client/src/api/client.ts), [NotFoundTracker `api/not-found-tracker-api.ts`](../../src/Umbraco.Community.NotFoundTracker/Client/src/api/not-found-tracker-api.ts)) — typed functions and DTO interfaces written by hand. Simple, no codegen step, but the types can drift from the C# DTOs if you forget to update both.
 - **Generated** ([Extensions `api/*.gen.ts`](../../src/UmbracoCommunity.Extensions/Client/src/api/)) — produced by `@hey-api/openapi-ts` from the controller's Swagger document via `npm run generate-client`. The C# side is the source of truth; you re-run the generator after changing a controller.
 
-→ The secured-API side — routing under `/umbraco`, the `AuthorizationPolicies` you decorate with, Swagger registration, and the token-bearing fetch wrapper — is the subject of a planned [backoffice Management API tutorial](../tutorials/foundations/backoffice-management-api-with-auth-policies.md). Community content on the new backoffice almost always stops at the property-editor UI; the C# it calls is consistently under-documented, so that one's worth writing.
+→ The secured-API side — routing under `/umbraco`, the `AuthorizationPolicies` you decorate with, Swagger registration, and the token-bearing fetch wrapper — is covered by the [backoffice Management API tutorial](../tutorials/foundations/backoffice-management-api-with-auth-policies.md).
 
 ## Why a separate Vite project each
 
@@ -164,7 +165,7 @@ export default defineConfig({
 The two lines that matter:
 
 - **`outDir`** writes straight into the package's own `wwwroot/App_Plugins/<Name>/`. No copy step, no manifest hand-off — the bundle lands exactly where Umbraco looks for it.
-- **`rollupOptions.external`** tells Rollup *not* to bundle those packages — emit bare `import` statements for them and assume the host provides them at runtime. The backoffice ships its own copy of `@umbraco/*` (and Lit) and exposes them through its **import map** (the browser feature that resolves a bare specifier like `lit` to a real URL). Bundling them would ship a second copy and, worse, a second Lit instance that doesn't share the backoffice's reactive context. The exact list varies by package — BlockRestrictions externalises `@umbraco` and `lit`; Extensions externalises only `@umbraco` (its elements import Lit through `@umbraco-cms/backoffice`, so it's already covered); NotFoundTracker externalises `@umbraco-cms/backoffice`.
+- **`rollupOptions.external`** tells Rollup *not* to bundle those packages — emit bare `import` statements for them and assume the host provides them at runtime. The backoffice ships its own copy of `@umbraco/*` (and Lit) and exposes them through its **import map** (the browser feature that resolves a bare specifier like `lit` to a real URL). Bundling them would ship a second copy and, worse, a second Lit instance that doesn't share the backoffice's reactive context. The exact list varies by package — BlockRestrictions externalises `@umbraco` and `lit`; Extensions externalises only `@umbraco` (its elements import Lit through `@umbraco-cms/backoffice`, so it's already covered); NotFoundTracker and BlogAnnouncements each externalise `@umbraco-cms/backoffice` only.
 
 Why not fold this into the public-site `StaticAssets` build? Because the two targets barely overlap: the backoffice has different module-loading conventions, host-provided `@umbraco/*`, no manifest/HMR story, and a different externalisation list. The repo *did* once build the backoffice from `StaticAssets` behind a `BUILD_TARGET` switch and the gymnastics weren't worth it; each client is small enough to own its toolchain cleanly.
 
@@ -173,7 +174,7 @@ Why not fold this into the public-site `StaticAssets` build? Because the two tar
 The backoffice clients are **not** built by `dotnet build` — there's no MSBuild target invoking npm, so you build them by hand when you've changed backoffice TypeScript:
 
 ```bash
-cd src/UmbracoCommunity.Extensions/Client        # or BlockRestrictions / NotFoundTracker
+cd src/UmbracoCommunity.Extensions/Client        # or BlockRestrictions / NotFoundTracker / BlogAnnouncements
 npm ci          # first time only
 npm run build   # tsc type-check, then vite build → ../wwwroot/App_Plugins/<Name>/
 ```
@@ -202,6 +203,6 @@ A `Client/` folder follows this layout (Block Restrictions shown — the others 
 - **[Frontend primer](frontend.md)** — the public-site Vite project, for contrast with the backoffice builds.
 - **[`docs/BUILDING_BLOCKS.md`](../BUILDING_BLOCKS.md)** — adding a content block (the *content* side; this primer is the *editor-UI* side).
 
-For *why* specific backoffice pieces are shaped the way they are — wrapping the native block editor, shipping EF Core migrations from a package, the secured Management API — see the [tutorials suite](../tutorials/README.md). Several of those are still stubs in [`IDEAS.md`](../tutorials/IDEAS.md); if you've just been spelunking in one of these `Client/` folders, you're in a good position to write one.
+For *why* specific backoffice pieces are shaped the way they are — wrapping the native block editor, the secured Management API — see the [tutorials suite](../tutorials/README.md).
 
 Hopefully that's enough to find your way around the admin side — happy extending!

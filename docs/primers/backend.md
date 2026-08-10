@@ -12,14 +12,16 @@ The C# side of the site lives across five projects, with **`src/UmbracoCommunity
 
 ```
 src/
-├── UmbracoCommunity.Web.UI/             ← Host project (Program.cs, Views/, wwwroot/, appsettings)
-├── UmbracoCommunity.Web/                ← Core C# (controllers, models, services, builders, ...)
-├── UmbracoCommunity.StaticAssets/       ← Vite-built frontend assets — see frontend primer
-├── UmbracoCommunity.Extensions/         ← Umbraco backoffice extensions (RCL + own client)
-└── UmbracoCommunity.BlockRestrictions/  ← Block restrictions backoffice + EF Core migrations
+├── UmbracoCommunity.Web.UI/               ← Host project (Program.cs, Views/, wwwroot/, appsettings)
+├── UmbracoCommunity.Web/                  ← Core C# (controllers, models, services, builders, ...)
+├── UmbracoCommunity.StaticAssets/         ← Vite-built frontend assets — see frontend primer
+├── UmbracoCommunity.Extensions/           ← Umbraco backoffice extensions (RCL + own client)
+├── UmbracoCommunity.BlockRestrictions/    ← Block restrictions backoffice + EF Core migrations
+├── Umbraco.Community.NotFoundTracker/     ← 404 tracking backoffice + EF Core migrations
+└── UmbracoCommunity.BlogAnnouncements/    ← Discord blog-announcement pipeline backoffice + EF Core migrations
 ```
 
-`UmbracoCommunity.Web.UI` is the runnable project — it owns `Program.cs`, the Razor views, `wwwroot/`, and `appsettings.json`. `UmbracoCommunity.Web` is everything else C#: controllers, models, services, builders, middleware. The other three are: a Vite asset bundle that gets copied in (see the [frontend primer](frontend.md)), and two backoffice extension RCLs that ship their own backoffice clients (covered in the future backoffice primer — entry in [`IDEAS.md`](IDEAS.md)).
+`UmbracoCommunity.Web.UI` is the runnable project — it owns `Program.cs`, the Razor views, `wwwroot/`, and `appsettings.json`. `UmbracoCommunity.Web` is everything else C#: controllers, models, services, builders, middleware. The other five are: a Vite asset bundle that gets copied in (see the [frontend primer](frontend.md)), and four backoffice extension RCLs that ship their own backoffice clients (see the [backoffice primer](backoffice.md)).
 
 Package versions are managed centrally via `Directory.Packages.props`.
 
@@ -163,8 +165,8 @@ Under `UmbracoCommunity.Web/`:
 | `Middleware/` | Custom ASP.NET middleware (CSP disable, blog folder redirects, form validation) |
 | `Notifications/` | Umbraco notification handlers (cache invalidation tied to content events) |
 | `Extensions/` | `IUmbracoBuilder` + `IServiceCollection` extension methods, including the named-policy `OutputCachePolicies` static class |
-| `TagHelpers/` | Custom Razor TagHelpers (`SvgTagHelper`, `NonceTagHelper`) — see the [inline SVG tutorial](../tutorials/foundations/inline-svg-tag-helper.md) |
-| `Vite/` | The Razor↔Vite manifest bridge — see the [frontend primer](frontend.md) |
+| `TagHelpers/` | Custom Razor TagHelpers (`SvgTagHelper`) — see the [inline SVG tutorial](../tutorials/foundations/inline-svg-tag-helper.md) |
+| `Vite/` | The Razor↔Vite manifest bridge, plus `NonceTagHelper` (under `Vite/TagHelpers/`) — see the [frontend primer](frontend.md) |
 | `Utilities/`, `Helpers/` | Helper classes; utilities are pure (string, URL, semver), helpers wrap domain concerns (colour, image, video) |
 | `Configuration/`, `Constants.*.cs` | Options classes and string constants |
 
@@ -189,7 +191,7 @@ Caching is the kind of thing that gets layered on as a project grows, so it's wo
 
 The pattern: cache durations are config-bound via `OutputCacheOptions` (settable per environment in `appsettings.*.json`), eviction is tag-based for content-driven endpoints, time-based for external integrations. New endpoint? Pick a policy and decorate.
 
-→ A future caching primer would thread output caching together with `AppCaches.RuntimeCache`, `MemoryCache`, and `RequestCache` so the whole story sits in one place — see [`IDEAS.md`](IDEAS.md).
+→ See the [caching primer](caching.md), which threads output caching together with `AppCaches.RuntimeCache`, `MemoryCache`, and `RequestCache` so the whole story sits in one place.
 
 ## Self-contained features
 
