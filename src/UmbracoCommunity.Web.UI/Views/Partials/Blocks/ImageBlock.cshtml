@@ -8,6 +8,7 @@
 @if (Model.Content.Image is not null)
 {
     bool hasBg = Model.Settings.HasBg();
+    bool hasCaption = !string.IsNullOrWhiteSpace(Model.Content.ImageCaption);
 
     <div class="dc-image-block @(hasBg ? "has-bg" : "")" id="@Model.Content.IdHash">
         @if (hasBg)
@@ -19,8 +20,20 @@
             </style>
         }
 
-        <div class="dc-image-wrapper">
-            <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
-        </div>
+        @if (hasCaption)
+        {
+            <figure>
+                <div class="dc-image-wrapper">
+                    <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+                </div>
+                <figcaption>@Model.Content.ImageCaption</figcaption>
+            </figure>
+        }
+        else
+        {
+            <div class="dc-image-wrapper">
+                <img src="@Model.Content.Image.GetCropUrl(width: (int)Math.Round(imgWidth))" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+            </div>
+        }
     </div>
 }

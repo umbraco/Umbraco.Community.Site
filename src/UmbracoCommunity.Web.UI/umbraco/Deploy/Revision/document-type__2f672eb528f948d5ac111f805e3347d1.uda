@@ -32,6 +32,15 @@
           "DataType": "umb://data-type/7aaaa639fc5e47d4acf4a1a8eb2083df",
           "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
           "Name": "Image"
+        },
+        {
+          "Key": "de931a34-5d2a-43f8-b8ed-b35d75bd5f09",
+          "Alias": "imageCaption",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Optional caption text to display under the image.",
+          "Name": "Image Caption",
+          "SortOrder": 2
         }
       ]
     }
@@ -53,5 +62,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.0.1"
 }
