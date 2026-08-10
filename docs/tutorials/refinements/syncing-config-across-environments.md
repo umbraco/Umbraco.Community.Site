@@ -4,7 +4,7 @@ tags: [umbraco-cloud, deployment, configuration, version-control, ef-core]
 
 # Syncing custom backoffice configuration across environments
 
-> **Builds on:** the Block Restrictions package, whose rules live in a custom database table (see [Configuration that inherits down the content tree](../foundations/content-tree-inherited-config.md) for how those rules resolve). This refinement is about a problem that hits *any* package storing its own config: how does config set in one environment reach the others, and stay in version control?
+> **Builds on:** the Block Restrictions package, whose rules live in a custom database table (see [How to make configuration cascade down a content tree, with document type overrides](../foundations/content-tree-inherited-config.md) for how those rules resolve). This refinement is about a problem that hits *any* package storing its own config: how does config set in one environment reach the others, and stay in version control?
 
 You've built a feature whose configuration lives in your own table — for us, block-restriction rules keyed by document type. It works beautifully on your machine. Then someone asks the obvious question: a rule you set up locally needs to be on staging and production too, and ideally it should be reviewable in a pull request like the rest of the codebase. Suddenly "it's in the database" is a problem, not a feature. This tutorial is how Block Restrictions makes its configuration travel between environments and live in git.
 
@@ -110,7 +110,7 @@ Uploading only writes the *files* — you then run the same Preview → Apply fr
 
 ## Where to go next
 
-- **[Configuration that inherits down the content tree](../foundations/content-tree-inherited-config.md)** — how a rule, once in the database, resolves for any content node.
+- **[How to make configuration cascade down a content tree, with document type overrides](../foundations/content-tree-inherited-config.md)** — how a rule, once in the database, resolves for any content node.
 - **[The `UmbracoCommunity.BlockRestrictions` README](../../../src/UmbracoCommunity.BlockRestrictions/README.md)** — the dashboard walkthrough for the import/export and zip flows described here, click by click.
 - **[`LESSONS_LEARNED.md`](../../LESSONS_LEARNED.md)** — the broader Umbraco Cloud deploy notes this sits alongside, plus how the package runs its own EF Core migrations on startup without racing the installer.
 

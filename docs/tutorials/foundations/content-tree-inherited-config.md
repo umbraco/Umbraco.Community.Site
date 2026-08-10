@@ -2,7 +2,7 @@
 tags: [content-tree, configuration, inheritance, caching]
 ---
 
-# Configuration that inherits down the content tree
+# How to make configuration cascade down a content tree, with document type overrides
 
 A common need in a CMS: attach a piece of configuration to *something* high up, and have everything below it pick the value up automatically unless it's overridden closer to home. Block Restrictions does it with allowed-block rules — set a rule once, and every page beneath inherits it — but the shape is general. This tutorial is the resolution engine behind that: how to attach a rule, resolve it for any node by walking *up* the tree, cache the answer so you're not re-walking on every request, and fail open when nothing is configured. It's the "how rules resolve" half of the [Block Restrictions trio](./one-master-block-datatype.md); the [editor-wrapping refinement](../refinements/wrapping-umbraco-native-block-editor.md) is what *consumes* the answer.
 
@@ -144,7 +144,7 @@ The API endpoint tries the node first and only falls back when it 404s and a typ
 
 ## Where to go next
 
-- **[One master block data type, restricted per consumer](./one-master-block-datatype.md)** — the content-modelling reason this resolver exists.
+- **[How to create and use a master block list that you can filter per tenant](./one-master-block-datatype.md)** — the content-modelling reason this resolver exists.
 - **[Wrapping Umbraco's native block editor](../refinements/wrapping-umbraco-native-block-editor.md)** — how the resolved answer is enforced in the editing UI.
 - **[The `UmbracoCommunity.BlockRestrictions` README](../../../src/UmbracoCommunity.BlockRestrictions/README.md)** — the whole package, including the dual DB/JSON persistence the rule store sits on.
 - If your version of this pattern is tenant-shaped rather than branch-shaped, the [multi-tenant content resolution](./multi-tenant-content-resolution.md) foundation walks the same tree for a different purpose.

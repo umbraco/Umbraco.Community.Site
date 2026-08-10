@@ -6,10 +6,12 @@ using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
+using UmbracoCommunity.Web.Services.Documentation.Search;
 
 namespace UmbracoCommunity.Web.Services;
 
@@ -36,6 +38,14 @@ internal sealed class SearchService : ISearchService
         CommunityBlogsSearchIndexer.FieldExcerpt,
         CommunityBlogsSearchIndexer.FieldAuthor,
     };
+    private static readonly string[] DocumentationSearchFields =
+    {
+        DocumentationIndexFields.Title,
+        DocumentationIndexFields.Tags,
+        DocumentationIndexFields.Excerpt,
+        DocumentationIndexFields.Body,
+    };
+    private const string DocumentationCategory = "documentation";
     private static readonly Regex HtmlTagRegex = new("<[^>]+>", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
@@ -170,7 +180,47 @@ internal sealed class SearchService : ISearchService
             }
         }
 
-        // Merge content + community hits by raw Lucene score. Note: scores from two different
+        // Documentation articles (primers/tutorials) live in their own Lucene index, built from
+        // markdown rather than Umbraco content — see DocumentationService. They're tenant-scoped
+        // through the single per-tenant Documentation node's URL, same as DocumentationContentFinder.
+        // A missing index or an unresolvable Documentation node just contributes nothing.
+        if (_examineManager.TryGetIndex(DocumentationLuceneIndex.IndexName, out var docsIndex))
+        {
+            try
+            {
+                var docsRoot = currentPage.Root().DescendantsOrSelf<Models.PublishedModels.Documentation>().FirstOrDefault();
+                if (docsRoot is not null)
+                {
+                    var docsBaseUrl = docsRoot.Url(_publishedUrlProvider).TrimEnd('/');
+                    var docsResults = docsIndex.Searcher
+                        .CreateQuery()
+                        .ManagedQuery(query, DocumentationSearchFields)
+                        .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
+
+                    foreach (var result in docsResults)
+                    {
+                        var title = result.GetValues(DocumentationIndexFields.Title).FirstOrDefault();
+                        var articlePath = result.GetValues(DocumentationIndexFields.ArticlePath).FirstOrDefault();
+                        if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(articlePath)) continue;
+
+                        combined.Add((result.Score, new SearchResultItem
+                        {
+                            Name = title,
+                            Url = $"{docsBaseUrl}/{articlePath}",
+                            Description = BuildExcerpt(result.GetValues(DocumentationIndexFields.Excerpt).FirstOrDefault()),
+                            ContentTypeAlias = DocumentationCategory,
+                            IsExternal = false,
+                        }));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Search: documentation query failed for '{Query}'", query);
+            }
+        }
+
+        // Merge content + community + documentation hits by raw Lucene score. Note: scores from different
         // indexes are not strictly comparable (different IDF/field norms/doc counts), so the
         // interleave is approximate by design — acceptable for this feed's size.
         var ordered = combined
