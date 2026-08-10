@@ -594,7 +594,7 @@ export class BlogPostsListElement extends LitElement {
 
     .sidebar-card {
       background: var(--color-white, #fff);
-      border-radius: var(--border-radius, 6px);
+      border-radius: var(--border-radius-lg, 15px);
       padding: var(--unit-md, 1.5rem);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
@@ -643,7 +643,7 @@ export class BlogPostsListElement extends LitElement {
       display: inline-block;
       padding: var(--unit-xs, 0.25rem) var(--unit-sm, 0.5rem);
       background: var(--color-grey-light, #f3f4f6);
-      border-radius: var(--border-radius-sm, 4px);
+      border-radius: 20px;
       color: var(--color-text, #4a4a4a);
       text-decoration: none;
       font-size: var(--font-size-sm, 0.875rem);
@@ -670,7 +670,7 @@ export class BlogPostsListElement extends LitElement {
 
     .card {
       background: var(--color-white, #fff);
-      border-radius: var(--border-radius, 6px);
+      border-radius: var(--border-radius-lg, 15px);
       overflow: hidden;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: box-shadow 0.2s ease, transform 0.2s ease;
