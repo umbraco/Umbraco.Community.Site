@@ -1,0 +1,44 @@
+{
+  "Name": "Icon link cards block",
+  "Alias": "iconLinkCardsBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-layout-grid",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [],
+  "PropertyTypes": [
+    {
+      "Key": "fb3b2280-a973-4dbd-b819-79d6ee5c7cee",
+      "Alias": "cardItems",
+      "DataType": "umb://data-type/be360e6e9d04421ab48a22e968d2acd4",
+      "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
+      "Mandatory": true,
+      "Name": "Card items"
+    }
+  ],
+  "Udi": "umb://document-type/413d41959c144ac5ad54199b50811170",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/be360e6e9d04421ab48a22e968d2acd4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/ac7331ad526e48588ffb1b1c7370fbc1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.0.1"
+}
