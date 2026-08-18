@@ -1,0 +1,63 @@
+@using Umbraco.Community.FormsSpamGuard
+@using Umbraco.Community.FormsSpamGuard.FieldTypes
+@using Umbraco.Community.FormsSpamGuard.Signals
+@using Umbraco.Community.FormsSpamGuard.Tokens
+@using Umbraco.Forms.Web
+
+@inject ISpamGuardTokenService TokenService
+
+@model Umbraco.Forms.Web.Models.FieldViewModel
+
+@{
+    // Model.FieldType is the per-field clone with the editor's settings already applied (see
+    // FieldTypeStorage.GetFieldTypeByField), so its settings can be read directly.
+    var field = Model.FieldType as SpamGuardField;
+
+    if (field is null)
+    {
+        return;
+    }
+
+    SpamGuardFieldSettings settings = field.ResolveSettings();
+
+    // Deliberately keyed off Model.Name, not Model.Id: Id carries FormDesignSettings.FormElementHtmlIdPrefix
+    // while the posted key does not, so using Id would break matching wherever a prefix is configured.
+    var fieldKey = Model.Name;
+
+    SpamGuardToken token = TokenService.Issue();
+
+    var decoyId = $"{Model.Id}_decoy";
+    var scriptId = $"{Model.Id}_js";
+}
+
+@* The token is the only unconditional input. Everything else is omitted entirely when its signal is off, so a
+   disabled check leaves nothing in the markup for a bot to learn the shape of. *@
+<input type="hidden" name="@(fieldKey + Constants.FormKeys.TokenSuffix)" value="@TokenService.Protect(token)" />
+
+@if (settings.EnableDecoyField)
+{
+    Html.AddFormThemeCssFile(Constants.Assets.StyleSheet);
+
+    @* aria-hidden and tabindex="-1" are kept on purpose. They are a tell a sophisticated bot can read, but
+       removing them would mean screen readers announcing a fake field to real people, which is the worse
+       trade. The other giveaways of the built-in honeypot — a 32-hex name, a self-documenting class, no label,
+       no id, display:none — are all gone. *@
+    <div class="ucfsg-decoy" aria-hidden="true">
+        <label for="@decoyId">@settings.DecoyFieldLabel</label>
+        <input type="text"
+               id="@decoyId"
+               name="@token.DecoyFieldName"
+               tabindex="-1"
+               autocomplete="off" />
+    </div>
+}
+
+@if (settings.RequireJavaScript)
+{
+    Html.AddFormThemeScriptFile(Constants.Assets.Script);
+
+    <input type="hidden"
+           id="@scriptId"
+           name="@(fieldKey + Constants.FormKeys.JavaScriptSuffix)"
+           data-ucfsg-nonce="@token.Nonce" />
+}

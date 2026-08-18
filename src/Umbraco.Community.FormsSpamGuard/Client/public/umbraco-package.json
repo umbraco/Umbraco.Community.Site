@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.Community.FormsSpamGuard",
+  "name": "Forms Spam Guard",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "Umbraco.Community.FormsSpamGuard.Bundle",
+      "name": "Forms Spam Guard Bundle",
+      "js": "/App_Plugins/UmbracoCommunityFormsSpamGuard/forms-spam-guard.js"
+    }
+  ]
+}
