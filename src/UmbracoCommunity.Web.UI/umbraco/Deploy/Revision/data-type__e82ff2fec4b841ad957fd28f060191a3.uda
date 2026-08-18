@@ -1,0 +1,17 @@
+{
+  "Name": "Icon link cards items per row",
+  "EditorAlias": "Umbraco.RadioButtonList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.RadioButtonList",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "items": [
+      "3",
+      "4",
+      "5"
+    ]
+  },
+  "Udi": "umb://data-type/e82ff2fec4b841ad957fd28f060191a3",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.0.1"
+}

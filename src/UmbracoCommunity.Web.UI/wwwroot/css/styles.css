@@ -769,6 +769,95 @@ ol.no-margin p {
     font-size: 18px;
 }
 
+/* Icon link cards block (parent falls back to the frontend partial for preview) */
+.dc-icon-link-cards {
+    text-align: center;
+}
+
+.dc-icon-link-cards .block-title {
+    color: #283A97;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+}
+
+.dc-icon-link-cards .block-subtitle {
+    color: #5e6279;
+    font-size: 16px;
+    margin: 0 0 1rem;
+}
+
+.dc-icon-link-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.dc-icon-link-cards-grid__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    width: 150px;
+}
+
+.dc-icon-link-cards-grid__item .dc-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.dc-icon-link-cards-grid__item .dc-image.is-circle {
+    clip-path: circle();
+}
+
+.dc-icon-link-cards-grid__item .card-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 10px 0 0;
+}
+
+.dc-icon-link-cards-grid__item .card-description {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 4px 0 0;
+}
+
+.icon-link-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+}
+
+.icon-link-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.icon-link-card p {
+    margin: 0;
+    padding-bottom: 5px;
+}
+
+.icon-link-card-title {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.icon-link-card-description {
+    font-size: 14px;
+    color: #6b7280;
+}
+
 /* Hero banner */
 .main-hero__content-container {
     display: grid;

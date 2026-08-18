@@ -1,0 +1,15 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<IconLinkCardItemBlock>>
+
+@if (Model.Content != null)
+{
+    <div class="icon-link-card">
+        <img src="@Model.Content.CardIcon?.GetCropUrl(width: 150, height: 150)" alt="@Model.Content.CardTitle" class="dc-image is-circle" loading="lazy" />
+        <div>
+            <p class="icon-link-card-title">@Model.Content.CardTitle</p>
+            @if (!string.IsNullOrEmpty(Model.Content.CardDescription))
+            {
+                <p class="icon-link-card-description">@Model.Content.CardDescription</p>
+            }
+        </div>
+    </div>
+}

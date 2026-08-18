@@ -1,0 +1,94 @@
+.dc-icon-link-cards {
+    margin-bottom: var(--unit-md);
+}
+
+.dc-icon-link-cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: var(--unit-lg);
+    gap: var(--unit-md);
+}
+
+.dc-icon-link-cards-grid__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: var(--unit, 1rem);
+    cursor: default;
+    border-radius: var(--border-radius-xl, 12px);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: inherit;
+}
+
+a.dc-icon-link-cards-grid__item {
+    cursor: pointer;
+}
+
+a.dc-icon-link-cards-grid__item:hover,
+a.dc-icon-link-cards-grid__item:focus-visible {
+    background-color: var(--color-light, #f1f0ee);
+    transform: translateY(-2px);
+}
+
+a.dc-icon-link-cards-grid__item:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+}
+
+@media (min-width: 768px) {
+    .dc-icon-link-cards-grid {
+        gap: var(--unit-md);
+    }
+
+    .dc-icon-link-cards-grid__item {
+        width: calc(50% - var(--unit-md));
+    }
+}
+
+@media (min-width: 1024px) {
+    .dc-icon-link-cards-grid {
+        gap: var(--unit-md) var(--unit-lg);
+    }
+
+    .dc-icon-link-cards-grid__item {
+        width: calc(25% - var(--unit-lg));
+    }
+
+    .dc-icon-link-cards-grid[data-columns="3"] .dc-icon-link-cards-grid__item {
+        width: calc(33.333% - var(--unit-lg));
+    }
+
+    .dc-icon-link-cards-grid[data-columns="5"] .dc-icon-link-cards-grid__item {
+        width: calc(20% - var(--unit-lg));
+    }
+}
+
+.dc-icon-link-cards-grid__item .dc-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.dc-icon-link-cards-grid__item .dc-image.is-circle {
+    clip-path: circle();
+}
+
+.dc-icon-link-cards-grid__item .card-title {
+    font-weight: bold;
+    font-size: var(--font-size-large);
+    margin: 1rem 0 0;
+    text-align: center;
+}
+
+.dc-icon-link-cards-grid__item .card-description {
+    font-size: var(--font-size-sm);
+    margin: 0.25rem 0 0;
+    text-align: center;
+    color: var(--color-grey-dark, #6b7280);
+}

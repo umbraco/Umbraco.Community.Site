@@ -157,6 +157,12 @@
         "allowAtRoot": true,
         "allowInAreas": true,
         "editorSize": "full"
+      },
+      {
+        "contentElementTypeKey": "413d4195-9c14-4ac5-ad54-199b50811170",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "0ac6f64c-6c6a-4ebe-90a5-9c06e7ad1b61"
       }
     ],
     "createLabel": "Add new content block"
@@ -175,6 +181,9 @@
       "Udi": "umb://document-type/0a12408ae55043ffa50d331b2df9ae84"
     },
     {
+      "Udi": "umb://document-type/0ac6f64c6c6a4ebe90a59c06e7ad1b61"
+    },
+    {
       "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24"
     },
     {
@@ -191,6 +200,9 @@
     },
     {
       "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
+    },
+    {
+      "Udi": "umb://document-type/413d41959c144ac5ad54199b50811170"
     },
     {
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
@@ -260,5 +272,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.0.1"
 }
