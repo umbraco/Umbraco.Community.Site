@@ -6,57 +6,57 @@
   <ItemGroup>
     <!-- Umbraco -->
     <PackageVersion Include="Flip.Umbraco" Version="18.0.0" />
-    <PackageVersion Include="Umbraco.Cms" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.Cms" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.1.1" />
     <!-- Umbraco Cloud & Deploy -->
-    <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.2" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="18.0.0" />
     <PackageVersion Include="Umbraco.Deploy.OnPrem" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Cloud" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Infrastructure" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Core" Version="18.0.1" />
     <!-- Umbraco Forms -->
-    <PackageVersion Include="Umbraco.Forms" Version="18.0.5" />
+    <PackageVersion Include="Umbraco.Forms" Version="18.0.6" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
-    <PackageVersion Include="Umbraco.AI" Version="18.2.0" />
-    <PackageVersion Include="Umbraco.AI.Agent" Version="18.1.1" />
-    <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.0.2" />
-    <PackageVersion Include="Umbraco.AI.Google" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.1.2" />
-    <PackageVersion Include="Umbraco.AI.Prompt" Version="18.2.0" />
-    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.1" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.AI" Version="18.3.1" />
+    <PackageVersion Include="Umbraco.AI.Agent" Version="18.1.4" />
+    <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.0.5" />
+    <PackageVersion Include="Umbraco.AI.Amazon" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.AI.Anthropic" Version="18.1.0" />
+    <PackageVersion Include="Umbraco.AI.Google" Version="18.0.3" />
+    <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.3" />
+    <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.AI.Prompt" Version="18.2.3" />
+    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.3" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.3" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.3" />
     <!-- Umbraco Automate -->
-    <PackageVersion Include="Umbraco.Automate" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.1" />
+    <PackageVersion Include="Umbraco.Automate" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.3" />
     <!-- Umbraco Community Packages -->
-    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.0" />
-    <PackageVersion Include="Umbraco.Community.Contentment" Version="7.0.1" />
+    <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.1" />
+    <PackageVersion Include="Umbraco.Community.Contentment" Version="7.1.0" />
     <!-- Microsoft -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <!-- Testing -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="FluentAssertions" Version="[7.2.2,8.0.0)" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.11" />
     <!-- Auth -->
     <PackageVersion Include="AspNet.Security.OAuth.GitHub" Version="10.0.0" />
     <!-- Other -->
