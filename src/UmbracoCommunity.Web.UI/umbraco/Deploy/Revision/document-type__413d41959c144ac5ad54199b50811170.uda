@@ -13,17 +13,25 @@
   "CompositionContentTypes": [
     "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
   ],
-  "PropertyGroups": [],
-  "PropertyTypes": [
+  "PropertyGroups": [
     {
-      "Key": "fb3b2280-a973-4dbd-b819-79d6ee5c7cee",
-      "Alias": "cardItems",
-      "DataType": "umb://data-type/be360e6e9d04421ab48a22e968d2acd4",
-      "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
-      "Mandatory": true,
-      "Name": "Card items"
+      "Key": "88eb406c-d7aa-4920-9b2f-244967a84e4b",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "fb3b2280-a973-4dbd-b819-79d6ee5c7cee",
+          "Alias": "cardItems",
+          "DataType": "umb://data-type/be360e6e9d04421ab48a22e968d2acd4",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
+          "Mandatory": true,
+          "Name": "Card items"
+        }
+      ]
     }
   ],
+  "PropertyTypes": [],
   "Udi": "umb://document-type/413d41959c144ac5ad54199b50811170",
   "Dependencies": [
     {
