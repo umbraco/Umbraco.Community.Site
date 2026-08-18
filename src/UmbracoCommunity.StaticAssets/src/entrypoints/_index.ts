@@ -65,6 +65,24 @@ function initializeNavScrollingBehavior() {
   });
 }
 
+/**
+ * Keeps --live-nav-height in sync with the header's actual rendered height
+ * (which varies by breakpoint and scrolled/unscrolled state), so in-page
+ * anchor jumps and scrollIntoView() calls can offset for the sticky nav via
+ * `scroll-padding-top: var(--live-nav-height)` on <html> instead of relying
+ * on a single guessed pixel value.
+ */
+function initializeLiveNavHeightTracking() {
+  const header = document.querySelector(".nav-header .header");
+  if (!header) return;
+
+  const root = document.documentElement;
+  const resizeObserver = new ResizeObserver(([entry]) => {
+    root.style.setProperty("--live-nav-height", `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
+  });
+  resizeObserver.observe(header);
+}
+
 function initatilzePlanComparisionTable() {
   const activeClassName = 'active';
   const expandedClassName = 'expanded';
@@ -135,6 +153,7 @@ function initializeBase() {
   });
 
   initializeNavScrollingBehavior();
+  initializeLiveNavHeightTracking();
   setUtmCookies();
 }
 

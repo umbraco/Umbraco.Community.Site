@@ -20,6 +20,11 @@ body {
 
 html {
   scroll-behavior: smooth;
+  /* Keeps anchor jumps (and scrollIntoView calls) from landing behind the
+     sticky nav. --live-nav-height is kept in sync with the header's actual
+     rendered height by _index.ts; --navigation-height is a static fallback
+     for the brief window before that JS has run. */
+  scroll-padding-top: var(--live-nav-height, var(--navigation-height));
 }
 
 body {
