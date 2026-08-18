@@ -1,0 +1,13 @@
+/*
+ * Hides the decoy input without using display:none. A bot that computes styles can trivially see that a
+ * display:none field is not rendered; an off-screen field is rendered, occupies layout, and takes more work to
+ * distinguish from a real one. Screen readers never reach it because the wrapper is aria-hidden.
+ */
+.ucfsg-decoy {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

@@ -57,6 +57,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.BlogAnnoun
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.BlogAnnouncements.Tests", "tests\UmbracoCommunity.BlogAnnouncements.Tests\UmbracoCommunity.BlogAnnouncements.Tests.csproj", "{EDE3357E-8AA0-45BB-9271-C958C4C9559E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Community.FormsSpamGuard", "src\Umbraco.Community.FormsSpamGuard\Umbraco.Community.FormsSpamGuard.csproj", "{4818E83F-3A24-45BF-9208-986144477E96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Community.FormsSpamGuard.Tests", "tests\Umbraco.Community.FormsSpamGuard.Tests\Umbraco.Community.FormsSpamGuard.Tests.csproj", "{610F1BA5-4D2C-489E-A06F-7295A2E5392E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +190,30 @@ Global
 		{EDE3357E-8AA0-45BB-9271-C958C4C9559E}.Release|x64.Build.0 = Release|Any CPU
 		{EDE3357E-8AA0-45BB-9271-C958C4C9559E}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDE3357E-8AA0-45BB-9271-C958C4C9559E}.Release|x86.Build.0 = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|x64.Build.0 = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Debug|x86.Build.0 = Debug|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|x64.ActiveCfg = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|x64.Build.0 = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|x86.ActiveCfg = Release|Any CPU
+		{4818E83F-3A24-45BF-9208-986144477E96}.Release|x86.Build.0 = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|x64.Build.0 = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Debug|x86.Build.0 = Debug|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x64.ActiveCfg = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x64.Build.0 = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x86.ActiveCfg = Release|Any CPU
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,6 +223,8 @@ Global
 		{F9228C67-C7CD-4E48-AE55-87EAE0A8DC6F} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{82866E8E-8997-4167-8D8E-0B7589A0AB03} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{EDE3357E-8AA0-45BB-9271-C958C4C9559E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{4818E83F-3A24-45BF-9208-986144477E96} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{610F1BA5-4D2C-489E-A06F-7295A2E5392E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F82B796A-0297-45AF-BD1E-5CA3C452ED80}

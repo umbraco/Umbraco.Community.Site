@@ -70,6 +70,7 @@
   <ItemGroup>
     <ProjectReference Include="..\UmbracoCommunity.Extensions\UmbracoCommunity.Extensions.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.BlockRestrictions\UmbracoCommunity.BlockRestrictions.csproj" />
+    <ProjectReference Include="..\Umbraco.Community.FormsSpamGuard\Umbraco.Community.FormsSpamGuard.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

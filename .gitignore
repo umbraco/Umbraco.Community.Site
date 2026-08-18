@@ -415,6 +415,11 @@ healthchecksdb
 **/Views/Partials/Forms/Export/excel.cshtml
 **/Views/Partials/Forms/Themes/bootstrap3-horizontal/
 **/Views/Partials/Forms/Themes/default/
+# ...except the field views shipped by our own Forms packages. Those rules above exist to keep the
+# Forms-installed default theme out of the repo, but a package that ships a field type puts its view at
+# the same conventional path so that consumers can still theme-override it.
+!/src/Umbraco.Community.FormsSpamGuard/Views/Partials/Forms/Themes/default/
+!/src/Umbraco.Community.FormsSpamGuard/Views/Partials/Forms/Themes/default/**
 
 # Tests
 tests/**/appsettings-schema.*.json
@@ -455,6 +460,7 @@ App_Data/
 /src/UmbracoCommunity.BlockRestrictions/wwwroot/App_Plugins/
 /src/Umbraco.Community.NotFoundTracker/wwwroot/App_Plugins/
 /src/UmbracoCommunity.BlogAnnouncements/wwwroot/App_Plugins/
+/src/Umbraco.Community.FormsSpamGuard/wwwroot/App_Plugins/
 .claude
 .mcp.json
 src/UmbracoCommunity.Web.UI/Hangfire.db*

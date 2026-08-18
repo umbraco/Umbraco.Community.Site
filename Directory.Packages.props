@@ -22,6 +22,9 @@
     <PackageVersion Include="Umbraco.Deploy.Core" Version="18.0.1" />
     <!-- Umbraco Forms -->
     <PackageVersion Include="Umbraco.Forms" Version="18.0.6" />
+    <PackageVersion Include="Umbraco.Forms.Core" Version="18.0.6" />
+    <PackageVersion Include="Umbraco.Forms.Core.Providers" Version="18.0.6" />
+    <PackageVersion Include="Umbraco.Forms.Web" Version="18.0.6" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
     <PackageVersion Include="Umbraco.AI" Version="18.3.1" />
