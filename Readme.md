@@ -59,5 +59,5 @@ tools\upgrade-umbraco\bin\Debug\net10.0\upgrade-umbraco.exe all
 
 See [tools/upgrade-umbraco/README.md](tools/upgrade-umbraco/README.md) for full documentation.
 
-<!-- no-op: trigger a fresh Cloud deploy -->
+<!-- no-op: trigger a fresh Cloud deploy with a new run number -->
 
