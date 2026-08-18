@@ -57,11 +57,24 @@
         {
             var smallImage = block.Image.GetCropUrl(width: 375, height: 375);
             var largeImage = block.Image.GetCropUrl(width: 750, height: 750);
+            bool hasCaption = !string.IsNullOrWhiteSpace(block.ImageCaption);
 
             <div class="dc-faqs-and-image-block__image-container">
-                <img srcset="@smallImage 375w, @largeImage 750w" sizes="(max-width: 400px) 375px, 750px"
-                     src="@largeImage" alt="@block.AltText"
-                     loading="lazy" />
+                @if (hasCaption)
+                {
+                    <figure>
+                        <img srcset="@smallImage 375w, @largeImage 750w" sizes="(max-width: 400px) 375px, 750px"
+                             src="@largeImage" alt="@block.AltText"
+                             loading="lazy" />
+                        <figcaption>@block.ImageCaption</figcaption>
+                    </figure>
+                }
+                else
+                {
+                    <img srcset="@smallImage 375w, @largeImage 750w" sizes="(max-width: 400px) 375px, 750px"
+                         src="@largeImage" alt="@block.AltText"
+                         loading="lazy" />
+                }
             </div>
         }
     }

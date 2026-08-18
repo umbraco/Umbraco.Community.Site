@@ -15,11 +15,25 @@
         var typedBlock = block.Content as ImageBlock;
         if (typedBlock?.Image != null)
         {
+            bool hasCaption = !string.IsNullOrWhiteSpace(typedBlock.ImageCaption);
             <div class="dc-image-and-text-block__image-container">
-                <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
-                     sizes="(max-width: 400px) 386px, 906px"
-                     src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
-                     loading="lazy" />
+                @if (hasCaption)
+                {
+                    <figure>
+                        <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
+                             sizes="(max-width: 400px) 386px, 906px"
+                             src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                             loading="lazy" />
+                        <figcaption>@typedBlock.ImageCaption</figcaption>
+                    </figure>
+                }
+                else
+                {
+                    <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
+                         sizes="(max-width: 400px) 386px, 906px"
+                         src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                         loading="lazy" />
+                }
             </div>
         }
     }
