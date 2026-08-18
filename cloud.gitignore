@@ -414,3 +414,10 @@ healthchecksdb
 **/Views/Partials/Forms/Export/excel.cshtml
 **/Views/Partials/Forms/Themes/bootstrap3-horizontal/
 **/Views/Partials/Forms/Themes/default/
+# ...except the field views shipped by our own Forms packages. These rules keep the Forms-installed
+# default theme out of the repo, but a package that ships a field type puts its view at the same
+# conventional path so consumers can still theme-override it. Cloud honours this file when it commits
+# the uploaded source, so without the negation the view never reaches the build, the RCL compiles
+# without it, and every page rendering that form 500s. Keep in step with the block in .gitignore.
+!/src/Umbraco.Community.FormsSpamGuard/Views/Partials/Forms/Themes/default/
+!/src/Umbraco.Community.FormsSpamGuard/Views/Partials/Forms/Themes/default/**

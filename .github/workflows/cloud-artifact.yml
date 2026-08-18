@@ -103,6 +103,15 @@ jobs:
         run: npm ci && npm run build
         shell: bash
 
+      # build the forms spam guard client assets
+      # NOTE: this one is not just a backoffice dashboard. Client/public also holds spam-guard.css, which hides
+      # the decoy field on the public site. wwwroot/App_Plugins is gitignored, so without this step the CSS is
+      # absent from the artifact and the decoy renders as a visible text box to every visitor.
+      - name: Build forms spam guard client
+        working-directory: src/Umbraco.Community.FormsSpamGuard/Client
+        run: npm ci && npm run build
+        shell: bash
+
       # zip everything, except what is defined in the 'cloud.zipignore'
       - name: Zip Source Code
         run: |
