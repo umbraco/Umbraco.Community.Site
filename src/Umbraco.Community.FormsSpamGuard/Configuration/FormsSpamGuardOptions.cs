@@ -20,4 +20,12 @@ public sealed class FormsSpamGuardOptions
     /// thresholds are tuned.
     /// </summary>
     public LogLevel RejectionLogLevel { get; set; } = LogLevel.Warning;
+
+    /// <summary>
+    /// The level at which accepted submissions are logged. A rejection is otherwise the only outcome that leaves
+    /// a trace, which makes "nothing was logged" ambiguous between "it passed" and "this field never ran at all"
+    /// (e.g. every signal disabled, or the field misplaced on a non-final page). Defaults alongside the site's
+    /// default minimum level so it is visible without extra configuration.
+    /// </summary>
+    public LogLevel AcceptanceLogLevel { get; set; } = LogLevel.Information;
 }

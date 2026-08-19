@@ -45,6 +45,19 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
         public const string TokenUnreadable = "TokenUnreadable";
     }
 
+    /// <summary>
+    /// Values of the <c>Signal</c> log property on an acceptance, i.e. not the name of an <see cref="ISpamSignal"/>
+    /// that tripped.
+    /// </summary>
+    internal static class AcceptanceReasons
+    {
+        /// <summary>Every signal ran and none of them objected.</summary>
+        public const string Passed = "Passed";
+
+        /// <summary>The editor switched off every signal, so the field is deliberately inert.</summary>
+        public const string AllSignalsDisabled = "AllSignalsDisabled";
+    }
+
     /// <summary>Scoped per field so two spam guard fields on one form cannot overwrite each other.</summary>
     private static string FillDurationItemKey(Field field) => FillDurationItemKeyPrefix + field.Id;
 
@@ -182,10 +195,12 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
     {
         SpamGuardFieldSettings settings = ResolveSettings();
 
-        // With every signal switched off the field is inert. Say nothing and let the submission through rather
-        // than failing closed on what is plainly a deliberate configuration.
+        // With every signal switched off the field is inert. Let the submission through rather than failing
+        // closed on what is plainly a deliberate configuration — but still log it, the same as any other
+        // outcome, so this doesn't read as "the field silently did nothing" to whoever is checking.
         if (_signals.Any(x => x.IsEnabled(settings)) == false)
         {
+            Accept(form, field, AcceptanceReasons.AllSignalsDisabled, "Every signal is disabled on this field.");
             return [];
         }
 
@@ -238,6 +253,7 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
             context.Items[FillDurationItemKey(field)] = (now - token.RenderedUtc).TotalSeconds;
         }
 
+        Accept(form, field, AcceptanceReasons.Passed, $"Decoy field: '{token.DecoyFieldName}'.");
         return [];
     }
 
@@ -281,6 +297,24 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
         return [string.IsNullOrWhiteSpace(ErrorMessage)
             ? "We couldn't process this submission. Please try again."
             : ErrorMessage];
+    }
+
+    /// <summary>
+    /// Records that a submission passed. Without this, a rejection is the only outcome that leaves a trace, so
+    /// "no log line" is ambiguous between "this passed" and "this field never ran" (wrong page, wrong fieldset,
+    /// every signal disabled). Deliberately silent on which decoy name or timing passed — that's for tuning, not
+    /// for a bot reading the response, and this never reaches the response anyway; it's a log-only record.
+    /// </summary>
+    private void Accept(Form form, Field field, string signal, string reason)
+    {
+        _logger.Log(
+            _options.AcceptanceLogLevel,
+            "Spam guard accepted a submission. Signal: {Signal}. Form: '{FormName}' ({FormId}), field: '{FieldCaption}'. {Reason}",
+            signal,
+            form.Name,
+            form.Id,
+            field.Caption,
+            reason);
     }
 
     private static string? ReadPostedValue(HttpContext context, string key)

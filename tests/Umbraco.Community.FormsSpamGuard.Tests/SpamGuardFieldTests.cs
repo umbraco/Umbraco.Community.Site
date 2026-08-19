@@ -221,6 +221,37 @@ public class SpamGuardFieldTests
     }
 
     [Fact]
+    public void Logs_an_acceptance_when_every_signal_passes()
+    {
+        // A rejection was otherwise the only outcome that left a trace, which made "nothing logged" ambiguous
+        // between "this passed" and "this field never ran at all" (wrong page, wrong fieldset, config error).
+        var logger = new CapturingLogger();
+        SpamGuardField field = CreateField(logger: logger);
+
+        SpamGuardToken token = TestHelpers.CreateToken(renderedUtc: TestHelpers.Now.AddSeconds(-20));
+        Validate(field, CreateRequest(new Dictionary<string, string>
+        {
+            [FieldId + Constants.FormKeys.TokenSuffix] = _tokenService.Protect(token),
+        })).Should().BeEmpty();
+
+        logger.Messages.Should().ContainSingle().Which.Should().Contain("accepted").And.Contain("Passed");
+    }
+
+    [Fact]
+    public void Logs_an_acceptance_when_every_signal_is_disabled()
+    {
+        var logger = new CapturingLogger();
+        SpamGuardField field = CreateField(logger: logger);
+        field.EnableDecoyField = "False";
+        field.EnableTimingCheck = "False";
+        field.RequireJavaScript = "False";
+
+        Validate(field, CreateRequest([])).Should().BeEmpty();
+
+        logger.Messages.Should().ContainSingle().Which.Should().Contain("accepted").And.Contain("AllSignalsDisabled");
+    }
+
+    [Fact]
     public void Evaluates_signals_in_order_and_stops_at_the_first_failure()
     {
         var recorder = new RecordingSignal();

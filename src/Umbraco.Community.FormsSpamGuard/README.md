@@ -113,7 +113,8 @@ Site-wide options bind from `UmbracoCommunity:FormsSpamGuard`:
   "UmbracoCommunity": {
     "FormsSpamGuard": {
       "DataProtectionPurpose": "Umbraco.Community.FormsSpamGuard.v1",
-      "RejectionLogLevel": "Warning"
+      "RejectionLogLevel": "Warning",
+      "AcceptanceLogLevel": "Information"
     }
   }
 }
@@ -156,7 +157,14 @@ nothing about which of the three checks caught it.
 A rejected submission is **never stored** — there is no record, no entry in the list, and workflows never run.
 The log line is the only record that it happened, so this is where you look.
 
-Every rejection logs at `Warning` (configurable) with a `Signal` property naming exactly what caught it:
+**Every outcome is logged, not just rejections.** An earlier version only logged when a submission was rejected,
+which made "nothing in the log" ambiguous between "this passed" and "the field never ran at all" — misplaced on
+a non-final page, sitting in a hidden fieldset, or every signal switched off. Both outcomes now log, at different
+levels so they can be filtered independently: rejections at `Warning` (configurable via `RejectionLogLevel`),
+acceptances at `Information` (configurable via `AcceptanceLogLevel`). Neither log line reveals anything to the
+visitor — this is server-side only, same as the rejection reason always was.
+
+Every rejection logs with a `Signal` property naming exactly what caught it:
 
 | `Signal` | Means | What to do |
 | --- | --- | --- |
@@ -166,17 +174,32 @@ Every rejection logs at `Warning` (configurable) with a `Signal` property naming
 | `SubmissionTimingSignal` | Too fast, or older than the maximum | Check the elapsed time in the message before tightening the minimum |
 | `JavaScriptTokenSignal` | Scripts did not run, or the answer was wrong | If this spikes after a deploy, suspect drift between `spam-guard.js` and the C# side |
 
+Every acceptance logs with the same `Signal` property, naming why it passed rather than what caught it:
+
+| `Signal` | Means |
+| --- | --- |
+| `Passed` | Every enabled signal ran and none of them objected |
+| `AllSignalsDisabled` | Every signal is switched off on this field, so it let the submission through without evaluating anything |
+
+If you expect a form to be checked and see neither a rejection nor a `Passed`/`AllSignalsDisabled` acceptance for
+a submission you know happened, the field itself never ran — go back to the three things in
+[the section above](#three-things-that-will-silently-stop-it-working).
+
 In **Settings → Log Viewer**, these all work as queries:
 
 ```
 SourceContext = 'Umbraco.Community.FormsSpamGuard.FieldTypes.SpamGuardField'
 Signal = 'TokenUnreadable'
 Signal = 'DecoyFieldSignal'
+Signal = 'AllSignalsDisabled'
 @Message like '%Spam guard rejected%'
+@Message like '%Spam guard accepted%'
 ```
 
-The first is the one to save — it shows every rejection from the field and nothing else. `Signal = 'TokenUnreadable'`
-is the one worth alerting on: at anything above a trickle it is an outage, not a spam report.
+The first is the one to save — it shows every outcome from the field and nothing else. `Signal = 'TokenUnreadable'`
+is the one worth alerting on: at anything above a trickle it is an outage, not a spam report. `Signal =
+'AllSignalsDisabled'` is worth a one-off check the first time you see it — it usually means a form was set up
+with every toggle turned off during testing and never turned back on.
 
 ## Relationship to the built-in honeypot
 
