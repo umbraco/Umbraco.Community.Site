@@ -104,6 +104,7 @@ nothing until an editor places it on a form.
 | Maximum form age (hours) | 2 | |
 | Decoy field label | `Enquiry reference` | Must stay outside autofill vocabulary — see below |
 | Error message | generic fallback | Keep it generic — see below |
+| Log submitted values on rejection | Off | Writes the visitor's other field values into the **rejection** log, so a false positive can be recovered by hand — see below |
 | Save fill duration | Off | Stores fill time (e.g. `71.8s`) on **successful** submissions, for tuning the minimum |
 
 Site-wide options bind from `UmbracoCommunity:FormsSpamGuard`:
@@ -151,6 +152,19 @@ This differs from Forms' built-in honeypot, which fakes success and silently dis
 discard is the worse failure: a false positive — autofill, an unusually quick genuine visitor, a stale page —
 costs a real enquiry with no visible trace. A visible generic error lets a real person retry while telling a bot
 nothing about which of the three checks caught it.
+
+### Recovering a false positive
+
+A rejected submission is **never stored**, so a real enquiry caught by a false positive has nowhere to be
+recovered from by default — the visitor sees a generic error and, if they don't retry, it's simply gone.
+
+Turn on **Log submitted values on rejection** to change that: every rejection then also logs the visitor's other
+field values (`Caption: 'value'` pairs) so you can read them back out of the log and follow up by hand. Any field
+the editor marked **Contains sensitive data** in Forms is always left out, regardless of this setting.
+
+This is off by default because it writes personal data into your application logs, which typically have
+different retention and access controls than stored form submissions — decide deliberately, per form, whether
+that trade-off is acceptable, rather than assuming your log retention already matches your data retention policy.
 
 ### Reading the logs
 

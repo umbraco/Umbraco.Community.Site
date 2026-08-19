@@ -44,13 +44,29 @@ public class SpamGuardFieldTests
     }
 
     private IEnumerable<string> Validate(SpamGuardField field, HttpContext context) =>
+        Validate(field, context, new Form { Name = "Contact", Id = Guid.NewGuid() });
+
+    private IEnumerable<string> Validate(SpamGuardField field, HttpContext context, Form form) =>
         field.ValidateField(
-            new Form { Name = "Contact", Id = Guid.NewGuid() },
+            form,
             new Field { Id = FieldId, Caption = "Spam guard" },
             [],
             context,
             Mock.Of<IPlaceholderParsingService>(),
             Mock.Of<IFieldTypeStorage>());
+
+    /// <summary>Builds a form whose <see cref="Form.AllFields"/> includes the spam guard field plus the given ones.</summary>
+    private static Form CreateFormWithFields(params Field[] otherFields)
+    {
+        var container = new FieldsetContainer
+        {
+            Fields = [new Field { Id = FieldId, Caption = "Spam guard" }, ..otherFields],
+        };
+        var fieldSet = new FieldSet { Containers = [container] };
+        var page = new Page { FieldSets = [fieldSet] };
+
+        return new Form { Name = "Contact", Id = Guid.NewGuid(), Pages = [page] };
+    }
 
     [Fact]
     public void Accepts_a_clean_submission()
@@ -218,6 +234,64 @@ public class SpamGuardFieldTests
         field.RequireJavaScript = "False";
 
         Validate(field, CreateRequest([])).Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Does_not_include_submitted_values_in_the_rejection_log_by_default()
+    {
+        var logger = new CapturingLogger();
+        SpamGuardField field = CreateField(logger: logger);
+        var nameField = new Field { Id = Guid.NewGuid(), Caption = "Name" };
+        Form form = CreateFormWithFields(nameField);
+
+        Validate(field, CreateRequest(new Dictionary<string, string>
+        {
+            [nameField.Id.ToString()] = "Cheap viagra, click here",
+        }), form);
+
+        logger.Messages.Should().ContainSingle().Which.Should().NotContain("Cheap viagra");
+    }
+
+    [Fact]
+    public void Includes_submitted_values_in_the_rejection_log_when_enabled()
+    {
+        var logger = new CapturingLogger();
+        SpamGuardField field = CreateField(logger: logger);
+        field.LogRejectedSubmissionValues = "True";
+
+        var nameField = new Field { Id = Guid.NewGuid(), Caption = "Name" };
+        var emailField = new Field { Id = Guid.NewGuid(), Caption = "Email" };
+        Form form = CreateFormWithFields(nameField, emailField);
+
+        Validate(field, CreateRequest(new Dictionary<string, string>
+        {
+            [nameField.Id.ToString()] = "John Bot",
+            [emailField.Id.ToString()] = "bot@spam.example",
+        }), form);
+
+        logger.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Name: 'John Bot'").And.Contain("Email: 'bot@spam.example'");
+    }
+
+    [Fact]
+    public void Excludes_fields_the_editor_marked_as_containing_sensitive_data()
+    {
+        var logger = new CapturingLogger();
+        SpamGuardField field = CreateField(logger: logger);
+        field.LogRejectedSubmissionValues = "True";
+
+        var nameField = new Field { Id = Guid.NewGuid(), Caption = "Name" };
+        var ssnField = new Field { Id = Guid.NewGuid(), Caption = "Social Security Number", ContainsSensitiveData = true };
+        Form form = CreateFormWithFields(nameField, ssnField);
+
+        Validate(field, CreateRequest(new Dictionary<string, string>
+        {
+            [nameField.Id.ToString()] = "John Bot",
+            [ssnField.Id.ToString()] = "123-45-6789",
+        }), form);
+
+        logger.Messages.Should().ContainSingle()
+            .Which.Should().Contain("Name: 'John Bot'").And.NotContain("123-45-6789");
     }
 
     [Fact]

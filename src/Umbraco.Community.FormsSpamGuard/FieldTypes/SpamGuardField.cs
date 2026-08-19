@@ -161,6 +161,17 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
     public virtual string ErrorMessage { get; set; } = string.Empty;
 
     [Setting(
+        "Log submitted values on rejection",
+        Description = "Write the visitor's submitted values (e.g. name, email, message) into the rejection log "
+            + "entry, so a genuine enquiry caught by a false positive can be recovered by hand. Fields the editor "
+            + "marked \"Contains sensitive data\" are always left out. Off by default: this writes personal data "
+            + "into application logs, which usually have different retention and access than stored form "
+            + "submissions — turn this on only if that trade-off is acceptable for this form.",
+        View = "Umb.PropertyEditorUi.Toggle",
+        DisplayOrder = 75)]
+    public virtual string LogRejectedSubmissionValues { get; set; } = string.Empty;
+
+    [Setting(
         "Save fill duration",
         Description = "Store how long the visitor took, e.g. \"71.8s\", against the submission. Useful for tuning the minimum fill time against real timings rather than guesswork. Shown in the entry under this field's caption, so give the field a caption that makes the number make sense.",
         View = "Umb.PropertyEditorUi.Toggle",
@@ -217,7 +228,7 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
         // posting "{fieldId}_sg= " would otherwise fall through and raise the infrastructure alarm below.
         if (string.IsNullOrWhiteSpace(protectedToken))
         {
-            return Reject(form, field, RejectionSignals.TokenAbsent,
+            return Reject(form, field, context, RejectionSignals.TokenAbsent,
                 "No token was posted; the submission did not come from a rendered form.");
         }
 
@@ -226,6 +237,7 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
             return Reject(
                 form,
                 field,
+                context,
                 RejectionSignals.TokenUnreadable,
                 "A token was posted but could not be unprotected. If this is not isolated, check that Data "
                 + "Protection keys are shared across instances — every submission will be rejected until they are.");
@@ -244,7 +256,7 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
             SpamSignalResult result = signal.Evaluate(signalContext);
             if (result.IsSpam)
             {
-                return Reject(form, field, signal.Name, result.Reason ?? string.Empty);
+                return Reject(form, field, context, signal.Name, result.Reason ?? string.Empty);
             }
         }
 
@@ -280,23 +292,69 @@ public class SpamGuardField : Umbraco.Forms.Core.FieldType
     /// simply waits; one told "leave that field alone" simply does. The log carries the real reason so the site
     /// owner can tune thresholds and spot false positives.
     /// </remarks>
-    private string[] Reject(Form form, Field field, string signal, string reason)
+    private string[] Reject(Form form, Field field, HttpContext context, string signal, string reason)
     {
         // Signal is its own structured property rather than being folded into Reason, so the Umbraco log viewer
         // can filter on it directly (Signal = 'TokenUnreadable') instead of substring-matching free text. Since
         // a rejected submission is never stored, this log line is the only record that it happened.
-        _logger.Log(
-            _options.RejectionLogLevel,
-            "Spam guard rejected a submission. Signal: {Signal}. Form: '{FormName}' ({FormId}), field: '{FieldCaption}'. {Reason}",
-            signal,
-            form.Name,
-            form.Id,
-            field.Caption,
-            reason);
+        if (ParseBool(LogRejectedSubmissionValues))
+        {
+            _logger.Log(
+                _options.RejectionLogLevel,
+                "Spam guard rejected a submission. Signal: {Signal}. Form: '{FormName}' ({FormId}), field: "
+                + "'{FieldCaption}'. {Reason} Submitted values: {SubmittedValues}",
+                signal,
+                form.Name,
+                form.Id,
+                field.Caption,
+                reason,
+                BuildSubmittedValuesSummary(form, field, context));
+        }
+        else
+        {
+            _logger.Log(
+                _options.RejectionLogLevel,
+                "Spam guard rejected a submission. Signal: {Signal}. Form: '{FormName}' ({FormId}), field: '{FieldCaption}'. {Reason}",
+                signal,
+                form.Name,
+                form.Id,
+                field.Caption,
+                reason);
+        }
 
         return [string.IsNullOrWhiteSpace(ErrorMessage)
             ? "We couldn't process this submission. Please try again."
             : ErrorMessage];
+    }
+
+    /// <summary>
+    /// Renders every other field's posted value as "Caption: 'value'" pairs, for an operator to recover a
+    /// genuine enquiry that a false positive rejected. Skips this field itself (it never posts a value under
+    /// its own key anyway), any field the editor marked <see cref="Field.ContainsSensitiveData"/>, and any
+    /// field that posted nothing — a bot that never got as far as the visible fields shouldn't produce a wall
+    /// of empty pairs.
+    /// </summary>
+    private static string BuildSubmittedValuesSummary(Form form, Field field, HttpContext context)
+    {
+        List<string> pairs = [];
+
+        foreach (Field other in form.AllFields)
+        {
+            if (other.Id == field.Id || other.ContainsSensitiveData)
+            {
+                continue;
+            }
+
+            var value = ReadPostedValue(context, other.Id.ToString());
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                continue;
+            }
+
+            pairs.Add($"{other.Caption}: '{value}'");
+        }
+
+        return pairs.Count == 0 ? "(none captured)" : string.Join("; ", pairs);
     }
 
     /// <summary>
