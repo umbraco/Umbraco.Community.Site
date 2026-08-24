@@ -100,7 +100,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
         var knownIds = known.Select(k => k.PlatformPostId).ToHashSet();
         var knownFingerprints = known.Select(k => k.Fingerprint).ToHashSet(StringComparer.Ordinal);
 
-        var newCount = 0;
+        var added = new List<AnnouncedBlogPost>();
         var skippedCount = 0;
         var trackedCandidates = new List<(Guid PlatformPostId, AnnouncementCandidatePost Post)>();
 
@@ -128,7 +128,7 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
 
             var publishedAtUtc = post.PublishedAt.UtcDateTime;
             var withinWindow = publishedAtUtc >= windowStartUtc;
-            db.AnnouncedBlogPosts.Add(new AnnouncedBlogPost
+            var row = new AnnouncedBlogPost
             {
                 PlatformPostId = platformPostId,
                 Url = post.Url,
@@ -142,11 +142,12 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
                 AuthorProfileUrl = post.AuthorProfileUrl,
                 Excerpt = post.Excerpt,
                 CoverImageUrl = post.CoverImageUrl,
-            });
+            };
+            db.AnnouncedBlogPosts.Add(row);
+            added.Add(row);
 
             knownIds.Add(platformPostId);
             knownFingerprints.Add(fingerprint);
-            newCount++;
             if (!withinWindow)
             {
                 skippedCount++;
@@ -156,8 +157,60 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
         await RefreshTrackedMetadataAsync(db, trackedCandidates, cancellationToken);
 
         // EF only writes modified columns; when nothing is new and nothing changed, this is a no-op.
-        await db.SaveChangesAsync(cancellationToken);
-        return (newCount, skippedCount);
+        var lostRaces = await SaveIngestAsync(db, added, cancellationToken);
+
+        // Rows another cycle inserted first aren't ours to count as new (or as skipped).
+        return (added.Count - lostRaces.Count,
+            skippedCount - lostRaces.Count(p => p.Status == AnnouncementStatus.SkippedTooOld));
+    }
+
+    /// <summary>
+    /// Commits the ingest, recovering from the one collision the read-then-insert above can lose:
+    /// a concurrent poll cycle (see <see cref="AnnouncementClaims"/> for why cycles overlap)
+    /// inserting the same post between our read of the known ids and this write, which the primary
+    /// key then rejects. The rows the other cycle got in first are dropped and the rest committed,
+    /// so a lost race costs us nothing rather than failing the whole cycle. Returns the dropped
+    /// rows. Anything else — a genuine constraint or connection failure — propagates.
+    /// </summary>
+    private async Task<IReadOnlyCollection<AnnouncedBlogPost>> SaveIngestAsync(
+        BlogAnnouncementsDbContext db,
+        IReadOnlyCollection<AnnouncedBlogPost> added,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+            return [];
+        }
+        catch (DbUpdateException) when (added.Count > 0)
+        {
+            // Nothing was committed (EF batches the insert in one transaction), so the entities are
+            // still Added and the retry below re-sends whatever survives.
+            var ids = added.Select(p => p.PlatformPostId).ToList();
+            var alreadyStored = await db.AnnouncedBlogPosts
+                .AsNoTracking()
+                .Where(p => ids.Contains(p.PlatformPostId))
+                .Select(p => p.PlatformPostId)
+                .ToListAsync(cancellationToken);
+
+            if (alreadyStored.Count == 0)
+            {
+                throw;
+            }
+
+            var dropped = added.Where(p => alreadyStored.Contains(p.PlatformPostId)).ToList();
+            foreach (var row in dropped)
+            {
+                db.Entry(row).State = EntityState.Detached;
+            }
+
+            _logger.LogInformation(
+                "Dropped {Count} post(s) a concurrent cycle ingested first: {Titles}.",
+                dropped.Count, string.Join(", ", dropped.Select(p => p.Title)));
+
+            await db.SaveChangesAsync(cancellationToken);
+            return dropped;
+        }
     }
 
     /// <summary>
@@ -221,11 +274,20 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
     /// </summary>
     private static readonly TimeSpan InterMessageDelay = TimeSpan.FromSeconds(1);
 
+    /// <summary>The states the automatic cycle may claim a row out of — its own queue.</summary>
+    private static readonly AnnouncementStatus[] ClaimableStatuses =
+        [AnnouncementStatus.Pending, AnnouncementStatus.Failed];
+
     /// <summary>
     /// Delivers Pending + Failed posts. Selection keeps the cap's guardrail semantics (the
     /// <em>newest</em> posts win a slot when over cap); delivery then runs strictly sequentially,
     /// oldest first with PlatformPostId as a tie-break (upstream publish times are often date-only
     /// midnights), so the channel reads chronologically and the order is deterministic.
+    ///
+    /// Every post is claimed in the database before it is sent and settled straight after, one row
+    /// at a time — see <see cref="AnnouncementClaims"/>. That's what stops a concurrent cycle
+    /// (second instance, overlapping schedule) announcing the same post twice, and it also means a
+    /// process that dies mid-cycle can't lose the outcome of sends it already made.
     /// Returns (announced, failed).
     /// </summary>
     private async Task<(int Announced, int Failed)> DeliverQueueAsync(
@@ -240,7 +302,19 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
             return (0, 0);
         }
 
+        // Claims abandoned by a crashed or recycled process would otherwise block their post forever.
+        var released = await AnnouncementClaims.ReleaseStaleClaimsAsync(db, nowUtc, cancellationToken);
+        if (released > 0)
+        {
+            _logger.LogWarning(
+                "Reverted {Count} stale delivery claim(s) (older than {Timeout}) to Failed for retry.",
+                released, AnnouncementClaims.StaleClaimTimeout);
+        }
+
+        // AsNoTracking: the rows are moved through Claimed and their outcome by AnnouncementClaims'
+        // conditional updates, so nothing here may also be written via the change tracker.
         var selected = await db.AnnouncedBlogPosts
+            .AsNoTracking()
             .Where(p => p.Status == AnnouncementStatus.Pending || p.Status == AnnouncementStatus.Failed)
             .OrderByDescending(p => p.PublishedAtUtc)
             .ThenBy(p => p.PlatformPostId)
@@ -258,6 +332,19 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
         for (var i = 0; i < queue.Count; i++)
         {
             var post = queue[i];
+
+            // Commit the claim before sending: a concurrent cycle that read the same row loses
+            // this update and skips the post rather than announcing it a second time.
+            var claimed = await AnnouncementClaims.TryClaimAsync(
+                db, post.PlatformPostId, nowUtc, ClaimableStatuses, cancellationToken);
+            if (!claimed)
+            {
+                _logger.LogInformation(
+                    "Skipping '{Title}' — another delivery claimed it first (concurrent cycle).",
+                    post.Title);
+                continue;
+            }
+
             var payload = AnnouncementPayloadFactory.FromPost(post);
 
             DeliveryResult result;
@@ -280,22 +367,31 @@ public sealed class BlogAnnouncementDetector : IBlogAnnouncementDetector
                 Destination = "Discord",
                 Outcome = result.DryRun ? "DryRun" : result.Success ? "Success" : "Failed",
             });
+            await db.SaveChangesAsync(cancellationToken);
+
+            // Dry-run posts nothing, so the claim is released back to the pre-claim state.
+            var settledStatus = result.DryRun
+                ? post.Status
+                : result.Success
+                    ? AnnouncementStatus.Announced
+                    : AnnouncementStatus.Failed;
+            var announcedUtc = !result.DryRun && result.Success ? nowUtc : post.AnnouncedUtc;
+
+            await AnnouncementClaims.SettleAsync(
+                db, post.PlatformPostId, settledStatus, announcedUtc, cancellationToken);
 
             if (result.DryRun)
             {
-                // Dry-run: leave the row Pending and post nothing (no spacing needed either).
+                // No message was sent, so no spacing is needed either.
                 continue;
             }
 
             if (result.Success)
             {
-                post.Status = AnnouncementStatus.Announced;
-                post.AnnouncedUtc = nowUtc;
                 announcedCount++;
             }
             else
             {
-                post.Status = AnnouncementStatus.Failed;
                 failedCount++;
             }
 

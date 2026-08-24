@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UmbracoCommunity.BlogAnnouncements.Infrastructure;
 
@@ -10,9 +11,11 @@ using UmbracoCommunity.BlogAnnouncements.Infrastructure;
 namespace UmbracoCommunity.BlogAnnouncements.Migrations
 {
     [DbContext(typeof(BlogAnnouncementsDbContext))]
-    partial class BlogAnnouncementsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260824084602_AddDeliveryClaim")]
+    partial class AddDeliveryClaim
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");

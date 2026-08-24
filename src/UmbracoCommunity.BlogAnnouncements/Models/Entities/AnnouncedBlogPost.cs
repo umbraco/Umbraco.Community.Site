@@ -31,6 +31,13 @@ public class AnnouncedBlogPost
 
     public AnnouncementStatus Status { get; set; } = AnnouncementStatus.Pending;
 
+    /// <summary>
+    /// When a cycle claimed this row for delivery (see <see cref="AnnouncementStatus.Claimed"/>).
+    /// Null in every other state. Used to detect and revert claims abandoned by a crashed or
+    /// recycled process.
+    /// </summary>
+    public DateTime? ClaimedUtc { get; set; }
+
     // Denormalised post fields (for the dashboard and the Discord payload).
     public string? AuthorName { get; set; }
     public string? AuthorAvatarUrl { get; set; }

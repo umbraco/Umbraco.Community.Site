@@ -54,8 +54,22 @@ public sealed class BlogAnnouncementDashboardService
 {
     private const int DefaultWindowDays = 30;
 
-    // In-flight guard across all requests — the service is a singleton.
+    // In-flight guard across all requests — the service is a singleton. Backed by a database
+    // claim (see AnnouncementClaims) for the cross-process case.
     private readonly ConcurrentDictionary<Guid, byte> _inFlight = new();
+
+    /// <summary>
+    /// The states a manual delivery may claim a row out of — anything but an in-flight one. Repost
+    /// deliberately includes already-announced rows; that's the point of it.
+    /// </summary>
+    private static readonly AnnouncementStatus[] ManuallyClaimableStatuses =
+    [
+        AnnouncementStatus.Pending,
+        AnnouncementStatus.Announced,
+        AnnouncementStatus.SkippedTooOld,
+        AnnouncementStatus.Suppressed,
+        AnnouncementStatus.Failed,
+    ];
 
     private readonly IDbContextFactory<BlogAnnouncementsDbContext> _contextFactory;
     private readonly IDiscordAnnouncer _announcer;
@@ -232,7 +246,10 @@ public sealed class BlogAnnouncementDashboardService
         {
             await using var db = await _contextFactory.CreateDbContextAsync(ct);
 
-            var post = await db.AnnouncedBlogPosts.FirstOrDefaultAsync(p => p.PlatformPostId == platformPostId, ct);
+            // AsNoTracking: the row's status is moved by AnnouncementClaims' conditional updates
+            // below, so it must not also be written through the change tracker.
+            var post = await db.AnnouncedBlogPosts.AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PlatformPostId == platformPostId, ct);
             if (post is null)
             {
                 return new ManualAnnounceResult(ManualAnnounceOutcome.PostNotFound);
@@ -245,6 +262,16 @@ public sealed class BlogAnnouncementDashboardService
             }
 
             var nowUtc = _time.GetUtcNow().UtcDateTime;
+
+            // The in-flight dictionary above only guards this process; the automatic cycle may be
+            // delivering the same post from another instance. Claiming decides it in the database.
+            var claimed = await AnnouncementClaims.TryClaimAsync(
+                db, platformPostId, nowUtc, ManuallyClaimableStatuses, ct);
+            if (!claimed)
+            {
+                return new ManualAnnounceResult(ManualAnnounceOutcome.InFlight);
+            }
+
             var payload = AnnouncementPayloadFactory.FromPost(post);
 
             DeliveryResult result;
@@ -267,28 +294,23 @@ public sealed class BlogAnnouncementDashboardService
                 Destination = "Discord",
                 Outcome = result.DryRun ? "DryRun" : result.Success ? "Success" : "Failed",
             });
-
-            // Dry-run posts nothing and leaves the status untouched.
-            if (!result.DryRun)
-            {
-                if (result.Success)
-                {
-                    post.Status = AnnouncementStatus.Announced;
-                    post.AnnouncedUtc = nowUtc;
-                }
-                else
-                {
-                    post.Status = AnnouncementStatus.Failed;
-                }
-            }
-
             await db.SaveChangesAsync(ct);
+
+            // Dry-run posts nothing, so the claim is released back to the pre-claim state.
+            var settledStatus = result.DryRun
+                ? post.Status
+                : result.Success
+                    ? AnnouncementStatus.Announced
+                    : AnnouncementStatus.Failed;
+            var announcedUtc = result.DryRun || !result.Success ? post.AnnouncedUtc : nowUtc;
+
+            await AnnouncementClaims.SettleAsync(db, post.PlatformPostId, settledStatus, announcedUtc, ct);
 
             return new ManualAnnounceResult(
                 ManualAnnounceOutcome.Delivered,
                 result,
-                post.Status,
-                AsUtc(post.AnnouncedUtc));
+                settledStatus,
+                AsUtc(announcedUtc));
         }
         finally
         {
@@ -319,6 +341,13 @@ public sealed class BlogAnnouncementDashboardService
             if (post is null)
             {
                 return ResetOutcome.PostNotFound;
+            }
+
+            // Claimed means a delivery is in flight (possibly from another instance) — its outcome
+            // would overwrite the reset moments later.
+            if (post.Status == AnnouncementStatus.Claimed)
+            {
+                return ResetOutcome.InFlight;
             }
 
             if (post.Status is not (AnnouncementStatus.Announced or AnnouncementStatus.Failed))

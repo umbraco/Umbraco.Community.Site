@@ -6,6 +6,7 @@ export const STATUS_LABELS: Record<number, string> = {
   [PostStatus.SkippedTooOld]: "Skipped (too old)",
   [PostStatus.Suppressed]: "Suppressed",
   [PostStatus.Failed]: "Failed",
+  [PostStatus.Claimed]: "In flight",
 };
 
 // uui-tag colours: positive (green), warning (amber), danger (red), default (grey).
@@ -14,6 +15,7 @@ export function statusColor(status: number): "positive" | "warning" | "danger" |
     case PostStatus.Announced:
       return "positive";
     case PostStatus.Pending:
+    case PostStatus.Claimed:
       return "warning";
     case PostStatus.Failed:
       return "danger";

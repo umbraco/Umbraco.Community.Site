@@ -17,4 +17,12 @@ public enum AnnouncementStatus : byte
 
     /// <summary>A delivery attempt failed; retried on the next cycle.</summary>
     Failed = 4,
+
+    /// <summary>
+    /// Delivery is in flight: a cycle has claimed this row and committed the claim before sending,
+    /// so a concurrent cycle (a second app instance, or an overlapping schedule) can't send the
+    /// same post again. Cleared to the delivery outcome when the send settles, or reverted to
+    /// <see cref="Failed"/> by the next cycle if the claim goes stale (process died mid-send).
+    /// </summary>
+    Claimed = 5,
 }
