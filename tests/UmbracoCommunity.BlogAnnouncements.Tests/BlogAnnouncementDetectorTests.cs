@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using UmbracoCommunity.BlogAnnouncements;
@@ -18,7 +19,7 @@ public class BlogAnnouncementDetectorTests : IDisposable
 
     private readonly SqliteContextFactory _factory = new();
 
-    private BlogAnnouncementDetector CreateDetector(RecordingAnnouncer announcer, BlogAnnouncementsOptions options)
+    private BlogAnnouncementDetector CreateDetector(IDiscordAnnouncer announcer, BlogAnnouncementsOptions options)
         => new(
             _factory,
             announcer,
@@ -240,6 +241,161 @@ public class BlogAnnouncementDetectorTests : IDisposable
         succeeding.Calls.Should().Be(1);
     }
 
+    /// <summary>
+    /// The double-announce regression: two cycles overlapping (a second app instance, or a
+    /// schedule that fires twice per tick) both read the same Pending row. The second one must
+    /// find it claimed and skip it, rather than sending the same post to Discord again.
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentCycle_ArrivingMidDelivery_DoesNotAnnounceTheSamePostTwice()
+    {
+        var id = Guid.NewGuid().ToString();
+        var options = new BlogAnnouncementsOptions { DryRun = false };
+
+        // The interloper runs a full second cycle from inside the first cycle's webhook call —
+        // exactly the window where the row used to still look deliverable.
+        var interloper = new RecordingAnnouncer(DeliveryResult.Ok(204));
+        var interloperDetector = CreateDetector(interloper, options);
+
+        var firstCycle = new ReentrantAnnouncer(
+            DeliveryResult.Ok(204),
+            () => interloperDetector.AnnounceQueuedAsync(0, 0, 0));
+        var detector = CreateDetector(firstCycle, options);
+
+        await detector.DetectAndAnnounceAsync(Data(Post(id, Now.AddDays(-1))));
+
+        firstCycle.Calls.Should().Be(1);
+        interloper.Calls.Should().Be(0, "the concurrent cycle should have found the post claimed");
+
+        await using var db = _factory.CreateDbContext();
+        var row = await db.AnnouncedBlogPosts.SingleAsync();
+        row.Status.Should().Be(AnnouncementStatus.Announced);
+        row.ClaimedUtc.Should().BeNull("a settled row holds no claim");
+        (await db.AnnouncementAttempts.CountAsync()).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task DryRun_ReleasesTheClaim_LeavingThePostDeliverableNextCycle()
+    {
+        var announcer = new RecordingAnnouncer(DeliveryResult.Dry);
+        var detector = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = true });
+
+        await detector.DetectAndAnnounceAsync(Data(Post(Guid.NewGuid().ToString(), Now.AddDays(-1))));
+
+        await using var db = _factory.CreateDbContext();
+        var row = await db.AnnouncedBlogPosts.SingleAsync();
+        row.Status.Should().Be(AnnouncementStatus.Pending);
+        row.ClaimedUtc.Should().BeNull();
+    }
+
+    /// <summary>
+    /// A process that dies between claiming and settling would otherwise leave the row stuck in
+    /// flight forever; the next cycle reverts the abandoned claim and retries it.
+    /// </summary>
+    [Fact]
+    public async Task StaleClaim_IsRevertedAndRetried()
+    {
+        var id = Guid.NewGuid();
+        await using (var seed = _factory.CreateDbContext())
+        {
+            seed.AnnouncedBlogPosts.Add(new AnnouncedBlogPost
+            {
+                PlatformPostId = id,
+                Url = "https://blog.example/a",
+                Title = "Abandoned mid-send",
+                PublishedAtUtc = Now.AddDays(-1).UtcDateTime,
+                Fingerprint = "jane|abandoned mid-send|2026-06-14",
+                FirstSeenUtc = Now.AddDays(-1).UtcDateTime,
+                Status = AnnouncementStatus.Claimed,
+                ClaimedUtc = Now.UtcDateTime - TimeSpan.FromHours(1),
+                AuthorName = "Jane",
+            });
+            await seed.SaveChangesAsync();
+        }
+
+        var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
+        var detector = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = false });
+
+        await detector.AnnounceQueuedAsync(0, 0, 0);
+
+        announcer.Calls.Should().Be(1);
+        await using var db = _factory.CreateDbContext();
+        var row = await db.AnnouncedBlogPosts.SingleAsync();
+        row.Status.Should().Be(AnnouncementStatus.Announced);
+        row.ClaimedUtc.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task FreshClaim_IsLeftAlone_NotStolenByTheNextCycle()
+    {
+        await using (var seed = _factory.CreateDbContext())
+        {
+            seed.AnnouncedBlogPosts.Add(new AnnouncedBlogPost
+            {
+                PlatformPostId = Guid.NewGuid(),
+                Url = "https://blog.example/a",
+                Title = "In flight elsewhere",
+                PublishedAtUtc = Now.AddDays(-1).UtcDateTime,
+                Fingerprint = "jane|in flight elsewhere|2026-06-14",
+                FirstSeenUtc = Now.AddDays(-1).UtcDateTime,
+                Status = AnnouncementStatus.Claimed,
+                ClaimedUtc = Now.UtcDateTime - TimeSpan.FromSeconds(5),
+                AuthorName = "Jane",
+            });
+            await seed.SaveChangesAsync();
+        }
+
+        var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
+        var detector = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = false });
+
+        await detector.AnnounceQueuedAsync(0, 0, 0);
+
+        announcer.Calls.Should().Be(0);
+        await using var db = _factory.CreateDbContext();
+        (await db.AnnouncedBlogPosts.SingleAsync()).Status.Should().Be(AnnouncementStatus.Claimed);
+    }
+
+    /// <summary>
+    /// The ingest counterpart of the delivery race: a concurrent cycle inserts the same brand-new
+    /// post between our read of the known ids and our write, so the primary key rejects ours. The
+    /// cycle must drop that row and carry on rather than failing.
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentCycle_IngestingTheSamePostFirst_DoesNotFailTheCycle()
+    {
+        var id = Guid.NewGuid();
+        var interceptor = new RacingInsertInterceptor(async () =>
+        {
+            await using var other = _factory.CreateRawDbContext();
+            other.AnnouncedBlogPosts.Add(new AnnouncedBlogPost
+            {
+                PlatformPostId = id,
+                Url = "https://blog.example/a",
+                Title = "A Post",
+                PublishedAtUtc = Now.AddDays(-1).UtcDateTime,
+                Fingerprint = "jane|a post|2026-06-14",
+                FirstSeenUtc = Now.UtcDateTime,
+                Status = AnnouncementStatus.Pending,
+                AuthorName = "Jane",
+            });
+            await other.SaveChangesAsync();
+        });
+        _factory.Interceptor = interceptor;
+
+        var announcer = new RecordingAnnouncer(DeliveryResult.Ok(204));
+        var detector = CreateDetector(announcer, new BlogAnnouncementsOptions { DryRun = false });
+
+        await detector.DetectAndAnnounceAsync(Data(Post(id.ToString(), Now.AddDays(-1))));
+
+        interceptor.Fired.Should().BeTrue("the test must actually have injected the racing insert");
+
+        await using var db = _factory.CreateRawDbContext();
+        (await db.AnnouncedBlogPosts.CountAsync()).Should().Be(1, "the duplicate insert must not have landed");
+        // The other cycle's row is still delivered — it was Pending and this cycle claimed it.
+        (await db.AnnouncedBlogPosts.SingleAsync()).Status.Should().Be(AnnouncementStatus.Announced);
+        (await db.AnnouncementRuns.SingleAsync()).New.Should().Be(0, "the row was the other cycle's to count");
+    }
+
     public void Dispose() => _factory.Dispose();
 
     // --- test doubles ---
@@ -257,6 +413,61 @@ public class BlogAnnouncementDetectorTests : IDisposable
             Calls++;
             Payloads.Add(payload);
             return Task.FromResult(_result);
+        }
+    }
+
+    /// <summary>
+    /// Announcer that runs <paramref name="onFirstCall"/> — a whole second announcement cycle —
+    /// from inside its first delivery, simulating an overlapping cycle arriving while this one is
+    /// mid-send. Sequential, so the shared in-memory SQLite connection stays safe.
+    /// </summary>
+    private sealed class ReentrantAnnouncer : IDiscordAnnouncer
+    {
+        private readonly DeliveryResult _result;
+        private readonly Func<Task> _onFirstCall;
+        public int Calls { get; private set; }
+
+        public ReentrantAnnouncer(DeliveryResult result, Func<Task> onFirstCall)
+        {
+            _result = result;
+            _onFirstCall = onFirstCall;
+        }
+
+        public async Task<DeliveryResult> AnnounceAsync(AnnouncementPayload payload, CancellationToken cancellationToken)
+        {
+            Calls++;
+            if (Calls == 1)
+            {
+                await _onFirstCall();
+            }
+
+            return _result;
+        }
+    }
+
+    /// <summary>
+    /// Runs <paramref name="inject"/> once, immediately before the first SaveChanges of the context
+    /// it is attached to — the exact window in which a concurrent cycle's insert lands.
+    /// </summary>
+    private sealed class RacingInsertInterceptor : SaveChangesInterceptor
+    {
+        private readonly Func<Task> _inject;
+        public bool Fired { get; private set; }
+
+        public RacingInsertInterceptor(Func<Task> inject) => _inject = inject;
+
+        public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (!Fired)
+            {
+                Fired = true;
+                await _inject();
+            }
+
+            return result;
         }
     }
 
@@ -287,13 +498,25 @@ public class BlogAnnouncementDetectorTests : IDisposable
             ctx.Database.EnsureCreated();
         }
 
+        /// <summary>Interceptor applied to contexts created from here; set by tests that need to
+        /// act between a cycle's read and its write.</summary>
+        public IInterceptor? Interceptor { get; set; }
+
         public BlogAnnouncementsDbContext CreateDbContext()
         {
-            var options = new DbContextOptionsBuilder<BlogAnnouncementsDbContext>()
-                .UseSqlite(_connection)
-                .Options;
-            return new BlogAnnouncementsDbContext(options);
+            var builder = new DbContextOptionsBuilder<BlogAnnouncementsDbContext>()
+                .UseSqlite(_connection);
+            if (Interceptor is not null)
+            {
+                builder.AddInterceptors(Interceptor);
+            }
+
+            return new BlogAnnouncementsDbContext(builder.Options);
         }
+
+        /// <summary>A context without the interceptor — for a test's own seeding and assertions.</summary>
+        public BlogAnnouncementsDbContext CreateRawDbContext()
+            => new(new DbContextOptionsBuilder<BlogAnnouncementsDbContext>().UseSqlite(_connection).Options);
 
         public void Dispose() => _connection.Dispose();
     }
