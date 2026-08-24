@@ -7,6 +7,7 @@ export const enum PostStatus {
   SkippedTooOld = 2,
   Suppressed = 3,
   Failed = 4,
+  Claimed = 5,
 }
 
 /** AnnouncementTrigger byte values (see Models/Entities/AnnouncementTrigger.cs). */

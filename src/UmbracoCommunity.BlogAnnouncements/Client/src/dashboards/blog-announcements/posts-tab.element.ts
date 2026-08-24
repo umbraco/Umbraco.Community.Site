@@ -19,6 +19,7 @@ const STATUS_OPTIONS = [
   { name: "Skipped (too old)", value: String(PostStatus.SkippedTooOld) },
   { name: "Suppressed", value: String(PostStatus.Suppressed) },
   { name: "Failed", value: String(PostStatus.Failed) },
+  { name: "In flight", value: String(PostStatus.Claimed) },
 ];
 
 function daysAgoIso(days: number): string {
