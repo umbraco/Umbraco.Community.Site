@@ -22,10 +22,27 @@
  * 4. The restriction is applied by modifying the `blocks` config array:
  *    - Allowed blocks: left unchanged (can be added at root and in areas)
  *    - Disallowed blocks: `allowAtRoot` and `allowInAreas` set to `false`
- *    This means disallowed blocks won't appear in the "add content" catalogue,
- *    but existing instances of those blocks can still render and be edited.
- *    This is important: if a block was added before a restriction was applied,
- *    the content author can still see and edit it — they just can't add new ones.
+ *    This keeps disallowed blocks out of the "add content" catalogue.
+ *
+ *    ⚠️ It does NOT leave existing instances alone. Umbraco derives the set of
+ *    valid block types for *existing* entries from the very same flags:
+ *    `#retrieveAllowedElementTypes()` in `block-grid-entries.context.ts` builds
+ *    the root list as `getBlockTypes().filter((x) => x.allowAtRoot)` (and
+ *    `allowInAreas` for entries inside areas), `isBlockTypeAllowed()` tests
+ *    membership of that filtered list, and `block-grid-entry.element.ts` renders
+ *    the `blockEditor_invalidDropPosition` warning — "<block> is not allowed at
+ *    this spot." — for any entry whose type is missing from it.
+ *
+ *    So restricting a block type retroactively BREAKS existing content that
+ *    uses it: every such block is flagged invalid in the editor, and the author
+ *    cannot resolve the warning except by deleting the block. Restriction rules
+ *    must therefore be kept in sync whenever new block types are added — a rule
+ *    that lags behind the block catalogue silently makes content uneditable.
+ *    This is not theoretical: a stale `article` rule omitting `textBlock` did
+ *    exactly this to every blog post on the live site.
+ *
+ *    (Verified against Umbraco 18.1.1 and 17.4.2 — long-standing behaviour,
+ *    not a regression introduced by an upgrade.)
  *
  * 5. The native Block Grid element is created imperatively (not via template)
  *    because it needs to live in the Light DOM for Umbraco's context propagation
@@ -411,9 +428,19 @@ export default class BlockGridRestrictedElement
    * disallowed types. This approach:
    *
    * - Prevents disallowed blocks from appearing in the "add content" catalogue
-   * - Allows existing instances of disallowed blocks to render and be edited
-   *   (the block definition is still present so the editor knows how to render it)
-   * - Preserves the block's settings, stylesheets, and other configuration
+   * - Keeps the block definition present, so the editor still knows how to
+   *   render existing instances, and their settings, stylesheets and other
+   *   configuration survive untouched
+   *
+   * What it does NOT do is leave existing instances usable. Umbraco reads the
+   * same two flags to decide whether an *already-placed* entry sits in a legal
+   * spot, so every existing block of a disallowed type gets the "is not allowed
+   * at this spot." warning and cannot be cleared except by deleting the block.
+   * See the ⚠️ note in the file header for the exact call chain.
+   *
+   * Practical consequence: only ever narrow a rule deliberately, and keep rules
+   * current as new block types are added — a stale rule makes existing content
+   * uneditable rather than merely limiting what can be added next.
    *
    * The effective config is created as a new UmbPropertyEditorConfigCollection
    * instance (using the original's constructor) so Lit's change detection sees

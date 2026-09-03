@@ -492,19 +492,25 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 
 ## Key Dependencies
 
+Versions are deliberately **not** listed here — they go stale faster than this file
+gets updated. Read them from the manifests instead:
+
+- **Backend** — [`Directory.Packages.props`](./Directory.Packages.props) (Central Package Management, so every version for every project lives in that one file)
+- **Frontend** — the `package.json` of the relevant Vite project (`UmbracoCommunity.StaticAssets`, or a `*/Client/` backoffice project)
+
 **Backend:**
-- Umbraco CMS 17.4.2 on .NET 10
-- Entity Framework Core 10.0.8 (SQLite + SQL Server providers)
-- Joonasw.AspNetCore.SecurityHeaders 6.0.0 - Security headers middleware
-- Schema.NET 13.0.0 - Structured data/schema markup
-- Umbraco.Community.BlockPreview 5.3.2 - Block preview in backoffice
-- Umbraco.Community.Contentment 6.1.4 - Extended content editors
+- Umbraco CMS on .NET
+- Entity Framework Core (SQLite + SQL Server providers)
+- Joonasw.AspNetCore.SecurityHeaders - Security headers middleware
+- Schema.NET - Structured data/schema markup
+- Umbraco.Community.BlockPreview - Block preview in backoffice
+- Umbraco.Community.Contentment - Extended content editors
 
 **Frontend:**
-- Lit 3.3.0 - Web components framework
-- RxJS 7.8.1 - Reactive programming
-- Zod 4.x - TypeScript schema validation
-- Vite 7.x - Build tool and dev server
+- Lit - Web components framework
+- RxJS - Reactive programming
+- Zod - TypeScript schema validation
+- Vite - Build tool and dev server
 - Vitest - Testing framework
 - PostCSS with custom rhythm mixin system
 
