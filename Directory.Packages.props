@@ -21,10 +21,10 @@
     <PackageVersion Include="Umbraco.Deploy.Infrastructure" Version="18.0.1" />
     <PackageVersion Include="Umbraco.Deploy.Core" Version="18.0.1" />
     <!-- Umbraco Forms -->
-    <PackageVersion Include="Umbraco.Forms" Version="18.0.6" />
-    <PackageVersion Include="Umbraco.Forms.Core" Version="18.0.6" />
-    <PackageVersion Include="Umbraco.Forms.Core.Providers" Version="18.0.6" />
-    <PackageVersion Include="Umbraco.Forms.Web" Version="18.0.6" />
+    <PackageVersion Include="Umbraco.Forms" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Forms.Core" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Forms.Core.Providers" Version="18.1.1" />
+    <PackageVersion Include="Umbraco.Forms.Web" Version="18.1.1" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
     <PackageVersion Include="Umbraco.AI" Version="18.3.1" />
@@ -40,9 +40,9 @@
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.3" />
     <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.3" />
     <!-- Umbraco Automate -->
-    <PackageVersion Include="Umbraco.Automate" Version="18.2.0" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="18.2.0" />
-    <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.3" />
+    <PackageVersion Include="Umbraco.Automate" Version="18.4.0" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="18.4.0" />
+    <PackageVersion Include="Umbraco.Deploy.Automate" Version="18.0.4" />
     <!-- Umbraco Community Packages -->
     <PackageVersion Include="Umbraco.Community.BlockPreview" Version="6.1.1" />
     <PackageVersion Include="Umbraco.Community.Contentment" Version="7.1.0" />
