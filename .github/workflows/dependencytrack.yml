@@ -106,3 +106,100 @@ jobs:
           project_version: ${{ github.ref_name }}
           output_file: sbom/bom-${{ matrix.tree.slug }}.xml
           api_key: ${{ secrets.DTRACK_API_KEY }}
+
+  # Safety net for newly-added projects: finds any npm project or standalone
+  # .csproj that isn't already covered by the jobs above, so a future
+  # contribution doesn't silently go untracked just because nobody
+  # remembered to add it here. Known/named projects are excluded so this
+  # never double-scans them. New discoveries get auto-generated DT project
+  # names (no existing history to protect, unlike sbom-frontend).
+  discover-extra:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.find.outputs.projects }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Find uncovered npm/NuGet projects
+        id: find
+        run: |
+          projects="[]"
+
+          KNOWN_NPM_DIRS=(
+            "./src/UmbracoCommunity.StaticAssets"
+            "./src/UmbracoCommunity.Extensions/Client"
+            "./src/UmbracoCommunity.BlockRestrictions/Client"
+            "./src/Umbraco.Community.NotFoundTracker/Client"
+          )
+
+          # Any package-lock.json not already one of the named frontend trees
+          while IFS= read -r lockfile; do
+            dir=$(dirname "$lockfile")
+            known=false
+            for k in "${KNOWN_NPM_DIRS[@]}"; do
+              [ "$dir" = "$k" ] && known=true && break
+            done
+            [ "$known" = true ] && continue
+            slug=$(echo "$dir" | sed 's#^\./##; s#/#-#g')
+            projects=$(echo "$projects" | jq --arg dir "$dir" --arg slug "$slug" \
+              '. + [{"dir": $dir, "slug": $slug, "type": "npm"}]')
+          done < <(find . -name package-lock.json -not -path '*/node_modules/*')
+
+          # Any .csproj not referenced by the main solution and not the
+          # already-tracked tools/upgrade-umbraco project
+          grep -oE '"[^"]+\.csproj"' UmbracoCommunity.sln | tr -d '"' | tr '\\' '/' > /tmp/sln-projects.txt
+
+          while IFS= read -r csproj; do
+            rel="${csproj#./}"
+            grep -qxF "$rel" /tmp/sln-projects.txt && continue
+            [ "$rel" = "tools/upgrade-umbraco/upgrade-umbraco.csproj" ] && continue
+            slug=$(echo "$rel" | sed 's#\.csproj$##; s#/#-#g')
+            projects=$(echo "$projects" | jq --arg dir "$rel" --arg slug "$slug" \
+              '. + [{"dir": $dir, "slug": $slug, "type": "nuget"}]')
+          done < <(find . -name '*.csproj' -not -path '*/bin/*' -not -path '*/obj/*')
+
+          projects=$(echo "$projects" | jq -c .)
+          echo "Discovered uncovered projects: $projects"
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
+
+  sbom-extra:
+    needs: discover-extra
+    if: needs.discover-extra.outputs.projects != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.discover-extra.outputs.projects) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        if: matrix.project.type == 'npm'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.x'
+
+      - name: Install npm dependencies
+        if: matrix.project.type == 'npm'
+        working-directory: ${{ matrix.project.dir }}
+        run: npm ci --no-audit --no-fund
+
+      - name: Setup .NET
+        if: matrix.project.type == 'nuget'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore NuGet dependencies
+        if: matrix.project.type == 'nuget'
+        run: dotnet restore "${{ matrix.project.dir }}"
+
+      - name: Generate and upload SBOM
+        uses: umbraco/.github/actions/generate-sbom@main
+        with:
+          project_path: ${{ matrix.project.dir }}
+          project_name: ${{ github.event.repository.name }}-${{ matrix.project.slug }}
+          project_version: ${{ github.ref_name }}
+          output_file: sbom/bom-${{ matrix.project.slug }}.xml
+          api_key: ${{ secrets.DTRACK_API_KEY }}
