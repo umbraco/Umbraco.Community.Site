@@ -1,0 +1,2 @@
+# clasp writes the script id here; per-deployment, keep out of git
+.clasp.json
