@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font: 15px/1.45 system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; color: #1c1c1c; }
+    h1 { font-size: 1.4rem; margin-bottom: .25rem; }
+    .who { color: #666; font-size: .9rem; margin-bottom: 1.5rem; }
+    label { display: block; font-weight: 600; margin-top: 1rem; }
+    input, textarea, select { width: 100%; box-sizing: border-box; padding: .5rem; font: inherit; border: 1px solid #bbb; border-radius: 4px; margin-top: .25rem; }
+    textarea { min-height: 5rem; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    button { margin-top: 1.5rem; padding: .7rem 1.2rem; font: inherit; font-weight: 600; background: #3544b1; color: #fff; border: 0; border-radius: 4px; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    details { margin-top: 1.25rem; font-size: .9rem; }
+    pre { background: #f4f4f4; padding: .75rem; border-radius: 4px; overflow: auto; }
+    .result { margin-top: 1.5rem; padding: 1rem; border-radius: 4px; }
+    .ok { background: #e6f4ea; border: 1px solid #8bc79a; }
+    .err { background: #fdecea; border: 1px solid #f19c93; }
+    .denied { background: #fff4e5; border: 1px solid #f0c27b; padding: 1rem; border-radius: 4px; }
+    small { color: #666; font-weight: normal; }
+  </style>
+</head>
+<body>
+  <h1>Create community Meet</h1>
+  <div class="who">Running as the community host account · you are <?= who || 'not signed in' ?></div>
+
+  <? if (!allowed) { ?>
+    <div class="denied">Only <b><?= approverDomain ?></b> accounts can create meetings. Sign in with your work account and reload. If you see this on a deployment set to "Anyone", that's the cause: the form needs a deployment restricted to the organisation so Google passes your identity through.</div>
+  <? } else { ?>
+
+  <form id="f" onsubmit="return submitForm(event)">
+    <input type="hidden" name="recordId" value="<?= p.recordId || '' ?>">
+
+    <label>Meeting title
+      <input name="title" required minlength="3" value="<?= p.title || '' ?>"></label>
+
+    <label>Requester name
+      <input name="requesterName" value="<?= p.requesterName || '' ?>"></label>
+
+    <label>Requester's Google account <small>(they become co-host)</small>
+      <input name="cohostEmail" type="email" required value="<?= p.cohostEmail || '' ?>"></label>
+
+    <label>Purpose / description
+      <textarea name="description"><?= p.description || '' ?></textarea></label>
+
+    <div class="row">
+      <label>Start <small>(local time in the zone below)</small>
+        <input name="startLocal" type="datetime-local" required step="900" value="<?= (p.startLocal || '').slice(0, 16) ?>"></label>
+      <label>Duration <small>(minutes)</small>
+        <input name="durationMinutes" type="number" required min="5" max="480" step="1" value="<?= p.durationMinutes || 60 ?>"></label>
+    </div>
+
+    <label>Timezone <small>(IANA, e.g. Europe/London)</small>
+      <input name="timeZone" required list="tz" value="<?= p.timeZone || 'Europe/Copenhagen' ?>">
+      <datalist id="tz"></datalist></label>
+
+    <label style="display:flex;gap:.5rem;align-items:center;font-weight:600">
+      <input type="checkbox" name="recordMeeting" style="width:auto;margin:0" <?= String(p.recordMeeting || 'true') === 'false' ? '' : 'checked' ?>>
+      Record the meeting <small>(transcript and Gemini notes are off by default)</small></label>
+
+    <label style="display:flex;gap:.5rem;align-items:center;font-weight:600">
+      <input type="checkbox" name="transcribeMeeting" style="width:auto;margin:0" <?= String(p.transcribeMeeting || 'false') === 'true' ? 'checked' : '' ?>>
+      Take notes and transcribe <small>(Gemini notes + transcript; language follows the host account's setting)</small></label>
+
+    <details><summary>Host controls that will be applied</summary><pre><?= spaceConfigJson ?></pre></details>
+
+    <button id="go" type="submit">Create calendar event + Meet</button>
+  </form>
+
+  <div id="out"></div>
+
+  <script>
+    // Populate the timezone datalist from the browser when supported.
+    try {
+      var dl = document.getElementById('tz');
+      (Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : []).forEach(function (z) {
+        var o = document.createElement('option'); o.value = z; dl.appendChild(o);
+      });
+    } catch (e) {}
+
+    function submitForm(ev) {
+      ev.preventDefault();
+      var f = document.getElementById('f'), btn = document.getElementById('go'), out = document.getElementById('out');
+      var data = {};
+      new FormData(f).forEach(function (v, k) { data[k] = v; });
+      btn.disabled = true; out.innerHTML = '<div class="result">Creating…</div>';
+      google.script.run
+        .withSuccessHandler(function (r) {
+          btn.disabled = false;
+          if (r.ok) {
+            out.innerHTML = '<div class="result ok"><b>Done.</b><br>Meet: <a href="' + r.state.meetUri + '" target="_blank">' + r.state.meetUri + '</a>' +
+              '<br>Event: <a href="' + r.state.htmlLink + '" target="_blank">open in Calendar</a>' +
+              (r.state.cohostManual ? '<br><br><b>One more step:</b> ' + escapeHtml(r.state.cohostInstructions) : '') +
+              '<br><br><small>Copy the Meet link into the Forms entry, then approve it.</small></div>';
+          } else {
+            out.innerHTML = '<div class="result err"><b>Failed at step "' + (r.step || '?') + '"</b><br>' + escapeHtml(r.error) +
+              (r.state && r.state.meetUri ? '<br><br>The event and Meet <i>were</i> created: <a href="' + r.state.meetUri + '">' + r.state.meetUri + '</a>. Only the later steps failed — fix by hand in Calendar → Meet settings.' : '') + '</div>';
+          }
+        })
+        .withFailureHandler(function (e) {
+          btn.disabled = false;
+          out.innerHTML = '<div class="result err"><b>Script error</b><br>' + escapeHtml(String(e.message || e)) + '</div>';
+        })
+        .provisionFromForm(data);
+      return false;
+    }
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  </script>
+
+  <? } ?>
+</body>
+</html>

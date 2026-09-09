@@ -39,7 +39,12 @@ Worth knowing they exist, though they're hot-linked CDN/build-time bits rather t
 | Sessionize | `Features/Sessionize/` | backend feed + `/api/sessionize` + Lit | `Sessionize` section | `EventId` per env |
 | Calendar Feed | `Features/Feeds/Calendar/` | backend feed (server-rendered) | `CalendarFeed` section | none (public) |
 | Community Blogs | `Features/Feeds/CommunityBlogs/` | backend feed + background service | `CommunityBlogs` section | `ApiKey` (Local/portal) |
+| Meet booking | `src/UmbracoCommunity.MeetBooking/` | **outbound** POST from a Forms workflow to the community Apps Script (`tools/meet-booking-apps-script/`) | `MeetBooking` section | `AppsScript:WebAppUrl`, `AppsScript:SharedSecret` (Local/portal) |
 | MVP / contributor avatars | `Features/Mvp/`, `devops/` | CDN hot-link / build-time | none / `GITHUB_TOKEN` (CI) | — |
+
+## The one that pushes instead of pulls
+
+**Meet booking** ([`src/UmbracoCommunity.MeetBooking/`](../../src/UmbracoCommunity.MeetBooking/)) is the odd one out: not a feed but an **Umbraco Forms workflow type**. When HQ approves a community meeting request, it POSTs the request to a Google Apps Script running as the community host account, which creates the Calendar event + Google Meet and applies the host controls; the workflow writes the Meet link back onto the entry. Same building blocks as the feeds — options class (`MeetBooking`), a typed `HttpClient` with a timeout and User-Agent, secrets in `appsettings.Local.json` / the Cloud portal — but no cache, because there's nothing to serve stale: a failed call shows as a failed workflow on the entry and re-running it resumes from the saved state. Slack notifications for the same form use Forms' built-in *Slack* workflow, not code. The project README covers the form fields and the retry story; the design doc is [`docs/plans/2026-09-03-community-meet-booking-design.md`](../plans/2026-09-03-community-meet-booking-design.md).
 
 ## What isn't here (so you don't go looking)
 
