@@ -8,13 +8,16 @@
     The form itself is delegated to Views/Partials/Blocks/FormBlock.cshtml rather than reproduced here: it handles
     the stepped-form wrapper, the block id and the empty-form guard, and a second copy of that would drift.
     Text is rendered inline, matching ImageTextRow and TextRow.
+
+    Unlike those two, the container is vertical-text-position-TOP rather than -center: a form is far taller
+    than a paragraph, and centring leaves the text floating halfway down beside it.
 *@
 
 @{
     bool bgIsDark = Model.HasBg && Model.BackgroundColour.IsDark();
 }
 
-<div class="dc-image-and-text-block vertical-text-position-center @(Model.HasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.IdHash">
+<div class="dc-image-and-text-block vertical-text-position-top @(Model.HasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.IdHash">
     @if (Model.HasBg)
     {
         <style asp-add-nonce="true">

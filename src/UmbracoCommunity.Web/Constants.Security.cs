@@ -17,11 +17,15 @@
 
             public static readonly string[] DefaultAllowWorkers = [];
 
-            public static readonly string[] DefaultAllowConnections = [];
+            // load.sst.umbraco.com is Umbraco's server-side tagging endpoint: the inline GTM loader fetches its
+            // script from there, and the tags it runs beacon data back to the same host. Both directives are
+            // needed or the loader 404s on CSP instead of doing anything. Individual GTM tags may want further
+            // hosts — read the console's CSP violations and add exactly those rather than widening pre-emptively.
+            public static readonly string[] DefaultAllowConnections = ["load.sst.umbraco.com"];
 
             public static readonly string[] DefaultAllowFrames = ["*.youtube.com", "*.walls.io"];
 
-            public static readonly string[] DefaultAllowScripts = ["*.youtube.com"];
+            public static readonly string[] DefaultAllowScripts = ["*.youtube.com", "load.sst.umbraco.com"];
 
             public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "api.dicebear.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com", "cdn.sessionize.com"];
 
