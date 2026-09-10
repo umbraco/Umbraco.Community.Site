@@ -21,9 +21,12 @@
             // script from there, and the tags it runs beacon data back to the same host. Both directives are
             // needed or the loader 404s on CSP instead of doing anything. Individual GTM tags may want further
             // hosts — read the console's CSP violations and add exactly those rather than widening pre-emptively.
-            public static readonly string[] DefaultAllowConnections = ["load.sst.umbraco.com"];
+            public static readonly string[] DefaultAllowConnections = ["load.sst.umbraco.com", "consentcdn.cookiebot.com"];
 
-            public static readonly string[] DefaultAllowFrames = ["*.youtube.com", "*.walls.io"];
+            // consentcdn.cookiebot.com is framed by the Cookiebot consent banner, which GTM loads. Without it the
+            // iframe is blocked and the banner's postMessage handshake fails with a "target origin ... does not
+            // match" error against origin 'null' — a symptom of the blocked frame, not a separate fault.
+            public static readonly string[] DefaultAllowFrames = ["*.youtube.com", "*.walls.io", "consentcdn.cookiebot.com"];
 
             public static readonly string[] DefaultAllowScripts = ["*.youtube.com", "load.sst.umbraco.com"];
 
