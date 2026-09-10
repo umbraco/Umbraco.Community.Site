@@ -55,6 +55,9 @@
         "columnSpanOptions": [
           {
             "columnSpan": 12
+          },
+          {
+            "columnSpan": 6
           }
         ],
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
