@@ -28,7 +28,6 @@
 @inject ICspNonceService nonceService;
 @inject IWebHostEnvironment webHostEnvironment;
 
-@if (webHostEnvironment.IsProduction())
-{
-    <script id="gtmScript" asp-add-nonce data-nonce="@nonceService.GetNonce()">(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = "https://load.sst.umbraco.com/1tsxmrrbeo.js?" + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'evkn1fvu=aWQ9R1RNLVQ2VEtNVDI%3D&apiKey=f8823aac');</script>
-}
+@* Directives only. Razor silently discards markup in a _ViewImports document — it renders nowhere, in any
+   environment. A Google Tag Manager <script> lived here from 2025-08 to 2026-09 and never once loaded.
+   The injects above stay: other views (e.g. MetaTags) rely on them. *@

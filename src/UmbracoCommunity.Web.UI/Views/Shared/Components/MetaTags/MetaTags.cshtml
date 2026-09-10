@@ -76,3 +76,11 @@ else if (Model.Robots == "noindex, nofollow")
         <script type="application/ld+json" asp-add-nonce="true">@Html.Raw(schemaMarkup)</script>
     }
 }
+
+@* Google Tag Manager. Must live in a real view — it was moved to _ViewImports.cshtml in 2025-08 and Razor
+   silently discards markup in a view-imports document, so GTM stopped loading entirely once this copy was
+   removed on 2025-10-28. Do not move it back there. *@
+@if (webHostEnvironment.IsProduction())
+{
+    <script id="gtmScript" asp-add-nonce="true">(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = "https://load.sst.umbraco.com/1tsxmrrbeo.js?" + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'evkn1fvu=aWQ9R1RNLVQ2VEtNVDI%3D&apiKey=f8823aac');</script>
+}
