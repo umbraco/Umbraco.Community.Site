@@ -56,6 +56,13 @@ const projects = {
     path: resolve(ROOT, "src/UmbracoCommunity.Extensions/Client"),
     color: "\x1b[35m", // magenta
   },
+  // Not just a backoffice bundle: Client/public also holds spam-guard.css, which hides the Spam Guard decoy
+  // field on the public site. wwwroot/App_Plugins is gitignored, so skipping this build leaves the decoy
+  // rendering as a visible text box locally — CI already builds it (see cloud-artifact.yml).
+  FormsSpamGuard: {
+    path: resolve(ROOT, "src/Umbraco.Community.FormsSpamGuard/Client"),
+    color: "\x1b[33m", // yellow
+  },
   NotFoundTracker: {
     path: resolve(ROOT, "src/Umbraco.Community.NotFoundTracker/Client"),
     color: "\x1b[32m", // green
@@ -285,6 +292,7 @@ async function runLocal(withDotnet) {
     buildProject("BlockRestrictions", "build"),
     buildProject("BlogAnnouncements", "build"),
     buildProject("Extensions", "build"),
+    buildProject("FormsSpamGuard", "build"),
     buildProject("NotFoundTracker", "build"),
     buildProject("StaticAssets", "build:for:cloud"),
   ]);
@@ -328,6 +336,7 @@ async function runDev(withDotnet, firstTimeIntro = null) {
     buildProject("BlockRestrictions", "build"),
     buildProject("BlogAnnouncements", "build"),
     buildProject("Extensions", "build"),
+    buildProject("FormsSpamGuard", "build"),
     buildProject("NotFoundTracker", "build"),
   ]);
 

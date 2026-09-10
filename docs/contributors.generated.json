@@ -1,6 +1,6 @@
 {
   "primers/README.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -17,7 +17,7 @@
     ]
   },
   "primers/backend.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -34,7 +34,7 @@
     ]
   },
   "primers/backoffice.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -51,7 +51,7 @@
     ]
   },
   "primers/caching.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -68,7 +68,7 @@
     ]
   },
   "primers/content-modelling.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -85,7 +85,7 @@
     ]
   },
   "primers/frontend.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -102,18 +102,24 @@
     ]
   },
   "primers/getting-started.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
         "login": "lssweatherhead",
         "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
         "profileUrl": "https://github.com/lssweatherhead"
+      },
+      {
+        "name": "Sebastiaan Janssen",
+        "login": "nul800sebastiaan",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+        "profileUrl": "https://github.com/nul800sebastiaan"
       }
     ]
   },
   "primers/integrations.md": {
-    "lastEditedAt": "2026-07-27T14:04:28+02:00",
+    "lastEditedAt": "2026-09-10T10:39:46+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -130,7 +136,7 @@
     ]
   },
   "primers/multi-tenancy.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -147,7 +153,7 @@
     ]
   },
   "primers/seo-and-structured-data.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -164,7 +170,7 @@
     ]
   },
   "tutorials/README.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -181,18 +187,24 @@
     ]
   },
   "tutorials/foundations/README.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
         "login": "lssweatherhead",
         "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
         "profileUrl": "https://github.com/lssweatherhead"
+      },
+      {
+        "name": "Sebastiaan Janssen",
+        "login": "nul800sebastiaan",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+        "profileUrl": "https://github.com/nul800sebastiaan"
       }
     ]
   },
   "tutorials/foundations/backoffice-management-api-with-auth-policies.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -209,7 +221,7 @@
     ]
   },
   "tutorials/foundations/content-tree-inherited-config.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -226,7 +238,7 @@
     ]
   },
   "tutorials/foundations/drag-to-scroll-with-snap.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -243,18 +255,24 @@
     ]
   },
   "tutorials/foundations/github-oauth-member-authentication.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
         "login": "lssweatherhead",
         "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
         "profileUrl": "https://github.com/lssweatherhead"
+      },
+      {
+        "name": "Sebastiaan Janssen",
+        "login": "nul800sebastiaan",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+        "profileUrl": "https://github.com/nul800sebastiaan"
       }
     ]
   },
   "tutorials/foundations/inline-svg-tag-helper.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -271,7 +289,7 @@
     ]
   },
   "tutorials/foundations/intersection-observer-paused-animation.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -288,7 +306,7 @@
     ]
   },
   "tutorials/foundations/multi-tenant-content-resolution.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -305,7 +323,7 @@
     ]
   },
   "tutorials/foundations/mutation-observer-progressive-enhancement.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -322,7 +340,7 @@
     ]
   },
   "tutorials/foundations/nonce-csp-with-razor.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -339,7 +357,7 @@
     ]
   },
   "tutorials/foundations/one-master-block-datatype.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -356,7 +374,7 @@
     ]
   },
   "tutorials/foundations/postcss-mixin-for-design-tokens.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -373,7 +391,7 @@
     ]
   },
   "tutorials/foundations/site-search-with-examine-externalindex.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -390,7 +408,7 @@
     ]
   },
   "tutorials/foundations/vite-umbraco-manifest-integration.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -407,13 +425,19 @@
     ]
   },
   "tutorials/refinements/README.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
         "login": "lssweatherhead",
         "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
         "profileUrl": "https://github.com/lssweatherhead"
+      },
+      {
+        "name": "Sebastiaan Janssen",
+        "login": "nul800sebastiaan",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+        "profileUrl": "https://github.com/nul800sebastiaan"
       }
     ]
   },
@@ -435,7 +459,7 @@
     ]
   },
   "tutorials/refinements/output-cache-policies-for-slow-upstream-apis.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -452,7 +476,7 @@
     ]
   },
   "tutorials/refinements/per-tenant-404-content-finder.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -486,7 +510,7 @@
     ]
   },
   "tutorials/refinements/syncing-config-across-environments.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -503,7 +527,7 @@
     ]
   },
   "tutorials/refinements/tenant-fallback-for-schema-and-seo.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -520,7 +544,7 @@
     ]
   },
   "tutorials/refinements/wrapping-umbraco-native-block-editor.md": {
-    "lastEditedAt": "2026-08-10T09:31:28+02:00",
+    "lastEditedAt": "2026-08-10T10:12:17+02:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",

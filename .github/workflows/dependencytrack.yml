@@ -6,117 +6,169 @@ on:
     branches:
       - '*'
 
-env:
-  TRACKER_ENDPOINT: "https://ca-live-global-dtrack-api.purplemoss-6e7d841c.westeurope.azurecontainerapps.io/api/v1/bom"
-
 jobs:
-  sbom:
+  sbom-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      # .NET SBOM
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '9.0.x'
 
       - name: Restore .NET dependencies
-        run: dotnet restore
+        run: dotnet restore UmbracoCommunity.sln
 
-      - name: Install CycloneDX for .NET
-        run: dotnet tool install --global CycloneDX
+      - name: Generate and upload SBOM
+        uses: umbraco/.github/actions/generate-sbom@main
+        with:
+          project_path: UmbracoCommunity.sln
+          project_name: ${{ github.event.repository.name }}-backend
+          project_version: ${{ github.ref_name }}
+          output_file: sbom/bom-dotnet.xml
+          api_key: ${{ secrets.DTRACK_API_KEY }}
 
-      - name: Generate SBOM for .NET
-        run: |
-          mkdir -p ./sbom
-          SOLUTION_FILE=$(find . -name "*.sln" | head -n 1)
-          if [ -z "$SOLUTION_FILE" ]; then
-            PROJECT_FILE=$(find . -name "*.csproj" -o -name "*.fsproj" -o -name "*.vbproj" | head -n 1)
-            if [ -z "$PROJECT_FILE" ]; then
-              echo "No solution or project files found!"
-              exit 1
-            else
-              TARGET_FILE="$PROJECT_FILE"
-            fi
-          else
-            TARGET_FILE="$SOLUTION_FILE"
-          fi
-          dotnet-CycloneDX "$TARGET_FILE" --output ./sbom --filename bom-dotnet.xml --output-format Xml --spec-version 1.6 --enable-github-licenses --github-bearer-token ${{ secrets.GITHUB_TOKEN }}
+  # tools/upgrade-umbraco.csproj isn't a member of UmbracoCommunity.sln,
+  # so the old solution-level scan never covered it. Tracked separately here.
+  sbom-upgrade-tool:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-      # Node.js SBOM
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore .NET dependencies
+        run: dotnet restore tools/upgrade-umbraco/upgrade-umbraco.csproj
+
+      - name: Generate and upload SBOM
+        uses: umbraco/.github/actions/generate-sbom@main
+        with:
+          project_path: tools/upgrade-umbraco/upgrade-umbraco.csproj
+          project_name: ${{ github.event.repository.name }}-upgrade-umbraco
+          project_version: ${{ github.ref_name }}
+          output_file: sbom/bom-upgrade-umbraco.xml
+          api_key: ${{ secrets.DTRACK_API_KEY }}
+
+  # Each frontend tree gets its own SBOM and its own Dependency-Track
+  # project, so vulnerabilities can be attributed to the package they
+  # ship in. New trees: add a matrix entry below.
+  #
+  # Kept as an explicit list (rather than dynamic discovery) so project
+  # names stay exactly what they already are in Dependency-Track -
+  # auto-slugging from folder paths would rename these and orphan their
+  # existing history.
+  sbom-frontend:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tree:
+          - { slug: frontend, dir: src/UmbracoCommunity.StaticAssets }
+          - { slug: extensions-client, dir: src/UmbracoCommunity.Extensions/Client }
+          - { slug: block-restrictions-client, dir: src/UmbracoCommunity.BlockRestrictions/Client }
+          - { slug: not-found-tracker-client, dir: src/Umbraco.Community.NotFoundTracker/Client }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: '22.x'
 
-      - name: Install CycloneDX Node.js CLI
-        run: npm install -g @cyclonedx/cyclonedx-npm
-
-      # Each frontend tree gets its own SBOM and its own Dependency-Track
-      # project, so vulnerabilities can be attributed to the package they
-      # ship in. New trees: append a "<slug>:<dir>" line below.
-      - name: Generate SBOMs for all frontend trees
+      - name: Check for lockfile
+        id: check
+        working-directory: ${{ matrix.tree.dir }}
         run: |
-          set -e
-          mkdir -p ./sbom
-          for entry in \
-            "frontend:src/UmbracoCommunity.StaticAssets" \
-            "extensions-client:src/UmbracoCommunity.Extensions/Client" \
-            "block-restrictions-client:src/UmbracoCommunity.BlockRestrictions/Client" \
-            "not-found-tracker-client:src/Umbraco.Community.NotFoundTracker/Client" ; do
-            slug="${entry%%:*}"
-            dir="${entry##*:}"
-            if [ ! -f "$dir/package-lock.json" ]; then
-              echo "::warning::Skipping $slug ($dir) — no package-lock.json"
-              continue
-            fi
-            echo "::group::Installing $slug ($dir)"
-            (cd "$dir" && npm ci --no-audit --no-fund)
-            echo "::endgroup::"
-            echo "::group::Generating SBOM for $slug"
-            (cd "$dir" && cyclonedx-npm --spec-version 1.6 --output-format xml -o "$GITHUB_WORKSPACE/sbom/bom-$slug.xml")
-            echo "::endgroup::"
-          done
+          if [ -f package-lock.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Skipping ${{ matrix.tree.slug }} (${{ matrix.tree.dir }}) — no package-lock.json"
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      # Upload .NET SBOM
-      - name: Upload .NET SBOM to Dependency-Track
-        env:
-          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-        run: |
-          curl --fail-with-body -v -i -w "\nHTTP Status: %{http_code}\n" \
-            -X POST "$TRACKER_ENDPOINT" \
-            -H "X-Api-Key: $DTRACK_API_KEY" \
-            -H "accept: application/json" \
-            -H "Content-Type: multipart/form-data" \
-            -F "autoCreate=true" \
-            -F "projectName=${{ github.event.repository.name }}-backend" \
-            -F "projectVersion=${{ github.ref_name }}" \
-            -F "bom=@./sbom/bom-dotnet.xml"
+      - name: Install dependencies
+        if: steps.check.outputs.exists == 'true'
+        working-directory: ${{ matrix.tree.dir }}
+        run: npm ci --no-audit --no-fund
 
-      # Each ./sbom/bom-<slug>.xml lands as a separate Dependency-Track project
-      # named <repo>-<slug> (e.g. Umbraco.Community.Site-not-found-tracker-client).
-      - name: Upload frontend SBOMs to Dependency-Track
-        env:
-          DTRACK_API_KEY: ${{ secrets.DTRACK_API_KEY }}
-        run: |
-          set -e
-          shopt -s nullglob
-          for bom in ./sbom/bom-*.xml; do
-            # skip the .NET one, uploaded separately
-            [ "$bom" = "./sbom/bom-dotnet.xml" ] && continue
-            slug=$(basename "$bom" .xml)
-            slug="${slug#bom-}"
-            echo "::group::Uploading $slug"
-            curl --fail-with-body -v -i -w "\nHTTP Status: %{http_code}\n" \
-              -X POST "$TRACKER_ENDPOINT" \
-              -H "X-Api-Key: $DTRACK_API_KEY" \
-              -H "accept: application/json" \
-              -H "Content-Type: multipart/form-data" \
-              -F "autoCreate=true" \
-              -F "projectName=${{ github.event.repository.name }}-$slug" \
-              -F "projectVersion=${{ github.ref_name }}" \
-              -F "bom=@$bom"
-            echo "::endgroup::"
-          done
+      - name: Generate and upload SBOM
+        if: steps.check.outputs.exists == 'true'
+        uses: umbraco/.github/actions/generate-sbom@main
+        with:
+          project_path: ${{ matrix.tree.dir }}
+          project_name: ${{ github.event.repository.name }}-${{ matrix.tree.slug }}
+          project_version: ${{ github.ref_name }}
+          output_file: sbom/bom-${{ matrix.tree.slug }}.xml
+          api_key: ${{ secrets.DTRACK_API_KEY }}
+
+  # Safety net for newly-added projects: finds any npm project or standalone
+  # .csproj that isn't already covered by the jobs above, so a future
+  # contribution doesn't silently go untracked just because nobody
+  # remembered to add it here.
+  discover-extra:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.find.outputs.projects }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Find uncovered npm/NuGet projects
+        id: find
+        uses: umbraco/.github/actions/discover-sbom-projects@main
+        with:
+          main_solution: UmbracoCommunity.sln
+          known_npm_dirs: |
+            src/UmbracoCommunity.StaticAssets
+            src/UmbracoCommunity.Extensions/Client
+            src/UmbracoCommunity.BlockRestrictions/Client
+            src/Umbraco.Community.NotFoundTracker/Client
+          known_nuget_paths: |
+            tools/upgrade-umbraco/upgrade-umbraco.csproj
+
+  sbom-extra:
+    needs: discover-extra
+    if: needs.discover-extra.outputs.projects != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.discover-extra.outputs.projects) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        if: matrix.project.type == 'npm'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22.x'
+
+      - name: Install npm dependencies
+        if: matrix.project.type == 'npm'
+        working-directory: ${{ matrix.project.dir }}
+        run: npm ci --no-audit --no-fund
+
+      - name: Setup .NET
+        if: matrix.project.type == 'nuget'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore NuGet dependencies
+        if: matrix.project.type == 'nuget'
+        run: dotnet restore "${{ matrix.project.dir }}"
+
+      - name: Generate and upload SBOM
+        uses: umbraco/.github/actions/generate-sbom@main
+        with:
+          project_path: ${{ matrix.project.dir }}
+          project_name: ${{ github.event.repository.name }}-${{ matrix.project.slug }}
+          project_version: ${{ github.ref_name }}
+          output_file: sbom/bom-${{ matrix.project.slug }}.xml
+          api_key: ${{ secrets.DTRACK_API_KEY }}

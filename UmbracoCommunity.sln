@@ -61,6 +61,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Community.FormsSpam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Community.FormsSpamGuard.Tests", "tests\Umbraco.Community.FormsSpamGuard.Tests\Umbraco.Community.FormsSpamGuard.Tests.csproj", "{610F1BA5-4D2C-489E-A06F-7295A2E5392E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.MeetBooking", "src\UmbracoCommunity.MeetBooking\UmbracoCommunity.MeetBooking.csproj", "{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoCommunity.MeetBooking.Tests", "tests\UmbracoCommunity.MeetBooking.Tests\UmbracoCommunity.MeetBooking.Tests.csproj", "{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,6 +218,30 @@ Global
 		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x64.Build.0 = Release|Any CPU
 		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x86.ActiveCfg = Release|Any CPU
 		{610F1BA5-4D2C-489E-A06F-7295A2E5392E}.Release|x86.Build.0 = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|x64.Build.0 = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Debug|x86.Build.0 = Debug|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|x64.ActiveCfg = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|x64.Build.0 = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|x86.ActiveCfg = Release|Any CPU
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11}.Release|x86.Build.0 = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|x64.Build.0 = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -225,6 +253,8 @@ Global
 		{EDE3357E-8AA0-45BB-9271-C958C4C9559E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{4818E83F-3A24-45BF-9208-986144477E96} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{610F1BA5-4D2C-489E-A06F-7295A2E5392E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{7D3A9C1E-5B2F-4E8A-9C61-2F0B4D7E8A11} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{8E4B0D2F-6C30-4F9B-AD72-301C5E8F9B22} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F82B796A-0297-45AF-BD1E-5CA3C452ED80}

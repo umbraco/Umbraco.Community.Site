@@ -22,7 +22,7 @@ Planned-but-unwritten primers or tutorials live as stub files directly under the
 
 ## Solution Structure
 
-The solution consists of 7 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 8 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
@@ -31,6 +31,7 @@ The solution consists of 7 projects (uses Central Package Management via `Direct
 - **UmbracoCommunity.BlockRestrictions** - Block-level content restrictions (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 - **Umbraco.Community.NotFoundTracker** - 404 tracking with ignore rules and a dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 - **UmbracoCommunity.BlogAnnouncements** - Discord blog-post announcement pipeline (detection, delivery, tracking store) and its dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
+- **UmbracoCommunity.MeetBooking** - Umbraco Forms workflow type that provisions a Google Meet for approved community meeting requests via the community Apps Script in `tools/meet-booking-apps-script/` (Razor Class Library, no client; see its README and `docs/plans/2026-09-03-community-meet-booking-design.md`)
 
 ### Key Directories in UmbracoCommunity.Web
 
