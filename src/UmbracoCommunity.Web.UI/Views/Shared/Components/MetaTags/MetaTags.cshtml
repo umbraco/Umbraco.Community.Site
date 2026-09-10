@@ -73,7 +73,20 @@ else if (Model.Robots == "noindex, nofollow")
 {
     foreach (var schemaMarkup in Model.SchemaMarkups)
     {
-        <script type="application/ld+json" asp-add-nonce="true">@Html.Raw(schemaMarkup)</script>
+        @*
+            Written raw, deliberately. Two reasons:
+
+            No nonce: an ld+json block is data, never executed, so script-src does not apply and a nonce buys
+            nothing (it also made the element tag-helper-processed, which is worse — see below).
+
+            Raw tag: written as normal markup, something in the pipeline HTML-encodes the "+" in the type
+            attribute, giving type="application/ld&#x2B;json". That is valid HTML and parsers decode it, but it
+            is needlessly obscure in a tag whose entire audience is search engines, and the encoder responsible
+            was not identifiable — no project tag helper targets a bare <script>, and no assembly contains the
+            encoded literal, so it happens at runtime. Emitting the tag raw sidesteps the question entirely.
+            schemaMarkup is already HTML-escaped by Schema.NET's ToHtmlEscapedString(), so this adds no risk.
+        *@
+        @Html.Raw($"<script type=\"application/ld+json\">{schemaMarkup}</script>")
     }
 }
 
