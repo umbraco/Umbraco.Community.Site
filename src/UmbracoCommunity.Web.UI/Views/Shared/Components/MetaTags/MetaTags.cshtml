@@ -92,8 +92,16 @@ else if (Model.Robots == "noindex, nofollow")
 
 @* Google Tag Manager. Must live in a real view — it was moved to _ViewImports.cshtml in 2025-08 and Razor
    silently discards markup in a view-imports document, so GTM stopped loading entirely once this copy was
-   removed on 2025-10-28. Do not move it back there. *@
+   removed on 2025-10-28. Do not move it back there.
+
+   data-nonce is not a duplicate of nonce and is not optional. Every Custom HTML tag in the container is
+   emitted as <script nonce="{{macro}}">, and that macro is a GTM "DOM Element" variable pointing at element
+   id "gtmScript", attribute "data-nonce". The nonce attribute cannot serve: browsers blank the nonce *content*
+   attribute once the element is connected (only the IDL property keeps the value), so getAttribute("nonce")
+   returns "". Without data-nonce the macro resolves to nothing, GTM writes nonce="null", and script-src blocks
+   every Custom HTML tag — e.g. the afterLoadMatomo dataLayer push. Renaming the id or dropping the attribute
+   here silently breaks those tags again; the container in GTM has to change with it. *@
 @if (webHostEnvironment.IsProduction())
 {
-    <script id="gtmScript" asp-add-nonce="true">(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = "https://load.sst.umbraco.com/1tsxmrrbeo.js?" + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'evkn1fvu=aWQ9R1RNLVQ2VEtNVDI%3D&apiKey=f8823aac');</script>
+    <script id="gtmScript" data-nonce="@nonceService.GetNonce()" asp-add-nonce="true">(function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = "https://load.sst.umbraco.com/1tsxmrrbeo.js?" + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', 'evkn1fvu=aWQ9R1RNLVQ2VEtNVDI%3D&apiKey=f8823aac');</script>
 }
