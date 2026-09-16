@@ -128,19 +128,24 @@ public class NonceTagHelper : TagHelper
     [HtmlAttributeName("asp-add-nonce")]
     public bool AddNonce { get; set; }
 
+    /// <summary>Run after every other tag helper, so this one collapses any nonce another has already added.</summary>
+    public override int Order => int.MaxValue;
+
     public NonceTagHelper(ICspNonceService nonceService) => _nonceService = nonceService;
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {
         if (AddNonce)
         {
-            output.Attributes.Add("nonce", _nonceService.GetNonce());
+            output.Attributes.SetAttribute("nonce", _nonceService.GetNonce());
         }
     }
 }
 ```
 
-Three target elements, one gating attribute, one job: add a `nonce="..."` attribute carrying whatever `ICspNonceService.GetNonce()` returns for *this* request — the same scoped instance from Step 1, so the value here is guaranteed to match the value the CSP middleware stamps onto the response header. `Process` never touches tag content, only `output.Attributes` — same minimal-mutation shape as the [inline SVG TagHelper](inline-svg-tag-helper.md), just adding an attribute instead of replacing content.
+`SetAttribute` and `Order` are not incidental. Joonasw.AspNetCore.SecurityHeaders ships its own tag helper for the same `asp-add-nonce` attribute and both are registered in `_ViewImports.cshtml`, so both run on every element. This one originally used `Attributes.Add`, which *appends* — so every element came out with `nonce` twice, and a duplicate attribute makes the nonce ineffective. Inline scripts were blocked as "nonce required" while `src`-based ones survived on `'self'`, which hid the fault until an inline script was actually needed. `SetAttribute` replaces rather than appends, and `Order => int.MaxValue` means this helper has the final say whichever order the two are invoked in.
+
+Beyond that: three target elements, one gating attribute, one job: add a `nonce="..."` attribute carrying whatever `ICspNonceService.GetNonce()` returns for *this* request — the same scoped instance from Step 1, so the value here is guaranteed to match the value the CSP middleware stamps onto the response header. `Process` never touches tag content, only `output.Attributes` — same minimal-mutation shape as the [inline SVG TagHelper](inline-svg-tag-helper.md), just adding an attribute instead of replacing content.
 
 ### Step 5 — Use it from Razor
 
@@ -193,6 +198,7 @@ This is worth being precise about, because it's easy to assume it's a live featu
 - **No CSP violation reporting.** The package supports `ReportOnly` and `ReportUri`, and neither is configured here. If a nonce goes missing on a new tag in production, there's no telemetry — you find out from a broken page in someone's browser console, not a report landing in a dashboard.
 - **Style nonces are currently decorative.** `style-src` carries `.AllowUnsafeInline()`, so every `<style asp-add-nonce="true">` block in the codebase would render identically without the attribute — the nonce isn't doing enforcement work today. It's applied consistently anyway, which is either good future-proofing (the day `AllowUnsafeInline()` comes off styles, every tag is already ready) or dead weight, depending on how charitable you're feeling. Don't take its presence as proof that inline styles are nonce-gated; check the directive config to be sure.
 - **The escape hatch needs a rebuild to use.** `DisableCspMiddleware`'s trigger list is a hardcoded array, not a backoffice setting — turning it on for a real block means a code change and deploy, not a content-editor toggle.
+- **A nonce can't be handed to a third-party script injector through the `nonce` attribute.** Once an element is browsing-context connected under a header-delivered CSP, browsers blank the `nonce` content attribute and keep the value only on the IDL property — so anything that reads the DOM with `getAttribute("nonce")` (tag managers, consent tools, A/B testing snippets) sees an empty string. The workaround is to publish the value in a second, custom attribute the browser doesn't blank, which is what the Google Tag Manager loader in [`MetaTags.cshtml`](../../../src/UmbracoCommunity.Web.UI/Views/Shared/Components/MetaTags/MetaTags.cshtml) does with `data-nonce`. That has a cost: the blanking exists to stop a scriptless attacker reading the nonce back out via CSS attribute selectors, and `style-src` here carries `'unsafe-inline'`. Prefer handing the injector the IDL property instead (GTM can, via a Custom JavaScript variable) and only fall back to a `data-` attribute when the third party can't read anything but attributes.
 - **Domain allow-lists drift with third parties, silently.** Every Sessionize CDN move, new avatar provider, or added OAuth target has needed its own `Constants.Security` commit after the fact — there's no test or CI check that catches a newly-added external asset before it 404s past CSP in production.
 
 ## Where to go next
