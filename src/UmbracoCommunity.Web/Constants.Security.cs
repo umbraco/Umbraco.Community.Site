@@ -17,11 +17,20 @@
 
             public static readonly string[] DefaultAllowWorkers = [];
 
-            // load.sst.umbraco.com is Umbraco's server-side tagging endpoint: the inline GTM loader fetches its
-            // script from there, and the tags it runs beacon data back to the same host. Both directives are
-            // needed or the loader 404s on CSP instead of doing anything. Individual GTM tags may want further
-            // hosts — read the console's CSP violations and add exactly those rather than widening pre-emptively.
-            public static readonly string[] DefaultAllowConnections = ["load.sst.umbraco.com", "consentcdn.cookiebot.com"];
+            // Two different Umbraco server-side tagging hosts, despite the names — do not assume one covers the
+            // other. load.sst.umbraco.com serves the GTM container the inline loader requests (script-src), while
+            // sst.umbraco.com is where the Stape Data Tag POSTs its payload (connect-src): tag_id 582 fires a
+            // page_view on every page with no consent gate, so a missing sst.umbraco.com is a guaranteed console
+            // error on every request, not an edge case.
+            //
+            // Adding a host here is only needed for destinations that cannot carry a nonce — fetch/XHR targets and
+            // img pixels. GTM propagates this page's nonce to the scripts it injects (that is what the data-nonce
+            // attribute on #gtmScript is for, see MetaTags.cshtml), so those satisfy script-src by nonce whatever
+            // their host: stapecdn.com and consent.cookiebot.com both load today without appearing in any list.
+            // Individual GTM tags may still want further connect/img hosts — read the console's CSP violations and
+            // add exactly those rather than widening pre-emptively. The consent-gated tags (LinkedIn, Navattic)
+            // have never fired, because the Cookiebot banner is not authorised for these domains yet.
+            public static readonly string[] DefaultAllowConnections = ["load.sst.umbraco.com", "sst.umbraco.com", "consentcdn.cookiebot.com"];
 
             // consentcdn.cookiebot.com is framed by the Cookiebot consent banner, which GTM loads. Without it the
             // iframe is blocked and the banner's postMessage handshake fails with a "target origin ... does not
