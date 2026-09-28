@@ -121,20 +121,27 @@ public sealed class CommunityBlogsService : ICommunityBlogsService
 
     public PagedCommunityBlogPosts GetPage(int page, int pageSize)
     {
-        var data = GetData();
         pageSize = Math.Max(1, pageSize);
 
-        var totalItems = data.Posts.Count;
+        // Filtered before paging, so totals and page counts reflect what's actually shown.
+        var posts = GetData().Posts
+            .Where(p => !IsExcludedFromListings(p.Url))
+            .ToArray();
+
+        var totalItems = posts.Length;
         var totalPages = totalItems == 0 ? 0 : (int)Math.Ceiling(totalItems / (double)pageSize);
         var clampedPage = totalPages == 0 ? 1 : Math.Clamp(page, 1, totalPages);
 
-        var items = data.Posts
+        var items = posts
             .Skip((clampedPage - 1) * pageSize)
             .Take(pageSize)
             .ToArray();
 
         return new PagedCommunityBlogPosts(items, clampedPage, pageSize, totalItems, totalPages);
     }
+
+    public bool IsExcludedFromListings(string? url)
+        => ListingHostFilter.IsExcluded(url, _options.CurrentValue.ExcludedListingHosts);
 
     private async Task WriteCacheFileAsync(CommunityBlogsData data, CancellationToken cancellationToken)
     {
