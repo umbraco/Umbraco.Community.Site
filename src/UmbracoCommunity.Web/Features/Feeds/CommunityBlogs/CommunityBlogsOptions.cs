@@ -33,4 +33,16 @@ public class CommunityBlogsOptions
 
     /// <summary>Maximum number of (newest) posts to keep, so pagination stays manageable (default 5 pages of 12).</summary>
     public int MaxPosts { get; set; } = 60;
+
+    /// <summary>
+    /// Hosts (e.g. <c>"community.umbraco.com"</c>) whose posts are hidden from the reader-facing
+    /// listings — the Community Blog Posts block and site search — because the aggregate includes
+    /// the site's own blog RSS, and those articles are already shown by the Blog Showcase block and
+    /// as regular search hits. This is the only source of that filtering, and it applies to every
+    /// tenant. Matched case-insensitively, ignoring a leading "www."; a scheme/port/path is
+    /// tolerated and ignored (see <see cref="ListingHostFilter"/>). Never affects the cache file,
+    /// Discord announcements or the community blogs RSS feed, which always carry every post.
+    /// Default: empty.
+    /// </summary>
+    public string[] ExcludedListingHosts { get; set; } = [];
 }

@@ -117,6 +117,65 @@ public class CommunityBlogsServiceTests : IDisposable
         page2.Items.Select(p => p.Id).Should().Equal("3", "4");
     }
 
+    private static string MixedHostPosts() => """
+    {
+      "data": [
+        { "id": "1", "type": "blog_post", "title": "P1", "url": "https://community.umbraco.com/blog/1", "content": null, "coverImageUrl": null, "publishedAt": "2026-06-06T00:00:00Z", "author": null },
+        { "id": "2", "type": "blog_post", "title": "P2", "url": "https://other.dev/2", "content": null, "coverImageUrl": null, "publishedAt": "2026-06-05T00:00:00Z", "author": null },
+        { "id": "3", "type": "blog_post", "title": "P3", "url": "https://WWW.Community.Umbraco.com/blog/3", "content": null, "coverImageUrl": null, "publishedAt": "2026-06-04T00:00:00Z", "author": null },
+        { "id": "4", "type": "blog_post", "title": "P4", "url": "not a url", "content": null, "coverImageUrl": null, "publishedAt": "2026-06-03T00:00:00Z", "author": null },
+        { "id": "5", "type": "blog_post", "title": "P5", "url": "https://blog.example.org/5", "content": null, "coverImageUrl": null, "publishedAt": "2026-06-02T00:00:00Z", "author": null }
+      ],
+      "pagination": { "nextCursor": null, "hasMore": false }
+    }
+    """;
+
+    [Fact]
+    public async Task GetPage_filters_excluded_hosts_before_paging()
+    {
+        var service = CreateService(ClientReturning(MixedHostPosts()),
+            new CommunityBlogsOptions
+            {
+                ApiKey = "psk_test",
+                ApiBaseUrl = "https://test.local/api/v1/",
+                ExcludedListingHosts = ["www.community.umbraco.com"],
+            });
+        await service.RefreshAsync();
+
+        var page1 = service.GetPage(1, 2);
+        var page2 = service.GetPage(2, 2);
+
+        page1.TotalItems.Should().Be(3);
+        page1.TotalPages.Should().Be(2);
+        page1.Items.Select(p => p.Id).Should().Equal("2", "4");
+        page2.Items.Select(p => p.Id).Should().Equal("5");
+        // The unfiltered data is untouched (feed/announcements still see everything).
+        service.GetData().Posts.Should().HaveCount(5);
+    }
+
+    [Fact]
+    public async Task GetPage_without_excluded_hosts_returns_all_posts()
+    {
+        var service = CreateService(ClientReturning(MixedHostPosts()),
+            new CommunityBlogsOptions { ApiKey = "psk_test", ApiBaseUrl = "https://test.local/api/v1/" });
+        await service.RefreshAsync();
+
+        var page = service.GetPage(1, 10);
+
+        page.TotalItems.Should().Be(5);
+        service.IsExcludedFromListings("https://community.umbraco.com/blog/1").Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsExcludedFromListings_uses_configured_hosts()
+    {
+        var service = CreateService(ClientReturning(MixedHostPosts()),
+            new CommunityBlogsOptions { ExcludedListingHosts = ["community.umbraco.com"] });
+
+        service.IsExcludedFromListings("https://WWW.community.umbraco.com/blog/1").Should().BeTrue();
+        service.IsExcludedFromListings("https://other.dev/2").Should().BeFalse();
+    }
+
     [Fact]
     public async Task GetPage_clamps_out_of_range_page()
     {
