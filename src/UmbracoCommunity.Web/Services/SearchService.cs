@@ -52,17 +52,20 @@ internal sealed class SearchService : ISearchService
     private readonly IExamineManager _examineManager;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly ICommunityBlogsService _communityBlogsService;
     private readonly ILogger<SearchService> _logger;
 
     public SearchService(
         IExamineManager examineManager,
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
+        ICommunityBlogsService communityBlogsService,
         ILogger<SearchService> logger)
     {
         _examineManager = examineManager;
         _umbracoContextAccessor = umbracoContextAccessor;
         _publishedUrlProvider = publishedUrlProvider;
+        _communityBlogsService = communityBlogsService;
         _logger = logger;
     }
 
@@ -145,8 +148,11 @@ internal sealed class SearchService : ISearchService
             }));
         }
 
-        // Community blog posts are global (not tenant-filtered) and marked external.
-        // A missing index is not an error — it just contributes nothing.
+        // Community blog posts are global and marked external — except posts on a host in
+        // CommunityBlogs:ExcludedListingHosts (the aggregator also picks up the site's own blog
+        // RSS). Those articles are already in ExternalIndex as content hits above, so they're
+        // dropped here to avoid duplicates. Filtered in memory before the combined set is counted/paged, so
+        // totals stay accurate. A missing index is not an error — it just contributes nothing.
         if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))
         {
             try
@@ -163,6 +169,7 @@ internal sealed class SearchService : ISearchService
                     var url = result.GetValues(CommunityBlogsSearchIndexer.FieldUrl).FirstOrDefault();
                     var title = result.GetValues(CommunityBlogsSearchIndexer.FieldTitle).FirstOrDefault();
                     if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(title)) continue;
+                    if (_communityBlogsService.IsExcludedFromListings(url)) continue;
 
                     combined.Add((result.Score, new SearchResultItem
                     {
