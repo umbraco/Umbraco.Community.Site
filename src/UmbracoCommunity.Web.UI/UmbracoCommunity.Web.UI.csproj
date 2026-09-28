@@ -72,6 +72,7 @@
     <ProjectReference Include="..\UmbracoCommunity.BlockRestrictions\UmbracoCommunity.BlockRestrictions.csproj" />
     <ProjectReference Include="..\Umbraco.Community.FormsSpamGuard\Umbraco.Community.FormsSpamGuard.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.MeetBooking\UmbracoCommunity.MeetBooking.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.ActiveCampaign\UmbracoCommunity.ActiveCampaign.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
