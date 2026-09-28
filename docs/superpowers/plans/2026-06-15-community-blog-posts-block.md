@@ -116,7 +116,7 @@ If the file does not exist, create it. Add/merge:
 ```json
 {
   "CommunityBlogs": {
-    "ApiKey": "psk_4462e882ba13d8f35c6c2d509564a3f4"
+    "ApiKey": "psk_<your-key>"
   }
 }
 ```
