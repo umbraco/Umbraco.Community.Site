@@ -24,6 +24,7 @@
     <PackageReference Include="Umbraco.AI" />
     <PackageReference Include="Umbraco.AI.Agent" />
     <PackageReference Include="Umbraco.AI.Agent.Copilot" />
+    <PackageReference Include="Umbraco.AI.Agent.Copilot.Workspace" />
     <PackageReference Include="Umbraco.AI.Amazon" />
     <PackageReference Include="Umbraco.AI.Anthropic" />
     <PackageReference Include="Umbraco.AI.Google" />
