@@ -24,6 +24,30 @@ export type SeedExportStatus = {
     startedAt?: string | null;
 };
 
+export type ExternalMemberGroup = {
+    key: string;
+    name: string;
+};
+
+export type ExternalMemberGroups = {
+    memberKey: string;
+    userName: string;
+    groups: Array<ExternalMemberGroup>;
+};
+
+export type UpdateExternalMemberGroupsRequest = {
+    groupKeys: Array<string>;
+};
+
+export type ProblemDetails = {
+    type?: null | string;
+    title?: null | string;
+    status?: null | number;
+    detail?: null | string;
+    instance?: null | string;
+    [key: string]: unknown | null | string | null | string | null | number | null | string | null | string | undefined;
+};
+
 export type CreateBlogArticleData = {
     body?: never;
     path: {
@@ -156,3 +180,75 @@ export type StatusResponses = {
 };
 
 export type StatusResponse = StatusResponses[keyof StatusResponses];
+
+export type GetExternalMemberGroupsData = {
+    body?: never;
+    path: {
+        memberKey: string;
+    };
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups';
+};
+
+export type GetExternalMemberGroupsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type GetExternalMemberGroupsResponses = {
+    /**
+     * OK
+     */
+    200: ExternalMemberGroups;
+};
+
+export type GetExternalMemberGroupsResponse = GetExternalMemberGroupsResponses[keyof GetExternalMemberGroupsResponses];
+
+export type SetExternalMemberGroupsData = {
+    body: UpdateExternalMemberGroupsRequest;
+    path: {
+        memberKey: string;
+    };
+    query?: never;
+    url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups';
+};
+
+export type SetExternalMemberGroupsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type SetExternalMemberGroupsError = SetExternalMemberGroupsErrors[keyof SetExternalMemberGroupsErrors];
+
+export type SetExternalMemberGroupsResponses = {
+    /**
+     * OK
+     */
+    200: ExternalMemberGroups;
+};
+
+export type SetExternalMemberGroupsResponse = SetExternalMemberGroupsResponses[keyof SetExternalMemberGroupsResponses];

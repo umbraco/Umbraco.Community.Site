@@ -115,6 +115,39 @@ public class ProfileAccessServiceTests
         viewable.Should().Be(ViewableProfile.None);
     }
 
+    [Theory]
+    [InlineData(new[] { "Community Members", "Early access" }, true)]
+    [InlineData(new[] { "Community Members", "early ACCESS" }, true)]
+    [InlineData(new[] { "Community Members" }, false)]
+    public async Task Early_access_is_read_from_the_member_groups_of_an_external_member(string[] groups, bool expected)
+    {
+        // External-only members have a GUID identity Id, which IsMemberAuthorizedAsync can't
+        // handle (it int.Parse()s the Id), so membership must come from GetRolesAsync.
+        var member = new MemberIdentityUser { Id = Guid.NewGuid().ToString(), UserName = Handle, IsExternalOnly = true };
+        var memberManager = new Mock<IMemberManager>();
+        memberManager.Setup(m => m.IsLoggedIn()).Returns(true);
+        memberManager.Setup(m => m.GetCurrentMemberAsync()).ReturnsAsync(member);
+        memberManager.Setup(m => m.GetRolesAsync(member)).ReturnsAsync(groups);
+        var service = new ProfileAccessService(memberManager.Object, HiddenProfileProvider().Object, NullLogger<ProfileAccessService>.Instance);
+
+        var isInEarlyAccess = await service.IsCurrentMemberInEarlyAccessAsync();
+
+        isInEarlyAccess.Should().Be(expected);
+        memberManager.Verify(
+            m => m.IsMemberAuthorizedAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<int>>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task Nobody_signed_in_is_not_in_early_access()
+    {
+        var service = new ProfileAccessService(MemberManagerFor(null).Object, HiddenProfileProvider().Object, NullLogger<ProfileAccessService>.Instance);
+
+        var isInEarlyAccess = await service.IsCurrentMemberInEarlyAccessAsync();
+
+        isInEarlyAccess.Should().BeFalse();
+    }
+
     private static (ProfileAccessService Service, Mock<IProfileDataProvider> Provider) CreateService(string? signedInHandle)
     {
         var provider = HiddenProfileProvider();
