@@ -175,6 +175,9 @@ public class FeedSubmissionApiController : ControllerBase
         }
 
         Response.Headers.CacheControl = "private, max-age=600";
+        // The bytes come from a third-party site, so if one of these URLs is opened directly (rather than in an
+        // <img>) nothing in it may run: an SVG here would otherwise execute with this site's origin.
+        Response.Headers.ContentSecurityPolicy = "sandbox; default-src 'none'";
         return File(result.Value.Bytes, result.Value.ContentType);
     }
 

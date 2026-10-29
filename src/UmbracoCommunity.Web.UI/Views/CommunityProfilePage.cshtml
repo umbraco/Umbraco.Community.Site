@@ -184,7 +184,13 @@ else
                             @foreach (var link in identity.SocialLinks)
                             {
                                 <li>
-                                    <a href="@link.Url" rel="me noopener" target="_blank">@link.Platform</a>
+                                    <a class="no-link-animation" href="@link.Url" rel="me noopener" target="_blank">
+                                        @if (!string.IsNullOrEmpty(link.FaviconUrl))
+                                        {
+                                            <img class="community-profile__social-favicon" src="@link.FaviconUrl" alt="" width="16" height="16" loading="lazy" />
+                                        }
+                                        @link.Platform
+                                    </a>
                                 </li>
                             }
                         </ul>

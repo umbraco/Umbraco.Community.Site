@@ -22,7 +22,8 @@ public class MemberProfileDetailsTests : IDisposable
         _store = new MemberProfileStore(_database);
         _provider = new MemberProfileDataProvider(
             _store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()));
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            TestImageProxy.Create());
     }
 
     public void Dispose() => _database.Dispose();
