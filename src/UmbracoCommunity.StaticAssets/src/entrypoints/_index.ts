@@ -8,6 +8,7 @@ import '../components/index.js';
 import "../integrations/index.js";
 import { FAQsAccordion } from "../components/faqs-accordion.element";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+import { listenForMemberAvatarChanges } from "../util/member-avatar-sync";
 
 polyfillCountryFlagEmojis("Twemoji Country Flags", "/fonts/TwemojiCountryFlags.woff2");
 
@@ -22,6 +23,9 @@ import '@ungap/custom-elements';
 
 // must be available globally for dc-currency elements to reference
 window.localeResolver = new LocaleResolver();
+
+// Update the header avatar straight away when the member uploads or removes their avatar.
+listenForMemberAvatarChanges();
 
 function getClickedWebComponentElement(e: Event): HTMLElement | undefined {
   const path = e.composedPath();

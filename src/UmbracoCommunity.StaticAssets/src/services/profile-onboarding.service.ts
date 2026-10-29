@@ -8,6 +8,22 @@ export const MAX_AVATAR_MB = MAX_AVATAR_BYTES / 1_000_000;
 // Keep in sync with ProfileApiController.MaxBioLength.
 export const MAX_BIO_LENGTH = 280;
 
+/**
+ * Dispatched on window after the signed-in member's avatar is uploaded or removed, so other
+ * parts of the page (such as the header avatar) can show the new image straight away.
+ */
+export const PROFILE_AVATAR_CHANGED_EVENT = "dc-profile-avatar-changed";
+
+export interface ProfileAvatarChangedDetail {
+  avatarUrl: string;
+}
+
+function notifyAvatarChanged(avatarUrl: string): void {
+  window.dispatchEvent(
+    new CustomEvent<ProfileAvatarChangedDetail>(PROFILE_AVATAR_CHANGED_EVENT, { detail: { avatarUrl } })
+  );
+}
+
 export type OnboardingStatus = "NotStarted" | "InProgress" | "Completed";
 
 export interface OnboardingState {
@@ -50,13 +66,17 @@ export class ProfileOnboardingService extends ServiceBase {
       body: formData,
     });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const result: { avatarUrl: string; hasCustomAvatar: boolean } = await response.json();
+    notifyAvatarChanged(result.avatarUrl);
+    return result;
   }
 
   static async removeAvatar(): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
     const response = await fetch(`${this.BASE_URL}/avatar`, { method: "delete" });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const result: { avatarUrl: string; hasCustomAvatar: boolean } = await response.json();
+    notifyAvatarChanged(result.avatarUrl);
+    return result;
   }
 
   static async complete(): Promise<void> {
