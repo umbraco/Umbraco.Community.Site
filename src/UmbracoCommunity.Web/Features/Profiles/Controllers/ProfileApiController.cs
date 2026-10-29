@@ -10,8 +10,11 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// Onboarding + ongoing profile-editing API. Covers both the onboarding wizard and later
 /// Account-page edits (avatar/bio are the same operation regardless of when they happen) —
 /// always scoped to the current signed-in member, never trusting an id from the caller.
+/// Every POST, PUT and DELETE must carry the antiforgery request token from
+/// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
+[AutoValidateAntiforgeryToken]
 [Route("api/profile")]
 public class ProfileApiController : ControllerBase
 {

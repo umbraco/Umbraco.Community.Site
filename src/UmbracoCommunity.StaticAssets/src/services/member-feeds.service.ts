@@ -40,11 +40,7 @@ export class MemberFeedsService extends ServiceBase {
   }
 
   static async remove(id: number, reason?: string): Promise<void> {
-    const response = await fetch(`${this.BASE_URL}/${id}`, {
-      method: "delete",
-      body: JSON.stringify({ reason }),
-      headers: { "Content-Type": "application/json" },
-    });
+    const response = await ServiceBase.delete(`${this.BASE_URL}/${id}`, { reason });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
   }
 

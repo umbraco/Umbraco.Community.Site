@@ -10,8 +10,11 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// Feed management API — always scoped to the current signed-in member, never trusting an
 /// id-in-URL for whose feeds are being modified. Shared between the onboarding wizard's
 /// feeds step and the Account page (same endpoints, same behaviour in both places).
+/// Every POST, PUT and DELETE must carry the antiforgery request token from
+/// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
+[AutoValidateAntiforgeryToken]
 [Route("api/member-feeds")]
 public class MemberFeedsApiController : ControllerBase
 {
