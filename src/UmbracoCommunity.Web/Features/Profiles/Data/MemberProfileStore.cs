@@ -63,14 +63,65 @@ public class MemberProfileStore
         return entity;
     }
 
-    public async Task UpdateBioAsync(Guid memberKey, string? bio, CancellationToken ct = default)
+    /// <summary>
+    /// Sets the member's own bio. Empty or whitespace-only text is stored as null, so the
+    /// GitHub bio shows again. Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> UpdateBioAsync(Guid memberKey, string? bio, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.Bio = ProfileText.Normalize(bio);
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
+    }
+
+    /// <summary>
+    /// Sets the member's own headline. Empty or whitespace-only text is stored as null, so the
+    /// GitHub company shows again.
+    /// Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> UpdateHeadlineAsync(Guid memberKey, string? headline, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.Headline = ProfileText.Normalize(headline);
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
+    }
+
+    /// <summary>
+    /// Sets the member's own display name. Empty or whitespace-only text is stored as null, so
+    /// the GitHub name shows again. Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> UpdateDisplayNameAsync(Guid memberKey, string? displayName, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.DisplayNameOverride = ProfileText.Normalize(displayName);
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
+    }
+
+    /// <summary>Stores the bio and company fetched from the member's GitHub profile and when they were fetched.</summary>
+    public async Task SetGitHubDefaultsAsync(Guid memberKey, string? gitHubBio, string? gitHubCompany, DateTime fetchedUtc, CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
         if (entity == null) return;
 
-        entity.Bio = bio;
-        entity.UpdatedUtc = DateTime.UtcNow;
+        entity.GitHubBio = gitHubBio;
+        entity.GitHubCompany = gitHubCompany;
+        entity.GitHubFetchedUtc = fetchedUtc;
         await context.SaveChangesAsync(ct);
     }
 

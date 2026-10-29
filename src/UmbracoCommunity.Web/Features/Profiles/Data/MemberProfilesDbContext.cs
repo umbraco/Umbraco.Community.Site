@@ -22,7 +22,11 @@ public class MemberProfilesDbContext : DbContext
 
             entity.Property(e => e.GitHubHandle).IsRequired().HasMaxLength(100);
             entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.DisplayNameOverride).HasMaxLength(200);
+            entity.Property(e => e.Headline).HasMaxLength(200);
             entity.Property(e => e.Bio).HasMaxLength(1000);
+            entity.Property(e => e.GitHubBio).HasMaxLength(1000);
+            entity.Property(e => e.GitHubCompany).HasMaxLength(200);
             entity.Property(e => e.PlatformProfileId).HasMaxLength(100);
 
             entity.HasIndex(e => e.MemberKey).IsUnique();

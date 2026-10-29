@@ -268,6 +268,7 @@ export class OnboardingWizardElement extends LitElement {
               id="dc-onboarding-bio"
               rows="4"
               maxlength="${MAX_BIO_LENGTH}"
+              placeholder=${state.gitHubBio ?? ""}
               .value=${this._bioDraft}
               @input=${(event: Event) => (this._bioDraft = (event.target as HTMLTextAreaElement).value)}
             ></textarea>

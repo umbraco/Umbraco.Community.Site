@@ -25,7 +25,10 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     /// </summary>
     public bool IsHiddenPreview { get; init; }
 
-    /// <summary>The tenant's account page URL, linked from the hidden-profile banner. Null when there is no account page.</summary>
+    /// <summary>
+    /// The tenant's account page URL, linked from the owner's "Edit profile" link and the
+    /// hidden-profile banner. Null for other visitors, or when there is no account page.
+    /// </summary>
     public string? AccountPageUrl { get; init; }
 
     /// <summary>True when the current request may see the profile's enriched sections (see <c>ProfileAccessService</c>).</summary>

@@ -115,13 +115,7 @@ else
         <header class="community-profile__hero">
             <div class="community-profile__hero-inner">
                 <div class="community-profile__portrait">
-                    @if (Model.IsOwnProfile)
-                    {
-                        <dc-profile-avatar-editor
-                            avatar-url="@identity.AvatarUrl"
-                            display-name="@identity.DisplayName"></dc-profile-avatar-editor>
-                    }
-                    else if (!string.IsNullOrEmpty(identity.AvatarUrl))
+                    @if (!string.IsNullOrEmpty(identity.AvatarUrl))
                     {
                         <img class="community-profile__avatar"
                              src="@identity.AvatarUrl"
@@ -172,11 +166,7 @@ else
                         <p class="community-profile__headline">@identity.Headline</p>
                     }
 
-                    @if (Model.IsOwnProfile)
-                    {
-                        <dc-profile-bio-editor bio="@identity.Bio"></dc-profile-bio-editor>
-                    }
-                    else if (!string.IsNullOrEmpty(identity.Bio))
+                    @if (!string.IsNullOrEmpty(identity.Bio))
                     {
                         <p class="community-profile__bio">@identity.Bio</p>
                     }
@@ -198,6 +188,13 @@ else
                                 </li>
                             }
                         </ul>
+                    }
+
+                    @if (Model.IsOwnProfile && !string.IsNullOrEmpty(Model.AccountPageUrl))
+                    {
+                        <p class="community-profile__edit">
+                            <a class="btn is-transparent" href="@Model.AccountPageUrl">Edit profile</a>
+                        </p>
                     }
                 </div>
             </div>

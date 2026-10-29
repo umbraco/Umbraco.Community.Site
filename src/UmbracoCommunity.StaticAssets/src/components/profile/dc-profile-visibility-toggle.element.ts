@@ -9,13 +9,18 @@ let instanceCount = 0;
 /**
  * A "Show my profile" switch on the Account page. Profiles start hidden, so only the owner
  * can see them until this is switched on. The switch moves as soon as it is clicked and
- * moves back if saving fails.
+ * moves back if saving fails. The text explaining who can see the profile, and the profile
+ * link below it, follow the switch so they never describe the old state.
  */
 @customElement(elementName)
 export class ProfileVisibilityToggleElement extends LitElement {
   /** The stored state when the page rendered. */
   @property({ type: Boolean, attribute: "profile-visible" })
   profileVisible = false;
+
+  /** The member's public profile URL, shown below the switch. Nothing is shown when empty. */
+  @property({ attribute: "profile-url" })
+  profileUrl = "";
 
   @state()
   private _visible = false;
@@ -94,9 +99,21 @@ export class ProfileVisibilityToggleElement extends LitElement {
         </label>
         <p id=${this.#hintId} class="dc-profile-visibility-toggle__hint">
           ${this._visible
-            ? "Your profile is public. Anyone in the world can see it."
-            : "Your profile is hidden. Only you can see it, so you can finish editing it first. Turning this on makes it public, so anyone in the world can see it, not just you."}
+            ? "Your profile is public. This is where the rest of the community finds you."
+            : "Your profile is hidden. Only you can see this page; the rest of the community can't find you until you turn on Show my profile. Turning it on makes it public, so anyone in the world can see it, not just you."}
         </p>
+        ${this.profileUrl
+          ? html`<p class="dc-profile-visibility-toggle__url-label">
+                ${this._visible ? "Your public profile link:" : "Only you can see this link for now:"}
+              </p>
+              <a
+                class="account-page__profile-url no-link-animation"
+                href=${this.profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                >${this.profileUrl}</a
+              >`
+          : ""}
         <p class="dc-profile-visibility-toggle__status" role="status" aria-live="polite">${this._statusMessage}</p>
         ${this._errorMessage
           ? html`<p class="dc-profile-visibility-toggle__error" role="alert">${this._errorMessage}</p>`

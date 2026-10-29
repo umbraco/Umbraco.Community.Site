@@ -16,7 +16,9 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// The community-activity collections (blog posts, videos, talks, badges, forum posts,
 /// packages, meetups) are always returned empty — populating those requires a real
 /// external content-aggregation integration, which is out of scope for this provider.
-/// Only <see cref="ProfileIdentity"/> (bio, avatar, handle, feeds-as-social-links) is real.
+/// Only <see cref="ProfileIdentity"/> (headline, bio, avatar, handle, feeds-as-social-links) is real.
+/// The display name, headline and bio are the member's own, falling back to the GitHub
+/// name, company and bio respectively.
 /// </remarks>
 public sealed class MemberProfileDataProvider : IProfileDataProvider
 {
@@ -48,9 +50,9 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
             Slug: entity.GitHubHandle,
             PlatformId: entity.PlatformProfileId,
             Identity: new ProfileIdentity(
-                DisplayName: entity.DisplayName,
-                Headline: null,
-                Bio: entity.Bio,
+                DisplayName: entity.EffectiveDisplayName,
+                Headline: entity.EffectiveHeadline,
+                Bio: entity.EffectiveBio,
                 AvatarUrl: _avatarUrlResolver.Resolve(entity.AvatarMediaKey, entity.GitHubHandle),
                 Location: null,
                 Pronouns: null,
