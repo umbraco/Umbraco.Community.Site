@@ -40,6 +40,13 @@ public class MemberProfileEntity
 
     public DateTime? OnboardingCompletedUtc { get; set; }
 
+    /// <summary>
+    /// True once the member has chosen to show their profile. New profiles start hidden, so
+    /// the public profile page renders for other visitors exactly as it does for a handle that
+    /// has no profile, while the owner can still see and edit it.
+    /// </summary>
+    public bool IsProfileVisible { get; set; }
+
     /// <summary>The external platform's internal profile id, once it has a real claim endpoint. Null today.</summary>
     public string? PlatformProfileId { get; set; }
 

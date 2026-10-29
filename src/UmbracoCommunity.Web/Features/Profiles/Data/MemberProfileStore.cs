@@ -50,6 +50,8 @@ public class MemberProfileStore
                 GitHubHandle = gitHubHandle,
                 DisplayName = displayName,
                 OnboardingStatus = OnboardingStatus.InProgress,
+                // New profiles start hidden until the member chooses to show them.
+                IsProfileVisible = false,
                 OnboardingStartedUtc = now,
                 CreatedUtc = now,
                 UpdatedUtc = now,
@@ -81,6 +83,19 @@ public class MemberProfileStore
         entity.AvatarMediaKey = avatarMediaKey;
         entity.UpdatedUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
+    }
+
+    /// <summary>Sets whether the member's profile is visible to everyone. Returns false when the member has no profile row.</summary>
+    public async Task<bool> SetProfileVisibleAsync(Guid memberKey, bool isVisible, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return false;
+
+        entity.IsProfileVisible = isVisible;
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return true;
     }
 
     public async Task<MemberProfileEntity?> CompleteOnboardingAsync(Guid memberKey, CancellationToken ct = default)

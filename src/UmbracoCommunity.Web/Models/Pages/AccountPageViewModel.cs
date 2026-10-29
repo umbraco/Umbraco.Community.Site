@@ -12,6 +12,9 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     /// <summary>True once the member has completed onboarding — gates showing the public profile link.</summary>
     public bool OnboardingCompleted { get; set; }
 
+    /// <summary>True when the member has chosen to show their profile to everyone. New profiles start hidden.</summary>
+    public bool IsProfileVisible { get; set; }
+
     /// <summary>The member's public profile URL, once claimed.</summary>
     public string? ProfileUrl { get; set; }
 

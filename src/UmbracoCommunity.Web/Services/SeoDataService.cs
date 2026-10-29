@@ -26,7 +26,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly BreadcrumbSchemaBuilder _breadcrumbSchemaBuilder;
     private readonly UrlUtilities _urlUtilities;
     private readonly IDocumentationService _documentationService;
-    private readonly IProfileDataProvider _profileDataProvider;
+    private readonly ProfileAccessService _profileAccessService;
 
     public SeoDataService(
         IImageUrlBuilder imageUrlBuilder,
@@ -37,7 +37,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
         UrlUtilities urlUtilities,
         IDocumentationService documentationService,
-        IProfileDataProvider profileDataProvider)
+        ProfileAccessService profileAccessService)
     {
         _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
@@ -47,7 +47,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         _breadcrumbSchemaBuilder = breadcrumbSchemaBuilder;
         _urlUtilities = urlUtilities;
         _documentationService = documentationService;
-        _profileDataProvider = profileDataProvider;
+        _profileAccessService = profileAccessService;
     }
 
     public async Task<MetaTagsViewModel> BuildAsync(IPublishedContent currentPage)
@@ -191,13 +191,29 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         viewModel.CanonicalUrl = $"{request.Scheme}://{request.Host}{path}";
 
-        var profile = await _profileDataProvider.GetProfileAsync(handle);
-        if (profile is null)
+        // Same rules as the page itself: a hidden profile is loaded only for its owner.
+        var viewable = await _profileAccessService.GetViewableProfileAsync(handle);
+        if (viewable.Profile is null)
         {
             return;
         }
 
-        viewModel.MetaTitle = profile.Identity.DisplayName;
+        viewModel.MetaTitle = viewable.Profile.Identity.DisplayName;
+
+        // The owner's preview of their hidden profile must not be indexed.
+        if (viewable.IsHiddenPreview)
+        {
+            viewModel.Robots = "noindex, follow";
+            return;
+        }
+
+        // A page that shows the enriched sections only to an early access member on their own
+        // profile must not be indexed. Everyone else gets the page exactly as before.
+        var access = await _profileAccessService.ResolveAsync(currentPage, handle);
+        if (access.IsGated)
+        {
+            viewModel.Robots = "noindex, follow";
+        }
     }
 
     private async Task ApplySessionOpenGraphOverridesAsync(MetaTagsViewModel viewModel)

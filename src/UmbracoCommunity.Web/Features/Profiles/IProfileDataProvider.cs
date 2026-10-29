@@ -14,5 +14,9 @@ public interface IProfileDataProvider
     /// such profile exists (the caller renders a 404).
     /// </summary>
     /// <param name="slug">The member's GitHub handle, taken from the request URL.</param>
-    Task<CommunityProfile?> GetProfileAsync(string slug, CancellationToken cancellationToken = default);
+    /// <param name="includeHidden">
+    /// Also return a profile its owner has not shown yet. Only pass <c>true</c> when the
+    /// signed-in member is the owner of <paramref name="slug"/>.
+    /// </param>
+    Task<CommunityProfile?> GetProfileAsync(string slug, bool includeHidden = false, CancellationToken cancellationToken = default);
 }

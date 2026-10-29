@@ -79,6 +79,28 @@ public class ProfileApiController : ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Shows or hides the current member's profile. To everyone but its owner, a hidden profile
+    /// renders as if the handle had no profile at all.
+    /// </summary>
+    [HttpPut("visibility")]
+    public async Task<IActionResult> UpdateVisibility([FromBody] UpdateProfileVisibilityRequest request, CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        var updated = await _store.SetProfileVisibleAsync(member.Key, request.Visible, cancellationToken);
+        if (!updated)
+        {
+            return BadRequest(new { error = "Onboarding hasn't been started yet." });
+        }
+
+        return Ok();
+    }
+
     [HttpPut("avatar")]
     [RequestSizeLimit(AvatarUploadService.MaxBytes)]
     public async Task<IActionResult> UpdateAvatar(IFormFile file, CancellationToken cancellationToken)
@@ -119,7 +141,10 @@ public class ProfileApiController : ControllerBase
         return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, member.UserName ?? string.Empty), false));
     }
 
-    /// <summary>Marks onboarding complete — this is what makes the profile publicly visible.</summary>
+    /// <summary>
+    /// Marks onboarding complete. The profile still starts hidden: only its owner can see it
+    /// until they show it (see <see cref="UpdateVisibility"/>).
+    /// </summary>
     [HttpPost("onboarding/complete")]
     public async Task<IActionResult> Complete(CancellationToken cancellationToken)
     {

@@ -290,6 +290,10 @@ export class OnboardingWizardElement extends LitElement {
         <h2>Your feeds</h2>
         <p>Add your blog, LinkedIn, or other social links — you can always change these later from your account page.</p>
         <dc-feed-manager restrict-hide-to-platform></dc-feed-manager>
+        <p class="dc-onboarding__hint">
+          Your profile starts hidden, so only you can see it. When you are happy with it, show it from your
+          profile page or your account page. Showing it makes it public, so anyone in the world can see it.
+        </p>
         <div class="dc-onboarding__actions">
           <button class="btn" type="button" @click=${this.#back}>Back</button>
           <button class="btn is-blue" type="button" @click=${this.#finish}>Finish</button>

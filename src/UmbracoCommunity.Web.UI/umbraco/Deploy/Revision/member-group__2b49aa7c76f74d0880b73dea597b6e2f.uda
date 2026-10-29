@@ -1,0 +1,7 @@
+{
+  "Name": "Early access",
+  "Udi": "umb://member-group/2b49aa7c76f74d0880b73dea597b6e2f",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.MemberGroupArtifact",
+  "__version": "18.0.1"
+}

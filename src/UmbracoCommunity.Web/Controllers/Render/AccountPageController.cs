@@ -71,6 +71,7 @@ public class AccountPageController : RenderController
             Email = member?.Email,
             AvatarUrl = handle != null ? _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle) : null,
             OnboardingCompleted = onboardingCompleted,
+            IsProfileVisible = profile?.IsProfileVisible ?? false,
         };
 
         if (onboardingCompleted && handle != null)
