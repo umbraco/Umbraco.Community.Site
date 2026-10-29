@@ -2,10 +2,16 @@
   "Name": "Community profile page",
   "Alias": "CommunityProfilePage",
   "File": "umb://template-file/CommunityProfilePage.cshtml",
+  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/019ed55303a770ca9e531becb851ca7f",
   "Dependencies": [
     {
       "Udi": "umb://template-file/CommunityProfilePage.cshtml",
+      "Ordering": true,
+      "Mode": "Exist"
+    },
+    {
+      "Udi": "umb://template/f894a6c7db394547be53d62c3c411be1",
       "Ordering": true,
       "Mode": "Exist"
     }
