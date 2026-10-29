@@ -17,4 +17,6 @@ export * from "./onboarding/dc-onboarding-wizard.element.js";
 export * from "./onboarding/dc-feed-manager.element.js";
 export * from "./profile/dc-profile-avatar-editor.element.js";
 export * from "./profile/dc-profile-bio-editor.element.js";
+export * from "./profile/dc-profile-hidden-banner.element.js";
 export * from "./profile/dc-profile-link.element.js";
+export * from "./profile/dc-profile-visibility-toggle.element.js";

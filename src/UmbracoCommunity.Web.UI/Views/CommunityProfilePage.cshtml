@@ -108,6 +108,10 @@ else
     }
 
     <article class="community-profile">
+        @if (Model.IsHiddenPreview)
+        {
+            <dc-profile-hidden-banner account-url="@Model.AccountPageUrl"></dc-profile-hidden-banner>
+        }
         <header class="community-profile__hero">
             <div class="community-profile__hero-inner">
                 <div class="community-profile__portrait">

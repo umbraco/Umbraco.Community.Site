@@ -51,6 +51,15 @@
           "SortOrder": 10
         },
         {
+          "Key": "1521e851-83a9-417b-b42d-f62221e8ccb4",
+          "Alias": "showEnrichedProfileSections",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Description": "Decides whether the extra profile sections show to everyone on this site. When off, only members in the Early access group see them, and only on their own profile.",
+          "Name": "Show enriched profile sections",
+          "SortOrder": 11
+        },
+        {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
           "Alias": "headerLogo",
           "DataType": "umb://data-type/67dd2843799e4a368597e7fd5e4c9203",

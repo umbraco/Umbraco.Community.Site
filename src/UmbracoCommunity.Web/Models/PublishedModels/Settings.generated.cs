@@ -81,6 +81,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops HeaderLogo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "headerLogo");
 
 		///<summary>
+		/// Show enriched profile sections: Decides whether the extra profile sections show to everyone on this site. When off, only members in the Early access group see them, and only on their own profile.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("showEnrichedProfileSections")]
+		public virtual bool ShowEnrichedProfileSections => this.Value<bool>(_publishedValueFallback, "showEnrichedProfileSections");
+
+		///<summary>
 		/// Site name: This will be displayed in the site title
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

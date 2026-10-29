@@ -685,7 +685,12 @@ async function offerFirstTimeSeed(willStartDotnet, launchProfile, intro = null) 
     log("After this completes, run `node build.mjs dev:dotnet` to finish first-time setup.");
   }
 
-  const yes = await promptYesNo("Download the latest community snapshot and run setup now?");
+  const hasDownloadedSnapshot = existsSync(SEED_STAGE) || existsSync(SEED_TARGET);
+  const yes = await promptYesNo(
+    hasDownloadedSnapshot
+      ? "Run setup now using the previously downloaded community snapshot?"
+      : "Download the latest community snapshot and run setup now?",
+  );
   if (!yes) return;
 
   // Phase 1 must boot with the live target empty — any zip Deploy can see will

@@ -7,8 +7,10 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// Live profile source backed by <see cref="MemberProfileStore"/>. Replaces
 /// <see cref="DummyProfileDataProvider"/> in DI. Only returns a profile for members who
-/// have completed onboarding (see <see cref="OnboardingStatus.Completed"/>) — an
-/// in-progress onboarding is never visible as a public profile.
+/// have completed onboarding (see <see cref="OnboardingStatus.Completed"/>); an in-progress
+/// onboarding is never visible. Profiles start hidden (see
+/// <see cref="MemberProfileEntity.IsProfileVisible"/>) and a hidden profile is returned only
+/// when the caller asks for it with <c>includeHidden</c>, which only the owner's own request does.
 /// </summary>
 /// <remarks>
 /// The community-activity collections (blog posts, videos, talks, badges, forum posts,
@@ -27,10 +29,12 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
         _avatarUrlResolver = avatarUrlResolver;
     }
 
-    public async Task<CommunityProfile?> GetProfileAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<CommunityProfile?> GetProfileAsync(string slug, bool includeHidden = false, CancellationToken cancellationToken = default)
     {
         var entity = await _store.GetByHandleAsync(slug, cancellationToken);
-        if (entity == null || entity.OnboardingStatus != OnboardingStatus.Completed)
+        if (entity == null
+            || entity.OnboardingStatus != OnboardingStatus.Completed
+            || (!entity.IsProfileVisible && !includeHidden))
         {
             return null;
         }

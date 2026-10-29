@@ -51,7 +51,14 @@
 
             @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
             {
-                <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
+                @if (Model.IsProfileVisible)
+                {
+                    <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
+                }
+                else
+                {
+                    <p class="account-page__section-hint">Only you can see this page until you show your profile. Showing it makes it public, so anyone in the world can see it.</p>
+                }
                 <a class="account-page__profile-url no-link-animation" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
 
                 @if (Model.LastSyncedAt is not null)
@@ -74,6 +81,14 @@
                 </p>
             }
         </section>
+
+        @if (Model.OnboardingCompleted)
+        {
+            <section class="account-page__section">
+                <h2>Profile visibility</h2>
+                <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"></dc-profile-visibility-toggle>
+            </section>
+        }
 
         <section class="account-page__section">
             <h2>Your feeds</h2>

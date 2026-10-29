@@ -138,3 +138,92 @@
 .account-page__sync-status--pending::before {
   background: var(--color-identity-orange);
 }
+
+/* Profile visibility switch: a real checkbox drawn as a switch track. */
+.dc-profile-visibility-toggle__label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--unit-xs);
+  font-weight: 700;
+  color: var(--color-identity-blue);
+  cursor: pointer;
+}
+
+/* Visually hidden but still focusable and announced. */
+.dc-profile-visibility-toggle__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dc-profile-visibility-toggle__track {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--color-dark-grey);
+  transition: background-color 0.2s ease;
+}
+
+.dc-profile-visibility-toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-white);
+  transition: transform 0.2s ease;
+}
+
+.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track {
+  background: var(--color-identity-blue);
+}
+
+.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track::after {
+  transform: translateX(20px);
+}
+
+.dc-profile-visibility-toggle__input:focus-visible + .dc-profile-visibility-toggle__track {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-profile-visibility-toggle__input[aria-busy="true"] + .dc-profile-visibility-toggle__track {
+  opacity: 0.6;
+}
+
+.dc-profile-visibility-toggle__hint {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-visibility-toggle__status:not(:empty),
+.dc-profile-visibility-toggle__error {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-visibility-toggle__status {
+  margin: 0;
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-visibility-toggle__error {
+  color: var(--color-red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-profile-visibility-toggle__track,
+  .dc-profile-visibility-toggle__track::after {
+    transition: none;
+  }
+}

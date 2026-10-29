@@ -10,4 +10,6 @@ public sealed record OnboardingStateResponse(
 
 public sealed record UpdateBioRequest(string? Bio);
 
+public sealed record UpdateProfileVisibilityRequest(bool Visible);
+
 public sealed record UpdateAvatarResponse(string AvatarUrl, bool HasCustomAvatar);
