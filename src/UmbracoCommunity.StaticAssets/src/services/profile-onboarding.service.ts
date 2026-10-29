@@ -1,4 +1,5 @@
 import { ServiceBase } from "./service-base";
+import { antiforgeryFetch } from "./antiforgery";
 
 // Keep in sync with AvatarUploadService.MaxBytes — shared so the onboarding wizard and the
 // profile page's avatar editor both fail fast client-side with the same limit.
@@ -45,7 +46,8 @@ export class ProfileOnboardingService extends ServiceBase {
     formData.append("file", file);
     // Not ServiceBase.put — that always JSON-encodes the body. A multipart file upload
     // needs FormData with no explicit Content-Type (the browser sets the boundary).
-    const response = await fetch(`${this.BASE_URL}/avatar`, {
+    // antiforgeryFetch still adds the antiforgery token header.
+    const response = await antiforgeryFetch(`${this.BASE_URL}/avatar`, {
       method: "put",
       body: formData,
     });
@@ -54,7 +56,7 @@ export class ProfileOnboardingService extends ServiceBase {
   }
 
   static async removeAvatar(): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
-    const response = await fetch(`${this.BASE_URL}/avatar`, { method: "delete" });
+    const response = await ServiceBase.delete(`${this.BASE_URL}/avatar`);
     if (!response.ok) throw new Error(await this.#errorMessage(response));
     return response.json();
   }
