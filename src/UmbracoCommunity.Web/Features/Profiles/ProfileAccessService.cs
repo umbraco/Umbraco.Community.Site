@@ -128,6 +128,22 @@ public sealed class ProfileAccessService
         return _currentMemberHandle;
     }
 
+    // Deliberately not IMemberManager.IsMemberAuthorizedAsync: in Umbraco 18 that method
+    // int.Parse()s the identity Id, which is a GUID for lightweight external members, so it
+    // throws for every member who signed up through GitHub. GetRolesAsync reads groups from
+    // the right store for both content-based and external-only members.
+    internal async Task<bool> IsCurrentMemberInEarlyAccessAsync()
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return false;
+        }
+
+        var roles = await _memberManager.GetRolesAsync(member);
+        return roles.Contains(EarlyAccessGroupName, StringComparer.OrdinalIgnoreCase);
+    }
+
     private async Task<EnrichedSectionsAccess> ResolveUncachedAsync(IPublishedContent currentPage, string handle)
     {
         try
@@ -144,10 +160,7 @@ public sealed class ProfileAccessService
                 return EnrichedSectionsAccess.None;
             }
 
-            var isInEarlyAccess = await _memberManager.IsMemberAuthorizedAsync(
-                allowTypes: [],
-                allowGroups: [EarlyAccessGroupName],
-                allowMembers: []);
+            var isInEarlyAccess = await IsCurrentMemberInEarlyAccessAsync();
 
             var show = CanSeeEnrichedSections(openToAll, isOwnProfile, isInEarlyAccess);
             return new EnrichedSectionsAccess(Show: show, IsGated: show);

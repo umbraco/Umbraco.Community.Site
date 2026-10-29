@@ -6,13 +6,13 @@
   <ItemGroup>
     <!-- Umbraco -->
     <PackageVersion Include="Flip.Umbraco" Version="18.1.0" />
-    <PackageVersion Include="Umbraco.Cms" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.2.2" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.2.2" />
+    <PackageVersion Include="Umbraco.Cms" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="18.3.0" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="18.3.0" />
     <!-- Umbraco Cloud & Deploy -->
     <PackageVersion Include="Umbraco.Cloud.Cms" Version="18.0.3" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="18.0.0" />
@@ -27,8 +27,8 @@
     <PackageVersion Include="Umbraco.Forms.Web" Version="18.2.2" />
     <PackageVersion Include="Umbraco.Forms.Deploy" Version="18.0.1" />
     <!-- Umbraco AI -->
-    <PackageVersion Include="Umbraco.AI" Version="18.6.0" />
-    <PackageVersion Include="Umbraco.AI.Agent" Version="18.4.0" />
+    <PackageVersion Include="Umbraco.AI" Version="18.6.1" />
+    <PackageVersion Include="Umbraco.AI.Agent" Version="18.4.1" />
     <PackageVersion Include="Umbraco.AI.Agent.Copilot" Version="18.2.0" />
     <PackageVersion Include="Umbraco.AI.Agent.Copilot.Workspace" Version="18.2.0" />
     <PackageVersion Include="Umbraco.AI.Amazon" Version="18.1.1" />
@@ -37,9 +37,9 @@
     <PackageVersion Include="Umbraco.AI.MicrosoftFoundry" Version="18.0.4" />
     <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.3.1" />
     <PackageVersion Include="Umbraco.AI.Prompt" Version="18.4.0" />
-    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.4" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.4" />
-    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.4" />
+    <PackageVersion Include="Umbraco.AI.Search" Version="18.0.5" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.5" />
+    <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.5" />
     <!-- Umbraco Automate -->
     <PackageVersion Include="Umbraco.Automate" Version="18.5.1" />
     <PackageVersion Include="Umbraco.Automate.Core" Version="18.5.1" />
@@ -65,7 +65,7 @@
     <PackageVersion Include="AspNet.Security.OAuth.GitHub" Version="10.0.0" />
     <!-- Other -->
     <PackageVersion Include="Joonasw.AspNetCore.SecurityHeaders" Version="6.0.0" />
-    <PackageVersion Include="Markdig" Version="1.5.0" />
+    <PackageVersion Include="Markdig" Version="1.5.1" />
     <PackageVersion Include="Schema.NET" Version="13.0.0" />
   </ItemGroup>
 </Project>
