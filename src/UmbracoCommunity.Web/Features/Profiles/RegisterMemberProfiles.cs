@@ -54,6 +54,17 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.AddScoped<ProfileAccessService>();
         builder.Services.AddScoped<IProfileSyncClient, StubProfileSyncClient>();
 
+        builder.Services.AddHttpClient<GitHubProfileClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.github.com/");
+            client.Timeout = TimeSpan.FromSeconds(5);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunity/1.0");
+        });
+        builder.Services.AddScoped<GitHubProfileDefaultsService>();
+
         // Append so built-in content finders match first. Ours only fires under the tenant's
         // Community Profile page for a plausible-handle trailing segment (e.g. /community/profiles/octocat).
         builder.ContentFinders().Append<CommunityProfileContentFinder>();

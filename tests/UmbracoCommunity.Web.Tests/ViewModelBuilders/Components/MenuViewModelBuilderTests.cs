@@ -134,6 +134,35 @@ public class MenuViewModelBuilderTests : IDisposable
 
         viewModel.IsSignedIn.Should().BeTrue();
         viewModel.MemberAvatarUrl.Should().Be(GitHubAvatarUrl);
+        viewModel.MemberDisplayName.Should().Be(Handle);
+    }
+
+    [Fact]
+    public async Task A_member_who_chose_a_display_name_gets_that_name()
+    {
+        var store = await CreateStoreAsync();
+        await store.GetOrStartOnboardingAsync(_memberKey, Handle, "The Octocat");
+        await store.UpdateDisplayNameAsync(_memberKey, "Octo");
+        var builder = CreateBuilder(SignedInMemberManager(_memberKey).Object, store);
+        var viewModel = new MenuViewModel();
+
+        await builder.PopulateMemberAsync(viewModel, signInEnabled: true);
+
+        viewModel.MemberDisplayName.Should().Be("Octo");
+    }
+
+    [Fact]
+    public async Task A_member_without_a_chosen_display_name_gets_the_name_from_sign_in()
+    {
+        var store = await CreateStoreAsync();
+        await store.GetOrStartOnboardingAsync(_memberKey, Handle, "The Octocat");
+        var builder = CreateBuilder(SignedInMemberManager(_memberKey).Object, store);
+        var viewModel = new MenuViewModel();
+
+        await builder.PopulateMemberAsync(viewModel, signInEnabled: true);
+
+        // The test principal has no given-name claim, so the handle is the sign-in name.
+        viewModel.MemberDisplayName.Should().Be(Handle);
     }
 
     [Theory]

@@ -57,73 +57,6 @@
     box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12), 0 0 0 12px var(--color-identity-pink);
 }
 
-/* Profile-owner avatar editing — a small upload badge overlaid on the avatar's corner,
-   only ever rendered for Model.IsOwnProfile (see dc-profile-avatar-editor). */
-
-.community-profile__avatar-editor {
-    position: relative;
-    display: inline-block;
-    width: 180px;
-    height: 180px;
-}
-
-.community-profile__avatar-editor .community-profile__avatar {
-    display: block;
-}
-
-.community-profile__avatar-upload {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 3px solid var(--color-white);
-    background: var(--color-identity-blue);
-    color: var(--color-white);
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.community-profile__avatar-upload:hover {
-    background: var(--color-identity-dark);
-}
-
-.community-profile__avatar-upload.is-saving {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.community-profile__avatar-upload:focus-visible {
-    outline: var(--focus-outline-width) solid var(--color-white);
-    outline-offset: var(--focus-outline-offset);
-}
-
-.community-profile__avatar-upload svg {
-    width: 18px;
-    height: 18px;
-}
-
-.community-profile__avatar-error {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;
-    max-width: 220px;
-    margin-top: var(--unit-xs);
-    padding: var(--unit-xxs) var(--unit-sm);
-    border-radius: var(--border-radius);
-    background: var(--color-white);
-    color: var(--color-error, #c0392b);
-    font-size: var(--font-size-xs);
-    text-align: center;
-    box-shadow: var(--base-box-shadow);
-}
-
 .community-profile__name {
     display: flex;
     flex-wrap: wrap;
@@ -157,89 +90,6 @@
     color: rgba(255, 255, 255, 0.85);
 }
 
-/* Profile-owner bio editing — an edit badge at the top right of the bio box, revealing an
-   inline textarea in place. Only ever rendered for Model.IsOwnProfile (see
-   dc-profile-bio-editor). */
-
-.community-profile__bio-editor {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    max-width: 100ch;
-    margin: var(--unit) 0 0;
-    padding-right: var(--unit-lg);
-}
-
-.community-profile__bio-editor .community-profile__bio {
-    margin: 0;
-}
-
-.community-profile__bio--empty {
-    color: rgba(255, 255, 255, 0.55);
-    font-style: italic;
-}
-
-.community-profile__bio-edit {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--color-white);
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-.community-profile__bio-edit:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.community-profile__bio-edit:focus-visible {
-    outline: var(--focus-outline-width) solid var(--color-white);
-    outline-offset: var(--focus-outline-offset);
-}
-
-.community-profile__bio-edit svg {
-    width: 16px;
-    height: 16px;
-}
-
-.community-profile__bio-editor--editing {
-    display: block;
-    padding-right: 0;
-}
-
-.community-profile__bio-editor-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--unit-sm);
-    margin-top: var(--unit-xs);
-}
-
-.community-profile__bio-count {
-    margin: 0;
-    font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.community-profile__bio-actions {
-    display: flex;
-    gap: var(--unit-xs);
-}
-
-.community-profile__bio-error {
-    margin: var(--unit-xs) 0 0;
-    color: var(--color-identity-pink);
-    font-size: var(--font-size-sm);
-}
-
 .community-profile__meta,
 .community-profile__socials {
     display: flex;
@@ -266,6 +116,11 @@
 .community-profile__socials a {
     color: var(--color-white);
     font-weight: 700;
+}
+
+/* "Edit profile" link, only shown to the profile's owner. */
+.community-profile__edit {
+    margin: var(--unit) 0 0;
 }
 
 /* MVP awards — a ring of medals orbiting the portrait. Each medal's angle is

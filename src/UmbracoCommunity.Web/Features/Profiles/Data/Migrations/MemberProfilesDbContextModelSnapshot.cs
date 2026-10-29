@@ -75,9 +75,23 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(200);
 
+                    b.Property<string>("DisplayNameOverride")
+                        .HasMaxLength(200);
+
+                    b.Property<string>("GitHubBio")
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("GitHubCompany")
+                        .HasMaxLength(200);
+
+                    b.Property<DateTime?>("GitHubFetchedUtc");
+
                     b.Property<string>("GitHubHandle")
                         .IsRequired()
                         .HasMaxLength(100);
+
+                    b.Property<string>("Headline")
+                        .HasMaxLength(200);
 
                     b.Property<bool>("IsProfileVisible");
 

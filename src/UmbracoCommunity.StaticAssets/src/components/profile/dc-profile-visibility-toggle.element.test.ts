@@ -6,9 +6,10 @@ if (!customElements.get("dc-profile-visibility-toggle")) {
   customElements.define("dc-profile-visibility-toggle", ProfileVisibilityToggleElement);
 }
 
-async function mount(profileVisible = false): Promise<ProfileVisibilityToggleElement> {
+async function mount(profileVisible = false, profileUrl = ""): Promise<ProfileVisibilityToggleElement> {
   const element = new ProfileVisibilityToggleElement();
   element.profileVisible = profileVisible;
+  element.profileUrl = profileUrl;
   document.body.appendChild(element);
   await element.updateComplete;
   return element;
@@ -16,6 +17,16 @@ async function mount(profileVisible = false): Promise<ProfileVisibilityToggleEle
 
 function getSwitch(element: ProfileVisibilityToggleElement): HTMLInputElement {
   return element.querySelector<HTMLInputElement>('input[role="switch"]')!;
+}
+
+const profileUrl = "https://example.com/community/profiles/octocat";
+
+function getUrlLabel(element: ProfileVisibilityToggleElement): string {
+  return element.querySelector(".dc-profile-visibility-toggle__url-label")?.textContent?.trim() ?? "";
+}
+
+function getUrlLink(element: ProfileVisibilityToggleElement): HTMLAnchorElement | null {
+  return element.querySelector<HTMLAnchorElement>(`a[href="${profileUrl}"]`);
 }
 
 function getHint(element: ProfileVisibilityToggleElement): string {
@@ -46,14 +57,14 @@ describe("ProfileVisibilityToggleElement", () => {
     expect(input.type).toBe("checkbox");
     expect(input.checked).toBe(false);
     expect(element.querySelector(`label[for="${input.id}"]`)?.textContent).toContain("Show my profile");
-    expect(getHint(element)).toContain("Only you can see it");
+    expect(getHint(element)).toContain("the rest of the community can't find you");
     expect(element.querySelector('[role="status"]')?.getAttribute("aria-live")).toBe("polite");
   });
 
   it("reflects the stored state on first render", async () => {
     const element = await mount(true);
     expect(getSwitch(element).checked).toBe(true);
-    expect(getHint(element)).toBe("Your profile is public. Anyone in the world can see it.");
+    expect(getHint(element)).toBe("Your profile is public. This is where the rest of the community finds you.");
   });
 
   it("shows the profile when switched on", async () => {
@@ -64,7 +75,7 @@ describe("ProfileVisibilityToggleElement", () => {
 
     expect(spy).toHaveBeenCalledWith(true);
     expect(getSwitch(element).checked).toBe(true);
-    expect(getHint(element)).toBe("Your profile is public. Anyone in the world can see it.");
+    expect(getHint(element)).toBe("Your profile is public. This is where the rest of the community finds you.");
     expect(element.querySelector('[role="status"]')?.textContent).toContain("now visible");
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
@@ -77,7 +88,7 @@ describe("ProfileVisibilityToggleElement", () => {
 
     expect(spy).toHaveBeenCalledWith(false);
     expect(getSwitch(element).checked).toBe(false);
-    expect(getHint(element)).toContain("Only you can see it");
+    expect(getHint(element)).toContain("the rest of the community can't find you");
     expect(element.querySelector('[role="status"]')?.textContent).toContain("now hidden");
   });
 
@@ -88,8 +99,60 @@ describe("ProfileVisibilityToggleElement", () => {
     await toggle(element);
 
     expect(getSwitch(element).checked).toBe(false);
-    expect(getHint(element)).toContain("Only you can see it");
+    expect(getHint(element)).toContain("the rest of the community can't find you");
     expect(element.querySelector('[role="alert"]')?.textContent).toContain("Something went wrong");
     expect(element.querySelector('[role="status"]')?.textContent?.trim()).toBe("");
+  });
+
+  it("warns that a hidden profile can't be found, and that showing it makes it public", async () => {
+    const element = await mount(false);
+
+    expect(getHint(element)).toContain("Your profile is hidden.");
+    expect(getHint(element)).toContain("the rest of the community can't find you until you turn on Show my profile");
+    expect(getHint(element)).toContain("anyone in the world can see it");
+  });
+
+  it("shows the profile link with a label that matches the stored state", async () => {
+    const hidden = await mount(false, profileUrl);
+    expect(getUrlLabel(hidden)).toBe("Only you can see this link for now:");
+    const link = getUrlLink(hidden)!;
+    expect(link.textContent).toBe(profileUrl);
+    expect(link.target).toBe("_blank");
+    expect(link.rel).toBe("noopener noreferrer");
+
+    document.body.innerHTML = "";
+    const visible = await mount(true, profileUrl);
+    expect(getUrlLabel(visible)).toBe("Your public profile link:");
+  });
+
+  it("updates the hint and link label as soon as the switch is flipped", async () => {
+    vi.spyOn(ProfileOnboardingService, "setProfileVisible").mockResolvedValue();
+    const element = await mount(false, profileUrl);
+
+    await toggle(element);
+
+    expect(getHint(element)).toBe("Your profile is public. This is where the rest of the community finds you.");
+    expect(getUrlLabel(element)).toBe("Your public profile link:");
+
+    await toggle(element);
+
+    expect(getHint(element)).toContain("the rest of the community can't find you");
+    expect(getUrlLabel(element)).toBe("Only you can see this link for now:");
+  });
+
+  it("puts the link label back when saving fails", async () => {
+    vi.spyOn(ProfileOnboardingService, "setProfileVisible").mockRejectedValue(new Error("Something went wrong"));
+    const element = await mount(false, profileUrl);
+
+    await toggle(element);
+
+    expect(getUrlLabel(element)).toBe("Only you can see this link for now:");
+  });
+
+  it("shows no link when there is no profile URL", async () => {
+    const element = await mount(true);
+
+    expect(element.querySelector(".dc-profile-visibility-toggle__url-label")).toBeNull();
+    expect(element.querySelector("a")).toBeNull();
   });
 });

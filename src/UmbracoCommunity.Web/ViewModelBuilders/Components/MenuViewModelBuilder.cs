@@ -63,30 +63,29 @@ internal class MenuViewModelBuilder : IAsyncViewModelBuilder<MenuViewModel>
         viewModel.IsSignedIn = true;
         var user = _httpContextAccessor.HttpContext?.User;
         var handle = user?.Identity?.Name;
-        viewModel.MemberDisplayName = user?.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? handle;
-        viewModel.MemberAvatarUrl = handle != null ? await ResolveMemberAvatarUrlAsync(handle) : null;
-    }
+        var claimsDisplayName = user?.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value ?? handle;
+        viewModel.MemberDisplayName = claimsDisplayName;
 
-    // Same rule as the account and profile pages: an uploaded avatar first, otherwise the
-    // GitHub avatar. Any failure falls back to the GitHub avatar so the header always renders.
-    private async Task<string> ResolveMemberAvatarUrlAsync(string handle)
-    {
+        if (handle == null)
+        {
+            return;
+        }
+
+        // Same rule as the account and profile pages: an uploaded avatar first, otherwise the
+        // GitHub avatar; the member's chosen display name first, otherwise the one from the
+        // sign-in claims. Any failure falls back to the GitHub values so the header always renders.
         var gitHubAvatarUrl = $"https://github.com/{handle}.png";
         try
         {
             var member = await _memberManager.GetCurrentMemberAsync();
-            if (member == null)
-            {
-                return gitHubAvatarUrl;
-            }
-
-            var profile = await _memberProfileStore.GetByMemberKeyAsync(member.Key);
-            return _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle);
+            var profile = member != null ? await _memberProfileStore.GetByMemberKeyAsync(member.Key) : null;
+            viewModel.MemberAvatarUrl = _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle);
+            viewModel.MemberDisplayName = profile?.DisplayNameOverride ?? claimsDisplayName;
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Could not resolve the signed-in member's avatar; using the GitHub avatar.");
-            return gitHubAvatarUrl;
+            _logger.LogWarning(ex, "Could not load the signed-in member's profile; using the GitHub avatar and name.");
+            viewModel.MemberAvatarUrl = gitHubAvatarUrl;
         }
     }
 

@@ -23,6 +23,7 @@ public class AccountPageController : RenderController
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly IProfileSyncClient _profileSyncClient;
+    private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -32,7 +33,8 @@ public class AccountPageController : RenderController
         MemberProfileStore store,
         IPublishedUrlProvider publishedUrlProvider,
         ProfileAvatarUrlResolver avatarUrlResolver,
-        IProfileSyncClient profileSyncClient)
+        IProfileSyncClient profileSyncClient,
+        GitHubProfileDefaultsService gitHubDefaultsService)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
@@ -40,6 +42,7 @@ public class AccountPageController : RenderController
         _publishedUrlProvider = publishedUrlProvider;
         _avatarUrlResolver = avatarUrlResolver;
         _profileSyncClient = profileSyncClient;
+        _gitHubDefaultsService = gitHubDefaultsService;
     }
 
     [NonAction]
@@ -64,14 +67,28 @@ public class AccountPageController : RenderController
         var profile = profileTask.Result;
         var onboardingCompleted = profile?.OnboardingStatus == OnboardingStatus.Completed;
 
+        // The profile details editor shows the GitHub bio and company as the defaults, so fetch
+        // them now if onboarding didn't manage to.
+        if (onboardingCompleted && profile != null)
+        {
+            await _gitHubDefaultsService.EnsureGitHubDefaultsAsync(profile, cancellationToken);
+        }
+
         var viewModel = new AccountPageViewModel(currentPage)
         {
-            DisplayName = member?.Name,
+            DisplayName = profile?.EffectiveDisplayName ?? member?.Name,
             GitHubHandle = handle,
             Email = member?.Email,
             AvatarUrl = handle != null ? _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle) : null,
             OnboardingCompleted = onboardingCompleted,
             IsProfileVisible = profile?.IsProfileVisible ?? false,
+            HasCustomAvatar = profile?.AvatarMediaKey.HasValue ?? false,
+            CustomDisplayName = profile?.DisplayNameOverride,
+            DefaultDisplayName = profile?.DisplayName ?? member?.Name,
+            CustomHeadline = profile?.Headline,
+            GitHubHeadline = profile?.GitHubCompany,
+            CustomBio = profile?.Bio,
+            GitHubBio = profile?.GitHubBio,
         };
 
         if (onboardingCompleted && handle != null)
