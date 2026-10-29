@@ -108,7 +108,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IViewModelBuilder<ContentPageViewModel>, ContentPageViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<BlogPageViewModel>, BlogPageViewModelBuilder>();
 
-            builder.Services.AddScoped<IViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
+            builder.Services.AddScoped<IAsyncViewModelBuilder<MenuViewModel>, MenuViewModelBuilder>();
             builder.Services.AddScoped<IViewModelBuilder<FooterViewModel>, FooterViewModelBuilder>();
 
             return builder;

@@ -7,18 +7,18 @@ namespace UmbracoCommunity.Web.ViewComponents;
 
 public class MenuViewComponent : ViewComponent
 {
-    private readonly IViewModelBuilder<MenuViewModel> _menuViewModelBuilder;
+    private readonly IAsyncViewModelBuilder<MenuViewModel> _menuViewModelBuilder;
     private readonly ContentContextService _currentPageService;
 
     public MenuViewComponent(
-        IViewModelBuilder<MenuViewModel> menuViewModelBuilder,
+        IAsyncViewModelBuilder<MenuViewModel> menuViewModelBuilder,
         ContentContextService currentPageService)
     {
         _menuViewModelBuilder = menuViewModelBuilder;
         _currentPageService = currentPageService;
     }
 
-    public IViewComponentResult Invoke()
+    public async Task<IViewComponentResult> InvokeAsync()
     {
         var currentPage = _currentPageService.CurrentPage;
         var umbracoContext = _currentPageService.UmbracoContext;
@@ -28,7 +28,7 @@ public class MenuViewComponent : ViewComponent
             return View("Menu", new MenuViewModel());
         }
 
-        var viewModel = _menuViewModelBuilder.Build(currentPage, umbracoContext);
+        var viewModel = await _menuViewModelBuilder.Build(currentPage, umbracoContext);
         return View("Menu", viewModel);
     }
 }
