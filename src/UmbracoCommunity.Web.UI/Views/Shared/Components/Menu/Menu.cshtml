@@ -126,7 +126,7 @@
                     <a href="@Model.AccountPageUrl" class="member-avatar__trigger" aria-label="@Model.MemberDisplayName — account" tabindex="0">
                         @if (!string.IsNullOrEmpty(Model.MemberAvatarUrl))
                         {
-                            <img src="@Model.MemberAvatarUrl" alt="" width="36" height="36" />
+                            <img src="@Model.MemberAvatarUrl" alt="" width="36" height="36" data-member-avatar />
                         }
                     </a>
                     <div class="member-avatar__menu">
