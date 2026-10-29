@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RefreshSessionizeCacheData, RefreshSessionizeCacheErrors, RefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, GetExternalMemberGroupsData, GetExternalMemberGroupsErrors, GetExternalMemberGroupsResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RefreshSessionizeCacheData, RefreshSessionizeCacheErrors, RefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, SetExternalMemberGroupsData, SetExternalMemberGroupsErrors, SetExternalMemberGroupsResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -81,6 +81,36 @@ export class UmbracoCommunityExtensionsService {
             ],
             url: '/umbraco/umbracocommunityextensions/api/v1/seed/status',
             ...options
+        });
+    }
+    
+    public static getExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<GetExternalMemberGroupsData, ThrowOnError>) {
+        return (options.client ?? client).get<GetExternalMemberGroupsResponses, GetExternalMemberGroupsErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            ...options
+        });
+    }
+    
+    public static setExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<SetExternalMemberGroupsData, ThrowOnError>) {
+        return (options.client ?? client).put<SetExternalMemberGroupsResponses, SetExternalMemberGroupsErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
         });
     }
 }
