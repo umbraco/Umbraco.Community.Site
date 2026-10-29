@@ -25,6 +25,28 @@ public static class PublicNetworkGuard
         }
     }
 
+    /// <summary>
+    /// <c>SocketsHttpHandler.ConnectCallback</c> that resolves the host, refuses non-public addresses and
+    /// connects straight to the validated IP, so no DNS-rebinding window exists between check and connect.
+    /// </summary>
+    public static async ValueTask<Stream> ConnectToPublicAddressAsync(SocketsHttpConnectionContext context, CancellationToken cancellationToken)
+    {
+        var address = await ResolvePublicAddressAsync(context.DnsEndPoint.Host, cancellationToken)
+            ?? throw new HttpRequestException($"'{context.DnsEndPoint.Host}' does not resolve to a permitted address.");
+
+        var socket = new Socket(SocketType.Stream, ProtocolType.Tcp) { NoDelay = true };
+        try
+        {
+            await socket.ConnectAsync(new IPEndPoint(address, context.DnsEndPoint.Port), cancellationToken);
+            return new NetworkStream(socket, ownsSocket: true);
+        }
+        catch
+        {
+            socket.Dispose();
+            throw;
+        }
+    }
+
     public static bool IsPublicAddress(IPAddress address)
     {
         if (IPAddress.IsLoopback(address) || address.IsIPv6LinkLocal || address.IsIPv6SiteLocal || address.IsIPv6Multicast)

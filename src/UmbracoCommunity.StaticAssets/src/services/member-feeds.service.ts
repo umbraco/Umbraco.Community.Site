@@ -8,7 +8,13 @@ export interface MemberFeed {
   url: string;
   isHidden: boolean;
   source: MemberFeedSource;
+  status: MemberFeedStatus;
+  previewTitle: string | null;
+  faviconUrl: string | null;
+  previewImageUrl: string | null;
 }
+
+export type MemberFeedStatus = "Visible" | "Hidden" | "Unreachable";
 
 /**
  * Platform-synced feeds were matched to this member automatically by the external content
@@ -32,6 +38,17 @@ export class MemberFeedsService extends ServiceBase {
     const response = await ServiceBase.post(this.BASE_URL, { platform, url });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
     return response.json();
+  }
+
+  static async update(id: number, platform: string, url: string): Promise<MemberFeed> {
+    const response = await ServiceBase.put(`${this.BASE_URL}/${id}`, { platform, url });
+    if (!response.ok) throw new Error(await this.#errorMessage(response));
+    return response.json();
+  }
+
+  static async reorder(ids: number[]): Promise<void> {
+    const response = await ServiceBase.put(`${this.BASE_URL}/order`, { ids });
+    if (!response.ok) throw new Error(await this.#errorMessage(response));
   }
 
   static async setHidden(id: number, isHidden: boolean): Promise<void> {

@@ -32,6 +32,18 @@ export class FeedManagerElement extends LitElement {
   private _urlDraft = "";
 
   @state()
+  private _editingId: number | null = null;
+
+  @state()
+  private _editPlatformDraft = "";
+
+  @state()
+  private _editUrlDraft = "";
+
+  @state()
+  private _draggingId: number | null = null;
+
+  @state()
   private _removingId: number | null = null;
 
   @state()
@@ -83,6 +95,55 @@ export class FeedManagerElement extends LitElement {
     }
   }
 
+  #startEdit(feed: MemberFeed) {
+    this._editingId = feed.id;
+    this._editPlatformDraft = feed.platform;
+    this._editUrlDraft = feed.url;
+  }
+
+  #cancelEdit() {
+    this._editingId = null;
+  }
+
+  async #saveEdit(event: Event, id: number) {
+    event.preventDefault();
+    try {
+      const updated = await MemberFeedsService.update(id, this._editPlatformDraft.trim(), this._editUrlDraft.trim());
+      this._feeds = this._feeds.map((f) => (f.id === id ? updated : f));
+      this._editingId = null;
+      this._errorMessage = "";
+    } catch (error) {
+      this._errorMessage = error instanceof Error ? error.message : "Couldn't save that link.";
+    }
+  }
+
+  /** Moves a link to where another one currently sits, then stores the new order. */
+  async #moveBefore(feedId: number, targetId: number, after = false) {
+    if (feedId === targetId) return;
+    const previous = this._feeds;
+    const moving = previous.find((f) => f.id === feedId);
+    if (!moving) return;
+
+    const rest = previous.filter((f) => f.id !== feedId);
+    const targetIndex = rest.findIndex((f) => f.id === targetId);
+    if (targetIndex < 0) return;
+    rest.splice(targetIndex + (after ? 1 : 0), 0, moving);
+
+    this._feeds = rest;
+    try {
+      await MemberFeedsService.reorder(rest.map((f) => f.id));
+      this._errorMessage = "";
+    } catch (error) {
+      this._feeds = previous;
+      this._errorMessage = error instanceof Error ? error.message : "Couldn't save the new order.";
+    }
+  }
+
+  #moveByStep(feed: MemberFeed, group: MemberFeed[], step: -1 | 1) {
+    const neighbour = group[group.indexOf(feed) + step];
+    if (neighbour) void this.#moveBefore(feed.id, neighbour.id, step === 1);
+  }
+
   #startRemove(feed: MemberFeed) {
     this._removingId = feed.id;
     this._removeReasonDraft = "";
@@ -108,7 +169,7 @@ export class FeedManagerElement extends LitElement {
     return !this.restrictHideToPlatform || isPlatformSourced(feed);
   }
 
-  #renderFeed(feed: MemberFeed): TemplateResult {
+  #renderFeed(feed: MemberFeed, group: MemberFeed[]): TemplateResult {
     // Platform-synced feeds were matched to this member automatically, so removing one can mean
     // "that's a mismatch, not mine" — the copy reflects that so the flag is meaningful when it's
     // reported back. Member-added feeds were added deliberately, so removing one is just tidying
@@ -139,14 +200,86 @@ export class FeedManagerElement extends LitElement {
       `;
     }
 
+    if (this._editingId === feed.id) {
+      return html`
+        <li class="dc-feed-manager__item dc-feed-manager__item--editing">
+          <form class="dc-feed-manager__add-form" @submit=${(event: Event) => this.#saveEdit(event, feed.id)}>
+            <div class="dc-form-field">
+              <label for="dc-feed-manager-edit-platform-${feed.id}">Platform</label>
+              <input
+                id="dc-feed-manager-edit-platform-${feed.id}"
+                type="text"
+                required
+                .value=${this._editPlatformDraft}
+                @input=${(event: Event) => (this._editPlatformDraft = (event.target as HTMLInputElement).value)}
+              />
+            </div>
+            <div class="dc-form-field">
+              <label for="dc-feed-manager-edit-url-${feed.id}">URL</label>
+              <input
+                id="dc-feed-manager-edit-url-${feed.id}"
+                type="url"
+                required
+                .value=${this._editUrlDraft}
+                @input=${(event: Event) => (this._editUrlDraft = (event.target as HTMLInputElement).value)}
+              />
+            </div>
+            <div class="dc-feed-manager__item-actions">
+              <button class="btn" type="button" @click=${this.#cancelEdit}>Cancel</button>
+              <button class="btn is-blue" type="submit">Save</button>
+            </div>
+          </form>
+        </li>
+      `;
+    }
+
+    const position = group.indexOf(feed);
+    const statusLabel =
+      feed.status === "Hidden" ? "Hidden from profile" : feed.status === "Unreachable" ? "Couldn't be reached" : "Shown on profile";
+
     return html`
-      <li class="dc-feed-manager__item ${feed.isHidden ? "dc-feed-manager__item--hidden" : ""}">
+      <li
+        class="dc-feed-manager__item ${feed.isHidden ? "dc-feed-manager__item--hidden" : ""}"
+        draggable="true"
+        @dragstart=${() => (this._draggingId = feed.id)}
+        @dragend=${() => (this._draggingId = null)}
+        @dragover=${(event: DragEvent) => event.preventDefault()}
+        @drop=${(event: DragEvent) => {
+          event.preventDefault();
+          if (this._draggingId !== null && group.some((f) => f.id === this._draggingId)) {
+            void this.#moveBefore(this._draggingId, feed.id, group.findIndex((f) => f.id === this._draggingId) < position);
+          }
+          this._draggingId = null;
+        }}
+      >
         <div class="dc-feed-manager__item-info">
-          <span class="dc-feed-manager__platform">${feed.platform}</span>
+          <span class="dc-feed-manager__platform">
+            ${feed.faviconUrl ? html`<img class="dc-feed-manager__favicon" src=${feed.faviconUrl} alt="" width="16" height="16" loading="lazy" />` : ""}
+            ${feed.platform}
+          </span>
           <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
-          ${feed.isHidden ? html`<span class="dc-feed-manager__badge">Hidden from profile</span>` : ""}
+          <span class="dc-feed-manager__badge dc-feed-manager__badge--${feed.status.toLowerCase()}">${statusLabel}</span>
         </div>
         <div class="dc-feed-manager__item-actions">
+          <button
+            class="link-action"
+            type="button"
+            ?disabled=${position === 0}
+            aria-label="Move ${feed.platform} up"
+            @click=${() => this.#moveByStep(feed, group, -1)}
+          >
+            ↑
+          </button>
+          <button
+            class="link-action"
+            type="button"
+            ?disabled=${position === group.length - 1}
+            aria-label="Move ${feed.platform} down"
+            @click=${() => this.#moveByStep(feed, group, 1)}
+          >
+            ↓
+          </button>
+          <button class="link-action" type="button" @click=${() => this.#startEdit(feed)}>Edit</button>
           ${this.#canHide(feed)
             ? html`<button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
                 ${feed.isHidden ? iconEye : iconEyeOff}
@@ -168,7 +301,7 @@ export class FeedManagerElement extends LitElement {
       <div class="dc-feed-manager__group">
         <h3 class="dc-feed-manager__group-title">${title}</h3>
         <ul class="dc-feed-manager__list">
-          ${feeds.map((feed) => this.#renderFeed(feed))}
+          ${feeds.map((feed) => this.#renderFeed(feed, feeds))}
         </ul>
       </div>
     `;
@@ -193,7 +326,7 @@ export class FeedManagerElement extends LitElement {
           <input
             id="dc-feed-manager-url"
             type="url"
-            placeholder="https://…"
+            placeholder="https://…" pattern="https://.*"
             required
             .value=${this._urlDraft}
             @input=${(event: Event) => (this._urlDraft = (event.target as HTMLInputElement).value)}
@@ -220,7 +353,7 @@ export class FeedManagerElement extends LitElement {
           </p>`
         : html`
             <p class="dc-feed-manager__hint">
-              Hiding a feed keeps it here for you to manage, but removes it from your public profile.
+              Hiding a feed keeps it here for you to manage, but removes it from your public profile. Drag a link, or use the arrows, to change the order it appears in.
             </p>
             ${this.#renderGroup("Synced automatically", platformFeeds)}
             ${this.#renderGroup("Added by you", memberFeeds)}

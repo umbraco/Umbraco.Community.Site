@@ -17,7 +17,7 @@ namespace UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 /// This is a caller-supplied-URL proxy, so it's guarded against being turned into an open image relay or an
 /// SSRF probe. Authorization is a self-contained, tamper-proof <see cref="IDataProtector"/>-signed token
 /// (created via <see cref="CreateProxyUrl"/> at the moment a URL is put in front of a client, verified via
-/// <see cref="FetchAsync"/>) rather than a server-side "recently seen" allowlist keyed by client IP — behind a
+/// <see cref="FetchAsync"/>; valid for <see cref="TokenLifetime"/>) rather than a server-side "recently seen" allowlist keyed by client IP — behind a
 /// reverse proxy/CDN (e.g. Azure Front Door in front of Umbraco Cloud) or more than one app instance,
 /// <c>RemoteIpAddress</c> isn't reliably the same value across the preview call and the image requests it
 /// triggers, so an IP-keyed allowlist silently 404s every image in production even though it works locally.
@@ -31,15 +31,17 @@ public sealed class FeedSubmissionImageProxyService
     private const string DataProtectionPurpose = "UmbracoCommunity.FeedSubmissionImageProxy.v1";
     private const long MaxBytes = 5_000_000;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(24);
 
     private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/tiff", "image/svg+xml",
+        "image/x-icon", "image/vnd.microsoft.icon",
     };
 
     private readonly HttpClient _http;
     private readonly IMemoryCache _cache;
-    private readonly IDataProtector _protector;
+    private readonly ITimeLimitedDataProtector _protector;
     private readonly ILogger<FeedSubmissionImageProxyService> _logger;
 
     public FeedSubmissionImageProxyService(
@@ -50,7 +52,7 @@ public sealed class FeedSubmissionImageProxyService
     {
         _http = typedClient.Client;
         _cache = cache;
-        _protector = dataProtectionProvider.CreateProtector(DataProtectionPurpose);
+        _protector = dataProtectionProvider.CreateProtector(DataProtectionPurpose).ToTimeLimitedDataProtector();
         _logger = logger;
     }
 
@@ -66,7 +68,7 @@ public sealed class FeedSubmissionImageProxyService
             return null;
         }
 
-        var token = _protector.Protect(absoluteUrl);
+        var token = _protector.Protect(absoluteUrl, TokenLifetime);
         return $"/api/feed-submission/image-proxy?token={Uri.EscapeDataString(token)}";
     }
 
@@ -80,7 +82,7 @@ public sealed class FeedSubmissionImageProxyService
         }
         catch (CryptographicException)
         {
-            _logger.LogWarning("Refusing to proxy: token failed to unprotect (tampered, expired key ring, or not ours).");
+            _logger.LogWarning("Refusing to proxy: token failed to unprotect (tampered, expired, or not ours).");
             return null;
         }
 
