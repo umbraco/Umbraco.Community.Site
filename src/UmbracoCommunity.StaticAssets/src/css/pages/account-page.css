@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 /* Settings-page style, not the bold public-profile look. */
 .account-page-wrapper {
   max-width: 1040px;
@@ -19,15 +21,6 @@
   gap: var(--unit-sm);
   padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light-grey);
-}
-
-.account-page__avatar {
-  display: block;
-  flex-shrink: 0;
-  width: 108px;
-  height: 108px;
-  border-radius: 50%;
-  object-fit: cover;
 }
 
 .account-page__identity {
@@ -73,7 +66,7 @@
   word-break: break-word;
 }
 
-/* margin-left: auto keeps avatar+identity grouped on the left. */
+/* margin-left: auto keeps the identity on the left and sign-out on the right. */
 .account-page__header-logout {
   margin-left: auto;
   flex-shrink: 0;
@@ -206,6 +199,12 @@
   color: var(--color-light-blue);
 }
 
+.dc-profile-visibility-toggle__url-label {
+  margin: var(--unit-sm) 0 var(--unit-xxs);
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
 .dc-profile-visibility-toggle__status:not(:empty),
 .dc-profile-visibility-toggle__error {
   margin: var(--unit-xs) 0 0;
@@ -226,4 +225,163 @@
   .dc-profile-visibility-toggle__track::after {
     transition: none;
   }
+}
+
+/* Profile details editor: photo beside the headline and bio fields from --sm up. */
+.dc-profile-details-editor {
+  display: grid;
+  gap: var(--unit-sm);
+
+  @media (--sm) {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--unit-md);
+  }
+}
+
+.dc-profile-details-editor__photo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-sm);
+
+  @media (--sm) {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 220px;
+  }
+}
+
+.dc-profile-details-editor__avatar {
+  display: block;
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dc-profile-details-editor__photo-controls {
+  min-width: 0;
+}
+
+.dc-profile-details-editor__photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+}
+
+.dc-profile-details-editor__photo-actions .btn {
+  min-height: 32px;
+  padding: 0 var(--unit-sm);
+  gap: var(--unit-xxs);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.dc-profile-details-editor__photo-actions .btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* The file input is visually hidden, so its focus ring is drawn on the label button. */
+.dc-profile-details-editor__photo-actions input:focus-visible + .btn {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-profile-details-editor__photo-actions input[aria-busy="true"] + .btn {
+  opacity: 0.6;
+}
+
+.dc-profile-details-editor__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-sm);
+  min-width: 0;
+}
+
+.dc-profile-details-editor__field-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--unit-sm);
+}
+
+.dc-profile-details-editor__hint {
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+  overflow-wrap: anywhere;
+}
+
+.dc-profile-details-editor__count {
+  flex-shrink: 0;
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-details-editor__count--limit {
+  color: var(--color-red);
+}
+
+/* Reads as a link here, not as quiet secondary text. */
+.dc-profile-details-editor .dc-profile-details-editor__use-github-photo {
+  color: var(--color-identity-blue);
+  font-weight: 600;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.dc-profile-details-editor .dc-profile-details-editor__use-github-photo:hover {
+  color: var(--color-identity-dark);
+}
+
+.dc-profile-details-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-sm);
+}
+
+.dc-profile-details-editor__error {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-red);
+}
+
+.dc-profile-details-editor__status:not(:empty) {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-details-editor__status {
+  margin: 0;
+}
+
+/* Sits beside the Save button; holds "Saved." and the link to the public profile. */
+.dc-profile-details-editor__save-status {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-details-editor__profile-link {
+  font-weight: 700;
+  color: var(--color-identity-blue);
+}
+
+.dc-profile-details-editor__profile-link:hover {
+  text-decoration: underline;
+}
+
+.dc-profile-details-editor__profile-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
 }

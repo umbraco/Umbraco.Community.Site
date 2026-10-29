@@ -62,7 +62,7 @@ public class CommunityProfilePageController : RenderController
             Profile = viewable.Profile,
             IsOwnProfile = isOwnProfile,
             IsHiddenPreview = viewable.IsHiddenPreview,
-            AccountPageUrl = viewable.IsHiddenPreview
+            AccountPageUrl = isOwnProfile
                 ? currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider)
                 : null,
             ShowEnrichedSections = access.Show,

@@ -9,15 +9,6 @@
 <div class="account-page-wrapper">
     <article class="account-page">
         <header class="account-page__header">
-            @if (!string.IsNullOrEmpty(Model.AvatarUrl))
-            {
-                <img class="account-page__avatar"
-                     src="@Model.AvatarUrl"
-                     alt=""
-                     width="108"
-                     height="108" />
-            }
-
             <div class="account-page__identity">
                 <h1 class="account-page__name">@Model.DisplayName</h1>
 
@@ -46,20 +37,12 @@
             </form>
         </header>
 
-        <section class="account-page__section">
-            <h2>Your public profile</h2>
-
-            @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
-            {
-                @if (Model.IsProfileVisible)
-                {
-                    <p class="account-page__section-hint">This is where the rest of the community finds you.</p>
-                }
-                else
-                {
-                    <p class="account-page__section-hint">Only you can see this page until you show your profile. Showing it makes it public, so anyone in the world can see it.</p>
-                }
-                <a class="account-page__profile-url no-link-animation" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">@Model.ProfileUrl</a>
+        @if (Model.OnboardingCompleted)
+        {
+            <section class="account-page__section">
+                <h2>Your public profile</h2>
+                <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"
+                                              profile-url="@Model.ProfileUrl"></dc-profile-visibility-toggle>
 
                 @if (Model.LastSyncedAt is not null)
                 {
@@ -73,20 +56,29 @@
                         Sync pending — your profile data hasn't synced yet.
                     </p>
                 }
-            }
-            else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
-            {
+            </section>
+
+            <section class="account-page__section">
+                <h2>Your profile details</h2>
+                <p class="account-page__section-hint">Your photo, name, headline and bio as they appear on your public profile. Leave a field empty to use what's on your GitHub profile.</p>
+                <dc-profile-details-editor avatar-url="@Model.AvatarUrl"
+                                           has-custom-avatar="@Model.HasCustomAvatar"
+                                           custom-display-name="@Model.CustomDisplayName"
+                                           default-display-name="@Model.DefaultDisplayName"
+                                           custom-headline="@Model.CustomHeadline"
+                                           github-headline="@Model.GitHubHeadline"
+                                           custom-bio="@Model.CustomBio"
+                                           github-bio="@Model.GitHubBio"
+                                           profile-url="@Model.ProfileUrl"></dc-profile-details-editor>
+            </section>
+        }
+        else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
+        {
+            <section class="account-page__section">
+                <h2>Your public profile</h2>
                 <p class="account-page__section-hint">
                     <a href="@Model.OnboardingUrl">Finish setting up your profile</a> to get a public page the community can find.
                 </p>
-            }
-        </section>
-
-        @if (Model.OnboardingCompleted)
-        {
-            <section class="account-page__section">
-                <h2>Profile visibility</h2>
-                <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"></dc-profile-visibility-toggle>
             </section>
         }
 

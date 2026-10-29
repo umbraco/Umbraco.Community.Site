@@ -26,10 +26,38 @@ public class MemberProfileEntity
     /// </summary>
     public string GitHubHandle { get; set; } = string.Empty;
 
-    /// <summary>Denormalized cache of the member's display name, synced when onboarding starts.</summary>
+    /// <summary>
+    /// Denormalized cache of the member's display name from GitHub, synced when onboarding starts.
+    /// The default when the member hasn't chosen their own (see <see cref="DisplayNameOverride"/>).
+    /// </summary>
     public string DisplayName { get; set; } = string.Empty;
 
+    /// <summary>The member's own display name. Null = use <see cref="DisplayName"/>.</summary>
+    public string? DisplayNameOverride { get; set; }
+
+    /// <summary>The member's own headline. Null = use <see cref="GitHubCompany"/>.</summary>
+    public string? Headline { get; set; }
+
+    /// <summary>The member's own bio. Null = use <see cref="GitHubBio"/>.</summary>
     public string? Bio { get; set; }
+
+    /// <summary>The bio from the member's public GitHub profile, cached so it is fetched once rather than per page view.</summary>
+    public string? GitHubBio { get; set; }
+
+    /// <summary>The company from the member's public GitHub profile, cached alongside <see cref="GitHubBio"/>.</summary>
+    public string? GitHubCompany { get; set; }
+
+    /// <summary>When <see cref="GitHubBio"/> and <see cref="GitHubCompany"/> were fetched. Null = not fetched yet.</summary>
+    public DateTime? GitHubFetchedUtc { get; set; }
+
+    /// <summary>The display name to show: the member's own, otherwise the GitHub one.</summary>
+    public string EffectiveDisplayName => DisplayNameOverride ?? DisplayName;
+
+    /// <summary>The headline to show: the member's own, otherwise their GitHub company.</summary>
+    public string? EffectiveHeadline => Headline ?? GitHubCompany;
+
+    /// <summary>The bio to show: the member's own, otherwise their GitHub bio.</summary>
+    public string? EffectiveBio => Bio ?? GitHubBio;
 
     /// <summary>Umbraco Media item key for an uploaded custom avatar. Null = use the GitHub avatar default.</summary>
     public Guid? AvatarMediaKey { get; set; }

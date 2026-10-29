@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 
 namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
 /// Onboarding + ongoing profile-editing API. Covers both the onboarding wizard and later
-/// Account-page edits (avatar/bio are the same operation regardless of when they happen) —
+/// Account-page edits (avatar/name/headline/bio are the same operation regardless of when they happen) —
 /// always scoped to the current signed-in member, never trusting an id from the caller.
 /// Every POST, PUT and DELETE must carry the antiforgery request token from
 /// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
@@ -18,29 +19,27 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 [Route("api/profile")]
 public class ProfileApiController : ControllerBase
 {
-    // Short by design — the bio renders in the profile page's hero band next to the headline
-    // (see community-profile.css .community-profile__bio, max-width: 60ch), not as a full
-    // "about me" section, so it needs to stay skimmable rather than wrapping for many lines.
-    private const int MaxBioLength = 280;
-
     private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly AvatarUploadService _avatarUploadService;
     private readonly IProfileSyncClient _profileSyncClient;
+    private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
 
     public ProfileApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
         ProfileAvatarUrlResolver avatarUrlResolver,
         AvatarUploadService avatarUploadService,
-        IProfileSyncClient profileSyncClient)
+        IProfileSyncClient profileSyncClient,
+        GitHubProfileDefaultsService gitHubDefaultsService)
     {
         _memberManager = memberManager;
         _store = store;
         _avatarUrlResolver = avatarUrlResolver;
         _avatarUploadService = avatarUploadService;
         _profileSyncClient = profileSyncClient;
+        _gitHubDefaultsService = gitHubDefaultsService;
     }
 
     /// <summary>Idempotently creates/fetches the current member's profile row and returns its current draft state.</summary>
@@ -54,16 +53,19 @@ public class ProfileApiController : ControllerBase
         }
 
         var entity = await _store.GetOrStartOnboardingAsync(member.Key, member.UserName, member.Name ?? member.UserName, cancellationToken);
+        await _gitHubDefaultsService.EnsureGitHubDefaultsAsync(entity, cancellationToken);
 
         return Ok(new OnboardingStateResponse(
             entity.GitHubHandle,
-            entity.DisplayName,
+            entity.EffectiveDisplayName,
             entity.Bio,
             _avatarUrlResolver.Resolve(entity.AvatarMediaKey, entity.GitHubHandle),
             entity.AvatarMediaKey.HasValue,
-            entity.OnboardingStatus.ToString()));
+            entity.OnboardingStatus.ToString(),
+            entity.GitHubBio));
     }
 
+    /// <summary>Sets the member's own bio. Empty or whitespace-only text clears it, so the GitHub bio shows again.</summary>
     [HttpPut("bio")]
     public async Task<IActionResult> UpdateBio([FromBody] UpdateBioRequest request, CancellationToken cancellationToken)
     {
@@ -73,13 +75,66 @@ public class ProfileApiController : ControllerBase
             return Unauthorized();
         }
 
-        if (request.Bio is { Length: > MaxBioLength })
+        if (ProfileText.Normalize(request.Bio) is { Length: > ProfileText.MaxBioLength })
         {
-            return BadRequest(new { error = $"Bio must be {MaxBioLength} characters or fewer." });
+            return BadRequest(new { error = $"Bio must be {ProfileText.MaxBioLength} characters or fewer." });
         }
 
-        await _store.UpdateBioAsync(member.Key, request.Bio, cancellationToken);
-        return Ok();
+        var entity = await _store.UpdateBioAsync(member.Key, request.Bio, cancellationToken);
+        if (entity == null)
+        {
+            return BadRequest(new { error = "Onboarding hasn't been started yet." });
+        }
+
+        return Ok(ToDetailsResponse(entity));
+    }
+
+    /// <summary>Sets the member's own headline. Empty or whitespace-only text clears it, so the GitHub company shows again.</summary>
+    [HttpPut("headline")]
+    public async Task<IActionResult> UpdateHeadline([FromBody] UpdateHeadlineRequest request, CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        if (ProfileText.Normalize(request.Headline) is { Length: > ProfileText.MaxHeadlineLength })
+        {
+            return BadRequest(new { error = $"Headline must be {ProfileText.MaxHeadlineLength} characters or fewer." });
+        }
+
+        var entity = await _store.UpdateHeadlineAsync(member.Key, request.Headline, cancellationToken);
+        if (entity == null)
+        {
+            return BadRequest(new { error = "Onboarding hasn't been started yet." });
+        }
+
+        return Ok(ToDetailsResponse(entity));
+    }
+
+    /// <summary>Sets the member's own display name. Empty or whitespace-only text clears it, so the GitHub name shows again.</summary>
+    [HttpPut("display-name")]
+    public async Task<IActionResult> UpdateDisplayName([FromBody] UpdateDisplayNameRequest request, CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        if (ProfileText.Normalize(request.DisplayName) is { Length: > ProfileText.MaxDisplayNameLength })
+        {
+            return BadRequest(new { error = $"Display name must be {ProfileText.MaxDisplayNameLength} characters or fewer." });
+        }
+
+        var entity = await _store.UpdateDisplayNameAsync(member.Key, request.DisplayName, cancellationToken);
+        if (entity == null)
+        {
+            return BadRequest(new { error = "Onboarding hasn't been started yet." });
+        }
+
+        return Ok(ToDetailsResponse(entity));
     }
 
     /// <summary>
@@ -169,4 +224,16 @@ public class ProfileApiController : ControllerBase
 
         return Ok();
     }
+
+    private static ProfileDetailsResponse ToDetailsResponse(MemberProfileEntity entity) =>
+        new(
+            entity.EffectiveDisplayName,
+            entity.DisplayNameOverride != null,
+            entity.DisplayName,
+            entity.EffectiveHeadline,
+            entity.Headline != null,
+            entity.GitHubCompany,
+            entity.EffectiveBio,
+            entity.Bio != null,
+            entity.GitHubBio);
 }
