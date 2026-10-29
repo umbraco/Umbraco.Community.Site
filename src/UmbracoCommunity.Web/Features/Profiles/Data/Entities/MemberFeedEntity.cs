@@ -1,3 +1,5 @@
+using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
+
 namespace UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 
 public enum FeedSyncStatus
@@ -51,6 +53,24 @@ public class MemberFeedEntity
     public DateTime? RemovedUtc { get; set; }
 
     public DateTime AddedUtc { get; set; }
+
+    /// <summary>
+    /// Position in the member's list. Rows that predate ordering all hold 0, which falls back to
+    /// <see cref="AddedUtc"/> order until the member first reorders.
+    /// </summary>
+    public int SortOrder { get; set; }
+
+    public LinkPreviewStatus PreviewStatus { get; set; }
+
+    public string? PreviewTitle { get; set; }
+
+    /// <summary>Absolute https URL on the linked site. Never rendered directly — always via the image proxy.</summary>
+    public string? PreviewImageUrl { get; set; }
+
+    /// <summary>Absolute https URL on the linked site. Never rendered directly — always via the image proxy.</summary>
+    public string? FaviconUrl { get; set; }
+
+    public DateTime? PreviewCheckedUtc { get; set; }
 
     /// <summary>
     /// Lightweight sync-state tracking so a future reconciliation job can find feeds that

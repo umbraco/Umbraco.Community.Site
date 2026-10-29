@@ -110,12 +110,46 @@
 }
 
 .community-profile__socials {
-    gap: var(--unit);
+    gap: var(--unit-xs);
 }
 
+.community-profile__socials li {
+    display: flex;
+}
+
+/* Each link is a pill in the page's soft surface colour, so favicons (designed for light backgrounds) stay
+   legible on the blue band without the harshness of pure white. */
 .community-profile__socials a {
-    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    gap: var(--unit-xs);
+    padding: var(--unit-xxs) var(--unit-sm);
+    border-radius: var(--border-radius-xl);
+    background: var(--color-page-surface);
+    color: var(--color-identity-blue);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
     font-weight: 700;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+/* Outranks the global "#main-content .no-link-animation" rule, which zeroes padding-bottom and would
+   otherwise leave the pill's text sitting low. */
+#main-content .community-profile__socials a.no-link-animation {
+    padding: var(--unit-xxs) var(--unit-sm);
+}
+
+.community-profile__socials a:hover,
+.community-profile__socials a:focus-visible {
+    background: var(--color-white);
+}
+
+.community-profile__social-favicon {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
 }
 
 /* "Edit profile" link, only shown to the profile's owner. */

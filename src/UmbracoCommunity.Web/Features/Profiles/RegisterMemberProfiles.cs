@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 using UmbracoCommunity.Web.Routing;
 
 namespace UmbracoCommunity.Web.Features.Profiles;
@@ -64,6 +66,19 @@ public sealed class RegisterMemberProfiles : IComposer
             client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunity/1.0");
         });
         builder.Services.AddScoped<GitHubProfileDefaultsService>();
+
+        // Fetches member-supplied link pages: no automatic redirects (the service follows them, re-checking each
+        // hop) and connections restricted to public addresses.
+        builder.Services.AddHttpClient<LinkPreviewHttpClient>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
+        }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            AllowAutoRedirect = false,
+            ConnectCallback = PublicNetworkGuard.ConnectToPublicAddressAsync,
+        });
+        builder.Services.AddScoped<LinkPreviewService>();
 
         // Append so built-in content finders match first. Ours only fires under the tenant's
         // Community Profile page for a plausible-handle trailing segment (e.g. /community/profiles/octocat).

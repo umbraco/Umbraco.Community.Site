@@ -91,7 +91,8 @@ public sealed record ProfileBadge(
 /// <summary>A link to the member's presence on an external platform.</summary>
 public sealed record ProfileSocialLink(
     string Platform,
-    string Url);
+    string Url,
+    string? FaviconUrl = null);
 
 /// <summary>A post the member made on a social platform (LinkedIn, Mastodon, Bluesky).</summary>
 public sealed record ProfileSocialPost(

@@ -1,3 +1,4 @@
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.Models;
@@ -24,11 +25,16 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
 {
     private readonly MemberProfileStore _store;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
+    private readonly FeedSubmissionImageProxyService _imageProxy;
 
-    public MemberProfileDataProvider(MemberProfileStore store, ProfileAvatarUrlResolver avatarUrlResolver)
+    public MemberProfileDataProvider(
+        MemberProfileStore store,
+        ProfileAvatarUrlResolver avatarUrlResolver,
+        FeedSubmissionImageProxyService imageProxy)
     {
         _store = store;
         _avatarUrlResolver = avatarUrlResolver;
+        _imageProxy = imageProxy;
     }
 
     public async Task<CommunityProfile?> GetProfileAsync(string slug, bool includeHidden = false, CancellationToken cancellationToken = default)
@@ -43,7 +49,10 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
 
         var socialLinks = entity.Feeds
             .Where(f => !f.IsRemoved && !f.IsHidden)
-            .Select(f => new ProfileSocialLink(f.Platform, f.Url))
+            .OrderBy(f => f.SortOrder)
+            .ThenBy(f => f.AddedUtc)
+            .ThenBy(f => f.Id)
+            .Select(f => new ProfileSocialLink(f.Platform, f.Url, _imageProxy.CreateProxyUrl(f.FaviconUrl)))
             .ToList();
 
         return new CommunityProfile(

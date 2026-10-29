@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
+using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 
 namespace UmbracoCommunity.Web.Features.Profiles.Data;
 
@@ -168,15 +169,21 @@ public class MemberProfileStore
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         return await context.MemberFeeds
             .Where(f => f.MemberProfile!.MemberKey == memberKey && !f.IsRemoved)
-            .OrderBy(f => f.AddedUtc)
+            .OrderBy(f => f.SortOrder)
+            .ThenBy(f => f.AddedUtc)
+            .ThenBy(f => f.Id)
             .ToListAsync(ct);
     }
 
-    public async Task<MemberFeedEntity?> AddFeedAsync(Guid memberKey, string platform, string url, CancellationToken ct = default)
+    public async Task<MemberFeedEntity?> AddFeedAsync(Guid memberKey, string platform, string url, LinkPreview? preview = null, CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         var profile = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
         if (profile == null) return null;
+
+        var highestOrder = await context.MemberFeeds
+            .Where(f => f.MemberProfileId == profile.Id && !f.IsRemoved)
+            .MaxAsync(f => (int?)f.SortOrder, ct) ?? 0;
 
         var feed = new MemberFeedEntity
         {
@@ -184,10 +191,68 @@ public class MemberProfileStore
             Platform = platform,
             Url = url,
             AddedUtc = DateTime.UtcNow,
+            SortOrder = highestOrder + 1,
         };
+        ApplyPreview(feed, preview);
         context.MemberFeeds.Add(feed);
         await context.SaveChangesAsync(ct);
         return feed;
+    }
+
+    /// <summary>Changes a link's platform name and address. A new address resets its sync state and replaces its preview.</summary>
+    public async Task<MemberFeedEntity?> UpdateFeedAsync(Guid memberKey, int feedId, string platform, string url, LinkPreview? preview, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var feed = await context.MemberFeeds
+            .FirstOrDefaultAsync(f => f.Id == feedId && f.MemberProfile!.MemberKey == memberKey && !f.IsRemoved, ct);
+        if (feed == null) return null;
+
+        var urlChanged = !string.Equals(feed.Url, url, StringComparison.Ordinal);
+        feed.Platform = platform;
+        feed.Url = url;
+        if (urlChanged)
+        {
+            feed.PlatformSyncStatus = FeedSyncStatus.Pending;
+            feed.LastPlatformSyncAttemptUtc = null;
+            feed.LastPlatformSyncError = null;
+            ApplyPreview(feed, preview);
+        }
+
+        await context.SaveChangesAsync(ct);
+        return feed;
+    }
+
+    /// <summary>
+    /// Stores the order of the member's active links. <paramref name="orderedIds"/> must name each of them exactly once.
+    /// </summary>
+    public async Task<bool> ReorderFeedsAsync(Guid memberKey, IReadOnlyList<int> orderedIds, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var feeds = await context.MemberFeeds
+            .Where(f => f.MemberProfile!.MemberKey == memberKey && !f.IsRemoved)
+            .ToListAsync(ct);
+
+        if (orderedIds.Count != feeds.Count || orderedIds.Distinct().Count() != feeds.Count || feeds.Any(f => !orderedIds.Contains(f.Id)))
+        {
+            return false;
+        }
+
+        for (var position = 0; position < orderedIds.Count; position++)
+        {
+            feeds.First(f => f.Id == orderedIds[position]).SortOrder = position + 1;
+        }
+
+        await context.SaveChangesAsync(ct);
+        return true;
+    }
+
+    private static void ApplyPreview(MemberFeedEntity feed, LinkPreview? preview)
+    {
+        feed.PreviewStatus = preview?.Status ?? LinkPreviewStatus.Unchecked;
+        feed.PreviewTitle = preview?.Title;
+        feed.PreviewImageUrl = preview?.ImageUrl;
+        feed.FaviconUrl = preview?.FaviconUrl;
+        feed.PreviewCheckedUtc = preview == null ? null : DateTime.UtcNow;
     }
 
     public async Task<bool> SetFeedHiddenAsync(Guid memberKey, int feedId, bool isHidden, CancellationToken ct = default)

@@ -47,6 +47,9 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.Url).IsRequired().HasMaxLength(2048);
             entity.Property(e => e.RemovedReason).HasMaxLength(500);
             entity.Property(e => e.LastPlatformSyncError).HasMaxLength(1000);
+            entity.Property(e => e.PreviewTitle).HasMaxLength(200);
+            entity.Property(e => e.PreviewImageUrl).HasMaxLength(2048);
+            entity.Property(e => e.FaviconUrl).HasMaxLength(2048);
 
             entity.HasIndex(e => e.MemberProfileId);
         });

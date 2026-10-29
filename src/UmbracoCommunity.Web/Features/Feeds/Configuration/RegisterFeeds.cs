@@ -76,23 +76,7 @@ public sealed class RegisterFeeds : IComposer
         }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
         {
             AllowAutoRedirect = false,
-            ConnectCallback = async (context, cancellationToken) =>
-            {
-                var address = await PublicNetworkGuard.ResolvePublicAddressAsync(context.DnsEndPoint.Host, cancellationToken)
-                    ?? throw new HttpRequestException($"'{context.DnsEndPoint.Host}' does not resolve to a permitted address.");
-
-                var socket = new Socket(SocketType.Stream, ProtocolType.Tcp) { NoDelay = true };
-                try
-                {
-                    await socket.ConnectAsync(new IPEndPoint(address, context.DnsEndPoint.Port), cancellationToken);
-                    return new NetworkStream(socket, ownsSocket: true);
-                }
-                catch
-                {
-                    socket.Dispose();
-                    throw;
-                }
-            },
+            ConnectCallback = PublicNetworkGuard.ConnectToPublicAddressAsync,
         });
         builder.Services.AddSingleton<FeedSubmissionImageProxyService>();
         builder.Services.AddExamineLuceneIndex(CommunityBlogsSearchIndexer.IndexName);

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security;
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
+using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 
@@ -21,15 +23,21 @@ public class MemberFeedsApiController : ControllerBase
     private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly IProfileSyncClient _profileSyncClient;
+    private readonly LinkPreviewService _linkPreviews;
+    private readonly FeedSubmissionImageProxyService _imageProxy;
 
     public MemberFeedsApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
-        IProfileSyncClient profileSyncClient)
+        IProfileSyncClient profileSyncClient,
+        LinkPreviewService linkPreviews,
+        FeedSubmissionImageProxyService imageProxy)
     {
         _memberManager = memberManager;
         _store = store;
         _profileSyncClient = profileSyncClient;
+        _linkPreviews = linkPreviews;
+        _imageProxy = imageProxy;
     }
 
     [HttpGet]
@@ -59,12 +67,13 @@ public class MemberFeedsApiController : ControllerBase
             return BadRequest(new { error = "Please provide a platform name." });
         }
 
-        if (!IsValidFeedUrl(request.Url))
+        if (!ProfileLinkUrl.TryParse(request.Url, out _))
         {
-            return BadRequest(new { error = "Please provide a valid absolute http or https URL." });
+            return BadRequest(new { error = "Please provide a valid https URL." });
         }
 
-        var feed = await _store.AddFeedAsync(member.Key, request.Platform.Trim(), request.Url.Trim(), cancellationToken);
+        var preview = await _linkPreviews.FetchAsync(request.Url.Trim(), cancellationToken);
+        var feed = await _store.AddFeedAsync(member.Key, request.Platform.Trim(), request.Url.Trim(), preview, cancellationToken);
         if (feed == null)
         {
             return BadRequest(new { error = "Start onboarding before adding feeds." });
@@ -73,6 +82,71 @@ public class MemberFeedsApiController : ControllerBase
         await _profileSyncClient.NotifyFeedAddedAsync(member.UserName ?? string.Empty, feed.Platform, feed.Url, cancellationToken);
 
         return Ok(ToResponse(feed));
+    }
+
+    /// <summary>Changes a link's platform name and address. A new address is re-checked and reported to the platform as a swap.</summary>
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateFeedRequest request, CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Platform))
+        {
+            return BadRequest(new { error = "Please provide a platform name." });
+        }
+
+        if (!ProfileLinkUrl.TryParse(request.Url, out _))
+        {
+            return BadRequest(new { error = "Please provide a valid https URL." });
+        }
+
+        var existing = (await _store.GetActiveFeedsAsync(member.Key, cancellationToken)).FirstOrDefault(f => f.Id == id);
+        if (existing == null)
+        {
+            return NotFound();
+        }
+
+        var url = request.Url.Trim();
+        var oldUrl = existing.Url;
+        var urlChanged = !string.Equals(oldUrl, url, StringComparison.Ordinal);
+        var preview = urlChanged ? await _linkPreviews.FetchAsync(url, cancellationToken) : null;
+
+        var feed = await _store.UpdateFeedAsync(member.Key, id, request.Platform.Trim(), url, preview, cancellationToken);
+        if (feed == null)
+        {
+            return NotFound();
+        }
+
+        if (urlChanged)
+        {
+            var handle = member.UserName ?? string.Empty;
+            await _profileSyncClient.NotifyFeedRemovedAsync(handle, oldUrl, "Address changed", cancellationToken);
+            await _profileSyncClient.NotifyFeedAddedAsync(handle, feed.Platform, feed.Url, cancellationToken);
+        }
+
+        return Ok(ToResponse(feed));
+    }
+
+    /// <summary>Stores the order of all of the member's active links. The ids must be exactly those links.</summary>
+    [HttpPut("order")]
+    public async Task<IActionResult> Reorder([FromBody] ReorderFeedsRequest request, CancellationToken cancellationToken)
+    {
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!await _store.ReorderFeedsAsync(member.Key, request.Ids, cancellationToken))
+        {
+            return BadRequest(new { error = "The list of links is out of date. Reload and try again." });
+        }
+
+        return Ok();
     }
 
     [HttpPut("{id:int}/hide")]
@@ -134,8 +208,23 @@ public class MemberFeedsApiController : ControllerBase
         return Ok();
     }
 
-    private static bool IsValidFeedUrl(string? url) =>
-        Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https";
+    /// <summary>
+    /// What the member sees next to a link: "Hidden" (kept off the public profile), "Unreachable" (the last
+    /// server-side check couldn't load the page) or "Visible".
+    /// </summary>
+    private static string StatusOf(MemberFeedEntity feed) =>
+        feed.IsHidden ? "Hidden"
+        : feed.PreviewStatus == LinkPreviewStatus.Unreachable ? "Unreachable"
+        : "Visible";
 
-    private static MemberFeedResponse ToResponse(MemberFeedEntity feed) => new(feed.Id, feed.Platform, feed.Url, feed.IsHidden, feed.Source.ToString());
+    private MemberFeedResponse ToResponse(MemberFeedEntity feed) => new(
+        feed.Id,
+        feed.Platform,
+        feed.Url,
+        feed.IsHidden,
+        feed.Source.ToString(),
+        StatusOf(feed),
+        feed.PreviewTitle,
+        _imageProxy.CreateProxyUrl(feed.FaviconUrl),
+        _imageProxy.CreateProxyUrl(feed.PreviewImageUrl));
 }
