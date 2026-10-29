@@ -907,3 +907,48 @@
         50% { opacity: 0.25; }
     }
 }
+
+/* Owner-only banner shown while the profile is still hidden: a full-bleed strip above the hero. */
+.dc-profile-hidden-banner {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: var(--color-identity-yellow);
+    color: var(--color-identity-dark);
+}
+
+.dc-profile-hidden-banner__inner {
+    max-width: var(--max-width);
+    margin-inline: auto;
+    padding: var(--unit-sm) var(--unit);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--unit-xs);
+}
+
+.dc-profile-hidden-banner__message {
+    margin: 0;
+    font-weight: 700;
+}
+
+.dc-profile-hidden-banner__note,
+.dc-profile-hidden-banner__error {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: var(--font-size-sm);
+}
+
+#main-content .dc-profile-hidden-banner .dc-profile-hidden-banner__note a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* Dark text rather than red: red on the yellow strip does not meet contrast. */
+.dc-profile-hidden-banner__error {
+    font-weight: 700;
+}
+
+.dc-profile-hidden-banner__action:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}

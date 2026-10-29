@@ -34,6 +34,12 @@ export class ProfileOnboardingService extends ServiceBase {
     if (!response.ok) throw new Error(await this.#errorMessage(response));
   }
 
+  /** Shows or hides the current member's profile. */
+  static async setProfileVisible(visible: boolean): Promise<void> {
+    const response = await ServiceBase.put(`${this.BASE_URL}/visibility`, { visible });
+    if (!response.ok) throw new Error(await this.#errorMessage(response));
+  }
+
   static async uploadAvatar(file: File): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
     const formData = new FormData();
     formData.append("file", file);

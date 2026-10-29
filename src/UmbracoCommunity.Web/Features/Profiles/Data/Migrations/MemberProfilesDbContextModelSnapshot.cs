@@ -79,6 +79,8 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100);
 
+                    b.Property<bool>("IsProfileVisible");
+
                     b.Property<Guid>("MemberKey");
 
                     b.Property<DateTime?>("OnboardingCompletedUtc");
