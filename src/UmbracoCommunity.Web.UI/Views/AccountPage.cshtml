@@ -43,19 +43,6 @@
                 <h2>Your public profile</h2>
                 <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"
                                               profile-url="@Model.ProfileUrl"></dc-profile-visibility-toggle>
-
-                @if (Model.LastSyncedAt is not null)
-                {
-                    <p class="account-page__sync-status">
-                        Last synced @Model.LastSyncedAt.Value.ToRelativeTime()
-                    </p>
-                }
-                else
-                {
-                    <p class="account-page__sync-status account-page__sync-status--pending">
-                        Sync pending — your profile data hasn't synced yet.
-                    </p>
-                }
             </section>
 
             <section class="account-page__section">

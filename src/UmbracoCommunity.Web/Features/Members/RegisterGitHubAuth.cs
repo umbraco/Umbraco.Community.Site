@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 
 namespace UmbracoCommunity.Web.Features.Members;
 
@@ -18,6 +19,8 @@ public class RegisterGitHubAuth : IComposer
 
         if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             return;
+
+        builder.AddNotificationAsyncHandler<MemberLoginSuccessNotification, MvpEarlyAccessLoginHandler>();
 
         builder.AddMemberExternalLogins(logins =>
         {
