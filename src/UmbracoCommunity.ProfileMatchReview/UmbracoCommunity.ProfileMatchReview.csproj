@@ -31,4 +31,13 @@
     <Content Remove="Client\**" />
     <None Include="Client\public\umbraco-package.json" Pack="false" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Umbraco copies its JSON schema files into every project that references it; publishing them from here as
+         well as from the host fails with NETSDK1152 (duplicate publish output). -->
+    <Content Update="appsettings-schema*.json;umbraco-package-schema.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>
