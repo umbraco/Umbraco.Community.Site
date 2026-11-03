@@ -17,6 +17,7 @@ namespace UmbracoCommunity.Web.Controllers.Render;
 public class CommunityProfilePageController : RenderController
 {
     private readonly ProfileAccessService _profileAccessService;
+    private readonly ProfileActivityService _profileActivityService;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
 
     public CommunityProfilePageController(
@@ -24,10 +25,12 @@ public class CommunityProfilePageController : RenderController
         ICompositeViewEngine compositeViewEngine,
         IUmbracoContextAccessor umbracoContextAccessor,
         ProfileAccessService profileAccessService,
+        ProfileActivityService profileActivityService,
         IPublishedUrlProvider publishedUrlProvider)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _profileAccessService = profileAccessService;
+        _profileActivityService = profileActivityService;
         _publishedUrlProvider = publishedUrlProvider;
     }
 
@@ -56,10 +59,15 @@ public class CommunityProfilePageController : RenderController
             ? await _profileAccessService.ResolveAsync(currentPage, handle)
             : EnrichedSectionsAccess.None;
 
+        // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
+        var profile = viewable.Profile != null && access.Show
+            ? await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken)
+            : viewable.Profile;
+
         var viewModel = new CommunityProfilePageViewModel(currentPage)
         {
             Handle = handle,
-            Profile = viewable.Profile,
+            Profile = profile,
             IsOwnProfile = isOwnProfile,
             IsHiddenPreview = viewable.IsHiddenPreview,
             AccountPageUrl = isOwnProfile

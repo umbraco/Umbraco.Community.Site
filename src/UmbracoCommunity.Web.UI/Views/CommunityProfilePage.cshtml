@@ -327,12 +327,12 @@ else
         }
 
         <div class="community-profile__departments">
-            @if (profile.Packages.Count > 1)
+            @if (profile.Packages.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Packages">
                     <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "package") Packages</h2>
                     <ul class="community-profile__dept-list">
-                        @foreach (var package in profile.Packages.Skip(1))
+                        @foreach (var package in profile.Packages)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@package.Url" target="_blank" rel="noopener">@package.Name</a>
@@ -352,12 +352,12 @@ else
                 </section>
             }
 
-            @if (profile.Talks.Count > 1)
+            @if (profile.Talks.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Talks">
                     <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "talk") Talks</h2>
                     <ul class="community-profile__dept-list">
-                        @foreach (var talk in profile.Talks.Skip(1))
+                        @foreach (var talk in profile.Talks)
                         {
                             <li class="community-profile__dept-item">
                                 @if (!string.IsNullOrEmpty(talk.Url))
@@ -379,12 +379,12 @@ else
                 </section>
             }
 
-            @if (profile.BlogPosts.Count > 1)
+            @if (profile.BlogPosts.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Blog posts">
                     <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "blog") Blog posts</h2>
                     <ul class="community-profile__dept-list">
-                        @foreach (var post in profile.BlogPosts.Skip(1))
+                        @foreach (var post in profile.BlogPosts)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
@@ -399,12 +399,12 @@ else
                 </section>
             }
 
-            @if (profile.Videos.Count > 1)
+            @if (profile.Videos.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Videos">
                     <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "video") Videos</h2>
                     <ul class="community-profile__dept-list">
-                        @foreach (var video in profile.Videos.Skip(1))
+                        @foreach (var video in profile.Videos)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@video.Url" target="_blank" rel="noopener">@video.Title</a>
