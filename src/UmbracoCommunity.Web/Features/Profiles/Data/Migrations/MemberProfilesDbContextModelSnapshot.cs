@@ -133,10 +133,61 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.ToTable("MemberProfiles", (string)null);
                 });
 
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.ProfileMatchEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("Confidence");
+
+                    b.Property<DateTime>("CreatedUtc");
+
+                    b.Property<int>("DecidedBy");
+
+                    b.Property<string>("DecidedByUserName")
+                        .HasMaxLength(200);
+
+                    b.Property<Guid?>("DecidedByUserKey");
+
+                    b.Property<DateTime>("DecidedUtc");
+
+                    b.Property<int>("MemberProfileId");
+
+                    b.Property<string>("SignalsJson")
+                        .IsRequired()
+                        .HasMaxLength(4000);
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(450);
+
+                    b.Property<int>("State");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("State");
+
+                    b.HasIndex("MemberProfileId", "SourceUrl")
+                        .IsUnique();
+
+                    b.ToTable("ProfileMatches", (string)null);
+                });
+
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>
                 {
                     b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")
                         .WithMany("Feeds")
+                        .HasForeignKey("MemberProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MemberProfile");
+                });
+
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.ProfileMatchEntity", b =>
+                {
+                    b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")
+                        .WithMany()
                         .HasForeignKey("MemberProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -12,6 +12,7 @@ public class MemberProfilesDbContext : DbContext
 
     public DbSet<MemberProfileEntity> MemberProfiles { get; set; } = null!;
     public DbSet<MemberFeedEntity> MemberFeeds { get; set; } = null!;
+    public DbSet<ProfileMatchEntity> ProfileMatches { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +53,24 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.FaviconUrl).HasMaxLength(2048);
 
             entity.HasIndex(e => e.MemberProfileId);
+        });
+
+        modelBuilder.Entity<ProfileMatchEntity>(entity =>
+        {
+            entity.ToTable("ProfileMatches");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SourceUrl).IsRequired().HasMaxLength(ProfileMatchEntity.MaxSourceUrlLength);
+            entity.Property(e => e.SignalsJson).IsRequired().HasMaxLength(4000);
+            entity.Property(e => e.DecidedByUserName).HasMaxLength(200);
+
+            entity.HasOne(e => e.MemberProfile)
+                .WithMany()
+                .HasForeignKey(e => e.MemberProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => new { e.MemberProfileId, e.SourceUrl }).IsUnique();
+            entity.HasIndex(e => e.State);
         });
     }
 }

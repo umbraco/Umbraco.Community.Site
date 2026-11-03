@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoCommunity.ProfileMatchReview",
+  "name": "Profile match review",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "UmbracoCommunity.ProfileMatchReview.Bundle",
+      "name": "Profile Match Review Bundle",
+      "js": "/App_Plugins/UmbracoCommunityProfileMatchReview/profile-match-review.js"
+    }
+  ]
+}
