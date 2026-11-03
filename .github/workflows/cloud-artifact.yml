@@ -103,6 +103,12 @@ jobs:
         run: npm ci && npm run build
         shell: bash
 
+      # build the profile match review client assets (backoffice dashboard)
+      - name: Build profile match review client
+        working-directory: src/UmbracoCommunity.ProfileMatchReview/Client
+        run: npm ci && npm run build
+        shell: bash
+
       # build the forms spam guard client assets
       # NOTE: this one is not just a backoffice dashboard. Client/public also holds spam-guard.css, which hides
       # the decoy field on the public site. wwwroot/App_Plugins is gitignored, so without this step the CSS is

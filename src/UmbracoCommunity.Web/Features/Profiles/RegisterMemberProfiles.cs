@@ -50,6 +50,7 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartedNotification, MemberProfilesMigrationNotificationHandler>();
 
         builder.Services.AddScoped<MemberProfileStore>();
+        builder.Services.AddScoped<ProfileMatchStore>();
         builder.Services.AddScoped<ProfileAvatarUrlResolver>();
         builder.Services.AddScoped<AvatarUploadService>();
         builder.Services.AddScoped<IProfileDataProvider, MemberProfileDataProvider>();

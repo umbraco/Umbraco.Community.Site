@@ -67,6 +67,10 @@ const projects = {
     path: resolve(ROOT, "src/Umbraco.Community.NotFoundTracker/Client"),
     color: "\x1b[32m", // green
   },
+  ProfileMatchReview: {
+    path: resolve(ROOT, "src/UmbracoCommunity.ProfileMatchReview/Client"),
+    color: "\x1b[91m", // bright red
+  },
   StaticAssets: {
     path: resolve(ROOT, "src/UmbracoCommunity.StaticAssets"),
     color: "\x1b[33m", // yellow
@@ -294,6 +298,7 @@ async function runLocal(withDotnet) {
     buildProject("Extensions", "build"),
     buildProject("FormsSpamGuard", "build"),
     buildProject("NotFoundTracker", "build"),
+    buildProject("ProfileMatchReview", "build"),
     buildProject("StaticAssets", "build:for:cloud"),
   ]);
 
@@ -338,6 +343,7 @@ async function runDev(withDotnet, firstTimeIntro = null) {
     buildProject("Extensions", "build"),
     buildProject("FormsSpamGuard", "build"),
     buildProject("NotFoundTracker", "build"),
+    buildProject("ProfileMatchReview", "build"),
   ]);
 
   const servers = withDotnet ? "Vite dev server + dotnet run" : "Vite dev server";
