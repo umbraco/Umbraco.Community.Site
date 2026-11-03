@@ -19,7 +19,7 @@ If no mode is provided, an interactive prompt lets you pick one.
 
 ### dev / dev:dotnet (default)
 
-The typical development workflow. Builds the four backoffice extension projects first (BlockRestrictions, BlogAnnouncements, Extensions, and NotFoundTracker), then starts the Vite dev server for StaticAssets. With `:dotnet`, the .NET backend starts alongside the Vite server.
+The typical development workflow. Builds the five backoffice extension projects first (BlockRestrictions, BlogAnnouncements, Extensions, NotFoundTracker, and ProfileMatchReview), then starts the Vite dev server for StaticAssets. With `:dotnet`, the .NET backend starts alongside the Vite server.
 
 ```bash
 # Just the frontend
@@ -31,7 +31,7 @@ node build.mjs dev:dotnet
 
 ### local / local:dotnet
 
-Performs a full production-style build of all five frontend projects (BlockRestrictions, BlogAnnouncements, Extensions, NotFoundTracker, and StaticAssets with `build:for:cloud`). Use this to test the cloud deployment build locally.
+Performs a full production-style build of all six frontend projects (BlockRestrictions, BlogAnnouncements, Extensions, NotFoundTracker, ProfileMatchReview, and StaticAssets with `build:for:cloud`). Use this to test the cloud deployment build locally.
 
 ```bash
 # Build only
@@ -54,7 +54,7 @@ The Local environment reads from `appsettings.Local.json` (gitignored), which is
 
 ## Projects
 
-The script manages five frontend projects:
+The script manages six frontend projects:
 
 | Project | Directory | Build command |
 |---|---|---|
@@ -62,6 +62,7 @@ The script manages five frontend projects:
 | BlogAnnouncements | `src/UmbracoCommunity.BlogAnnouncements/Client` | `npm run build` |
 | Extensions | `src/UmbracoCommunity.Extensions/Client` | `npm run build` |
 | NotFoundTracker | `src/Umbraco.Community.NotFoundTracker/Client` | `npm run build` |
+| ProfileMatchReview | `src/UmbracoCommunity.ProfileMatchReview/Client` | `npm run build` |
 | StaticAssets | `src/UmbracoCommunity.StaticAssets` | `npm run build:for:cloud` (local) / `npm run dev` (dev) |
 
 Missing `node_modules` are detected automatically and `npm ci` runs before the build.

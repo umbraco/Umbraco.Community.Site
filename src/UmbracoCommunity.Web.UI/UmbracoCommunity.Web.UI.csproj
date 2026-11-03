@@ -74,6 +74,7 @@
     <ProjectReference Include="..\Umbraco.Community.FormsSpamGuard\Umbraco.Community.FormsSpamGuard.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.MeetBooking\UmbracoCommunity.MeetBooking.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.ActiveCampaign\UmbracoCommunity.ActiveCampaign.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.ProfileMatchReview\UmbracoCommunity.ProfileMatchReview.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
