@@ -1,14 +1,26 @@
+using UmbracoCommunity.Web.Features.Profiles.Models;
+
 namespace UmbracoCommunity.Web.Features.Profiles;
 
 /// <summary>
-/// Notifies the external content platform of profile-claim and feed changes. That platform has
-/// no profile/feed endpoints today — <see cref="StubProfileSyncClient"/> is a safe no-op
-/// implementation for now, mirroring the <see cref="IProfileDataProvider"/>/<see cref="DummyProfileDataProvider"/>
-/// seam: swap in a real <c>CommunityBlogsApiClient</c>-based implementation once those endpoints
-/// exist, with no change to callers.
+/// Talks to the external content platform about a profile. Reads a member's public activity from it
+/// (<see cref="FindProfileAsync"/>, <see cref="GetActivitiesAsync"/>); the platform has no endpoints
+/// yet for profile-claim and feed notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
 /// </summary>
 public interface IProfileSyncClient
 {
+    /// <summary>
+    /// Looks the member up on the platform by GitHub handle. Returns <c>null</c> when the platform has no
+    /// profile for the handle or is not configured. Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<PlatformProfile?> FindProfileAsync(string handle, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The newest activity of one <paramref name="group"/> (see <see cref="PlatformActivityGroups"/>) for a
+    /// platform profile, newest first. Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<IReadOnlyList<PlatformActivity>> GetActivitiesAsync(string platformProfileId, string group, int limit, CancellationToken cancellationToken = default);
+
     Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default);
 
     Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default);

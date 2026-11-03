@@ -17,6 +17,43 @@ public sealed class CommunityBlogsApiClient
         _options = options;
     }
 
+    /// <summary>True when an API address and key are configured; without them no request is attempted.</summary>
+    public bool IsConfigured =>
+        _http.BaseAddress != null && !string.IsNullOrWhiteSpace(_options.CurrentValue.ApiKey);
+
+    /// <summary>Looks a profile up by GitHub username. Returns <c>null</c> when the platform has no matching profile (404).</summary>
+    public async Task<ProfileLookupDto?> LookupProfileAsync(string github, CancellationToken cancellationToken)
+    {
+        var requestUri = $"profiles/lookup?github={Uri.EscapeDataString(github)}";
+        try
+        {
+            using var response = await SendWithRetryAsync(
+                () => new HttpRequestMessage(HttpMethod.Get, requestUri),
+                cancellationToken);
+
+            var envelope = await response.Content.ReadFromJsonAsync<ProfileLookupResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
+            return envelope?.Data;
+        }
+        catch (CommunityBlogsApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>Fetches the newest activity of one group (e.g. "blog", "forum") for a platform profile.</summary>
+    public async Task<IReadOnlyList<ProfileActivityDto>> GetProfileActivitiesAsync(
+        string profileId, string group, int limit, CancellationToken cancellationToken)
+    {
+        var requestUri = $"profiles/{Uri.EscapeDataString(profileId)}/activities"
+            + $"?group={Uri.EscapeDataString(group)}&limit={limit.ToString(CultureInfo.InvariantCulture)}";
+        using var response = await SendWithRetryAsync(
+            () => new HttpRequestMessage(HttpMethod.Get, requestUri),
+            cancellationToken);
+
+        var envelope = await response.Content.ReadFromJsonAsync<ProfileActivitiesResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
+        return envelope?.Data ?? [];
+    }
+
     /// <summary>Fetches one page of blog posts. <paramref name="cursor"/> null fetches the first page.</summary>
     public async Task<PostsResponseDto?> GetBlogPostsAsync(string? cursor, int limit, CancellationToken cancellationToken)
     {
