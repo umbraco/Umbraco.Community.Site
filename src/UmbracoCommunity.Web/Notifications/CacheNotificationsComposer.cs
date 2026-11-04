@@ -11,5 +11,6 @@ public class CacheNotificationsComposer : IComposer
     public void Compose(IUmbracoBuilder builder)
     {
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, BlogContentCacheInvalidationHandler>();
+        builder.AddNotificationHandler<ContentCacheRefresherNotification, RobotsTxtCacheInvalidationHandler>();
     }
 }
