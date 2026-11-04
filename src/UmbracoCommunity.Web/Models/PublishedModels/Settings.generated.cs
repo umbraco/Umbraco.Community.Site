@@ -94,13 +94,5 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("siteName")]
 		public virtual string SiteName => this.Value<string>(_publishedValueFallback, "siteName");
-
-		///<summary>
-		/// Custom robots.txt: Overrides the generated robots.txt for this site entirely when set. Leave blank to use the default generated rules.
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("customRobotsTxt")]
-		public virtual string CustomRobotsTxt => this.Value<string>(_publishedValueFallback, "customRobotsTxt");
 	}
 }
