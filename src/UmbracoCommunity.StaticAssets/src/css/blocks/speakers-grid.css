@@ -60,6 +60,10 @@
     clip-path: circle();
 }
 
+.dc-speakers-grid__no-image {
+    background-color: var(--color-grey);
+}
+
 .dc-speakers-grid__item .speaker-name {
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-large);

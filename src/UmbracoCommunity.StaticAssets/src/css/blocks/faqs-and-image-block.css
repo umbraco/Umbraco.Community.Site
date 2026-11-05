@@ -33,6 +33,7 @@
   border-radius: var(--radius-card);
   width: 100%;
   height: auto;
+  aspect-ratio: 1;
 }
 
 .dc-faqs-and-image-block__content-container {
