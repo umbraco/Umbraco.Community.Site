@@ -178,7 +178,15 @@
     border-radius: var(--radius-card);
     max-width: 100%;
     width: 100%;
+    height: auto;
+    aspect-ratio: 906 / 605;
     object-fit: cover;
+
+    &[srcset] {
+        @media (max-width: 400px) {
+            aspect-ratio: 386 / 265;
+        }
+    }
 }
 
 .item-title {

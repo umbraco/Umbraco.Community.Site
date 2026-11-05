@@ -22,6 +22,14 @@
 
 .dc-image-and-text-block__image-container img {
   border-radius: var(--radius-card);
+  width: 100%;
+  height: auto;
+  aspect-ratio: 906 / 605;
+  object-fit: cover;
+
+  @media (max-width: 400px) {
+    aspect-ratio: 386 / 265;
+  }
 }
 
 .dc-image-and-text-block__content-container {

@@ -16,6 +16,8 @@
                     <img src="@Model.Settings?.BackgroundImage?.GetCropUrl("mobile")"
                          alt="@Model.Settings?.BackgroundImage?.Name"
                          sizes="100vw"
+                         width="386"
+                         height="@(Model.Settings?.BackgroundImage?.Value<int>("umbracoWidth") is > 0 and var w ? 386 * Model.Settings.BackgroundImage.Value<int>("umbracoHeight") / w : 386)"
                          loading="lazy">
                 </picture>
             </div>

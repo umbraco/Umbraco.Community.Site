@@ -129,7 +129,7 @@
             <div class="dc-blog-showcase-block__content">
                 @if (article.ThumbnailImage != null && !string.IsNullOrEmpty(authorAvatarUrl))
                 {
-                    <img class="dc-blog-showcase-block__avatar" src="@authorAvatarUrl" alt="" loading="lazy" />
+                    <img class="dc-blog-showcase-block__avatar" src="@authorAvatarUrl" alt="" width="44" height="44" loading="lazy" />
                 }
                 <h3 class="dc-blog-showcase-block__title">@article.Name</h3>
                 @if (hasTeaser)

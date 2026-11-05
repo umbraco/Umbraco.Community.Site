@@ -58,6 +58,7 @@
                         {
                             <img src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
                                  class="is-circle"
+                                 width="386" height="265"
                                  loading="lazy" />
 
                         }
@@ -66,6 +67,7 @@
                             <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
                                  sizes="(max-width: 400px) 386px, 906px"
                                  src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
+                                 width="386" height="265"
                                  loading="lazy" />
                         }
                     </div>
@@ -77,7 +79,7 @@
                     <div class="dc-image-wrapper">
                         <img srcset="@imageOverlayItem.Image.GetCropUrl("mobile") 386w, @imageOverlayItem.Image.GetCropUrl("desktop") 906w"
                              sizes="(max-width: 400px) 386px, 906px"
-                             src="@imageOverlayItem.Image.GetCropUrl("desktop")" alt="@imageOverlayItem.AltText" class="dc-image" loading="lazy" />
+                             src="@imageOverlayItem.Image.GetCropUrl("desktop")" alt="@imageOverlayItem.AltText" class="dc-image" width="386" height="265" loading="lazy" />
 
                         @if (!imageOverlayItem.OverlayText.IsEmptyHtmlString())
                         {
