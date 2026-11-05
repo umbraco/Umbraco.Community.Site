@@ -17,7 +17,7 @@
 }
 
 .dc-image-and-text-block__image-container img {
-  border-radius: 20px;
+  border-radius: var(--radius-card);
 }
 
 .dc-image-and-text-block__content-container {
@@ -30,10 +30,10 @@
 }
 
 .dc-image-and-text-block__content h2 {
-  font-size: 30px;
+  font-size: var(--font-size-display-xs);
   font-style: normal;
-  font-weight: 400;
-  line-height: 35px;
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-md);
   margin-top: 0;
 }
 
@@ -48,7 +48,7 @@
 
 .dc-image-and-text-block.has-bg {
   padding: var(--unit-md);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
 }
 
 .dc-image-and-text-block.bg-dark {

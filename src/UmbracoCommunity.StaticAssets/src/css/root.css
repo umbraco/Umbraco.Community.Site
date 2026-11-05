@@ -1,3 +1,5 @@
+@import "./base/media-queries.css";
+
 :root,
 :host {
     --color-identity-blue: #283a97;
@@ -27,6 +29,9 @@
     --color-green: #39d18c;
     --color-green-hover: #32b77b;
     --color-red: #e51400;
+    --color-error: #c0392b;
+    --color-grey-dark: #6b7280;
+    --color-border-subtle: #e5e7eb;
     --color-page-surface: var(--color-identity-smoke);
     --color-footer-headline: #babcd5;
     --link-color: var(--color-blue);
@@ -51,9 +56,41 @@
     --font-size-large: 24px;
     --font-family: 'Lato', 'Helvetica', 'Arial', 'sans-serif';
 
+    --font-size-display-xs: 30px;
+    --font-size-display-sm: 35px;
+    --font-size-display: 40px;
+    --font-size-display-lg: 60px;
+    --font-size-display-xl: 80px;
+
+    --line-height-xs: 21px;
+    --line-height-sm: 25px;
+    --line-height-md: 35px;
+    --line-height-lg: 45px;
+    --line-height-xl: 65px;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    --font-size-h1: 2.25rem;
+    --font-size-h2: 1.75rem;
+    --font-size-h3: 1.5rem;
+    --font-size-h4: 1.25rem;
+    --line-height-heading: 1.125;
+
+    --block-title-font-size: var(--font-size-display);
+    --block-title-line-height: var(--line-height-lg);
+    --block-subtitle-font-size: var(--font-size);
+    --block-subtitle-line-height: var(--line-height-xs);
+
+    --measure: 70ch;
+
     --border-radius: 3px;
+    --border-radius-md: 12px;
     --border-radius-lg: 15px;
     --border-radius-xl: 22px;
+    --radius-card: 20px;
+    --radius-pill: 999px;
 
     --base-border: 1px solid var(--color-dark-grey);
     --base-box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.1);
@@ -68,4 +105,29 @@
     --focus-outline-offset: 2px;
     --focus-outline-color: var(--color-identity-blue);
     --focus-outline: var(--focus-outline-width) solid var(--focus-outline-color);
+}
+
+@media (--sm) {
+    :root,
+    :host {
+        --font-size-h1: 3rem;
+        --font-size-h2: 2.25rem;
+        --font-size-h3: 1.75rem;
+        --font-size-h4: 1.375rem;
+
+        --block-title-font-size: var(--font-size-display-lg);
+        --block-title-line-height: var(--line-height-xl);
+        --block-subtitle-font-size: 20px;
+        --block-subtitle-line-height: var(--line-height-sm);
+    }
+}
+
+@media (--md) {
+    :root,
+    :host {
+        --font-size-h1: 3.75rem;
+        --font-size-h2: 2.75rem;
+        --font-size-h3: 2rem;
+        --font-size-h4: 1.5rem;
+    }
 }

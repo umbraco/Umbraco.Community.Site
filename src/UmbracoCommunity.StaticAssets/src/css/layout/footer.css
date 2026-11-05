@@ -1,3 +1,4 @@
+@import "../base/media-queries.css";
 
 .footer-placeholder::before {
   content: '';
@@ -62,7 +63,7 @@ footer.sticky-footer .footer-links__column-section {
 footer.sticky-footer .footer-links__column-section h2 {
   font-size: 12px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   line-height: normal;
   text-transform: uppercase;
   color: var(--color-footer-headline);
@@ -79,7 +80,7 @@ footer.sticky-footer .footer-links__column-section ul a {
   color: var(--color-white);
   font-size: 16px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 30px;
   text-decoration: none;
   cursor: pointer;
@@ -112,7 +113,7 @@ footer.sticky-footer .footer-inner__form .umbraco-forms-form {
 footer.sticky-footer .footer-inner__form legend {
   font-size: 25px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 32px;
   width: 66%;
   margin-bottom: 30px;
@@ -125,14 +126,14 @@ footer.sticky-footer .footer-inner__form .umbraco-forms-form .umbraco-forms-fiel
 footer.sticky-footer .footer-inner__form .umbraco-forms-form .umbraco-forms-field-wrapper label {
   font-size: 10px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 15px;
 }
 
 footer.sticky-footer .footer-inner__form .umbraco-forms-form input {
   font-size: 16px !important;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 30px;
   padding: 0 20px !important;
 }
@@ -186,11 +187,11 @@ footer.sticky-footer .footer-inner__form .umbraco-forms-form input[type=submit] 
   align-items: center;
   min-height: 40px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   font-size: 16px;
   text-align: center;
   box-shadow: none;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   border: 1px solid var(--color-identity-blue);
   cursor: pointer;
   color: var(--color-identity-blue);
@@ -222,7 +223,7 @@ footer.sticky-footer .footer-bottom ul {
   display: flex;
   font-size: 12px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: normal;
   column-gap: .5rem;
 }
@@ -249,7 +250,7 @@ body.document-partnerForgotPasswordPage .sticky-footer {
   padding-top: 4rem;
 }
 
-@media (min-width: 768px) {
+@media (--sm) {
   footer.sticky-footer {
     margin-top: -2.5rem;
     padding-top: 4rem;

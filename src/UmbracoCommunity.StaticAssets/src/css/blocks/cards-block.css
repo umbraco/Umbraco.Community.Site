@@ -14,7 +14,7 @@
   aspect-ratio: 1/1;
   max-width: 509px;
   max-height: 493px;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   background: var(--card-background-color);
   color: var(--card-foreground-color);
   overflow: hidden;
@@ -39,7 +39,7 @@ a.dc-cards-block__card:hover {
 
 .dc-cards-block__card > span {
   font-size: 16px;
-  line-height: 21px;
+  line-height: var(--line-height-xs);
   margin-top: 1rem;
 }
 
@@ -132,7 +132,7 @@ a.dc-cards-block__card:hover .dc-cards-block__link-icon svg {
 
 @media(min-width: 1120px){
   .dc-cards-block__card > p {
-    font-size: 30px;
+    font-size: var(--font-size-display-xs);
   }
 
   .dc-cards-block__card > span {
@@ -157,13 +157,13 @@ a.dc-cards-block__card:hover .dc-cards-block__link-icon svg {
   }
 
   .dc-cards-block__card p {
-    font-size: 35px;
-    line-height: 45px;
+    font-size: var(--font-size-display-sm);
+    line-height: var(--line-height-lg);
   }
 
   .dc-cards-block__card > span {
     font-size: 20px;
-    line-height: 25px;
+    line-height: var(--line-height-sm);
     margin-top: 1.75rem;
   }
 

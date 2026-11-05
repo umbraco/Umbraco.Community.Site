@@ -54,7 +54,7 @@ html:has(.dc-signage) {
 
 .dc-program-room__clock-date {
   font-size: clamp(1.25rem, 1.6vw, 2.25rem);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--color-light-blue);
@@ -269,7 +269,7 @@ html:has(.dc-signage) {
 
 .dc-program-slot--current .dc-program-slot__speakers {
   font-size: clamp(1.35rem, 2vw, 2.75rem);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin: 0;
   line-height: 1.2;
   color: var(--color-identity-pink);
@@ -290,7 +290,7 @@ html:has(.dc-signage) {
 
 .dc-program-slot--next .dc-program-slot__title {
   font-size: clamp(1.25rem, 1.6vw, 2.25rem);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin: 0;
   line-height: 1.2;
   color: var(--color-identity-blue);
@@ -339,7 +339,7 @@ html:has(.dc-signage) {
    "Up next" session. */
 .dc-program-slot__no-session {
   font-size: clamp(1.5rem, 2.4vw, 3rem);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin: 0;
   opacity: 0.65;
   text-transform: uppercase;
@@ -681,7 +681,7 @@ html:has(.dc-signage) {
   grid-column: 2;
   grid-row: 1;
   font-size: clamp(0.85rem, min(1.2vw, 1.7vh), 1.4rem);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin: 0;
   line-height: 1.15;
   display: -webkit-box;

@@ -32,12 +32,7 @@
 .dc-slider-block.bg-dark {
     color: var(--color-white);
     --slider-controls-color: var(--color-white);
-
-    .block-title,
-    .block-subtitle,
-    .block-tagline {
-        color: var(--color-white);
-    }
+    --block-heading-color: var(--color-white);
 }
 
 /* Intro */
@@ -47,10 +42,10 @@
 }
 
 .block-tagline {
-    color: var(--color-blue);
+    color: var(--block-heading-color, var(--color-blue));
     text-align: center;
     font-size: var(--tagline-size);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     letter-spacing: var(--tagline-spacing);
     text-transform: uppercase;
     margin: 0 0 var(--unit);
@@ -170,7 +165,7 @@
 
 .dc-slide-item__text {
     font-size: var(--slide-text-size);
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 1.5;
     margin: 0;
     opacity: 0.9;

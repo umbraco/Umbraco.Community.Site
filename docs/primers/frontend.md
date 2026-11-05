@@ -130,7 +130,7 @@ CSS is **[PostCSS](https://postcss.org)** — a CSS post-processor pipeline (thi
 
 - **`postcss-mixins`** with a custom `rhythm` mixin (see [`postcss-rhythm.mixin.ts`](../../src/UmbracoCommunity.StaticAssets/postcss-rhythm.mixin.ts)) — generates utility spacing classes like `.pt-md`, `.mx-xs`, `.m-lg` from CSS custom properties defined once in `root.css`. The point is design-token-driven spacing: one source of truth for the rem scale, used by hundreds of layouts, so spacing stays consistent without anyone having to remember individual values. Modifiers: `-xxs`, `-xs`, `-sm`, *(no suffix)*, `-md`, `-lg`, `-xl`, `-0`.
 - **`postcss-calc`** — pre-computes `calc()` expressions at build time where it can.
-- **`postcss-preset-env`** — opts in to upcoming CSS syntax (nesting, color functions, etc.) and inlines custom-property defaults.
+- **`postcss-preset-env`** — opts in to upcoming CSS syntax (nesting, color functions, etc.) and keeps custom properties as runtime `var()`s, so tokens can be overridden in a scope.
 
 → A tutorial on the rhythm mixin pattern is planned — see the stub at [`docs/tutorials/foundations/postcss-mixin-for-design-tokens.md`](../tutorials/foundations/postcss-mixin-for-design-tokens.md).
 

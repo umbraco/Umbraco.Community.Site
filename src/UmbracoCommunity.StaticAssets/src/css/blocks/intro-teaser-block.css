@@ -73,7 +73,7 @@
 .dc-intro-teaser__content h2 {
   font-size: 22px;
   line-height: 32px;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   color: var(--intro-teaser-text-color);
   margin: 0;
 

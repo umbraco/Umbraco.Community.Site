@@ -21,7 +21,7 @@ dc-timeline {
     height: 40px;
     padding: 0 2.5rem 0 1rem;
     font-size: var(--font-size);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--color-white) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") no-repeat right 10px center / 16px;
     border: 2px solid var(--color-pink);
     appearance: none;
@@ -57,10 +57,10 @@ dc-timeline {
     align-items: center;
     background: var(--color-blue);
     color: var(--color-white);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 0.4em 1.2em;
     font-size: var(--font-size-sm);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.02em;
     white-space: nowrap;
 }
@@ -84,7 +84,7 @@ dc-timeline {
     margin: 0 0 var(--unit-xs);
     font-size: var(--font-size);
     color: var(--color-dark);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .dc-timeline-goal__body {
@@ -112,10 +112,10 @@ dc-timeline {
 
 .dc-timeline-tag {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     line-height: 1.4;
     padding: 0.2em 0.6em;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     border: 1px solid var(--color-pink);
     color: var(--color-blue);
 }

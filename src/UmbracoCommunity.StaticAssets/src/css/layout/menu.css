@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .subnav {
     background: rgba(22,35,53,.92)
 }
@@ -43,7 +45,7 @@
 .subnav-link {
     color: #162335;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     padding: 1em;
     display: block
 }
@@ -90,7 +92,7 @@
     z-index: 5
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (--md) {
     .subnav-list.has-dropdown:after {
         display:none;
         left: 50%;
@@ -114,7 +116,7 @@
     width: 100%
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (--md) {
     .subnav-dropdown {
         left:0;
         width: 175%;
@@ -126,7 +128,7 @@
     }
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (--md) {
     .subnav-dropdown.is-scrollable {
         max-height:512px;
         overflow-x: hidden;
@@ -139,7 +141,7 @@
     display: block!important
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (--md) {
     .subnav-dropdown .subnav-link {
         padding-top:1.5em;
         padding-bottom: 1.5em
@@ -151,7 +153,7 @@
     background: hsla(0,0%,42.7%,.07)
 }
 
-@media only screen and (min-width: 1024px) {
+@media only screen and (--md) {
     .subnav {
         display:flex;
         justify-content: center;

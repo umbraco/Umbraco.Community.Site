@@ -25,8 +25,8 @@
 
 .dc-headline__content > h1 {
   margin: 0;
-  font-size: 35px;
-  font-weight: 400;
+  font-size: var(--font-size-display-sm);
+  font-weight: var(--font-weight-regular);
   color: var(--color-identity-blue);
   grid-column: 1 / span 4;
   grid-row: 1 / span 1;
@@ -37,7 +37,7 @@
   grid-column: 2 / span 4;
   grid-row: 2 / span 1;
   margin: 0;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   text-align: left;
   color: var(--color-identity-blue);
 }
@@ -62,7 +62,7 @@
 
   .dc-headline__content>h1 {
     font-size: 55px;
-    line-height: 65px;
+    line-height: var(--line-height-xl);
     grid-column: 1 / span 3;
     grid-row: 1 / span 2;
   }
@@ -102,7 +102,7 @@
   color: var(--color-blue);
   font-size: 12px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 22px;
   letter-spacing: 0.96px;
   text-transform: uppercase;
@@ -110,9 +110,9 @@
 
 .dc-headline__container > h2 {
   color: var(--color-blue);
-  font-size: 40px;
-  font-weight: 400;
-  line-height: 45px;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg);
   margin: 0;
 }
 
@@ -129,8 +129,8 @@
   }
 
   .dc-headline__container > h2 {
-    font-size: 60px;
-    font-weight: 400;
+    font-size: var(--font-size-display-lg);
+    font-weight: var(--font-weight-regular);
     line-height: 70px;
     flex: 2;
   }

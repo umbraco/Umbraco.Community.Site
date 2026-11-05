@@ -4,7 +4,7 @@
   position: relative;
   display: grid;
   align-items: center;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 
@@ -60,10 +60,10 @@
 
 .dc-big-cta-block__content h2 {
   color: var(--color-blue);
-  font-size: 40px;
+  font-size: var(--font-size-display);
   font-style: normal;
-  font-weight: 400;
-  line-height: 45px; /* 112.5% */
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-lg); /* 112.5% */
   margin: 0;
 }
 
@@ -71,8 +71,8 @@
   color: var(--color-blue);
   font-size: 16px;
   font-style: normal;
-  font-weight: 400;
-  line-height: 21px; /* 131.25% */
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs); /* 131.25% */
   padding: 1.25rem 0 0 0;
   margin: 0;
 }
@@ -123,17 +123,17 @@
   .dc-big-cta-block__content h2 {
     max-width: 1100px;
     text-align: left;
-    font-size: 60px;
-    font-weight: 400;
-    line-height: 65px; /* 106.25% */
+    font-size: var(--font-size-display-lg);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-xl); /* 106.25% */
   }
 
   .dc-big-cta-block__content p {
     max-width: 590px;
     text-align: left;
     font-size: 20px;
-    font-weight: 400;
-    line-height: 25px; /* 125% */
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-sm); /* 125% */
   }
 
   .dc-big-cta-block__content.align-center {
@@ -164,8 +164,8 @@
 
   .dc-big-cta-block__content.image h2,
   .dc-big-cta-block__content.color h2 {
-    font-size: 30px;
-    line-height: 35px;
+    font-size: var(--font-size-display-xs);
+    line-height: var(--line-height-md);
   }
 
   .dc-big-cta-block__content.image p,
@@ -186,22 +186,22 @@
 @media (--md) {
   .dc-big-cta-block__content.image h2,
   .dc-big-cta-block__content.color h2 {
-    font-size: 40px;
-    line-height: 45px;
+    font-size: var(--font-size-display);
+    line-height: var(--line-height-lg);
   }
 
   .dc-big-cta-block__content.image p,
   .dc-big-cta-block__content.color p {
     font-size: 20px;
-    line-height: 25px;
+    line-height: var(--line-height-sm);
   }
 }
 
 @media (--lg) {
   .dc-big-cta-block__content.image h2,
   .dc-big-cta-block__content.color h2 {
-    font-size: 60px;
-    line-height: 65px;
+    font-size: var(--font-size-display-lg);
+    line-height: var(--line-height-xl);
   }
 }
 
@@ -211,7 +211,7 @@
   }
 
   .dc-big-cta-block__content h2 {
-    font-size: 80px;
+    font-size: var(--font-size-display-xl);
     line-height: 85px; /* 106.25% */
   }
 

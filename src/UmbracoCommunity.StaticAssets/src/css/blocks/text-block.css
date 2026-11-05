@@ -7,7 +7,7 @@
 
   &.has-bg {
     padding: var(--unit-md);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     background-color: var(--block-background-color);
   }
 
@@ -30,7 +30,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 20px;
+      border-radius: var(--radius-card);
     }
 
     .dc-text-block__content {
