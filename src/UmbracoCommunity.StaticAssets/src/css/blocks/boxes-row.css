@@ -233,6 +233,11 @@
     grid-row: 1 / 2;
 }
 
+.dc-boxes-row__item .dc-image-wrapper:has(.overlay) .dc-image {
+    align-self: stretch;
+    height: 100%;
+}
+
 @media (--sm) {
     .dc-boxes-row__item {
         padding: 1em 0 1em;
@@ -315,6 +320,12 @@
 
     .dc-boxes-row__item:has(.dc-image-wrapper):has(.overlay) {
         aspect-ratio: 1;
+        align-self: stretch;
+
+        .dc-image-wrapper {
+            flex: 1;
+            min-height: min-content;
+        }
     }
 
     .dc-boxes-row__item .row-item-image {
