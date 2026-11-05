@@ -27,7 +27,7 @@ dc-feed-submission {
 }
 
 .dc-feed-submission__optional {
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   color: var(--color-dark-grey);
 }
 

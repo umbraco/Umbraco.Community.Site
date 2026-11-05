@@ -16,7 +16,7 @@ dc-feed-manager {
 .dc-feed-manager__group-title {
   margin: 0 0 var(--unit-xs);
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-light-blue);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -66,7 +66,7 @@ dc-feed-manager {
   display: inline-flex;
   align-items: center;
   gap: var(--unit-xxs);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
 }
 
@@ -94,7 +94,7 @@ dc-feed-manager {
 }
 
 .dc-feed-manager__error {
-  color: var(--color-error, #c0392b);
+  color: var(--color-error);
 }
 
 .dc-feed-manager__empty {

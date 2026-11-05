@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .dc-icon-link-cards {
     margin-bottom: var(--unit-md);
 }
@@ -41,7 +43,7 @@ a.dc-icon-link-cards-grid__item:focus-visible {
     outline-offset: var(--focus-outline-offset);
 }
 
-@media (min-width: 768px) {
+@media (--sm) {
     .dc-icon-link-cards-grid {
         gap: var(--unit-md);
     }
@@ -51,7 +53,7 @@ a.dc-icon-link-cards-grid__item:focus-visible {
     }
 }
 
-@media (min-width: 1024px) {
+@media (--md) {
     .dc-icon-link-cards-grid {
         gap: var(--unit-md) var(--unit-lg);
     }
@@ -80,7 +82,7 @@ a.dc-icon-link-cards-grid__item:focus-visible {
 }
 
 .dc-icon-link-cards-grid__item .card-title {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     font-size: var(--font-size-large);
     margin: 1rem 0 0;
     text-align: center;
@@ -90,5 +92,5 @@ a.dc-icon-link-cards-grid__item:focus-visible {
     font-size: var(--font-size-sm);
     margin: 0.25rem 0 0;
     text-align: center;
-    color: var(--color-grey-dark, #6b7280);
+    color: var(--color-grey-dark);
 }

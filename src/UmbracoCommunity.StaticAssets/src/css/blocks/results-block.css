@@ -37,7 +37,7 @@
 
 .dc-results-item__text {
     font-size: 45px;
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     color: var(--results-item-foreground);
     margin-top: 5px;
     opacity: 1;
@@ -46,7 +46,7 @@
 
 .dc-results-item__description {
     font-size: 13px;
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
 }
 
 @media only screen and (min-width: 769px) {

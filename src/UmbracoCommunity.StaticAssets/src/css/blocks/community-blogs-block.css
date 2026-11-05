@@ -12,10 +12,9 @@
   border-radius: var(--border-radius-lg);
 }
 
-.dc-community-blogs.bg-dark,
-.dc-community-blogs.bg-dark .block-title,
-.dc-community-blogs.bg-dark .block-subtitle {
+.dc-community-blogs.bg-dark {
   color: var(--color-white);
+  --block-heading-color: var(--color-white);
 }
 
 .dc-community-blogs__intro {

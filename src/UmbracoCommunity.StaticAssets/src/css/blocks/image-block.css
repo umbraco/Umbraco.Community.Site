@@ -3,7 +3,7 @@
 /* padding prevents margin collapsing */
 .dc-image-block.has-bg {
   padding: var(--unit-md);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   max-width: none;
   margin-left: 0;
   margin-right: 0;
@@ -55,10 +55,6 @@
     > * {
       max-width: 90ch;
     }
-  }
-
-  .text a {
-    --link-color: var(--dc-image-block--text-color, var(--color-light));
   }
 
   h1,

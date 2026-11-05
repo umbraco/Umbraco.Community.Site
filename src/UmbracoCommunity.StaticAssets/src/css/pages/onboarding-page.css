@@ -37,7 +37,7 @@ dc-onboarding-wizard,
 .dc-onboarding__step-indicator {
   margin: 0 0 var(--unit-sm);
   font-size: var(--font-size-sm);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-light-blue);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -198,7 +198,7 @@ dc-onboarding-wizard,
 }
 
 .dc-onboarding__bio-count--limit {
-  color: var(--color-error, #c0392b);
+  color: var(--color-error);
 }
 
 .dc-onboarding__actions {
@@ -213,5 +213,5 @@ dc-onboarding-wizard,
 }
 
 .dc-onboarding__status--error {
-  color: var(--color-error, #c0392b);
+  color: var(--color-error);
 }

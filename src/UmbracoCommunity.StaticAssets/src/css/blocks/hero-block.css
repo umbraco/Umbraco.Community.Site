@@ -5,8 +5,8 @@
   }
 
   h1 {
-    font-weight: 500;
-    font-size: 40px;
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-display);
     line-height: 55px;
     margin: var(--unit-md);
     background-image: var(--hero-background-image);

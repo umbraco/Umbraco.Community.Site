@@ -177,6 +177,8 @@ Built assets go to:
 
 Backoffice extensions are **not** built from this project. Each lives in its own Vite project (`UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, `Umbraco.Community.NotFoundTracker/Client/`) and emits to its own `App_Plugins/<Name>/` folder.
 
+**Design tokens** (`src/css/root.css`): type scale (`--font-size-display-*`, `--line-height-*`, `--font-weight-*`), responsive heading and block-title tokens (`--font-size-h1`…`h4`, `--block-title-*`, `--block-subtitle-*`, redefined per breakpoint in `root.css`), radii (`--radius-card`, `--radius-pill`) and `--measure`. Prefer a token over a literal, and change a size per breakpoint by redefining the token rather than adding a `@media` override in a block. Tokens are runtime custom properties (`preserve: true` in `vite.config.ts`), so they can be overridden in a scope. Dark-background blocks set `--block-heading-color` on their `.bg-dark` rule instead of re-colouring `.block-title`/`.block-subtitle` themselves. Files that use `@media (--sm)` etc. must `@import` `base/media-queries.css` first.
+
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
 **Dialog System** (`src/components/dialog/`):

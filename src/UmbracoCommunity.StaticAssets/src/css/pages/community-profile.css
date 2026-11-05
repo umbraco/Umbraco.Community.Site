@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 /* Community profile page — bold magazine layout. */
 
 .community-profile {
@@ -72,7 +74,7 @@
 
 .community-profile__pronouns {
     font-size: var(--font-size);
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     color: var(--color-identity-pink);
 }
 
@@ -129,7 +131,7 @@
     color: var(--color-identity-blue);
     font-size: var(--font-size-sm);
     line-height: 1.5;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-decoration: none;
     transition: background-color 0.15s ease;
 }
@@ -459,7 +461,7 @@
 
 .community-profile__highlight-title {
     font-size: var(--font-size-large);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-dark);
     text-decoration: none;
 }
@@ -514,7 +516,7 @@
     align-items: center;
     gap: var(--unit-xxs);
     font-size: var(--font-size-xs);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-dark-grey);
@@ -635,7 +637,7 @@
 }
 
 .community-profile__activity-event {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-white);
     text-decoration: none;
 }
@@ -695,7 +697,7 @@
 }
 
 .community-profile__dept-title {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-blue);
     text-decoration: none;
 }
@@ -731,10 +733,10 @@
     background: var(--color-light);
     color: var(--color-light-blue);
     font-size: var(--font-size-xs);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
-@media (min-width: 1024px) {
+@media (--md) {
     .community-profile__hero {
         padding-block: var(--unit-lg);
     }
@@ -782,7 +784,7 @@
     }
 }
 
-@media (min-width: 1216px) {
+@media (--lg) {
     .community-profile__departments {
         columns: 3;
     }
@@ -819,7 +821,7 @@
 
 .dc-profile-hidden-banner__message {
     margin: 0;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .dc-profile-hidden-banner__note,
@@ -836,7 +838,7 @@
 
 /* Dark text rather than red: red on the yellow strip does not meet contrast. */
 .dc-profile-hidden-banner__error {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .dc-profile-hidden-banner__action:disabled {

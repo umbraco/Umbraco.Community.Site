@@ -15,11 +15,7 @@
 
 .dc-blog-showcase-block.bg-dark {
   color: var(--color-white);
-}
-
-.dc-blog-showcase-block.bg-dark .block-title,
-.dc-blog-showcase-block.bg-dark .block-subtitle {
-  color: var(--color-white);
+  --block-heading-color: var(--color-white);
 }
 
 .dc-blog-showcase-block__intro {

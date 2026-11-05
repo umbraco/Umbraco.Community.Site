@@ -9,7 +9,7 @@
   border-radius: var(--border-radius-lg);
   background: var(--color-identity-blue);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 
   @media (--md) {
     gap: var(--unit-sm);
@@ -27,7 +27,7 @@
 
 .profile-link__base {
   color: rgba(255, 255, 255, 0.7);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
 }
 
 .profile-link__slug {

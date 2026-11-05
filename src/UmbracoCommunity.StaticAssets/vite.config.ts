@@ -19,7 +19,7 @@ export const postcssPlugins: AcceptedPlugin[] = [
     postcssPresetEnv({
         features: {
             "custom-properties": {
-                preserve: false,
+                preserve: true,
             },
         },
     }),
