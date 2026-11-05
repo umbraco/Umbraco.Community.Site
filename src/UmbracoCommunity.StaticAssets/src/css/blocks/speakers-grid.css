@@ -1,9 +1,5 @@
 @import "../base/media-queries.css";
 
-.dc-speakers {
-    margin-bottom: var(--unit-md);
-}
-
 .dc-speakers-grid {
     display: flex;
     flex-wrap: wrap;
