@@ -1,0 +1,13 @@
+{
+  "name": "umbraco-community-visual-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "baseline": "playwright test --update-snapshots=all",
+    "compare": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

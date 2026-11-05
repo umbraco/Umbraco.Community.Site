@@ -131,6 +131,8 @@ npm run test:coverage
 
 Test files are colocated with components (`.test.ts` suffix).
 
+**Visual regression** (local only): `tests/visual/` is a Playwright harness that screenshots and dumps computed styles for a fixed list of Community and Codegarden pages at 375/768/1280/1440px. Run `npm run baseline` before a CSS change and `npm run compare` after it (needs the site running). See [`tests/visual/README.md`](tests/visual/README.md).
+
 ## Architecture Patterns
 
 ### Pages (Document Types)
