@@ -1,0 +1,14 @@
+{
+  "id": "UmbracoCommunity.SearchTracker",
+  "name": "Search Tracker",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "UmbracoCommunity.SearchTracker.Bundle",
+      "name": "Search Tracker Bundle",
+      "js": "/App_Plugins/UmbracoCommunitySearchTracker/search-tracker.js"
+    }
+  ]
+}

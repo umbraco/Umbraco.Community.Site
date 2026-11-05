@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Extensions;
+using UmbracoCommunity.SearchTracker.Recording;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Models.Pages;
 
@@ -13,13 +15,19 @@ namespace UmbracoCommunity.Web.Controllers.Render
         private const int PageSize = 10;
 
         private readonly ISearchService _searchService;
+        private readonly ISearchTermRecorder _searchTermRecorder;
 
         public SearchPageController(
             ILogger<SearchPageController> logger,
             ICompositeViewEngine compositeViewEngine,
             IUmbracoContextAccessor umbracoContextAccessor,
-            ISearchService searchService)
-            : base(logger, compositeViewEngine, umbracoContextAccessor) => _searchService = searchService;
+            ISearchService searchService,
+            ISearchTermRecorder searchTermRecorder)
+            : base(logger, compositeViewEngine, umbracoContextAccessor)
+        {
+            _searchService = searchService;
+            _searchTermRecorder = searchTermRecorder;
+        }
 
         [NonAction]
         public sealed override IActionResult Index() => throw new NotImplementedException();
@@ -44,6 +52,11 @@ namespace UmbracoCommunity.Web.Controllers.Render
                 var (results, total) = await _searchService.SearchAsync(currentPage, query, skip, PageSize, cancellationToken);
                 viewModel.Results = results;
                 viewModel.TotalResults = total;
+
+                if (page == 1)
+                {
+                    _searchTermRecorder.Record(currentPage.Root().Key, query, total, HttpContext);
+                }
 
                 // Clamp current page if the request asked for one past the end (e.g. user changed query).
                 if (viewModel.TotalPages > 0 && page > viewModel.TotalPages)

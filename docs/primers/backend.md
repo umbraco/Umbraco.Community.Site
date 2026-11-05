@@ -18,7 +18,8 @@ src/
 ├── UmbracoCommunity.Extensions/           ← Umbraco backoffice extensions (RCL + own client)
 ├── UmbracoCommunity.BlockRestrictions/    ← Block restrictions backoffice + EF Core migrations
 ├── Umbraco.Community.NotFoundTracker/     ← 404 tracking backoffice + EF Core migrations
-└── UmbracoCommunity.BlogAnnouncements/    ← Discord blog-announcement pipeline backoffice + EF Core migrations
+├── UmbracoCommunity.BlogAnnouncements/    ← Discord blog-announcement pipeline backoffice + EF Core migrations
+└── UmbracoCommunity.SearchTracker/        ← Site-search term logging, its dashboard + EF Core migrations
 ```
 
 `UmbracoCommunity.Web.UI` is the runnable project — it owns `Program.cs`, the Razor views, `wwwroot/`, and `appsettings.json`. `UmbracoCommunity.Web` is everything else C#: controllers, models, services, builders, middleware. The other five are: a Vite asset bundle that gets copied in (see the [frontend primer](frontend.md)), and four backoffice extension RCLs that ship their own backoffice clients (see the [backoffice primer](backoffice.md)).
