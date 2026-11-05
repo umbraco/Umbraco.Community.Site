@@ -179,6 +179,8 @@ Backoffice extensions are **not** built from this project. Each lives in its own
 
 **Design tokens** (`src/css/root.css`): type scale (`--font-size-display-*`, `--line-height-*`, `--font-weight-*`), responsive heading and block-title tokens (`--font-size-h1`…`h4`, `--block-title-*`, `--block-subtitle-*`, redefined per breakpoint in `root.css`), radii (`--radius-card`, `--radius-pill`) and `--measure`. Prefer a token over a literal, and change a size per breakpoint by redefining the token rather than adding a `@media` override in a block. Tokens are runtime custom properties (`preserve: true` in `vite.config.ts`), so they can be overridden in a scope. Dark-background blocks set `--block-heading-color` on their `.bg-dark` rule instead of re-colouring `.block-title`/`.block-subtitle` themselves. Files that use `@media (--sm)` etc. must `@import` `base/media-queries.css` first.
 
+**Tenant themes**: `<body>` carries `data-site` set to the request root's doc type alias (`home` or `eventsHome`, via `ContentContextService.SiteAlias`). Codegarden-only styling goes in `css/themes/codegarden.css` as token overrides under `[data-site="eventsHome"]`, which keeps Community untouched.
+
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
 **Dialog System** (`src/components/dialog/`):

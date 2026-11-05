@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Services;
 
@@ -23,6 +24,8 @@ public class ContentContextService
             : null;
 
     public string? ContentTypeAlias => CurrentPage?.ContentType.Alias;
+
+    public string? SiteAlias => CurrentPage?.Root().ContentType.Alias;
 
     public string Culture =>
         _umbracoContextAccessor.TryGetUmbracoContext(out var context)
