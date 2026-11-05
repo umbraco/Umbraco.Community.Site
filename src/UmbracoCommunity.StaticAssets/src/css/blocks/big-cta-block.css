@@ -37,6 +37,10 @@
   z-index: 1;
 }
 
+.dc-big-cta-block__content:not(.image, .color) {
+  padding-block: 0;
+}
+
 .dc-big-cta-block__content .content-links {
   text-align: center;
 }

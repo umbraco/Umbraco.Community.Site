@@ -11,6 +11,10 @@
 .dc-image-and-text-block__image-container {
   margin-bottom: var(--unit-md);
 
+  &:last-child {
+    margin-bottom: 0;
+  }
+
   @media (--md) {
     margin-bottom: var(--unit-lg);
   }
@@ -27,6 +31,19 @@
 
 .dc-image-and-text-block__content {
   width: 100%;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > p:empty,
+  > umb-rte-block:empty {
+    display: none;
+  }
+
+  > :not(:has(~ :not(p:empty):not(umb-rte-block:empty))) {
+    margin-bottom: 0;
+  }
 }
 
 .dc-image-and-text-block__content h2 {

@@ -94,7 +94,7 @@
 .dc-headline__container {
   display: flex;
   flex-direction: column;
-  padding: var(--unit) 0;
+  padding: 0;
   row-gap: 1.5rem;
 }
 
