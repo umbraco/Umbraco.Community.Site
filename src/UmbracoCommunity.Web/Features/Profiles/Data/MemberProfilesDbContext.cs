@@ -14,6 +14,7 @@ public class MemberProfilesDbContext : DbContext
     public DbSet<MemberFeedEntity> MemberFeeds { get; set; } = null!;
     public DbSet<ProfileMatchEntity> ProfileMatches { get; set; } = null!;
     public DbSet<MemberPinnedItemEntity> MemberPinnedItems { get; set; } = null!;
+    public DbSet<MemberActivityEntryEntity> MemberActivityEntries { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -59,6 +60,27 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.Source).HasMaxLength(MemberPinnedItemEntity.MaxSourceLength);
 
             entity.HasIndex(e => e.MemberProfileId);
+        });
+
+        modelBuilder.Entity<MemberActivityEntryEntity>(entity =>
+        {
+            entity.ToTable("MemberActivityEntries");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Kind).IsRequired().HasMaxLength(MemberActivityEntryEntity.MaxKindLength);
+            entity.Property(e => e.Title).IsRequired().HasMaxLength(MemberActivityEntryEntity.MaxTitleLength);
+            entity.Property(e => e.Url).IsRequired().HasMaxLength(MemberActivityEntryEntity.MaxUrlLength);
+            entity.Property(e => e.Description).HasMaxLength(MemberActivityEntryEntity.MaxDescriptionLength);
+            entity.Property(e => e.RejectionReason).HasMaxLength(MemberActivityEntryEntity.MaxReasonLength);
+            entity.Property(e => e.DecidedByUserName).HasMaxLength(200);
+
+            entity.HasOne(e => e.MemberProfile)
+                .WithMany()
+                .HasForeignKey(e => e.MemberProfileId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.MemberProfileId);
+            entity.HasIndex(e => e.State);
         });
 
         modelBuilder.Entity<MemberFeedEntity>(entity =>

@@ -31,6 +31,7 @@ public static class ProfileDisplay
         PlatformActivityGroups.Meetups => "Meet-ups",
         PlatformActivityGroups.Videos => "Videos",
         PlatformActivityGroups.Social => "Social activity",
+        PlatformActivityGroups.Other => "Other activity",
         _ => group,
     };
 
@@ -212,6 +213,7 @@ public static class ProfileDisplay
             Meetups = Shown(PlatformActivityGroups.Meetups, profile.Meetups, m => m.ActivityId),
             Videos = Shown(PlatformActivityGroups.Videos, profile.Videos, v => v.ActivityId),
             SocialPosts = Shown(PlatformActivityGroups.Social, profile.SocialPosts, p => p.ActivityId),
+            OtherActivities = Shown(PlatformActivityGroups.Other, profile.OtherActivities, a => a.ActivityId),
         };
 
         var loadedIds = ActivityItems(profile).Select(i => i.ActivityId).ToHashSet(StringComparer.Ordinal);
@@ -269,6 +271,9 @@ public static class ProfileDisplay
                 PlatformActivityGroups.Social => profile.SocialPosts
                     .Where(p => p.ActivityId != null)
                     .Select(p => new ProfileFeaturedItem(group, p.ActivityId!, p.Text, p.Url, null, p.PostedAt, p.Platform, null)),
+                PlatformActivityGroups.Other => profile.OtherActivities
+                    .Where(a => a.ActivityId != null)
+                    .Select(a => new ProfileFeaturedItem(group, a.ActivityId!, a.Title, a.Url, a.Description, a.Date, a.Kind, null)),
                 _ => [],
             };
 

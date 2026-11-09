@@ -93,6 +93,7 @@ public class AccountPageController : RenderController
             CustomBio = profile?.Bio,
             GitHubBio = profile?.GitHubBio,
             CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(),
+            CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(),
         };
 
         if (onboardingCompleted && handle != null)

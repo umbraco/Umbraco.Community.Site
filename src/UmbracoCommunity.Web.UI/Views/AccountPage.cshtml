@@ -67,6 +67,15 @@
                     <dc-profile-display-editor></dc-profile-display-editor>
                 </section>
             }
+
+            @if (Model.CanAddActivity)
+            {
+                <section class="account-page__section">
+                    <h2>Add your activity</h2>
+                    <p class="account-page__section-hint">Add a blog post, video, package, talk or anything else that isn't on your profile yet. We check each one before it appears.</p>
+                    <dc-profile-activity-editor></dc-profile-activity-editor>
+                </section>
+            }
         }
         else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
         {

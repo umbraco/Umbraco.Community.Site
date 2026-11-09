@@ -30,6 +30,9 @@ public sealed record CommunityProfile(
     /// <summary>What the member has chosen the activity sections show. Applied by <see cref="ProfileDisplay.Apply"/>.</summary>
     public ProfileDisplayChoices DisplayChoices { get; init; } = ProfileDisplayChoices.None;
 
+    /// <summary>Activity the member added by hand that has no section of its own (a talk, a contribution, a podcast, anything else).</summary>
+    public IReadOnlyList<ProfileOtherActivity> OtherActivities { get; init; } = [];
+
     /// <summary>
     /// The member's pinned activities, in their order. Empty until <see cref="ProfileDisplay.Apply"/> has run,
     /// and when nothing pinned can be shown.
@@ -133,4 +136,13 @@ public sealed record ProfileMeetup(
     string? Group,
     DateTimeOffset Date,
     string? Url = null,
+    string? ActivityId = null);
+
+/// <summary>A piece of activity the member added by hand; <paramref name="Kind"/> says what it is (e.g. "Talk").</summary>
+public sealed record ProfileOtherActivity(
+    string Kind,
+    string Title,
+    string Url,
+    DateTimeOffset Date,
+    string? Description = null,
     string? ActivityId = null);

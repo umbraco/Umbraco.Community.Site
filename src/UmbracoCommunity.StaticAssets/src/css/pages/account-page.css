@@ -514,3 +514,87 @@
 .dc-profile-display-editor__error {
   color: var(--color-red);
 }
+
+/* Profile activity editor: a small form to add activity by hand, then the member's entries with where each one stands. */
+.dc-profile-activity-editor {
+  display: grid;
+  gap: var(--unit-sm);
+}
+
+.dc-profile-activity-editor__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-sm);
+  max-width: 40rem;
+}
+
+.dc-profile-activity-editor .dc-form-field select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 16px;
+  font-family: var(--font-family);
+  color: var(--color-dark);
+  background: var(--color-white);
+  border: 1px solid var(--color-light-grey);
+  border-radius: var(--border-radius-lg);
+  box-sizing: border-box;
+}
+
+.dc-profile-activity-editor .dc-form-field select:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-color: var(--color-identity-blue);
+}
+
+.dc-profile-activity-editor__hint {
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-activity-editor__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-profile-activity-editor__entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--unit-xxs);
+  padding: var(--unit-xs) 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-profile-activity-editor__entry-title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.dc-profile-activity-editor__entry-meta,
+.dc-profile-activity-editor__state {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-activity-editor__state--rejected,
+.dc-profile-activity-editor__reason {
+  color: var(--color-red);
+}
+
+.dc-profile-activity-editor__reason {
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-activity-editor__status:not(:empty) {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-activity-editor__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-red);
+}
