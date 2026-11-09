@@ -42,6 +42,9 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     /// </summary>
     public bool CanChooseProfileDisplay { get; set; }
 
+    /// <summary>True when the member may add activity to their profile by hand (see <c>ProfileAccessService.CanAddActivityAsync</c>).</summary>
+    public bool CanAddActivity { get; set; }
+
     /// <summary>The member's public profile URL, once claimed.</summary>
     public string? ProfileUrl { get; set; }
 

@@ -20,3 +20,4 @@ export * from "./profile/dc-profile-display-editor.element.js";
 export * from "./profile/dc-profile-hidden-banner.element.js";
 export * from "./profile/dc-profile-link.element.js";
 export * from "./profile/dc-profile-visibility-toggle.element.js";
+export * from "./profile/dc-profile-activity-editor.element.js";

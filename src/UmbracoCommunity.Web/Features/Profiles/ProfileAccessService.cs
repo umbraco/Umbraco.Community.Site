@@ -147,6 +147,9 @@ public sealed class ProfileAccessService
         }
     }
 
+    /// <summary>True when the signed-in member may add activity to their own profile by hand: the same group as the display choices.</summary>
+    public Task<bool> CanAddActivityAsync() => CanChooseProfileDisplayAsync();
+
     // Deliberately not IMemberManager.IsMemberAuthorizedAsync: in Umbraco 18 that method
     // int.Parse()s the identity Id, which is a GUID for lightweight external members, so it
     // throws for every member who signed up through GitHub. GetRolesAsync reads groups from

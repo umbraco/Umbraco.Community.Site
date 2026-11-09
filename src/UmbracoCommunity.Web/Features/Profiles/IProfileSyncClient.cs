@@ -5,7 +5,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// Talks to the external content platform about a profile. Reads a member's public activity from it
 /// (<see cref="FindProfileAsync"/>, <see cref="GetActivitiesAsync"/>); the platform has no endpoints
-/// yet for profile-claim and feed notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
+/// yet for profile-claim, feed and activity notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
 /// </summary>
 public interface IProfileSyncClient
 {
@@ -29,6 +29,12 @@ public interface IProfileSyncClient
     Task NotifyFeedHiddenAsync(string handle, string url, bool isHidden, CancellationToken cancellationToken = default);
 
     Task NotifyFeedRemovedAsync(string handle, string url, string? reason, CancellationToken cancellationToken = default);
+
+    /// <summary>A member's hand-added activity was verified and now shows on their profile.</summary>
+    Task NotifyActivityVerifiedAsync(string handle, ActivityEntryRecord entry, CancellationToken cancellationToken = default);
+
+    /// <summary>Activity that was verified is no longer shown on the profile.</summary>
+    Task NotifyActivityRemovedAsync(string handle, string url, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// When the external platform last synced this member's profile data (blog posts, talks, badges, etc.).
