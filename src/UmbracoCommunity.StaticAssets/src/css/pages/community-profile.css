@@ -474,6 +474,15 @@
     color: var(--color-dark-grey);
 }
 
+/* The member's own note on why they pinned the item. */
+.community-profile__highlight-reason {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--color-identity-blue);
+}
+
 /* Community activity — social posts + meet-ups, two columns of lists.
    A distinct tinted panel so it pops out from the plain catalogue below. */
 

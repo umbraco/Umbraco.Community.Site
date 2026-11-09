@@ -60,8 +60,9 @@ public class CommunityProfilePageController : RenderController
             : EnrichedSectionsAccess.None;
 
         // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
+        // The member's choices of what the sections show (sections off, hidden and pinned items) apply on top.
         var profile = viewable.Profile != null && access.Show
-            ? await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken)
+            ? ProfileDisplay.Apply(await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken))
             : viewable.Profile;
 
         var viewModel = new CommunityProfilePageViewModel(currentPage)
