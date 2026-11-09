@@ -36,6 +36,12 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     /// <summary>True when the member has chosen to show their profile to everyone. New profiles start hidden.</summary>
     public bool IsProfileVisible { get; set; }
 
+    /// <summary>
+    /// True when the member may choose what the activity sections of their profile show (see
+    /// <c>ProfileAccessService.CanChooseProfileDisplayAsync</c>).
+    /// </summary>
+    public bool CanChooseProfileDisplay { get; set; }
+
     /// <summary>The member's public profile URL, once claimed.</summary>
     public string? ProfileUrl { get; set; }
 

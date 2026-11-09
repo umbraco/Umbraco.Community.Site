@@ -1,5 +1,6 @@
 @inherits UmbracoViewPage<CommunityProfilePageViewModel>
 @using UmbracoCommunity.Web.Features.Members
+@using UmbracoCommunity.Web.Features.Profiles.Models
 @using UmbracoCommunity.Web.Models.Pages
 @using UmbracoCommunity.Web.Utilities
 @{
@@ -64,9 +65,9 @@ else
     var identity = profile.Identity;
     var currentYear = DateTime.UtcNow.Year;
 
-    // "Featured" strip, shown above the fold. Phase 1 auto-selects the most recent item
-    // of each type (each list is assumed newest-first). Later this becomes member/editor
-    // curated — they choose which items to highlight here — see docs/COMMUNITY_PROFILES_SPEC.md.
+    // "Featured" strip, shown above the fold. The items the member pinned (FeaturedItems, see
+    // ProfileDisplay) when there are any; otherwise the most recent item of each type (each
+    // list is assumed newest-first).
     // Stock placeholder images (Pexels, CSP-allowed) for the blog/video cards in the
     // prototype. Real cover art / YouTube thumbnails arrive with the live data.
     const string blogStockImage = "https://images.pexels.com/photos/7059/man-people-space-desk.jpg?auto=compress&cs=tinysrgb&w=600";
@@ -83,28 +84,49 @@ else
         + "</svg>";
     var packageStockImage = "data:image/svg+xml," + Uri.EscapeDataString(packageSvg);
 
-    var highlights = new List<(string Kind, string Key, string Title, string? Meta, string? Desc, IReadOnlyList<string>? Chips, string? Url, string? Thumb)>();
-    if (profile.Packages.Count > 0)
+    var highlights = new List<(string Kind, string Key, string Title, string? Meta, string? Desc, IReadOnlyList<string>? Chips, string? Url, string? Thumb, string? Reason)>();
+    if (profile.FeaturedItems.Count > 0)
     {
-        var p = profile.Packages[0];
-        highlights.Add(("Package", "package", p.Name, null, p.Description, p.Versions, p.Url, packageStockImage));
+        // The member pinned these themselves, in this order, with their own note on why.
+        foreach (var item in profile.FeaturedItems)
+        {
+            var (kind, key, thumb) = item.Group switch
+            {
+                PlatformActivityGroups.Blog => ("Blog post", "blog", blogStockImage),
+                PlatformActivityGroups.Videos => ("Video", "video", videoStockImage),
+                PlatformActivityGroups.Packages => ("Package", "package", packageStockImage),
+                PlatformActivityGroups.Forum => ("Forum post", "forum", (string?)null),
+                PlatformActivityGroups.Meetups => ("Meet-up", "meetup", null),
+                _ => ("Social post", "social", null),
+            };
+            var meta = string.Join(" · ", new[] { item.Date is null ? null : Date(item.Date), item.Source }.Where(s => !string.IsNullOrEmpty(s)));
+            highlights.Add((kind, key, item.Title, meta, item.Description, null, item.Url, thumb, item.Reason));
+        }
     }
-    if (profile.Talks.Count > 0)
+    else
     {
-        var t = profile.Talks[0];
-        var meta = string.Join(" · ", new[] { t.EventName, t.Date is null ? null : Date(t.Date) }.Where(s => !string.IsNullOrEmpty(s)));
-        highlights.Add(("Talk", "talk", t.Title, meta, t.Description, null, t.Url, talkStockImage));
-    }
-    if (profile.BlogPosts.Count > 0)
-    {
-        var b = profile.BlogPosts[0];
-        var meta = string.Join(" · ", new[] { Date(b.PublishedAt), b.Source }.Where(s => !string.IsNullOrEmpty(s)));
-        highlights.Add(("Blog post", "blog", b.Title, meta, b.Excerpt, null, b.Url, blogStockImage));
-    }
-    if (profile.Videos.Count > 0)
-    {
-        var v = profile.Videos[0];
-        highlights.Add(("Video", "video", v.Title, v.PublishedAt is null ? null : Date(v.PublishedAt), v.Description, null, v.Url, videoStockImage));
+        if (profile.Packages.Count > 0)
+        {
+            var p = profile.Packages[0];
+            highlights.Add(("Package", "package", p.Name, null, p.Description, p.Versions, p.Url, packageStockImage, null));
+        }
+        if (profile.Talks.Count > 0)
+        {
+            var t = profile.Talks[0];
+            var meta = string.Join(" · ", new[] { t.EventName, t.Date is null ? null : Date(t.Date) }.Where(s => !string.IsNullOrEmpty(s)));
+            highlights.Add(("Talk", "talk", t.Title, meta, t.Description, null, t.Url, talkStockImage, null));
+        }
+        if (profile.BlogPosts.Count > 0)
+        {
+            var b = profile.BlogPosts[0];
+            var meta = string.Join(" · ", new[] { Date(b.PublishedAt), b.Source }.Where(s => !string.IsNullOrEmpty(s)));
+            highlights.Add(("Blog post", "blog", b.Title, meta, b.Excerpt, null, b.Url, blogStockImage, null));
+        }
+        if (profile.Videos.Count > 0)
+        {
+            var v = profile.Videos[0];
+            highlights.Add(("Video", "video", v.Title, v.PublishedAt is null ? null : Date(v.PublishedAt), v.Description, null, v.Url, videoStockImage, null));
+        }
     }
 
     <article class="community-profile">
@@ -249,6 +271,10 @@ else
                                 @highlight.Kind
                             </span>
                             <a class="community-profile__highlight-title" href="@highlight.Url" target="_blank" rel="noopener">@highlight.Title</a>
+                            @if (!string.IsNullOrEmpty(highlight.Reason))
+                            {
+                                <p class="community-profile__highlight-reason">@highlight.Reason</p>
+                            }
                             @if (!string.IsNullOrEmpty(highlight.Desc))
                             {
                                 <p class="community-profile__highlight-desc">@highlight.Desc</p>

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
+using UmbracoCommunity.Web.Features.Profiles.Models;
 
 namespace UmbracoCommunity.Web.Features.Profiles.Data;
 
@@ -24,6 +25,8 @@ public class MemberProfileStore
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         return await context.MemberProfiles
             .Include(p => p.Feeds)
+            .Include(p => p.PinnedItems)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
     }
 
@@ -33,6 +36,8 @@ public class MemberProfileStore
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         return await context.MemberProfiles
             .Include(p => p.Feeds)
+            .Include(p => p.PinnedItems)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(p => p.GitHubHandle.ToLower() == handle.ToLower(), ct);
     }
 
@@ -148,6 +153,43 @@ public class MemberProfileStore
         entity.UpdatedUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return true;
+    }
+
+    /// <summary>
+    /// Replaces what the member has chosen their profile's activity sections show: the sections switched off,
+    /// the hidden items and the pinned items (stored in the order given, each with its copy of the item). Expects
+    /// choices already checked by <see cref="ProfileDisplay.TryNormalize"/>. Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> SetDisplayChoicesAsync(Guid memberKey, ProfileDisplayChoices choices, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles
+            .Include(p => p.PinnedItems)
+            .FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.HiddenSections = [.. choices.HiddenSections];
+        entity.HiddenActivityIds = [.. choices.HiddenActivityIds];
+
+        context.MemberPinnedItems.RemoveRange(entity.PinnedItems);
+        entity.PinnedItems = choices.Pins
+            .Select((pin, index) => new MemberPinnedItemEntity
+            {
+                ActivityId = pin.ActivityId,
+                Reason = pin.Reason,
+                SortOrder = index + 1,
+                Group = pin.Snapshot?.Group,
+                Title = pin.Snapshot?.Title,
+                Url = pin.Snapshot?.Url,
+                Description = pin.Snapshot?.Description,
+                DateUtc = pin.Snapshot?.Date?.UtcDateTime,
+                Source = pin.Snapshot?.Source,
+            })
+            .ToList();
+
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
     }
 
     public async Task<MemberProfileEntity?> CompleteOnboardingAsync(Guid memberKey, CancellationToken ct = default)
