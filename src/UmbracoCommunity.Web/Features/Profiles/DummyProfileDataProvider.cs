@@ -53,7 +53,10 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
                 new ProfileSocialLink("LinkedIn", "https://www.linkedin.com/in/alexpenrose"),
                 new ProfileSocialLink("Bluesky", "https://bsky.app/profile/alexpenrose.bsky.social"),
             },
-            HasCustomAvatar: true),
+            HasCustomAvatar: true)
+            {
+                IsCurrentMvp = true,
+            },
         BlogPosts: new[]
         {
             new ProfileBlogPost(

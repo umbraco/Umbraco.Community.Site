@@ -9,6 +9,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
+using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
+using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Controllers;
 using UmbracoCommunity.Web.Features.Profiles.Data;
@@ -98,6 +100,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
 
         return new ProfileActivityService(
             syncClient.Object,
+            Mock.Of<IMvpDataService>(m => m.GetAll() == Array.Empty<MvpYear>()),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             Mock.Of<IOptionsMonitor<ProfileActivityOptions>>(o => o.CurrentValue == new ProfileActivityOptions()),

@@ -2,8 +2,11 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
+using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Models;
+using Moq;
 using Xunit;
 
 namespace UmbracoCommunity.Web.Tests.Features.Profiles;
@@ -18,9 +21,10 @@ public class ProfileActivityServiceTests
         Identity: new ProfileIdentity("The Octocat", null, null, null, null, null, false, [], Handle, null, [], false),
         BlogPosts: [], Videos: [], ForumPosts: [], Packages: [], Talks: [], Badges: [], SocialPosts: [], Meetups: []);
 
-    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null) =>
+    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null, IMvpDataService? mvp = null) =>
         new(
             client,
+            mvp ?? Listed(),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
@@ -126,6 +130,40 @@ public class ProfileActivityServiceTests
         result.SocialPosts.Single().ActivityId.Should().Be("s1");
         result.Meetups.Single().ActivityId.Should().Be("m1");
     }
+
+    [Fact]
+    public async Task Mvp_years_come_from_the_platform_when_it_reports_them()
+    {
+        var listed = Listed(new MvpYear(2026, [Member(Handle)]));
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", [2023, 2027]) };
+
+        var result = await CreateService(client, mvp: listed).EnrichAsync(Profile);
+
+        result.Identity.MvpYears.Should().Equal(2027, 2023);
+        result.Identity.IsCurrentMvp.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Mvp_years_fall_back_to_the_list_when_the_platform_has_none_or_is_down()
+    {
+        var listed = Listed(new MvpYear(2025, [Member(Handle)]), new MvpYear(2026, [Member(Handle)]));
+
+        var noYears = await CreateService(new FakeSyncClient { Profile = new PlatformProfile("p1", []) }, mvp: listed).EnrichAsync(Profile);
+        var down = await CreateService(new FakeSyncClient { Throws = true }, mvp: listed).EnrichAsync(Profile);
+
+        noYears.Identity.MvpYears.Should().Equal(2026, 2025);
+        down.Identity.MvpYears.Should().Equal(2026, 2025);
+        down.Identity.IsMvp.Should().BeTrue();
+    }
+
+    private static IMvpDataService Listed(params MvpYear[] years)
+    {
+        var mvp = new Mock<IMvpDataService>();
+        mvp.Setup(m => m.GetAll()).Returns(years);
+        return mvp.Object;
+    }
+
+    private static MvpMember Member(string handle) => new(handle, false, "https://example.dev/a.png", null, handle);
 
     [Fact]
     public async Task A_member_the_platform_does_not_know_gets_the_profile_unchanged()
