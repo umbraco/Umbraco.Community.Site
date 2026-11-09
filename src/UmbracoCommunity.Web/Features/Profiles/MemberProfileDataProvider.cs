@@ -78,6 +78,9 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
             Talks: [],
             Badges: [],
             SocialPosts: [],
-            Meetups: []);
+            Meetups: [])
+        {
+            DisplayChoices = ProfileDisplay.StoredChoices(entity),
+        };
     }
 }

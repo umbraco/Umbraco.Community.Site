@@ -58,6 +58,15 @@
                                            github-bio="@Model.GitHubBio"
                                            profile-url="@Model.ProfileUrl"></dc-profile-details-editor>
             </section>
+
+            @if (Model.CanChooseProfileDisplay)
+            {
+                <section class="account-page__section">
+                    <h2>What your profile shows</h2>
+                    <p class="account-page__section-hint">Choose which activity sections appear on your profile, hide single items, and pin up to three items you're proud of to the top.</p>
+                    <dc-profile-display-editor></dc-profile-display-editor>
+                </section>
+            }
         }
         else if (!string.IsNullOrEmpty(Model.OnboardingUrl))
         {

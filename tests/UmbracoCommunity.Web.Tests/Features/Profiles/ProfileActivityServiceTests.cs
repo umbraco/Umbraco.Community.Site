@@ -99,6 +99,35 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
+    public async Task Every_item_carries_its_platform_activity_id()
+    {
+        PlatformActivity At(string id, string title) =>
+            new(id, "x:y", "web", title, $"https://example.dev/{id}", null, null, DateTimeOffset.UtcNow);
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities =
+            {
+                [PlatformActivityGroups.Blog] = [At("b1", "Post")],
+                [PlatformActivityGroups.Videos] = [At("v1", "Video")],
+                [PlatformActivityGroups.Forum] = [At("f1", "Thread")],
+                [PlatformActivityGroups.Packages] = [At("p1", "Package")],
+                [PlatformActivityGroups.Social] = [At("s1", "Social post")],
+                [PlatformActivityGroups.Meetups] = [At("m1", "Meet-up")],
+            },
+        };
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.BlogPosts.Single().ActivityId.Should().Be("b1");
+        result.Videos.Single().ActivityId.Should().Be("v1");
+        result.ForumPosts.Single().ActivityId.Should().Be("f1");
+        result.Packages.Single().ActivityId.Should().Be("p1");
+        result.SocialPosts.Single().ActivityId.Should().Be("s1");
+        result.Meetups.Single().ActivityId.Should().Be("m1");
+    }
+
+    [Fact]
     public async Task A_member_the_platform_does_not_know_gets_the_profile_unchanged()
     {
         var result = await CreateService(new FakeSyncClient { Profile = null }).EnrichAsync(Profile);

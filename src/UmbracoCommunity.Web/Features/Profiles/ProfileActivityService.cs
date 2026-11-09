@@ -99,23 +99,23 @@ public sealed class ProfileActivityService
 
         return new ProfileActivity(
             BlogPosts: Items(PlatformActivityGroups.Blog)
-                .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary)))
+                .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary), a.Id))
                 .ToList(),
             Videos: Items(PlatformActivityGroups.Videos)
-                .Select(a => new ProfileVideo(a.Title!, a.Url!, _imageProxy.CreateProxyUrl(a.ImageUrl), a.OccurredAt, Truncate(a.Summary)))
+                .Select(a => new ProfileVideo(a.Title!, a.Url!, _imageProxy.CreateProxyUrl(a.ImageUrl), a.OccurredAt, Truncate(a.Summary), a.Id))
                 .ToList(),
             ForumPosts: Items(PlatformActivityGroups.Forum)
-                .Select(a => new ProfileForumPost(a.Title!, a.Url!, a.OccurredAt, null))
+                .Select(a => new ProfileForumPost(a.Title!, a.Url!, a.OccurredAt, null, a.Id))
                 .ToList(),
             Packages: Items(PlatformActivityGroups.Packages)
                 .DistinctBy(a => a.Url)
-                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary)))
+                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary), a.Id))
                 .ToList(),
             SocialPosts: Items(PlatformActivityGroups.Social)
-                .Select(a => new ProfileSocialPost(a.Platform ?? "Social", a.Url!, Truncate(a.Title)!, a.OccurredAt))
+                .Select(a => new ProfileSocialPost(a.Platform ?? "Social", a.Url!, Truncate(a.Title)!, a.OccurredAt, a.Id))
                 .ToList(),
             Meetups: Items(PlatformActivityGroups.Meetups)
-                .Select(a => new ProfileMeetup(MeetupAction(a.Type), a.Title!, null, a.OccurredAt, a.Url))
+                .Select(a => new ProfileMeetup(MeetupAction(a.Type), a.Title!, null, a.OccurredAt, a.Url, a.Id))
                 .ToList());
     }
 

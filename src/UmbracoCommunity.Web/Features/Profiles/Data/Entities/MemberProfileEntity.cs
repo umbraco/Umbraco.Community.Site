@@ -78,9 +78,20 @@ public class MemberProfileEntity
     /// <summary>The external platform's internal profile id, once it has a real claim endpoint. Null today.</summary>
     public string? PlatformProfileId { get; set; }
 
+    /// <summary>
+    /// The activity sections (see <see cref="Models.PlatformActivityGroups"/>) the member has switched
+    /// off. Empty = every section is shown.
+    /// </summary>
+    public List<string> HiddenSections { get; set; } = [];
+
+    /// <summary>The ids of single activities from the external content platform the member has hidden.</summary>
+    public List<string> HiddenActivityIds { get; set; } = [];
+
     public DateTime CreatedUtc { get; set; }
 
     public DateTime UpdatedUtc { get; set; }
 
     public List<MemberFeedEntity> Feeds { get; set; } = [];
+
+    public List<MemberPinnedItemEntity> PinnedItems { get; set; } = [];
 }
