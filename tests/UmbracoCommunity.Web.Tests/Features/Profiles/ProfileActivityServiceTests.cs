@@ -1,10 +1,12 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
+using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using Moq;
 using Xunit;
@@ -21,14 +23,30 @@ public class ProfileActivityServiceTests
         Identity: new ProfileIdentity("The Octocat", null, null, null, null, null, false, [], Handle, null, [], false),
         BlogPosts: [], Videos: [], ForumPosts: [], Packages: [], Talks: [], Badges: [], SocialPosts: [], Meetups: []);
 
-    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null, IMvpDataService? mvp = null) =>
+    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null, IMvpDataService? mvp = null, ProfileActivityEntryService? activityEntryService = null) =>
         new(
             client,
+            activityEntryService ?? CreateActivityEntryService(client),
             mvp ?? Listed(),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);
+
+    private static ProfileActivityEntryService CreateActivityEntryService(IProfileSyncClient client)
+    {
+        var database = new MemberProfilesTestDatabase();
+        using (var context = database.CreateDbContext())
+        {
+            context.Database.Migrate();
+        }
+
+        return new ProfileActivityEntryService(
+            new MemberActivityEntryStore(database),
+            client,
+            new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
+            NullLogger<ProfileActivityEntryService>.Instance);
+    }
 
     private static PlatformActivity Activity(string title, string url, DateTimeOffset at, string type = "x:y") =>
         new(Guid.NewGuid().ToString(), type, "web", title, url, null, null, at);
@@ -213,7 +231,7 @@ public class ProfileActivityServiceTests
         await CreateService(client, new ProfileActivityOptions { ItemsPerSection = 3 }).EnrichAsync(Profile);
 
         client.RequestedLimits.Should().OnlyContain(l => l == 3);
-        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.All);
+        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.FromPlatform);
     }
 
     private sealed class FakeSyncClient : IProfileSyncClient
@@ -246,6 +264,8 @@ public class ProfileActivityServiceTests
         public Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedHiddenAsync(string handle, string url, bool isHidden, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedRemovedAsync(string handle, string url, string? reason, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task NotifyActivityVerifiedAsync(string handle, ActivityEntryRecord entry, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task NotifyActivityRemovedAsync(string handle, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<DateTimeOffset?> GetLastSyncedAtAsync(string handle, CancellationToken cancellationToken = default) => Task.FromResult<DateTimeOffset?>(null);
     }
 

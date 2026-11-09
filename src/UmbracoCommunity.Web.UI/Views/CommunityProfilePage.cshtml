@@ -96,6 +96,7 @@ else
                 PlatformActivityGroups.Packages => ("Package", "package", packageStockImage),
                 PlatformActivityGroups.Forum => ("Forum post", "forum", (string?)null),
                 PlatformActivityGroups.Meetups => ("Meet-up", "meetup", null),
+                PlatformActivityGroups.Other => (item.Source ?? "Activity", "other", null),
                 _ => ("Social post", "social", null),
             };
             var meta = string.Join(" · ", new[] { item.Date is null ? null : Date(item.Date), item.Source }.Where(s => !string.IsNullOrEmpty(s)));
@@ -452,6 +453,26 @@ else
                                 {<a class="community-profile__dept-title" href="@meetup.Url" target="_blank" rel="noopener">@meetup.EventName</a>}
                                 else
                                 {<strong class="community-profile__dept-title">@meetup.EventName</strong>}@tail</p>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (profile.OtherActivities.Count > 0)
+            {
+                <section class="community-profile__section" aria-label="Other activity">
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "other") Other activity</h2>
+                    <ul class="community-profile__dept-list">
+                        @foreach (var activity in profile.OtherActivities)
+                        {
+                            <li class="community-profile__dept-item">
+                                <a class="community-profile__dept-title" href="@activity.Url" target="_blank" rel="noopener">@activity.Title</a>
+                                <p class="community-profile__dept-meetup">@activity.Kind, @Date(activity.Date)</p>
+                                @if (!string.IsNullOrEmpty(activity.Description))
+                                {
+                                    <p class="community-profile__dept-desc">@activity.Description</p>
+                                }
                             </li>
                         }
                     </ul>

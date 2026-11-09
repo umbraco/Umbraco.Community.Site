@@ -5,17 +5,22 @@ import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
 import type { UmbNotificationContext } from "@umbraco-cms/backoffice/notification";
 import { ApiError, ProfileMatchReviewApi, setAuthConfig } from "./api/profile-match-review-api.js";
 import type { MatchState, ProfileMatch } from "./api/profile-match-review-types.js";
+import "./profile-activity-review-panel.element.js";
 
 const PAGE_SIZE = 25;
-const TABS: Array<{ state: MatchState; label: string }> = [
+// The tab that shows the activity members added by hand instead of a match list.
+const ACTIVITY_TAB = "Activity";
+type Tab = MatchState | typeof ACTIVITY_TAB;
+const TABS: Array<{ state: Tab; label: string }> = [
   { state: "Held", label: "Held" },
   { state: "Confirmed", label: "Linked" },
   { state: "Rejected", label: "Rejected" },
+  { state: ACTIVITY_TAB, label: "Added activity" },
 ];
 
 @customElement("profile-match-review-dashboard")
 export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitElement) {
-  @state() private activeState: MatchState = "Held";
+  @state() private activeState: Tab = "Held";
   @state() private items: ProfileMatch[] = [];
   @state() private total = 0;
   @state() private loading = false;
@@ -50,6 +55,7 @@ export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitEleme
     this.error = undefined;
     try {
       const skip = reset ? 0 : this.items.length;
+      if (this.activeState === ACTIVITY_TAB) return;
       const page = await ProfileMatchReviewApi.list(this.activeState, skip, PAGE_SIZE);
       this.items = reset ? page.items : [...this.items, ...page.items];
       this.total = page.total;
@@ -65,12 +71,14 @@ export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitEleme
     }
   }
 
-  #selectTab(next: MatchState) {
+  #selectTab(next: Tab) {
     if (next === this.activeState) return;
     this.activeState = next;
     this.items = [];
     this.total = 0;
-    void this.#load(true);
+    if (next !== ACTIVITY_TAB) {
+      void this.#load(true);
+    }
   }
 
   async #decide(match: ProfileMatch, decision: "link" | "reject") {
@@ -187,6 +195,12 @@ export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitEleme
           ></uui-tab>`,
         )}
       </uui-tab-group>
+      ${this.activeState === ACTIVITY_TAB ? html`<profile-activity-review-panel></profile-activity-review-panel>` : this.#renderMatches()}
+    `;
+  }
+
+  #renderMatches() {
+    return html`
       ${this.error ? html`<uui-box><p>${this.error}</p></uui-box>` : nothing}
       ${!this.loading && !this.error && this.items.length === 0
         ? html`<uui-box><p>Nothing here.</p></uui-box>`

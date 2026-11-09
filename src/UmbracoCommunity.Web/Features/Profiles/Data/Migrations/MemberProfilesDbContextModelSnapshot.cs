@@ -219,6 +219,53 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.ToTable("ProfileMatches", (string)null);
                 });
 
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberActivityEntryEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreatedUtc");
+
+                    b.Property<DateTime>("DateUtc");
+
+                    b.Property<Guid?>("DecidedByUserKey");
+
+                    b.Property<string>("DecidedByUserName")
+                        .HasMaxLength(200);
+
+                    b.Property<DateTime?>("DecidedUtc");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500);
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<int>("MemberProfileId");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500);
+
+                    b.Property<int>("State");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2048);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemberProfileId");
+
+                    b.HasIndex("State");
+
+                    b.ToTable("MemberActivityEntries", (string)null);
+                });
+
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>
                 {
                     b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")
@@ -242,6 +289,17 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                 });
 
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.ProfileMatchEntity", b =>
+                {
+                    b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")
+                        .WithMany()
+                        .HasForeignKey("MemberProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MemberProfile");
+                });
+
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberActivityEntryEntity", b =>
                 {
                     b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")
                         .WithMany()
