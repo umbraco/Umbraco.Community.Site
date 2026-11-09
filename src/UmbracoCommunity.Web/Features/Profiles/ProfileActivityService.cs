@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
+using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 
 namespace UmbracoCommunity.Web.Features.Profiles;
@@ -18,6 +19,7 @@ public sealed class ProfileActivityService
     private const int MaxTextLength = 280;
 
     private readonly IProfileSyncClient _syncClient;
+    private readonly IMvpDataService _mvpDataService;
     private readonly FeedSubmissionImageProxyService _imageProxy;
     private readonly AppCaches _appCaches;
     private readonly IOptionsMonitor<ProfileActivityOptions> _options;
@@ -25,12 +27,14 @@ public sealed class ProfileActivityService
 
     public ProfileActivityService(
         IProfileSyncClient syncClient,
+        IMvpDataService mvpDataService,
         FeedSubmissionImageProxyService imageProxy,
         AppCaches appCaches,
         IOptionsMonitor<ProfileActivityOptions> options,
         ILogger<ProfileActivityService> logger)
     {
         _syncClient = syncClient;
+        _mvpDataService = mvpDataService;
         _imageProxy = imageProxy;
         _appCaches = appCaches;
         _options = options;
@@ -40,17 +44,22 @@ public sealed class ProfileActivityService
     public async Task<CommunityProfile> EnrichAsync(CommunityProfile profile, CancellationToken cancellationToken = default)
     {
         var activity = await GetActivityAsync(profile.Slug, cancellationToken);
-        return activity == null
-            ? profile
-            : profile with
-            {
-                BlogPosts = activity.BlogPosts,
-                Videos = activity.Videos,
-                ForumPosts = activity.ForumPosts,
-                Packages = activity.Packages,
-                SocialPosts = activity.SocialPosts,
-                Meetups = activity.Meetups,
-            };
+        var identity = ProfileMvp.Apply(profile.Identity, activity?.MvpYears, _mvpDataService.GetAll());
+        if (activity == null)
+        {
+            return ReferenceEquals(identity, profile.Identity) ? profile : profile with { Identity = identity };
+        }
+
+        return profile with
+        {
+            Identity = identity,
+            BlogPosts = activity.BlogPosts,
+            Videos = activity.Videos,
+            ForumPosts = activity.ForumPosts,
+            Packages = activity.Packages,
+            SocialPosts = activity.SocialPosts,
+            Meetups = activity.Meetups,
+        };
     }
 
     private async Task<ProfileActivity?> GetActivityAsync(string handle, CancellationToken cancellationToken)
@@ -98,6 +107,7 @@ public sealed class ProfileActivityService
                 .ToList();
 
         return new ProfileActivity(
+            MvpYears: platformProfile.MvpYears,
             BlogPosts: Items(PlatformActivityGroups.Blog)
                 .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary), a.Id))
                 .ToList(),
@@ -139,6 +149,7 @@ public sealed class ProfileActivityService
     }
 
     private sealed record ProfileActivity(
+        IReadOnlyList<int> MvpYears,
         IReadOnlyList<ProfileBlogPost> BlogPosts,
         IReadOnlyList<ProfileVideo> Videos,
         IReadOnlyList<ProfileForumPost> ForumPosts,

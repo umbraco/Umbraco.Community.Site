@@ -53,7 +53,11 @@ public sealed record ProfileIdentity(
     string? GitHubHandle,
     string? YouTubeChannelUrl,
     IReadOnlyList<ProfileSocialLink> SocialLinks,
-    bool HasCustomAvatar);
+    bool HasCustomAvatar)
+{
+    /// <summary>True when the newest of <see cref="MvpYears"/> is the current MVP year. Set by <see cref="ProfileMvp"/>.</summary>
+    public bool IsCurrentMvp { get; init; }
+}
 
 /// <summary>A blog post or article the member has written, from any source.</summary>
 public sealed record ProfileBlogPost(

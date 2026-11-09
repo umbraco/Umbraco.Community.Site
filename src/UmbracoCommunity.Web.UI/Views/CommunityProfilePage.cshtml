@@ -63,7 +63,6 @@
 else
 {
     var identity = profile.Identity;
-    var currentYear = DateTime.UtcNow.Year;
 
     // "Featured" strip, shown above the fold. The items the member pinned (FeaturedItems, see
     // ProfileDisplay) when there are any; otherwise the most recent item of each type (each
@@ -139,38 +138,14 @@ else
                 <div class="community-profile__portrait">
                     @if (!string.IsNullOrEmpty(identity.AvatarUrl))
                     {
-                        <img class="community-profile__avatar"
+                        <img class="community-profile__avatar@(identity.IsCurrentMvp ? " community-profile__avatar--mvp" : "")"
                              src="@identity.AvatarUrl"
                              alt="@identity.DisplayName"
                              width="170" height="170" loading="eager" />
                     }
-                    @if (identity.IsMvp && identity.MvpYears.Count > 0)
+                    @if (identity.IsCurrentMvp)
                     {
-                        var mvpYears = identity.MvpYears.OrderByDescending(y => y).ToList();
-                        var mvpCount = mvpYears.Count;
-                        <ul class="community-profile__mvp" aria-label="Umbraco MVP awards by year">
-                            @for (var i = 0; i < mvpCount; i++)
-                            {
-                                var year = mvpYears[i];
-                                var isCurrent = year == currentYear;
-                                // Most recent (i = 0) sits at bottom centre (180°); the rest trail up the
-                                // right-hand side with a fixed step (~10px gap between 50px medals on the
-                                // 132px-radius ring), so spacing is uniform for any count.
-                                var stepDeg = 60d / 132d * (180d / System.Math.PI);
-                                var angle = 180d - i * stepDeg;
-                                var angleText = angle.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
-                                var awardClass = isCurrent
-                                    ? "community-profile__mvp-award community-profile__mvp-award--current"
-                                    : "community-profile__mvp-award";
-                                var awardStyle = "transform: rotate(" + angleText + "deg) translateY(-132px) rotate(-" + angleText + "deg)";
-                                <li class="@awardClass" style="@awardStyle">
-                                    <span class="community-profile__mvp-medal">
-                                        <span class="community-profile__mvp-label">MVP</span>
-                                        <span class="community-profile__mvp-year">@year</span>
-                                    </span>
-                                </li>
-                            }
-                        </ul>
+                        <span class="community-profile__mvp-badge" role="img" aria-label="Umbraco MVP">MVP</span>
                     }
                 </div>
 
@@ -182,6 +157,20 @@ else
                             <span class="community-profile__pronouns">@identity.Pronouns</span>
                         }
                     </h1>
+
+                    @if (identity.IsMvp && identity.MvpYears.Count > 0)
+                    {
+                        var yearsText = string.Join(", ", identity.MvpYears);
+                        <div class="community-profile__mvp-pill" role="group" tabindex="0" aria-label="Umbraco MVP @yearsText">
+                            <span class="community-profile__mvp-pill-label">MVP × @identity.MvpYears.Count</span>
+                            <ul class="community-profile__mvp-years" aria-label="Umbraco MVP years">
+                                @foreach (var year in identity.MvpYears)
+                                {
+                                    <li>@year</li>
+                                }
+                            </ul>
+                        </div>
+                    }
 
                     @if (!string.IsNullOrEmpty(identity.Headline))
                     {
