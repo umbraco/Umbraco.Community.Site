@@ -32,6 +32,16 @@ namespace UmbracoCommunity.Web.Extensions
                   action = "Index"
               });
 
+            // Register route for the signed Web Bot Auth key directory (Cloudflare verified bots)
+            builder.EndpointRouteBuilder.MapControllerRoute(
+              "WebBotAuthDirectory",
+              ".well-known/http-message-signatures-directory",
+              new
+              {
+                  controller = "WebBotAuthDirectory",
+                  action = "Index"
+              });
+
             // Register route for the aggregated community blogs RSS feed
             builder.EndpointRouteBuilder.MapControllerRoute(
               "CommunityBlogsFeed",

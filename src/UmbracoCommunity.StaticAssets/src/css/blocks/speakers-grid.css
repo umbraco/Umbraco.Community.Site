@@ -1,6 +1,4 @@
-.dc-speakers {
-    margin-bottom: var(--unit-md);
-}
+@import "../base/media-queries.css";
 
 .dc-speakers-grid {
     display: flex;
@@ -24,7 +22,7 @@
     box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
+@media (--sm) {
     .dc-speakers-grid {
         gap: var(--unit-md);
     }
@@ -34,7 +32,7 @@
     }
 }
 
-@media (min-width: 1024px) {
+@media (--md) {
     .dc-speakers-grid {
         gap: var(--unit-md) var(--unit-lg);
     }
@@ -62,8 +60,12 @@
     clip-path: circle();
 }
 
+.dc-speakers-grid__no-image {
+    background-color: var(--color-grey);
+}
+
 .dc-speakers-grid__item .speaker-name {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     font-size: var(--font-size-large);
     margin: 1rem 0 0;
     text-align: center;
@@ -73,5 +75,5 @@
     font-size: var(--font-size-sm);
     margin: 0.25rem 0 0;
     text-align: center;
-    color: var(--color-grey-dark, #6b7280);
+    color: var(--color-grey-dark);
 }

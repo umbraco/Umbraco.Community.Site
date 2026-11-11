@@ -58,6 +58,7 @@
                         {
                             <img src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
                                  class="is-circle"
+                                 width="@imageItem.Image.GetCropSize("desktop")?.Width" height="@imageItem.Image.GetCropSize("desktop")?.Height" style="@imageItem.Image.GetCropRatioStyle()"
                                  loading="lazy" />
 
                         }
@@ -66,6 +67,7 @@
                             <img srcset="@imageItem.Image.GetCropUrl("mobile") 386w, @imageItem.Image.GetCropUrl("desktop") 906w"
                                  sizes="(max-width: 400px) 386px, 906px"
                                  src="@imageItem.Image.GetCropUrl("desktop")" alt="@imageItem.AltText"
+                                 width="@imageItem.Image.GetCropSize("mobile")?.Width" height="@imageItem.Image.GetCropSize("mobile")?.Height" style="@imageItem.Image.GetCropRatioStyle()"
                                  loading="lazy" />
                         }
                     </div>
@@ -77,7 +79,7 @@
                     <div class="dc-image-wrapper">
                         <img srcset="@imageOverlayItem.Image.GetCropUrl("mobile") 386w, @imageOverlayItem.Image.GetCropUrl("desktop") 906w"
                              sizes="(max-width: 400px) 386px, 906px"
-                             src="@imageOverlayItem.Image.GetCropUrl("desktop")" alt="@imageOverlayItem.AltText" class="dc-image" loading="lazy" />
+                             src="@imageOverlayItem.Image.GetCropUrl("desktop")" alt="@imageOverlayItem.AltText" class="dc-image" width="@imageOverlayItem.Image.GetCropSize("mobile")?.Width" height="@imageOverlayItem.Image.GetCropSize("mobile")?.Height" style="@imageOverlayItem.Image.GetCropRatioStyle()" loading="lazy" />
 
                         @if (!imageOverlayItem.OverlayText.IsEmptyHtmlString())
                         {

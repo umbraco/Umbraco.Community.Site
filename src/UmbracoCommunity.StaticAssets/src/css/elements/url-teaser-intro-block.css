@@ -7,7 +7,7 @@
 .url-teaser-intro-block__url {
   text-align: center;
   margin-bottom: var(--unit-md);
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
 }
 
 .url-teaser-intro-block__teaser {

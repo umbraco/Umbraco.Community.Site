@@ -40,7 +40,7 @@
     margin: 0 0 var(--unit);
     font-size: 38px !important;
     line-height: 49px !important;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
   }
 
   fieldset.umbraco-forms-field {

@@ -105,7 +105,7 @@
 
 .account-page__profile-url {
   display: block;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
   word-break: break-all;
 }
@@ -139,7 +139,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--unit-xs);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
   cursor: pointer;
 }
@@ -382,7 +382,7 @@
 }
 
 .dc-profile-details-editor__profile-link {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
 }
 

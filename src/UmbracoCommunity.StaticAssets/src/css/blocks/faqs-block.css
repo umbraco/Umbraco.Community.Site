@@ -1,4 +1,6 @@
 .dc-faqs {
+    margin-block: 0;
+
     .block-title,
     .block-subtitle {
         max-width: var(--narrow-width);
@@ -10,16 +12,22 @@
     }
 
     .block-subtitle h2 {
-        font-size: 1.5rem;
+        font-size: var(--content-h2-font-size, 1.5rem);
+        line-height: var(--content-h2-line-height, var(--line-height-heading));
         margin-top: var(--unit);
+
+        &:first-child {
+            margin-top: 0;
+        }
+
         display: inline-block;
 
         @media (--sm) {
-            font-size: 1.75rem;
+            font-size: var(--content-h2-font-size, 1.75rem);
         }
 
         @media (--md) {
-            font-size: 2rem;
+            font-size: var(--content-h2-font-size, 2rem);
         }
     }
 
@@ -41,7 +49,7 @@
         justify-content: space-between;
         align-items: center;
         transition: color ease-in-out .2s;
-        font-weight: 500;
+        font-weight: var(--font-weight-medium);
     }
 
     label:hover {

@@ -48,7 +48,10 @@
 @functions {
     void RenderCardContent(IconLinkCardItemBlock card)
     {
-        <img class="dc-image is-circle" src="@card.CardIcon?.GetCropUrl(width: 150, height: 150)" alt="@card.CardTitle" loading="lazy" />
+        if (card.CardIcon != null)
+        {
+            <img class="dc-image is-circle" src="@card.CardIcon.GetCropUrl(width: 150, height: 150)" alt="@card.CardTitle" width="150" height="150" loading="lazy" />
+        }
         <p class="card-title">@card.CardTitle</p>
         @if (!string.IsNullOrEmpty(card.CardDescription))
         {

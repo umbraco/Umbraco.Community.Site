@@ -9,9 +9,9 @@
 
     .dc-link-slider-item__headline {
         padding: 24px;
-        color: var(--black, #162335);
+        color: #162335;
         font-size: 26px;
-        font-weight: 500;
+        font-weight: var(--font-weight-medium);
         margin: 0;
         border-bottom: 1px solid #909090;
     }
@@ -34,7 +34,7 @@
     .dc-link-slider-item__text {
         color: var(--color-black);
         font-size: 20px;
-        font-weight: 400;
+        font-weight: var(--font-weight-regular);
         line-height: 30px;
         margin-top:27px;
     }

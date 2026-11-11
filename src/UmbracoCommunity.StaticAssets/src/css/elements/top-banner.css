@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .top-banner__container {
     display: flex;
     margin: 1rem auto 0 auto;
@@ -5,7 +7,7 @@
     max-width: 1546px;
     font-size: 10px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: normal;
     position: relative;
     z-index: 2;
@@ -57,7 +59,7 @@ body.hero-full-width .top-banner__container {
     margin-left: 5px;
 }
 
-@media(min-width: 768px) {
+@media (--sm) {
     body:not(.hero-half-width):not(.hero-full-width) .top-banner__container {
         padding: 0 2rem;
     }
