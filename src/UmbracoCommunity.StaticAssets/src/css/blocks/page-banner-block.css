@@ -1,6 +1,20 @@
 .dc-page-banner-block {
+  --page-banner-inset: var(--unit);
+
   max-width: var(--max-width);
   margin: 0 auto;
+
+  @media (--sm) {
+    --page-banner-inset: var(--unit-md);
+  }
+
+  @media (--lg) {
+    --page-banner-inset: var(--unit-lg);
+  }
+
+  @media (--xl) {
+    --page-banner-inset: var(--unit-xl);
+  }
 }
 
 .dc-page-banner-block h1, .dc-page-banner-block .banner-content {
@@ -19,7 +33,7 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--unit-md) var(--unit);
+  padding: var(--unit-md) var(--page-banner-inset);
   background-size: cover;
   background-position: center center;
   background-image: var(--page-banner-background-image);
@@ -30,9 +44,13 @@
     color: var(--color-white);
   }
 
+  .dc-page-banner-block:not(.has-bg) & {
+    padding-inline: var(--page-banner-plain-inset, var(--page-banner-inset));
+  }
+
   @media (--sm) {
     min-height: 270px;
-    padding: var(--unit-lg) var(--unit-md);
+    padding-block: var(--unit-lg);
   }
 }
 
@@ -46,21 +64,11 @@
 }
 
 /* ==========================================================================
-   Desktop (1216px+)
-   ========================================================================== */
-
-@media (--lg) {
-    .dc-page-banner-block__container {
-      padding: var(--unit-lg);
-    }
-}
-
-/* ==========================================================================
    Desktop (1408px+)
    ========================================================================== */
 
 @media (--xl) {
     .dc-page-banner-block__container {
-      padding: var(--unit-xl);
+      padding-block: var(--unit-xl);
     }
 }
