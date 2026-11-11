@@ -47,6 +47,7 @@
 
   h2 {
     margin: 1rem 0;
+    line-height: var(--content-h2-line-height, 1.6);
   }
 
   h3 {

@@ -55,10 +55,10 @@
 }
 
 .dc-image-and-text-block__content h2 {
-  font-size: var(--font-size-display-xs);
+  font-size: var(--content-h2-font-size, var(--font-size-display-xs));
   font-style: normal;
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-md);
+  line-height: var(--content-h2-line-height, var(--line-height-md));
   margin-top: 0;
 }
 

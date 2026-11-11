@@ -12,8 +12,8 @@
     }
 
     .block-subtitle h2 {
-        font-size: 1.5rem;
-        line-height: var(--line-height-heading);
+        font-size: var(--content-h2-font-size, 1.5rem);
+        line-height: var(--content-h2-line-height, var(--line-height-heading));
         margin-top: var(--unit);
 
         &:first-child {
@@ -23,11 +23,11 @@
         display: inline-block;
 
         @media (--sm) {
-            font-size: 1.75rem;
+            font-size: var(--content-h2-font-size, 1.75rem);
         }
 
         @media (--md) {
-            font-size: 2rem;
+            font-size: var(--content-h2-font-size, 2rem);
         }
     }
 

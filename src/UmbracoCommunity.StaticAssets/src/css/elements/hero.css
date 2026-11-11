@@ -209,9 +209,9 @@
 }
 
 .main-hero__content h1 {
-  font-size: var(--font-size-display);
+  font-size: var(--hero-title-font-size, var(--font-size-display));
   font-weight: var(--font-weight-regular);
-  line-height: var(--line-height-lg);
+  line-height: var(--hero-title-line-height, var(--line-height-lg));
   margin: 0 0 14px;
 }
 
@@ -326,9 +326,9 @@
   }
 
   .main-hero__content h1 {
-    font-size: var(--font-size-display-xl);
+    font-size: var(--hero-title-font-size, var(--font-size-display-xl));
     font-weight: var(--font-weight-regular);
-    line-height: 85px;
+    line-height: var(--hero-title-line-height, 85px);
     margin-bottom: 2rem;
     width: 777px;
   }
