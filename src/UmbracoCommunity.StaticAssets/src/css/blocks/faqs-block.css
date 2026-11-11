@@ -13,6 +13,7 @@
 
     .block-subtitle h2 {
         font-size: 1.5rem;
+        line-height: var(--line-height-heading);
         margin-top: var(--unit);
 
         &:first-child {
