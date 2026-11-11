@@ -32,6 +32,7 @@ Run `baseline` on the commit you trust (e.g. `develop`), make your change, then 
 - The harness disables animations and transitions, forces reduced motion, waits for fonts, custom elements and lazy images, and clips screenshots to a whole-pixel page height.
 - Block element IDs are random per request (`StringUtilities.RandomString`), so element paths use tag and position instead of IDs.
 - Content that changes between runs is masked in screenshots and skipped in the style dump: Sessionize components, iframes, videos, and anything with `data-visual-mask`. The list is `maskSelectors` in `pages.ts`.
+- The upcoming events list is hidden entirely (in `stabilise.ts`), because events drop off as their dates pass and the list disappears once they all have. The block's title and intro are still checked.
 - To add a page, add its path to `pages.ts`.
 
 ## Not covered
