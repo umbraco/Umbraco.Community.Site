@@ -179,12 +179,12 @@
     max-width: 100%;
     width: 100%;
     height: auto;
-    aspect-ratio: 906 / 605;
+    aspect-ratio: var(--crop-ratio-desktop, auto);
     object-fit: cover;
 
     &[srcset] {
         @media (max-width: 400px) {
-            aspect-ratio: 386 / 265;
+            aspect-ratio: var(--crop-ratio-mobile, var(--crop-ratio-desktop, auto));
         }
     }
 }

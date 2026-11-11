@@ -4,10 +4,8 @@
     var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
     var imgIsCircle = Model.Settings?.ImageIsCircular ?? false;
     var cropWidth = (int)Math.Round(imgWidth);
-    var naturalWidth = Model.Content.Image?.Value<int>("umbracoWidth") ?? 0;
-    var naturalHeight = Model.Content.Image?.Value<int>("umbracoHeight") ?? 0;
-    var aspectRatio = naturalWidth > 0 && naturalHeight > 0 ? $"aspect-ratio: {naturalWidth} / {naturalHeight}" : null;
-    var attrHeight = naturalWidth > 0 ? 386 * naturalHeight / naturalWidth : 386;
+    var aspectRatio = Model.Content.Image.GetAspectRatioStyle();
+    var attrHeight = Model.Content.Image.GetScaledHeight(386);
 }
 
 @if (Model.Content.Image is not null)

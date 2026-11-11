@@ -24,11 +24,11 @@
   border-radius: var(--radius-card);
   width: 100%;
   height: auto;
-  aspect-ratio: 906 / 605;
+  aspect-ratio: var(--crop-ratio-desktop, auto);
   object-fit: cover;
 
   @media (max-width: 400px) {
-    aspect-ratio: 386 / 265;
+    aspect-ratio: var(--crop-ratio-mobile, var(--crop-ratio-desktop, auto));
   }
 }
 
