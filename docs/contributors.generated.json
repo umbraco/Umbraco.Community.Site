@@ -85,7 +85,7 @@
     ]
   },
   "primers/frontend.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-11T16:20:28+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -98,6 +98,12 @@
         "login": "nul800sebastiaan",
         "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
         "profileUrl": "https://github.com/nul800sebastiaan"
+      },
+      {
+        "name": "Laura Weatherhead",
+        "login": "lssweatherhead",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
+        "profileUrl": "https://github.com/lssweatherhead"
       }
     ]
   },

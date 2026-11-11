@@ -54,6 +54,29 @@ public class KeyDirectoryServiceTests
         service.IsConfigured.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData("quoted")]
+    [InlineData("literal-newlines")]
+    [InlineData("spaces")]
+    public void Common_paste_mistakes_still_parse(string shape)
+    {
+        var gen = new Ed25519KeyPairGenerator();
+        gen.Init(new Ed25519KeyGenerationParameters(new SecureRandom()));
+        var sw = new StringWriter();
+        new PemWriter(sw).WriteObject(gen.GenerateKeyPair().Private);
+        var pem = sw.ToString().Trim().Replace("\r", string.Empty);
+        var body = string.Concat(pem.Split('\n').Where(l => !l.StartsWith("-----")));
+
+        var value = shape switch
+        {
+            "quoted" => $"\"{body}\"",
+            "literal-newlines" => pem.Replace("\n", "\\n"),
+            _ => $"  {body[..10]} {body[10..]}  ",
+        };
+
+        Create(pemOverride: value).Service.IsConfigured.Should().BeTrue();
+    }
+
     [Fact]
     public void Garbage_key_disables_the_service_instead_of_throwing()
     {
