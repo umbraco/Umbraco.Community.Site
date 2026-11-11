@@ -14,6 +14,8 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <item>The enriched sections: shown to everyone when the tenant's Settings node has
 /// <c>showEnrichedProfileSections</c> switched on, otherwise only to a signed-in member of the
 /// <see cref="EarlyAccessGroupName"/> member group viewing their own profile.</item>
+/// <item>The display choices (see <see cref="ProfileDisplay"/>): offered to a signed-in member of the
+/// <see cref="EarlyAccessGroupName"/> member group, for their own profile.</item>
 /// </list>
 /// Any failure resolves to the most restrictive answer.
 /// </summary>
@@ -127,6 +129,26 @@ public sealed class ProfileAccessService
         _currentMemberResolved = true;
         return _currentMemberHandle;
     }
+
+    /// <summary>
+    /// True when the signed-in member may choose what the enriched sections of their own profile show,
+    /// which is when they are in the <see cref="EarlyAccessGroupName"/> member group.
+    /// </summary>
+    public async Task<bool> CanChooseProfileDisplayAsync()
+    {
+        try
+        {
+            return await IsCurrentMemberInEarlyAccessAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not resolve the signed-in member's groups; not offering the profile display choices.");
+            return false;
+        }
+    }
+
+    /// <summary>True when the signed-in member may add activity to their own profile by hand: the same group as the display choices.</summary>
+    public Task<bool> CanAddActivityAsync() => CanChooseProfileDisplayAsync();
 
     // Deliberately not IMemberManager.IsMemberAuthorizedAsync: in Umbraco 18 that method
     // int.Parse()s the identity Id, which is a GUID for lightweight external members, so it

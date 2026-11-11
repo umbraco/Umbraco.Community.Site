@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
+using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 
 namespace UmbracoCommunity.Web.Features.Profiles;
@@ -10,7 +11,8 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// Fills the activity sections of a <see cref="CommunityProfile"/> (blog posts, videos, forum posts, packages,
 /// social posts, meet-ups) from the external content platform, newest first. The platform profile is found by
 /// the member's GitHub handle only. The result is cached per handle; if the platform has nothing, is not
-/// configured or fails, the profile is returned unchanged.
+/// configured or fails, the profile is returned unchanged. Activity the member added by hand and an admin verified
+/// (see <see cref="ProfileActivityEntryService"/>) is added to the matching sections.
 /// </summary>
 public sealed class ProfileActivityService
 {
@@ -18,6 +20,8 @@ public sealed class ProfileActivityService
     private const int MaxTextLength = 280;
 
     private readonly IProfileSyncClient _syncClient;
+    private readonly ProfileActivityEntryService _activityEntryService;
+    private readonly IMvpDataService _mvpDataService;
     private readonly FeedSubmissionImageProxyService _imageProxy;
     private readonly AppCaches _appCaches;
     private readonly IOptionsMonitor<ProfileActivityOptions> _options;
@@ -25,12 +29,16 @@ public sealed class ProfileActivityService
 
     public ProfileActivityService(
         IProfileSyncClient syncClient,
+        ProfileActivityEntryService activityEntryService,
+        IMvpDataService mvpDataService,
         FeedSubmissionImageProxyService imageProxy,
         AppCaches appCaches,
         IOptionsMonitor<ProfileActivityOptions> options,
         ILogger<ProfileActivityService> logger)
     {
         _syncClient = syncClient;
+        _activityEntryService = activityEntryService;
+        _mvpDataService = mvpDataService;
         _imageProxy = imageProxy;
         _appCaches = appCaches;
         _options = options;
@@ -40,9 +48,12 @@ public sealed class ProfileActivityService
     public async Task<CommunityProfile> EnrichAsync(CommunityProfile profile, CancellationToken cancellationToken = default)
     {
         var activity = await GetActivityAsync(profile.Slug, cancellationToken);
-        return activity == null
-            ? profile
-            : profile with
+        var identity = ProfileMvp.Apply(profile.Identity, activity?.MvpYears, _mvpDataService.GetAll());
+        var enriched = ReferenceEquals(identity, profile.Identity) ? profile : profile with { Identity = identity };
+
+        if (activity != null)
+        {
+            enriched = enriched with
             {
                 BlogPosts = activity.BlogPosts,
                 Videos = activity.Videos,
@@ -51,6 +62,67 @@ public sealed class ProfileActivityService
                 SocialPosts = activity.SocialPosts,
                 Meetups = activity.Meetups,
             };
+        }
+
+        return AddVerifiedActivity(enriched, await GetVerifiedActivityAsync(profile.Slug, cancellationToken));
+    }
+
+    private async Task<IReadOnlyList<ActivityEntryRecord>> GetVerifiedActivityAsync(string handle, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _activityEntryService.GetVerifiedAsync(handle, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Could not load the activity {Handle} added by hand", handle);
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Adds verified hand-added activity to the section its kind belongs to, newest first. A link the platform already
+    /// reports for the member is not shown twice.
+    /// </summary>
+    internal static CommunityProfile AddVerifiedActivity(CommunityProfile profile, IReadOnlyList<ActivityEntryRecord> entries)
+    {
+        if (entries.Count == 0)
+        {
+            return profile;
+        }
+
+        DateTimeOffset At(ActivityEntryRecord entry) => new(entry.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+        IEnumerable<ActivityEntryRecord> InSection(string group, IEnumerable<string> existingUrls) =>
+            entries.Where(e => ProfileActivityEntry.Group(e.Kind) == group
+                && !existingUrls.Contains(e.Url, StringComparer.OrdinalIgnoreCase));
+
+        return profile with
+        {
+            BlogPosts = profile.BlogPosts
+                .Concat(InSection(PlatformActivityGroups.Blog, profile.BlogPosts.Select(p => p.Url))
+                    .Select(e => new ProfileBlogPost(e.Title, e.Url, At(e), null, e.Description, ProfileActivityEntry.ActivityId(e.Id))))
+                .OrderByDescending(p => p.PublishedAt)
+                .ToList(),
+            Videos = profile.Videos
+                .Concat(InSection(PlatformActivityGroups.Videos, profile.Videos.Select(v => v.Url))
+                    .Select(e => new ProfileVideo(e.Title, e.Url, null, At(e), e.Description, ProfileActivityEntry.ActivityId(e.Id))))
+                .OrderByDescending(v => v.PublishedAt)
+                .ToList(),
+            Packages = profile.Packages
+                .Concat(InSection(PlatformActivityGroups.Packages, profile.Packages.Select(p => p.Url))
+                    .Select(e => new ProfilePackage(e.Title, e.Url, [], e.Description, ProfileActivityEntry.ActivityId(e.Id))))
+                .ToList(),
+            Meetups = profile.Meetups
+                .Concat(InSection(PlatformActivityGroups.Meetups, profile.Meetups.Select(m => m.Url ?? string.Empty))
+                    .Select(e => new ProfileMeetup("Took part in", e.Title, null, At(e), e.Url, ProfileActivityEntry.ActivityId(e.Id))))
+                .OrderByDescending(m => m.Date)
+                .ToList(),
+            OtherActivities = profile.OtherActivities
+                .Concat(InSection(PlatformActivityGroups.Other, [])
+                    .Select(e => new ProfileOtherActivity(ProfileActivityEntry.KindLabel(e.Kind), e.Title, e.Url, At(e), e.Description, ProfileActivityEntry.ActivityId(e.Id))))
+                .OrderByDescending(a => a.Date)
+                .ToList(),
+        };
     }
 
     private async Task<ProfileActivity?> GetActivityAsync(string handle, CancellationToken cancellationToken)
@@ -88,7 +160,7 @@ public sealed class ProfileActivityService
             return null;
         }
 
-        var groups = await Task.WhenAll(PlatformActivityGroups.All.Select(async group =>
+        var groups = await Task.WhenAll(PlatformActivityGroups.FromPlatform.Select(async group =>
             (Group: group, Items: await _syncClient.GetActivitiesAsync(platformProfile.Id, group, limit, cancellationToken))));
         IReadOnlyList<PlatformActivity> Items(string group) =>
             groups.First(g => g.Group == group).Items
@@ -98,24 +170,25 @@ public sealed class ProfileActivityService
                 .ToList();
 
         return new ProfileActivity(
+            MvpYears: platformProfile.MvpYears,
             BlogPosts: Items(PlatformActivityGroups.Blog)
-                .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary)))
+                .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary), a.Id))
                 .ToList(),
             Videos: Items(PlatformActivityGroups.Videos)
-                .Select(a => new ProfileVideo(a.Title!, a.Url!, _imageProxy.CreateProxyUrl(a.ImageUrl), a.OccurredAt, Truncate(a.Summary)))
+                .Select(a => new ProfileVideo(a.Title!, a.Url!, _imageProxy.CreateProxyUrl(a.ImageUrl), a.OccurredAt, Truncate(a.Summary), a.Id))
                 .ToList(),
             ForumPosts: Items(PlatformActivityGroups.Forum)
-                .Select(a => new ProfileForumPost(a.Title!, a.Url!, a.OccurredAt, null))
+                .Select(a => new ProfileForumPost(a.Title!, a.Url!, a.OccurredAt, null, a.Id))
                 .ToList(),
             Packages: Items(PlatformActivityGroups.Packages)
                 .DistinctBy(a => a.Url)
-                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary)))
+                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary), a.Id))
                 .ToList(),
             SocialPosts: Items(PlatformActivityGroups.Social)
-                .Select(a => new ProfileSocialPost(a.Platform ?? "Social", a.Url!, Truncate(a.Title)!, a.OccurredAt))
+                .Select(a => new ProfileSocialPost(a.Platform ?? "Social", a.Url!, Truncate(a.Title)!, a.OccurredAt, a.Id))
                 .ToList(),
             Meetups: Items(PlatformActivityGroups.Meetups)
-                .Select(a => new ProfileMeetup(MeetupAction(a.Type), a.Title!, null, a.OccurredAt, a.Url))
+                .Select(a => new ProfileMeetup(MeetupAction(a.Type), a.Title!, null, a.OccurredAt, a.Url, a.Id))
                 .ToList());
     }
 
@@ -139,6 +212,7 @@ public sealed class ProfileActivityService
     }
 
     private sealed record ProfileActivity(
+        IReadOnlyList<int> MvpYears,
         IReadOnlyList<ProfileBlogPost> BlogPosts,
         IReadOnlyList<ProfileVideo> Videos,
         IReadOnlyList<ProfileForumPost> ForumPosts,

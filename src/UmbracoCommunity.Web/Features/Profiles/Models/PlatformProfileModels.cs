@@ -14,7 +14,7 @@ public sealed record PlatformActivity(
     string? ImageUrl,
     DateTimeOffset OccurredAt);
 
-/// <summary>The activity groups the platform can filter on that the profile page has a section for.</summary>
+/// <summary>The activity sections of the profile page. All but <see cref="Other"/> can also be filtered on the platform.</summary>
 public static class PlatformActivityGroups
 {
     public const string Blog = "blog";
@@ -24,5 +24,10 @@ public static class PlatformActivityGroups
     public const string Videos = "videos";
     public const string Social = "social";
 
-    public static readonly IReadOnlyList<string> All = [Blog, Forum, Packages, Meetups, Videos, Social];
+    /// <summary>Activity a member added by hand that has no section of its own.</summary>
+    public const string Other = "other";
+
+    public static readonly IReadOnlyList<string> FromPlatform = [Blog, Forum, Packages, Meetups, Videos, Social];
+
+    public static readonly IReadOnlyList<string> All = [.. FromPlatform, Other];
 }

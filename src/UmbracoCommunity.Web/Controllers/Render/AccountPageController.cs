@@ -24,6 +24,7 @@ public class AccountPageController : RenderController
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly IProfileSyncClient _profileSyncClient;
     private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
+    private readonly ProfileAccessService _profileAccessService;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -34,7 +35,8 @@ public class AccountPageController : RenderController
         IPublishedUrlProvider publishedUrlProvider,
         ProfileAvatarUrlResolver avatarUrlResolver,
         IProfileSyncClient profileSyncClient,
-        GitHubProfileDefaultsService gitHubDefaultsService)
+        GitHubProfileDefaultsService gitHubDefaultsService,
+        ProfileAccessService profileAccessService)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
@@ -43,6 +45,7 @@ public class AccountPageController : RenderController
         _avatarUrlResolver = avatarUrlResolver;
         _profileSyncClient = profileSyncClient;
         _gitHubDefaultsService = gitHubDefaultsService;
+        _profileAccessService = profileAccessService;
     }
 
     [NonAction]
@@ -89,6 +92,8 @@ public class AccountPageController : RenderController
             GitHubHeadline = profile?.GitHubCompany,
             CustomBio = profile?.Bio,
             GitHubBio = profile?.GitHubBio,
+            CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(),
+            CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(),
         };
 
         if (onboardingCompleted && handle != null)
