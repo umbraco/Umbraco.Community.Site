@@ -1,9 +1,14 @@
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
+using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
+using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
+using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Models;
+using Moq;
 using Xunit;
 
 namespace UmbracoCommunity.Web.Tests.Features.Profiles;
@@ -18,13 +23,30 @@ public class ProfileActivityServiceTests
         Identity: new ProfileIdentity("The Octocat", null, null, null, null, null, false, [], Handle, null, [], false),
         BlogPosts: [], Videos: [], ForumPosts: [], Packages: [], Talks: [], Badges: [], SocialPosts: [], Meetups: []);
 
-    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null) =>
+    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null, IMvpDataService? mvp = null, ProfileActivityEntryService? activityEntryService = null) =>
         new(
             client,
+            activityEntryService ?? CreateActivityEntryService(client),
+            mvp ?? Listed(),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);
+
+    private static ProfileActivityEntryService CreateActivityEntryService(IProfileSyncClient client)
+    {
+        var database = new MemberProfilesTestDatabase();
+        using (var context = database.CreateDbContext())
+        {
+            context.Database.Migrate();
+        }
+
+        return new ProfileActivityEntryService(
+            new MemberActivityEntryStore(database),
+            client,
+            new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
+            NullLogger<ProfileActivityEntryService>.Instance);
+    }
 
     private static PlatformActivity Activity(string title, string url, DateTimeOffset at, string type = "x:y") =>
         new(Guid.NewGuid().ToString(), type, "web", title, url, null, null, at);
@@ -99,6 +121,69 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
+    public async Task Every_item_carries_its_platform_activity_id()
+    {
+        PlatformActivity At(string id, string title) =>
+            new(id, "x:y", "web", title, $"https://example.dev/{id}", null, null, DateTimeOffset.UtcNow);
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities =
+            {
+                [PlatformActivityGroups.Blog] = [At("b1", "Post")],
+                [PlatformActivityGroups.Videos] = [At("v1", "Video")],
+                [PlatformActivityGroups.Forum] = [At("f1", "Thread")],
+                [PlatformActivityGroups.Packages] = [At("p1", "Package")],
+                [PlatformActivityGroups.Social] = [At("s1", "Social post")],
+                [PlatformActivityGroups.Meetups] = [At("m1", "Meet-up")],
+            },
+        };
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.BlogPosts.Single().ActivityId.Should().Be("b1");
+        result.Videos.Single().ActivityId.Should().Be("v1");
+        result.ForumPosts.Single().ActivityId.Should().Be("f1");
+        result.Packages.Single().ActivityId.Should().Be("p1");
+        result.SocialPosts.Single().ActivityId.Should().Be("s1");
+        result.Meetups.Single().ActivityId.Should().Be("m1");
+    }
+
+    [Fact]
+    public async Task Mvp_years_come_from_the_platform_when_it_reports_them()
+    {
+        var listed = Listed(new MvpYear(2026, [Member(Handle)]));
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", [2023, 2027]) };
+
+        var result = await CreateService(client, mvp: listed).EnrichAsync(Profile);
+
+        result.Identity.MvpYears.Should().Equal(2027, 2023);
+        result.Identity.IsCurrentMvp.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Mvp_years_fall_back_to_the_list_when_the_platform_has_none_or_is_down()
+    {
+        var listed = Listed(new MvpYear(2025, [Member(Handle)]), new MvpYear(2026, [Member(Handle)]));
+
+        var noYears = await CreateService(new FakeSyncClient { Profile = new PlatformProfile("p1", []) }, mvp: listed).EnrichAsync(Profile);
+        var down = await CreateService(new FakeSyncClient { Throws = true }, mvp: listed).EnrichAsync(Profile);
+
+        noYears.Identity.MvpYears.Should().Equal(2026, 2025);
+        down.Identity.MvpYears.Should().Equal(2026, 2025);
+        down.Identity.IsMvp.Should().BeTrue();
+    }
+
+    private static IMvpDataService Listed(params MvpYear[] years)
+    {
+        var mvp = new Mock<IMvpDataService>();
+        mvp.Setup(m => m.GetAll()).Returns(years);
+        return mvp.Object;
+    }
+
+    private static MvpMember Member(string handle) => new(handle, false, "https://example.dev/a.png", null, handle);
+
+    [Fact]
     public async Task A_member_the_platform_does_not_know_gets_the_profile_unchanged()
     {
         var result = await CreateService(new FakeSyncClient { Profile = null }).EnrichAsync(Profile);
@@ -146,7 +231,7 @@ public class ProfileActivityServiceTests
         await CreateService(client, new ProfileActivityOptions { ItemsPerSection = 3 }).EnrichAsync(Profile);
 
         client.RequestedLimits.Should().OnlyContain(l => l == 3);
-        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.All);
+        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.FromPlatform);
     }
 
     private sealed class FakeSyncClient : IProfileSyncClient
@@ -179,6 +264,8 @@ public class ProfileActivityServiceTests
         public Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedHiddenAsync(string handle, string url, bool isHidden, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedRemovedAsync(string handle, string url, string? reason, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task NotifyActivityVerifiedAsync(string handle, ActivityEntryRecord entry, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public Task NotifyActivityRemovedAsync(string handle, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task<DateTimeOffset?> GetLastSyncedAtAsync(string handle, CancellationToken cancellationToken = default) => Task.FromResult<DateTimeOffset?>(null);
     }
 

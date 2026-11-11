@@ -7,7 +7,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// <see cref="IProfileSyncClient"/> backed by the external content platform's API (the same address and key
 /// as <see cref="CommunityBlogsApiClient"/>). Reads are real; the platform has no endpoints yet for
-/// profile-claim and feed notifications, so those calls just log what they would have sent.
+/// profile-claim, feed and activity notifications, so those calls just log what they would have sent.
 /// </summary>
 public sealed class PlatformProfileSyncClient : IProfileSyncClient
 {
@@ -74,6 +74,22 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
         _logger.LogInformation(
             "Profile sync: would notify feed removed for {Handle} ({Url}), reason: {Reason}",
             handle, url, reason ?? "(none given)");
+        return Task.CompletedTask;
+    }
+
+    public Task NotifyActivityVerifiedAsync(string handle, ActivityEntryRecord entry, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Profile sync: would notify activity verified for {Handle} ({Kind}: {Url})",
+            handle, entry.Kind, entry.Url);
+        return Task.CompletedTask;
+    }
+
+    public Task NotifyActivityRemovedAsync(string handle, string url, CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "Profile sync: would notify activity removed for {Handle} ({Url})",
+            handle, url);
         return Task.CompletedTask;
     }
 

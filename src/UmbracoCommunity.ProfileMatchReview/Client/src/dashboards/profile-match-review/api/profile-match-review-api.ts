@@ -1,4 +1,4 @@
-import type { MatchState, ProfileMatch, ProfileMatchList } from "./profile-match-review-types.js";
+import type { MatchState, ProfileMatch, ProfileMatchList, ActivityEntry, ActivityEntryList, ActivityEntryState } from "./profile-match-review-types.js";
 
 const BASE = "/umbraco/profilematchreview/api/v1";
 
@@ -68,5 +68,18 @@ export const ProfileMatchReviewApi = {
 
   reject(id: number): Promise<ProfileMatch> {
     return request<ProfileMatch>(`/matches/${id}/reject`, { method: "POST" });
+  },
+
+  listActivity(state: ActivityEntryState, skip: number, take: number): Promise<ActivityEntryList> {
+    const params = new URLSearchParams({ state, skip: String(skip), take: String(take) });
+    return request<ActivityEntryList>(`/activity?${params.toString()}`);
+  },
+
+  verifyActivity(id: number): Promise<ActivityEntry> {
+    return request<ActivityEntry>(`/activity/${id}/verify`, { method: "POST" });
+  },
+
+  rejectActivity(id: number, reason: string): Promise<ActivityEntry> {
+    return request<ActivityEntry>(`/activity/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) });
   },
 };

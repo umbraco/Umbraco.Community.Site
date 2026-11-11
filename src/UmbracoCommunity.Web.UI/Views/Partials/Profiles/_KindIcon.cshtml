@@ -1,7 +1,7 @@
 @model string
 @{
     // Small icon for a content type / platform. Model is the key:
-    // "package" | "talk" | "blog" | "video" | "forum" | "meetup"
+    // "package" | "talk" | "blog" | "video" | "forum" | "meetup" | "other"
     // | "linkedin" | "mastodon" | "bluesky".
     const string attrs = "class=\"community-profile__icon\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"";
     // Brand glyphs (Simple Icons, single-path) are solid fills, not strokes.
@@ -23,6 +23,9 @@
         break;
     case "forum":
         @Html.Raw($"<svg {attrs}><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>")
+        break;
+    case "other":
+        @Html.Raw($"<svg {attrs}><path d=\"M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z\"/></svg>")
         break;
     case "social":
         @Html.Raw($"<svg {attrs}><path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/></svg>")

@@ -132,8 +132,9 @@
   background: var(--color-identity-orange);
 }
 
-/* Profile visibility switch: a real checkbox drawn as a switch track. */
-.dc-profile-visibility-toggle__label {
+/* Profile visibility switch (and the display editor's section switches): a real checkbox drawn as a switch track. */
+.dc-profile-visibility-toggle__label,
+.dc-profile-display-editor__switch {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -144,7 +145,8 @@
 }
 
 /* Visually hidden but still focusable and announced. */
-.dc-profile-visibility-toggle__input {
+.dc-profile-visibility-toggle__input,
+.dc-profile-display-editor__switch-input {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -154,7 +156,8 @@
   cursor: pointer;
 }
 
-.dc-profile-visibility-toggle__track {
+.dc-profile-visibility-toggle__track,
+.dc-profile-display-editor__switch-track {
   position: relative;
   flex-shrink: 0;
   width: 44px;
@@ -164,7 +167,8 @@
   transition: background-color 0.2s ease;
 }
 
-.dc-profile-visibility-toggle__track::after {
+.dc-profile-visibility-toggle__track::after,
+.dc-profile-display-editor__switch-track::after {
   content: "";
   position: absolute;
   top: 3px;
@@ -176,15 +180,18 @@
   transition: transform 0.2s ease;
 }
 
-.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track {
+.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track,
+.dc-profile-display-editor__switch-input:checked + .dc-profile-display-editor__switch-track {
   background: var(--color-identity-blue);
 }
 
-.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track::after {
+.dc-profile-visibility-toggle__input:checked + .dc-profile-visibility-toggle__track::after,
+.dc-profile-display-editor__switch-input:checked + .dc-profile-display-editor__switch-track::after {
   transform: translateX(20px);
 }
 
-.dc-profile-visibility-toggle__input:focus-visible + .dc-profile-visibility-toggle__track {
+.dc-profile-visibility-toggle__input:focus-visible + .dc-profile-visibility-toggle__track,
+.dc-profile-display-editor__switch-input:focus-visible + .dc-profile-display-editor__switch-track {
   outline: var(--focus-outline);
   outline-offset: var(--focus-outline-offset);
 }
@@ -222,7 +229,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dc-profile-visibility-toggle__track,
-  .dc-profile-visibility-toggle__track::after {
+  .dc-profile-visibility-toggle__track::after,
+  .dc-profile-display-editor__switch-track,
+  .dc-profile-display-editor__switch-track::after {
     transition: none;
   }
 }
@@ -384,4 +393,208 @@
 .dc-profile-details-editor__profile-link:focus-visible {
   outline: var(--focus-outline);
   outline-offset: var(--focus-outline-offset);
+}
+
+/* Profile display editor: pinned items, then one switch and item list per activity section. */
+.dc-profile-display-editor__heading {
+  margin: var(--unit-sm) 0 var(--unit-xxs);
+  font-size: 1rem;
+  color: var(--color-identity-blue);
+}
+
+.dc-profile-display-editor__heading:first-child {
+  margin-top: 0;
+}
+
+.dc-profile-display-editor__hint,
+.dc-profile-display-editor__empty {
+  margin: 0 0 var(--unit-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-display-editor__pins,
+.dc-profile-display-editor__sections,
+.dc-profile-display-editor__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-profile-display-editor__pin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--unit-xxs) var(--unit-sm);
+  padding: var(--unit-xs) 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-profile-display-editor__pin-title,
+.dc-profile-display-editor__reason-label,
+.dc-profile-display-editor__reason {
+  grid-column: 1 / -1;
+}
+
+.dc-profile-display-editor__pin-title,
+.dc-profile-display-editor__item-title {
+  font-weight: 700;
+  color: var(--color-identity-blue);
+  overflow-wrap: anywhere;
+}
+
+.dc-profile-display-editor__reason-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-display-editor__count {
+  font-size: var(--font-size-xs);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-display-editor__section {
+  padding: var(--unit-xs) 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-profile-display-editor__section:last-child {
+  border-bottom: none;
+}
+
+.dc-profile-display-editor__section .dc-profile-display-editor__empty {
+  margin: var(--unit-xxs) 0 0;
+}
+
+.dc-profile-display-editor__items {
+  margin-top: var(--unit-xs);
+}
+
+.dc-profile-display-editor__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--unit-xxs) var(--unit-sm);
+  padding: var(--unit-xxs) 0;
+}
+
+.dc-profile-display-editor__item-title {
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.dc-profile-display-editor__item--hidden .dc-profile-display-editor__item-title {
+  color: var(--color-dark-grey);
+  text-decoration: line-through;
+}
+
+.dc-profile-display-editor__item-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-display-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+}
+
+.dc-profile-display-editor__status:not(:empty),
+.dc-profile-display-editor__error {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-display-editor__status {
+  margin: 0;
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-display-editor__error {
+  color: var(--color-red);
+}
+
+/* Profile activity editor: a small form to add activity by hand, then the member's entries with where each one stands. */
+.dc-profile-activity-editor {
+  display: grid;
+  gap: var(--unit-sm);
+}
+
+.dc-profile-activity-editor__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-sm);
+  max-width: 40rem;
+}
+
+.dc-profile-activity-editor .dc-form-field select {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-size: 16px;
+  font-family: var(--font-family);
+  color: var(--color-dark);
+  background: var(--color-white);
+  border: 1px solid var(--color-light-grey);
+  border-radius: var(--border-radius-lg);
+  box-sizing: border-box;
+}
+
+.dc-profile-activity-editor .dc-form-field select:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  border-color: var(--color-identity-blue);
+}
+
+.dc-profile-activity-editor__hint {
+  margin: var(--unit-xxs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-profile-activity-editor__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-profile-activity-editor__entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--unit-xxs);
+  padding: var(--unit-xs) 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-profile-activity-editor__entry-title {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.dc-profile-activity-editor__entry-meta,
+.dc-profile-activity-editor__state {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-activity-editor__state--rejected,
+.dc-profile-activity-editor__reason {
+  color: var(--color-red);
+}
+
+.dc-profile-activity-editor__reason {
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-activity-editor__status:not(:empty) {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-activity-editor__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-red);
 }

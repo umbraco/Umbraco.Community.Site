@@ -21,6 +21,7 @@
     <!-- <PackageReference Include="Umbraco.Deploy.Cloud" /> -->
     <PackageReference Include="Umbraco.Forms" />
     <PackageReference Include="Umbraco.Forms.Deploy" />
+    <PackageReference Include="Umbraco.Mcp.HostedAuth" />
     <PackageReference Include="Umbraco.AI" />
     <PackageReference Include="Umbraco.AI.Agent" />
     <PackageReference Include="Umbraco.AI.Agent.Copilot" />
