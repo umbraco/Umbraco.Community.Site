@@ -8,7 +8,7 @@ import { TermSort, type DailyCount, type SiteItem, type SummaryResponse, type Te
 import { formatDay, percent, rangeForDays } from "../util/format.js";
 import "./search-daily-chart.element.js";
 
-const PERIODS = [7, 30, 90, 365];
+const PERIODS = [7, 30, 90];
 const SORTS = [
   { value: TermSort.Searches, name: "Most searched" },
   { value: TermSort.FewestResults, name: "Fewest results" },
@@ -37,6 +37,9 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
   @state() private trend: DailyCount[] = [];
 
   private _authReady = false;
+  private _summaryRequest = 0;
+  private _termsRequest = 0;
+  private _trendRequest = 0;
 
   constructor() {
     super();
@@ -159,14 +162,17 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
   }
 
   private async loadSummary() {
+    const request = ++this._summaryRequest;
     try {
-      this.summary = await SearchTrackerApi.getSummary(this.range);
+      const summary = await SearchTrackerApi.getSummary(this.range);
+      if (request === this._summaryRequest) this.summary = summary;
     } catch (e) {
-      this.error = (e as Error).message;
+      if (request === this._summaryRequest) this.error = (e as Error).message;
     }
   }
 
   private async loadTerms() {
+    const request = ++this._termsRequest;
     this.loading = true;
     this.error = null;
     try {
@@ -178,12 +184,13 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
         skip: this.skip,
         take: PAGE_SIZE,
       });
+      if (request !== this._termsRequest) return;
       this.terms = result.items;
       this.total = result.total;
     } catch (e) {
-      this.error = (e as Error).message;
+      if (request === this._termsRequest) this.error = (e as Error).message;
     } finally {
-      this.loading = false;
+      if (request === this._termsRequest) this.loading = false;
     }
   }
 
@@ -192,12 +199,14 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
       this.expandedTerm = null;
       return;
     }
+    const request = ++this._trendRequest;
     this.expandedTerm = item.term;
     this.trend = [];
     try {
-      this.trend = await SearchTrackerApi.getTermTrend(item.term, this.range);
+      const trend = await SearchTrackerApi.getTermTrend(item.term, this.range);
+      if (request === this._trendRequest) this.trend = trend;
     } catch (e) {
-      this.error = (e as Error).message;
+      if (request === this._trendRequest) this.error = (e as Error).message;
     }
   }
 

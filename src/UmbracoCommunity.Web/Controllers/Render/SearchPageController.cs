@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Extensions;
 using UmbracoCommunity.SearchTracker.Recording;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Models.Pages;

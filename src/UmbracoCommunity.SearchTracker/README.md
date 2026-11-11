@@ -12,7 +12,7 @@ The recorder skips the search when:
 - the same client searched the same term on the same site within `DuplicateWindow` (default 30 minutes)
 - the client has already logged `MaxSearchesPerClientPerHour` searches (default 60)
 
-The client address is only used as an in-memory key for those checks. It is never written anywhere.
+Those checks key on the visitor's address (from `CF-Connecting-IP` or `X-Forwarded-For` when a proxy or CDN sets them, otherwise the connection) plus their user agent, so people behind one shared address are still told apart. That key only lives in memory and is never written anywhere.
 
 Terms are normalised before storage: Unicode NFKC, lower-cased, whitespace collapsed, capped at `MaxTermLength` (default 100). Email addresses become `[email]`, and digit runs of 7+ digits (phone numbers, IDs) become `[number]`.
 
@@ -20,7 +20,7 @@ Terms are normalised before storage: Unicode NFKC, lower-cased, whitespace colla
 
 One table, `SearchTrackerTermDaily`: one row per site, UTC day and term, holding the number of searches, how many of those found nothing, and how many results the latest search returned (empty for rows logged before that was recorded). Events are queued in memory and written in batches by `SearchEventWriterService`, so search requests never wait on the database. If the queue is full, events are dropped.
 
-`SearchTrackerRetentionService` deletes rows older than `RetentionDays` (default 365). Editors can also delete a term from the dashboard, which removes it for every date.
+`SearchTrackerRetentionService` deletes rows older than `RetentionDays` (default 90). Editors can also delete a term from the dashboard, which removes it for every date.
 
 Migrations run on `UmbracoApplicationStartedNotification`, like the other packages in this repo.
 
@@ -28,7 +28,7 @@ Migrations run on `UmbracoApplicationStartedNotification`, like the other packag
 
 Content section → **Search Terms**:
 
-- site and period filters (7 / 30 / 90 / 365 days)
+- site and period filters (7 / 30 / 90 days)
 - totals: searches, different terms, and searches that found nothing (with their share of all searches)
 - a searches-per-day chart split into searches that found results and searches that found nothing
 - a term table with each term's latest result count, sortable by searches, fewest results, last searched or A–Z, filterable to terms whose latest search found nothing, with a per-term trend and delete
@@ -37,6 +37,16 @@ Users with content start nodes only see the sites those start nodes sit under.
 
 API base: `/umbraco/searchtracker/api/v1` (`sites`, `summary`, `terms`, `terms/trend`, `DELETE terms`), Content section access.
 
+## Privacy
+
+Search terms are free text, so they can contain personal data that the masking doesn't catch, such as a person's name. Before enabling this on a live site:
+
+- make sure the site's privacy notice covers logging search terms for improving content, and how long they're kept;
+- keep `RetentionDays` as short as the reporting needs (default 90);
+- remove a term from the dashboard if it identifies someone.
+
+This needs sign-off from whoever owns data protection for the site; this README isn't a privacy assessment.
+
 ## Configuration
 
 All optional, under `SearchTracker` in `appsettings.json`:
@@ -44,7 +54,7 @@ All optional, under `SearchTracker` in `appsettings.json`:
 ```json
 "SearchTracker": {
   "Enabled": true,
-  "RetentionDays": 365,
+  "RetentionDays": 90,
   "MaxTermLength": 100,
   "MaxSearchesPerClientPerHour": 60,
   "DuplicateWindow": "00:30:00"

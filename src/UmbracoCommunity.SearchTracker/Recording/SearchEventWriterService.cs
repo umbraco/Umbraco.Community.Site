@@ -82,7 +82,16 @@ public sealed class SearchEventWriterService : BackgroundService
 
         try
         {
-            await UpsertBatchAsync(events, ct);
+            try
+            {
+                await UpsertBatchAsync(events, ct);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Another instance inserted one of these rows first; a second pass now finds and updates it.
+                _logger.LogWarning(ex, "SearchTracker batch write conflicted, retrying once");
+                await UpsertBatchAsync(events, ct);
+            }
         }
         catch (Exception ex)
         {
@@ -94,18 +103,26 @@ public sealed class SearchEventWriterService : BackgroundService
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
 
-        var groups = events.GroupBy(e => (e.SiteKey, Day: DateOnly.FromDateTime(e.OccurredUtc), e.Term));
+        var groups = events
+            .GroupBy(e => (e.SiteKey, Day: DateOnly.FromDateTime(e.OccurredUtc), e.Term))
+            .ToList();
+
+        var siteKeys = groups.Select(g => g.Key.SiteKey).Distinct().ToList();
+        var days = groups.Select(g => g.Key.Day).Distinct().ToList();
+        var terms = groups.Select(g => g.Key.Term).Distinct().ToList();
+        var existing = (await context.SearchTermDaily
+                .Where(r => siteKeys.Contains(r.SiteKey) && days.Contains(r.Day) && terms.Contains(r.Term))
+                .ToListAsync(ct))
+            .ToDictionary(r => (r.SiteKey, r.Day, r.Term));
+
         foreach (var group in groups)
         {
-            var (siteKey, day, term) = group.Key;
             var searches = group.Count();
             var zeroResults = group.Count(e => e.ResultCount == 0);
             var lastResultCount = group.Last().ResultCount;
+            var (siteKey, day, term) = group.Key;
 
-            var row = await context.SearchTermDaily
-                .FirstOrDefaultAsync(r => r.SiteKey == siteKey && r.Day == day && r.Term == term, ct);
-
-            if (row is null)
+            if (!existing.TryGetValue(group.Key, out var row))
             {
                 context.SearchTermDaily.Add(new SearchTermDailyEntity
                 {

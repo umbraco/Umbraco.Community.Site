@@ -75,6 +75,20 @@ internal sealed class SearchReportService : ISearchReportService
         ReportFilter filter, TermQuery query, SiteScope scope, CancellationToken ct)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var grouped = BuildTermsQuery(context, filter, query, scope);
+
+        var total = await grouped.CountAsync(ct);
+
+        var items = await OrderTerms(grouped, query.Sort)
+            .Skip(query.Skip)
+            .Take(query.Take)
+            .ToListAsync(ct);
+
+        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Latest, g.Last)).ToList(), total);
+    }
+
+    internal static IQueryable<TermRow> BuildTermsQuery(SearchTrackerDbContext context, ReportFilter filter, TermQuery query, SiteScope scope)
+    {
         var rows = Filtered(context, filter, scope);
 
         var contains = query.Contains?.Trim().ToLowerInvariant();
@@ -85,7 +99,7 @@ internal sealed class SearchReportService : ISearchReportService
 
         var grouped = rows
             .GroupBy(r => r.Term)
-            .Select(g => new
+            .Select(g => new TermRow
             {
                 Term = g.Key,
                 Searches = g.Sum(r => r.SearchCount),
@@ -93,27 +107,23 @@ internal sealed class SearchReportService : ISearchReportService
                 Last = g.Max(r => r.Day),
             });
 
-        if (query.NothingFoundOnly)
-        {
-            grouped = grouped.Where(g => g.Latest == 0);
-        }
+        return query.NothingFoundOnly ? grouped.Where(g => g.Latest == 0) : grouped;
+    }
 
-        var total = await grouped.CountAsync(ct);
+    internal static IQueryable<TermRow> OrderTerms(IQueryable<TermRow> terms, TermSort sort) => sort switch
+    {
+        TermSort.FewestResults => terms.OrderBy(g => g.Latest == null).ThenBy(g => g.Latest).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
+        TermSort.LastSearched => terms.OrderByDescending(g => g.Last).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
+        TermSort.Term => terms.OrderBy(g => g.Term),
+        _ => terms.OrderByDescending(g => g.Searches).ThenBy(g => g.Term),
+    };
 
-        var ordered = query.Sort switch
-        {
-            TermSort.FewestResults => grouped.OrderBy(g => g.Latest == null).ThenBy(g => g.Latest).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
-            TermSort.LastSearched => grouped.OrderByDescending(g => g.Last).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
-            TermSort.Term => grouped.OrderBy(g => g.Term),
-            _ => grouped.OrderByDescending(g => g.Searches).ThenBy(g => g.Term),
-        };
-
-        var items = await ordered
-            .Skip(query.Skip)
-            .Take(query.Take)
-            .ToListAsync(ct);
-
-        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Latest, g.Last)).ToList(), total);
+    internal sealed class TermRow
+    {
+        public string Term { get; init; } = string.Empty;
+        public int Searches { get; init; }
+        public int? Latest { get; init; }
+        public DateOnly Last { get; init; }
     }
 
     public async Task<IReadOnlyList<DailyCount>> GetTermTrendAsync(ReportFilter filter, string term, SiteScope scope, CancellationToken ct)

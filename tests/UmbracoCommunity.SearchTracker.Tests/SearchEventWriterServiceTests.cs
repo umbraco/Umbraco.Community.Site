@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging.Abstractions;
 using UmbracoCommunity.SearchTracker.Infrastructure;
 using UmbracoCommunity.SearchTracker.Recording;
@@ -56,5 +58,56 @@ public class SearchEventWriterServiceTests : SqliteTestBase
         row.SearchCount.Should().Be(7);
         row.ZeroResultCount.Should().Be(2);
         row.LastResultCount.Should().Be(7);
+    }
+
+    [Fact]
+    public async Task Retries_when_another_instance_inserted_the_row_first()
+    {
+        var options = TestOptions.Create();
+        var channel = new SearchEventChannel(options);
+        var factory = new RacingContextFactory(DbOptions, () => Seed(Row(SiteA, "2026-11-05", "forms", searches: 5)));
+        var writer = new SearchEventWriterService(channel, factory, new SearchTrackerSchemaState(), options,
+            NullLogger<SearchEventWriterService>.Instance);
+        channel.Writer.TryWrite(new SearchEvent(SiteA, "forms", 2, Day2));
+
+        await writer.DrainOnceAsync(int.MaxValue, CancellationToken.None);
+
+        using var context = CreateContext();
+        var row = context.SearchTermDaily.Single();
+        row.SearchCount.Should().Be(6);
+        row.LastResultCount.Should().Be(2);
+    }
+
+    private sealed class RacingContextFactory : IDbContextFactory<SearchTrackerDbContext>
+    {
+        private readonly DbContextOptions<SearchTrackerDbContext> _options;
+        private readonly Action _race;
+        private bool _raced;
+
+        public RacingContextFactory(DbContextOptions<SearchTrackerDbContext> options, Action race)
+        {
+            _options = options;
+            _race = race;
+        }
+
+        public SearchTrackerDbContext CreateDbContext()
+        {
+            if (_raced) return new SearchTrackerDbContext(_options);
+            _raced = true;
+            var options = new DbContextOptionsBuilder<SearchTrackerDbContext>(_options)
+                .AddInterceptors(new RaceInterceptor(_race))
+                .Options;
+            return new SearchTrackerDbContext(options);
+        }
+    }
+
+    private sealed class RaceInterceptor(Action race) : SaveChangesInterceptor
+    {
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            race();
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
     }
 }

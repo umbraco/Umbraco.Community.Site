@@ -5,7 +5,7 @@ public sealed class SearchTrackerOptions
     public const string SectionName = "SearchTracker";
 
     public bool Enabled { get; set; } = true;
-    public int RetentionDays { get; set; } = 365;
+    public int RetentionDays { get; set; } = 90;
     public int MaxTermLength { get; set; } = 100;
     public int MaxSearchesPerClientPerHour { get; set; } = 60;
     public TimeSpan DuplicateWindow { get; set; } = TimeSpan.FromMinutes(30);

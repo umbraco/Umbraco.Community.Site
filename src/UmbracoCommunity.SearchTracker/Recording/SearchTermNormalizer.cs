@@ -27,7 +27,7 @@ public static partial class SearchTermNormalizer
 
         var text = builder.ToString().ToLowerInvariant();
         text = EmailRegex().Replace(text, EmailPlaceholder);
-        text = NumberRegex().Replace(text, m => m.Value.Count(char.IsAsciiDigit) >= MinDigitsToMask ? NumberPlaceholder : m.Value);
+        text = NumberRegex().Replace(text, m => LooksLikePhoneOrId(m.Value) ? NumberPlaceholder : m.Value);
         text = WhitespaceRegex().Replace(text, " ").Trim();
 
         if (text.Length > maxLength)
@@ -38,10 +38,21 @@ public static partial class SearchTermNormalizer
         return text.Length == 0 ? null : text;
     }
 
+    // Years and version lists ("2026 2027", "13 14") stay; a leading +, a long digit run or 3+ short groups ("12 34 56 78") don't.
+    private static bool LooksLikePhoneOrId(string candidate)
+    {
+        var groups = DigitGroupRegex().Matches(candidate).Select(g => g.Length).ToList();
+        if (groups.Sum() < MinDigitsToMask) return false;
+        return candidate.Contains('+') || groups.Max() >= MinDigitsToMask || (groups.Count >= 3 && groups.All(g => g <= 4));
+    }
+
+    [GeneratedRegex(@"\d+", RegexOptions.CultureInvariant)]
+    private static partial Regex DigitGroupRegex();
+
     [GeneratedRegex(@"[^\s@]+@[^\s@]+\.[^\s@]+", RegexOptions.CultureInvariant)]
     private static partial Regex EmailRegex();
 
-    [GeneratedRegex(@"\+?\d[\d \-().]*\d", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"[+(]*\d[\d \-()]*\d", RegexOptions.CultureInvariant)]
     private static partial Regex NumberRegex();
 
     [GeneratedRegex(@"\s+", RegexOptions.CultureInvariant)]

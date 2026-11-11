@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -40,7 +41,7 @@ internal sealed partial class SearchTermRecorder : ISearchTermRecorder, IDisposa
         var term = SearchTermNormalizer.Normalize(query, options.MaxTermLength);
         if (term is null) return;
 
-        var client = httpContext.Connection.RemoteIpAddress?.ToString() ?? userAgent;
+        var client = GetClientKey(httpContext, userAgent);
 
         var duplicateKey = $"dup|{client}|{siteKey:N}|{term}";
         if (_cache.TryGetValue(duplicateKey, out _)) return;
@@ -55,6 +56,23 @@ internal sealed partial class SearchTermRecorder : ISearchTermRecorder, IDisposa
         _cache.Set(duplicateKey, true, options.DuplicateWindow);
 
         _channel.Writer.TryWrite(new SearchEvent(siteKey, term, Math.Max(0, resultCount), _timeProvider.GetUtcNow().UtcDateTime));
+    }
+
+    // Proxies and CDNs put the visitor's address in a header; the user agent keeps people behind one address apart.
+    internal static string GetClientKey(HttpContext httpContext, string userAgent)
+    {
+        var headers = httpContext.Request.Headers;
+        var address = FirstAddress(headers["CF-Connecting-IP"].ToString())
+            ?? FirstAddress(headers["X-Forwarded-For"].ToString())
+            ?? httpContext.Connection.RemoteIpAddress?.ToString();
+        return $"{address}|{userAgent}";
+    }
+
+    private static string? FirstAddress(string header)
+    {
+        var first = header.Split(',')[0].Trim();
+        if (IPAddress.TryParse(first, out var address)) return address.ToString();
+        return IPEndPoint.TryParse(first, out var endPoint) ? endPoint.Address.ToString() : null;
     }
 
     public void Dispose() => _cache.Dispose();

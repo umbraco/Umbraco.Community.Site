@@ -70,6 +70,35 @@ public class SearchTermRecorderTests
     }
 
     [Fact]
+    public void Tells_visitors_behind_one_proxy_apart()
+    {
+        var (recorder, channel) = Create();
+        var first = Request(ip: "10.0.0.1");
+        first.Request.Headers["X-Forwarded-For"] = "203.0.113.5:51234, 10.0.0.1";
+        var second = Request(ip: "10.0.0.1");
+        second.Request.Headers["CF-Connecting-IP"] = "198.51.100.7";
+        var sameAsFirst = Request(ip: "10.0.0.2");
+        sameAsFirst.Request.Headers["X-Forwarded-For"] = "203.0.113.5";
+
+        recorder.Record(Site, "forms", 3, first);
+        recorder.Record(Site, "forms", 3, second);
+        recorder.Record(Site, "forms", 3, sameAsFirst);
+
+        Drain(channel).Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void Separates_browsers_on_the_same_address()
+    {
+        var (recorder, channel) = Create();
+
+        recorder.Record(Site, "forms", 3, Request());
+        recorder.Record(Site, "forms", 3, Request(userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) Safari/605.1.15"));
+
+        Drain(channel).Should().HaveCount(2);
+    }
+
+    [Fact]
     public void Caps_searches_per_client()
     {
         var (recorder, channel) = Create(o => o.MaxSearchesPerClientPerHour = 2);

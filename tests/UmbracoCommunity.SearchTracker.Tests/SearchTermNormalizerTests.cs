@@ -21,6 +21,8 @@ public class SearchTermNormalizerTests
 
     [Theory]
     [InlineData("call +45 12 34 56 78", "call [number]")]
+    [InlineData("call 12 34 56 78", "call [number]")]
+    [InlineData("call (+45) 1234 5678", "call [number]")]
     [InlineData("order 12345678", "order [number]")]
     public void Masks_long_numbers(string raw, string expected)
         => SearchTermNormalizer.Normalize(raw, 100).Should().Be(expected);
@@ -28,6 +30,9 @@ public class SearchTermNormalizerTests
     [Theory]
     [InlineData("umbraco 13.2.1", "umbraco 13.2.1")]
     [InlineData("codegarden 2026", "codegarden 2026")]
+    [InlineData("codegarden 2026 2027", "codegarden 2026 2027")]
+    [InlineData("upgrade 14.0.1 to 16.2.0", "upgrade 14.0.1 to 16.2.0")]
+    [InlineData("v13 v14 v15", "v13 v14 v15")]
     public void Keeps_short_numbers_and_versions(string raw, string expected)
         => SearchTermNormalizer.Normalize(raw, 100).Should().Be(expected);
 
