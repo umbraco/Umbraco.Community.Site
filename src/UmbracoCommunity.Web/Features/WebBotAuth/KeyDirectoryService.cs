@@ -81,16 +81,17 @@ public sealed class KeyDirectoryService
 
     private static Ed25519PrivateKeyParameters ParsePrivateKey(string value)
     {
-        var text = value.Trim();
+        // Secrets get pasted in many shapes: a real multi-line PEM, a JSON-escaped one with
+        // literal "\n" text, wrapped in quotes, or just the base64 body. Strip the PEM armour
+        // and every non-base64 character (quotes, whitespace, literal "\n"), then rebuild it.
+        var body = value
+            .Replace("\\r", string.Empty)
+            .Replace("\\n", string.Empty)
+            .Replace("-----BEGIN PRIVATE KEY-----", string.Empty)
+            .Replace("-----END PRIVATE KEY-----", string.Empty);
+        body = new string(body.Where(c => char.IsAsciiLetterOrDigit(c) || c is '+' or '/' or '=').ToArray());
 
-        // Accept a full PEM, or just the base64 body of the PKCS8 key (what you get when
-        // the BEGIN/END lines are left off).
-        if (!text.StartsWith("-----", StringComparison.Ordinal))
-        {
-            text = $"-----BEGIN PRIVATE KEY-----\n{text}\n-----END PRIVATE KEY-----";
-        }
-
-        using var reader = new StringReader(text);
+        using var reader = new StringReader($"-----BEGIN PRIVATE KEY-----\n{body}\n-----END PRIVATE KEY-----");
         return new PemReader(reader).ReadObject() switch
         {
             Ed25519PrivateKeyParameters key => key,
