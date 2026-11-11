@@ -39,13 +39,7 @@ API base: `/umbraco/searchtracker/api/v1` (`sites`, `summary`, `terms`, `terms/t
 
 ## Privacy
 
-Search terms are free text, so they can contain personal data that the masking doesn't catch, such as a person's name. Before enabling this on a live site:
-
-- make sure the site's privacy notice covers logging search terms for improving content, and how long they're kept;
-- keep `RetentionDays` as short as the reporting needs (default 90);
-- remove a term from the dashboard if it identifies someone.
-
-This needs sign-off from whoever owns data protection for the site; this README isn't a privacy assessment.
+Only the search terms and counts are stored; nothing links a search to the visitor who made it. Terms are free text, so they can occasionally include a name; editors can remove a term from the dashboard, and rows are deleted after `RetentionDays` (default 90). The site's privacy notice should mention that searches are logged to improve content.
 
 ## Configuration
 

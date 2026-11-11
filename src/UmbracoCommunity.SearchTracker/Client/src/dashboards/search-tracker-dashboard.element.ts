@@ -278,7 +278,7 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
         <thead><tr>
           <th scope="col">Term</th>
           <th scope="col" class="number">Searches</th>
-          <th scope="col" class="number" title="Number of results the most recent search for this term returned">Results (latest)</th>
+          <th scope="col" class="number" title="Number of results the most recent search for this term returned">Results count (latest)</th>
           <th scope="col">Last searched</th>
           <th scope="col"><span class="sr-only">Actions</span></th>
         </tr></thead><tbody>
