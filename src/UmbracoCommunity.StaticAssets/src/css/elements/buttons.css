@@ -9,7 +9,7 @@
   text-align: center;
   box-shadow: none;
   background-color: transparent;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-control);
   border: 1px solid var(--color-identity-blue);
   cursor: pointer;
   color: var(--color-identity-blue);

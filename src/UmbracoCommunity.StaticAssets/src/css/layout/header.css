@@ -319,7 +319,7 @@ body.scroll .nav-header .search-btn form {
   font-weight: var(--font-weight-regular);
   font-size: 16px;
   line-height: normal;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-control);
   background: var(--color-white);
   backdrop-filter: blur(50px);
   outline-color: var(--color-identity-blue);

@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Services;
 

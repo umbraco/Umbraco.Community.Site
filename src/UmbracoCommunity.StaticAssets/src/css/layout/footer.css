@@ -191,7 +191,7 @@ footer.sticky-footer .footer-inner__form .umbraco-forms-form input[type=submit] 
   font-size: 16px;
   text-align: center;
   box-shadow: none;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-control);
   border: 1px solid var(--color-identity-blue);
   cursor: pointer;
   color: var(--color-identity-blue);
