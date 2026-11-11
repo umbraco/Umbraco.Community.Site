@@ -24,6 +24,7 @@ public class WebBotAuthDirectoryController : Controller
 
         var signed = _directory.Sign(Request.Host.Value ?? string.Empty);
 
+        Response.Headers["Content-Digest"] = signed.ContentDigest;
         Response.Headers["Signature-Input"] = signed.SignatureInput;
         Response.Headers["Signature"] = signed.Signature;
         Response.Headers.CacheControl = $"public, max-age={_directory.CacheMaxAgeSeconds}";

@@ -107,11 +107,11 @@ public class KeyDirectoryServiceTests
         var (service, pub) = Create();
         var signed = service.Sign("community.umbraco.com");
 
-        signed.SignatureInput.Should().StartWith("sig1=(\"@authority\";req);alg=\"ed25519\";keyid=\"");
+        signed.SignatureInput.Should().StartWith("sig1=(\"@authority\";req \"content-digest\");alg=\"ed25519\";keyid=\"");
         signed.SignatureInput.Should().Contain("created=1800000000;expires=1800000300;tag=\"http-message-signatures-directory\"");
 
         var parameters = signed.SignatureInput["sig1=".Length..];
-        var signatureBase = $"\"@authority\";req: community.umbraco.com\n\"@signature-params\": {parameters}";
+        var signatureBase = $"\"@authority\";req: community.umbraco.com\n\"content-digest\": {signed.ContentDigest}\n\"@signature-params\": {parameters}";
         var sig = Convert.FromBase64String(signed.Signature["sig1=:".Length..^1]);
 
         var verifier = new Ed25519Signer();
@@ -119,5 +119,8 @@ public class KeyDirectoryServiceTests
         var data = Encoding.UTF8.GetBytes(signatureBase);
         verifier.BlockUpdate(data, 0, data.Length);
         verifier.VerifySignature(sig).Should().BeTrue();
+
+        var expected = $"sha-256=:{Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(signed.Body)))}:";
+        signed.ContentDigest.Should().Be(expected);
     }
 }

@@ -9,7 +9,7 @@ using Org.BouncyCastle.Security;
 
 namespace UmbracoCommunity.Web.Features.WebBotAuth;
 
-public sealed record SignedKeyDirectory(string Body, string SignatureInput, string Signature);
+public sealed record SignedKeyDirectory(string Body, string ContentDigest, string SignatureInput, string Signature);
 
 /// <summary>
 /// Builds the Web Bot Auth key directory (a JWKS) and signs the response per RFC 9421 so
@@ -64,9 +64,14 @@ public sealed class KeyDirectoryService
         var created = _timeProvider.GetUtcNow().ToUnixTimeSeconds();
         var expires = created + _options.SignatureLifetimeSeconds;
 
+        // RFC 9530 digest of the exact body bytes; Cloudflare's validator requires it and a
+        // signature that covers it, so a cached or tampered body can't ride on the signature.
+        var bodyBytes = Encoding.UTF8.GetBytes(_directoryJson);
+        var contentDigest = $"sha-256=:{Convert.ToBase64String(SHA256.HashData(bodyBytes))}:";
+
         // Signature parameters: covered components, then alg/keyid/created/expires/tag.
-        var parameters = $"(\"@authority\";req);alg=\"ed25519\";keyid=\"{_keyId}\";created={created};expires={expires};tag=\"{Tag}\"";
-        var signatureBase = $"\"@authority\";req: {authority}\n\"@signature-params\": {parameters}";
+        var parameters = $"(\"@authority\";req \"content-digest\");alg=\"ed25519\";keyid=\"{_keyId}\";created={created};expires={expires};tag=\"{Tag}\"";
+        var signatureBase = $"\"@authority\";req: {authority}\n\"content-digest\": {contentDigest}\n\"@signature-params\": {parameters}";
 
         var signer = new Ed25519Signer();
         signer.Init(true, _privateKey);
@@ -75,6 +80,7 @@ public sealed class KeyDirectoryService
 
         return new SignedKeyDirectory(
             _directoryJson,
+            contentDigest,
             $"sig1={parameters}",
             $"sig1=:{Convert.ToBase64String(signer.GenerateSignature())}:");
     }
