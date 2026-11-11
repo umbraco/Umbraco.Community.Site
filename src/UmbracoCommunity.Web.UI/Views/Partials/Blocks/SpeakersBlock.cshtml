@@ -28,7 +28,14 @@
                 var speaker = item.Content as SpeakerItemBlock;
                 if (speaker == null) continue;
                 <div class="dc-speakers-grid__item">
-                    <img class="dc-image is-circle" src="@speaker.SpeakerImage?.GetCropUrl(width: 150, height: 150)" alt="@speaker.SpeakerName" loading="lazy" />
+                    @if (speaker.SpeakerImage != null)
+                    {
+                        <img class="dc-image is-circle" src="@speaker.SpeakerImage.GetCropUrl(width: 150, height: 150)" alt="@speaker.SpeakerName" width="150" height="150" loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="dc-image is-circle dc-speakers-grid__no-image" aria-hidden="true"></div>
+                    }
                     <p class="speaker-name">@speaker.SpeakerName</p>
                     @if (!string.IsNullOrEmpty(speaker.SpeakerDescription))
                     {

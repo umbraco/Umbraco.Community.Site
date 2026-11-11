@@ -24,6 +24,8 @@ public class ContentContextService
 
     public string? ContentTypeAlias => CurrentPage?.ContentType.Alias;
 
+    public string? SiteAlias => CurrentPage?.Root().ContentType.Alias;
+
     public string Culture =>
         _umbracoContextAccessor.TryGetUmbracoContext(out var context)
             ? context.PublishedRequest?.Culture ?? Constants.Culture.Default

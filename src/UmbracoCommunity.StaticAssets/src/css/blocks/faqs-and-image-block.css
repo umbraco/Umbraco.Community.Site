@@ -30,9 +30,10 @@
 }
 
 .dc-faqs-and-image-block__image-container img {
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   width: 100%;
   height: auto;
+  aspect-ratio: 1;
 }
 
 .dc-faqs-and-image-block__content-container {
@@ -71,7 +72,7 @@
   cursor: pointer;
   font-size: 1.25rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 1.4;
   color: var(--color-blue);
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -148,7 +149,7 @@
   color: var(--color-blue);
   font-size: 1rem;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 1.6;
   opacity: 0;
   transform: translateY(-10px);

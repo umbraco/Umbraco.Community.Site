@@ -132,6 +132,8 @@ npm run test:coverage
 
 Test files are colocated with components (`.test.ts` suffix).
 
+**Visual regression** (local only): `tests/visual/` is a Playwright harness that screenshots and dumps computed styles for a fixed list of Community and Codegarden pages at 375/768/1280/1440px. Run `npm run baseline` before a CSS change and `npm run compare` after it (needs the site running). See [`tests/visual/README.md`](tests/visual/README.md).
+
 ## Architecture Patterns
 
 ### Pages (Document Types)
@@ -175,6 +177,10 @@ Built assets go to:
 - Frontend: `dist/` → copied to `../UmbracoCommunity.Web.UI/wwwroot/assets/` for production, referenced in views
 
 Backoffice extensions are **not** built from this project. Each lives in its own Vite project (`UmbracoCommunity.Extensions/Client/`, `UmbracoCommunity.BlockRestrictions/Client/`, `Umbraco.Community.NotFoundTracker/Client/`) and emits to its own `App_Plugins/<Name>/` folder.
+
+**Design tokens** (`src/css/root.css`): type scale (`--font-size-display-*`, `--line-height-*`, `--font-weight-*`), responsive heading and block-title tokens (`--font-size-h1`…`h4`, `--block-title-*`, `--block-subtitle-*`, redefined per breakpoint in `root.css`), radii (`--radius-card`, `--radius-pill`) and `--measure`. Prefer a token over a literal, and change a size per breakpoint by redefining the token rather than adding a `@media` override in a block. Tokens are runtime custom properties (`preserve: true` in `vite.config.ts`), so they can be overridden in a scope. Dark-background blocks set `--block-heading-color` on their `.bg-dark` rule instead of re-colouring `.block-title`/`.block-subtitle` themselves. Files that use `@media (--sm)` etc. must `@import` `base/media-queries.css` first.
+
+**Tenant themes**: `<body>` carries `data-site` set to the request root's doc type alias (`home` or `eventsHome`, via `ContentContextService.SiteAlias`). Codegarden-only styling goes in `css/themes/codegarden.css` as token overrides under `[data-site="eventsHome"]`, which keeps Community untouched.
 
 **PostCSS Rhythm System**: Custom mixin (`postcss-rhythm.mixin.ts`) generates spacing utility classes like `.pt-md`, `.m-xs`, `.mx-lg` based on CSS custom properties with modifiers: `-xxs`, `-xs`, `-sm`, (default), `-md`, `-lg`, `-xl`, `-0`.
 
@@ -499,6 +505,15 @@ The site implements structured data using Schema.NET for better search engine vi
 - Robots meta tag with configurable directives per page
 
 **Configuration**: Organization data is tenant-configurable via `SocialSettings` document type (OrganisationName, OrganisationUrl, OrganisationLogo). Falls back to Umbraco defaults if not configured.
+
+### Web Bot Auth Key Directory
+
+`GET /.well-known/http-message-signatures-directory` publishes the Ed25519 public key (JWKS) that Umbraco's crawler signs its requests with, so Cloudflare can verify it as a known bot. The response itself is signed (RFC 9421: `tag="http-message-signatures-directory"`, covered `"@authority";req`, `alg="ed25519"`, `keyid` = JWK thumbprint, `created`/`expires`), freshly on each request with a 5-minute lifetime and `Cache-Control: max-age=60`.
+
+- `Features/WebBotAuth/KeyDirectoryService.cs` (signing, BouncyCastle, as .NET has no Ed25519), `Controllers/WebBotAuthDirectoryController.cs`, route in `UmbracoEndpointBuilderContextExtensions`.
+- Config: `WebBotAuth:SigningPrivateKey` = the PKCS8 PEM private key from the Sphere repo's `generate-crawler-signing-key.ts` (same key the crawler uses as `CRAWLER_SIGNING_PRIVATE_KEY`). A secret: `appsettings.Local.json` locally, an environment variable / Cloud secret in deployed environments, never committed. With no key the endpoint returns 404; an invalid key is logged (never the key) and also gives 404.
+- Optional: `WebBotAuth:SignatureLifetimeSeconds` (300), `WebBotAuth:CacheMaxAgeSeconds` (60).
+- Verify after deploy with `http-signature-directory` (crates.io); if Cloudflare rejects `@authority;req` on a response, try plain `@authority`.
 
 ### Security Headers
 

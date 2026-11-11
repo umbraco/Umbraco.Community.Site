@@ -15,7 +15,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-white);
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   align-items: center;
   justify-content: center;
   padding: 1rem;
@@ -33,7 +33,7 @@
   text-align: center;
   font-size: 22px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 27px; /* 122.727% */
   margin: 1rem 0 0;
 }
@@ -43,8 +43,8 @@
   text-align: center;
   font-size: 16px;
   font-style: normal;
-  font-weight: 400;
-  line-height: 21px; /* 131.25% */
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-xs); /* 131.25% */
   margin: 1rem 0 0;
 }
 
@@ -53,7 +53,7 @@
   text-align: center;
   font-size: 14px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 23px; /* 164.286% */
   text-decoration-line: underline;
   text-decoration-style: solid;
@@ -96,23 +96,23 @@
   }
 
   .dc-multiple-cards__item h2 {
-    font-size: 30px;
+    font-size: var(--font-size-display-xs);
     font-style: normal;
-    font-weight: 400;
-    line-height: 35px; /* 116.667% */
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-md); /* 116.667% */
   }
 
   .dc-multiple-cards__item p {
     font-size: 20px;
     font-style: normal;
-    font-weight: 400;
-    line-height: 25px; /* 125% */
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-sm); /* 125% */
   }
 
   .dc-multiple-cards__item a{
     font-size: 20px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 23px; /* 115% */
   }
 }

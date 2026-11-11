@@ -126,7 +126,7 @@
 
 .search-page__result-title {
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   line-height: 1.3;
   margin: 0 0 var(--unit-xs);
   color: var(--color-blue);
@@ -209,7 +209,7 @@
   display: inline-block;
   margin-left: var(--unit-xs);
   padding: 0.1rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: 0.75rem;
   font-weight: 600;
   vertical-align: middle;

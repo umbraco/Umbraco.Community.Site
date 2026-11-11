@@ -23,7 +23,7 @@
   h2 {
     color: var(--dc-cta-text-color, var(--default-color));
     font-size: 18px;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 49px;
     margin: 0;
   }

@@ -1,0 +1,26 @@
+@import "../base/media-queries.css";
+
+[data-site="eventsHome"] {
+    --font-size-h1: 2.75rem;
+    --font-size-h2: 30px;
+    --font-size-h3: 22px;
+
+    --hero-title-font-size: var(--font-size-h1);
+    --hero-title-line-height: var(--line-height-heading);
+    --content-h2-font-size: var(--font-size-h2);
+    --content-h2-line-height: 1.2;
+
+    --page-banner-plain-inset: 0;
+
+    @media (--sm) {
+        --font-size-h1: 3.5rem;
+        --font-size-h2: 34px;
+        --font-size-h3: 25px;
+    }
+
+    @media (--md) {
+        --font-size-h1: 4.5rem;
+        --font-size-h2: 40px;
+        --font-size-h3: 28px;
+    }
+}

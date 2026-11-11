@@ -45,7 +45,7 @@
   text-align: center;
   font-size: 14px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   text-transform: uppercase;
   padding: 2px 8px;
 }
@@ -56,9 +56,9 @@
 
 .plan-comparison__title {
   text-align: center;
-  font-size: 30px;
+  font-size: var(--font-size-display-xs);
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   margin-top: 2.5rem;
 }
 
@@ -66,7 +66,7 @@
   text-align: center;
   font-size: 20px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 1.2rem;
   margin: 0;
   height: 50px;
@@ -76,12 +76,12 @@
   text-align: center;
   font-size: var(--unit-lg);
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   margin-top: 1.75rem;
 }
 
 .plan-comparison__price-wrapper {
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   text-align: center;
 }
 
@@ -89,7 +89,7 @@
   text-align: center;
   font-size: 24px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 29px; /* 120.833% */
 }
 
@@ -126,7 +126,7 @@
   text-align: center;
   font-size: 14px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 18px; /* 131.25% */
   border-bottom: 1px solid rgba(40, 58, 151, 0.1);
   padding: 1rem 0;
@@ -171,8 +171,8 @@
         text-align: center;
         font-size: 16px;
         font-style: normal;
-        font-weight: 400;
-        line-height: 21px; /* 131.25% */
+        font-weight: var(--font-weight-regular);
+        line-height: var(--line-height-xs); /* 131.25% */
 
       }
     }
@@ -192,7 +192,6 @@
     min-width: var(--col-width);
     text-align: center;
 
-
     &:first-child {
       text-align: left;
     }
@@ -211,7 +210,7 @@
   td {
     font-size: 16px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 23px; /* 143.75% */
   }
 
@@ -244,7 +243,7 @@
     position: absolute;
     font-size: 12px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 15px; /* 125% */
     width: 250px;
     border-radius: 10px;
@@ -275,7 +274,7 @@
     color: var(--color-blue);
     font-size: 16px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 23px; /* 143.75% */
     text-transform: uppercase;
     border-bottom: 1px solid var(--color-blue);
@@ -416,10 +415,10 @@
 
       .plan-comparison__title {
         text-align: center;
-        font-size: 30px;
+        font-size: var(--font-size-display-xs);
         font-style: normal;
-        font-weight: 400;
-        line-height: 35px; /* 116.667% */
+        font-weight: var(--font-weight-regular);
+        line-height: var(--line-height-md); /* 116.667% */
         height: 70px;
         display: flex;
         align-items: center;
@@ -430,8 +429,8 @@
         text-align: center;
         font-size: 20px;
         font-style: normal;
-        font-weight: 400;
-        line-height: 25px; /* 125% */
+        font-weight: var(--font-weight-regular);
+        line-height: var(--line-height-sm); /* 125% */
         height: 25px;
         align-items: center;
         padding: 0;
@@ -486,7 +485,7 @@
   text-align: center;
   font-size: 16px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 23px; /* 143.75% */
   text-decoration-line: underline;
   text-decoration-style: solid;
@@ -530,7 +529,7 @@
   .plan-column {
     background-color: white;
     padding: 1rem 1.25rem 1.25rem 1.25rem;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     position: relative;
     width: auto;
@@ -572,7 +571,7 @@
     color: var(--color-blue);
     font-size: 16px;
     font-style: normal;
-    font-weight: 400;
+    font-weight: var(--font-weight-regular);
     line-height: 23px; /* 143.75% */
     text-transform: uppercase;
     opacity: 0.5;
@@ -588,8 +587,8 @@
     color: var(--color-blue);
     font-size: 20px;
     font-style: normal;
-    font-weight: 400;
-    line-height: 25px;
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-sm);
   }
 
   .plan-column__includes > ul > li + li {

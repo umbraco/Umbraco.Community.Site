@@ -104,7 +104,7 @@ body:not(.mobile) .nav-header .nav-list__list {
   color: var(--color-identity-blue);
   font-family: var(--font-family);
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   font-size: var(--nav-item-font-size);
   line-height: var(--nav-item-font-size);
   cursor: pointer;
@@ -194,7 +194,7 @@ body:not(.mobile) .nav-header .nav-item.opened .dropdown-button>svg {
 .nav-header .nav-item__dropdown-item>span {
   color: var(--color-black);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 1rem;
   text-transform: uppercase;
   margin-bottom: .5rem;
@@ -210,7 +210,7 @@ body:not(.mobile) .nav-header .nav-item.opened .dropdown-button>svg {
 .nav-header .nav-item__dropdown-item>a section {
   color: var(--color-blue);
   font-size: var(--nav-item-font-size);
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: calc(var(--nav-item-font-size)+5px);
   align-items: flex-start;
   column-gap: 20px;
@@ -249,7 +249,7 @@ body:not(.mobile) .nav-header .nav-item__dropdown-item>a.has-caption+a.has-capti
   color: var(--color-light-gray-navigation);
   opacity: 60%;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 19px;
 }
 
@@ -260,7 +260,7 @@ body:not(.mobile) .nav-header .nav-item__dropdown-item:hover>a {
 
 .nav-header .nav-item__dropdown-list {
   position: absolute;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   line-height: 39px;
   border-radius: 22px;
   background-color: var(--dropdown-background-color);
@@ -316,10 +316,10 @@ body.scroll .nav-header .search-btn form {
   padding: 0 40px 0 15px;
   min-width: 250px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   font-size: 16px;
   line-height: normal;
-  border-radius: 20px;
+  border-radius: var(--radius-control);
   background: var(--color-white);
   backdrop-filter: blur(50px);
   outline-color: var(--color-identity-blue);
@@ -501,7 +501,7 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
   z-index: 2;
 }
 
-@media(min-width: 768px) {
+@media (--sm) {
   body:not(.scroll):not(.hero-full-width):not(.hero-half-width) .nav-header .nav {
     padding: 10px 0;
   }
@@ -660,7 +660,7 @@ body:not(.mobile) .nav-header .member-avatar:focus-within .member-avatar__menu {
   display: block;
   padding: 8px 14px 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
   white-space: nowrap;
   overflow: hidden;

@@ -25,6 +25,8 @@
                 <img src="@Model.Settings?.BackgroundImage?.GetCropUrl("mobile")"
                      alt="@Model.Settings?.BackgroundImage?.Name"
                      sizes="100vw"
+                     width="@Model.Settings?.BackgroundImage.GetCropSize("mobile")?.Width"
+                     height="@Model.Settings?.BackgroundImage.GetCropSize("mobile")?.Height"
                      loading="lazy">
             </picture>
         }
