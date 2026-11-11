@@ -4,7 +4,8 @@
 @import './dialog.css';
 @import './testimonial.css';
 @import './top-banner.css';
-@import './page-not-found-suggestions.css';
+@import './page-not-found.css';
+@import './page-suggestions.css';
 @import './feed-manager.css';
 @import './form-field.css';
 @import './profile-link.css';

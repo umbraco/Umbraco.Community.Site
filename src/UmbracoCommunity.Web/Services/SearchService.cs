@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
+using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Models.Pages;
 using UmbracoCommunity.Web.Models.PublishedModels;
@@ -45,6 +46,9 @@ internal sealed class SearchService : ISearchService
         DocumentationIndexFields.Excerpt,
         DocumentationIndexFields.Body,
     };
+    private static readonly string[] ContentFuzzyFields = ["nodeName", "metaTitle"];
+    private static readonly string[] CommunityFuzzyFields = [CommunityBlogsSearchIndexer.FieldTitle];
+    private static readonly string[] DocumentationFuzzyFields = [DocumentationIndexFields.Title, DocumentationIndexFields.Tags];
     private const string DocumentationCategory = "documentation";
     private static readonly Regex HtmlTagRegex = new("<[^>]+>", RegexOptions.Compiled);
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
@@ -103,9 +107,7 @@ internal sealed class SearchService : ISearchService
             // Exclude pages flagged hideFromSearch and any node without a template (non-routable).
             // Fetch up to MaxIndexFetch and apply tenant + current-page filtering in memory so
             // pagination totals stay accurate after filtering.
-            searchResults = index.Searcher
-                .CreateQuery("content")
-                .ManagedQuery(query, SearchFields)
+            searchResults = Match(index.Searcher.CreateQuery("content"), query, SearchFields, "nodeName", ContentFuzzyFields)
                 .Not().Field("templateID", "0")
                 .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
         }
@@ -127,18 +129,14 @@ internal sealed class SearchService : ISearchService
             if (content is null) continue;
             if (content.Root().Id != tenantRootId) continue;
             if (content.Id == currentPage.Id) continue;
-            // Only routable pages whose doc type opts into the page-config composition AND
-            // that haven't been flagged hideFromSearch are searchable. Doing this in code (vs
-            // in the Examine query) sidesteps the fact that nodes without the composition
-            // simply don't have the hideFromSearch field indexed at all.
-            if (!content.TemplateId.HasValue) continue;
-            if (content is not ICompositionPageConfiguration pageConfig) continue;
-            if (pageConfig.HideFromSearch) continue;
+            // Checked in code because nodes without the page-config composition have no hideFromSearch field to query.
+            if (!content.IsSearchable()) continue;
 
             combined.Add((result.Score, new SearchResultItem
             {
                 Name = content.Name ?? string.Empty,
                 Url = content.Url(_publishedUrlProvider),
+                ContentKey = content.Key,
                 Description =
                     BuildExcerpt(result.GetValues("metaDescription").FirstOrDefault())
                     ?? BuildExcerpt(result.GetValues("teaser").FirstOrDefault())
@@ -159,9 +157,7 @@ internal sealed class SearchService : ISearchService
             {
                 // MaxIndexFetch is a generous safety cap here: the community feed is expected
                 // to stay well under it (~60 posts), so this fetches the whole index in practice.
-                var communityResults = communityIndex.Searcher
-                    .CreateQuery()
-                    .ManagedQuery(query, CommunitySearchFields)
+                var communityResults = Match(communityIndex.Searcher.CreateQuery(), query, CommunitySearchFields, CommunityBlogsSearchIndexer.FieldTitle, CommunityFuzzyFields)
                     .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
 
                 foreach (var result in communityResults)
@@ -199,9 +195,7 @@ internal sealed class SearchService : ISearchService
                 if (docsRoot is not null)
                 {
                     var docsBaseUrl = docsRoot.Url(_publishedUrlProvider).TrimEnd('/');
-                    var docsResults = docsIndex.Searcher
-                        .CreateQuery()
-                        .ManagedQuery(query, DocumentationSearchFields)
+                    var docsResults = Match(docsIndex.Searcher.CreateQuery(), query, DocumentationSearchFields, DocumentationIndexFields.Title, DocumentationFuzzyFields)
                         .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
 
                     foreach (var result in docsResults)
@@ -238,6 +232,12 @@ internal sealed class SearchService : ISearchService
         var items = ordered.Skip(skip).Take(take).Select(x => x.Item).ToList();
 
         return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((items, total));
+    }
+
+    private static IBooleanOperation Match(IQuery examineQuery, string query, string[] fields, string titleField, string[] fuzzyFields)
+    {
+        var lucene = SearchQueryBuilder.Build(query, fields, titleField, fuzzyFields);
+        return lucene is null ? examineQuery.ManagedQuery(query, fields) : examineQuery.NativeQuery(lucene);
     }
 
     private static string? BuildExcerpt(string? raw)
