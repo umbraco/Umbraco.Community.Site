@@ -6,6 +6,9 @@ const freezeCss = `
   animation: none !important;
   caret-color: transparent !important;
   scroll-behavior: auto !important;
+}
+.dc-upcoming-events__list {
+  display: none !important;
 }`;
 
 export async function stabilise(page: Page) {
