@@ -499,12 +499,12 @@ The site implements structured data using Schema.NET for better search engine vi
 
 ### Web Bot Auth Key Directory
 
-`GET /.well-known/http-message-signatures-directory` publishes the Ed25519 public key (JWKS) that Umbraco's crawler signs its requests with, so Cloudflare can verify it as a known bot. The response itself is signed (RFC 9421: `tag="http-message-signatures-directory"`, covered `"@authority";req`, `alg="ed25519"`, `keyid` = JWK thumbprint, `created`/`expires`), freshly on each request with a 5-minute lifetime and `Cache-Control: max-age=60`.
+`GET /.well-known/http-message-signatures-directory` publishes the Ed25519 public key (JWKS) that Umbraco's crawler signs its requests with, so Cloudflare can verify it as a known bot. The response itself is signed (RFC 9421: `tag="http-message-signatures-directory"`, covered `"@authority";req` and `"content-digest"`, `alg="ed25519"`, `keyid` = JWK thumbprint, `created`/`expires`), freshly on each request with a 5-minute lifetime and `Cache-Control: max-age=60`.
 
 - `Features/WebBotAuth/KeyDirectoryService.cs` (signing, BouncyCastle, as .NET has no Ed25519), `Controllers/WebBotAuthDirectoryController.cs`, route in `UmbracoEndpointBuilderContextExtensions`.
 - Config: `WebBotAuth:SigningPrivateKey` = the PKCS8 PEM private key from the Sphere repo's `generate-crawler-signing-key.ts` (same key the crawler uses as `CRAWLER_SIGNING_PRIVATE_KEY`). A secret: `appsettings.Local.json` locally, an environment variable / Cloud secret in deployed environments, never committed. With no key the endpoint returns 404; an invalid key is logged (never the key) and also gives 404.
 - Optional: `WebBotAuth:SignatureLifetimeSeconds` (300), `WebBotAuth:CacheMaxAgeSeconds` (60).
-- Verify after deploy with `http-signature-directory` (crates.io); if Cloudflare rejects `@authority;req` on a response, try plain `@authority`.
+- The response also carries `Content-Digest: sha-256=:…:` (RFC 9530) over the body; Cloudflare's `http-signature-directory` validator (crates.io) requires it and checks the signature covers it. `@authority;req` is accepted on responses. Re-run that tool against the live URL after changing anything here.
 
 ### Security Headers
 
