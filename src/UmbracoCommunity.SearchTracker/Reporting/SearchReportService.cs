@@ -7,7 +7,7 @@ namespace UmbracoCommunity.SearchTracker.Reporting;
 public enum TermSort : byte
 {
     Searches = 0,
-    ZeroResults = 1,
+    FewestResults = 1,
     LastSearched = 2,
     Term = 3,
 }
@@ -18,9 +18,9 @@ public sealed record DailyCount(DateOnly Day, int Searches, int ZeroResultSearch
 
 public sealed record SearchSummary(int TotalSearches, int ZeroResultSearches, int UniqueTerms, IReadOnlyList<DailyCount> Days);
 
-public sealed record TermStat(string Term, int Searches, int ZeroResultSearches, DateOnly LastSearched);
+public sealed record TermStat(string Term, int Searches, int? LatestResultCount, DateOnly LastSearched);
 
-public sealed record TermQuery(string? Contains, bool ZeroResultsOnly, TermSort Sort, int Skip, int Take);
+public sealed record TermQuery(string? Contains, bool NothingFoundOnly, TermSort Sort, int Skip, int Take);
 
 public interface ISearchReportService
 {
@@ -89,20 +89,20 @@ internal sealed class SearchReportService : ISearchReportService
             {
                 Term = g.Key,
                 Searches = g.Sum(r => r.SearchCount),
-                Zero = g.Sum(r => r.ZeroResultCount),
+                Latest = g.OrderByDescending(r => r.Day).Select(r => r.LastResultCount).FirstOrDefault(),
                 Last = g.Max(r => r.Day),
             });
 
-        if (query.ZeroResultsOnly)
+        if (query.NothingFoundOnly)
         {
-            grouped = grouped.Where(g => g.Zero > 0);
+            grouped = grouped.Where(g => g.Latest == 0);
         }
 
         var total = await grouped.CountAsync(ct);
 
         var ordered = query.Sort switch
         {
-            TermSort.ZeroResults => grouped.OrderByDescending(g => g.Zero).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
+            TermSort.FewestResults => grouped.OrderBy(g => g.Latest == null).ThenBy(g => g.Latest).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
             TermSort.LastSearched => grouped.OrderByDescending(g => g.Last).ThenByDescending(g => g.Searches).ThenBy(g => g.Term),
             TermSort.Term => grouped.OrderBy(g => g.Term),
             _ => grouped.OrderByDescending(g => g.Searches).ThenBy(g => g.Term),
@@ -113,7 +113,7 @@ internal sealed class SearchReportService : ISearchReportService
             .Take(query.Take)
             .ToListAsync(ct);
 
-        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Zero, g.Last)).ToList(), total);
+        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Latest, g.Last)).ToList(), total);
     }
 
     public async Task<IReadOnlyList<DailyCount>> GetTermTrendAsync(ReportFilter filter, string term, SiteScope scope, CancellationToken ct)

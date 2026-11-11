@@ -24,6 +24,8 @@ namespace UmbracoCommunity.SearchTracker.Migrations
 
                     b.Property<DateOnly>("Day");
 
+                    b.Property<int?>("LastResultCount");
+
                     b.Property<int>("SearchCount");
 
                     b.Property<Guid>("SiteKey");

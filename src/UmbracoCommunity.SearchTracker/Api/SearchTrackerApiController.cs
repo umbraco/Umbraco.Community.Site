@@ -59,7 +59,7 @@ public sealed class SearchTrackerApiController : SearchTrackerApiControllerBase
         [FromQuery] DateOnly? from,
         [FromQuery] DateOnly? to,
         [FromQuery] string? contains,
-        [FromQuery] bool zeroResultsOnly = false,
+        [FromQuery] bool nothingFoundOnly = false,
         [FromQuery] byte sort = 0,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 25,
@@ -67,7 +67,7 @@ public sealed class SearchTrackerApiController : SearchTrackerApiControllerBase
     {
         var query = new TermQuery(
             contains,
-            zeroResultsOnly,
+            nothingFoundOnly,
             Enum.IsDefined(typeof(TermSort), sort) ? (TermSort)sort : TermSort.Searches,
             Math.Max(0, skip),
             Math.Clamp(take, 1, 200));

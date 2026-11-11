@@ -32,13 +32,14 @@ public abstract class SqliteTestBase : IDisposable
         context.SaveChanges();
     }
 
-    protected static SearchTermDailyEntity Row(Guid site, string day, string term, int searches, int zero = 0) => new()
+    protected static SearchTermDailyEntity Row(Guid site, string day, string term, int searches, int zero = 0, int? latest = null) => new()
     {
         SiteKey = site,
         Day = DateOnly.Parse(day),
         Term = term,
         SearchCount = searches,
         ZeroResultCount = zero,
+        LastResultCount = latest,
     };
 
     public void Dispose()

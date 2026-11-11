@@ -1,4 +1,4 @@
-import { formatDay, percent, rangeForDays } from "./format.js";
+import { axisTicks, formatDay, formatShortDay, percent, rangeForDays } from "./format.js";
 
 describe("formatDay", () => {
   it("formats an ISO day as DD-MM-YYYY", () => {
@@ -27,5 +27,21 @@ describe("percent", () => {
 
   it("handles a zero total", () => {
     expect(percent(0, 0)).toBe("0%");
+  });
+});
+
+describe("formatShortDay", () => {
+  it("formats an ISO day as DD-MM", () => {
+    expect(formatShortDay("2026-11-05")).toBe("05-11");
+  });
+});
+
+describe("axisTicks", () => {
+  it("covers the maximum with whole-number steps", () => {
+    expect(axisTicks(7)).toEqual([0, 2, 4, 6, 8]);
+  });
+
+  it("always has a non-zero top", () => {
+    expect(axisTicks(0)).toEqual([0, 1]);
   });
 });

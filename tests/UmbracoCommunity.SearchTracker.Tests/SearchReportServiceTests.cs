@@ -14,18 +14,18 @@ public class SearchReportServiceTests : SqliteTestBase
     public SearchReportServiceTests()
     {
         Seed(
-            Row(SiteA, "2026-11-01", "forms", 4, 0),
-            Row(SiteA, "2026-11-03", "forms", 2, 0),
-            Row(SiteA, "2026-11-03", "headless", 3, 3),
+            Row(SiteA, "2026-11-01", "forms", 4, 0, latest: 5),
+            Row(SiteA, "2026-11-03", "forms", 2, 0, latest: 2),
+            Row(SiteA, "2026-11-03", "headless", 3, 3, latest: 0),
             Row(SiteA, "2026-10-01", "old term", 9, 9),
-            Row(SiteB, "2026-11-05", "tickets", 6, 1),
-            Row(SiteB, "2026-11-05", "forms", 1, 0));
+            Row(SiteB, "2026-11-05", "tickets", 6, 1, latest: 4),
+            Row(SiteB, "2026-11-05", "forms", 1, 0, latest: 3));
     }
 
     private SearchReportService Service => new(Factory);
 
-    private static TermQuery Query(TermSort sort = TermSort.Searches, bool zeroOnly = false, string? contains = null)
-        => new(contains, zeroOnly, sort, 0, 25);
+    private static TermQuery Query(TermSort sort = TermSort.Searches, bool nothingFoundOnly = false, string? contains = null)
+        => new(contains, nothingFoundOnly, sort, 0, 25);
 
     [Fact]
     public async Task Summary_totals_the_range_and_fills_empty_days()
@@ -49,11 +49,27 @@ public class SearchReportServiceTests : SqliteTestBase
     }
 
     [Fact]
-    public async Task Zero_results_only_returns_terms_with_failed_searches()
+    public async Task Latest_result_count_comes_from_the_most_recent_day()
     {
-        var (items, _) = await Service.GetTermsAsync(AllSites, Query(TermSort.ZeroResults, zeroOnly: true), SiteScope.Full, CancellationToken.None);
+        var (items, _) = await Service.GetTermsAsync(AllSites, Query(), SiteScope.Full, CancellationToken.None);
 
-        items.Select(i => i.Term).Should().Equal("headless", "tickets");
+        items.Select(i => (i.Term, i.LatestResultCount)).Should().Equal(("forms", 3), ("tickets", 4), ("headless", 0));
+    }
+
+    [Fact]
+    public async Task Nothing_found_only_uses_the_latest_result_count()
+    {
+        var (items, _) = await Service.GetTermsAsync(AllSites, Query(nothingFoundOnly: true), SiteScope.Full, CancellationToken.None);
+
+        items.Select(i => i.Term).Should().Equal("headless");
+    }
+
+    [Fact]
+    public async Task Fewest_results_sorts_by_latest_result_count()
+    {
+        var (items, _) = await Service.GetTermsAsync(AllSites, Query(TermSort.FewestResults), SiteScope.Full, CancellationToken.None);
+
+        items.Select(i => i.Term).Should().Equal("headless", "forms", "tickets");
     }
 
     [Fact]

@@ -100,6 +100,7 @@ public sealed class SearchEventWriterService : BackgroundService
             var (siteKey, day, term) = group.Key;
             var searches = group.Count();
             var zeroResults = group.Count(e => e.ResultCount == 0);
+            var lastResultCount = group.Last().ResultCount;
 
             var row = await context.SearchTermDaily
                 .FirstOrDefaultAsync(r => r.SiteKey == siteKey && r.Day == day && r.Term == term, ct);
@@ -113,12 +114,14 @@ public sealed class SearchEventWriterService : BackgroundService
                     Term = term,
                     SearchCount = searches,
                     ZeroResultCount = zeroResults,
+                    LastResultCount = lastResultCount,
                 });
             }
             else
             {
                 row.SearchCount += searches;
                 row.ZeroResultCount += zeroResults;
+                row.LastResultCount = lastResultCount;
             }
         }
 

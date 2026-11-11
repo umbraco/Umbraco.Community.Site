@@ -50,7 +50,7 @@ export const SearchTrackerApi = {
   getTerms(query: TermQuery): Promise<TermListResponse> {
     const params = rangeParams(query);
     if (query.contains) params.set("contains", query.contains);
-    if (query.zeroResultsOnly) params.set("zeroResultsOnly", "true");
+    if (query.nothingFoundOnly) params.set("nothingFoundOnly", "true");
     if (query.sort !== undefined) params.set("sort", String(query.sort));
     if (query.skip !== undefined) params.set("skip", String(query.skip));
     if (query.take !== undefined) params.set("take", String(query.take));

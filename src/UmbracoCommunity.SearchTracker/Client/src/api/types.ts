@@ -21,7 +21,7 @@ export interface SummaryResponse {
 export interface TermStat {
   term: string;
   searches: number;
-  zeroResultSearches: number;
+  latestResultCount: number | null;
   lastSearched: string;
 }
 
@@ -32,7 +32,7 @@ export interface TermListResponse {
 
 export enum TermSort {
   Searches = 0,
-  ZeroResults = 1,
+  FewestResults = 1,
   LastSearched = 2,
   Term = 3,
 }
@@ -45,7 +45,7 @@ export interface RangeQuery {
 
 export interface TermQuery extends RangeQuery {
   contains?: string;
-  zeroResultsOnly?: boolean;
+  nothingFoundOnly?: boolean;
   sort?: TermSort;
   skip?: number;
   take?: number;

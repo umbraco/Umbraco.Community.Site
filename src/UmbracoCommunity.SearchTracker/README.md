@@ -18,7 +18,7 @@ Terms are normalised before storage: Unicode NFKC, lower-cased, whitespace colla
 
 ## Storage
 
-One table, `SearchTrackerTermDaily`: one row per site, UTC day and term, holding the number of searches and how many of those returned no results. Events are queued in memory and written in batches by `SearchEventWriterService`, so search requests never wait on the database. If the queue is full, events are dropped.
+One table, `SearchTrackerTermDaily`: one row per site, UTC day and term, holding the number of searches, how many of those found nothing, and how many results the latest search returned (empty for rows logged before that was recorded). Events are queued in memory and written in batches by `SearchEventWriterService`, so search requests never wait on the database. If the queue is full, events are dropped.
 
 `SearchTrackerRetentionService` deletes rows older than `RetentionDays` (default 365). Editors can also delete a term from the dashboard, which removes it for every date.
 
@@ -29,9 +29,9 @@ Migrations run on `UmbracoApplicationStartedNotification`, like the other packag
 Content section → **Search Terms**:
 
 - site and period filters (7 / 30 / 90 / 365 days)
-- totals: searches, different terms, searches with no results
-- searches per day, with the no-result share highlighted
-- a term table sortable by searches, no-result searches, last searched or A–Z, with a per-term trend and delete
+- totals: searches, different terms, and searches that found nothing (with their share of all searches)
+- a searches-per-day chart split into searches that found results and searches that found nothing
+- a term table with each term's latest result count, sortable by searches, fewest results, last searched or A–Z, filterable to terms whose latest search found nothing, with a per-term trend and delete
 
 Users with content start nodes only see the sites those start nodes sit under.
 

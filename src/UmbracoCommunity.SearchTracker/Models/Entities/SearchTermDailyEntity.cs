@@ -8,4 +8,5 @@ public class SearchTermDailyEntity
     public string Term { get; set; } = string.Empty;
     public int SearchCount { get; set; }
     public int ZeroResultCount { get; set; }
+    public int? LastResultCount { get; set; }
 }

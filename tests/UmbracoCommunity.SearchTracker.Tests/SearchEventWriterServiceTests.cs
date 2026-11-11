@@ -35,7 +35,7 @@ public class SearchEventWriterServiceTests : SqliteTestBase
         var rows = context.SearchTermDaily.OrderBy(r => r.Day).ThenBy(r => r.SearchCount).ToList();
         rows.Should().HaveCount(3);
         rows.Should().ContainSingle(r => r.SiteKey == SiteA && r.Day == new DateOnly(2026, 11, 4))
-            .Which.Should().Match<Models.Entities.SearchTermDailyEntity>(r => r.SearchCount == 2 && r.ZeroResultCount == 1);
+            .Which.Should().Match<Models.Entities.SearchTermDailyEntity>(r => r.SearchCount == 2 && r.ZeroResultCount == 1 && r.LastResultCount == 0);
         rows.Should().ContainSingle(r => r.SiteKey == SiteA && r.Day == new DateOnly(2026, 11, 5))
             .Which.ZeroResultCount.Should().Be(1);
         rows.Should().ContainSingle(r => r.SiteKey == SiteB).Which.ZeroResultCount.Should().Be(0);
@@ -55,5 +55,6 @@ public class SearchEventWriterServiceTests : SqliteTestBase
         var row = context.SearchTermDaily.Single();
         row.SearchCount.Should().Be(7);
         row.ZeroResultCount.Should().Be(2);
+        row.LastResultCount.Should().Be(7);
     }
 }

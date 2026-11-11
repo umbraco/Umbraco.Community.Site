@@ -18,3 +18,16 @@ export function percent(part: number, total: number): string {
   if (total <= 0) return "0%";
   return `${Math.round((part / total) * 100)}%`;
 }
+
+export function formatShortDay(isoDay: string): string {
+  const [, month, day] = isoDay.split("-");
+  return month && day ? `${day}-${month}` : isoDay;
+}
+
+export function axisTicks(max: number, count = 4): number[] {
+  const step = Math.max(1, Math.ceil(Math.max(max, 1) / count));
+  const ticks: number[] = [];
+  for (let value = 0; value <= Math.max(max, 1); value += step) ticks.push(value);
+  if (ticks[ticks.length - 1] < max) ticks.push(ticks[ticks.length - 1] + step);
+  return ticks;
+}

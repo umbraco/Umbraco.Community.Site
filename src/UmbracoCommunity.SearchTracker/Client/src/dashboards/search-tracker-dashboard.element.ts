@@ -11,7 +11,7 @@ import "./search-daily-chart.element.js";
 const PERIODS = [7, 30, 90, 365];
 const SORTS = [
   { value: TermSort.Searches, name: "Most searched" },
-  { value: TermSort.ZeroResults, name: "Most searches with no results" },
+  { value: TermSort.FewestResults, name: "Fewest results" },
   { value: TermSort.LastSearched, name: "Recently searched" },
   { value: TermSort.Term, name: "A–Z" },
 ];
@@ -23,7 +23,7 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
   @state() private siteKey = "";
   @state() private periodDays = 30;
   @state() private termFilter = "";
-  @state() private zeroResultsOnly = false;
+  @state() private nothingFoundOnly = false;
   @state() private sort = TermSort.Searches;
   @state() private skip = 0;
 
@@ -70,7 +70,6 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
     .field { display: flex; flex-direction: column; gap: var(--uui-size-1); min-width: 160px; }
     .field > uui-input,
     .field > uui-select { width: 100%; }
-    .toggle-field { align-self: center; padding-top: var(--uui-size-space-4); }
     .spacer { flex: 1; }
     .tiles {
       display: grid;
@@ -78,15 +77,40 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
       gap: var(--uui-size-space-4);
       margin-bottom: var(--uui-size-space-4);
     }
+    .tile {
+      display: flex;
+      flex-direction: column;
+      gap: var(--uui-size-space-2);
+      padding: var(--uui-size-space-2) var(--uui-size-space-1);
+    }
     .tile-value {
       font-size: var(--uui-type-h3-size, 24px);
       font-weight: 700;
+      line-height: 1;
     }
-    .tile-label { color: var(--uui-color-text-alt); }
+    .tile-label { font-weight: 600; }
+    .tile-note { color: var(--uui-color-text-alt); font-size: var(--uui-type-small-size, 12px); }
+    uui-button uui-icon { margin-right: var(--uui-size-space-1); }
+    .trend-heading { margin: 0 0 var(--uui-size-space-1); font-weight: 600; }
+    .trend-note { margin: 0 0 var(--uui-size-space-3); color: var(--uui-color-text-alt); font-size: var(--uui-type-small-size, 12px); }
+    .muted { color: var(--uui-color-text-alt); }
     uui-box { margin-bottom: var(--uui-size-space-4); }
     .term { font-family: var(--uui-font-monospace, monospace); word-break: break-word; }
     .number { text-align: right; font-variant-numeric: tabular-nums; }
     .row-actions { display: flex; gap: var(--uui-size-space-1); justify-content: flex-end; }
+    .terms { width: 100%; border-collapse: collapse; }
+    .terms th,
+    .terms td {
+      padding: var(--uui-size-space-3) var(--uui-size-space-4);
+      border-bottom: 1px solid var(--uui-color-border);
+      text-align: left;
+      vertical-align: middle;
+    }
+    .terms th { font-weight: 700; white-space: nowrap; }
+    .terms tbody tr:hover td { background: var(--uui-color-surface-emphasis); }
+    .terms th.number,
+    .terms td.number { text-align: right; }
+    .terms tbody tr.trend-row:hover td,
     .trend-cell { background: var(--uui-color-surface-alt); }
     .empty {
       text-align: center;
@@ -149,7 +173,7 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
       const result = await SearchTrackerApi.getTerms({
         ...this.range,
         contains: this.termFilter.trim() || undefined,
-        zeroResultsOnly: this.zeroResultsOnly,
+        nothingFoundOnly: this.nothingFoundOnly,
         sort: this.sort,
         skip: this.skip,
         take: PAGE_SIZE,
@@ -212,20 +236,28 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
     return html`
       <div class="tiles">
         <uui-box>
-          <div class="tile-value">${s.totalSearches.toLocaleString()}</div>
-          <div class="tile-label">Searches</div>
+          <div class="tile">
+            <div class="tile-value">${s.totalSearches.toLocaleString()}</div>
+            <div class="tile-label">Searches</div>
+            <div class="tile-note">In the last ${this.periodDays} days</div>
+          </div>
         </uui-box>
         <uui-box>
-          <div class="tile-value">${s.uniqueTerms.toLocaleString()}</div>
-          <div class="tile-label">Different terms</div>
+          <div class="tile">
+            <div class="tile-value">${s.uniqueTerms.toLocaleString()}</div>
+            <div class="tile-label">Different terms</div>
+            <div class="tile-note">${s.uniqueTerms ? `${(s.totalSearches / s.uniqueTerms).toLocaleString(undefined, { maximumFractionDigits: 1 })} searches per term on average` : "No terms yet"}</div>
+          </div>
         </uui-box>
         <uui-box>
-          <div class="tile-value">${s.zeroResultSearches.toLocaleString()}
-            <small>(${percent(s.zeroResultSearches, s.totalSearches)})</small></div>
-          <div class="tile-label">Searches with no results</div>
+          <div class="tile">
+            <div class="tile-value">${s.zeroResultSearches.toLocaleString()}</div>
+            <div class="tile-label">Searches that found nothing</div>
+            <div class="tile-note">${percent(s.zeroResultSearches, s.totalSearches)} of all searches</div>
+          </div>
         </uui-box>
       </div>
-      <uui-box headline="Searches per day">
+      <uui-box headline="Searches per day, ${formatDay(s.from)} – ${formatDay(s.to)}">
         <search-tracker-daily-chart .days=${s.days}></search-tracker-daily-chart>
       </uui-box>
     `;
@@ -233,36 +265,39 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
 
   private renderTable() {
     return html`
-      <uui-table aria-label="Search terms">
-        <uui-table-head>
-          <uui-table-head-cell>Term</uui-table-head-cell>
-          <uui-table-head-cell class="number">Searches</uui-table-head-cell>
-          <uui-table-head-cell class="number">No results</uui-table-head-cell>
-          <uui-table-head-cell>Last searched</uui-table-head-cell>
-          <uui-table-head-cell><span class="sr-only">Actions</span></uui-table-head-cell>
-        </uui-table-head>
+      <table class="terms" aria-label="Search terms">
+        <thead><tr>
+          <th scope="col">Term</th>
+          <th scope="col" class="number">Searches</th>
+          <th scope="col" class="number" title="Number of results the most recent search for this term returned">Results (latest)</th>
+          <th scope="col">Last searched</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
+        </tr></thead><tbody>
         ${this.terms.length === 0 && !this.loading
           ? html`
-              <uui-table-row>
-                <uui-table-cell colspan="5"><div class="empty">No searches logged for this period.</div></uui-table-cell>
-              </uui-table-row>
+              <tr>
+                <td colspan="5"><div class="empty">No searches logged for this period.</div></td>
+              </tr>
             `
           : this.terms.map(
               (item) => html`
-                <uui-table-row>
-                  <uui-table-cell class="term">${item.term}</uui-table-cell>
-                  <uui-table-cell class="number">${item.searches.toLocaleString()}</uui-table-cell>
-                  <uui-table-cell class="number">${item.zeroResultSearches.toLocaleString()}</uui-table-cell>
-                  <uui-table-cell>${formatDay(item.lastSearched)}</uui-table-cell>
-                  <uui-table-cell>
+                <tr>
+                  <td class="term">${item.term}</td>
+                  <td class="number">${item.searches.toLocaleString()}</td>
+                  <td class="number">${this.renderResultCount(item.latestResultCount)}</td>
+                  <td>${formatDay(item.lastSearched)}</td>
+                  <td>
                     <div class="row-actions">
                       <uui-button
                         compact
                         look="secondary"
-                        label=${this.expandedTerm === item.term ? "Hide trend" : "Trend"}
+                        label=${this.expandedTerm === item.term ? "Hide trend" : "Show trend"}
                         aria-expanded=${this.expandedTerm === item.term ? "true" : "false"}
                         @click=${() => this.toggleTrend(item)}
-                      ></uui-button>
+                      >
+                        <uui-icon name=${this.expandedTerm === item.term ? "icon-navigation-up" : "icon-chart-curve"}></uui-icon>
+                        ${this.expandedTerm === item.term ? "Hide trend" : "Show trend"}
+                      </uui-button>
                       <uui-button
                         compact
                         look="secondary"
@@ -271,23 +306,36 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
                         @click=${() => this.deleteTerm(item)}
                       ></uui-button>
                     </div>
-                  </uui-table-cell>
-                </uui-table-row>
+                  </td>
+                </tr>
                 ${this.expandedTerm === item.term
                   ? html`
-                      <uui-table-row>
-                        <uui-table-cell class="trend-cell" colspan="5">
+                      <tr class="trend-row">
+                        <td class="trend-cell" colspan="5">
+                          <p class="trend-heading">Searches per day for “${item.term}”</p>
+                          <p class="trend-note">
+                            ${this.trend.length ? html`${formatDay(this.trend[0].day)} – ${formatDay(this.trend[this.trend.length - 1].day)}. ` : nothing}
+                            ${item.latestResultCount === null
+                              ? "The number of results wasn't recorded for this term's latest search."
+                              : html`Its latest search returned ${item.latestResultCount === 1 ? "1 result" : `${item.latestResultCount.toLocaleString()} results`}.`}
+                          </p>
                           ${this.trend.length
-                            ? html`<search-tracker-daily-chart .days=${this.trend} height="48"></search-tracker-daily-chart>`
+                            ? html`<search-tracker-daily-chart .days=${this.trend} height="90"></search-tracker-daily-chart>`
                             : html`<uui-loader></uui-loader>`}
-                        </uui-table-cell>
-                      </uui-table-row>
+                        </td>
+                      </tr>
                     `
                   : nothing}
               `,
             )}
-      </uui-table>
+      </tbody></table>
     `;
+  }
+
+  private renderResultCount(count: number | null) {
+    if (count === null) return html`<span class="muted" title="Not recorded for this search">–</span>`;
+    if (count === 0) return html`<uui-tag color="danger" look="secondary">None</uui-tag>`;
+    return count.toLocaleString();
   }
 
   private renderPagination() {
@@ -324,6 +372,10 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
       selected: this.periodDays === d,
     }));
     const sortOptions = SORTS.map((s) => ({ name: s.name, value: String(s.value), selected: this.sort === s.value }));
+    const showOptions = [
+      { name: "All terms", value: "all", selected: !this.nothingFoundOnly },
+      { name: "Only terms that found nothing", value: "nothing", selected: this.nothingFoundOnly },
+    ];
 
     return html`
       <div class="toolbar">
@@ -366,19 +418,25 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
             @change=${(e: Event) => { this.sort = parseInt((e.target as HTMLSelectElement).value, 10); this.skip = 0; this.loadTerms(); }}
           ></uui-select>
         </div>
-        <uui-toggle
-          class="toggle-field"
-          label="Only terms with no results"
-          .checked=${this.zeroResultsOnly}
-          @change=${(e: Event) => { this.zeroResultsOnly = (e.target as HTMLInputElement).checked; this.skip = 0; this.loadTerms(); }}
-        ></uui-toggle>
+        <div class="field">
+          <uui-label for="show">Show</uui-label>
+          <uui-select
+            id="show"
+            label="Show"
+            .options=${showOptions}
+            @change=${(e: Event) => { this.nothingFoundOnly = (e.target as HTMLSelectElement).value === "nothing"; this.skip = 0; this.loadTerms(); }}
+          ></uui-select>
+        </div>
         <div class="spacer"></div>
         <uui-button
           look="secondary"
           label=${this.loading ? "Refreshing…" : "Refresh"}
           ?disabled=${this.loading}
           @click=${() => { this.loadSites(); this.loadAll(); }}
-        ></uui-button>
+        >
+          <uui-icon name="icon-refresh"></uui-icon>
+          ${this.loading ? "Refreshing…" : "Refresh"}
+        </uui-button>
       </div>
 
       ${this.error ? html`<div class="error-banner" role="alert">${this.error}</div>` : nothing}
