@@ -84,7 +84,6 @@ public class ProfileActivityEntryTests : IDisposable
             _activityEntryService,
             new ProfileMatchStore(_database),
             Mock.Of<IMvpDataService>(m => m.GetAll() == Array.Empty<MvpYear>()),
-            TestImageProxy.Create(),
             Caches(),
             Mock.Of<IOptionsMonitor<ProfileActivityOptions>>(o => o.CurrentValue == new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);

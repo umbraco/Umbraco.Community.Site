@@ -324,10 +324,6 @@ body.mobile.hero-full-width:not(.scroll) .nav-header .header {
     padding: 16px 32px;
 }
 
-body.mobile.hero-full-width.scroll .nav-header .header {
-    padding: 19px 1.5rem;
-}
-
 body.mobile.hero-half-width:not(.scroll) .nav-header .header {
     padding: 1rem 10px;
 }

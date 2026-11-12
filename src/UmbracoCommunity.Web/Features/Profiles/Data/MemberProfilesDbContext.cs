@@ -15,6 +15,7 @@ public class MemberProfilesDbContext : DbContext
     public DbSet<ProfileMatchEntity> ProfileMatches { get; set; } = null!;
     public DbSet<MemberPinnedItemEntity> MemberPinnedItems { get; set; } = null!;
     public DbSet<MemberActivityEntryEntity> MemberActivityEntries { get; set; } = null!;
+    public DbSet<ProfileTimelinePreviewEntity> ProfileTimelinePreviews { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -81,6 +82,19 @@ public class MemberProfilesDbContext : DbContext
 
             entity.HasIndex(e => e.MemberProfileId);
             entity.HasIndex(e => e.State);
+        });
+
+        modelBuilder.Entity<ProfileTimelinePreviewEntity>(entity =>
+        {
+            entity.ToTable("ProfileTimelinePreviews");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.PageUrlHash).IsRequired().HasMaxLength(ProfileTimelinePreviewEntity.UrlHashLength);
+            entity.Property(e => e.PageUrl).IsRequired().HasMaxLength(ProfileTimelinePreviewEntity.MaxUrlLength);
+            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(ProfileTimelinePreviewEntity.MaxUrlLength);
+            entity.Property(e => e.Description).HasMaxLength(ProfileTimelinePreviewEntity.MaxDescriptionLength);
+
+            entity.HasIndex(e => e.PageUrlHash).IsUnique();
         });
 
         modelBuilder.Entity<MemberFeedEntity>(entity =>

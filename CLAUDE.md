@@ -22,7 +22,7 @@ Planned-but-unwritten primers or tutorials live as stub files directly under the
 
 ## Solution Structure
 
-The solution consists of 9 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 10 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
@@ -33,6 +33,7 @@ The solution consists of 9 projects (uses Central Package Management via `Direct
 - **UmbracoCommunity.BlogAnnouncements** - Discord blog-post announcement pipeline (detection, delivery, tracking store) and its dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 - **UmbracoCommunity.MeetBooking** - Umbraco Forms workflow type that provisions a Google Meet for approved community meeting requests via the community Apps Script in `tools/meet-booking-apps-script/` (Razor Class Library, no client; see its README and `docs/plans/2026-09-03-community-meet-booking-design.md`)
 - **UmbracoCommunity.ActiveCampaign** - Umbraco Forms workflow type (*Subscribe to ActiveCampaign*) that adds form submitters to an ActiveCampaign list via the v3 REST API; subscribes immediately (no double opt-in), so forms need a consent checkbox (Razor Class Library, no client; see its README)
+- **UmbracoCommunity.SearchTracker** - Logs site-search terms per tenant as daily counts and shows them in a *Search Terms* Content dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder; see its README)
 
 ### Key Directories in UmbracoCommunity.Web
 
@@ -159,7 +160,7 @@ See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 ### Frontend Assets
 
 Located in `src/UmbracoCommunity.StaticAssets/src/`:
-- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`, `image-slider/` for drag-to-scroll image slider)
+- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`, `image-slider/` for drag-to-scroll image slider, `video-hero/` for the background-video hero)
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
@@ -396,6 +397,39 @@ All YouTube input goes through the **YouTube video picker** data type (schema `U
 
 **Rendering**: `Views/Partials/Blocks/YouTubeVideoBlock.cshtml` renders `<dc-video-picker-youtube>` (the legacy block uses it too), which loads nothing from YouTube until the poster is played. Browsers (Chrome included) often ignore `autoplay=1` in an embed, leaving a second click on YouTube's own play button, so on click the component calls `playYouTube()` (`youtube-player.ts`, also used by the Video showcase), which loads YouTube's IFrame Player API once per page (`youtube-api.ts`), creates the player on youtube-nocookie and calls `playVideo()` on ready. Only if YouTube reports `onAutoplayBlocked` (sound refused) does it mute and play, and then it shows a "Turn sound on" button over the player (`.dc-youtube-unmute`, `css/elements/youtube-unmute.css`), which unmutes through the API and removes itself; it also goes if the visitor unmutes with YouTube's own control. If the API can't load it falls back to a plain `autoplay=1` iframe. The poster is cropped to the block's Format (16:9 or 4:3).
 
+### Video Hero
+
+A full-width banner block (`heroBannerWithVideo`) that sits behind the site header and plays a muted, looping background video. It's allowed in the ROOT banner block grid and in the `home` / `eventsHome` Block Restrictions rules.
+
+**Content Properties** (`HeroBannerWithVideo`):
+- `Tagline`, `Headline` (max 40 chars, rendered as the page `h1`), `BodyText`, `CallToActionLinks` (max 2, White + Transparent button themes)
+- `Video` (Video media type, required) and `MobileVideo` (optional; phones without one get the poster only)
+- `PosterImage` (required; crops `desktop` 1920×1080, `desktopSmall` 1280×720, `mobile` 828×1472, preloaded per breakpoint)
+
+**Settings** (`SettingsHeroBannerWithVideo`, Contentment Data List dropdowns):
+- `TextAlignment`: `Centre` (default) / `Left`
+- `HeroHeight`: `100%` / `90%` (default) / `70%` of the screen
+- The view compares these exact strings, so renaming an item value in the backoffice needs a matching change in `HeroBannerWithVideo.cshtml`
+
+**Header hero mode**: `ContentContextService.HasFullWidthHero` adds `hero-full-width` to `<body>` when the page's first banner block is a Video hero. In hero mode `.nav-header` is `position: fixed` (so the hero starts at the top of the page) and the logo, nav and focus ring are white until `body.scroll`. Hero-mode rules live in `header.css` / `header-mobile.css`. Once scrolled the header must look exactly like other pages, so don't add hero-specific scrolled padding or widths.
+
+**Frontend component** (`components/video-hero/dc-video-hero.element.ts`):
+- `<dc-video-hero>` reads `data-video` / `data-mobile-video` and picks a source with `(max-width: 767px)`. The `<video>` is `preload="none"` with no `src` until JS sets one, so it never competes with the poster
+- Fades the video in on `playing`, and pauses it when off-screen or when the tab is hidden
+- `prefers-reduced-motion` or Save-Data: no autoplay; the toggle starts as "Play"
+- The pause/play button is required for WCAG 2.2.2. It's hidden when there's no source or the video errors (the poster stays)
+
+**CSS** (`css/blocks/video-hero-block.css`):
+- The overlay is never lighter than 55% black, which keeps white text at ≥ 4.5:1 even over a white frame. Don't lighten it to make videos "pop"
+- The headline font size is capped at `11vw` so long words fit at 320px
+- The content keeps bottom padding clear of the toggle
+
+**Video size limit**: `Constants.Media.MaxHeroVideoBytes` (10 MB) is shared by the preview and `Notifications/HeroVideoSizeValidationHandler`.
+- The handler cancels both `ContentSavingNotification` and `ContentPublishingNotification`. Umbraco 18's **Save and publish** goes through `UpdateAndPublishDocumentController`, which a saving-only check doesn't stop
+- Persisted block values store a media picker value as a serialised JSON *string*, while editor payloads send an array; the handler parses both
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/HeroBannerWithVideo.cshtml`, styles in `wwwroot/css/styles.css`): shows the poster under the same overlay, the text and CTAs, plus pills with each video's name and size. A video over the limit gets a pink `is-warning` pill. New preview views need a rebuild before BlockPreview picks them up.
+
 ### Blog Showcase Block
 
 A block that surfaces recent articles from the tenant's Blog page, with optional category/tag filters and a switch between grid and slider layouts.
@@ -512,6 +546,14 @@ The GitHub OAuth App's callback URL must be set to `https://<host>/signin-github
 ### Site Search
 
 The nav search icon is wired to a `SearchPage` doc type backed by Umbraco's Examine `ExternalIndex`. A typed `SearchService` (`Services/SearchService.cs`) queries the index with multi-tenant scoping — results are filtered to descendants of the current request's content root, so search on Site A doesn't leak Site B hits. HTML is stripped from excerpts before display. The render controller (`Controllers/Render/SearchPageController.cs`) hands the results off to a `SearchPageViewModel` for the `SearchPage.cshtml` view to render.
+
+- **Matching:** `SearchQueryBuilder` turns the query into words (letters/digits only, filler words dropped, accents folded) and builds a Lucene `NativeQuery` matching each word exactly, by its root (`speaking` → `speak*`) and, on title-like fields, with small typos. Titles are weighted 3×. The raw query text never reaches Lucene; queries with no usable words fall back to `ManagedQuery`.
+- **Searchable pages:** `IPublishedContent.IsSearchable()` (`Extensions/PublishedContentExtensions.cs`) is the one definition, shared by search and suggestions.
+- **Suggestions:** with 0 keyword results the page shows up to 4 AI-matched pages; with 1–3, a "Related results" section of up to 3 more. Both come from `ContentSuggestionService` (Umbraco.AI.Search, also behind the 404 page's suggestions via `PageNotFoundSuggestionService`), rendered with `Views/Partials/Components/PageSuggestions.cshtml` and `dc-page-suggestions` styles. Paid lookups are cached per tenant/query and limited by `SuggestionBudget` (no bots, 20/hour per visitor, 60/minute site-wide). Suggestions need a default *Embedding* profile and a built AI index; the Google and Anthropic Umbraco.AI providers are chat-only, so use OpenAI, Microsoft Foundry or Amazon.
+
+See [`docs/tutorials/foundations/site-search-with-examine-externalindex.md`](docs/tutorials/foundations/site-search-with-examine-externalindex.md) for the full walkthrough.
+
+**Search term logging** (`UmbracoCommunity.SearchTracker`): on page 1 of a search, `SearchPageController` calls `ISearchTermRecorder.Record(root.Key, query, total, HttpContext)`. The recorder drops bots, repeat searches and floods, normalises the term (lower-cased, emails and long numbers masked) and queues it; a background writer adds it to one row per site/day/term (`SearchTrackerTermDaily`). No IP, user agent or member id is stored, and a retention sweep deletes rows older than `SearchTracker:RetentionDays` (default 365). The *Search Terms* dashboard in the Content section scopes sites by the user's start nodes. See [`src/UmbracoCommunity.SearchTracker/README.md`](src/UmbracoCommunity.SearchTracker/README.md).
 
 ### Vite Integration
 

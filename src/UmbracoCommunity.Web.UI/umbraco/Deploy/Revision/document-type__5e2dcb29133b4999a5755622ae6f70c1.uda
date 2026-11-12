@@ -1,0 +1,59 @@
+{
+  "Name": "[Settings] Video hero",
+  "Alias": "settingsHeroBannerWithVideo",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "44256b2f-5380-42fc-883f-f3e799035af6",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "1a2c0d74-108d-469c-be73-60be1bbdaf59",
+          "Alias": "textAlignment",
+          "DataType": "umb://data-type/682abc5946ef475d8a2d3ff741d54139",
+          "ValueType": "System.String",
+          "Description": "Defaults to Centre",
+          "Name": "Text alignment",
+          "SortOrder": 1
+        },
+        {
+          "Key": "eb1fe8e1-c3a2-4104-a8d7-c720ae3fc7c5",
+          "Alias": "heroHeight",
+          "DataType": "umb://data-type/97e0427167da44839625dbc2557361da",
+          "ValueType": "System.String",
+          "Description": "Defaults to Nearly full screen",
+          "Name": "Height",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5e2dcb29133b4999a5755622ae6f70c1",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/682abc5946ef475d8a2d3ff741d54139",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/97e0427167da44839625dbc2557361da",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

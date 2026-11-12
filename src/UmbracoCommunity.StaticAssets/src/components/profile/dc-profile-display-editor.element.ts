@@ -1,6 +1,7 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import {
+  MAX_NO_CARD_ITEMS,
   MAX_PIN_REASON_LENGTH,
   MAX_PINNED_ITEMS,
   ProfileDisplayService,
@@ -12,13 +13,31 @@ import {
 
 const elementName = "dc-profile-display-editor";
 
+const emptyChoices = (): ProfileDisplayChoices => ({
+  hiddenSections: [],
+  hiddenItemIds: [],
+  pins: [],
+  hideActivityGraph: false,
+  hideTimelineCards: false,
+  noCardItemIds: [],
+});
+
+/** The choices with every optional field filled in with its default. */
+const withDefaults = (choices: ProfileDisplayChoices): ProfileDisplayChoices => ({
+  ...choices,
+  hideActivityGraph: choices.hideActivityGraph ?? false,
+  hideTimelineCards: choices.hideTimelineCards ?? false,
+  noCardItemIds: choices.noCardItemIds ?? [],
+});
+
 let instanceCount = 0;
 
 /**
  * Lets the member choose what the activity sections of their profile show: switch whole sections
  * off, hide single items, and pin up to three items to the Featured block with a short note on why,
- * in an order they choose. Every change shows straight away and is saved in the background, in the
- * order it was made; if saving fails, the editor goes back to what was last saved.
+ * in an order they choose. Also switches the activity graph off or on again, and the timeline's preview
+ * cards, for the whole timeline or one item at a time. Every change shows straight away and is saved
+ * in the background, in the order it was made; if saving fails, the editor goes back to what was last saved.
  */
 @customElement(elementName)
 export class ProfileDisplayEditorElement extends LitElement {
@@ -26,7 +45,7 @@ export class ProfileDisplayEditorElement extends LitElement {
   private _sections: ProfileDisplaySection[] = [];
 
   @state()
-  private _choices: ProfileDisplayChoices = { hiddenSections: [], hiddenItemIds: [], pins: [] };
+  private _choices: ProfileDisplayChoices = emptyChoices();
 
   @state()
   private _loading = true;
@@ -45,7 +64,7 @@ export class ProfileDisplayEditorElement extends LitElement {
   private _reasonDrafts: Record<string, string> = {};
 
   /** The choices as the server last stored them. */
-  #stored: ProfileDisplayChoices = { hiddenSections: [], hiddenItemIds: [], pins: [] };
+  #stored: ProfileDisplayChoices = emptyChoices();
   #saveQueue: Promise<void> = Promise.resolve();
   #pendingSaves = 0;
 
@@ -66,8 +85,8 @@ export class ProfileDisplayEditorElement extends LitElement {
     try {
       const display = await ProfileDisplayService.load();
       this._sections = display.sections;
-      this._choices = display.choices;
-      this.#stored = display.choices;
+      this._choices = withDefaults(display.choices);
+      this.#stored = this._choices;
     } catch (error) {
       this._errorMessage = error instanceof Error && error.message ? error.message : "Couldn't load your activity.";
     } finally {
@@ -100,7 +119,7 @@ export class ProfileDisplayEditorElement extends LitElement {
 
   async #persist(successMessage: string) {
     try {
-      const stored = await ProfileDisplayService.save(this._choices);
+      const stored = withDefaults(await ProfileDisplayService.save(this._choices));
       this.#stored = stored;
       // Later changes are still waiting to be saved; keep showing them.
       if (this.#pendingSaves === 1) {
@@ -144,6 +163,34 @@ export class ProfileDisplayEditorElement extends LitElement {
         pins: hidden ? c.pins.filter((p) => p.id !== item.id) : c.pins,
       }),
       hidden ? `“${item.title}” is hidden from your profile.` : `“${item.title}” is shown on your profile.`
+    );
+  }
+
+  #setGraphShown(shown: boolean) {
+    void this.#update(
+      (c) => ({ ...c, hideActivityGraph: !shown }),
+      shown ? "Showing the activity graph on your profile." : "No longer showing the activity graph on your profile."
+    );
+  }
+
+  #setCardsShown(shown: boolean) {
+    void this.#update(
+      (c) => ({ ...c, hideTimelineCards: !shown }),
+      shown ? "Showing preview cards in your timeline." : "Your timeline shows plain lines only."
+    );
+  }
+
+  #hasNoCard(id: string): boolean {
+    return (this._choices.noCardItemIds ?? []).includes(id);
+  }
+
+  #setItemCard(item: ProfileDisplayItem, card: boolean) {
+    void this.#update(
+      (c) => {
+        const others = (c.noCardItemIds ?? []).filter((id) => id !== item.id);
+        return { ...c, noCardItemIds: card ? others : [...others, item.id] };
+      },
+      card ? `“${item.title}” can show as a card in your timeline.` : `“${item.title}” shows as a plain line in your timeline.`
     );
   }
 
@@ -267,6 +314,51 @@ export class ProfileDisplayEditorElement extends LitElement {
     `;
   }
 
+  #renderSwitch(id: string, label: string, checked: boolean, onChange: (checked: boolean) => void): TemplateResult {
+    return html`
+      <label class="dc-profile-display-editor__switch" for=${id}>
+        <input
+          id=${id}
+          class="dc-profile-display-editor__switch-input"
+          type="checkbox"
+          role="switch"
+          data-switch=${id.slice(this.#idPrefix.length + 1)}
+          .checked=${checked}
+          @change=${(event: Event) => onChange((event.target as HTMLInputElement).checked)}
+        />
+        <span class="dc-profile-display-editor__switch-track" aria-hidden="true"></span>
+        <span>${label}</span>
+      </label>
+    `;
+  }
+
+  #renderTimelineChoices(): TemplateResult {
+    return html`
+      <h3 class="dc-profile-display-editor__heading">Timeline</h3>
+      <p class="dc-profile-display-editor__hint">
+        Your activity shows in a timeline, newest first. An item whose page has a picture shows as a card.
+      </p>
+      <ul class="dc-profile-display-editor__sections">
+        <li class="dc-profile-display-editor__section">
+          ${this.#renderSwitch(
+            `${this.#idPrefix}-cards`,
+            "Show preview cards",
+            !this._choices.hideTimelineCards,
+            (checked) => this.#setCardsShown(checked)
+          )}
+        </li>
+        <li class="dc-profile-display-editor__section">
+          ${this.#renderSwitch(
+            `${this.#idPrefix}-graph`,
+            "Show an activity graph of the last 12 months",
+            !this._choices.hideActivityGraph,
+            (checked) => this.#setGraphShown(checked)
+          )}
+        </li>
+      </ul>
+    `;
+  }
+
   #renderSection(section: ProfileDisplaySection, index: number): TemplateResult {
     const shown = !this._choices.hiddenSections.includes(section.key);
     const switchId = `${this.#idPrefix}-section-${index}`;
@@ -299,13 +391,16 @@ export class ProfileDisplayEditorElement extends LitElement {
     const hidden = this._choices.hiddenItemIds.includes(item.id);
     const pinned = this.#isPinned(item.id);
     const canPin = !hidden && !pinned && this._choices.pins.length < MAX_PINNED_ITEMS;
+    const noCard = this.#hasNoCard(item.id);
+    // Per-item cards only matter while cards are on for the timeline and the item is shown.
+    const offerCard = !hidden && !this._choices.hideTimelineCards;
+    const canSwitchCardOff = noCard || (this._choices.noCardItemIds ?? []).length < MAX_NO_CARD_ITEMS;
     const date = this.#formatDate(item.date);
+    const notes = [date, hidden ? "Hidden" : "", pinned ? "Pinned" : "", offerCard && noCard ? "No card" : ""].filter(Boolean);
     return html`
       <li class="dc-profile-display-editor__item ${hidden ? "dc-profile-display-editor__item--hidden" : ""}" data-item-id=${item.id}>
         <span class="dc-profile-display-editor__item-title">${item.title}</span>
-        <span class="dc-profile-display-editor__item-meta">
-          ${date}${hidden ? html`${date ? " · " : ""}Hidden` : nothing}${pinned ? html`${date || hidden ? " · " : ""}Pinned` : nothing}
-        </span>
+        <span class="dc-profile-display-editor__item-meta">${notes.join(" · ")}</span>
         <div class="dc-profile-display-editor__actions">
           <button
             class="link-action"
@@ -328,6 +423,19 @@ export class ProfileDisplayEditorElement extends LitElement {
               >
                 Pin
               </button>`}
+          ${offerCard
+            ? html`<button
+                class="link-action"
+                type="button"
+                data-action="card"
+                aria-pressed=${noCard ? "true" : "false"}
+                ?disabled=${!canSwitchCardOff}
+                aria-label="Show “${item.title}” as a plain line"
+                @click=${() => this.#setItemCard(item, noCard)}
+              >
+                Plain line
+              </button>`
+            : nothing}
         </div>
       </li>
     `;
@@ -343,6 +451,7 @@ export class ProfileDisplayEditorElement extends LitElement {
         ${this._sections.length > 0
           ? html`
               ${this.#renderPins()}
+              ${this.#renderTimelineChoices()}
               <h3 class="dc-profile-display-editor__heading">Sections</h3>
               <ul class="dc-profile-display-editor__sections">
                 ${this._sections.map((section, index) => this.#renderSection(section, index))}

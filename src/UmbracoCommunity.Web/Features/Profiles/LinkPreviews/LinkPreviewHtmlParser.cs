@@ -3,9 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 
-/// <summary>Reads the title, share image and icon from the head of an HTML page.</summary>
+/// <summary>Reads the title, description, share image and icon from the head of an HTML page.</summary>
 public static partial class LinkPreviewHtmlParser
 {
+    private const int MaxDescriptionLength = 300;
+
     public static LinkPreview Parse(string html, Uri pageUri)
     {
         var headEnd = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
@@ -14,6 +16,8 @@ public static partial class LinkPreviewHtmlParser
         string? title = null;
         string? image = null;
         string? icon = null;
+        string? description = null;
+        string? metaDescription = null;
 
         foreach (Match tag in TagPattern().Matches(head))
         {
@@ -30,6 +34,14 @@ public static partial class LinkPreviewHtmlParser
                 {
                     title ??= Clean(content, 200);
                 }
+                else if (key is "og:description" or "twitter:description")
+                {
+                    description ??= Clean(content, MaxDescriptionLength);
+                }
+                else if (key is "description")
+                {
+                    metaDescription ??= Clean(content, MaxDescriptionLength);
+                }
             }
             else if (attributes.GetValueOrDefault("rel") is { } rel
                 && rel.Split(' ', StringSplitOptions.RemoveEmptyEntries).Any(r => r.Equals("icon", StringComparison.OrdinalIgnoreCase)))
@@ -41,7 +53,7 @@ public static partial class LinkPreviewHtmlParser
         title ??= TitlePattern().Match(head) is { Success: true } m ? Clean(m.Groups[1].Value, 200) : null;
         icon ??= new Uri(pageUri, "/favicon.ico").ToString();
 
-        return new LinkPreview(LinkPreviewStatus.Available, title, image, icon);
+        return new LinkPreview(LinkPreviewStatus.Available, title, image, icon, description ?? metaDescription);
     }
 
     private static Dictionary<string, string> ReadAttributes(string tag)

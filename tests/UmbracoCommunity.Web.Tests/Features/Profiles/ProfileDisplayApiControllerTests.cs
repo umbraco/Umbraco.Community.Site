@@ -2,6 +2,8 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -14,6 +16,7 @@ using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Controllers;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using Xunit;
 
@@ -107,7 +110,6 @@ public class ProfileDisplayApiControllerTests : IDisposable
                 NullLogger<ProfileActivityEntryService>.Instance),
             new ProfileMatchStore(_database),
             Mock.Of<IMvpDataService>(m => m.GetAll() == Array.Empty<MvpYear>()),
-            TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             Mock.Of<IOptionsMonitor<ProfileActivityOptions>>(o => o.CurrentValue == new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);
@@ -414,5 +416,84 @@ public class ProfileDisplayApiControllerTests : IDisposable
         var result = await CreateController().Get(default);
 
         result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [Fact]
+    public async Task The_graph_and_card_choices_are_stored_and_read_back()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+
+        var saved = Saved(await controller.Update(
+            new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true, HideTimelineCards: true, NoCardItemIds: ["b1"]),
+            default));
+
+        saved.HideActivityGraph.Should().BeTrue();
+        saved.HideTimelineCards.Should().BeTrue();
+        saved.NoCardItemIds.Should().Equal("b1");
+
+        var response = (await controller.Get(default)).Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<ProfileDisplayResponse>().Subject;
+        response.Choices.HideActivityGraph.Should().BeTrue();
+        response.Choices.HideTimelineCards.Should().BeTrue();
+        response.Choices.NoCardItemIds.Should().Equal("b1");
+
+        var profile = await PublicProfileAsync();
+        profile.DisplayChoices.HideActivityGraph.Should().BeTrue();
+        profile.DisplayChoices.HideTimelineCards.Should().BeTrue();
+        profile.DisplayChoices.NoCardActivityIds.Should().Equal("b1");
+    }
+
+    [Fact]
+    public async Task Saving_without_the_new_choices_switches_the_graph_and_cards_back_on()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        await controller.Update(new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true, HideTimelineCards: true, NoCardItemIds: ["b1"]), default);
+
+        var saved = Saved(await controller.Update(Choices(), default));
+
+        saved.HideActivityGraph.Should().BeFalse();
+        saved.HideTimelineCards.Should().BeFalse();
+        saved.NoCardItemIds.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Members_outside_early_access_cannot_change_the_graph_or_cards()
+    {
+        await CreateProfileAsync();
+
+        var result = await CreateController(inEarlyAccess: false)
+            .Update(new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true), default);
+
+        result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        (await _store.GetByMemberKeyAsync(_memberKey))!.HideActivityGraph.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task The_migration_leaves_existing_profiles_with_the_graph_and_cards_on()
+    {
+        await using (var context = _database.CreateDbContext())
+        {
+            var migrator = context.GetService<IMigrator>();
+            await migrator.MigrateAsync("20261109131255_AddMemberActivityEntries");
+
+            await context.Database.ExecuteSqlRawAsync(
+                "INSERT INTO MemberProfiles (MemberKey, GitHubHandle, DisplayName, OnboardingStatus, IsProfileVisible, HiddenSections, HiddenActivityIds, CreatedUtc, UpdatedUtc) " +
+                "VALUES ({0}, {1}, {2}, {3}, 1, '[]', '[\"b1\"]', {4}, {5})",
+                _memberKey, Handle, "The Octocat", (int)OnboardingStatus.Completed, DateTime.UtcNow, DateTime.UtcNow);
+
+            await context.Database.MigrateAsync();
+        }
+
+        var entity = await _store.GetByMemberKeyAsync(_memberKey);
+        entity!.HideActivityGraph.Should().BeFalse();
+        entity.HideTimelineCards.Should().BeFalse();
+        entity.NoCardActivityIds.Should().BeEmpty();
+        entity.HiddenActivityIds.Should().Equal("b1");
+
+        var choices = ProfileDisplay.StoredChoices(entity);
+        choices.HideActivityGraph.Should().BeFalse();
+        choices.HideTimelineCards.Should().BeFalse();
     }
 }

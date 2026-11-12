@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Configuration;
 using UmbracoCommunity.Web.Models.Pages;
@@ -99,8 +100,12 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<ContentContextService>();
             builder.Services.AddScoped<ISeoDataService, SeoDataService>();
             builder.Services.AddScoped<IBlogService, BlogService>();
+            builder.Services.TryAddSingleton(TimeProvider.System);
+            builder.Services.AddSingleton<ISuggestionBudget, SuggestionBudget>();
+            builder.Services.AddScoped<IContentSuggestionService, ContentSuggestionService>();
             builder.Services.AddScoped<IPageNotFoundSuggestionService, PageNotFoundSuggestionService>();
             builder.Services.AddScoped<ISearchService, SearchService>();
+            builder.Services.AddScoped<UmbracoCommunity.SearchTracker.Reporting.ISearchPageUrlProvider, SearchPageUrlProvider>();
             builder.Services.AddScoped<IImageUrlBuilder, ImageUrlBuilder>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();

@@ -1,24 +1,6 @@
 @import "../base/media-queries.css";
 
-/* The 404 hero just holds a short headline + intro — shrink the default 90px
-   vertical hero padding so the suggestions list sits close beneath it. */
-.document-pageNotFound .hero {
-  --hero-padding: var(--unit-md) 0;
-
-  @media (--sm) {
-    --hero-padding: var(--unit-md) 0;
-  }
-
-  @media (--md) {
-    --hero-padding: var(--unit-md) 0;
-  }
-}
-
-.document-pageNotFound .hero-content {
-  padding: var(--unit-sm) var(--unit);
-}
-
-.dc-page-not-found-suggestions {
+.dc-page-suggestions {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 0 var(--unit-lg);
@@ -29,12 +11,12 @@
   }
 }
 
-.dc-page-not-found-suggestions__heading {
+.dc-page-suggestions__heading {
   margin: 0 auto var(--unit);
   max-width: var(--narrow-width);
 }
 
-.dc-page-not-found-suggestions__list {
+.dc-page-suggestions__list {
   list-style: none;
   padding: 0;
   margin: 0 auto;
@@ -52,7 +34,7 @@
    so the card keeps its white background instead of growing a pink underline + fill.
    The global rule's specificity is higher than ours, so we use !important for the
    gradient-related properties. */
-.dc-page-not-found-suggestions__link {
+.dc-page-suggestions__link {
   display: flex;
   flex-direction: column;
   gap: var(--unit-xxs);
@@ -74,7 +56,7 @@
   }
 }
 
-.dc-page-not-found-suggestions__breadcrumb {
+.dc-page-suggestions__breadcrumb {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -83,17 +65,17 @@
   color: var(--color-light-blue);
 }
 
-.dc-page-not-found-suggestions__sep {
+.dc-page-suggestions__sep {
   color: var(--color-dark-grey);
 }
 
-.dc-page-not-found-suggestions__title {
+.dc-page-suggestions__title {
   font-weight: 600;
   font-size: 1.05rem;
   line-height: 1.3;
 }
 
-.dc-page-not-found-suggestions__description {
+.dc-page-suggestions__description {
   font-size: 0.9rem;
   line-height: 1.4;
   color: var(--color-light-blue);

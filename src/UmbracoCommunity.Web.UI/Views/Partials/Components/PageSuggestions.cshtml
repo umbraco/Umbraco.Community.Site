@@ -1,0 +1,54 @@
+@using Umbraco.Cms.Core.Models.PublishedContent
+@model PageSuggestionsViewModel
+
+@functions {
+    private static string? FirstNonEmpty(IPublishedContent content, params string[] aliases)
+    {
+        foreach (var alias in aliases)
+        {
+            var v = content.Value<string>(alias);
+            if (!string.IsNullOrWhiteSpace(v)) return v.Trim();
+        }
+        return null;
+    }
+}
+
+@if (Model.Items is { Count: > 0 })
+{
+    <section class="dc-page-suggestions">
+        <h2 class="dc-page-suggestions__heading">@Model.Heading</h2>
+        <ul class="dc-page-suggestions__list">
+            @foreach (var item in Model.Items)
+            {
+                var description = FirstNonEmpty(item, "metaDescription", "subtitle", "intro", "summary");
+                @* Crumbs from the tenant root (shown as "Home") to the item's parent; the item's name is the card title. *@
+                var crumbs = new List<string> { "Home" };
+                crumbs.AddRange(item.AncestorsOrSelf()
+                    .Reverse()
+                    .Skip(1)
+                    .SkipLast(1)
+                    .Select(a => a.Name));
+
+                <li>
+                    <a class="dc-page-suggestions__link" href="@item.Url(mode: UrlMode.Relative)">
+                        <span class="dc-page-suggestions__title">@item.Name</span>
+                        <span class="dc-page-suggestions__breadcrumb">
+                            @for (var i = 0; i < crumbs.Count; i++)
+                            {
+                                if (i > 0)
+                                {
+                                    <span class="dc-page-suggestions__sep" aria-hidden="true">→</span>
+                                }
+                                <span>@crumbs[i]</span>
+                            }
+                        </span>
+                        @if (!string.IsNullOrEmpty(description))
+                        {
+                            <span class="dc-page-suggestions__description">@description</span>
+                        }
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}

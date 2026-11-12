@@ -366,4 +366,61 @@ public class ProfileDisplayTests
         ProfileDisplay.HidesAnything(new ProfileDisplayChoices([PlatformActivityGroups.Blog], [], [])).Should().BeTrue();
         ProfileDisplay.HidesAnything(new ProfileDisplayChoices([], ["b1"], [])).Should().BeTrue();
     }
+
+    [Fact]
+    public void The_activity_graph_and_preview_cards_are_on_unless_the_member_switches_them_off()
+    {
+        ProfileDisplay.TryNormalize(Request(), out var choices, out _).Should().BeTrue();
+
+        choices!.HideActivityGraph.Should().BeFalse();
+        choices.HideTimelineCards.Should().BeFalse();
+        choices.NoCardActivityIds.Should().BeEmpty();
+        ProfileDisplayChoices.None.HideActivityGraph.Should().BeFalse();
+        ProfileDisplayChoices.None.HideTimelineCards.Should().BeFalse();
+    }
+
+    [Fact]
+    public void The_graph_and_card_choices_are_kept_with_repeated_no_card_ids_removed()
+    {
+        var ok = ProfileDisplay.TryNormalize(
+            new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true, HideTimelineCards: true, NoCardItemIds: [" b1 ", "b1", "v1"]),
+            out var choices,
+            out _);
+
+        ok.Should().BeTrue();
+        choices!.HideActivityGraph.Should().BeTrue();
+        choices.HideTimelineCards.Should().BeTrue();
+        choices.NoCardActivityIds.Should().Equal("b1", "v1");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void A_missing_no_card_id_is_rejected(string id)
+    {
+        ProfileDisplay.TryNormalize(new UpdateProfileDisplayRequest([], [], [], NoCardItemIds: [id]), out _, out var error).Should().BeFalse();
+        error.Should().Be("An item id is missing.");
+    }
+
+    [Fact]
+    public void Too_long_or_too_many_no_card_ids_are_rejected()
+    {
+        var tooLong = new string('x', ProfileDisplay.MaxActivityIdLength + 1);
+        var tooMany = Enumerable.Range(0, ProfileDisplay.MaxHiddenItems + 1).Select(i => $"id{i}").ToList();
+
+        ProfileDisplay.TryNormalize(new UpdateProfileDisplayRequest([], [], [], NoCardItemIds: [tooLong]), out _, out _).Should().BeFalse();
+        ProfileDisplay.TryNormalize(new UpdateProfileDisplayRequest([], [], [], NoCardItemIds: tooMany), out _, out var error).Should().BeFalse();
+        error.Should().Contain(ProfileDisplay.MaxHiddenItems.ToString());
+    }
+
+    [Fact]
+    public void Graph_and_card_choices_alone_do_not_change_the_activity_sections()
+    {
+        var choices = ProfileDisplayChoices.None with { HideActivityGraph = true, HideTimelineCards = true, NoCardActivityIds = ["b1"] };
+
+        var result = ProfileDisplay.Apply(With(choices));
+
+        result.BlogPosts.Should().HaveCount(2);
+        ProfileDisplay.HidesAnything(choices).Should().BeFalse();
+    }
 }

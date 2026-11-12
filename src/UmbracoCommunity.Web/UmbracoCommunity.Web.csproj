@@ -43,6 +43,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Community.NotFoundTracker\Umbraco.Community.NotFoundTracker.csproj" />
     <ProjectReference Include="..\UmbracoCommunity.BlogAnnouncements\UmbracoCommunity.BlogAnnouncements.csproj" />
+    <ProjectReference Include="..\UmbracoCommunity.SearchTracker\UmbracoCommunity.SearchTracker.csproj" />
   </ItemGroup>
 
 </Project>

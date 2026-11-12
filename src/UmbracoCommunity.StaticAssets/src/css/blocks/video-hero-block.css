@@ -1,0 +1,206 @@
+@import "../base/media-queries.css";
+
+body.hero-full-width main {
+  padding-top: 0;
+}
+
+.dc-video-hero {
+  --video-hero-height: 90svh;
+  --focus-outline: var(--focus-outline-width) solid var(--color-white);
+  --video-hero-overlay: linear-gradient(180deg, rgb(0 0 0 / 0.65) 0%, rgb(0 0 0 / 0.55) 25%, rgb(0 0 0 / 0.55) 75%, rgb(0 0 0 / 0.65) 100%);
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  min-height: max(var(--video-hero-height), 480px);
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  background-color: var(--color-identity-blue);
+  color: var(--color-white);
+}
+
+.dc-video-hero--h100 {
+  --video-hero-height: 100svh;
+}
+
+.dc-video-hero--h70 {
+  --video-hero-height: 70svh;
+}
+
+.dc-video-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--video-hero-overlay);
+}
+
+.dc-video-hero--left {
+  --video-hero-overlay: linear-gradient(90deg, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0.55) 60%);
+}
+
+.dc-video-hero__poster,
+.dc-video-hero__video {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+}
+
+.dc-video-hero__poster img,
+.dc-video-hero__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dc-video-hero__video {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.dc-video-hero.is-playing .dc-video-hero__video {
+  opacity: 1;
+}
+
+.dc-video-hero__content {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: calc(var(--navigation-height) + var(--unit)) var(--unit) calc(44px + var(--unit) * 2);
+
+  @media (--md) {
+    padding-bottom: calc(44px + var(--unit-md) + var(--unit));
+  }
+
+  @media (--sm) {
+    padding-inline: var(--unit-md);
+  }
+
+  @media (--lg) {
+    padding-inline: var(--unit-lg);
+  }
+}
+
+.dc-video-hero__text {
+  max-width: 900px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.dc-video-hero--left .dc-video-hero__text {
+  max-width: 720px;
+  margin-inline: 0;
+  text-align: left;
+}
+
+.dc-video-hero__tagline {
+  margin: 0 0 var(--unit);
+  font-size: 12px;
+  line-height: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  @media (--md) {
+    font-size: 14px;
+    line-height: 19px;
+  }
+}
+
+.dc-video-hero__headline {
+  margin: 0 0 var(--unit);
+  color: inherit;
+  font-size: min(var(--hero-title-font-size, var(--font-size-display)), 11vw);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--hero-title-line-height, var(--line-height-lg));
+  text-wrap: balance;
+  overflow-wrap: break-word;
+
+  @media (--xl) {
+    font-size: var(--hero-title-font-size, var(--font-size-display-xl));
+    line-height: var(--hero-title-line-height, 1.06);
+  }
+}
+
+.dc-video-hero__body {
+  margin: 0 0 var(--unit-md);
+  font-size: 16px;
+  line-height: var(--line-height-xs);
+
+  @media (--md) {
+    font-size: 18px;
+    line-height: var(--line-height-sm);
+  }
+
+  p {
+    margin: 0 0 var(--unit-sm);
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dc-video-hero--centre .dc-video-hero__body {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.dc-video-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+}
+
+.dc-video-hero--left .dc-video-hero__ctas {
+  justify-content: flex-start;
+}
+
+.dc-video-hero__toggle {
+  position: absolute;
+  right: var(--unit);
+  bottom: var(--unit);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.35);
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgb(0 0 0 / 0.6);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  &[hidden] {
+    display: none;
+  }
+
+  @media (--md) {
+    right: var(--unit-md);
+    bottom: var(--unit-md);
+  }
+}
+
+.dc-video-hero__icon-play,
+.dc-video-hero__toggle.is-paused .dc-video-hero__icon-pause {
+  display: none;
+}
+
+.dc-video-hero__toggle.is-paused .dc-video-hero__icon-play {
+  display: block;
+}

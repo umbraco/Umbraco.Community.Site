@@ -40,6 +40,7 @@
         if (Model.Results.Count == 0)
         {
             <p class="search-page__empty">No results for <strong>@Model.Query</strong>.</p>
+            @await Html.PartialAsync("Partials/Components/PageSuggestions", new PageSuggestionsViewModel("Perhaps one of these will help?", Model.Suggestions))
         }
         else
         {
@@ -104,6 +105,8 @@
                     }
                 </nav>
             }
+
+            @await Html.PartialAsync("Partials/Components/PageSuggestions", new PageSuggestionsViewModel("Related results", Model.RelatedResults))
         }
     }
 </section>
