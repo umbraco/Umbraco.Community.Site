@@ -70,7 +70,7 @@ public class ProfileAccessServiceTests
 
         viewable.Profile.Should().BeSameAs(HiddenProfile);
         viewable.IsHiddenPreview.Should().BeTrue();
-        provider.Verify(p => p.GetProfileAsync(Handle, true, It.IsAny<CancellationToken>()), Times.Once);
+        provider.Verify(p => p.GetProfileAsync(Handle, true, It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public class ProfileAccessServiceTests
         var viewable = await service.GetViewableProfileAsync(Handle);
 
         viewable.Should().Be(ViewableProfile.None);
-        provider.Verify(p => p.GetProfileAsync(It.IsAny<string>(), true, It.IsAny<CancellationToken>()), Times.Never);
+        provider.Verify(p => p.GetProfileAsync(It.IsAny<string>(), true, It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class ProfileAccessServiceTests
     {
         var provider = new Mock<IProfileDataProvider>();
         provider
-            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HiddenProfile);
         var service = new ProfileAccessService(MemberManagerFor(Handle).Object, provider.Object, NullLogger<ProfileAccessService>.Instance);
 
@@ -163,10 +163,10 @@ public class ProfileAccessServiceTests
     {
         var provider = new Mock<IProfileDataProvider>();
         provider
-            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((CommunityProfile?)null);
         provider
-            .Setup(p => p.GetProfileAsync(Handle, true, It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, true, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(HiddenProfile);
         return provider;
     }

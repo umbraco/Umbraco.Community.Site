@@ -114,3 +114,13 @@ dc-feed-manager {
 .dc-feed-manager__badge--unreachable {
   color: var(--color-pink);
 }
+
+/* Whether the link was checked as the member's (only shown to members whose links are checked). */
+.dc-feed-manager__match {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-feed-manager__match--rejected {
+  color: var(--color-red);
+}

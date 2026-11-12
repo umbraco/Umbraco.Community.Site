@@ -11,13 +11,19 @@ public enum ProfileMatchState
 public enum ProfileMatchDecider
 {
     Automatic = 0,
-    Manual = 1
+
+    /// <summary>A backoffice user decided in the match review dashboard.</summary>
+    Manual = 1,
+
+    /// <summary>The member decided on their own profile, e.g. by saying a source is not theirs.</summary>
+    Member = 2
 }
 
 /// <summary>
 /// The decision on whether an account or page found elsewhere (<see cref="SourceUrl"/>) belongs to a member's
-/// profile. One row per profile and source. A <see cref="ProfileMatchDecider.Manual"/> decision is final: later
-/// automatic runs leave the row alone.
+/// profile. One row per profile and source. A <see cref="ProfileMatchDecider.Manual"/> or
+/// <see cref="ProfileMatchDecider.Member"/> decision is final for automatic runs: they leave the row alone. A
+/// backoffice user can still change any decision.
 /// </summary>
 public class ProfileMatchEntity
 {

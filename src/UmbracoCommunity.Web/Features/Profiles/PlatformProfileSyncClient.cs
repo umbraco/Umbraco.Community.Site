@@ -6,11 +6,14 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 
 /// <summary>
 /// <see cref="IProfileSyncClient"/> backed by the external content platform's API (the same address and key
-/// as <see cref="CommunityBlogsApiClient"/>). Reads are real; the platform has no endpoints yet for
+/// as <see cref="CommunityBlogsApiClient"/>). Reads and link checks are real; the platform has no endpoints yet for
 /// profile-claim, feed and activity notifications, so those calls just log what they would have sent.
 /// </summary>
 public sealed class PlatformProfileSyncClient : IProfileSyncClient
 {
+    /// <summary>The most links the platform checks in one request.</summary>
+    private const int MaxLinksPerCheck = 20;
+
     private readonly CommunityBlogsApiClient _apiClient;
     private readonly ILogger<PlatformProfileSyncClient> _logger;
 
@@ -28,7 +31,48 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
         }
 
         var profile = await _apiClient.LookupProfileAsync(handle, cancellationToken);
-        return profile == null ? null : new PlatformProfile(profile.Id, profile.MvpYears ?? []);
+        if (profile == null)
+        {
+            return null;
+        }
+
+        return new PlatformProfile(profile.Id, profile.MvpYears ?? [])
+        {
+            Identities = (profile.Identities ?? [])
+                .Where(i => !string.IsNullOrWhiteSpace(i.ProfileUrl))
+                .Select(i => new PlatformIdentity(i.Platform, i.Username, i.ProfileUrl!.Trim()))
+                .ToList(),
+            Feeds = (profile.Feeds ?? [])
+                .Where(f => !string.IsNullOrWhiteSpace(f.Url))
+                .Select(f => new PlatformFeed(f.Url!.Trim(), f.Name))
+                .ToList(),
+        };
+    }
+
+    public async Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(
+        string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default)
+    {
+        if (!_apiClient.IsConfigured)
+        {
+            return [];
+        }
+
+        var links = urls
+            .Select(u => u.Trim())
+            .Where(u => Uri.TryCreate(u, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        var checks = new List<PlatformLinkCheck>();
+        foreach (var chunk in links.Chunk(MaxLinksPerCheck))
+        {
+            var results = await _apiClient.VerifyLinksAsync(handle, chunk, cancellationToken);
+            checks.AddRange(results
+                .Where(r => !string.IsNullOrWhiteSpace(r.Url) && !string.IsNullOrWhiteSpace(r.Status))
+                .Select(r => new PlatformLinkCheck(r.Url!, r.Status!.Trim().ToLowerInvariant(), r.Platform)));
+        }
+
+        return checks;
     }
 
     public async Task<IReadOnlyList<PlatformActivity>> GetActivitiesAsync(

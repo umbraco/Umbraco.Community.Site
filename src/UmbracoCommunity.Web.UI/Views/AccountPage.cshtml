@@ -92,5 +92,14 @@
             <p class="account-page__section-hint">Manage the blogs and social profiles that feed your public profile.</p>
             <dc-feed-manager></dc-feed-manager>
         </section>
+
+        @if (Model.CanMatchLinks)
+        {
+            <section class="account-page__section">
+                <h2>Links we found for you</h2>
+                <p class="account-page__section-hint">These accounts and feeds look like yours. Add the ones that are, and tell us about any that aren't.</p>
+                <dc-link-suggestions></dc-link-suggestions>
+            </section>
+        }
     </article>
 </div>

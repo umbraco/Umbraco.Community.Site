@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Notifications;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
+using UmbracoCommunity.Web.Features.Profiles.Matching;
 using UmbracoCommunity.Web.Routing;
 
 namespace UmbracoCommunity.Web.Features.Profiles;
@@ -60,6 +61,8 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.AddScoped<IProfileSyncClient, PlatformProfileSyncClient>();
         builder.Services.Configure<ProfileActivityOptions>(builder.Config.GetSection(ProfileActivityOptions.SectionName));
         builder.Services.AddScoped<ProfileActivityService>();
+        builder.Services.Configure<ProfileMatchingOptions>(builder.Config.GetSection(ProfileMatchingOptions.SectionName));
+        builder.Services.AddScoped<ProfileLinkMatchingService>();
 
         builder.Services.AddHttpClient<GitHubProfileClient>(client =>
         {

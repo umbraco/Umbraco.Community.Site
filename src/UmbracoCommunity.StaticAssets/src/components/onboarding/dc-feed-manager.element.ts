@@ -1,9 +1,20 @@
 import { LitElement, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { isPlatformSourced, MemberFeedsService, type MemberFeed } from "../../services/member-feeds.service.js";
+import {
+  isPlatformSourced,
+  MemberFeedsService,
+  type MemberFeed,
+  type MemberFeedMatchStatus,
+} from "../../services/member-feeds.service.js";
 import { iconEye, iconEyeOff, iconX } from "../../svg/lucide-icons.js";
 
 const elementName = "dc-feed-manager";
+
+const matchStatusLabels: Record<MemberFeedMatchStatus, string> = {
+  Confirmed: "Matches your profile",
+  Held: "Waiting for a check",
+  Rejected: "Marked as not yours",
+};
 
 @customElement(elementName)
 export class FeedManagerElement extends LitElement {
@@ -259,6 +270,9 @@ export class FeedManagerElement extends LitElement {
           </span>
           <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
           <span class="dc-feed-manager__badge dc-feed-manager__badge--${feed.status.toLowerCase()}">${statusLabel}</span>
+          ${feed.matchStatus && matchStatusLabels[feed.matchStatus]
+            ? html`<span class="dc-feed-manager__match dc-feed-manager__match--${feed.matchStatus.toLowerCase()}">${matchStatusLabels[feed.matchStatus]}</span>`
+            : ""}
         </div>
         <div class="dc-feed-manager__item-actions">
           <button

@@ -13,7 +13,7 @@ export interface ProfileMatch {
   state: MatchState;
   confidence: number;
   signals: MatchSignal[];
-  decidedBy: "Automatic" | "Manual";
+  decidedBy: "Automatic" | "Manual" | "Member";
   decidedByUserName: string | null;
   decidedUtc: string;
 }

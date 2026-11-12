@@ -133,7 +133,7 @@ public class ProfileDisplayApiController : ControllerBase
     /// </summary>
     private async Task<IReadOnlyList<ProfileFeaturedItem>> ActivityItemsAsync(MemberProfileEntity entity, CancellationToken cancellationToken)
     {
-        var profile = await _profileDataProvider.GetProfileAsync(entity.GitHubHandle, includeHidden: true, cancellationToken);
+        var profile = await _profileDataProvider.GetProfileAsync(entity.GitHubHandle, includeHidden: true, cancellationToken: cancellationToken);
         return profile != null
             ? ProfileDisplay.ActivityItems(await _profileActivityService.EnrichAsync(profile, cancellationToken)).ToList()
             : [];

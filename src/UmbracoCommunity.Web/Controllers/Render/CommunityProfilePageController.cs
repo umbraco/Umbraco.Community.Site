@@ -49,9 +49,14 @@ public class CommunityProfilePageController : RenderController
             return NotFound();
         }
 
-        // A hidden profile is loaded only for its signed-in owner; everyone else gets null,
-        // exactly as for a handle with no profile.
-        var viewable = await _profileAccessService.GetViewableProfileAsync(handle, cancellationToken);
+        // A DevRel member looking at someone else's profile may ask for everything the member hid as well,
+        // their hidden links included.
+        var isDevRelViewer = await _profileAccessService.IsDevRelViewAsync(handle);
+        var showEverything = isDevRelViewer && DevRelProfileView.IsShowEverythingRequested(Request.Query);
+
+        // A hidden profile is loaded only for its signed-in owner and for DevRel; everyone else
+        // gets null, exactly as for a handle with no profile.
+        var viewable = await _profileAccessService.GetViewableProfileAsync(handle, includeHiddenLinks: showEverything, cancellationToken);
         var isOwnProfile = await _profileAccessService.IsOwnProfileAsync(handle);
 
         // Only an existing profile has sections to show.
@@ -59,10 +64,17 @@ public class CommunityProfilePageController : RenderController
             ? await _profileAccessService.ResolveAsync(currentPage, handle)
             : EnrichedSectionsAccess.None;
 
+        // The DevRel page is never stored by a browser or shared cache.
+        var isDevRelView = viewable.Profile != null && isDevRelViewer;
+        if (isDevRelView)
+        {
+            DevRelProfileView.PreventCaching(Response);
+        }
+
         // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
         // The member's choices of what the sections show (sections off, hidden and pinned items) apply on top.
         var profile = viewable.Profile != null && access.Show
-            ? ProfileDisplay.Apply(await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken))
+            ? ProfileDisplay.Apply(await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken), showHidden: showEverything)
             : viewable.Profile;
 
         var viewModel = new CommunityProfilePageViewModel(currentPage)
@@ -76,6 +88,12 @@ public class CommunityProfilePageController : RenderController
                 : null,
             ShowEnrichedSections = access.Show,
             IsGated = access.IsGated,
+            IsDevRelView = isDevRelView,
+            IsHiddenFromPublic = viewable.IsHiddenFromPublic,
+            HasHiddenSocialLinks = viewable.HasHiddenSocialLinks,
+            IsShowingEverything = showEverything,
+            DevRelPublicViewUrl = isDevRelView ? DevRelProfileView.PublicViewUrl(Request.Path) : null,
+            DevRelShowEverythingUrl = isDevRelView ? DevRelProfileView.ShowEverythingUrl(Request.Path) : null,
         };
 
         return CurrentTemplate(viewModel);
