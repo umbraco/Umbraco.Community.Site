@@ -25,6 +25,7 @@ public class SearchTrackerDbContext : DbContext
 
             entity.HasIndex(e => new { e.SiteKey, e.Day, e.Term }).IsUnique();
             entity.HasIndex(e => e.Day);
+            entity.HasIndex(e => new { e.Term, e.Day });
         });
     }
 }

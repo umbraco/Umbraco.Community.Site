@@ -20,25 +20,34 @@ namespace UmbracoCommunity.SearchTracker.Migrations
             modelBuilder.Entity("UmbracoCommunity.SearchTracker.Models.Entities.SearchTermDailyEntity", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
-                    b.Property<DateOnly>("Day");
+                    b.Property<DateOnly>("Day")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("LastResultCount");
+                    b.Property<int?>("LastResultCount")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<int>("SearchCount");
+                    b.Property<int>("SearchCount")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("SiteKey");
+                    b.Property<Guid>("SiteKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Term")
                         .IsRequired()
-                        .HasMaxLength(200);
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("ZeroResultCount");
+                    b.Property<int>("ZeroResultCount")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Day");
+
+                    b.HasIndex("Term", "Day");
 
                     b.HasIndex("SiteKey", "Day", "Term")
                         .IsUnique();
