@@ -35,7 +35,7 @@
             // consentcdn.cookiebot.com is framed by the Cookiebot consent banner, which GTM loads. Without it the
             // iframe is blocked and the banner's postMessage handshake fails with a "target origin ... does not
             // match" error against origin 'null' — a symptom of the blocked frame, not a separate fault.
-            public static readonly string[] DefaultAllowFrames = ["*.youtube.com", "*.walls.io", "consentcdn.cookiebot.com"];
+            public static readonly string[] DefaultAllowFrames = ["*.youtube.com", "www.youtube-nocookie.com", "*.walls.io", "consentcdn.cookiebot.com"];
 
             public static readonly string[] DefaultAllowScripts = ["*.youtube.com", "load.sst.umbraco.com"];
 

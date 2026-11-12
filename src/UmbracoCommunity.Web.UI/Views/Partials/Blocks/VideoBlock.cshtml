@@ -33,8 +33,9 @@
                         name="@Model.Settings?.VideoTitle"
                         thumbnail="@thumbnailUrl"
                         format="@format"
+                        auto-play="@(autoplay ? "true" : null)"
                         id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
-                            <iframe id="player" slot="video" src="@videoSrc" allow="@allows" width="100%" height="100%" frameborder="0"></iframe>
+                        <a href="@Model.Content.Video.Url" target="_blank" rel="noopener">Watch @(string.IsNullOrWhiteSpace(Model.Settings?.VideoTitle) ? "the video" : Model.Settings.VideoTitle) on YouTube</a>
                     </dc-video-picker-youtube>
                 }
             }

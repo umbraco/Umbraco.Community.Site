@@ -1,78 +1,112 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createTestContainer } from '../../test/test-utils'
-import { VideoPickerYouTubeElement } from './video-picker-youtube'
+import './video-picker-youtube'
+import type { VideoPickerYouTubeElement } from './video-picker-youtube'
+
+const SOURCE = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ'
 
 describe('VideoPickerYouTubeElement', () => {
   let container: HTMLElement
-  let element: VideoPickerYouTubeElement
+
+  const create = async (attributes: Record<string, string> = {}) => {
+    const element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
+    element.setAttribute('source', SOURCE)
+    element.setAttribute('allow', 'autoplay; fullscreen')
+    for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value)
+    container.appendChild(element)
+    await element.updateComplete
+    return element
+  }
+
+  const youTubeScripts = () =>
+    [...document.querySelectorAll('script')].filter(s => s.src.includes('youtube.com'))
 
   beforeEach(() => {
-    // Mock the YouTube IFrame API global
-    (globalThis as any).YT = {
-      Player: vi.fn()
-    }
-
     container = createTestContainer()
-    element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
-    container.appendChild(element)
   })
 
   afterEach(() => {
-    delete (globalThis as any).YT
     vi.restoreAllMocks()
   })
 
-  describe('initialization', () => {
-    it('should create an instance of VideoPickerYouTubeElement', () => {
-      expect(element).toBeInstanceOf(VideoPickerYouTubeElement)
+  describe('before play', () => {
+    it('creates no iframe and loads no YouTube script', async () => {
+      const element = await create({ thumbnail: 'poster.jpg' })
+
+      expect(element.querySelector('iframe')).toBeNull()
+      expect(youTubeScripts()).toHaveLength(0)
     })
 
-    it('should extend DcVideoBlockElement', () => {
-      expect(element).toBeInstanceOf(VideoPickerYouTubeElement)
-    })
+    it('shows a poster even without a thumbnail', async () => {
+      const element = await create()
 
-    it('should have default property values', () => {
-      expect(element.videoPlayed).toBe(false)
-    })
-  })
-
-  describe('playVideo method', () => {
-    it('should set videoPlayed to true', () => {
-      expect(element.videoPlayed).toBe(false)
-      
-      element.playVideo()
-      
-      expect(element.videoPlayed).toBe(true)
-    })
-
-    it('should only set videoPlayed flag', () => {
-      // YouTube videos don't need to call play() on a video element
-      // They just need to set the flag to show the embedded video
-      element.playVideo()
-      
-      expect(element.videoPlayed).toBe(true)
+      expect(element.shadowRoot?.querySelector('.poster')).toBeTruthy()
+      expect(element.shadowRoot?.querySelector('slot[name="video"]')).toBeNull()
+      expect(element.querySelector('iframe')).toBeNull()
     })
   })
 
-  describe('edge cases', () => {
-    it('should handle multiple playVideo calls', () => {
+  describe('playVideo', () => {
+    it('creates the iframe in the video slot and starts playing', async () => {
+      const element = await create({ name: 'Keynote' })
+
       element.playVideo()
+      await element.updateComplete
+
+      const iframe = element.querySelector('iframe')!
+      expect(iframe.slot).toBe('video')
+      expect(new URL(iframe.src).searchParams.get('autoplay')).toBe('1')
+      expect(iframe.src.startsWith(SOURCE)).toBe(true)
+      expect(iframe.title).toBe('Keynote')
+      expect(iframe.allow).toBe('autoplay; fullscreen')
       expect(element.videoPlayed).toBe(true)
-      
-      element.playVideo()
-      expect(element.videoPlayed).toBe(true)
+      expect(element.shadowRoot?.querySelector('slot[name="video"]')).toBeTruthy()
     })
 
-    it('should work consistently', () => {
-      // Test that the method always sets videoPlayed to true
-      element.videoPlayed = false
+    it('moves focus into the player', async () => {
+      const element = await create()
+
       element.playVideo()
-      expect(element.videoPlayed).toBe(true)
-      
-      element.videoPlayed = false
+      await element.updateComplete
+      await Promise.resolve()
+
+      expect(document.activeElement).toBe(element.querySelector('iframe'))
+    })
+
+    it('only ever creates one iframe', async () => {
+      const element = await create()
+
       element.playVideo()
-      expect(element.videoPlayed).toBe(true)
+      element.playVideo()
+
+      expect(element.querySelectorAll('iframe')).toHaveLength(1)
+    })
+
+    it('still loads no YouTube script', async () => {
+      const element = await create()
+
+      element.playVideo()
+
+      expect(youTubeScripts()).toHaveLength(0)
+    })
+
+    it('does nothing without a source', async () => {
+      const element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
+      container.appendChild(element)
+
+      element.playVideo()
+
+      expect(element.querySelector('iframe')).toBeNull()
+    })
+  })
+
+  describe('editor autoplay', () => {
+    it('creates the iframe straight away, using the source as given', async () => {
+      const element = await create({ 'auto-play': 'true' })
+
+      const iframe = element.querySelector('iframe')!
+      expect(iframe).toBeTruthy()
+      expect(new URL(iframe.src).searchParams.get('autoplay')).toBeNull()
     })
   })
 })
-

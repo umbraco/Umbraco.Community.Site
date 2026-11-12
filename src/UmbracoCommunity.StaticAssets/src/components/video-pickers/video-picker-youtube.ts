@@ -1,40 +1,48 @@
 import { customElement } from 'lit/decorators.js';
 import { DcVideoBlockElement } from './video-block.element';
-import { YouTubePlayer } from 'youtube-player/dist/types';
-import PlayerFactory from 'youtube-player/dist';
-
-declare const YT: any;
-let player: any;
 
 const elementName = "dc-video-picker-youtube";
 
+/**
+ * Shows a poster and only creates the YouTube iframe when the visitor presses play (or when the editor
+ * turned on autoplay), so nothing is requested from YouTube on page load.
+ */
 @customElement(elementName)
 export class VideoPickerYouTubeElement extends DcVideoBlockElement {
+    protected override readonly posterWithoutThumbnail = true;
+
     connectedCallback(): void {
         super.connectedCallback();
 
-        if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
-            var tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            var firstScriptTag = document.getElementsByTagName('script')[0];
-            if (firstScriptTag && firstScriptTag.parentNode) {
-                firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            }
+        if (this.autoPlay) {
+            this.#createIframe(false);
         }
     }
-    
+
     playVideo() {
         this.videoPlayed = true;
+        this.#createIframe(true);
+    }
 
-        player = new YT.Player('player', {
-            events: {
-                'onReady': this.onPlayerReady
-            }
-        });
-    };
+    #createIframe(startPlaying: boolean) {
+        if (!this.source || this.querySelector('iframe')) return;
 
-    onPlayerReady(event: any) {
-        player.playVideo();
+        const src = new URL(this.source, window.location.href);
+        if (startPlaying) src.searchParams.set('autoplay', '1');
+
+        const iframe = document.createElement('iframe');
+        iframe.slot = 'video';
+        iframe.src = src.toString();
+        iframe.title = this.name || 'YouTube video';
+        iframe.allow = this.allow ?? '';
+        iframe.allowFullscreen = true;
+        iframe.setAttribute('frameborder', '0');
+        iframe.style.cssText = 'width:100%;height:100%;border:0;display:block';
+        this.append(iframe);
+
+        if (startPlaying) {
+            this.updateComplete.then(() => iframe.focus());
+        }
     }
 }
 
