@@ -10,6 +10,10 @@ public class SearchPageViewModel(IPublishedContent currentPage) : PageViewModelB
 
     public int TotalResults { get; set; }
 
+    public IReadOnlyList<IPublishedContent> Suggestions { get; set; } = Array.Empty<IPublishedContent>();
+
+    public IReadOnlyList<IPublishedContent> RelatedResults { get; set; } = Array.Empty<IPublishedContent>();
+
     public int PageSize { get; set; } = 10;
 
     public int CurrentPage { get; set; } = 1;
@@ -33,6 +37,8 @@ public sealed class SearchResultItem
     public required string Name { get; init; }
 
     public required string Url { get; init; }
+
+    public Guid? ContentKey { get; init; }
 
     public string? Description { get; init; }
 

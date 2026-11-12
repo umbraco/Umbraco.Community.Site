@@ -59,6 +59,12 @@ public static class PublishedContentExtensions
         return socialSettings?.As<SocialSettings>();
     }
 
+    /// <summary>Routable pages using the page-config composition that editors haven't hidden from search.</summary>
+    public static bool IsSearchable(this IPublishedContent content)
+        => content.TemplateId.HasValue
+           && content is ICompositionPageConfiguration pageConfig
+           && !pageConfig.HideFromSearch;
+
     public static T? GetSingletonPage<T>(this IPublishedContent content) where T : class, IPublishedContent
     {
         var root = content.Root();

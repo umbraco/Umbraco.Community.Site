@@ -461,6 +461,7 @@ App_Data/
 /src/Umbraco.Community.NotFoundTracker/wwwroot/App_Plugins/
 /src/UmbracoCommunity.BlogAnnouncements/wwwroot/App_Plugins/
 /src/UmbracoCommunity.ProfileMatchReview/wwwroot/App_Plugins/
+/src/UmbracoCommunity.SearchTracker/wwwroot/App_Plugins/
 /src/Umbraco.Community.FormsSpamGuard/wwwroot/App_Plugins/
 .claude
 .mcp.json

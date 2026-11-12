@@ -1,0 +1,19 @@
+@import "../base/media-queries.css";
+
+/* The 404 hero just holds a short headline + intro — shrink the default 90px
+   vertical hero padding so the suggestions list sits close beneath it. */
+.document-pageNotFound .hero {
+  --hero-padding: var(--unit-md) 0;
+
+  @media (--sm) {
+    --hero-padding: var(--unit-md) 0;
+  }
+
+  @media (--md) {
+    --hero-padding: var(--unit-md) 0;
+  }
+}
+
+.document-pageNotFound .hero-content {
+  padding: var(--unit-sm) var(--unit);
+}

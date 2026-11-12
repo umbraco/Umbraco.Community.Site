@@ -22,7 +22,7 @@ Planned-but-unwritten primers or tutorials live as stub files directly under the
 
 ## Solution Structure
 
-The solution consists of 9 projects (uses Central Package Management via `Directory.Packages.props`):
+The solution consists of 10 projects (uses Central Package Management via `Directory.Packages.props`):
 
 - **UmbracoCommunity.Web.UI** - Main web application (startup project)
 - **UmbracoCommunity.Web** - Core business logic, features, controllers, view models
@@ -33,6 +33,7 @@ The solution consists of 9 projects (uses Central Package Management via `Direct
 - **UmbracoCommunity.BlogAnnouncements** - Discord blog-post announcement pipeline (detection, delivery, tracking store) and its dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder)
 - **UmbracoCommunity.MeetBooking** - Umbraco Forms workflow type that provisions a Google Meet for approved community meeting requests via the community Apps Script in `tools/meet-booking-apps-script/` (Razor Class Library, no client; see its README and `docs/plans/2026-09-03-community-meet-booking-design.md`)
 - **UmbracoCommunity.ActiveCampaign** - Umbraco Forms workflow type (*Subscribe to ActiveCampaign*) that adds form submitters to an ActiveCampaign list via the v3 REST API; subscribes immediately (no double opt-in), so forms need a consent checkbox (Razor Class Library, no client; see its README)
+- **UmbracoCommunity.SearchTracker** - Logs site-search terms per tenant as daily counts and shows them in a *Search Terms* Content dashboard (Razor Class Library with EF Core migrations and backoffice client in `Client/` folder; see its README)
 
 ### Key Directories in UmbracoCommunity.Web
 
@@ -470,6 +471,14 @@ The GitHub OAuth App's callback URL must be set to `https://<host>/signin-github
 ### Site Search
 
 The nav search icon is wired to a `SearchPage` doc type backed by Umbraco's Examine `ExternalIndex`. A typed `SearchService` (`Services/SearchService.cs`) queries the index with multi-tenant scoping — results are filtered to descendants of the current request's content root, so search on Site A doesn't leak Site B hits. HTML is stripped from excerpts before display. The render controller (`Controllers/Render/SearchPageController.cs`) hands the results off to a `SearchPageViewModel` for the `SearchPage.cshtml` view to render.
+
+- **Matching:** `SearchQueryBuilder` turns the query into words (letters/digits only, filler words dropped, accents folded) and builds a Lucene `NativeQuery` matching each word exactly, by its root (`speaking` → `speak*`) and, on title-like fields, with small typos. Titles are weighted 3×. The raw query text never reaches Lucene; queries with no usable words fall back to `ManagedQuery`.
+- **Searchable pages:** `IPublishedContent.IsSearchable()` (`Extensions/PublishedContentExtensions.cs`) is the one definition, shared by search and suggestions.
+- **Suggestions:** with 0 keyword results the page shows up to 4 AI-matched pages; with 1–3, a "Related results" section of up to 3 more. Both come from `ContentSuggestionService` (Umbraco.AI.Search, also behind the 404 page's suggestions via `PageNotFoundSuggestionService`), rendered with `Views/Partials/Components/PageSuggestions.cshtml` and `dc-page-suggestions` styles. Paid lookups are cached per tenant/query and limited by `SuggestionBudget` (no bots, 20/hour per visitor, 60/minute site-wide). Suggestions need a default *Embedding* profile and a built AI index; the Google and Anthropic Umbraco.AI providers are chat-only, so use OpenAI, Microsoft Foundry or Amazon.
+
+See [`docs/tutorials/foundations/site-search-with-examine-externalindex.md`](docs/tutorials/foundations/site-search-with-examine-externalindex.md) for the full walkthrough.
+
+**Search term logging** (`UmbracoCommunity.SearchTracker`): on page 1 of a search, `SearchPageController` calls `ISearchTermRecorder.Record(root.Key, query, total, HttpContext)`. The recorder drops bots, repeat searches and floods, normalises the term (lower-cased, emails and long numbers masked) and queues it; a background writer adds it to one row per site/day/term (`SearchTrackerTermDaily`). No IP, user agent or member id is stored, and a retention sweep deletes rows older than `SearchTracker:RetentionDays` (default 365). The *Search Terms* dashboard in the Content section scopes sites by the user's start nodes. See [`src/UmbracoCommunity.SearchTracker/README.md`](src/UmbracoCommunity.SearchTracker/README.md).
 
 ### Vite Integration
 
