@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Web;
+using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Services;
 
@@ -25,6 +26,10 @@ public class ContentContextService
     public string? ContentTypeAlias => CurrentPage?.ContentType.Alias;
 
     public string? SiteAlias => CurrentPage?.Root().ContentType.Alias;
+
+    public bool HasFullWidthHero =>
+        CurrentPage is ICompositionBannerBlock page
+        && page.BannerContent?.FirstOrDefault()?.Content is HeroBannerWithVideo;
 
     public string Culture =>
         _umbracoContextAccessor.TryGetUmbracoContext(out var context)

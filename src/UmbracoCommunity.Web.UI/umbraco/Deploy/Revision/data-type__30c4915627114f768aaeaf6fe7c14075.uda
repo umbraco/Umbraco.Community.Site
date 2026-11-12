@@ -1,0 +1,25 @@
+{
+  "Name": "Video hero video picker",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "filter": "f6c515bb-653c-4bdc-821c-987729ebe327",
+    "validationLimit": {
+      "max": 1
+    }
+  },
+  "Parent": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
+  "Udi": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://media-type/f6c515bb653c4bdc821c987729ebe327",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.2.0"
+}

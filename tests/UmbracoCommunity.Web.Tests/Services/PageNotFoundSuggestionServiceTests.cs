@@ -43,4 +43,11 @@ public class PageNotFoundSuggestionServiceTests
     {
         PageNotFoundSuggestionService.HasNonContentExtension(path).Should().BeFalse();
     }
+
+    [Fact]
+    public void BuildQuery_TurnsPathAndReferrerIntoWords()
+    {
+        PageNotFoundSuggestionService.BuildQuery("/codegarden/tickts-2026/", "https://example.com/codegarden/practical-information")
+            .Should().Be("codegarden tickts practical information");
+    }
 }

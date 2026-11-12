@@ -17,7 +17,7 @@
     ]
   },
   "primers/backend.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -34,7 +34,7 @@
     ]
   },
   "primers/backoffice.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -51,7 +51,7 @@
     ]
   },
   "primers/caching.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -176,7 +176,7 @@
     ]
   },
   "tutorials/README.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -397,7 +397,7 @@
     ]
   },
   "tutorials/foundations/site-search-with-examine-externalindex.md": {
-    "lastEditedAt": "2026-09-28T16:56:19+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -465,7 +465,7 @@
     ]
   },
   "tutorials/refinements/output-cache-policies-for-slow-upstream-apis.md": {
-    "lastEditedAt": "2026-08-10T10:12:17+02:00",
+    "lastEditedAt": "2026-11-12T15:53:50+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",

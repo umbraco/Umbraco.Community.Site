@@ -48,7 +48,7 @@ The integration feeds all share one resilience shape: an in-memory cache for the
 
 ## A couple that don't fit the four
 
-- **404 suggestions** ([`Services/PageNotFoundSuggestionService.cs`](../../src/UmbracoCommunity.Web/Services/PageNotFoundSuggestionService.cs)) — caches suggestions per `{tenant}:{culture}:{max}:{query}` with an **outcome-dependent TTL** (a day for hits, an hour for empty results, a minute for failures) plus a concurrency limiter so a search outage can't stampede the index.
+- **Page suggestions** ([`Services/ContentSuggestionService.cs`](../../src/UmbracoCommunity.Web/Services/ContentSuggestionService.cs)), used by the 404 page and by searches that find little — caches eight page ids per `{tenant}:{culture}:{query}` with an **outcome-dependent TTL** (a day for hits, an hour for empty results, a minute for failures), a concurrency limiter so a search outage can't stampede the index, and a **budget on cache misses** ([`SuggestionBudget`](../../src/UmbracoCommunity.Web/Services/SuggestionBudget.cs)): no lookups for bots, 20 an hour per visitor, 60 a minute site-wide.
 - **404-tracker ignore rules** ([`Umbraco.Community.NotFoundTracker/Matching/`](../../src/Umbraco.Community.NotFoundTracker/Matching/)) — not a keyed cache at all but an **immutable snapshot** held behind a volatile reference and atomically swapped on change. No TTL, no per-lookup cost; the whole rule set is rebuilt and replaced when a rule mutates.
 
 ## The map

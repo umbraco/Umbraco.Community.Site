@@ -216,3 +216,7 @@
   background: var(--color-light);
   color: var(--color-blue);
 }
+
+.search-page__results ~ .dc-page-suggestions {
+  margin-top: var(--unit-xl);
+}

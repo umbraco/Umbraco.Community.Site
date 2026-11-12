@@ -18,6 +18,7 @@ The backoffice code lives in four Razor Class Libraries, each with a `Client/` f
 | [`UmbracoCommunity.BlockRestrictions`](../../src/UmbracoCommunity.BlockRestrictions/Client/) | The "Blocks" workspace tab on document types, the restricted Block Grid/List property editors, and the file-import dashboard | `UmbracoCommunityBlockRestrictions/` |
 | [`Umbraco.Community.NotFoundTracker`](../../src/Umbraco.Community.NotFoundTracker/Client/) | The 404 Tracker dashboard with hit-list and ignore-rule tabs and their modals | `UmbracoCommunityNotFoundTracker/` |
 | [`UmbracoCommunity.BlogAnnouncements`](../../src/UmbracoCommunity.BlogAnnouncements/Client/) | The Blog Announcements dashboard — posts/runs/settings tabs and a post-details modal for the Discord announcement pipeline | `UmbracoCommunityBlogAnnouncements/` |
+| [`UmbracoCommunity.SearchTracker`](../../src/UmbracoCommunity.SearchTracker/Client/) | The Search Terms dashboard — most-searched and no-result terms per site, with daily trends | `UmbracoCommunitySearchTracker/` |
 
 They don't share a build, a `package.json`, or a `node_modules`. Each is self-contained. That's deliberate — see [Why a separate Vite project each](#why-a-separate-vite-project-each) below. The pay-off is that the four follow an almost identical shape, so once you've read one `Client/` folder you can find your way around the others.
 

@@ -1,0 +1,117 @@
+{
+  "Name": "Video hero",
+  "Alias": "heroBannerWithVideo",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-video",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "cfcff740-c29a-4e5b-ae24-23d6ce7bd065",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "09e79fbd-9add-4892-be77-24ef72dc83cf",
+          "Alias": "posterImage",
+          "DataType": "umb://data-type/203b84b5923c43f185d56705adfe2697",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Description": "Shown while the video loads, and instead of it for visitors who prefer reduced motion or are saving data.\n\nIdeal dimensions: 1920\u00D71080",
+          "Mandatory": true,
+          "Name": "Poster image",
+          "SortOrder": 6
+        },
+        {
+          "Key": "15372d90-3c56-4df0-a253-36cd12ab2716",
+          "Alias": "headline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
+          "Description": "Max 40 chars",
+          "Mandatory": true,
+          "Name": "Headline",
+          "SortOrder": 1
+        },
+        {
+          "Key": "2489e0ec-7418-49a7-ab4b-93c9ba0930d7",
+          "Alias": "tagline",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
+          "Name": "Tagline"
+        },
+        {
+          "Key": "8364f619-6091-4193-9ad9-472f8cf72406",
+          "Alias": "bodyText",
+          "DataType": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+          "ValueType": "Umbraco.Cms.Core.Strings.IHtmlEncodedString",
+          "Name": "Body text",
+          "SortOrder": 2
+        },
+        {
+          "Key": "8b95772a-2f9b-4ee2-9606-9b5992ca6f16",
+          "Alias": "video",
+          "DataType": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Description": "MP4, muted and looping. Keep it short (10\u201320 seconds) and under 10 MB.\n\nIdeal dimensions: 1920\u00D71080",
+          "Mandatory": true,
+          "Name": "Video",
+          "SortOrder": 4
+        },
+        {
+          "Key": "d9fd7926-6622-4c7b-a5c7-a00b8058c0a2",
+          "Alias": "mobileVideo",
+          "DataType": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Description": "Optional smaller MP4 for phones. Without one, phones show the poster image.\n\nIdeal dimensions: 720\u00D71280",
+          "Name": "Mobile video",
+          "SortOrder": 5
+        },
+        {
+          "Key": "e956bb5f-2878-453d-8369-59c87f6d9491",
+          "Alias": "callToActionLinks",
+          "DataType": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.Link\u003E",
+          "Description": "Max 2 items",
+          "Name": "Call to action links",
+          "SortOrder": 3
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/536bafe77ed948ad8b7afef0e9e7b7b5",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/203b84b5923c43f185d56705adfe2697",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ca90c9500aff4e72b976a30b1ac57dad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/74fc9784adb34e3884ffc34950baf201",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}
