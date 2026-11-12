@@ -1,0 +1,32 @@
+{
+  "Name": "Video showcase items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "2faad0ba-0ec9-4300-b65b-f8ab54b405d6",
+        "label": "${video.title || \u0022Video\u0022}"
+      }
+    ],
+    "validationLimit": {
+      "min": 1,
+      "max": 12
+    },
+    "useLiveEditing": false,
+    "useInlineEditingAsDefault": false
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/2faad0ba0ec94300b65bf8ab54b405d6"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.2.0"
+}

@@ -1,0 +1,57 @@
+{
+  "Name": "[Settings] Video showcase",
+  "Alias": "settingsVideoShowcaseBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/fc91e41ce96445e682bf596c73a41fbe",
+  "Icon": "icon-plugin",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "10e5716e-38bf-44b5-b5d3-bc87016e7a21",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "651d2dfb-ad6a-4e9e-ad78-627211fc9fdb",
+          "Alias": "layout",
+          "DataType": "umb://data-type/4dda9c21fc3a4a51a2178d946ab2c4e9",
+          "ValueType": "System.String",
+          "Description": "Defaults to List.",
+          "Name": "Layout",
+          "SortOrder": 101
+        }
+      ]
+    }
+  ],
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/4dda9c21fc3a4a51a2178d946ab2c4e9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

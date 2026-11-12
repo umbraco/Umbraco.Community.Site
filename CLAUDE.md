@@ -394,7 +394,7 @@ All YouTube input goes through the **YouTube video picker** data type (schema `U
 
 **Legacy Video block**: the old `videoBlock` ("Video (legacy)", link picker + thumbnail) is kept in the "Legacy" block group so existing videos keep rendering and stay editable. It can't simply be removed from the block editors or restricted — Umbraco then marks existing instances invalid (see the Block Restrictions notes). Instead `LegacyVideoBlockGuard` refuses any save that *adds* a legacy video block (compared by block key against the saved version).
 
-**Rendering**: `Views/Partials/Blocks/YouTubeVideoBlock.cshtml` renders `<dc-video-picker-youtube>` (the legacy block uses it too), which loads nothing from YouTube until the poster is played. Browsers (Chrome included) often ignore `autoplay=1` in an embed, leaving a second click on YouTube's own play button, so on click the component loads YouTube's IFrame Player API once per page (`youtube-api.ts`), creates the player on youtube-nocookie and calls `playVideo()` on ready. If playback hasn't started after `MUTED_FALLBACK_MS` (sound refused), it mutes and plays, leaving YouTube's unmute button. If the API can't load it falls back to a plain `autoplay=1` iframe. The poster is cropped to the block's Format (16:9 or 4:3).
+**Rendering**: `Views/Partials/Blocks/YouTubeVideoBlock.cshtml` renders `<dc-video-picker-youtube>` (the legacy block uses it too), which loads nothing from YouTube until the poster is played. Browsers (Chrome included) often ignore `autoplay=1` in an embed, leaving a second click on YouTube's own play button, so on click the component calls `playYouTube()` (`youtube-player.ts`, also used by the Video showcase), which loads YouTube's IFrame Player API once per page (`youtube-api.ts`), creates the player on youtube-nocookie and calls `playVideo()` on ready. Only if YouTube reports `onAutoplayBlocked` (sound refused) does it mute and play, leaving YouTube's unmute button. If the API can't load it falls back to a plain `autoplay=1` iframe. The poster is cropped to the block's Format (16:9 or 4:3).
 
 ### Blog Showcase Block
 
@@ -426,6 +426,23 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Slider variant defines `--blog-showcase-slide-width` per breakpoint (1 / 2 / 3 cards + 20% peek at base / `--sm` / `--md`), with column-gap of `var(--unit)`
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
+
+### Video Showcase Block
+
+A Codegarden-only block (in the `eventsHome` Block Restrictions rule) for surfacing past talks from YouTube, with a link out to more on the channel.
+
+**Content** (`VideoShowcaseBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Videos` (Block List of `VideoShowcaseItem`, 1–12), `MoreVideosLink` (optional). Each `VideoShowcaseItem` has `Video` (YouTube video picker), `Speaker`, `Edition`, `Description` and an optional `AccentColour` (the shared Background colour picker). The partial in `Models/ContentModels/VideoShowcaseBlock.cs` adds `PlayableVideos` (skips items without a video, caps at 12), `IsGrid(settings)` and the item `Byline`.
+
+**Settings** (`SettingsVideoShowcaseBlock`, with `ISettingsBlockId` + `ISettingsColour`): `Layout`, `list` (default) or `grid`.
+
+**Layouts** (`Views/Partials/Blocks/VideoShowcaseBlock.cshtml`, `css/blocks/video-showcase-block.css`):
+- List: a playlist beside one player panel from `--md`, with Previous/Next buttons; below `--md` it's an accordion with each panel under its trigger. Items use `display: contents` on desktop, and panels span `grid-row: 1 / -1` over `repeat(var(--video-count), auto) 1fr` rows, so a tall panel doesn't stretch the list.
+- Grid: a bento grid with the first card featured (2×2 from `--md`) and a full-width "More on YouTube" tile. Playing a card makes it the full-width `is-spotlight` card and plays it there.
+- Accents cycle through `accent-0`…`accent-3` (blue, pink, orange, yellow); an item's `AccentColour` overrides it through a nonce'd `<style>` rule on the item's id.
+
+**Behaviour** (`components/video-showcase/dc-video-showcase.element.ts`): enhances the server-rendered markup through `data-showcase-*` hooks (`item`, `trigger`, `panel`, `player`, `play`, `step`). Posters are links to YouTube; the element plays them in place through `playYouTube()` (`components/video-pickers/youtube-player.ts`, shared with `<dc-video-picker-youtube>`), so nothing loads from YouTube until a poster is played. Only one video on the page plays at a time, across showcases.
+
+**Backoffice preview**: the block renders a summary card (layout, title, video thumbnails); items use `Views/BlockPreviewApi/BlockList/VideoShowcaseItem.cshtml`. Styles in `wwwroot/css/styles.css`.
 
 ### Timeline Block
 

@@ -1,0 +1,209 @@
+@using Umbraco.Cms.Core.Models
+@using UmbracoCommunity.Web.Helpers
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<VideoShowcaseBlock, SettingsVideoShowcaseBlock>>
+
+@{
+    var videos = Model.Content.PlayableVideos;
+    var isGrid = Model.Content.IsGrid(Model.Settings);
+    var id = Model.Content.IdHash;
+    var hasBg = Model.Settings?.HasBg() ?? false;
+    var bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    var more = Model.Content.MoreVideosLink;
+    var moreLabel = string.IsNullOrWhiteSpace(more?.Name) ? "More on YouTube" : more.Name;
+    var customAccents = videos.Select((item, index) => (item.AccentColour?.Color, index)).Where(accent => !string.IsNullOrEmpty(accent.Color)).ToList();
+}
+
+@functions {
+    private const int PaletteSize = 4;
+
+    private static string Number(int index) => (index + 1).ToString("00");
+
+    private static string TitleOf(VideoShowcaseItem item) =>
+        string.IsNullOrWhiteSpace(item.Video?.Title) ? "Untitled video" : item.Video.Title;
+
+    private static string AccentClass(VideoShowcaseItem item, int index) =>
+        string.IsNullOrEmpty(item.AccentColour?.Color) ? $"accent-{index % PaletteSize}" : "has-accent";
+
+    private void RenderPlayer(VideoShowcaseItem item, string sizes)
+    {
+        var video = item.Video!;
+        var title = TitleOf(item);
+        var poster = video.Poster;
+        <div class="dc-video-showcase__player" data-showcase-player data-source="@video.EmbedUrl" data-title="@title">
+            <a class="dc-video-showcase__poster" href="@video.WatchUrl" target="_blank" rel="noopener" data-showcase-play>
+                @if (poster != null)
+                {
+                    <img src="@poster.GetCropUrl(width: 960, height: 540, imageCropMode: ImageCropMode.Crop)"
+                         srcset="@poster.GetCropUrl(width: 640, height: 360, imageCropMode: ImageCropMode.Crop) 640w, @poster.GetCropUrl(width: 1280, height: 720, imageCropMode: ImageCropMode.Crop) 1280w"
+                         sizes="@sizes" alt="" loading="lazy" decoding="async" />
+                }
+                <span class="dc-video-showcase__play" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5Z" /></svg>
+                </span>
+                <span class="sr-only">Play @title</span>
+            </a>
+        </div>
+    }
+
+    private void RenderWatchLink(VideoShowcaseItem item)
+    {
+        <a class="dc-video-showcase__watch" href="@item.Video!.WatchUrl" target="_blank" rel="noopener">
+            Watch on YouTube <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span>
+        </a>
+    }
+}
+
+@if (Context.Request.IsBlockPreviewRequest())
+{
+    <div class="video-showcase-preview">
+        <div class="video-showcase-preview__header">
+            <p class="video-showcase-preview__eyebrow">Video showcase · @(isGrid ? "Grid" : "List")</p>
+            <p class="video-showcase-preview__title">@(string.IsNullOrWhiteSpace(Model.Content.Title) ? "No title" : Model.Content.Title)</p>
+        </div>
+        @if (videos.Count == 0)
+        {
+            <p class="video-showcase-preview__empty">No videos added yet</p>
+        }
+        else
+        {
+            <ol class="video-showcase-preview__videos">
+                @for (var i = 0; i < videos.Count; i++)
+                {
+                    var thumbnail = videos[i].Video!.Poster?.GetCropUrl(width: 320, height: 180, imageCropMode: ImageCropMode.Crop);
+                    <li>
+                        <span class="video-showcase-preview__thumb @(thumbnail == null ? "is-empty" : null)">
+                            @if (thumbnail != null)
+                            {
+                                <img src="@thumbnail" alt="" />
+                            }
+                        </span>
+                        <span class="video-showcase-preview__name">@Number(i) @TitleOf(videos[i])</span>
+                    </li>
+                }
+            </ol>
+        }
+        @if (more != null)
+        {
+            <p class="video-showcase-preview__more">@moreLabel ↗</p>
+        }
+    </div>
+    return;
+}
+
+@if (videos.Count > 0)
+{
+    <section class="dc-video-showcase-block @(isGrid ? "dc-video-showcase-block--grid" : "dc-video-showcase-block--list") @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@id" aria-labelledby="@(string.IsNullOrEmpty(Model.Content.Title) ? null : id + "-title")">
+        <style asp-add-nonce="true">
+            #@id {
+                --video-count: @videos.Count;
+                @if (hasBg)
+                {
+                    @:--block-background-color: @Model.Settings!.BackgroundColour!.Color.GetOptionalColor();
+                }
+            }
+            @foreach (var (colour, index) in customAccents)
+            {
+                @:#@id-@index { --accent: @colour.GetOptionalColor(); --accent-fg: @(colour.IsDark() ? "var(--color-white)" : "var(--color-dark)"); }
+            }
+        </style>
+
+        @if (!string.IsNullOrEmpty(Model.Content.Title) || !Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="dc-video-showcase-block__intro align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
+                @if (!string.IsNullOrEmpty(Model.Content.Title))
+                {
+                    <h2 class="block-title" id="@id-title">@Model.Content.Title</h2>
+                }
+                @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+                {
+                    <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+                }
+            </div>
+        }
+
+        <dc-video-showcase class="dc-video-showcase" data-layout="@(isGrid ? "grid" : "list")" data-allow="@VideoHelper.YouTubeAllow">
+            @if (isGrid)
+            {
+                @for (var i = 0; i < videos.Count; i++)
+                {
+                    var item = videos[i];
+                    <article class="dc-video-showcase__item dc-video-showcase__card @AccentClass(item, i)" id="@id-@i" data-showcase-item aria-labelledby="@id-@i-title">
+                        @{ RenderPlayer(item, i == 0 ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"); }
+                        <div class="dc-video-showcase__body">
+                            <span class="dc-video-showcase__number" aria-hidden="true">@Number(i)</span>
+                            <h3 class="dc-video-showcase__title" id="@id-@i-title">@TitleOf(item)</h3>
+                            @if (item.Byline != null)
+                            {
+                                <p class="dc-video-showcase__byline">@item.Byline</p>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(item.Description))
+                            {
+                                <p class="dc-video-showcase__description">@item.Description</p>
+                            }
+                            @{ RenderWatchLink(item); }
+                        </div>
+                    </article>
+                }
+                @if (more != null)
+                {
+                    <a class="dc-video-showcase__more-tile" href="@more.Url" target="@more.Target" rel="@(more.Target == "_blank" ? "noopener" : null)">
+                        <span class="dc-video-showcase__more-label">@moreLabel</span>
+                        <span class="dc-video-showcase__more-arrow" aria-hidden="true">↗</span>
+                    </a>
+                }
+            }
+            else
+            {
+                @for (var i = 0; i < videos.Count; i++)
+                {
+                    var item = videos[i];
+                    var selected = i == 0;
+                    <div class="dc-video-showcase__item @AccentClass(item, i) @(selected ? "is-selected" : null)" id="@id-@i" data-showcase-item>
+                        <h3 class="dc-video-showcase__heading">
+                            <button type="button" class="dc-video-showcase__trigger" id="@id-@i-trigger" aria-expanded="@(selected ? "true" : "false")" aria-controls="@id-@i-panel" data-showcase-trigger>
+                                <span class="dc-video-showcase__number" aria-hidden="true">@Number(i)</span>
+                                <span class="dc-video-showcase__label">
+                                    <span class="dc-video-showcase__title">@TitleOf(item)</span>
+                                    @if (item.Byline != null)
+                                    {
+                                        <span class="dc-video-showcase__byline">@item.Byline</span>
+                                    }
+                                </span>
+                            </button>
+                        </h3>
+                        <div class="dc-video-showcase__panel" id="@id-@i-panel" role="region" aria-labelledby="@id-@i-trigger" hidden="@(!selected)" data-showcase-panel>
+                            @{ RenderPlayer(item, "(min-width: 1024px) 60vw, 100vw"); }
+                            <div class="dc-video-showcase__panel-body">
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <p class="dc-video-showcase__description">@item.Description</p>
+                                }
+                                <div class="dc-video-showcase__panel-footer">
+                                    @{ RenderWatchLink(item); }
+                                    @if (videos.Count > 1)
+                                    {
+                                        <div class="dc-video-showcase__steps">
+                                            <button type="button" class="dc-video-showcase__step" data-showcase-step="-1" disabled="@(i == 0)">
+                                                <span aria-hidden="true">←</span><span class="sr-only">Previous video</span>
+                                            </button>
+                                            <button type="button" class="dc-video-showcase__step" data-showcase-step="1" disabled="@(i == videos.Count - 1)">
+                                                <span aria-hidden="true">→</span><span class="sr-only">Next video</span>
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </dc-video-showcase>
+
+        @if (more != null && !isGrid)
+        {
+            <p class="dc-video-showcase-block__more">
+                <a href="@more.Url" target="@more.Target" rel="@(more.Target == "_blank" ? "noopener" : null)">@moreLabel <span aria-hidden="true">↗</span></a>
+            </p>
+        }
+    </section>
+}

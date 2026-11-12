@@ -1,0 +1,67 @@
+{
+  "Name": "Video showcase",
+  "Alias": "videoShowcaseBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/335b9482bee5414d866fdcd5ffd2abaf",
+  "Icon": "icon-video",
+  "Description": "A set of past talks from YouTube as a list or a grid, with a link to more on YouTube. Nothing loads from YouTube until a video is played.",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "0a3ec25c-7ef7-4350-b823-082c2853e79f",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "3c06e44a-f664-4d8c-8f0f-91bc32aa0b5a",
+          "Alias": "videos",
+          "DataType": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
+          "Description": "Up to 12 videos, shown in this order.",
+          "Mandatory": true,
+          "Name": "Videos"
+        },
+        {
+          "Key": "ed2b7e49-156b-4e8e-9225-1b9ee3febcfe",
+          "Alias": "moreVideosLink",
+          "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
+          "Description": "Optional, e.g. the Umbraco YouTube channel or a playlist.",
+          "Name": "More videos link",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

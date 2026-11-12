@@ -45,6 +45,8 @@
     "textBlock",
     "titleBlock",
     "videoBlock",
+    "videoShowcaseBlock",
+    "videoShowcaseItem",
     "youTubeVideoBlock"
   ]
 }

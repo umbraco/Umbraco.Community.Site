@@ -138,8 +138,8 @@ describe('VideoPickerYouTubeElement', () => {
       youTubeScripts()[0].dispatchEvent(new Event('error'))
       await playing
 
-      const iframe = element.querySelector('iframe')!
-      expect(iframe.slot).toBe('video')
+      const iframe = element.querySelector('[slot="video"] iframe') as HTMLIFrameElement
+      expect(iframe).toBeTruthy()
       expect(new URL(iframe.src).searchParams.get('autoplay')).toBe('1')
       expect(new URL(iframe.src).searchParams.get('playsinline')).toBe('1')
     })

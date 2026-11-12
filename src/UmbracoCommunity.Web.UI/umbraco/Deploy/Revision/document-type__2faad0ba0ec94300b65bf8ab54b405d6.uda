@@ -1,0 +1,95 @@
+{
+  "Name": "Video showcase item",
+  "Alias": "videoShowcaseItem",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-video",
+  "Thumbnail": "folder.png",
+  "Description": "One video in a Video showcase.",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "31f05745-5605-440b-9e8e-15b6a08356b8",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "5a2f05c0-21e7-4002-a640-a6022974442e",
+          "Alias": "video",
+          "DataType": "umb://data-type/781bfd8fc2514c3295bf72ff40cea68a",
+          "ValueType": "UmbracoCommunity.Web.Features.YouTube.YouTubeVideo",
+          "Description": "Paste a YouTube link, then pick a still from the video as its poster.",
+          "Mandatory": true,
+          "Name": "Video"
+        },
+        {
+          "Key": "6f1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+          "Alias": "speaker",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Who is speaking, e.g. Jane Doe, Umbraco HQ.",
+          "Name": "Speaker",
+          "SortOrder": 1
+        },
+        {
+          "Key": "7a2c3d4e-5f6a-4b7c-9d8e-0f1a2b3c4d5e",
+          "Alias": "edition",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "e.g. Codegarden 2025.",
+          "Name": "Edition",
+          "SortOrder": 2
+        },
+        {
+          "Key": "8b3d4e5f-6a7b-4c8d-ae9f-1a2b3c4d5e6f",
+          "Alias": "description",
+          "DataType": "umb://data-type/3e4b047aa9f74036b1d8c3837e213b0c",
+          "ValueType": "System.String",
+          "Description": "A sentence or two about the talk.",
+          "Name": "Description",
+          "SortOrder": 3
+        },
+        {
+          "Key": "9c4e5f6a-7b8c-4d9e-bfa0-2b3c4d5e6f7a",
+          "Alias": "accentColour",
+          "DataType": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+          "ValueType": "Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter\u002BPickedColor",
+          "Description": "Optional. Leave empty to take the next colour from the brand palette.",
+          "Name": "Accent colour",
+          "SortOrder": 4
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/2faad0ba0ec94300b65bf8ab54b405d6",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3e4b047aa9f74036b1d8c3837e213b0c",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/781bfd8fc2514c3295bf72ff40cea68a",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}
