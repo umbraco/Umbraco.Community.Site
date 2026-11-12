@@ -13,6 +13,7 @@ public class MemberApiAntiforgeryTests
     [InlineData(typeof(MemberFeedsApiController))]
     [InlineData(typeof(ProfileDisplayApiController))]
     [InlineData(typeof(ProfileActivityEntryApiController))]
+    [InlineData(typeof(ProfileLinkMatchingApiController))]
     public void Member_api_controllers_validate_antiforgery_tokens(Type controllerType)
     {
         controllerType.GetCustomAttribute<AutoValidateAntiforgeryTokenAttribute>()
@@ -24,6 +25,7 @@ public class MemberApiAntiforgeryTests
     [InlineData(typeof(MemberFeedsApiController))]
     [InlineData(typeof(ProfileDisplayApiController))]
     [InlineData(typeof(ProfileActivityEntryApiController))]
+    [InlineData(typeof(ProfileLinkMatchingApiController))]
     public void No_member_api_action_opts_out_of_antiforgery_validation(Type controllerType)
     {
         controllerType

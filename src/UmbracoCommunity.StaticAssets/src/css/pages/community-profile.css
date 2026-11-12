@@ -845,3 +845,59 @@
     opacity: 0.6;
     cursor: progress;
 }
+
+/* DevRel-only banner: a full-bleed dark strip above the hero, on every DevRel view that differs from the public page. */
+.community-profile__devrel-banner {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: var(--color-identity-dark);
+    color: var(--color-white);
+    border-bottom: 4px solid var(--color-identity-yellow);
+}
+
+.community-profile__devrel-banner-inner {
+    max-width: var(--max-width);
+    margin-inline: auto;
+    padding: var(--unit-sm) var(--unit);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--unit-xs);
+}
+
+.community-profile__devrel-banner-title,
+.community-profile__devrel-banner-text {
+    margin: 0;
+}
+
+.community-profile__devrel-banner-title {
+    font-weight: 700;
+}
+
+.community-profile__devrel-banner-text {
+    font-size: var(--font-size-sm);
+}
+
+/* Marks a section or item the member hid, on a DevRel view that shows everything. Dark on yellow meets contrast. */
+.community-profile__hidden-label {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 0.125rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-identity-yellow);
+    color: var(--color-identity-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+/* A hidden link keeps its pill, with the hidden label beside it. */
+.community-profile__socials li:has(.community-profile__hidden-label) {
+    align-items: center;
+    gap: var(--unit-xxs);
+}
+
+.community-profile__socials .community-profile__hidden-label {
+    align-self: center;
+}

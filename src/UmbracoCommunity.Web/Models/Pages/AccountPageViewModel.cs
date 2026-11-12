@@ -45,6 +45,12 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     /// <summary>True when the member may add activity to their profile by hand (see <c>ProfileAccessService.CanAddActivityAsync</c>).</summary>
     public bool CanAddActivity { get; set; }
 
+    /// <summary>
+    /// True when the member is offered links found for them and can say a source is not theirs (see
+    /// <c>ProfileAccessService.CanMatchLinksAsync</c>).
+    /// </summary>
+    public bool CanMatchLinks { get; set; }
+
     /// <summary>The member's public profile URL, once claimed.</summary>
     public string? ProfileUrl { get; set; }
 

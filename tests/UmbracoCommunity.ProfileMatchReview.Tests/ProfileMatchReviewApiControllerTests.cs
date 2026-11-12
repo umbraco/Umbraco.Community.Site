@@ -132,4 +132,22 @@ public class ProfileMatchReviewApiControllerTests : IDisposable
         (await controller.Link(9999)).Result.Should().BeOfType<NotFoundResult>();
         (await controller.Reject(9999)).Result.Should().BeOfType<NotFoundResult>();
     }
+
+    [Fact]
+    public async Task A_member_saying_a_source_is_not_theirs_shows_as_rejected_by_the_member_and_can_be_overruled()
+    {
+        await HeldMatchAsync();
+        await _store.RecordMemberRejectionAsync(_profileId, Source, [new MatchSignal("Member", "Member said this is not theirs")]);
+        var controller = ControllerFor(_store, ProfileMatchReviewApiConstants.ReviewerGroupAlias, userName: "Ada");
+
+        var rejected = (await controller.List(ProfileMatchState.Rejected)).Value!.Items.Should().ContainSingle().Subject;
+
+        rejected.DecidedBy.Should().Be(ProfileMatchDecider.Member.ToString());
+        rejected.DecidedByUserName.Should().BeNull();
+        rejected.Signals.Select(s => s.Name).Should().Equal("Link", "Member");
+
+        var linked = (await controller.Link(rejected.Id)).Value!;
+        linked.State.Should().Be(ProfileMatchState.Confirmed.ToString());
+        linked.DecidedBy.Should().Be(ProfileMatchDecider.Manual.ToString());
+    }
 }

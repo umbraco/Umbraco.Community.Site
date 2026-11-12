@@ -4,7 +4,8 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 
 /// <summary>
 /// Talks to the external content platform about a profile. Reads a member's public activity from it
-/// (<see cref="FindProfileAsync"/>, <see cref="GetActivitiesAsync"/>); the platform has no endpoints
+/// (<see cref="FindProfileAsync"/>, <see cref="GetActivitiesAsync"/>) and asks it about a member's links
+/// (<see cref="VerifyLinksAsync"/>); the platform has no endpoints
 /// yet for profile-claim, feed and activity notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
 /// </summary>
 public interface IProfileSyncClient
@@ -20,6 +21,13 @@ public interface IProfileSyncClient
     /// platform profile, newest first. Throws when the platform cannot be reached or errors.
     /// </summary>
     Task<IReadOnlyList<PlatformActivity>> GetActivitiesAsync(string platformProfileId, string group, int limit, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asks whether the platform already ties each of <paramref name="urls"/> to the profile of the GitHub user
+    /// <paramref name="handle"/>. Only https addresses are sent. Returns an empty list when the platform is not
+    /// configured. Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default);
 
     Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default);
 

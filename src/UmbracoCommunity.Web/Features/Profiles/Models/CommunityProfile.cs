@@ -112,10 +112,15 @@ public sealed record ProfileBadge(
     DateTimeOffset? AwardedAt);
 
 /// <summary>A link to the member's presence on an external platform.</summary>
+/// <param name="IsHiddenByMember">
+/// True when the member hid the link. Such a link is only included on a DevRel view that shows everything
+/// (see <see cref="ProfileAccessService.GetViewableProfileAsync"/>).
+/// </param>
 public sealed record ProfileSocialLink(
     string Platform,
     string Url,
-    string? FaviconUrl = null);
+    string? FaviconUrl = null,
+    bool IsHiddenByMember = false);
 
 /// <summary>A post the member made on a social platform (LinkedIn, Mastodon, Bluesky).</summary>
 public sealed record ProfileSocialPost(

@@ -22,8 +22,9 @@ public class ProfileMatchStore
     }
 
     /// <summary>
-    /// Records an automatic decision, replacing an earlier automatic one. A manual decision is never replaced:
-    /// the stored record is returned as it is. Returns <c>null</c> when the profile does not exist.
+    /// Records an automatic decision, replacing an earlier automatic one. A decision made by a person (a backoffice
+    /// user or the member) is never replaced: the stored record is returned as it is. Returns <c>null</c> when the
+    /// profile does not exist.
     /// </summary>
     public async Task<ProfileMatchRecord?> RecordAutomaticAsync(
         int memberProfileId,
@@ -41,16 +42,13 @@ public class ProfileMatchStore
             return null;
         }
 
-        if (string.IsNullOrWhiteSpace(sourceUrl) || sourceUrl.Length > MaxSourceUrlLength)
-        {
-            throw new ArgumentException($"The source must be 1 to {MaxSourceUrlLength} characters.", nameof(sourceUrl));
-        }
+        ValidateSourceUrl(sourceUrl);
 
         var url = sourceUrl;
         var entity = await context.ProfileMatches
             .FirstOrDefaultAsync(m => m.MemberProfileId == memberProfileId && m.SourceUrl == url, ct);
 
-        if (entity?.DecidedBy == ProfileMatchDecider.Manual)
+        if (entity != null && entity.DecidedBy != ProfileMatchDecider.Automatic)
         {
             return ToRecord(entity, profile);
         }
@@ -77,6 +75,81 @@ public class ProfileMatchStore
 
         await context.SaveChangesAsync(ct);
         return ToRecord(entity, profile);
+    }
+
+    /// <summary>
+    /// Records that the member says <paramref name="sourceUrl"/> is not theirs: the match becomes
+    /// <see cref="ProfileMatchState.Rejected"/>, decided by <see cref="ProfileMatchDecider.Member"/>, and is created when
+    /// there was none. The signals are added to those already stored. Returns <c>null</c> when the profile does not exist.
+    /// </summary>
+    public async Task<ProfileMatchRecord?> RecordMemberRejectionAsync(
+        int memberProfileId,
+        string sourceUrl,
+        IReadOnlyList<MatchSignal> signals,
+        CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+
+        var profile = await context.MemberProfiles.FirstOrDefaultAsync(p => p.Id == memberProfileId, ct);
+        if (profile == null)
+        {
+            return null;
+        }
+
+        ValidateSourceUrl(sourceUrl);
+
+        var url = sourceUrl;
+        var entity = await context.ProfileMatches
+            .FirstOrDefaultAsync(m => m.MemberProfileId == memberProfileId && m.SourceUrl == url, ct);
+
+        var now = DateTime.UtcNow;
+        if (entity == null)
+        {
+            entity = new ProfileMatchEntity
+            {
+                MemberProfileId = memberProfileId,
+                SourceUrl = url,
+                CreatedUtc = now,
+            };
+            context.ProfileMatches.Add(entity);
+        }
+
+        entity.State = ProfileMatchState.Rejected;
+        entity.SignalsJson = SerializeSignals(DeserializeSignals(entity.SignalsJson).Concat(signals).Distinct().ToList());
+        entity.DecidedBy = ProfileMatchDecider.Member;
+        entity.DecidedByUserKey = null;
+        entity.DecidedByUserName = null;
+        entity.DecidedUtc = now;
+
+        await context.SaveChangesAsync(ct);
+        return ToRecord(entity, profile);
+    }
+
+    /// <summary>The sources rejected for the profile with the given GitHub handle (ignoring case); empty when there is no such profile.</summary>
+    public async Task<IReadOnlyList<string>> GetRejectedSourcesAsync(string gitHubHandle, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var handle = gitHubHandle.ToLower();
+        return await context.ProfileMatches
+            .AsNoTracking()
+            .Where(m => m.State == ProfileMatchState.Rejected && m.MemberProfile!.GitHubHandle.ToLower() == handle)
+            .Select(m => m.SourceUrl)
+            .ToListAsync(ct);
+    }
+
+    /// <summary>Every stored match of one profile, by source.</summary>
+    public async Task<IReadOnlyDictionary<string, ProfileMatchRecord>> GetForProfileAsync(int memberProfileId, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var rows = await context.ProfileMatches
+            .AsNoTracking()
+            .Include(m => m.MemberProfile)
+            .Where(m => m.MemberProfileId == memberProfileId)
+            .ToListAsync(ct);
+
+        return rows
+            .Select(m => ToRecord(m, m.MemberProfile!))
+            .ToDictionary(r => r.SourceUrl, StringComparer.Ordinal);
     }
 
     /// <summary>
@@ -132,6 +205,14 @@ public class ProfileMatchStore
             .ToListAsync(ct);
 
         return new ProfileMatchPage(rows.Select(m => ToRecord(m, m.MemberProfile!)).ToList(), total);
+    }
+
+    private static void ValidateSourceUrl(string sourceUrl)
+    {
+        if (string.IsNullOrWhiteSpace(sourceUrl) || sourceUrl.Length > MaxSourceUrlLength)
+        {
+            throw new ArgumentException($"The source must be 1 to {MaxSourceUrlLength} characters.", nameof(sourceUrl));
+        }
     }
 
     private static ProfileMatchRecord ToRecord(ProfileMatchEntity entity, MemberProfileEntity profile) =>

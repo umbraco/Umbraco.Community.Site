@@ -598,3 +598,72 @@
   font-size: var(--font-size-sm);
   color: var(--color-red);
 }
+
+/* Links found for the member: each one can be added to their links or marked as not theirs. */
+.dc-link-suggestions {
+  display: grid;
+  gap: var(--unit-sm);
+}
+
+.dc-link-suggestions__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-link-suggestions__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-sm);
+  padding: var(--unit-xs) 0;
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.dc-link-suggestions__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xxs);
+  min-width: 0;
+}
+
+.dc-link-suggestions__label {
+  font-weight: 700;
+  color: var(--color-identity-blue);
+}
+
+.dc-link-suggestions__platform {
+  font-weight: 400;
+  color: var(--color-dark-grey);
+}
+
+.dc-link-suggestions__url {
+  overflow-wrap: anywhere;
+  color: var(--color-dark-grey);
+}
+
+.dc-link-suggestions__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-sm);
+}
+
+.dc-link-suggestions__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-light-blue);
+}
+
+.dc-link-suggestions__status:not(:empty) {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-link-suggestions__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-red);
+}

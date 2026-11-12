@@ -11,7 +11,9 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// have completed onboarding (see <see cref="OnboardingStatus.Completed"/>); an in-progress
 /// onboarding is never visible. Profiles start hidden (see
 /// <see cref="MemberProfileEntity.IsProfileVisible"/>) and a hidden profile is returned only
-/// when the caller asks for it with <c>includeHidden</c>, which only the owner's own request does.
+/// when the caller asks for it with <c>includeHidden</c>, which only the owner's own request and a
+/// DevRel member's request do. The links the member hid are returned (marked) only when the caller asks for them
+/// with <c>includeHiddenLinks</c>, which only a DevRel view of someone else's profile does.
 /// </summary>
 /// <remarks>
 /// The community-activity collections (blog posts, videos, talks, badges, forum posts,
@@ -37,7 +39,11 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
         _imageProxy = imageProxy;
     }
 
-    public async Task<CommunityProfile?> GetProfileAsync(string slug, bool includeHidden = false, CancellationToken cancellationToken = default)
+    public async Task<CommunityProfile?> GetProfileAsync(
+        string slug,
+        bool includeHidden = false,
+        bool includeHiddenLinks = false,
+        CancellationToken cancellationToken = default)
     {
         var entity = await _store.GetByHandleAsync(slug, cancellationToken);
         if (entity == null
@@ -48,11 +54,11 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
         }
 
         var socialLinks = entity.Feeds
-            .Where(f => !f.IsRemoved && !f.IsHidden)
+            .Where(f => !f.IsRemoved && (includeHiddenLinks || !f.IsHidden))
             .OrderBy(f => f.SortOrder)
             .ThenBy(f => f.AddedUtc)
             .ThenBy(f => f.Id)
-            .Select(f => new ProfileSocialLink(f.Platform, f.Url, _imageProxy.CreateProxyUrl(f.FaviconUrl)))
+            .Select(f => new ProfileSocialLink(f.Platform, f.Url, _imageProxy.CreateProxyUrl(f.FaviconUrl), IsHiddenByMember: f.IsHidden))
             .ToList();
 
         return new CommunityProfile(

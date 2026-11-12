@@ -5,8 +5,8 @@ namespace UmbracoCommunity.Web.Features.Profiles.Models;
 /// </summary>
 /// <param name="Show">True when the enriched sections may be shown.</param>
 /// <param name="IsGated">
-/// True when they are shown only because the viewer is in the early access group looking at
-/// their own profile (the tenant's setting is off). Such a page must not be indexed.
+/// True when they are shown only because of the viewer's member group (the tenant's setting is off): the early
+/// access group looking at their own profile, or the DevRel group. Such a page must not be indexed.
 /// </param>
 public sealed record EnrichedSectionsAccess(bool Show, bool IsGated)
 {

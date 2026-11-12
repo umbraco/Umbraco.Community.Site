@@ -18,7 +18,11 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
     /// <summary>Visiting <c>/community/profiles/not-found</c> returns no profile (renders a 404).</summary>
     public const string NotFoundSlug = "not-found";
 
-    public Task<CommunityProfile?> GetProfileAsync(string slug, bool includeHidden = false, CancellationToken cancellationToken = default)
+    public Task<CommunityProfile?> GetProfileAsync(
+        string slug,
+        bool includeHidden = false,
+        bool includeHiddenLinks = false,
+        CancellationToken cancellationToken = default)
     {
         if (string.Equals(slug, NotFoundSlug, StringComparison.OrdinalIgnoreCase))
         {
