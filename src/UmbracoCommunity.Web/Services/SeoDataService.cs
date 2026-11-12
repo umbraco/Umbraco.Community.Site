@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Profiles;
+using UmbracoCommunity.Web.Features.Profiles.Models;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
@@ -201,7 +202,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         viewModel.MetaTitle = viewable.Profile.Identity.DisplayName;
 
         // A DevRel member's view of someone else's profile is not what the public sees, so it must not be indexed.
-        if (await _profileAccessService.IsDevRelViewAsync(handle))
+        var isDevRelView = await _profileAccessService.IsDevRelViewAsync(handle);
+        if (isDevRelView)
         {
             viewModel.Robots = "noindex, follow";
             return;
@@ -220,6 +222,36 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         if (access.IsGated)
         {
             viewModel.Robots = "noindex, follow";
+            return;
+        }
+
+        // Share previews and structured data are for the page everyone sees, which is only the case
+        // once the tenant has opened the profile sections to everyone.
+        if (ProfileSeo.IsPubliclyVisible(viewable, access, isDevRelView))
+        {
+            ApplyPublicProfileSeo(viewModel, viewable.Profile);
+        }
+    }
+
+    private void ApplyPublicProfileSeo(MetaTagsViewModel viewModel, CommunityProfile profile)
+    {
+        var description = ProfileSeo.Description(profile.Identity);
+        if (description.Length > 0)
+        {
+            viewModel.MetaDescription = description;
+        }
+
+        viewModel.OpenGraphType = "profile";
+        viewModel.TwitterCard = "summary";
+        viewModel.OpenGraphImageSize = null;
+
+        var imageUrl = _urlUtilities.MakeAbsoluteUrl(profile.Identity.AvatarUrl);
+        Uri? imageUri = Uri.TryCreate(imageUrl, UriKind.Absolute, out var parsed) ? parsed : null;
+        viewModel.OpenGraphImageUrl = imageUri?.ToString() ?? string.Empty;
+
+        if (Uri.TryCreate(viewModel.CanonicalUrl, UriKind.Absolute, out var pageUrl))
+        {
+            viewModel.AddSchemaMarkup(ProfileSeo.Schema(profile, pageUrl, imageUri).ToHtmlEscapedString());
         }
     }
 

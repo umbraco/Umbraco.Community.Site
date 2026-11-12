@@ -61,6 +61,7 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.AddScoped<AvatarUploadService>();
         builder.Services.AddScoped<IProfileDataProvider, MemberProfileDataProvider>();
         builder.Services.AddScoped<ProfileAccessService>();
+        builder.Services.AddScoped<ProfileSitemapService>();
         builder.Services.AddScoped<IProfileSyncClient, PlatformProfileSyncClient>();
         builder.Services.Configure<ProfileActivityOptions>(builder.Config.GetSection(ProfileActivityOptions.SectionName));
         builder.Services.AddScoped<ProfileActivityService>();
