@@ -1,13 +1,42 @@
 {
   "Name": "Video size dropdown",
-  "EditorAlias": "Umbraco.DropDown.Flexible",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
-  "DatabaseType": "Nvarchar",
+  "EditorAlias": "Umbraco.Community.Contentment.DataList",
+  "EditorUiAlias": "Umb.Contentment.PropertyEditorUi.DataList",
   "Configuration": {
-    "items": [
-      "100%",
-      "90%",
-      "70%"
+    "dataSource": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.UserDefinedDataListSource, Umbraco.Community.Contentment",
+        "value": {
+          "items": [
+            {
+              "name": "90%",
+              "value": "90%",
+              "icon": "icon-stop",
+              "description": ""
+            },
+            {
+              "name": "70%",
+              "value": "70%",
+              "icon": "icon-stop",
+              "description": ""
+            },
+            {
+              "name": "100%",
+              "value": "100%",
+              "icon": "icon-stop",
+              "description": ""
+            }
+          ]
+        }
+      }
+    ],
+    "listEditor": [
+      {
+        "key": "Umbraco.Community.Contentment.DataEditors.DropdownListDataListEditor, Umbraco.Community.Contentment",
+        "value": {
+          "allowEmpty": false
+        }
+      }
     ]
   },
   "Parent": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",

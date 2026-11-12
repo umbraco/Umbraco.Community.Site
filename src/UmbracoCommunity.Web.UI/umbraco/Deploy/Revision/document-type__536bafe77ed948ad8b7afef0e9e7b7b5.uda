@@ -23,7 +23,7 @@
           "Alias": "posterImage",
           "DataType": "umb://data-type/203b84b5923c43f185d56705adfe2697",
           "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
-          "Description": "Shown while the video loads, and instead of it for visitors who prefer reduced motion or are saving data.",
+          "Description": "Shown while the video loads, and instead of it for visitors who prefer reduced motion or are saving data.\n\nIdeal dimensions: 1920\u00D71080",
           "Mandatory": true,
           "Name": "Poster image",
           "SortOrder": 6
@@ -58,7 +58,7 @@
           "Alias": "video",
           "DataType": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
           "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
-          "Description": "MP4, muted and looping. Keep it short (10\u201320 seconds) and under about 8 MB.",
+          "Description": "MP4, muted and looping. Keep it short (10\u201320 seconds) and under 10 MB.\n\nIdeal dimensions: 1920\u00D71080",
           "Mandatory": true,
           "Name": "Video",
           "SortOrder": 4
@@ -68,7 +68,7 @@
           "Alias": "mobileVideo",
           "DataType": "umb://data-type/30c4915627114f768aaeaf6fe7c14075",
           "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
-          "Description": "Optional smaller MP4 for phones. Without one, phones show the poster image.",
+          "Description": "Optional smaller MP4 for phones. Without one, phones show the poster image.\n\nIdeal dimensions: 720\u00D71280",
           "Name": "Mobile video",
           "SortOrder": 5
         },

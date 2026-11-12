@@ -74,7 +74,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string Headline => this.Value<string>(_publishedValueFallback, "headline");
 
 		///<summary>
-		/// Mobile video: Optional smaller MP4 for phones. Without one, phones show the poster image.
+		/// Mobile video: Optional smaller MP4 for phones. Without one, phones show the poster image.  Ideal dimensions: 720×1280
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -82,7 +82,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops MobileVideo => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "mobileVideo");
 
 		///<summary>
-		/// Poster image: Shown while the video loads, and instead of it for visitors who prefer reduced motion or are saving data.
+		/// Poster image: Shown while the video loads, and instead of it for visitors who prefer reduced motion or are saving data.  Ideal dimensions: 1920×1080
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
@@ -98,7 +98,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string Tagline => this.Value<string>(_publishedValueFallback, "tagline");
 
 		///<summary>
-		/// Video: MP4, muted and looping. Keep it short (10–20 seconds) and under about 8 MB.
+		/// Video: MP4, muted and looping. Keep it short (10–20 seconds) and under 10 MB.  Ideal dimensions: 1920×1080
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]

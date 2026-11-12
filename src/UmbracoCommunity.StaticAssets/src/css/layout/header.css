@@ -504,7 +504,7 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
 body.hero-full-width .nav-header {
   position: fixed;
   inset: 0 0 auto;
-  margin-inline: auto;
+  max-width: none;
 }
 
 body.hero-full-width .nav-header__overlay {
@@ -532,10 +532,6 @@ body.hero-full-width .nav-header__overlay {
 
   body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
     padding: 2rem 3rem;
-  }
-
-  body.hero-full-width.scroll:not(.mobile) .nav-header .header {
-    padding: 1rem 5rem 16px 5rem;
   }
 
   body.scroll .nav-header .nav .nav-list {

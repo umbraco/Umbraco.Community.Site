@@ -6,7 +6,7 @@ body.hero-full-width main {
 
 .dc-video-hero {
   --video-hero-height: 90svh;
-  --video-hero-overlay: linear-gradient(180deg, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.3) 45%, rgb(0 0 0 / 0.55) 100%);
+  --video-hero-overlay: linear-gradient(180deg, rgb(0 0 0 / 0.65) 0%, rgb(0 0 0 / 0.55) 25%, rgb(0 0 0 / 0.55) 75%, rgb(0 0 0 / 0.65) 100%);
 
   position: relative;
   isolation: isolate;
@@ -37,7 +37,7 @@ body.hero-full-width main {
 }
 
 .dc-video-hero--left {
-  --video-hero-overlay: linear-gradient(90deg, rgb(0 0 0 / 0.65) 0%, rgb(0 0 0 / 0.35) 55%, rgb(0 0 0 / 0.15) 100%);
+  --video-hero-overlay: linear-gradient(90deg, rgb(0 0 0 / 0.7) 0%, rgb(0 0 0 / 0.55) 60%);
 }
 
 .dc-video-hero__poster,
