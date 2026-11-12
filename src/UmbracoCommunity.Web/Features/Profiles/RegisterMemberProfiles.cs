@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
@@ -87,6 +90,15 @@ public sealed class RegisterMemberProfiles : IComposer
             ConnectCallback = PublicNetworkGuard.ConnectToPublicAddressAsync,
         });
         builder.Services.AddScoped<LinkPreviewService>();
+        builder.Services.AddScoped<ProfileTimelinePreviewStore>();
+
+        // Copies of timeline preview pictures live in the media file system, like uploaded avatars.
+        builder.Services.AddScoped(sp => new ProfileTimelineImageStore(
+            sp.GetRequiredService<MediaFileManager>().FileSystem,
+            sp.GetRequiredService<LinkPreviewHttpClient>(),
+            sp.GetRequiredService<AppCaches>(),
+            sp.GetRequiredService<ILogger<ProfileTimelineImageStore>>()));
+        builder.Services.AddScoped<ProfileTimelinePreviewService>();
 
         // Append so built-in content finders match first. Ours only fires under the tenant's
         // Community Profile page for a plausible-handle trailing segment (e.g. /community/profiles/octocat).

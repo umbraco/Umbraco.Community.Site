@@ -79,8 +79,8 @@ public class ProfileDisplayApiController : ControllerBase
     }
 
     /// <summary>
-    /// Replaces the member's choices: sections switched off, hidden items, and pinned items in order. A pinned
-    /// item must be in the member's activity, or already be pinned.
+    /// Replaces the member's choices: sections switched off, hidden items, pinned items in order, the activity graph
+    /// switch and the timeline's preview card choices. A pinned item must be in the member's activity, or already be pinned.
     /// </summary>
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateProfileDisplayRequest request, CancellationToken cancellationToken)
@@ -143,5 +143,8 @@ public class ProfileDisplayApiController : ControllerBase
         new(
             choices.HiddenSections,
             choices.HiddenActivityIds,
-            choices.Pins.Select(p => new ProfilePinResponse(p.ActivityId, p.Reason, p.Snapshot?.Title)).ToList());
+            choices.Pins.Select(p => new ProfilePinResponse(p.ActivityId, p.Reason, p.Snapshot?.Title)).ToList(),
+            choices.HideActivityGraph,
+            choices.HideTimelineCards,
+            choices.NoCardActivityIds);
 }

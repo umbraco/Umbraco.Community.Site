@@ -157,7 +157,8 @@ public class MemberProfileStore
 
     /// <summary>
     /// Replaces what the member has chosen their profile's activity sections show: the sections switched off,
-    /// the hidden items and the pinned items (stored in the order given, each with its copy of the item). Expects
+    /// the hidden items, the pinned items (stored in the order given, each with its copy of the item), the activity
+    /// graph switch and the timeline's preview card choices. Expects
     /// choices already checked by <see cref="ProfileDisplay.TryNormalize"/>. Returns the updated row, or null when the member has no profile row.
     /// </summary>
     public async Task<MemberProfileEntity?> SetDisplayChoicesAsync(Guid memberKey, ProfileDisplayChoices choices, CancellationToken ct = default)
@@ -170,6 +171,9 @@ public class MemberProfileStore
 
         entity.HiddenSections = [.. choices.HiddenSections];
         entity.HiddenActivityIds = [.. choices.HiddenActivityIds];
+        entity.HideActivityGraph = choices.HideActivityGraph;
+        entity.HideTimelineCards = choices.HideTimelineCards;
+        entity.NoCardActivityIds = [.. choices.NoCardActivityIds];
 
         context.MemberPinnedItems.RemoveRange(entity.PinnedItems);
         entity.PinnedItems = choices.Pins

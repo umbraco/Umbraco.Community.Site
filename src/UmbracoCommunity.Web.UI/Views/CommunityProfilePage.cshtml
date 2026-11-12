@@ -20,15 +20,6 @@
             <span class="community-profile__hidden-label">Hidden by member</span>
         }
     }
-
-    // An item the member hid, unless its whole section is hidden: the section heading is marked then.
-    void HiddenItemLabel(string group, string? activityId)
-    {
-        if (!Model.IsMarkedHidden(group))
-        {
-            HiddenLabel(group, activityId);
-        }
-    }
 }
 
 @if (profile is null)
@@ -341,93 +332,112 @@ else
             </section>
         }
 
-        @if (profile.SocialPosts.Count > 0 || profile.ForumPosts.Count > 0)
+        @if (Model.ActivityGraph is { } graph)
         {
-            <section class="community-profile__social" aria-label="Community activity">
-                <div class="community-profile__activity-grid">
-                    @if (profile.SocialPosts.Count > 0)
+            <section class="community-profile__graph" aria-labelledby="community-profile-graph-title">
+                <h2 class="community-profile__section-title" id="community-profile-graph-title">Activity over the last 12 months</h2>
+                <div class="community-profile__graph-grid" aria-hidden="true">
+                    @foreach (var week in graph.Weeks)
                     {
-                        <div class="community-profile__activity-col">
-                            <h3 class="community-profile__social-subtitle">
-                                @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "social")
-                                Social activity
-                                @{ HiddenLabel(PlatformActivityGroups.Social); }
-                            </h3>
-                            <ul class="community-profile__activity-list">
-                                @foreach (var post in profile.SocialPosts)
-                                {
-                                    var platformKey = post.Platform.ToLowerInvariant();
-                                    <li class="community-profile__activity-item community-profile__social-item">
-                                        <span class="community-profile__social-badge community-profile__social-badge--@platformKey" aria-hidden="true">
-                                            @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", platformKey)
-                                        </span>
-                                        <div class="community-profile__social-body">
-                                            <span class="community-profile__social-head">
-                                                <span class="community-profile__social-name">@post.Platform</span>
-                                                <span class="community-profile__social-time">@post.PostedAt.ToRelativeTime()</span>
-                                            </span>
-                                            <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Text</a>
-                                            @{ HiddenItemLabel(PlatformActivityGroups.Social, post.ActivityId); }
-                                        </div>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    @if (profile.ForumPosts.Count > 0)
-                    {
-                        <div class="community-profile__activity-col">
-                            <h3 class="community-profile__social-subtitle">
-                                @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "forum")
-                                Forum activity
-                                @{ HiddenLabel(PlatformActivityGroups.Forum); }
-                            </h3>
-                            <ul class="community-profile__activity-list">
-                                @foreach (var post in profile.ForumPosts)
-                                {
-                                    <li class="community-profile__activity-item">
-                                        <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
-                                        @{ HiddenItemLabel(PlatformActivityGroups.Forum, post.ActivityId); }
-                                        <span class="community-profile__activity-meta">@Date(post.PostedAt)@(post.Replies is not null ? $" · {post.Replies} replies" : "")</span>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                        <span class="community-profile__graph-cell community-profile__graph-cell--@week.Level"
+                              title="Week of @week.Start.ToString("d MMM yyyy"): @(week.Count == 1 ? "1 item" : $"{week.Count} items")"></span>
+                        <span class="community-profile__graph-month">@week.MonthStart</span>
                     }
                 </div>
+                <ul class="sr-only">
+                    @foreach (var month in graph.Months)
+                    {
+                        <li>@month.Label: @(month.Count switch { 0 => "nothing", 1 => "1 item", _ => $"{month.Count} items" })</li>
+                    }
+                </ul>
             </section>
         }
 
-        <div class="community-profile__departments">
-            @if (profile.Packages.Count > 0)
-            {
-                <section class="community-profile__section" aria-label="Packages">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "package") Packages @{ HiddenLabel(PlatformActivityGroups.Packages); }</h2>
-                    <ul class="community-profile__dept-list">
-                        @foreach (var package in profile.Packages)
-                        {
-                            <li class="community-profile__dept-item">
-                                <a class="community-profile__dept-title" href="@package.Url" target="_blank" rel="noopener">@package.Name</a>
-                                @{ HiddenItemLabel(PlatformActivityGroups.Packages, package.ActivityId); }
-                                @if (!string.IsNullOrEmpty(package.Description))
+        @if (Model.ShowEnrichedSections && Model.Timeline.Count > 0)
+        {
+            <section class="community-profile__timeline" aria-labelledby="community-profile-timeline-title">
+                <h2 class="community-profile__section-title" id="community-profile-timeline-title">Timeline</h2>
+                <dc-profile-timeline>
+                    @if (Model.TimelineTypes.Count > 1)
+                    {
+                        // A plain GET form, so the filter also works without JavaScript; <dc-profile-timeline> filters in place
+                        // and keeps ?type= in the address. Other query string values (e.g. the DevRel view) are carried along.
+                        <form class="community-profile__timeline-filters" method="get" data-timeline-filters>
+                            @foreach (var parameter in Context.Request.Query.Where(q => !string.Equals(q.Key, ProfileTimeline.TypeQueryKey, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                foreach (var value in parameter.Value)
                                 {
-                                    <p class="community-profile__dept-desc">@package.Description</p>
+                                    <input type="hidden" name="@parameter.Key" value="@value" />
                                 }
-                                <ul class="community-profile__versions" aria-label="Versions">
-                                    @foreach (var version in package.Versions)
+                            }
+                            <div class="community-profile__timeline-filter">
+                                <label for="community-profile-timeline-type">Type</label>
+                                <select id="community-profile-timeline-type" name="@ProfileTimeline.TypeQueryKey" data-timeline-type>
+                                    <option value="" selected="@(Model.TimelineType == null)">Everything</option>
+                                    @foreach (var type in Model.TimelineTypes)
                                     {
-                                        <li class="community-profile__version">v@(version)</li>
+                                        <option value="@type.Key" selected="@(type.Key == Model.TimelineType)">@type.Label</option>
                                     }
-                                </ul>
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
+                                </select>
+                            </div>
+                            <button class="btn is-transparent community-profile__timeline-apply" type="submit" data-timeline-apply>Show</button>
+                        </form>
+                    }
+                    <p class="community-profile__timeline-empty" data-timeline-empty role="status" hidden="@Model.TimelineHasShownEntries">Nothing here for this filter.</p>
+                    @foreach (var month in Model.Timeline)
+                    {
+                        <section class="community-profile__timeline-month" data-timeline-month aria-labelledby="community-profile-timeline-@month.Key"
+                                 hidden="@(!month.Entries.Any(e => ProfileTimeline.IsShown(e, Model.TimelineType)))">
+                            <h3 class="community-profile__timeline-month-title" id="community-profile-timeline-@month.Key">@month.Label</h3>
+                            <ol class="community-profile__timeline-list">
+                                @foreach (var entry in month.Entries)
+                                {
+                                    var typeLabel = ProfileDisplay.SectionLabel(entry.Group);
+                                    <li class="community-profile__timeline-entry@(entry.Card != null ? " community-profile__timeline-entry--card" : "")"
+                                        data-timeline-entry data-type="@entry.Group" hidden="@(!ProfileTimeline.IsShown(entry, Model.TimelineType))">
+                                        <span class="community-profile__timeline-icon" title="@typeLabel">
+                                            @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", entry.IconKey)
+                                            <span class="sr-only">@typeLabel:</span>
+                                        </span>
+                                        <div class="community-profile__timeline-body">
+                                            @if (entry.Card is { } card)
+                                            {
+                                                <a class="community-profile__timeline-card no-link-animation" href="@entry.Url" target="_blank" rel="noopener">
+                                                    <img class="community-profile__timeline-card-image" src="@card.ImageUrl" alt="" loading="lazy" />
+                                                    <span class="community-profile__timeline-card-text">
+                                                        <span class="community-profile__timeline-title">@card.Title</span>
+                                                        @if (!string.IsNullOrEmpty(card.Description))
+                                                        {
+                                                            <span class="community-profile__timeline-desc">@card.Description</span>
+                                                        }
+                                                    </span>
+                                                </a>
+                                            }
+                                            else if (!string.IsNullOrEmpty(entry.Url))
+                                            {
+                                                <a class="community-profile__timeline-title" href="@entry.Url" target="_blank" rel="noopener">@entry.Title</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="community-profile__timeline-title">@entry.Title</span>
+                                            }
+                                            <span class="community-profile__timeline-meta">
+                                                <time datetime="@entry.Date.UtcDateTime.ToString("yyyy-MM-dd")">@Date(entry.Date)</time>@(string.IsNullOrEmpty(entry.Meta) ? "" : $" · {entry.Meta}")
+                                            </span>
+                                            @{ HiddenLabel(entry.Group, entry.ActivityId); }
+                                        </div>
+                                    </li>
+                                }
+                            </ol>
+                        </section>
+                    }
+                </dc-profile-timeline>
+            </section>
+        }
 
-            @if (profile.Talks.Count > 0)
-            {
+        @if (profile.Talks.Count > 0)
+        {
+            <div class="community-profile__departments">
                 <section class="community-profile__section" aria-label="Talks">
                     <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "talk") Talks</h2>
                     <ul class="community-profile__dept-list">
@@ -451,95 +461,7 @@ else
                         }
                     </ul>
                 </section>
-            }
-
-            @if (profile.BlogPosts.Count > 0)
-            {
-                <section class="community-profile__section" aria-label="Blog posts">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "blog") Blog posts @{ HiddenLabel(PlatformActivityGroups.Blog); }</h2>
-                    <ul class="community-profile__dept-list">
-                        @foreach (var post in profile.BlogPosts)
-                        {
-                            <li class="community-profile__dept-item">
-                                <a class="community-profile__dept-title" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
-                                @{ HiddenItemLabel(PlatformActivityGroups.Blog, post.ActivityId); }
-                                @if (!string.IsNullOrEmpty(post.Excerpt))
-                                {
-                                    <p class="community-profile__dept-desc">@post.Excerpt</p>
-                                }
-                                <span class="community-profile__dept-meta">@Date(post.PublishedAt)@(string.IsNullOrEmpty(post.Source) ? "" : $" · {post.Source}")</span>
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
-
-            @if (profile.Videos.Count > 0)
-            {
-                <section class="community-profile__section" aria-label="Videos">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "video") Videos @{ HiddenLabel(PlatformActivityGroups.Videos); }</h2>
-                    <ul class="community-profile__dept-list">
-                        @foreach (var video in profile.Videos)
-                        {
-                            <li class="community-profile__dept-item">
-                                <a class="community-profile__dept-title" href="@video.Url" target="_blank" rel="noopener">@video.Title</a>
-                                @{ HiddenItemLabel(PlatformActivityGroups.Videos, video.ActivityId); }
-                                @if (!string.IsNullOrEmpty(video.Description))
-                                {
-                                    <p class="community-profile__dept-desc">@video.Description</p>
-                                }
-                                @if (video.PublishedAt is not null)
-                                {
-                                    <span class="community-profile__dept-meta">@Date(video.PublishedAt)</span>
-                                }
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
-
-            @if (profile.Meetups.Count > 0)
-            {
-                <section class="community-profile__section" aria-label="Meet-ups">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "meetup") Meet-ups @{ HiddenLabel(PlatformActivityGroups.Meetups); }</h2>
-                    <ul class="community-profile__dept-list">
-                        @foreach (var meetup in profile.Meetups)
-                        {
-                            var tail = string.IsNullOrEmpty(meetup.Group)
-                                ? ", " + Date(meetup.Date)
-                                : ", " + meetup.Group + ", " + Date(meetup.Date);
-                            <li class="community-profile__dept-item">
-                                <p class="community-profile__dept-meetup">@meetup.Action @if (!string.IsNullOrEmpty(meetup.Url))
-                                {<a class="community-profile__dept-title" href="@meetup.Url" target="_blank" rel="noopener">@meetup.EventName</a>}
-                                else
-                                {<strong class="community-profile__dept-title">@meetup.EventName</strong>}@tail</p>
-                                @{ HiddenItemLabel(PlatformActivityGroups.Meetups, meetup.ActivityId); }
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
-
-            @if (profile.OtherActivities.Count > 0)
-            {
-                <section class="community-profile__section" aria-label="Other activity">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "other") Other activity @{ HiddenLabel(PlatformActivityGroups.Other); }</h2>
-                    <ul class="community-profile__dept-list">
-                        @foreach (var activity in profile.OtherActivities)
-                        {
-                            <li class="community-profile__dept-item">
-                                <a class="community-profile__dept-title" href="@activity.Url" target="_blank" rel="noopener">@activity.Title</a>
-                                @{ HiddenItemLabel(PlatformActivityGroups.Other, activity.ActivityId); }
-                                <p class="community-profile__dept-meetup">@activity.Kind, @Date(activity.Date)</p>
-                                @if (!string.IsNullOrEmpty(activity.Description))
-                                {
-                                    <p class="community-profile__dept-desc">@activity.Description</p>
-                                }
-                            </li>
-                        }
-                    </ul>
-                </section>
-            }
-        </div>
+            </div>
+        }
     </article>
 }

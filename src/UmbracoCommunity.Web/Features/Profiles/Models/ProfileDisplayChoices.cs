@@ -11,6 +11,15 @@ public sealed record ProfileDisplayChoices(
     IReadOnlyList<string> HiddenActivityIds,
     IReadOnlyList<ProfilePin> Pins)
 {
-    /// <summary>Every section shown, nothing hidden, nothing pinned.</summary>
+    /// <summary>Every section shown, nothing hidden, nothing pinned, the activity graph and preview cards on.</summary>
     public static readonly ProfileDisplayChoices None = new([], [], []);
+
+    /// <summary>True when the member has switched the activity graph off. The graph is on by default.</summary>
+    public bool HideActivityGraph { get; init; }
+
+    /// <summary>True when the member has switched preview cards off for the whole timeline. Cards are on by default.</summary>
+    public bool HideTimelineCards { get; init; }
+
+    /// <summary>The ids of single activities the member wants shown as a plain line in the timeline, without a preview card.</summary>
+    public IReadOnlyList<string> NoCardActivityIds { get; init; } = [];
 }

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
-using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Matching;
@@ -27,7 +26,6 @@ public sealed class ProfileActivityService
     private readonly ProfileActivityEntryService _activityEntryService;
     private readonly ProfileMatchStore _matchStore;
     private readonly IMvpDataService _mvpDataService;
-    private readonly FeedSubmissionImageProxyService _imageProxy;
     private readonly AppCaches _appCaches;
     private readonly IOptionsMonitor<ProfileActivityOptions> _options;
     private readonly ILogger<ProfileActivityService> _logger;
@@ -37,7 +35,6 @@ public sealed class ProfileActivityService
         ProfileActivityEntryService activityEntryService,
         ProfileMatchStore matchStore,
         IMvpDataService mvpDataService,
-        FeedSubmissionImageProxyService imageProxy,
         AppCaches appCaches,
         IOptionsMonitor<ProfileActivityOptions> options,
         ILogger<ProfileActivityService> logger)
@@ -46,7 +43,6 @@ public sealed class ProfileActivityService
         _activityEntryService = activityEntryService;
         _matchStore = matchStore;
         _mvpDataService = mvpDataService;
-        _imageProxy = imageProxy;
         _appCaches = appCaches;
         _options = options;
         _logger = logger;
@@ -155,7 +151,7 @@ public sealed class ProfileActivityService
                 .ToList(),
             Packages = profile.Packages
                 .Concat(InSection(PlatformActivityGroups.Packages, profile.Packages.Select(p => p.Url))
-                    .Select(e => new ProfilePackage(e.Title, e.Url, [], e.Description, ProfileActivityEntry.ActivityId(e.Id))))
+                    .Select(e => new ProfilePackage(e.Title, e.Url, [], e.Description, ProfileActivityEntry.ActivityId(e.Id), At(e))))
                 .ToList(),
             Meetups = profile.Meetups
                 .Concat(InSection(PlatformActivityGroups.Meetups, profile.Meetups.Select(m => m.Url ?? string.Empty))
@@ -220,14 +216,14 @@ public sealed class ProfileActivityService
                 .Select(a => new ProfileBlogPost(a.Title!, a.Url!, a.OccurredAt, a.Platform, Truncate(a.Summary), a.Id))
                 .ToList(),
             Videos: Items(PlatformActivityGroups.Videos)
-                .Select(a => new ProfileVideo(a.Title!, a.Url!, _imageProxy.CreateProxyUrl(a.ImageUrl), a.OccurredAt, Truncate(a.Summary), a.Id))
+                .Select(a => new ProfileVideo(a.Title!, a.Url!, a.ImageUrl, a.OccurredAt, Truncate(a.Summary), a.Id))
                 .ToList(),
             ForumPosts: Items(PlatformActivityGroups.Forum)
                 .Select(a => new ProfileForumPost(a.Title!, a.Url!, a.OccurredAt, null, a.Id))
                 .ToList(),
             Packages: Items(PlatformActivityGroups.Packages)
                 .DistinctBy(a => a.Url)
-                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary), a.Id))
+                .Select(a => new ProfilePackage(a.Title!, a.Url!, [], Truncate(a.Summary), a.Id, a.OccurredAt))
                 .ToList(),
             SocialPosts: Items(PlatformActivityGroups.Social)
                 .Select(a => new ProfileSocialPost(a.Platform ?? "Social", a.Url!, Truncate(a.Title)!, a.OccurredAt, a.Id))
