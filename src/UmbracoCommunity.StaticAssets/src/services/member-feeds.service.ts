@@ -12,9 +12,13 @@ export interface MemberFeed {
   previewTitle: string | null;
   faviconUrl: string | null;
   previewImageUrl: string | null;
+  /** Whether the link was checked as the member's; null when it has no decision or links aren't checked for them. */
+  matchStatus?: MemberFeedMatchStatus | null;
 }
 
 export type MemberFeedStatus = "Visible" | "Hidden" | "Unreachable";
+
+export type MemberFeedMatchStatus = "Confirmed" | "Held" | "Rejected";
 
 /**
  * Platform-synced feeds were matched to this member automatically by the external content

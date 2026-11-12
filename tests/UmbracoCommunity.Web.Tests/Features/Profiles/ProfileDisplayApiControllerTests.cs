@@ -105,6 +105,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
                 syncClient.Object,
                 new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
                 NullLogger<ProfileActivityEntryService>.Instance),
+            new ProfileMatchStore(_database),
             Mock.Of<IMvpDataService>(m => m.GetAll() == Array.Empty<MvpYear>()),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),

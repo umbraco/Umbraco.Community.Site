@@ -94,6 +94,7 @@ public class AccountPageController : RenderController
             GitHubBio = profile?.GitHubBio,
             CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(),
             CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(),
+            CanMatchLinks = onboardingCompleted && await _profileAccessService.CanMatchLinksAsync(),
         };
 
         if (onboardingCompleted && handle != null)

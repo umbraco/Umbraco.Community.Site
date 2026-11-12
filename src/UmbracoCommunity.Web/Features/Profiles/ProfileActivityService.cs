@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
+using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.Matching;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 
 namespace UmbracoCommunity.Web.Features.Profiles;
@@ -11,7 +13,9 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// Fills the activity sections of a <see cref="CommunityProfile"/> (blog posts, videos, forum posts, packages,
 /// social posts, meet-ups) from the external content platform, newest first. The platform profile is found by
 /// the member's GitHub handle only. The result is cached per handle; if the platform has nothing, is not
-/// configured or fails, the profile is returned unchanged. Activity the member added by hand and an admin verified
+/// configured or fails, the profile is returned unchanged. Platform activity from a source that was rejected for the
+/// member (see <see cref="ProfileMatchStore"/>) is left out; that is checked on every call, outside the cache, so a
+/// rejection takes effect at once. Activity the member added by hand and an admin verified
 /// (see <see cref="ProfileActivityEntryService"/>) is added to the matching sections.
 /// </summary>
 public sealed class ProfileActivityService
@@ -21,6 +25,7 @@ public sealed class ProfileActivityService
 
     private readonly IProfileSyncClient _syncClient;
     private readonly ProfileActivityEntryService _activityEntryService;
+    private readonly ProfileMatchStore _matchStore;
     private readonly IMvpDataService _mvpDataService;
     private readonly FeedSubmissionImageProxyService _imageProxy;
     private readonly AppCaches _appCaches;
@@ -30,6 +35,7 @@ public sealed class ProfileActivityService
     public ProfileActivityService(
         IProfileSyncClient syncClient,
         ProfileActivityEntryService activityEntryService,
+        ProfileMatchStore matchStore,
         IMvpDataService mvpDataService,
         FeedSubmissionImageProxyService imageProxy,
         AppCaches appCaches,
@@ -38,6 +44,7 @@ public sealed class ProfileActivityService
     {
         _syncClient = syncClient;
         _activityEntryService = activityEntryService;
+        _matchStore = matchStore;
         _mvpDataService = mvpDataService;
         _imageProxy = imageProxy;
         _appCaches = appCaches;
@@ -62,6 +69,7 @@ public sealed class ProfileActivityService
                 SocialPosts = activity.SocialPosts,
                 Meetups = activity.Meetups,
             };
+            enriched = WithoutRejectedSources(enriched, await GetRejectedSourcesAsync(profile.Slug, cancellationToken));
         }
 
         return AddVerifiedActivity(enriched, await GetVerifiedActivityAsync(profile.Slug, cancellationToken));
@@ -78,6 +86,43 @@ public sealed class ProfileActivityService
             _logger.LogWarning(ex, "Could not load the activity {Handle} added by hand", handle);
             return [];
         }
+    }
+
+    private async Task<IReadOnlyList<string>> GetRejectedSourcesAsync(string handle, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _matchStore.GetRejectedSourcesAsync(handle, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Could not load the rejected sources of {Handle}; showing all platform activity", handle);
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Leaves out the items in the platform activity sections whose link comes from one of
+    /// <paramref name="rejectedSources"/> (see <see cref="ProfileLinkMatchingService.SourceCovers"/>).
+    /// </summary>
+    internal static CommunityProfile WithoutRejectedSources(CommunityProfile profile, IReadOnlyList<string> rejectedSources)
+    {
+        if (rejectedSources.Count == 0)
+        {
+            return profile;
+        }
+
+        bool Keep(string? url) => url == null || !rejectedSources.Any(source => ProfileLinkMatchingService.SourceCovers(source, url));
+
+        return profile with
+        {
+            BlogPosts = profile.BlogPosts.Where(p => Keep(p.Url)).ToList(),
+            Videos = profile.Videos.Where(v => Keep(v.Url)).ToList(),
+            ForumPosts = profile.ForumPosts.Where(p => Keep(p.Url)).ToList(),
+            Packages = profile.Packages.Where(p => Keep(p.Url)).ToList(),
+            SocialPosts = profile.SocialPosts.Where(p => Keep(p.Url)).ToList(),
+            Meetups = profile.Meetups.Where(m => Keep(m.Url)).ToList(),
+        };
     }
 
     /// <summary>

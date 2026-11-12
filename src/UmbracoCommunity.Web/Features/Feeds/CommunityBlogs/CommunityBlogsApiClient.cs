@@ -40,6 +40,24 @@ public sealed class CommunityBlogsApiClient
         }
     }
 
+    /// <summary>
+    /// Asks whether the platform already ties each of <paramref name="links"/> (at most 20 https addresses) to the
+    /// profile of the GitHub user <paramref name="github"/>.
+    /// </summary>
+    public async Task<IReadOnlyList<VerifyLinkResultDto>> VerifyLinksAsync(
+        string github, IReadOnlyList<string> links, CancellationToken cancellationToken)
+    {
+        using var response = await SendWithRetryAsync(
+            () => new HttpRequestMessage(HttpMethod.Post, "profiles/verify-links")
+            {
+                Content = CreateJsonContent(new { github, links }),
+            },
+            cancellationToken);
+
+        var envelope = await response.Content.ReadFromJsonAsync<VerifyLinksResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
+        return envelope?.Data ?? [];
+    }
+
     /// <summary>Fetches the newest activity of one group (e.g. "blog", "forum") for a platform profile.</summary>
     public async Task<IReadOnlyList<ProfileActivityDto>> GetProfileActivitiesAsync(
         string profileId, string group, int limit, CancellationToken cancellationToken)

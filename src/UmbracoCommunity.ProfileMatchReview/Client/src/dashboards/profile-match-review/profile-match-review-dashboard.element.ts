@@ -145,7 +145,9 @@ export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitEleme
             Confidence ${Math.round(match.confidence * 100)}% ·
             ${match.decidedBy === "Manual"
               ? `decided by ${match.decidedByUserName ?? "a reviewer"}`
-              : "decided automatically"}
+              : match.decidedBy === "Member"
+                ? "decided by the member"
+                : "decided automatically"}
             · ${new Date(match.decidedUtc).toLocaleString()}
           </div>
           ${match.signals.length > 0

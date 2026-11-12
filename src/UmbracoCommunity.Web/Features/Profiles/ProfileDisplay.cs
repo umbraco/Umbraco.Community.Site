@@ -189,7 +189,12 @@ public static class ProfileDisplay
     /// the loaded activity is shown from the copy kept with its pin, and skipped when there is none. Talks and
     /// badges are not activity sections, so they are left as they are.
     /// </summary>
-    public static CommunityProfile Apply(CommunityProfile profile)
+    /// <param name="profile">The profile with its activity loaded.</param>
+    /// <param name="showHidden">
+    /// Keep the switched-off sections and hidden items, so only the pins are applied. The view marks them with
+    /// <see cref="IsHiddenByMember"/>.
+    /// </param>
+    public static CommunityProfile Apply(CommunityProfile profile, bool showHidden = false)
     {
         var choices = profile.DisplayChoices;
         if (choices.HiddenSections.Count == 0 && choices.HiddenActivityIds.Count == 0 && choices.Pins.Count == 0)
@@ -197,8 +202,12 @@ public static class ProfileDisplay
             return profile;
         }
 
-        var hiddenSections = new HashSet<string>(choices.HiddenSections, StringComparer.OrdinalIgnoreCase);
-        var hiddenIds = new HashSet<string>(choices.HiddenActivityIds, StringComparer.Ordinal);
+        var hiddenSections = showHidden
+            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(choices.HiddenSections, StringComparer.OrdinalIgnoreCase);
+        var hiddenIds = showHidden
+            ? new HashSet<string>(StringComparer.Ordinal)
+            : new HashSet<string>(choices.HiddenActivityIds, StringComparer.Ordinal);
 
         IReadOnlyList<T> Shown<T>(string group, IReadOnlyList<T> items, Func<T, string?> activityId) =>
             hiddenSections.Contains(group)
@@ -242,6 +251,18 @@ public static class ProfileDisplay
                 .ToList(),
         };
     }
+
+    /// <summary>True when the member has hidden anything: a section switched off or a single item hidden.</summary>
+    public static bool HidesAnything(ProfileDisplayChoices choices) =>
+        choices.HiddenSections.Count > 0 || choices.HiddenActivityIds.Count > 0;
+
+    /// <summary>
+    /// True when the member has switched off the section <paramref name="group"/>, or hidden the item with
+    /// <paramref name="activityId"/> (when given).
+    /// </summary>
+    public static bool IsHiddenByMember(ProfileDisplayChoices choices, string group, string? activityId = null) =>
+        choices.HiddenSections.Contains(group, StringComparer.OrdinalIgnoreCase)
+        || (activityId != null && choices.HiddenActivityIds.Contains(activityId, StringComparer.Ordinal));
 
     /// <summary>
     /// Every item in the profile's activity sections that has an activity id (and so can be hidden or pinned),

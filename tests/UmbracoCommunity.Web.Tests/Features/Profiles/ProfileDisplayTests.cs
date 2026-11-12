@@ -323,4 +323,47 @@ public class ProfileDisplayTests
             (PlatformActivityGroups.Videos, "v1"),
             (PlatformActivityGroups.Social, "s1"));
     }
+
+    [Fact]
+    public void Showing_hidden_keeps_the_switched_off_sections_and_hidden_items()
+    {
+        var result = ProfileDisplay.Apply(With(new ProfileDisplayChoices([PlatformActivityGroups.Videos], ["b1", "m1"], [])), showHidden: true);
+
+        result.BlogPosts.Select(p => p.ActivityId).Should().Equal("b1", "b2");
+        result.Videos.Should().HaveCount(1);
+        result.Meetups.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void Showing_hidden_still_features_the_pins_including_one_in_a_switched_off_section()
+    {
+        var choices = new ProfileDisplayChoices([PlatformActivityGroups.Videos], [], [new ProfilePin("v1", "Proud"), new ProfilePin("b2", null)]);
+
+        var result = ProfileDisplay.Apply(With(choices), showHidden: true);
+
+        result.FeaturedItems.Select(i => (i.ActivityId, i.Reason)).Should().Equal(("v1", "Proud"), ("b2", null));
+    }
+
+    [Theory]
+    [InlineData(PlatformActivityGroups.Videos, null, true)]
+    [InlineData("VIDEOS", "v9", true)]
+    [InlineData(PlatformActivityGroups.Blog, "b1", true)]
+    [InlineData(PlatformActivityGroups.Blog, "B1", false)]
+    [InlineData(PlatformActivityGroups.Blog, "b2", false)]
+    [InlineData(PlatformActivityGroups.Blog, null, false)]
+    public void An_item_or_section_is_hidden_by_the_member_when_its_section_is_off_or_its_id_is_hidden(string group, string? activityId, bool expected)
+    {
+        var choices = new ProfileDisplayChoices([PlatformActivityGroups.Videos], ["b1"], []);
+
+        ProfileDisplay.IsHiddenByMember(choices, group, activityId).Should().Be(expected);
+    }
+
+    [Fact]
+    public void Only_hidden_sections_or_items_count_as_hiding_anything()
+    {
+        ProfileDisplay.HidesAnything(ProfileDisplayChoices.None).Should().BeFalse();
+        ProfileDisplay.HidesAnything(new ProfileDisplayChoices([], [], [new ProfilePin("b1", null)])).Should().BeFalse();
+        ProfileDisplay.HidesAnything(new ProfileDisplayChoices([PlatformActivityGroups.Blog], [], [])).Should().BeTrue();
+        ProfileDisplay.HidesAnything(new ProfileDisplayChoices([], ["b1"], [])).Should().BeTrue();
+    }
 }

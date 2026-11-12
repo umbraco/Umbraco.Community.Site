@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Security;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
+using UmbracoCommunity.Web.Features.Profiles.Matching;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 
@@ -14,6 +15,8 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// feeds step and the Account page (same endpoints, same behaviour in both places).
 /// Every POST, PUT and DELETE must carry the antiforgery request token from
 /// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
+/// For members whose links are checked (see <see cref="ProfileAccessService.CanMatchLinksAsync"/>) a new or changed
+/// address is checked after it is saved, and each link is listed with its match status.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
@@ -25,19 +28,25 @@ public class MemberFeedsApiController : ControllerBase
     private readonly IProfileSyncClient _profileSyncClient;
     private readonly LinkPreviewService _linkPreviews;
     private readonly FeedSubmissionImageProxyService _imageProxy;
+    private readonly ProfileAccessService _profileAccessService;
+    private readonly ProfileLinkMatchingService _linkMatching;
 
     public MemberFeedsApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
         IProfileSyncClient profileSyncClient,
         LinkPreviewService linkPreviews,
-        FeedSubmissionImageProxyService imageProxy)
+        FeedSubmissionImageProxyService imageProxy,
+        ProfileAccessService profileAccessService,
+        ProfileLinkMatchingService linkMatching)
     {
         _memberManager = memberManager;
         _store = store;
         _profileSyncClient = profileSyncClient;
         _linkPreviews = linkPreviews;
         _imageProxy = imageProxy;
+        _profileAccessService = profileAccessService;
+        _linkMatching = linkMatching;
     }
 
     [HttpGet]
@@ -50,7 +59,14 @@ public class MemberFeedsApiController : ControllerBase
         }
 
         var feeds = await _store.GetActiveFeedsAsync(member.Key, cancellationToken);
-        return Ok(feeds.Select(ToResponse));
+        IReadOnlyDictionary<string, string> matchStatuses = new Dictionary<string, string>();
+        if (feeds.Count > 0 && await _profileAccessService.CanMatchLinksAsync())
+        {
+            matchStatuses = await _linkMatching.GetLinkStatusesAsync(
+                feeds[0].MemberProfileId, feeds.Select(f => f.Url).ToList(), cancellationToken);
+        }
+
+        return Ok(feeds.Select(f => ToResponse(f, matchStatuses.GetValueOrDefault(f.Url))));
     }
 
     [HttpPost]
@@ -81,7 +97,7 @@ public class MemberFeedsApiController : ControllerBase
 
         await _profileSyncClient.NotifyFeedAddedAsync(member.UserName ?? string.Empty, feed.Platform, feed.Url, cancellationToken);
 
-        return Ok(ToResponse(feed));
+        return Ok(await WithMatchStatusAsync(feed, member.UserName, checkFirst: true, cancellationToken));
     }
 
     /// <summary>Changes a link's platform name and address. A new address is re-checked and reported to the platform as a swap.</summary>
@@ -128,7 +144,7 @@ public class MemberFeedsApiController : ControllerBase
             await _profileSyncClient.NotifyFeedAddedAsync(handle, feed.Platform, feed.Url, cancellationToken);
         }
 
-        return Ok(ToResponse(feed));
+        return Ok(await WithMatchStatusAsync(feed, member.UserName, checkFirst: urlChanged, cancellationToken));
     }
 
     /// <summary>Stores the order of all of the member's active links. The ids must be exactly those links.</summary>
@@ -209,6 +225,27 @@ public class MemberFeedsApiController : ControllerBase
     }
 
     /// <summary>
+    /// For a member whose links are checked, returns a saved link with its match status, checking the link first when
+    /// <paramref name="checkFirst"/> is set. For everyone else the link is returned as it is.
+    /// </summary>
+    private async Task<MemberFeedResponse> WithMatchStatusAsync(
+        MemberFeedEntity feed, string? handle, bool checkFirst, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(handle) || !await _profileAccessService.CanMatchLinksAsync())
+        {
+            return ToResponse(feed);
+        }
+
+        if (checkFirst)
+        {
+            await _linkMatching.CheckLinksAsync(feed.MemberProfileId, handle, [feed.Url], cancellationToken);
+        }
+
+        var statuses = await _linkMatching.GetLinkStatusesAsync(feed.MemberProfileId, [feed.Url], cancellationToken);
+        return ToResponse(feed, statuses.GetValueOrDefault(feed.Url));
+    }
+
+    /// <summary>
     /// What the member sees next to a link: "Hidden" (kept off the public profile), "Unreachable" (the last
     /// server-side check couldn't load the page) or "Visible".
     /// </summary>
@@ -217,7 +254,9 @@ public class MemberFeedsApiController : ControllerBase
         : feed.PreviewStatus == LinkPreviewStatus.Unreachable ? "Unreachable"
         : "Visible";
 
-    private MemberFeedResponse ToResponse(MemberFeedEntity feed) => new(
+    private MemberFeedResponse ToResponse(MemberFeedEntity feed) => ToResponse(feed, null);
+
+    private MemberFeedResponse ToResponse(MemberFeedEntity feed, string? matchStatus) => new(
         feed.Id,
         feed.Platform,
         feed.Url,
@@ -226,5 +265,6 @@ public class MemberFeedsApiController : ControllerBase
         StatusOf(feed),
         feed.PreviewTitle,
         _imageProxy.CreateProxyUrl(feed.FaviconUrl),
-        _imageProxy.CreateProxyUrl(feed.PreviewImageUrl));
+        _imageProxy.CreateProxyUrl(feed.PreviewImageUrl),
+        matchStatus);
 }

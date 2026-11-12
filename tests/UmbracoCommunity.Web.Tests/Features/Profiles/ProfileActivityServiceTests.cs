@@ -7,6 +7,7 @@ using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Mvp.Models;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using Moq;
 using Xunit;
@@ -23,17 +24,26 @@ public class ProfileActivityServiceTests
         Identity: new ProfileIdentity("The Octocat", null, null, null, null, null, false, [], Handle, null, [], false),
         BlogPosts: [], Videos: [], ForumPosts: [], Packages: [], Talks: [], Badges: [], SocialPosts: [], Meetups: []);
 
-    private static ProfileActivityService CreateService(FakeSyncClient client, ProfileActivityOptions? options = null, IMvpDataService? mvp = null, ProfileActivityEntryService? activityEntryService = null) =>
-        new(
+    private static ProfileActivityService CreateService(
+        FakeSyncClient client,
+        ProfileActivityOptions? options = null,
+        IMvpDataService? mvp = null,
+        ProfileActivityEntryService? activityEntryService = null,
+        MemberProfilesTestDatabase? database = null)
+    {
+        database ??= CreateDatabase();
+        return new(
             client,
-            activityEntryService ?? CreateActivityEntryService(client),
+            activityEntryService ?? CreateActivityEntryService(client, database),
+            new ProfileMatchStore(database),
             mvp ?? Listed(),
             TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);
+    }
 
-    private static ProfileActivityEntryService CreateActivityEntryService(IProfileSyncClient client)
+    internal static MemberProfilesTestDatabase CreateDatabase()
     {
         var database = new MemberProfilesTestDatabase();
         using (var context = database.CreateDbContext())
@@ -41,6 +51,11 @@ public class ProfileActivityServiceTests
             context.Database.Migrate();
         }
 
+        return database;
+    }
+
+    private static ProfileActivityEntryService CreateActivityEntryService(IProfileSyncClient client, MemberProfilesTestDatabase database)
+    {
         return new ProfileActivityEntryService(
             new MemberActivityEntryStore(database),
             client,
@@ -174,6 +189,86 @@ public class ProfileActivityServiceTests
         down.Identity.IsMvp.Should().BeTrue();
     }
 
+    [Fact]
+    public async Task Activity_from_a_rejected_source_stops_showing_at_once_but_hand_added_activity_stays()
+    {
+        var database = CreateDatabase();
+        var profile = await new MemberProfileStore(database).GetOrStartOnboardingAsync(Guid.NewGuid(), Handle, "The Octocat");
+        var entries = new MemberActivityEntryStore(database);
+        var handAdded = await entries.AddAsync(profile.Id, new AddActivityEntryRequest("blog", "My own post", "https://not-mine.example/my-own-post", new DateOnly(2026, 1, 1), null));
+        await entries.DecideAsync(handAdded!.Id, verify: true, null, null, "Admin");
+
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities =
+            {
+                [PlatformActivityGroups.Blog] =
+                [
+                    Activity("Mine", "https://octo.example/mine", DateTimeOffset.UtcNow),
+                    Activity("Not mine", "https://not-mine.example/a-post", DateTimeOffset.UtcNow),
+                ],
+                [PlatformActivityGroups.Social] = [Activity("Not my toot", "https://social.example/@someone/1", DateTimeOffset.UtcNow)],
+                [PlatformActivityGroups.Meetups] = [Activity("Not my meetup", "https://www.not-mine.example/events/1", DateTimeOffset.UtcNow)],
+            },
+        };
+        var service = CreateService(client, database: database);
+        (await service.EnrichAsync(Profile)).BlogPosts.Should().HaveCount(3);
+
+        var matches = new ProfileMatchStore(database);
+        await matches.RecordMemberRejectionAsync(profile.Id, "https://not-mine.example", []);
+        await matches.RecordMemberRejectionAsync(profile.Id, "https://social.example/@someone", []);
+
+        var result = await service.EnrichAsync(Profile);
+
+        result.BlogPosts.Select(p => p.Title).Should().BeEquivalentTo("Mine", "My own post");
+        result.SocialPosts.Should().BeEmpty();
+        result.Meetups.Should().BeEmpty();
+        client.LookupCount.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Held_and_confirmed_sources_do_not_hide_activity()
+    {
+        var database = CreateDatabase();
+        var profile = await new MemberProfileStore(database).GetOrStartOnboardingAsync(Guid.NewGuid(), Handle, "The Octocat");
+        var matches = new ProfileMatchStore(database);
+        await matches.RecordAutomaticAsync(profile.Id, "https://octo.example", ProfileMatchState.Held, 0.3, []);
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities = { [PlatformActivityGroups.Blog] = [Activity("Mine", "https://octo.example/mine", DateTimeOffset.UtcNow)] },
+        };
+
+        var result = await CreateService(client, database: database).EnrichAsync(Profile);
+
+        result.BlogPosts.Should().ContainSingle();
+    }
+
+    [Fact]
+    public void Rejected_sources_filter_every_platform_section()
+    {
+        var at = DateTimeOffset.UtcNow;
+        var profile = Profile with
+        {
+            BlogPosts = [new ProfileBlogPost("b", "https://x.example/b", at, null)],
+            Videos = [new ProfileVideo("v", "https://x.example/v", null, at)],
+            ForumPosts = [new ProfileForumPost("f", "https://x.example/f", at, null)],
+            Packages = [new ProfilePackage("p", "https://x.example/p", [])],
+            SocialPosts = [new ProfileSocialPost("s", "https://x.example/s", "s", at)],
+            Meetups = [new ProfileMeetup("Attended", "m", null, at, "https://x.example/m"), new ProfileMeetup("Attended", "no link", null, at)],
+        };
+
+        var result = ProfileActivityService.WithoutRejectedSources(profile, ["https://x.example"]);
+
+        result.BlogPosts.Should().BeEmpty();
+        result.Videos.Should().BeEmpty();
+        result.ForumPosts.Should().BeEmpty();
+        result.Packages.Should().BeEmpty();
+        result.SocialPosts.Should().BeEmpty();
+        result.Meetups.Should().ContainSingle().Which.EventName.Should().Be("no link");
+    }
+
     private static IMvpDataService Listed(params MvpYear[] years)
     {
         var mvp = new Mock<IMvpDataService>();
@@ -260,6 +355,8 @@ public class ProfileActivityServiceTests
             return Task.FromResult(Activities.TryGetValue(group, out var items) ? items : []);
         }
 
+        public Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<PlatformLinkCheck>>([]);
         public Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedHiddenAsync(string handle, string url, bool isHidden, CancellationToken cancellationToken = default) => Task.CompletedTask;

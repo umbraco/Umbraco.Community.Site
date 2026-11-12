@@ -1,5 +1,6 @@
 @inherits UmbracoViewPage<CommunityProfilePageViewModel>
 @using UmbracoCommunity.Web.Features.Members
+@using UmbracoCommunity.Web.Features.Profiles
 @using UmbracoCommunity.Web.Features.Profiles.Models
 @using UmbracoCommunity.Web.Models.Pages
 @using UmbracoCommunity.Web.Utilities
@@ -10,6 +11,24 @@
 
 @functions {
     static string Date(DateTimeOffset? value) => value?.ToString("d MMM yyyy") ?? string.Empty;
+
+    // Marks a section or item the member hid, on a DevRel view that shows everything.
+    void HiddenLabel(string group, string? activityId = null)
+    {
+        if (Model.IsMarkedHidden(group, activityId))
+        {
+            <span class="community-profile__hidden-label">Hidden by member</span>
+        }
+    }
+
+    // An item the member hid, unless its whole section is hidden: the section heading is marked then.
+    void HiddenItemLabel(string group, string? activityId)
+    {
+        if (!Model.IsMarkedHidden(group))
+        {
+            HiddenLabel(group, activityId);
+        }
+    }
 }
 
 @if (profile is null)
@@ -83,7 +102,7 @@ else
         + "</svg>";
     var packageStockImage = "data:image/svg+xml," + Uri.EscapeDataString(packageSvg);
 
-    var highlights = new List<(string Kind, string Key, string Title, string? Meta, string? Desc, IReadOnlyList<string>? Chips, string? Url, string? Thumb, string? Reason)>();
+    var highlights = new List<(string Kind, string Key, string Title, string? Meta, string? Desc, IReadOnlyList<string>? Chips, string? Url, string? Thumb, string? Reason, string? Group, string? ActivityId)>();
     if (profile.FeaturedItems.Count > 0)
     {
         // The member pinned these themselves, in this order, with their own note on why.
@@ -100,7 +119,7 @@ else
                 _ => ("Social post", "social", null),
             };
             var meta = string.Join(" · ", new[] { item.Date is null ? null : Date(item.Date), item.Source }.Where(s => !string.IsNullOrEmpty(s)));
-            highlights.Add((kind, key, item.Title, meta, item.Description, null, item.Url, thumb, item.Reason));
+            highlights.Add((kind, key, item.Title, meta, item.Description, null, item.Url, thumb, item.Reason, item.Group, item.ActivityId));
         }
     }
     else
@@ -108,28 +127,54 @@ else
         if (profile.Packages.Count > 0)
         {
             var p = profile.Packages[0];
-            highlights.Add(("Package", "package", p.Name, null, p.Description, p.Versions, p.Url, packageStockImage, null));
+            highlights.Add(("Package", "package", p.Name, null, p.Description, p.Versions, p.Url, packageStockImage, null, PlatformActivityGroups.Packages, p.ActivityId));
         }
         if (profile.Talks.Count > 0)
         {
             var t = profile.Talks[0];
             var meta = string.Join(" · ", new[] { t.EventName, t.Date is null ? null : Date(t.Date) }.Where(s => !string.IsNullOrEmpty(s)));
-            highlights.Add(("Talk", "talk", t.Title, meta, t.Description, null, t.Url, talkStockImage, null));
+            highlights.Add(("Talk", "talk", t.Title, meta, t.Description, null, t.Url, talkStockImage, null, null, null));
         }
         if (profile.BlogPosts.Count > 0)
         {
             var b = profile.BlogPosts[0];
             var meta = string.Join(" · ", new[] { Date(b.PublishedAt), b.Source }.Where(s => !string.IsNullOrEmpty(s)));
-            highlights.Add(("Blog post", "blog", b.Title, meta, b.Excerpt, null, b.Url, blogStockImage, null));
+            highlights.Add(("Blog post", "blog", b.Title, meta, b.Excerpt, null, b.Url, blogStockImage, null, PlatformActivityGroups.Blog, b.ActivityId));
         }
         if (profile.Videos.Count > 0)
         {
             var v = profile.Videos[0];
-            highlights.Add(("Video", "video", v.Title, v.PublishedAt is null ? null : Date(v.PublishedAt), v.Description, null, v.Url, videoStockImage, null));
+            highlights.Add(("Video", "video", v.Title, v.PublishedAt is null ? null : Date(v.PublishedAt), v.Description, null, v.Url, videoStockImage, null, PlatformActivityGroups.Videos, v.ActivityId));
         }
     }
 
     <article class="community-profile">
+        @if (Model.ShowDevRelBanner)
+        {
+            <div class="community-profile__devrel-banner" role="status">
+                <div class="community-profile__devrel-banner-inner">
+                    <p class="community-profile__devrel-banner-title">DevRel view — this page is not public.</p>
+                    @if (Model.IsHiddenFromPublic)
+                    {
+                        <p class="community-profile__devrel-banner-text">This member has hidden their profile. Only DevRel can see it.</p>
+                    }
+                    @if (Model.IsGated)
+                    {
+                        <p class="community-profile__devrel-banner-text">The activity sections are not public on this site yet.</p>
+                    }
+                    @if (Model.IsShowingEverything)
+                    {
+                        <p class="community-profile__devrel-banner-text">Showing everything, including items the member hid.</p>
+                        <a class="btn is-white community-profile__devrel-banner-action" href="@Model.DevRelPublicViewUrl">Show what the public sees</a>
+                    }
+                    else
+                    {
+                        <p class="community-profile__devrel-banner-text">Showing what the public sees.</p>
+                        <a class="btn is-white community-profile__devrel-banner-action" href="@Model.DevRelShowEverythingUrl">Show everything, including hidden items</a>
+                    }
+                </div>
+            </div>
+        }
         @if (Model.IsHiddenPreview)
         {
             <dc-profile-hidden-banner account-url="@Model.AccountPageUrl"></dc-profile-hidden-banner>
@@ -203,6 +248,10 @@ else
                                         }
                                         @link.Platform
                                     </a>
+                                    @if (Model.IsMarkedHidden(link))
+                                    {
+                                        <span class="community-profile__hidden-label">Hidden by member</span>
+                                    }
                                 </li>
                             }
                         </ul>
@@ -260,6 +309,10 @@ else
                                 @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", highlight.Key)
                                 @highlight.Kind
                             </span>
+                            @if (highlight.Group != null)
+                            {
+                                HiddenLabel(highlight.Group, highlight.ActivityId);
+                            }
                             <a class="community-profile__highlight-title" href="@highlight.Url" target="_blank" rel="noopener">@highlight.Title</a>
                             @if (!string.IsNullOrEmpty(highlight.Reason))
                             {
@@ -298,6 +351,7 @@ else
                             <h3 class="community-profile__social-subtitle">
                                 @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "social")
                                 Social activity
+                                @{ HiddenLabel(PlatformActivityGroups.Social); }
                             </h3>
                             <ul class="community-profile__activity-list">
                                 @foreach (var post in profile.SocialPosts)
@@ -313,6 +367,7 @@ else
                                                 <span class="community-profile__social-time">@post.PostedAt.ToRelativeTime()</span>
                                             </span>
                                             <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Text</a>
+                                            @{ HiddenItemLabel(PlatformActivityGroups.Social, post.ActivityId); }
                                         </div>
                                     </li>
                                 }
@@ -326,12 +381,14 @@ else
                             <h3 class="community-profile__social-subtitle">
                                 @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "forum")
                                 Forum activity
+                                @{ HiddenLabel(PlatformActivityGroups.Forum); }
                             </h3>
                             <ul class="community-profile__activity-list">
                                 @foreach (var post in profile.ForumPosts)
                                 {
                                     <li class="community-profile__activity-item">
                                         <a class="community-profile__activity-text" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
+                                        @{ HiddenItemLabel(PlatformActivityGroups.Forum, post.ActivityId); }
                                         <span class="community-profile__activity-meta">@Date(post.PostedAt)@(post.Replies is not null ? $" · {post.Replies} replies" : "")</span>
                                     </li>
                                 }
@@ -346,12 +403,13 @@ else
             @if (profile.Packages.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Packages">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "package") Packages</h2>
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "package") Packages @{ HiddenLabel(PlatformActivityGroups.Packages); }</h2>
                     <ul class="community-profile__dept-list">
                         @foreach (var package in profile.Packages)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@package.Url" target="_blank" rel="noopener">@package.Name</a>
+                                @{ HiddenItemLabel(PlatformActivityGroups.Packages, package.ActivityId); }
                                 @if (!string.IsNullOrEmpty(package.Description))
                                 {
                                     <p class="community-profile__dept-desc">@package.Description</p>
@@ -398,12 +456,13 @@ else
             @if (profile.BlogPosts.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Blog posts">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "blog") Blog posts</h2>
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "blog") Blog posts @{ HiddenLabel(PlatformActivityGroups.Blog); }</h2>
                     <ul class="community-profile__dept-list">
                         @foreach (var post in profile.BlogPosts)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@post.Url" target="_blank" rel="noopener">@post.Title</a>
+                                @{ HiddenItemLabel(PlatformActivityGroups.Blog, post.ActivityId); }
                                 @if (!string.IsNullOrEmpty(post.Excerpt))
                                 {
                                     <p class="community-profile__dept-desc">@post.Excerpt</p>
@@ -418,12 +477,13 @@ else
             @if (profile.Videos.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Videos">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "video") Videos</h2>
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "video") Videos @{ HiddenLabel(PlatformActivityGroups.Videos); }</h2>
                     <ul class="community-profile__dept-list">
                         @foreach (var video in profile.Videos)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@video.Url" target="_blank" rel="noopener">@video.Title</a>
+                                @{ HiddenItemLabel(PlatformActivityGroups.Videos, video.ActivityId); }
                                 @if (!string.IsNullOrEmpty(video.Description))
                                 {
                                     <p class="community-profile__dept-desc">@video.Description</p>
@@ -441,7 +501,7 @@ else
             @if (profile.Meetups.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Meet-ups">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "meetup") Meet-ups</h2>
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "meetup") Meet-ups @{ HiddenLabel(PlatformActivityGroups.Meetups); }</h2>
                     <ul class="community-profile__dept-list">
                         @foreach (var meetup in profile.Meetups)
                         {
@@ -453,6 +513,7 @@ else
                                 {<a class="community-profile__dept-title" href="@meetup.Url" target="_blank" rel="noopener">@meetup.EventName</a>}
                                 else
                                 {<strong class="community-profile__dept-title">@meetup.EventName</strong>}@tail</p>
+                                @{ HiddenItemLabel(PlatformActivityGroups.Meetups, meetup.ActivityId); }
                             </li>
                         }
                     </ul>
@@ -462,12 +523,13 @@ else
             @if (profile.OtherActivities.Count > 0)
             {
                 <section class="community-profile__section" aria-label="Other activity">
-                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "other") Other activity</h2>
+                    <h2 class="community-profile__section-title">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", "other") Other activity @{ HiddenLabel(PlatformActivityGroups.Other); }</h2>
                     <ul class="community-profile__dept-list">
                         @foreach (var activity in profile.OtherActivities)
                         {
                             <li class="community-profile__dept-item">
                                 <a class="community-profile__dept-title" href="@activity.Url" target="_blank" rel="noopener">@activity.Title</a>
+                                @{ HiddenItemLabel(PlatformActivityGroups.Other, activity.ActivityId); }
                                 <p class="community-profile__dept-meetup">@activity.Kind, @Date(activity.Date)</p>
                                 @if (!string.IsNullOrEmpty(activity.Description))
                                 {
