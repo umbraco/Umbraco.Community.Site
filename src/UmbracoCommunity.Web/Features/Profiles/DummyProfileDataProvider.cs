@@ -148,17 +148,20 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
                 "Penrose.Seo",
                 "https://marketplace.umbraco.com/package/penrose.seo",
                 new[] { "3.2.1", "3.1.0", "2.4.0" },
-                "SEO toolkit: sitemaps, meta tags and structured data for Umbraco."),
+                "SEO toolkit: sitemaps, meta tags and structured data for Umbraco.",
+                Date: new DateTimeOffset(2026, 3, 12, 0, 0, 0, TimeSpan.Zero)),
             new ProfilePackage(
                 "Penrose.BlockHelpers",
                 "https://marketplace.umbraco.com/package/penrose.blockhelpers",
                 new[] { "1.4.0", "1.3.2" },
-                "Handy helpers and base classes for working with the block editors."),
+                "Handy helpers and base classes for working with the block editors.",
+                Date: new DateTimeOffset(2025, 11, 4, 0, 0, 0, TimeSpan.Zero)),
             new ProfilePackage(
                 "Penrose.Redirects",
                 "https://marketplace.umbraco.com/package/penrose.redirects",
                 new[] { "2.0.1", "2.0.0", "1.0.0" },
-                "Manage 301/302 redirects from the Umbraco back office."),
+                "Manage 301/302 redirects from the Umbraco back office.",
+                Date: new DateTimeOffset(2025, 6, 20, 0, 0, 0, TimeSpan.Zero)),
         },
         Talks: new[]
         {

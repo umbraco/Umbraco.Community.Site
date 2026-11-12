@@ -314,4 +314,74 @@ describe("ProfileDisplayEditorElement", () => {
 
     expect(element.querySelector('[role="alert"]')?.textContent).toContain("Finish setting up your profile first.");
   });
+
+  it("offers the activity graph and preview cards switched on by default", async () => {
+    const element = await mount();
+
+    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(true);
+    expect(sectionSwitch(element, "Show preview cards").checked).toBe(true);
+    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("switches the activity graph off and on again", async () => {
+    const save = mockSave();
+    const element = await mount();
+
+    sectionSwitch(element, "Show an activity graph").click();
+    await settle(element);
+
+    expect(lastSaved(save).hideActivityGraph).toBe(true);
+    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(false);
+    expect(status(element)).toContain("No longer showing the activity graph");
+
+    sectionSwitch(element, "Show an activity graph").click();
+    await settle(element);
+
+    expect(lastSaved(save).hideActivityGraph).toBe(false);
+    expect(status(element)).toContain("Showing the activity graph");
+  });
+
+  it("switches preview cards off for the whole timeline, which removes the per-item choice", async () => {
+    const save = mockSave();
+    const element = await mount();
+
+    sectionSwitch(element, "Show preview cards").click();
+    await settle(element);
+
+    expect(lastSaved(save).hideTimelineCards).toBe(true);
+    expect(button(item(element, "b1"), "card")).toBeNull();
+    expect(status(element)).toContain("plain lines only");
+  });
+
+  it("shows a single item as a plain line and as a card again", async () => {
+    const save = mockSave();
+    const element = await mount();
+
+    button(item(element, "b1"), "card").click();
+    await settle(element);
+
+    expect(lastSaved(save).noCardItemIds).toEqual(["b1"]);
+    expect(item(element, "b1").textContent).toContain("No card");
+    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("true");
+
+    button(item(element, "b1"), "card").click();
+    await settle(element);
+
+    expect(lastSaved(save).noCardItemIds).toEqual([]);
+    expect(item(element, "b1").textContent).not.toContain("No card");
+  });
+
+  it("keeps the stored card choices it loaded", async () => {
+    const element = await mount(display({ hideActivityGraph: true, hideTimelineCards: false, noCardItemIds: ["v1"] }));
+
+    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(false);
+    expect(button(item(element, "v1"), "card").getAttribute("aria-pressed")).toBe("true");
+    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("false");
+  });
+
+  it("offers no card choice for a hidden item", async () => {
+    const element = await mount(display({ hiddenItemIds: ["b1"] }));
+
+    expect(button(item(element, "b1"), "card")).toBeNull();
+  });
 });

@@ -148,6 +148,10 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.Property<string>("Headline")
                         .HasMaxLength(200);
 
+                    b.Property<bool>("HideActivityGraph");
+
+                    b.Property<bool>("HideTimelineCards");
+
                     b.PrimitiveCollection<string>("HiddenActivityIds")
                         .IsRequired();
 
@@ -157,6 +161,9 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.Property<bool>("IsProfileVisible");
 
                     b.Property<Guid>("MemberKey");
+
+                    b.PrimitiveCollection<string>("NoCardActivityIds")
+                        .IsRequired();
 
                     b.Property<DateTime?>("OnboardingCompletedUtc");
 
@@ -264,6 +271,36 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.HasIndex("State");
 
                     b.ToTable("MemberActivityEntries", (string)null);
+                });
+
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.ProfileTimelinePreviewEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CheckedUtc");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(300);
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048);
+
+                    b.Property<string>("PageUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048);
+
+                    b.Property<string>("PageUrlHash")
+                        .IsRequired()
+                        .HasMaxLength(64);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PageUrlHash")
+                        .IsUnique();
+
+                    b.ToTable("ProfileTimelinePreviews", (string)null);
                 });
 
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>
