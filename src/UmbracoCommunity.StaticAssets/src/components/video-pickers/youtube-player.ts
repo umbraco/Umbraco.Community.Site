@@ -1,4 +1,4 @@
-import { loadYouTubeApi } from './youtube-api';
+import { loadYouTubeApi, type YouTubePlayer } from './youtube-api';
 
 export interface EmbeddedYouTube {
     destroy(): void;
@@ -24,10 +24,41 @@ export function createYouTubeIframe(source: string, title: string, allow = '', s
     return iframe;
 }
 
+const UNMUTE_CHECK_MS = 1000;
+
+// Shown when the browser only allows muted playback; a click on the page is allowed to turn the sound on.
+function showUnmuteButton(container: HTMLElement, player: YouTubePlayer): () => void {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'dc-youtube-unmute';
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" fill="none"/></svg><span>Turn sound on</span>';
+
+    const remove = () => {
+        window.clearInterval(watch);
+        button.remove();
+    };
+    // Also goes if the visitor unmutes with YouTube's own control.
+    const watch = window.setInterval(() => {
+        if (!player.isMuted()) remove();
+    }, UNMUTE_CHECK_MS);
+
+    button.addEventListener('click', () => {
+        player.unMute();
+        player.playVideo();
+        remove();
+        player.getIframe().focus();
+    });
+
+    if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+    container.append(button);
+    button.focus();
+    return remove;
+}
+
 /**
- * Plays a YouTube embed URL inside `container`. Browsers often ignore
- * `autoplay=1` in an embed, so playback is started through the player API; only if the browser then blocks
- * playback with sound does it play muted. Falls back to a plain autoplaying iframe if the API can't load.
+ * Plays a YouTube embed URL inside `container`. Browsers often ignore `autoplay=1` in an embed, so playback
+ * is started through the player API. If the browser then blocks playback with sound, it plays muted and
+ * offers a "Turn sound on" button. Falls back to a plain autoplaying iframe if the API can't load.
  */
 export async function playYouTube(container: HTMLElement, source: string, title: string, allow = ''): Promise<EmbeddedYouTube> {
     const embed = new URL(source, window.location.href);
@@ -47,6 +78,7 @@ export async function playYouTube(container: HTMLElement, source: string, title:
     container.append(target);
 
     const start = Number(embed.searchParams.get('start')) || undefined;
+    let removeUnmute: (() => void) | undefined;
     const player = new YT.Player(target, {
         host: embed.origin,
         videoId: embed.pathname.split('/').pop(),
@@ -59,14 +91,20 @@ export async function playYouTube(container: HTMLElement, source: string, title:
                 iframe.title = title;
                 iframe.style.cssText = IFRAME_STYLE;
                 ready.playVideo();
-                iframe.focus();
+                if (!removeUnmute) iframe.focus();
             },
             onAutoplayBlocked: ({ target: blocked }) => {
                 blocked.mute();
                 blocked.playVideo();
+                removeUnmute ??= showUnmuteButton(container, blocked);
             },
         },
     });
 
-    return { destroy: () => player.destroy() };
+    return {
+        destroy: () => {
+            removeUnmute?.();
+            player.destroy();
+        },
+    };
 }

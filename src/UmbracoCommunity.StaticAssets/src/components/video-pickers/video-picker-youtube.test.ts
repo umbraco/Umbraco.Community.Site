@@ -14,10 +14,13 @@ describe('VideoPickerYouTubeElement', () => {
 
   const fakePlayer = () => {
     const iframe = document.createElement('iframe')
+    let muted = false
     return {
       iframe,
       playVideo: vi.fn(),
-      mute: vi.fn(),
+      mute: vi.fn(() => { muted = true }),
+      unMute: vi.fn(() => { muted = false }),
+      isMuted: () => muted,
       destroy: vi.fn(),
       getIframe: () => iframe,
     }
@@ -107,6 +110,40 @@ describe('VideoPickerYouTubeElement', () => {
       options.events.onAutoplayBlocked({ target: player })
       expect(player.mute).toHaveBeenCalledTimes(1)
       expect(player.playVideo).toHaveBeenCalledTimes(2)
+    })
+
+    it('offers a button to turn the sound on when it had to play muted', async () => {
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+      options.events.onReady({ target: player })
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+
+      options.events.onAutoplayBlocked({ target: player })
+      const button = element.querySelector<HTMLButtonElement>('.dc-youtube-unmute')!
+      expect(button.textContent).toContain('Turn sound on')
+      expect(document.activeElement).toBe(button)
+
+      button.click()
+      expect(player.unMute).toHaveBeenCalledTimes(1)
+      expect(player.playVideo).toHaveBeenCalledTimes(3)
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+      expect(document.activeElement).toBe(player.iframe)
+    })
+
+    it('removes the sound button once unmuted in the player itself', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      player.unMute()
+      vi.advanceTimersByTime(1000)
+
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
     })
 
     it('only ever creates one player', async () => {

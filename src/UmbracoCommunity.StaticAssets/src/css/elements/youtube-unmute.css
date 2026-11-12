@@ -1,0 +1,38 @@
+.dc-youtube-unmute {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.3);
+  color: var(--color-dark);
+  font: inherit;
+  font-weight: var(--font-weight-bold, 700);
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.dc-youtube-unmute:hover {
+  background: var(--color-identity-pink);
+}
+
+.dc-youtube-unmute:focus-visible {
+  outline: 3px solid var(--color-identity-blue);
+  outline-offset: 3px;
+}
+
+.dc-youtube-unmute svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

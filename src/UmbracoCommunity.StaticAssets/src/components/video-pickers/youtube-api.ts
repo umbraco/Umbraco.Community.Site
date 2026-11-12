@@ -2,6 +2,8 @@
 export interface YouTubePlayer {
     playVideo(): void;
     mute(): void;
+    unMute(): void;
+    isMuted(): boolean;
     getIframe(): HTMLIFrameElement;
     destroy(): void;
 }
