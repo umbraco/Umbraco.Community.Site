@@ -20,6 +20,7 @@ export class DcVideoHero extends HTMLElement {
         this.#isPaused = saveData || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         this.#video.addEventListener("playing", this.#onPlaying);
+        this.#video.addEventListener("error", this.#onError);
         this.#toggle?.addEventListener("click", this.#onToggle);
         this.#mobileQuery.addEventListener("change", this.#loadSource);
         document.addEventListener("visibilitychange", this.#update);
@@ -35,6 +36,7 @@ export class DcVideoHero extends HTMLElement {
 
     disconnectedCallback() {
         this.#video?.removeEventListener("playing", this.#onPlaying);
+        this.#video?.removeEventListener("error", this.#onError);
         this.#toggle?.removeEventListener("click", this.#onToggle);
         this.#mobileQuery.removeEventListener("change", this.#loadSource);
         document.removeEventListener("visibilitychange", this.#update);
@@ -84,6 +86,11 @@ export class DcVideoHero extends HTMLElement {
 
     #onPlaying = () => {
         this.classList.add("is-playing");
+    };
+
+    #onError = () => {
+        this.classList.remove("is-playing");
+        if (this.#toggle) this.#toggle.hidden = true;
     };
 
     #onToggle = () => {

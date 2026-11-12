@@ -6,6 +6,7 @@ body.hero-full-width main {
 
 .dc-video-hero {
   --video-hero-height: 90svh;
+  --focus-outline: var(--focus-outline-width) solid var(--color-white);
   --video-hero-overlay: linear-gradient(180deg, rgb(0 0 0 / 0.65) 0%, rgb(0 0 0 / 0.55) 25%, rgb(0 0 0 / 0.55) 75%, rgb(0 0 0 / 0.65) 100%);
 
   position: relative;
@@ -70,7 +71,11 @@ body.hero-full-width main {
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: calc(var(--navigation-height) + var(--unit)) var(--unit) var(--unit-lg);
+  padding: calc(var(--navigation-height) + var(--unit)) var(--unit) calc(44px + var(--unit) * 2);
+
+  @media (--md) {
+    padding-bottom: calc(44px + var(--unit-md) + var(--unit));
+  }
 
   @media (--sm) {
     padding-inline: var(--unit-md);
@@ -109,10 +114,11 @@ body.hero-full-width main {
 .dc-video-hero__headline {
   margin: 0 0 var(--unit);
   color: inherit;
-  font-size: var(--hero-title-font-size, var(--font-size-display));
+  font-size: min(var(--hero-title-font-size, var(--font-size-display)), 11vw);
   font-weight: var(--font-weight-regular);
   line-height: var(--hero-title-line-height, var(--line-height-lg));
   text-wrap: balance;
+  overflow-wrap: break-word;
 
   @media (--xl) {
     font-size: var(--hero-title-font-size, var(--font-size-display-xl));
