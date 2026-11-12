@@ -24,6 +24,12 @@
         "allowAtRoot": true,
         "allowInAreas": true,
         "settingsElementTypeKey": "1f1d7799-5cac-4e32-8605-3cee35346241"
+      },
+      {
+        "contentElementTypeKey": "536bafe7-7ed9-48ad-8b7a-fef0e9e7b7b5",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "5e2dcb29-133b-4999-a575-5622ae6f70c1"
       }
     ],
     "validationLimit": {
@@ -49,6 +55,12 @@
       "Udi": "umb://document-type/1f1d77995cac4e3286053cee35346241"
     },
     {
+      "Udi": "umb://document-type/536bafe77ed948ad8b7afef0e9e7b7b5"
+    },
+    {
+      "Udi": "umb://document-type/5e2dcb29133b4999a5755622ae6f70c1"
+    },
+    {
       "Udi": "umb://document-type/66e0b5573bbb4ddeacea7255772c5cfd"
     },
     {
@@ -56,5 +68,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.2.0"
 }

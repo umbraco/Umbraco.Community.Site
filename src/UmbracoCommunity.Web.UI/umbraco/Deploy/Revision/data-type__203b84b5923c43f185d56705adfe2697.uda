@@ -1,0 +1,46 @@
+{
+  "Name": "Video hero poster picker",
+  "EditorAlias": "Umbraco.MediaPicker3",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "Configuration": {
+    "filter": "cc07b313-0843-4aa8-bbda-871c8da728c8",
+    "validationLimit": {
+      "max": 1
+    },
+    "enableLocalFocalPoint": true,
+    "crops": [
+      {
+        "label": "Desktop",
+        "alias": "desktop",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "label": "Desktop (small)",
+        "alias": "desktopSmall",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "label": "Mobile",
+        "alias": "mobile",
+        "width": 828,
+        "height": 1472
+      }
+    ]
+  },
+  "Parent": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
+  "Udi": "umb://data-type/203b84b5923c43f185d56705adfe2697",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/96f3ec96217a47ec918d6aac0a5cc9f0",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://media-type/cc07b31308434aa8bbda871c8da728c8",
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.2.0"
+}

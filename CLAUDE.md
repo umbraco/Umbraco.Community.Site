@@ -160,7 +160,7 @@ See `docs/BUILDING_BLOCKS.md` for detailed instructions.
 ### Frontend Assets
 
 Located in `src/UmbracoCommunity.StaticAssets/src/`:
-- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`, `image-slider/` for drag-to-scroll image slider)
+- **components/** - Lit web components (including `sessionize/` for event components, `form/` for form enhancements like `<dc-form-steps>`, `image-slider/` for drag-to-scroll image slider, `video-hero/` for the background-video hero)
 - **entrypoints/** - Vite entry points (files starting with `_*.ts`)
 - **css/** - PostCSS stylesheets with custom rhythm mixin system
 - **services/** - Frontend services (fetch, logging, project/user services, sessionize service)
@@ -371,6 +371,39 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
 - Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
 - Uses design system variables from `root.css`
+
+### Video Hero
+
+A full-width banner block (`heroBannerWithVideo`) that sits behind the site header and plays a muted, looping background video. It's allowed in the ROOT banner block grid and in the `home` / `eventsHome` Block Restrictions rules.
+
+**Content Properties** (`HeroBannerWithVideo`):
+- `Tagline`, `Headline` (max 40 chars, rendered as the page `h1`), `BodyText`, `CallToActionLinks` (max 2, White + Transparent button themes)
+- `Video` (Video media type, required) and `MobileVideo` (optional; phones without one get the poster only)
+- `PosterImage` (required; crops `desktop` 1920×1080, `desktopSmall` 1280×720, `mobile` 828×1472, preloaded per breakpoint)
+
+**Settings** (`SettingsHeroBannerWithVideo`, Contentment Data List dropdowns):
+- `TextAlignment`: `Centre` (default) / `Left`
+- `HeroHeight`: `100%` / `90%` (default) / `70%` of the screen
+- The view compares these exact strings, so renaming an item value in the backoffice needs a matching change in `HeroBannerWithVideo.cshtml`
+
+**Header hero mode**: `ContentContextService.HasFullWidthHero` adds `hero-full-width` to `<body>` when the page's first banner block is a Video hero. In hero mode `.nav-header` is `position: fixed` (so the hero starts at the top of the page) and the logo, nav and focus ring are white until `body.scroll`. Hero-mode rules live in `header.css` / `header-mobile.css`. Once scrolled the header must look exactly like other pages, so don't add hero-specific scrolled padding or widths.
+
+**Frontend component** (`components/video-hero/dc-video-hero.element.ts`):
+- `<dc-video-hero>` reads `data-video` / `data-mobile-video` and picks a source with `(max-width: 767px)`. The `<video>` is `preload="none"` with no `src` until JS sets one, so it never competes with the poster
+- Fades the video in on `playing`, and pauses it when off-screen or when the tab is hidden
+- `prefers-reduced-motion` or Save-Data: no autoplay; the toggle starts as "Play"
+- The pause/play button is required for WCAG 2.2.2. It's hidden when there's no source or the video errors (the poster stays)
+
+**CSS** (`css/blocks/video-hero-block.css`):
+- The overlay is never lighter than 55% black, which keeps white text at ≥ 4.5:1 even over a white frame. Don't lighten it to make videos "pop"
+- The headline font size is capped at `11vw` so long words fit at 320px
+- The content keeps bottom padding clear of the toggle
+
+**Video size limit**: `Constants.Media.MaxHeroVideoBytes` (10 MB) is shared by the preview and `Notifications/HeroVideoSizeValidationHandler`.
+- The handler cancels both `ContentSavingNotification` and `ContentPublishingNotification`. Umbraco 18's **Save and publish** goes through `UpdateAndPublishDocumentController`, which a saving-only check doesn't stop
+- Persisted block values store a media picker value as a serialised JSON *string*, while editor payloads send an array; the handler parses both
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/HeroBannerWithVideo.cshtml`, styles in `wwwroot/css/styles.css`): shows the poster under the same overlay, the text and CTAs, plus pills with each video's name and size. A video over the limit gets a pink `is-warning` pill. New preview views need a rebuild before BlockPreview picks them up.
 
 ### Blog Showcase Block
 

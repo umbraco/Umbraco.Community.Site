@@ -1,0 +1,71 @@
+@using Umbraco.Cms.Core.Models
+@using UmbracoCommunity.Web.Services
+@using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
+@inject IImageUrlBuilder ImageUrls
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBannerWithVideo, SettingsHeroBannerWithVideo>>
+
+@{
+    var isLeft = Model.Settings?.TextAlignment == "Left";
+    var height = string.IsNullOrWhiteSpace(Model.Settings?.HeroHeight) ? "90%" : Model.Settings.HeroHeight;
+    var posterUrl = ImageUrls.GetImageUrl(Model.Content.PosterImage, "desktopSmall");
+}
+
+<div class="dc-video-hero-preview @(isLeft ? "dc-video-hero-preview--left" : string.Empty)">
+    @if (posterUrl != null)
+    {
+        <img class="dc-video-hero-preview__poster" src="@posterUrl" alt="">
+    }
+
+    <div class="dc-video-hero-preview__content">
+        @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+        {
+            <p class="dc-video-hero-preview__tagline">@Model.Content.Tagline</p>
+        }
+        <h2>@(string.IsNullOrWhiteSpace(Model.Content.Headline) ? "Video hero" : Model.Content.Headline)</h2>
+        @if (!Model.Content.BodyText.IsEmptyHtmlString())
+        {
+            <div class="dc-video-hero-preview__body">
+                @Html.Raw(Model.Content.BodyText?.ToHtmlString())
+            </div>
+        }
+        @if (Model.Content.CallToActionLinks?.Any() ?? false)
+        {
+            var themes = new[] { ButtonLinkTheme.White, ButtonLinkTheme.Transparent };
+            var links = Model.Content.CallToActionLinks.Take(themes.Length).ToList();
+            <div class="dc-video-hero-preview__ctas">
+                @for (var i = 0; i < links.Count; i++)
+                {
+                    @Html.RenderButtonCTA(links[i].Url, links[i].Name, links[i].Target, links[i].Name, themes[i])
+                }
+            </div>
+        }
+    </div>
+
+    <ul class="dc-video-hero-preview__meta">
+        @{
+            RenderVideoMeta("Video", Model.Content.Video, "not set");
+            RenderVideoMeta("Phones", Model.Content.MobileVideo, "poster image only");
+        }
+        <li>Height: @height of the screen</li>
+    </ul>
+</div>
+
+@functions {
+
+    void RenderVideoMeta(string label, MediaWithCrops? video, string fallback)
+    {
+        if (video == null)
+        {
+            <li>@label: @fallback</li>
+            return;
+        }
+
+        var bytes = (video.Content as UmbracoMediaVideo)?.UmbracoBytes ?? 0;
+        var isTooLarge = bytes > UmbracoCommunity.Web.Constants.Media.MaxHeroVideoBytes;
+
+        <li class="@(isTooLarge ? "is-warning" : null)">
+            @label: @video.Name (@UmbracoCommunity.Web.Constants.Media.FormatMegabytes(bytes))@(isTooLarge ? $", over the {UmbracoCommunity.Web.Constants.Media.FormatMegabytes(UmbracoCommunity.Web.Constants.Media.MaxHeroVideoBytes)} limit" : null)
+        </li>
+    }
+
+}

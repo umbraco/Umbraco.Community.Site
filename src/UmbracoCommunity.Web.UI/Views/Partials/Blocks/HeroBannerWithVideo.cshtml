@@ -1,0 +1,88 @@
+@using Umbraco.Cms.Core.Models
+@using UmbracoCommunity.Web.Services
+@using static UmbracoCommunity.Web.Extensions.HtmlHelperExtensions
+@inject IImageUrlBuilder ImageUrls
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<HeroBannerWithVideo, SettingsHeroBannerWithVideo>>
+
+@if (!string.IsNullOrWhiteSpace(Model.Content.Headline) && Model.Content.Video != null && Model.Content.PosterImage != null)
+{
+    var desktopPoster = ImageUrls.GetImageUrl(Model.Content.PosterImage, "desktop");
+    var desktopSmallPoster = ImageUrls.GetImageUrl(Model.Content.PosterImage, "desktopSmall");
+    var mobilePoster = ImageUrls.GetImageUrl(Model.Content.PosterImage, "mobile");
+
+    var alignmentClass = Model.Settings?.TextAlignment == "Left" ? "dc-video-hero--left" : "dc-video-hero--centre";
+    var heightClass = Model.Settings?.HeroHeight switch
+    {
+        "100%" => "dc-video-hero--h100",
+        "70%" => "dc-video-hero--h70",
+        _ => "dc-video-hero--h90"
+    };
+
+    <link rel="preload" as="image" href="@mobilePoster" media="(max-width: 767px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="@desktopSmallPoster" media="(min-width: 768px) and (max-width: 1279px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="@desktopPoster" media="(min-width: 1280px)" fetchpriority="high" />
+
+    <dc-video-hero class="dc-video-hero @alignmentClass @heightClass"
+                   data-video="@Model.Content.Video.MediaUrl()"
+                   data-mobile-video="@Model.Content.MobileVideo?.MediaUrl()">
+        <picture class="dc-video-hero__poster">
+            <source media="(min-width: 1280px)" srcset="@desktopPoster">
+            <source media="(min-width: 768px)" srcset="@desktopSmallPoster">
+            <img src="@mobilePoster" alt="" width="828" height="1472" fetchpriority="high">
+        </picture>
+        <video class="dc-video-hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+
+        <div class="dc-video-hero__content">
+            <div class="dc-video-hero__text">
+                @if (!string.IsNullOrEmpty(Model.Content.Tagline))
+                {
+                    <p class="dc-video-hero__tagline">@Model.Content.Tagline</p>
+                }
+                <h1 class="dc-video-hero__headline">@Model.Content.Headline</h1>
+                @if (!Model.Content.BodyText.IsEmptyHtmlString())
+                {
+                    <div class="dc-video-hero__body">
+                        @Html.Raw(Model.Content.BodyText?.ToHtmlString())
+                    </div>
+                }
+                @if (Model.Content.CallToActionLinks?.Any() ?? false)
+                {
+                    <div class="dc-video-hero__ctas">
+                        @{
+                            RenderCtaButtons(Model.Content.CallToActionLinks.ToList());
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button type="button" class="dc-video-hero__toggle" aria-label="Pause background video" hidden>
+            <svg class="dc-video-hero__icon-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+            <svg class="dc-video-hero__icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z" />
+            </svg>
+        </button>
+    </dc-video-hero>
+}
+
+@functions {
+
+    void RenderCtaButtons(List<Link> ctaButtons)
+    {
+        var themes = new ButtonLinkTheme[] {
+            ButtonLinkTheme.White,
+            ButtonLinkTheme.Transparent
+        };
+
+        for (var i = 0; i < ctaButtons.Count && i < themes.Length; i++)
+        {
+            var cta = ctaButtons[i];
+
+            @Html.RenderButtonCTA(cta.Url, cta.Name, cta.Target, cta.Name, themes[i])
+        }
+    }
+
+}
