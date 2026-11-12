@@ -105,6 +105,7 @@ namespace UmbracoCommunity.Web.Extensions
             builder.Services.AddScoped<IContentSuggestionService, ContentSuggestionService>();
             builder.Services.AddScoped<IPageNotFoundSuggestionService, PageNotFoundSuggestionService>();
             builder.Services.AddScoped<ISearchService, SearchService>();
+            builder.Services.AddScoped<UmbracoCommunity.SearchTracker.Reporting.ISearchPageUrlProvider, SearchPageUrlProvider>();
             builder.Services.AddScoped<IImageUrlBuilder, ImageUrlBuilder>();
 
             builder.Services.AddScoped<IViewModelBuilder<HomePageViewModel>, HomePageViewModelBuilder>();

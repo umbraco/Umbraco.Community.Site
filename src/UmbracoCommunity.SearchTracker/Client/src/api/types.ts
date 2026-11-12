@@ -1,6 +1,7 @@
 export interface SiteItem {
   key: string;
   name: string;
+  searchUrl: string | null;
 }
 
 export interface DailyCount {
@@ -23,6 +24,7 @@ export interface TermStat {
   searches: number;
   latestResultCount: number | null;
   lastSearched: string;
+  siteKeys: string[];
 }
 
 export interface TermListResponse {

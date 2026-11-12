@@ -7,6 +7,13 @@ namespace UmbracoCommunity.SearchTracker.Recording;
 /// <summary>Identifies who is searching, for bot filtering and per-visitor limits. Nothing here is stored.</summary>
 public static partial class SearchClient
 {
+    // Added by the dashboard's "View results" links so editors checking a term don't count as searches.
+    public const string DashboardQueryKey = "from";
+    public const string DashboardQueryValue = "search-tracker";
+
+    public static bool IsFromDashboard(HttpContext httpContext)
+        => string.Equals(httpContext.Request.Query[DashboardQueryKey].ToString(), DashboardQueryValue, StringComparison.Ordinal);
+
     public static bool IsBot(HttpContext httpContext)
     {
         var userAgent = httpContext.Request.Headers.UserAgent.ToString();

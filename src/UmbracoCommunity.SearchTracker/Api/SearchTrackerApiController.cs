@@ -14,17 +14,20 @@ public sealed class SearchTrackerApiController : SearchTrackerApiControllerBase
     private readonly ISearchReportService _reports;
     private readonly ISiteScopeService _scope;
     private readonly IEntityService _entityService;
+    private readonly ISearchPageUrlProvider _searchPageUrls;
     private readonly TimeProvider _timeProvider;
 
     public SearchTrackerApiController(
         ISearchReportService reports,
         ISiteScopeService scope,
         IEntityService entityService,
+        ISearchPageUrlProvider searchPageUrls,
         TimeProvider timeProvider)
     {
         _reports = reports;
         _scope = scope;
         _entityService = entityService;
+        _searchPageUrls = searchPageUrls;
         _timeProvider = timeProvider;
     }
 
@@ -38,7 +41,9 @@ public sealed class SearchTrackerApiController : SearchTrackerApiControllerBase
             .ToDictionary(e => e.Key, e => e.Name ?? string.Empty);
 
         var sites = keys
-            .Select(k => new SiteItem(k, names.TryGetValue(k, out var name) ? name : "(deleted site)"))
+            .Select(k => names.TryGetValue(k, out var name)
+                ? new SiteItem(k, name, _searchPageUrls.GetSearchPageUrl(k))
+                : new SiteItem(k, "(deleted site)", null))
             .OrderBy(s => s.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
         return Ok(sites);

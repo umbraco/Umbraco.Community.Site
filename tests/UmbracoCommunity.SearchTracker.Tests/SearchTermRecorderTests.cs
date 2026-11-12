@@ -43,6 +43,18 @@ public class SearchTermRecorderTests
             .Which.Should().Be(new SearchEvent(Site, "block grid", 0, Now.UtcDateTime));
     }
 
+    [Fact]
+    public void Skips_visits_from_the_dashboard()
+    {
+        var (recorder, channel) = Create();
+        var request = Request();
+        request.Request.QueryString = new QueryString($"?q=forms&{SearchClient.DashboardQueryKey}={SearchClient.DashboardQueryValue}");
+
+        recorder.Record(Site, "forms", 3, request);
+
+        Drain(channel).Should().BeEmpty();
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("Googlebot/2.1 (+http://www.google.com/bot.html)")]

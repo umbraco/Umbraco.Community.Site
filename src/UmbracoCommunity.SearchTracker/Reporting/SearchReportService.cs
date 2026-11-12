@@ -18,7 +18,11 @@ public sealed record DailyCount(DateOnly Day, int Searches, int ZeroResultSearch
 
 public sealed record SearchSummary(int TotalSearches, int ZeroResultSearches, int UniqueTerms, IReadOnlyList<DailyCount> Days);
 
-public sealed record TermStat(string Term, int Searches, int? LatestResultCount, DateOnly LastSearched);
+public sealed record TermStat(string Term, int Searches, int? LatestResultCount, DateOnly LastSearched)
+{
+    /// <summary>Sites this term was searched on within the filter, for linking to each site's live results.</summary>
+    public IReadOnlyList<Guid> SiteKeys { get; init; } = [];
+}
 
 public sealed record TermQuery(string? Contains, bool NothingFoundOnly, TermSort Sort, int Skip, int Take);
 
@@ -84,7 +88,19 @@ internal sealed class SearchReportService : ISearchReportService
             .Take(query.Take)
             .ToListAsync(ct);
 
-        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Latest, g.Last)).ToList(), total);
+        var pageTerms = items.Select(g => g.Term).ToList();
+        var sitesByTerm = (await Filtered(context, filter, scope)
+                .Where(r => pageTerms.Contains(r.Term))
+                .Select(r => new { r.Term, r.SiteKey })
+                .Distinct()
+                .ToListAsync(ct))
+            .GroupBy(r => r.Term)
+            .ToDictionary(g => g.Key, g => (IReadOnlyList<Guid>)g.Select(r => r.SiteKey).ToList());
+
+        return (items.Select(g => new TermStat(g.Term, g.Searches, g.Latest, g.Last)
+        {
+            SiteKeys = sitesByTerm.TryGetValue(g.Term, out var keys) ? keys : [],
+        }).ToList(), total);
     }
 
     internal static IQueryable<TermRow> BuildTermsQuery(SearchTrackerDbContext context, ReportFilter filter, TermQuery query, SiteScope scope)

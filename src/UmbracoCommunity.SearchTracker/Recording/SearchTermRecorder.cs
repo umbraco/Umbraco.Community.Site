@@ -33,7 +33,7 @@ internal sealed class SearchTermRecorder : ISearchTermRecorder, IDisposable
         var options = _options.Value;
         if (!options.Enabled || siteKey == Guid.Empty) return;
 
-        if (SearchClient.IsBot(httpContext)) return;
+        if (SearchClient.IsBot(httpContext) || SearchClient.IsFromDashboard(httpContext)) return;
 
         var term = SearchTermNormalizer.Normalize(query, options.MaxTermLength);
         if (term is null) return;

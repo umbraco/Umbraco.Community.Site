@@ -16,6 +16,9 @@ const SORTS = [
   { value: TermSort.Term, name: "A–Z" },
 ];
 const PAGE_SIZE = 25;
+// Matches SearchClient.DashboardQueryKey/Value, so checking a term from here isn't counted as a search.
+const DASHBOARD_QUERY_KEY = "from";
+const DASHBOARD_QUERY_VALUE = "search-tracker";
 
 @customElement("search-tracker-dashboard")
 export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
@@ -307,6 +310,7 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
                         <uui-icon name=${this.expandedTerm === item.term ? "icon-navigation-up" : "icon-chart-curve"}></uui-icon>
                         ${this.expandedTerm === item.term ? "Hide trend" : "Show trend"}
                       </uui-button>
+                      ${this.renderResultsLinks(item)}
                       <uui-button
                         compact
                         look="secondary"
@@ -339,6 +343,33 @@ export class SearchTrackerDashboardElement extends UmbElementMixin(LitElement) {
             )}
       </tbody></table>
     `;
+  }
+
+  private renderResultsLinks(item: TermStat) {
+    const sites = item.siteKeys
+      .map((key) => this.sites.find((s) => s.key === key))
+      .filter((s): s is SiteItem & { searchUrl: string } => !!s?.searchUrl);
+    const named = sites.length > 1;
+
+    return sites.map((site) => {
+      const url = new URL(site.searchUrl, window.location.origin);
+      url.searchParams.set("q", item.term);
+      url.searchParams.set(DASHBOARD_QUERY_KEY, DASHBOARD_QUERY_VALUE);
+      const text = named ? `View on ${site.name}` : "View results";
+      return html`
+        <uui-button
+          compact
+          look="secondary"
+          href=${url.toString()}
+          target="_blank"
+          rel="noopener"
+          label=${`${text} for “${item.term}” on ${site.name} (opens in a new tab)`}
+        >
+          <uui-icon name="icon-out"></uui-icon>
+          ${text}
+        </uui-button>
+      `;
+    });
   }
 
   private renderResultCount(count: number | null) {

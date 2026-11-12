@@ -63,6 +63,7 @@ public sealed class RegisterSearchTracker : IComposer
 
         builder.Services.AddScoped<ISiteScopeService, SiteScopeService>();
         builder.Services.AddSingleton<ISearchReportService, SearchReportService>();
+        builder.Services.TryAddScoped<ISearchPageUrlProvider, NoSearchPageUrlProvider>();
 
         builder.AddBackOfficeOpenApiDocument(SearchTrackerApiConstants.ApiName, doc => doc
             .WithTitle("Umbraco Community Search Tracker Backoffice API")

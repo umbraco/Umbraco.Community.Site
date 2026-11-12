@@ -49,6 +49,17 @@ public class SearchReportServiceTests : SqliteTestBase
     }
 
     [Fact]
+    public async Task Terms_list_the_sites_they_were_searched_on()
+    {
+        var (items, _) = await Service.GetTermsAsync(AllSites, Query(), SiteScope.Full, CancellationToken.None);
+        var (siteBItems, _) = await Service.GetTermsAsync(AllSites with { SiteKey = SiteB }, Query(), SiteScope.Full, CancellationToken.None);
+
+        items.Single(i => i.Term == "forms").SiteKeys.Should().BeEquivalentTo([SiteA, SiteB]);
+        items.Single(i => i.Term == "headless").SiteKeys.Should().Equal(SiteA);
+        siteBItems.Single(i => i.Term == "forms").SiteKeys.Should().Equal(SiteB);
+    }
+
+    [Fact]
     public async Task Latest_result_count_comes_from_the_most_recent_day()
     {
         var (items, _) = await Service.GetTermsAsync(AllSites, Query(), SiteScope.Full, CancellationToken.None);
