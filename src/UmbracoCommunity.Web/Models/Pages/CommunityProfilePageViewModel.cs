@@ -58,6 +58,27 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     /// </summary>
     public bool IsShowingEverything { get; init; }
 
+    /// <summary>
+    /// The profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the enriched sections
+    /// are not shown or there is nothing dated.
+    /// </summary>
+    public IReadOnlyList<ProfileTimelineMonth> Timeline { get; init; } = [];
+
+    /// <summary>The timeline's type filter options: the sections that have entries.</summary>
+    public IReadOnlyList<ProfileTimelineType> TimelineTypes { get; init; } = [];
+
+    /// <summary>
+    /// The type the timeline is filtered by, from the <c>?type=</c> query string (see <see cref="ProfileTimeline.SelectedType"/>).
+    /// Null shows everything.
+    /// </summary>
+    public string? TimelineType { get; init; }
+
+    /// <summary>True when the timeline has a month with an entry that matches <see cref="TimelineType"/>.</summary>
+    public bool TimelineHasShownEntries => Timeline.Any(m => m.Entries.Any(e => ProfileTimeline.IsShown(e, TimelineType)));
+
+    /// <summary>The activity graph, unless the member switched it off, when there was activity in the last 12 months.</summary>
+    public ProfileActivityGraph? ActivityGraph { get; init; }
+
     /// <summary>Link to the profile as the public sees it. Set for a DevRel view only.</summary>
     public string? DevRelPublicViewUrl { get; init; }
 

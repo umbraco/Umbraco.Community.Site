@@ -72,6 +72,10 @@ public sealed record ProfileBlogPost(
     string? ActivityId = null);
 
 /// <summary>A YouTube video. May be sourced from the external platform or derived from the channel link.</summary>
+/// <param name="ThumbnailUrl">
+/// The thumbnail's address on its own site. Never put in front of a visitor as it is: the timeline shows a copy
+/// stored by <see cref="ProfileTimelineImageStore"/>.
+/// </param>
 public sealed record ProfileVideo(
     string Title,
     string Url,
@@ -89,12 +93,14 @@ public sealed record ProfileForumPost(
     string? ActivityId = null);
 
 /// <summary>A released package and its published versions (newest first).</summary>
+/// <param name="Date">When the package was last active (its latest release, or the date the member gave). Null when not known.</param>
 public sealed record ProfilePackage(
     string Name,
     string Url,
     IReadOnlyList<string> Versions,
     string? Description = null,
-    string? ActivityId = null);
+    string? ActivityId = null,
+    DateTimeOffset? Date = null);
 
 /// <summary>A talk given by the member, sourced from Sessionize.</summary>
 public sealed record ProfileTalk(

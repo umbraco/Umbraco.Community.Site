@@ -48,4 +48,23 @@ public class LinkPreviewHtmlParserTests
         preview.ImageUrl.Should().BeNull();
         preview.FaviconUrl.Should().Be("https://example.org/favicon.ico");
     }
+
+    [Fact]
+    public void Reads_the_share_description_falling_back_to_the_plain_description()
+    {
+        const string withShare = """<head><meta name="description" content="Plain"><meta property="og:description" content="Shared &amp; described"></head>""";
+        const string plainOnly = """<head><meta name="description" content="  Plain words  "></head>""";
+
+        LinkPreviewHtmlParser.Parse(withShare, Page).Description.Should().Be("Shared & described");
+        LinkPreviewHtmlParser.Parse(plainOnly, Page).Description.Should().Be("Plain words");
+        LinkPreviewHtmlParser.Parse("<head></head>", Page).Description.Should().BeNull();
+    }
+
+    [Fact]
+    public void A_long_description_is_cut()
+    {
+        var html = $"""<head><meta property="og:description" content="{new string('a', 1000)}"></head>""";
+
+        LinkPreviewHtmlParser.Parse(html, Page).Description.Should().HaveLength(300);
+    }
 }

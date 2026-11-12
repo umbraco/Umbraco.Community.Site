@@ -37,7 +37,6 @@ public class ProfileActivityServiceTests
             activityEntryService ?? CreateActivityEntryService(client, database),
             new ProfileMatchStore(database),
             mvp ?? Listed(),
-            TestImageProxy.Create(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
             NullLogger<ProfileActivityService>.Instance);

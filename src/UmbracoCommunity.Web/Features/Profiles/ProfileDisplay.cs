@@ -6,8 +6,9 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 
 /// <summary>
 /// A member's choices of what the activity sections of their profile show: sections switched off, single
-/// items hidden, and up to <see cref="MaxPinnedItems"/> items pinned to the Featured block with a short note
-/// on why. Validates the choices a member sends and applies the stored ones to a <see cref="CommunityProfile"/>.
+/// items hidden, up to <see cref="MaxPinnedItems"/> items pinned to the Featured block with a short note
+/// on why, the activity graph switch, and the timeline's preview cards (off for the whole timeline or per item).
+/// Validates the choices a member sends and applies the stored ones to a <see cref="CommunityProfile"/>.
 /// The limits are mirrored client side in <c>profile-display.service.ts</c>.
 /// </summary>
 public static class ProfileDisplay
@@ -44,7 +45,12 @@ public static class ProfileDisplay
                 .OrderBy(p => p.SortOrder)
                 .ThenBy(p => p.Id)
                 .Select(p => new ProfilePin(p.ActivityId, p.Reason, StoredSnapshot(p)))
-                .ToList());
+                .ToList())
+        {
+            HideActivityGraph = entity.HideActivityGraph,
+            HideTimelineCards = entity.HideTimelineCards,
+            NoCardActivityIds = entity.NoCardActivityIds,
+        };
 
     /// <summary>
     /// Keeps a copy of each pinned item with its pin, so it can still be featured once it is no longer among the
@@ -140,6 +146,26 @@ public static class ProfileDisplay
             return false;
         }
 
+        var noCardIds = new List<string>();
+        foreach (var value in request.NoCardItemIds ?? [])
+        {
+            if (!TryNormalizeId(value, out var id, out error))
+            {
+                return false;
+            }
+
+            if (!noCardIds.Contains(id, StringComparer.Ordinal))
+            {
+                noCardIds.Add(id);
+            }
+        }
+
+        if (noCardIds.Count > MaxHiddenItems)
+        {
+            error = $"You can switch off up to {MaxHiddenItems} preview cards one by one.";
+            return false;
+        }
+
         var requestedPins = request.Pins ?? [];
         if (requestedPins.Count > MaxPinnedItems)
         {
@@ -177,7 +203,12 @@ public static class ProfileDisplay
             pins.Add(new ProfilePin(id, reason));
         }
 
-        choices = new ProfileDisplayChoices(hiddenSections, hiddenIds, pins);
+        choices = new ProfileDisplayChoices(hiddenSections, hiddenIds, pins)
+        {
+            HideActivityGraph = request.HideActivityGraph ?? false,
+            HideTimelineCards = request.HideTimelineCards ?? false,
+            NoCardActivityIds = noCardIds,
+        };
         error = null;
         return true;
     }
@@ -282,7 +313,7 @@ public static class ProfileDisplay
                     .Select(p => new ProfileFeaturedItem(group, p.ActivityId!, p.Title, p.Url, null, p.PostedAt, null, null)),
                 PlatformActivityGroups.Packages => profile.Packages
                     .Where(p => p.ActivityId != null)
-                    .Select(p => new ProfileFeaturedItem(group, p.ActivityId!, p.Name, p.Url, p.Description, null, null, null)),
+                    .Select(p => new ProfileFeaturedItem(group, p.ActivityId!, p.Name, p.Url, p.Description, p.Date, null, null)),
                 PlatformActivityGroups.Meetups => profile.Meetups
                     .Where(m => m.ActivityId != null && m.Url != null)
                     .Select(m => new ProfileFeaturedItem(group, m.ActivityId!, m.EventName, m.Url!, null, m.Date, m.Action, null)),

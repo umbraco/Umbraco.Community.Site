@@ -113,6 +113,31 @@ public class CommunityProfilePageViewModelTests
         asPublic.IsMarkedHidden(hidden).Should().BeFalse();
     }
 
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData(PlatformActivityGroups.Blog, true)]
+    [InlineData(PlatformActivityGroups.Forum, false)]
+    public void The_timeline_reports_whether_anything_matches_the_type_filter(string? type, bool expected)
+    {
+        var timeline = ProfileTimeline.ByMonth(ProfileTimeline.Entries(Profile));
+
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.Setup(t => t.Alias).Returns(CommunityProfilePage.ModelTypeAlias);
+        var page = new Mock<IPublishedContent>();
+        page.Setup(p => p.ContentType).Returns(contentType.Object);
+
+        var filtered = new CommunityProfilePageViewModel(page.Object)
+        {
+            Handle = "octocat",
+            Profile = Profile,
+            Timeline = timeline,
+            TimelineTypes = ProfileTimeline.Types(timeline.SelectMany(m => m.Entries)),
+            TimelineType = type,
+        };
+
+        filtered.TimelineHasShownEntries.Should().Be(expected);
+    }
+
     private static CommunityProfilePageViewModel Model(
         CommunityProfile? profile,
         bool isDevRelView,
