@@ -6,20 +6,9 @@ namespace UmbracoCommunity.Web.Helpers
 {
     public static class VideoHelper
     {
-        public static string GetAllow(this SettingsVideoBlock? videoSettings)
-        {
-            var allows = new List<string> {
-                "accelerometer",
-                "clipboard-write",
-                "encrypted-media",
-                "fullscreen",
-                "gyroscope",
-                "picture-in-picture",
-                "autoplay"
-            };
+        public const string YouTubeAllow = "accelerometer; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; autoplay";
 
-            return string.Join("; ", allows);
-        }
+        public static string GetAllow(this SettingsVideoBlock? videoSettings) => YouTubeAllow;
 
         public static string GetYouTubeLink(this string videoUrl, SettingsVideoBlock? settings)
         {

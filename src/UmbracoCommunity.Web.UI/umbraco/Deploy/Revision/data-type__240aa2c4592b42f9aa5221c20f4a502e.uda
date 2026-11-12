@@ -142,6 +142,17 @@
         "areas": []
       },
       {
+        "contentElementTypeKey": "b1a7fb4d-21d3-4820-872a-79f99d8b0a47",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "e851dbeb-13d8-44bd-a65c-3b1ce4efb695"
+      },
+      {
         "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -150,7 +161,8 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a",
+        "groupKey": "86a5a9f2-f123-4638-a3f5-78d35615700a"
       },
       {
         "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
@@ -165,7 +177,13 @@
         "settingsElementTypeKey": "0ac6f64c-6c6a-4ebe-90a5-9c06e7ad1b61"
       }
     ],
-    "createLabel": "Add new content block"
+    "createLabel": "Add new content block",
+    "blockGroups": [
+      {
+        "key": "86a5a9f2-f123-4638-a3f5-78d35615700a",
+        "name": "Legacy"
+      }
+    ]
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
   "Udi": "umb://data-type/240aa2c4592b42f9aa5221c20f4a502e",
@@ -238,6 +256,9 @@
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
     },
     {
+      "Udi": "umb://document-type/b1a7fb4d21d34820872a79f99d8b0a47"
+    },
+    {
       "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
     },
     {
@@ -265,6 +286,9 @@
       "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
     },
     {
+      "Udi": "umb://document-type/e851dbeb13d844bda65c3b1ce4efb695"
+    },
+    {
       "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
     },
     {
@@ -272,5 +296,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "18.0.1"
+  "__version": "18.2.0"
 }

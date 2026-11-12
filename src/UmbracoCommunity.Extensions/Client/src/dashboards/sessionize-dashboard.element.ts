@@ -50,7 +50,7 @@ export class SessionizeDashboardElement extends UmbElementMixin(LitElement) {
     this._isClearingCache = true;
 
     try {
-      const { data, error } = await UmbracoCommunityExtensionsService.refreshSessionizeCache();
+      const { data, error } = await UmbracoCommunityExtensionsService.postRefreshSessionizeCache();
 
       if (error) {
         throw new Error(String(error));

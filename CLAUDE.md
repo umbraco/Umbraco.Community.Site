@@ -311,9 +311,16 @@ Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice fu
 **API Controllers** (`Controllers/`):
 - Blog article creation
 - External member groups (`ExternalMemberGroupsApiController`, Members section access): `GET`/`PUT members/{memberKey}/external-groups` — read and replace the member groups of a lightweight external member (logic in `UmbracoCommunity.Web/Features/Members/Groups/ExternalMemberGroupService.cs`)
+- YouTube video picker (`YouTubeVideoApiController`): `GET youtube/preview`, `POST youtube/posters`, `GET youtube/posters/{mediaKey}` (see "YouTube Videos" below)
 
 **Backoffice Dashboards** (`Client/src/dashboards/`):
 - Sessionize dashboard
+
+**Property Editors** (`Client/src/property-editors/`):
+- Event schedule (`Umbraco.Plain.Json` schema)
+- YouTube video picker (`UmbracoCommunity.YouTubeVideo` schema, see "YouTube Videos" below)
+
+The API client in `Client/src/api/` is generated: run `npm run generate-client` with the site running after changing a controller, rather than editing it by hand.
 
 **Workspace Views** (`Client/src/workspace-views/`):
 - "Groups" tab on the member workspace, shown only for external-only members via the `UmbracoCommunity.Condition.IsExternalMember` condition (`Client/src/conditions/`, observes the member workspace context's `kind`). Umbraco 18.3 shows an external member's groups read-only and its Management API refuses to update external members, so this is the only way to assign/remove groups (e.g. "Early access") from the backoffice.
@@ -370,6 +377,24 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
 - Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
 - Uses design system variables from `root.css`
+
+### YouTube Videos
+
+All YouTube input goes through the **YouTube video picker** data type (schema `UmbracoCommunity.YouTubeVideo`, UI `UmbracoCommunity.PropertyEditorUi.YouTubeVideo`). The **Video** block (`youTubeVideoBlock` + `settingsYouTubeVideoBlock`) uses it, and new video-based blocks should too.
+
+**Editor flow**: paste a link → the picker calls `GET youtube/preview`, which returns the oEmbed title/author and up to four stills (YouTube's thumbnail plus its three auto-generated frames, `maxres*` falling back to `sd*`/`hq*`) → picking a still calls `POST youtube/posters`, which downloads it into the Media library at `Video thumbnails/<site root name>/` (reusing an earlier import by name). Editors can also choose any image from the Media library. Stills are only shown in the backoffice (it has no CSP); the front end serves the imported image, so visitors never load anything from YouTube until they press play.
+
+**Server** (`UmbracoCommunity.Web/Features/YouTube/`):
+- `YouTubeVideoPropertyEditor` (schema, reports the poster as a media reference for "Used by"), `YouTubeVideoValue` (stored JSON: `url`, `videoId`, `title`, `posterKey`), `YouTubeVideoValueConverter` → `YouTubeVideo` (`EmbedUrl` on youtube-nocookie with any `?t=` start time, `WatchUrl`, `Poster`)
+- `YouTubeVideoValueConnector` makes Umbraco Deploy bring the poster media along
+- `YouTubePosterService` only fetches `i.ytimg.com` images for an 11-character video id and a fixed list of variants, so it can't be pointed at other URLs
+- Link parsing lives in `VideoHelper.GetYouTubeVideoId` (`watch?v=`, `youtu.be`, `/shorts/`, `/live/`, `/embed/`); the picker relies on the preview endpoint rather than parsing links itself
+
+**Picker element** (`Extensions/Client/src/property-editors/youtube-video/`): inside block editors the document workspace context isn't reachable (block modals render outside it), so the page key for the site folder comes from the `/workspace/document/edit/{key}` route instead.
+
+**Legacy Video block**: the old `videoBlock` ("Video (legacy)", link picker + thumbnail) is kept in the "Legacy" block group so existing videos keep rendering and stay editable. It can't simply be removed from the block editors or restricted — Umbraco then marks existing instances invalid (see the Block Restrictions notes). Instead `LegacyVideoBlockGuard` refuses any save that *adds* a legacy video block (compared by block key against the saved version).
+
+**Rendering**: `Views/Partials/Blocks/YouTubeVideoBlock.cshtml` renders `<dc-video-picker-youtube>` (the legacy block uses it too), which loads nothing from YouTube until the poster is played. Browsers (Chrome included) often ignore `autoplay=1` in an embed, leaving a second click on YouTube's own play button, so on click the component loads YouTube's IFrame Player API once per page (`youtube-api.ts`), creates the player on youtube-nocookie and calls `playVideo()` on ready. If playback hasn't started after `MUTED_FALLBACK_MS` (sound refused), it mutes and plays, leaving YouTube's unmute button. If the API can't load it falls back to a plain `autoplay=1` iframe. The poster is cropped to the block's Format (16:9 or 4:3).
 
 ### Blog Showcase Block
 

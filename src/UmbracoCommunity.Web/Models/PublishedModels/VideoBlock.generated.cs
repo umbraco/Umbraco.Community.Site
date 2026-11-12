@@ -18,7 +18,7 @@ using Umbraco.Extensions;
 
 namespace UmbracoCommunity.Web.Models.PublishedModels
 {
-	/// <summary>Video block</summary>
+	/// <summary>Video (legacy)</summary>
 	[PublishedModel("videoBlock")]
 	public partial class VideoBlock : PublishedElementModel
 	{

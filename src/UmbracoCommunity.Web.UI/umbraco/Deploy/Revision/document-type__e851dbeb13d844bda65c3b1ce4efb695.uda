@@ -1,0 +1,51 @@
+{
+  "Name": "[Settings] Video",
+  "Alias": "settingsYouTubeVideoBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-plugin",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "f060392a-b1d2-4e80-972a-7ce926933187",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "663d088d-b343-4cf4-b6d9-10f2c0bf0198",
+          "Alias": "format",
+          "DataType": "umb://data-type/951f2062ebd9496b94d799397bccece0",
+          "ValueType": "System.String",
+          "Name": "Format",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/e851dbeb13d844bda65c3b1ce4efb695",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/951f2062ebd9496b94d799397bccece0",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

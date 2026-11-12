@@ -1,10 +1,11 @@
 {
-  "Name": "Video block",
+  "Name": "Video (legacy)",
   "Alias": "videoBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-video",
   "Thumbnail": "folder.png",
+  "Description": "Kept so existing videos keep working. Add new videos with the Video block.",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
@@ -41,5 +42,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.2.0"
 }

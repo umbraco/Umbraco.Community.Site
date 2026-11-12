@@ -1,0 +1,47 @@
+{
+  "Name": "Video",
+  "Alias": "youTubeVideoBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-video",
+  "Thumbnail": "folder.png",
+  "Description": "A YouTube video with a poster from the Media library. Nothing loads from YouTube until it\u0027s played.",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "a519c316-fcc0-4f07-a6df-cc3781447762",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "84cdc510-df07-43d5-9183-0cccf6231863",
+          "Alias": "video",
+          "DataType": "umb://data-type/781bfd8fc2514c3295bf72ff40cea68a",
+          "ValueType": "UmbracoCommunity.Web.Features.YouTube.YouTubeVideo",
+          "Description": "Paste a YouTube link, then pick a still from the video as its poster.",
+          "Mandatory": true,
+          "Name": "Video"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/b1a7fb4d21d34820872a79f99d8b0a47",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/781bfd8fc2514c3295bf72ff40cea68a",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

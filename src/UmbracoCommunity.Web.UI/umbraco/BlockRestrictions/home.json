@@ -25,6 +25,7 @@
     "timelineBlock",
     "titleBlock",
     "upcomingEventsBlock",
-    "videoBlock"
+    "videoBlock",
+    "youTubeVideoBlock"
   ]
 }

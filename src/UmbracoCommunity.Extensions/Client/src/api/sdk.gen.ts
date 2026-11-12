@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, GetExternalMemberGroupsData, GetExternalMemberGroupsErrors, GetExternalMemberGroupsResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, RefreshSessionizeCacheData, RefreshSessionizeCacheErrors, RefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, SetExternalMemberGroupsData, SetExternalMemberGroupsErrors, SetExternalMemberGroupsResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
+import type { CreateBlogArticleData, CreateBlogArticleErrors, CreateBlogArticleResponses, GetExternalMemberGroupsData, GetExternalMemberGroupsErrors, GetExternalMemberGroupsResponses, GetPosterData, GetPosterErrors, GetPosterResponses, GetPreviewData, GetPreviewErrors, GetPreviewResponses, ImportPosterData, ImportPosterErrors, ImportPosterResponses, IsBlogNodeData, IsBlogNodeErrors, IsBlogNodeResponses, PlanData, PlanErrors, PlanResponses, PostRefreshSessionizeCacheData, PostRefreshSessionizeCacheErrors, PostRefreshSessionizeCacheResponses, RegenerateData, RegenerateErrors, RegenerateResponses, RunData, RunErrors, RunResponses, SetExternalMemberGroupsData, SetExternalMemberGroupsErrors, SetExternalMemberGroupsResponses, StatusData, StatusErrors, StatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -45,15 +45,58 @@ export class UmbracoCommunityExtensionsService {
         });
     }
     
-    public static refreshSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<RefreshSessionizeCacheData, ThrowOnError>) {
-        return (options?.client ?? client).post<RefreshSessionizeCacheResponses, RefreshSessionizeCacheErrors, ThrowOnError>({
+    public static getExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<GetExternalMemberGroupsData, ThrowOnError>) {
+        return (options.client ?? client).get<GetExternalMemberGroupsResponses, GetExternalMemberGroupsErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache',
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            ...options
+        });
+    }
+    
+    public static setExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<SetExternalMemberGroupsData, ThrowOnError>) {
+        return (options.client ?? client).put<SetExternalMemberGroupsResponses, SetExternalMemberGroupsErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    public static plan<ThrowOnError extends boolean = false>(options?: Options<PlanData, ThrowOnError>) {
+        return (options?.client ?? client).get<PlanResponses, PlanErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/external-migration/plan',
+            ...options
+        });
+    }
+    
+    public static run<ThrowOnError extends boolean = false>(options?: Options<RunData, ThrowOnError>) {
+        return (options?.client ?? client).post<RunResponses, RunErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/members/external-migration/run',
             ...options
         });
     }
@@ -84,33 +127,59 @@ export class UmbracoCommunityExtensionsService {
         });
     }
     
-    public static getExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<GetExternalMemberGroupsData, ThrowOnError>) {
-        return (options.client ?? client).get<GetExternalMemberGroupsResponses, GetExternalMemberGroupsErrors, ThrowOnError>({
+    public static postRefreshSessionizeCache<ThrowOnError extends boolean = false>(options?: Options<PostRefreshSessionizeCacheData, ThrowOnError>) {
+        return (options?.client ?? client).post<PostRefreshSessionizeCacheResponses, PostRefreshSessionizeCacheErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            url: '/umbraco/umbracocommunityextensions/api/v1/sessionize/refresh-cache',
             ...options
         });
     }
     
-    public static setExternalMemberGroups<ThrowOnError extends boolean = false>(options: Options<SetExternalMemberGroupsData, ThrowOnError>) {
-        return (options.client ?? client).put<SetExternalMemberGroupsResponses, SetExternalMemberGroupsErrors, ThrowOnError>({
+    public static importPoster<ThrowOnError extends boolean = false>(options: Options<ImportPosterData, ThrowOnError>) {
+        return (options.client ?? client).post<ImportPosterResponses, ImportPosterErrors, ThrowOnError>({
             security: [
                 {
                     scheme: 'bearer',
                     type: 'http'
                 }
             ],
-            url: '/umbraco/umbracocommunityextensions/api/v1/members/{memberKey}/external-groups',
+            url: '/umbraco/umbracocommunityextensions/api/v1/youtube/posters',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers
             }
+        });
+    }
+    
+    public static getPoster<ThrowOnError extends boolean = false>(options: Options<GetPosterData, ThrowOnError>) {
+        return (options.client ?? client).get<GetPosterResponses, GetPosterErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/youtube/posters/{mediaKey}',
+            ...options
+        });
+    }
+    
+    public static getPreview<ThrowOnError extends boolean = false>(options?: Options<GetPreviewData, ThrowOnError>) {
+        return (options?.client ?? client).get<GetPreviewResponses, GetPreviewErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/umbracocommunityextensions/api/v1/youtube/preview',
+            ...options
         });
     }
 }

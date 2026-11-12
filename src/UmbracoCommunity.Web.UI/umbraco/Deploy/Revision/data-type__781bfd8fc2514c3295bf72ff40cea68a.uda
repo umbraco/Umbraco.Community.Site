@@ -1,0 +1,16 @@
+{
+  "Name": "YouTube video picker",
+  "EditorAlias": "UmbracoCommunity.YouTubeVideo",
+  "EditorUiAlias": "UmbracoCommunity.PropertyEditorUi.YouTubeVideo",
+  "Configuration": {},
+  "Parent": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+  "Udi": "umb://data-type/781bfd8fc2514c3295bf72ff40cea68a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/b95afc8bd3804eb3af46f269bc25f20f",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.2.0"
+}
