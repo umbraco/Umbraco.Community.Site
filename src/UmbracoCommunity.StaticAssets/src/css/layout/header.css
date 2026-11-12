@@ -501,6 +501,16 @@ body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
   z-index: 2;
 }
 
+body.hero-full-width .nav-header {
+  position: fixed;
+  inset: 0 0 auto;
+  margin-inline: auto;
+}
+
+body.hero-full-width .nav-header__overlay {
+  display: none;
+}
+
 @media (--sm) {
   body:not(.scroll):not(.hero-full-width):not(.hero-half-width) .nav-header .nav {
     padding: 10px 0;

@@ -20,7 +20,7 @@
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 </head>
 
-<body class="document-@currentPage.ContentTypeAlias" data-site="@currentPage.SiteAlias">
+<body class="document-@currentPage.ContentTypeAlias@(currentPage.HasFullWidthHero ? " hero-full-width" : "")" data-site="@currentPage.SiteAlias">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     @await Component.InvokeAsync("Menu")
 

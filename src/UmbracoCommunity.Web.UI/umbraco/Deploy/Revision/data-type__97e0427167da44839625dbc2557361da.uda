@@ -1,0 +1,23 @@
+{
+  "Name": "Video size dropdown",
+  "EditorAlias": "Umbraco.DropDown.Flexible",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
+  "DatabaseType": "Nvarchar",
+  "Configuration": {
+    "items": [
+      "100%",
+      "90%",
+      "70%"
+    ]
+  },
+  "Parent": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+  "Udi": "umb://data-type/97e0427167da44839625dbc2557361da",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/93184e7d425144b9969a4eb1a9bc6bd4",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "18.2.0"
+}
