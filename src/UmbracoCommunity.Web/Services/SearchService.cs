@@ -24,15 +24,8 @@ internal sealed class SearchService : ISearchService
 
     // Scope the managed query to author-content fields so editor identity
     // (writerName/creatorName) and other system metadata don't surface as hits.
-    private static readonly string[] SearchFields =
-    {
-        "nodeName",
-        "metaTitle",
-        "metaDescription",
-        "teaser",
-        "bannerContent",
-        "contentBlocks",
-    };
+    internal static readonly string[] BlockFields = ["bannerContent", "contentBlocks"];
+    private static readonly string[] SearchFields = ["nodeName", "metaTitle", "metaDescription", "teaser", .. BlockFields];
     private static readonly string[] CommunitySearchFields =
     {
         CommunityBlogsSearchIndexer.FieldTitle,
