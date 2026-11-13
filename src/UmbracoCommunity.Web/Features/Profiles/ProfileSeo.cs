@@ -30,11 +30,19 @@ public static class ProfileSeo
     /// </summary>
     public static string Description(ProfileIdentity identity)
     {
-        var text = string.Join(" · ", new[] { identity.Headline, identity.Bio }
+        var headline = identity.HeadlineIsCompany && !string.IsNullOrWhiteSpace(identity.Headline)
+            ? $"🏢 {CapitaliseWords(identity.Headline.Trim())}"
+            : identity.Headline;
+        var text = string.Join(" · ", new[] { headline, identity.Bio }
             .Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v!.Trim()));
         return text.Length > MaxDescriptionLength ? text[..(MaxDescriptionLength - 3)].TrimEnd() + "..." : text;
     }
+
+    // Only the first letter of each word is changed, so "GmbH" and "IBM" stay as they were written.
+    private static string CapitaliseWords(string text) =>
+        string.Join(' ', text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(w => char.ToUpperInvariant(w[0]) + w[1..]));
 
     /// <summary>
     /// A ProfilePage whose main entity is the member as a Person. Carries only what the page shows to everyone: the

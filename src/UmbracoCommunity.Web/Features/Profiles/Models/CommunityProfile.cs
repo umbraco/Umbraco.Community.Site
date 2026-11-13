@@ -60,6 +60,9 @@ public sealed record ProfileIdentity(
 {
     /// <summary>True when the newest of <see cref="MvpYears"/> is the current MVP year. Set by <see cref="ProfileMvp"/>.</summary>
     public bool IsCurrentMvp { get; init; }
+
+    /// <summary>True when <see cref="Headline"/> is the company from the member's GitHub profile, not something they wrote.</summary>
+    public bool HeadlineIsCompany { get; init; }
 }
 
 /// <summary>A blog post or article the member has written, from any source.</summary>
