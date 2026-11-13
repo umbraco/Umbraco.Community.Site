@@ -60,4 +60,14 @@ public class ProfileMvpTests
 
         result.IsCurrentMvp.Should().BeTrue();
     }
+
+    [Fact]
+    public void Resolve_gives_the_same_answer_without_a_profile()
+    {
+        var (years, isCurrent) = ProfileMvp.Resolve(Handle, null, [Year(2024, Handle), Year(2026, "someone")]);
+
+        years.Should().Equal(2024);
+        isCurrent.Should().BeFalse();
+        ProfileMvp.Resolve(null, null, [Year(2026, Handle)]).Years.Should().BeEmpty();
+    }
 }

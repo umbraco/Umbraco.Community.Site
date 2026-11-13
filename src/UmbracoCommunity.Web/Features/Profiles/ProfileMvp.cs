@@ -19,23 +19,41 @@ internal static class ProfileMvp
         IReadOnlyList<int>? platformYears,
         IReadOnlyList<MvpYear> listedYears)
     {
-        var years = platformYears is { Count: > 0 }
-            ? platformYears
-            : YearsFromList(identity.GitHubHandle, listedYears);
-
-        var ordered = years.Distinct().OrderByDescending(y => y).ToList();
-        if (ordered.Count == 0)
+        var (years, isCurrent) = Resolve(identity.GitHubHandle, platformYears, listedYears);
+        if (years.Count == 0)
         {
             return identity;
         }
 
-        var newestKnown = Math.Max(ordered[0], listedYears.Count > 0 ? listedYears.Max(y => y.Year) : 0);
         return identity with
         {
             IsMvp = true,
-            MvpYears = ordered,
-            IsCurrentMvp = ordered[0] == newestKnown,
+            MvpYears = years,
+            IsCurrentMvp = isCurrent,
         };
+    }
+
+    /// <summary>
+    /// The MVP years of <paramref name="handle"/> (newest first, empty when never an MVP) and whether the newest of them
+    /// is the newest year known anywhere. The same rule <see cref="Apply"/> uses, for callers without a profile.
+    /// </summary>
+    public static (IReadOnlyList<int> Years, bool IsCurrent) Resolve(
+        string? handle,
+        IReadOnlyList<int>? platformYears,
+        IReadOnlyList<MvpYear> listedYears)
+    {
+        var years = platformYears is { Count: > 0 }
+            ? platformYears
+            : YearsFromList(handle, listedYears);
+
+        var ordered = years.Distinct().OrderByDescending(y => y).ToList();
+        if (ordered.Count == 0)
+        {
+            return ([], false);
+        }
+
+        var newestKnown = Math.Max(ordered[0], listedYears.Count > 0 ? listedYears.Max(y => y.Year) : 0);
+        return (ordered, ordered[0] == newestKnown);
     }
 
     private static IReadOnlyList<int> YearsFromList(string? handle, IReadOnlyList<MvpYear> listedYears) =>

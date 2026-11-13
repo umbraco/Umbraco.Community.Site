@@ -548,6 +548,10 @@ The site implements structured data using Schema.NET for better search engine vi
 - Optional: `WebBotAuth:SignatureLifetimeSeconds` (300), `WebBotAuth:CacheMaxAgeSeconds` (60).
 - The response also carries `Content-Digest: sha-256=:…:` (RFC 9530) over the body; Cloudflare's `http-signature-directory` validator (crates.io) requires it and checks the signature covers it. `@authority;req` is accepted on responses. Re-run that tool against the live URL after changing anything here.
 
+### Open Badges (Umbraco MVP badge)
+
+Current MVPs (by `ProfileMvp.Resolve`, the same platform-years-else-`mvp.json` rule as the profile's MVP pill) get a "Download Umbraco MVP {year} badge" section on the account page: an Open Badges 2.0 PNG with the assertion JSON baked into an `openbadges` iTXt chunk (`PngBadgeBaker`, by hand), for uploading to Sessionize. Code in `Features/OpenBadges/`; public JSON-LD at `/badges/issuer.json`, `/badges/mvp/{year}.json`, `/badges/assertions/{id}.json` and artwork at `/badges/mvp/{year}.png` (all `ExternalApi` output-cached), member-only download at `/account/badges/umbraco-mvp-{year}.png` (routes in `UseApplicationEndpoints`). No table: the assertion id is `base64url("{handle}:{year}" + HMAC)` signed with `OpenBadges:SigningKey` (a secret, ≥32 chars, Local.json / environment only; without it every endpoint 404s and the section is hidden; rotating it breaks issued badges). Recipient is the member's profile URL (type `url`); `issuedOn` = 1 January of the MVP year, `expires` = 31 December 23:59:59 UTC plus `OpenBadges:ExpiryGraceMonths`; past years still resolve, as expired. Artwork is embedded `Features/OpenBadges/Assets/mvp-{year}.png`, resized to `OpenBadges:ImageSize` (400); a year without a file has no badge. See [`docs/tutorials/foundations/open-badges-mvp.md`](docs/tutorials/foundations/open-badges-mvp.md).
+
 ### Security Headers
 
 Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:

@@ -71,6 +71,14 @@ public sealed class ProfileActivityService
         return AddVerifiedActivity(enriched, await GetVerifiedActivityAsync(profile.Slug, cancellationToken));
     }
 
+    /// <summary>
+    /// The MVP years the external content platform reports for <paramref name="handle"/>, from the same per-handle cache
+    /// <see cref="EnrichAsync"/> uses. Null when the platform has no profile for the handle, is not configured or fails;
+    /// pass the result to <see cref="ProfileMvp.Resolve"/>, which then falls back to the MVP list.
+    /// </summary>
+    public async Task<IReadOnlyList<int>?> GetPlatformMvpYearsAsync(string handle, CancellationToken cancellationToken = default) =>
+        (await GetActivityAsync(handle, cancellationToken))?.MvpYears;
+
     private async Task<IReadOnlyList<ActivityEntryRecord>> GetVerifiedActivityAsync(string handle, CancellationToken cancellationToken)
     {
         try

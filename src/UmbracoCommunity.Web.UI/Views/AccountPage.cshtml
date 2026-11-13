@@ -87,6 +87,25 @@
             </section>
         }
 
+        @if (Model.MvpBadgeYear is { } mvpBadgeYear)
+        {
+            <section class="account-page__section account-page__mvp-badge" aria-labelledby="mvp-badge-heading">
+                <h2 id="mvp-badge-heading">Your Umbraco MVP @mvpBadgeYear badge</h2>
+                <div class="account-page__mvp-badge-body">
+                    <img class="account-page__mvp-badge-image" src="@Model.MvpBadgeImageUrl" alt="" width="120" height="120" loading="lazy" />
+                    <div>
+                        <p class="account-page__section-hint">
+                            A verifiable Open Badge for your MVP year. The image carries the badge details, so sites that support Open Badges can check it was issued to you. It shows as expired once your @mvpBadgeYear MVP year is over.
+                        </p>
+                        <p class="account-page__section-hint">
+                            To show it on Sessionize, open your profile, choose Edit, go to Badges and upload the PNG.
+                        </p>
+                        <a class="btn is-blue" href="@Model.MvpBadgeDownloadUrl" download>Download Umbraco MVP @mvpBadgeYear badge (PNG)</a>
+                    </div>
+                </div>
+            </section>
+        }
+
         <section class="account-page__section">
             <h2>Your feeds</h2>
             <p class="account-page__section-hint">Manage the blogs and social profiles that feed your public profile.</p>

@@ -57,6 +57,18 @@ public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModel
     /// <summary>The onboarding page URL, shown as a nudge when onboarding isn't complete yet.</summary>
     public string? OnboardingUrl { get; set; }
 
+    /// <summary>
+    /// The year of the Umbraco MVP badge the member can download, when they are a current MVP and that year's badge
+    /// can be issued. Null hides the badge section.
+    /// </summary>
+    public int? MvpBadgeYear { get; set; }
+
+    /// <summary>Where the member downloads their badge with the Open Badges data baked in.</summary>
+    public string? MvpBadgeDownloadUrl { get; set; }
+
+    /// <summary>The plain badge image, shown as a preview next to the download link.</summary>
+    public string? MvpBadgeImageUrl { get; set; }
+
     /// <summary>When the external platform last synced this member's profile data, if known.</summary>
     public DateTimeOffset? LastSyncedAt { get; set; }
 }
