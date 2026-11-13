@@ -79,17 +79,17 @@ public static class OpenBadgeDocuments
         };
 
     /// <summary>
-    /// When an MVP badge counts as issued: the start of the MVP year. Fixed rather than the download time, so the
-    /// hosted assertion (built again on every request, with no database behind it) never changes.
+    /// When an MVP badge counts as issued: the start of the MVP year, 1 June. Fixed rather than the download time, so
+    /// the hosted assertion (built again on every request, with no database behind it) never changes.
     /// </summary>
-    public static DateTimeOffset IssuedOn(int year) => new(year, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    public static DateTimeOffset IssuedOn(int year) => new(year, 6, 1, 0, 0, 0, TimeSpan.Zero);
 
     /// <summary>
-    /// When an MVP badge expires: the last second of the MVP year (31 December, 23:59:59 UTC), moved on by
-    /// <paramref name="graceMonths"/> months.
+    /// When an MVP badge expires: the MVP year runs June to June, so the end of the year is 1 June of the next year
+    /// (00:00 UTC), moved on by <paramref name="graceMonths"/> months as a buffer (one month by default: 1 July).
     /// </summary>
     public static DateTimeOffset Expires(int year, int graceMonths) =>
-        new DateTimeOffset(year + 1, 1, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(Math.Max(0, graceMonths)).AddSeconds(-1);
+        new DateTimeOffset(year + 1, 6, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(Math.Max(0, graceMonths));
 
     /// <summary>ISO 8601 with a time zone indicator, as Open Badges 2.0 requires.</summary>
     public static string FormatDate(DateTimeOffset value) =>

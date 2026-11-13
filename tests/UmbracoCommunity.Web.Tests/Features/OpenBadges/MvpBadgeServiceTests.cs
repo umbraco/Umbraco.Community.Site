@@ -90,7 +90,7 @@ public class MvpBadgeServiceTests
         var assertion = await Service().GetAssertionAsync(BaseUri, id);
 
         assertion.Should().NotBeNull();
-        DateTimeOffset.Parse(assertion!["expires"]!.GetValue<string>()).Should().BeBefore(new DateTimeOffset(2027, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        DateTimeOffset.Parse(assertion!["expires"]!.GetValue<string>()).Should().BeBefore(new DateTimeOffset(2027, 7, 2, 0, 0, 0, TimeSpan.Zero));
     }
 
     [Fact]

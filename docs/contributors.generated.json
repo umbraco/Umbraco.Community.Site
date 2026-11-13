@@ -176,7 +176,7 @@
     ]
   },
   "tutorials/README.md": {
-    "lastEditedAt": "2026-11-12T15:53:50+01:00",
+    "lastEditedAt": "2026-11-13T18:46:55+01:00",
     "contributors": [
       {
         "name": "Laura Weatherhead",
@@ -371,6 +371,17 @@
         "avatarUrl": "https://avatars.githubusercontent.com/u/6873029?v=4&s=80",
         "profileUrl": "https://github.com/lssweatherhead"
       },
+      {
+        "name": "Sebastiaan Janssen",
+        "login": "nul800sebastiaan",
+        "avatarUrl": "https://avatars.githubusercontent.com/u/304656?v=4&s=80",
+        "profileUrl": "https://github.com/nul800sebastiaan"
+      }
+    ]
+  },
+  "tutorials/foundations/open-badges-mvp.md": {
+    "lastEditedAt": "2026-11-13T18:46:55+01:00",
+    "contributors": [
       {
         "name": "Sebastiaan Janssen",
         "login": "nul800sebastiaan",
