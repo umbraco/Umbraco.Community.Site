@@ -8,6 +8,8 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
+using UmbracoCommunity.Web.Features.OpenBadges;
+using UmbracoCommunity.Web.Features.OpenBadges.Infrastructure;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
@@ -25,6 +27,7 @@ public class AccountPageController : RenderController
     private readonly IProfileSyncClient _profileSyncClient;
     private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
     private readonly ProfileAccessService _profileAccessService;
+    private readonly MvpBadgeService _mvpBadgeService;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -36,7 +39,8 @@ public class AccountPageController : RenderController
         ProfileAvatarUrlResolver avatarUrlResolver,
         IProfileSyncClient profileSyncClient,
         GitHubProfileDefaultsService gitHubDefaultsService,
-        ProfileAccessService profileAccessService)
+        ProfileAccessService profileAccessService,
+        MvpBadgeService mvpBadgeService)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
@@ -46,6 +50,7 @@ public class AccountPageController : RenderController
         _profileSyncClient = profileSyncClient;
         _gitHubDefaultsService = gitHubDefaultsService;
         _profileAccessService = profileAccessService;
+        _mvpBadgeService = mvpBadgeService;
     }
 
     [NonAction]
@@ -114,6 +119,13 @@ public class AccountPageController : RenderController
         }
 
         viewModel.LastSyncedAt = lastSyncedTask.Result;
+
+        if (await _mvpBadgeService.GetDownloadableYearAsync(handle, cancellationToken) is { } mvpBadgeYear)
+        {
+            viewModel.MvpBadgeYear = mvpBadgeYear;
+            viewModel.MvpBadgeDownloadUrl = OpenBadgesRoutes.MvpDownloadPath(mvpBadgeYear);
+            viewModel.MvpBadgeImageUrl = OpenBadgesRoutes.MvpImagePath(mvpBadgeYear);
+        }
 
         return CurrentTemplate(viewModel);
     }

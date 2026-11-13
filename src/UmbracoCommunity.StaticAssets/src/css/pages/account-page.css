@@ -103,6 +103,25 @@
   margin-top: 0;
 }
 
+/* MVP badge: preview next to the text, stacked on small screens. */
+.account-page__mvp-badge-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--unit-sm);
+}
+
+.account-page__mvp-badge-body > div {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.account-page__mvp-badge-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+}
+
 .account-page__profile-url {
   display: block;
   font-weight: var(--font-weight-bold);
