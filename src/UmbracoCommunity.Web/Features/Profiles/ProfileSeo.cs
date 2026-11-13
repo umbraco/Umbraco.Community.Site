@@ -11,6 +11,9 @@ public static class ProfileSeo
 {
     private const int MaxDescriptionLength = 200;
 
+    /// <summary>Width and height, in pixels, of the square share image.</summary>
+    public const int ShareImageSize = 600;
+
     /// <summary>
     /// True when the page is what any visitor sees: the profile is shown, and is not a preview for its owner or a view
     /// for DevRel, and the sections are open to everyone rather than shown only because of the viewer's member group.
@@ -22,10 +25,14 @@ public static class ProfileSeo
         && !isDevRelView
         && access is { Show: true, IsGated: false };
 
-    /// <summary>The headline, otherwise the bio, cut to a length that fits a search result. Empty when the member wrote neither.</summary>
+    /// <summary>
+    /// The headline and the bio, cut to a length that fits a search result. Empty when the member wrote neither.
+    /// </summary>
     public static string Description(ProfileIdentity identity)
     {
-        var text = FirstNonBlank(identity.Headline, identity.Bio);
+        var text = string.Join(" · ", new[] { identity.Headline, identity.Bio }
+            .Where(v => !string.IsNullOrWhiteSpace(v))
+            .Select(v => v!.Trim()));
         return text.Length > MaxDescriptionLength ? text[..(MaxDescriptionLength - 3)].TrimEnd() + "..." : text;
     }
 
@@ -71,6 +78,25 @@ public static class ProfileSeo
         };
     }
 
-    private static string FirstNonBlank(params string?[] values) =>
-        values.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))?.Trim() ?? string.Empty;
+    /// <summary>
+    /// The picture to share, as a small square: an uploaded photo is resized by <paramref name="resizeMedia"/> (which
+    /// returns its signed URL), a GitHub avatar is asked for at that size. Anything else is returned as it is.
+    /// </summary>
+    public static string? ShareImageUrl(ProfileIdentity identity, Func<string, int, string> resizeMedia)
+    {
+        var url = identity.AvatarUrl;
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return null;
+        }
+
+        if (identity.HasCustomAvatar && url.StartsWith('/') && !url.Split('?')[0].EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
+        {
+            return resizeMedia(url, ShareImageSize);
+        }
+
+        return Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)
+            ? $"{url.Split('?')[0]}?size={ShareImageSize}"
+            : url;
+    }
 }

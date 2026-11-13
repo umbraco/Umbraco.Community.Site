@@ -42,12 +42,25 @@ public class ProfileSeoTests
     }
 
     [Fact]
-    public void Description_prefers_the_headline_and_is_cut_to_fit()
+    public void Description_joins_the_headline_and_bio_and_is_cut_to_fit()
     {
-        ProfileSeo.Description(Profile().Identity).Should().Be("Umbraco developer");
+        ProfileSeo.Description(Profile().Identity).Should().Be("Umbraco developer · Writes about Umbraco.");
         ProfileSeo.Description(Profile(headline: " ").Identity).Should().Be("Writes about Umbraco.");
         ProfileSeo.Description(Profile(headline: null, bio: null).Identity).Should().BeEmpty();
         ProfileSeo.Description(Profile(headline: new string('a', 500)).Identity).Should().HaveLength(200).And.EndWith("...");
+    }
+
+    [Fact]
+    public void Share_image_is_a_small_square()
+    {
+        static ProfileIdentity With(string url, bool custom) =>
+            Profile().Identity with { AvatarUrl = url, HasCustomAvatar = custom };
+        static string Resize(string u, int size) => $"{u}?width={size}&hmac=x";
+
+        ProfileSeo.ShareImageUrl(With("/media/a/me.png", true), Resize).Should().Be("/media/a/me.png?width=600&hmac=x");
+        ProfileSeo.ShareImageUrl(With("/media/a/me.svg", true), Resize).Should().Be("/media/a/me.svg");
+        ProfileSeo.ShareImageUrl(With("https://github.com/octocat.png", false), Resize).Should().Be("https://github.com/octocat.png?size=600");
+        ProfileSeo.ShareImageUrl(With("", false), Resize).Should().BeNull();
     }
 
     [Fact]
