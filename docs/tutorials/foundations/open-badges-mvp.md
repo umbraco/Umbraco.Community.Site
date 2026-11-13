@@ -60,8 +60,8 @@ The recipient is the profile page URL rather than a hashed email: it is public a
 
 Nothing is stored, so the dates are derived from the year and never change between requests:
 
-- `issuedOn` is the start of the MVP year: `{year}-01-01T00:00:00Z`.
-- `expires` is the last second of the MVP year, `{year}-12-31T23:59:59Z`, moved on by `OpenBadges:ExpiryGraceMonths` months (default 0). Set a grace period if the next year's MVPs are announced well into January and you don't want badges to lapse in between.
+- The MVP year runs **June to June**. `issuedOn` is the start of it: `{year}-06-01T00:00:00Z`.
+- `expires` is the end of it, `{year+1}-06-01T00:00:00Z`, moved on by `OpenBadges:ExpiryGraceMonths` months (default 1, so a 2026 badge expires on `2027-07-01T00:00:00Z`). The buffer stops badges lapsing in the weeks between the year turning over and the next MVPs being announced; set 0 to expire exactly on 1 June.
 
 ### Baking the PNG
 
@@ -82,7 +82,7 @@ The baked text is the assertion JSON, as the 2.0 Baking Specification describes 
 | `OpenBadges:IssuerUrl` | the site | |
 | `OpenBadges:IssuerEmail` | `community@umbraco.com` (set in appsettings.json) | Public contact address shown in the issuer profile. |
 | `OpenBadges:CriteriaUrl` | *(none)* | A page explaining the MVP programme. |
-| `OpenBadges:ExpiryGraceMonths` | `0` | See *Dates and expiry*. |
+| `OpenBadges:ExpiryGraceMonths` | `1` | See *Dates and expiry*. |
 | `OpenBadges:ImageSize` | `400` | 0 keeps the artwork's own size. |
 | `OpenBadges:BakeAssertionUrl` | `false` | Bake the URL instead of the JSON. |
 

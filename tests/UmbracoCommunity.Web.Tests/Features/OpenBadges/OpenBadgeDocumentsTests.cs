@@ -64,8 +64,8 @@ public class OpenBadgeDocumentsTests
         Text(recipient, "identity").Should().Be("https://community.example/profile/octocat");
 
         Text(assertion["verification"]!.AsObject(), "type").Should().Be("HostedBadge");
-        Text(assertion, "issuedOn").Should().Be("2026-01-01T00:00:00Z");
-        Text(assertion, "expires").Should().Be("2026-12-31T23:59:59Z");
+        Text(assertion, "issuedOn").Should().Be("2026-06-01T00:00:00Z");
+        Text(assertion, "expires").Should().Be("2027-07-01T00:00:00Z");
     }
 
     [Fact]
@@ -79,11 +79,11 @@ public class OpenBadgeDocumentsTests
     }
 
     [Theory]
-    [InlineData(2026, 0, "2026-12-31T23:59:59Z")]
-    [InlineData(2026, 2, "2027-02-28T23:59:59Z")]
-    [InlineData(2027, 2, "2028-02-29T23:59:59Z")]
-    [InlineData(2026, -5, "2026-12-31T23:59:59Z")]
-    public void A_badge_expires_at_the_end_of_the_mvp_year_plus_the_grace_months(int year, int graceMonths, string expected) =>
+    [InlineData(2026, 0, "2027-06-01T00:00:00Z")]
+    [InlineData(2026, 1, "2027-07-01T00:00:00Z")]
+    [InlineData(2027, 2, "2028-08-01T00:00:00Z")]
+    [InlineData(2026, -5, "2027-06-01T00:00:00Z")]
+    public void A_badge_expires_at_the_end_of_the_june_to_june_mvp_year_plus_the_grace_months(int year, int graceMonths, string expected) =>
         OpenBadgeDocuments.FormatDate(OpenBadgeDocuments.Expires(year, graceMonths)).Should().Be(expected);
 
     [Theory]

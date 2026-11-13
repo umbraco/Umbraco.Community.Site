@@ -40,10 +40,11 @@ public sealed class OpenBadgesOptions
     public string? CriteriaUrl { get; set; }
 
     /// <summary>
-    /// How many months after the end of the MVP year (31 December, 23:59:59 UTC) a badge expires. 0 (the default)
-    /// expires it at the end of the MVP year itself.
+    /// How many months after the end of the MVP year (1 June of the next year, 00:00 UTC) a badge expires. The default
+    /// of 1 gives a buffer until 1 July, for when the next MVPs are announced a little after the year turns over;
+    /// 0 expires it exactly at the end of the MVP year.
     /// </summary>
-    public int ExpiryGraceMonths { get; set; }
+    public int ExpiryGraceMonths { get; set; } = 1;
 
     /// <summary>
     /// What goes in the PNG's <c>openbadges</c> chunk. False (the default) bakes the assertion JSON, as the Open Badges
