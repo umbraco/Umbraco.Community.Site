@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Schema.NET;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
@@ -28,6 +29,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly UrlUtilities _urlUtilities;
     private readonly IDocumentationService _documentationService;
     private readonly ProfileAccessService _profileAccessService;
+    private readonly IImageUrlGenerator _imageUrlGenerator;
 
     public SeoDataService(
         IImageUrlBuilder imageUrlBuilder,
@@ -38,7 +40,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
         UrlUtilities urlUtilities,
         IDocumentationService documentationService,
-        ProfileAccessService profileAccessService)
+        ProfileAccessService profileAccessService,
+        IImageUrlGenerator imageUrlGenerator)
     {
         _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
@@ -49,6 +52,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         _urlUtilities = urlUtilities;
         _documentationService = documentationService;
         _profileAccessService = profileAccessService;
+        _imageUrlGenerator = imageUrlGenerator;
     }
 
     public async Task<MetaTagsViewModel> BuildAsync(IPublishedContent currentPage)
@@ -243,9 +247,9 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         viewModel.OpenGraphType = "profile";
         viewModel.TwitterCard = "summary";
-        viewModel.OpenGraphImageSize = null;
+        viewModel.OpenGraphImageSize = (ProfileSeo.ShareImageSize, ProfileSeo.ShareImageSize);
 
-        var imageUrl = _urlUtilities.MakeAbsoluteUrl(profile.Identity.AvatarUrl);
+        var imageUrl = _urlUtilities.MakeAbsoluteUrl(ProfileSeo.ShareImageUrl(profile.Identity, GetResizedMediaUrl));
         Uri? imageUri = Uri.TryCreate(imageUrl, UriKind.Absolute, out var parsed) ? parsed : null;
         viewModel.OpenGraphImageUrl = imageUri?.ToString() ?? string.Empty;
 
@@ -310,6 +314,17 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         return _urlUtilities.GetAbsoluteUrl(content);
     }
+
+    // The signed URL has to come from the generator: the image processor refuses a query string it did not sign.
+    private string GetResizedMediaUrl(string mediaUrl, int size) =>
+        _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaUrl)
+        {
+            Width = size,
+            Height = size,
+            ImageCropMode = ImageCropMode.Crop,
+            Quality = 80,
+            FurtherOptions = "format=jpg",
+        }) ?? mediaUrl;
 
     private string GetOpenGraphImageUrl(MediaWithCrops? mediaWithCrops, SocialSettings? socialSettings)
     {
