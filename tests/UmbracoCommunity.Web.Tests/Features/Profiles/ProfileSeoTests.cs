@@ -51,6 +51,14 @@ public class ProfileSeoTests
     }
 
     [Fact]
+    public void A_company_headline_gets_an_office_emoji_and_capitalised_words()
+    {
+        var identity = Profile(headline: "acme widgets GmbH").Identity with { HeadlineIsCompany = true };
+
+        ProfileSeo.Description(identity).Should().Be("🏢 Acme Widgets GmbH · Writes about Umbraco.");
+    }
+
+    [Fact]
     public void Share_image_is_a_small_square()
     {
         static ProfileIdentity With(string url, bool custom) =>
