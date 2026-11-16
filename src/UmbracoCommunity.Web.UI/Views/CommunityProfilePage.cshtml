@@ -336,6 +336,19 @@ else
         {
             <section class="community-profile__graph" aria-labelledby="community-profile-graph-title">
                 <h2 class="community-profile__section-title" id="community-profile-graph-title">Activity over the last 12 months</h2>
+                @if (graph.Summary.Count > 0)
+                {
+                    <ul class="community-profile__graph-summary">
+                        @foreach (var item in graph.Summary)
+                        {
+                            <li class="community-profile__graph-stat">
+                                <span class="community-profile__graph-stat-icon" aria-hidden="true">@await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", item.IconKey)</span>
+                                <span class="community-profile__graph-stat-count">@item.Count</span>
+                                <span class="community-profile__graph-stat-label">@item.Label</span>
+                            </li>
+                        }
+                    </ul>
+                }
                 <div class="community-profile__graph-grid" aria-hidden="true">
                     @foreach (var week in graph.Weeks)
                     {
@@ -373,7 +386,7 @@ else
                             <div class="community-profile__timeline-filter">
                                 <label for="community-profile-timeline-type">Type</label>
                                 <select id="community-profile-timeline-type" name="@ProfileTimeline.TypeQueryKey" data-timeline-type>
-                                    <option value="" selected="@(Model.TimelineType == null)">Everything</option>
+                                    <option value="" selected="@(Model.TimelineType == null)">Highlights</option>
                                     @foreach (var type in Model.TimelineTypes)
                                     {
                                         <option value="@type.Key" selected="@(type.Key == Model.TimelineType)">@type.Label</option>
@@ -387,14 +400,14 @@ else
                     @foreach (var month in Model.Timeline)
                     {
                         <section class="community-profile__timeline-month" data-timeline-month aria-labelledby="community-profile-timeline-@month.Key"
-                                 hidden="@(!month.Entries.Any(e => ProfileTimeline.IsShown(e, Model.TimelineType)))">
+                                 hidden="@(!month.Entries.Any(e => ProfileTimeline.IsShown(e, Model.TimelineType, Model.TimelineTypes.Count > 1)))">
                             <h3 class="community-profile__timeline-month-title" id="community-profile-timeline-@month.Key">@month.Label</h3>
                             <ol class="community-profile__timeline-list">
                                 @foreach (var entry in month.Entries)
                                 {
                                     var typeLabel = ProfileDisplay.SectionLabel(entry.Group);
                                     <li class="community-profile__timeline-entry@(entry.Card != null ? " community-profile__timeline-entry--card" : "")"
-                                        data-timeline-entry data-type="@entry.Group" hidden="@(!ProfileTimeline.IsShown(entry, Model.TimelineType))">
+                                        data-timeline-entry data-type="@entry.Group" data-release="@(entry.IsRoutineRelease ? "true" : null)" hidden="@(!ProfileTimeline.IsShown(entry, Model.TimelineType, Model.TimelineTypes.Count > 1))">
                                         <span class="community-profile__timeline-icon" title="@typeLabel">
                                             @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", entry.IconKey)
                                             <span class="sr-only">@typeLabel:</span>
@@ -403,7 +416,10 @@ else
                                             @if (entry.Card is { } card)
                                             {
                                                 <a class="community-profile__timeline-card no-link-animation" href="@entry.Url" target="_blank" rel="noopener">
-                                                    <img class="community-profile__timeline-card-image" src="@card.ImageUrl" alt="" loading="lazy" />
+                                                    <span class="community-profile__timeline-card-image">
+                                                        <img class="community-profile__timeline-card-backdrop" src="@card.ImageUrl" alt="" aria-hidden="true" loading="lazy" />
+                                                        <img class="community-profile__timeline-card-picture" src="@card.ImageUrl" alt="" loading="lazy" />
+                                                    </span>
                                                     <span class="community-profile__timeline-card-text">
                                                         <span class="community-profile__timeline-title">@card.Title</span>
                                                         @if (!string.IsNullOrEmpty(card.Description))
@@ -415,11 +431,25 @@ else
                                             }
                                             else if (!string.IsNullOrEmpty(entry.Url))
                                             {
-                                                <a class="community-profile__timeline-title" href="@entry.Url" target="_blank" rel="noopener">@entry.Title</a>
+                                                <a class="community-profile__timeline-card community-profile__timeline-card--plain no-link-animation" href="@entry.Url" target="_blank" rel="noopener">
+                                                    <span class="community-profile__timeline-card-image community-profile__timeline-card-placeholder" aria-hidden="true">
+                                                        @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", entry.IconKey)
+                                                    </span>
+                                                    <span class="community-profile__timeline-card-text">
+                                                        <span class="community-profile__timeline-title">@entry.Title</span>
+                                                    </span>
+                                                </a>
                                             }
                                             else
                                             {
-                                                <span class="community-profile__timeline-title">@entry.Title</span>
+                                                <div class="community-profile__timeline-card community-profile__timeline-card--plain">
+                                                    <span class="community-profile__timeline-card-image community-profile__timeline-card-placeholder" aria-hidden="true">
+                                                        @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", entry.IconKey)
+                                                    </span>
+                                                    <span class="community-profile__timeline-card-text">
+                                                        <span class="community-profile__timeline-title">@entry.Title</span>
+                                                    </span>
+                                                </div>
                                             }
                                             <span class="community-profile__timeline-meta">
                                                 <time datetime="@entry.Date.UtcDateTime.ToString("yyyy-MM-dd")">@Date(entry.Date)</time>@(string.IsNullOrEmpty(entry.Meta) ? "" : $" · {entry.Meta}")

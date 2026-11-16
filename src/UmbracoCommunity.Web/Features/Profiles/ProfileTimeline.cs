@@ -53,8 +53,11 @@ public static class ProfileTimeline
                 p.Url,
                 p.Description,
                 p.Date!.Value,
-                p.Versions.Count > 0 ? "v" + p.Versions[0] : null,
-                null)));
+                p.IsNew ? "New package" : p.Versions.Count > 0 ? "v" + p.Versions[0] : null,
+                null)
+            {
+                IsNewPackage = p.IsNew,
+            }));
 
         entries.AddRange(profile.Meetups.Select(m => new ProfileTimelineEntry(
             PlatformActivityGroups.Meetups,
@@ -73,11 +76,14 @@ public static class ProfileTimeline
             p.Url,
             null,
             p.PostedAt,
-            p.Replies is { } replies ? $"{replies} replies" : null,
-            null)));
+            p.IsSolution ? "Solved" : p.Replies is { } replies ? $"{replies} replies" : null,
+            null)
+        {
+            IsSolution = p.IsSolution,
+        }));
 
-        entries.AddRange(profile.SocialPosts.Select(p => new ProfileTimelineEntry(
-            PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null)));
+        entries.AddRange(MergeCrossPosts(profile.SocialPosts.Select(p => new ProfileTimelineEntry(
+            PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null))));
 
         entries.AddRange(profile.OtherActivities.Select(a => new ProfileTimelineEntry(
             PlatformActivityGroups.Other, a.ActivityId, a.Title, a.Url, a.Description, a.Date, a.Kind, null)));
@@ -89,6 +95,108 @@ public static class ProfileTimeline
             .ThenBy(e => e.index)
             .Select(e => e.entry)
             .ToList();
+    }
+
+    /// <summary>How far apart two posts can be and still be the same post shared on two platforms.</summary>
+    internal static readonly TimeSpan CrossPostWindow = TimeSpan.FromDays(2);
+
+    /// <summary>How alike two posts' texts must be (0 to 1) to count as the same post.</summary>
+    internal const double CrossPostSimilarity = 0.8;
+
+    /// <summary>
+    /// Folds a post that was shared on more than one platform (e.g. Mastodon and Bluesky) into one entry. Two posts
+    /// on different platforms, close in time, whose texts are nearly identical (see <see cref="TextSimilarity"/>) are
+    /// the same post (similar as characters or as words): the newest stays, linking to its own post, and its meta lists the platforms ("bluesky, mastodon").
+    /// Posts on the same platform are never merged.
+    /// </summary>
+    internal static IReadOnlyList<ProfileTimelineEntry> MergeCrossPosts(IEnumerable<ProfileTimelineEntry> posts)
+    {
+        var groups = new List<(ProfileTimelineEntry Lead, string Text, List<string> Platforms)>();
+        foreach (var post in posts.OrderByDescending(p => p.Date))
+        {
+            var platform = post.Meta ?? string.Empty;
+            var text = NormaliseSocialText(post.Title);
+            var match = groups.FindIndex(g =>
+                !g.Platforms.Contains(platform, StringComparer.OrdinalIgnoreCase)
+                && (g.Lead.Date - post.Date).Duration() <= CrossPostWindow
+                && Math.Max(TextSimilarity(g.Text, text), WordOverlap(g.Text, text)) >= CrossPostSimilarity);
+
+            if (match < 0)
+            {
+                groups.Add((post, text, [platform]));
+            }
+            else
+            {
+                groups[match].Platforms.Add(platform);
+            }
+        }
+
+        return groups
+            .Select(g => g.Platforms.Count == 1
+                ? g.Lead
+                : g.Lead with { Meta = string.Join(", ", g.Platforms.Where(p => p.Length > 0).Order(StringComparer.OrdinalIgnoreCase)) })
+            .ToList();
+    }
+
+    /// <summary>Lower-cased words only, without the "Attached: 4 images" note some platforms put in front.</summary>
+    private static string NormaliseSocialText(string text)
+    {
+        var withoutNote = System.Text.RegularExpressions.Regex.Replace(
+            text, @"^\s*Attached:\s*\d+\s+images?\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        var words = System.Text.RegularExpressions.Regex.Matches(withoutNote.ToLowerInvariant(), @"[\p{L}\p{N}#@]+")
+            .Select(m => m.Value);
+        return string.Join(' ', words);
+    }
+
+    /// <summary>
+    /// How many of the words two normalised texts share, from 0 to 1 (the Dice coefficient over their word sets).
+    /// Catches the same post with a clause reworded or moved, which an edit distance counts as a big change.
+    /// </summary>
+    internal static double WordOverlap(string a, string b)
+    {
+        var first = a.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+        var second = b.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+        return first.Count == 0 || second.Count == 0
+            ? 0
+            : 2.0 * first.Intersect(second).Count() / (first.Count + second.Count);
+    }
+
+    /// <summary>
+    /// How alike two normalised texts are, from 0 to 1: one minus the Levenshtein edit distance over the longer
+    /// length. A text that is a truncated start of the other (ending "...") compares on the shorter length.
+    /// </summary>
+    internal static double TextSimilarity(string a, string b)
+    {
+        if (a.Length == 0 || b.Length == 0)
+        {
+            return 0;
+        }
+
+        // Compare like with like: cut the longer one down to the shorter's length, so a truncated copy still matches.
+        var length = Math.Min(a.Length, b.Length);
+        if (Math.Max(a.Length, b.Length) > length * 1.25)
+        {
+            return 0;
+        }
+
+        a = a[..length];
+        b = b[..length];
+
+        var previous = Enumerable.Range(0, length + 1).ToArray();
+        var current = new int[length + 1];
+        for (var i = 1; i <= length; i++)
+        {
+            current[0] = i;
+            for (var j = 1; j <= length; j++)
+            {
+                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
+                current[j] = Math.Min(Math.Min(current[j - 1] + 1, previous[j] + 1), previous[j - 1] + cost);
+            }
+
+            (previous, current) = (current, previous);
+        }
+
+        return 1.0 - (double)previous[length] / length;
     }
 
     /// <summary>The entries grouped by calendar month (UTC), newest month first, keeping their order within a month.</summary>
@@ -112,9 +220,16 @@ public static class ProfileTimeline
             ? null
             : types.FirstOrDefault(t => string.Equals(t.Key, requested.Trim(), StringComparison.OrdinalIgnoreCase))?.Key;
 
-    /// <summary>True when <paramref name="entry"/> matches the type filter <paramref name="selectedType"/> (null matches everything).</summary>
-    public static bool IsShown(ProfileTimelineEntry entry, string? selectedType) =>
-        selectedType == null || entry.Group == selectedType;
+    /// <summary>
+    /// True when <paramref name="entry"/> matches the type filter <paramref name="selectedType"/>. With no type selected the
+    /// timeline shows the highlights: everything except routine package releases (many, and not news), which show
+    /// only when "Packages" is selected. A package's first release is a highlight. When <paramref name="hasTypeFilter"/> is false (the member has nothing but package
+    /// releases, so there is no filter to pick them with) they show anyway.
+    /// </summary>
+    public static bool IsShown(ProfileTimelineEntry entry, string? selectedType, bool hasTypeFilter = true) =>
+        selectedType == null
+            ? !hasTypeFilter || !entry.IsRoutineRelease
+            : entry.Group == selectedType;
 
     /// <summary>The type filter's options: the sections that have entries, in <see cref="PlatformActivityGroups.All"/> order.</summary>
     public static IReadOnlyList<ProfileTimelineType> Types(IEnumerable<ProfileTimelineEntry> entries)
@@ -146,8 +261,17 @@ public sealed record ProfileTimelineEntry(
     /// <summary>The preview card to show, or null for a plain line. Set by <see cref="ProfileTimelinePreviewService"/>.</summary>
     public ProfileTimelineCard? Card { get; init; }
 
+    /// <summary>True for the release that is a package's very first (a brand-new package), which is a highlight; other releases are routine.</summary>
+    public bool IsNewPackage { get; init; }
+
+    /// <summary>True for a routine package release: left out of the highlights, shown under "Packages".</summary>
+    public bool IsRoutineRelease => Group == PlatformActivityGroups.Packages && !IsNewPackage;
+
+    /// <summary>True for an answer of the member's that was accepted as the solution of a forum topic.</summary>
+    public bool IsSolution { get; init; }
+
     /// <summary>The icon for the entry's section.</summary>
-    public string IconKey => ProfileTimeline.IconKey(Group);
+    public string IconKey => IsSolution ? "solved" : ProfileTimeline.IconKey(Group);
 }
 
 /// <summary>A preview card for a timeline entry. <paramref name="ImageUrl"/> is always our stored copy (see <see cref="ProfileTimelineImageStore"/>).</summary>

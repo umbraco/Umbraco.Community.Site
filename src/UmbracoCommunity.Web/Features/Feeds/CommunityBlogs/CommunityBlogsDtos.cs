@@ -72,6 +72,9 @@ public sealed record ProfileActivityDto(
     string? ImageUrl,
     DateTimeOffset OccurredAt);
 
+/// <summary>Response from GET /v1/profiles/{id}/forum-stats: exact counts over the trailing months, the current one included.</summary>
+public sealed record ProfileForumStatsDto(int TopicsCreated, int Replies, int Solutions);
+
 public static class CommunityBlogsJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web);

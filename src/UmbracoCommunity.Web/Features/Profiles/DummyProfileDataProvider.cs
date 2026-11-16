@@ -252,7 +252,7 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
         Meetups: new[]
         {
             new ProfileMeetup(
-                "RSVP'd yes to",
+                "Signed up",
                 "UmbLeeds: Codegarden review",
                 "Umbraco Leeds Meetup group",
                 new DateTimeOffset(2026, 6, 18, 18, 0, 0, TimeSpan.Zero),
@@ -264,7 +264,7 @@ public sealed class DummyProfileDataProvider : IProfileDataProvider
                 new DateTimeOffset(2026, 5, 21, 18, 0, 0, TimeSpan.Zero),
                 null),
             new ProfileMeetup(
-                "Attended",
+                "Signed up",
                 "Umbraco UK Festival meetup",
                 "Bristol Umbraco Meetup group",
                 new DateTimeOffset(2026, 3, 12, 18, 30, 0, TimeSpan.Zero),

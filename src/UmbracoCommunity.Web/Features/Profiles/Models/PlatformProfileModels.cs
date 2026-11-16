@@ -46,6 +46,9 @@ public sealed record PlatformActivity(
     string? ImageUrl,
     DateTimeOffset OccurredAt);
 
+/// <summary>The member's forum counts over the last months, as the platform counts them (exact, not from a page of items).</summary>
+public sealed record PlatformForumStats(int TopicsCreated, int Replies, int Solutions);
+
 /// <summary>The activity sections of the profile page. All but <see cref="Other"/> can also be filtered on the platform.</summary>
 public static class PlatformActivityGroups
 {

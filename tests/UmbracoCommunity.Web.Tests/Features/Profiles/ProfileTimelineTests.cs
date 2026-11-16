@@ -121,12 +121,15 @@ public class ProfileTimelineTests
     }
 
     [Fact]
-    public void Filtering_by_type_shows_only_that_types_entries_and_no_type_shows_everything()
+    public void Filtering_by_type_shows_only_that_types_entries_and_no_type_shows_the_highlights_without_package_releases()
     {
         var entries = ProfileTimeline.Entries(Everything());
 
         entries.Where(e => ProfileTimeline.IsShown(e, PlatformActivityGroups.Blog)).Select(e => e.ActivityId).Should().Equal("b1");
-        entries.Where(e => ProfileTimeline.IsShown(e, null)).Should().HaveCount(entries.Count);
+        entries.Where(e => ProfileTimeline.IsShown(e, PlatformActivityGroups.Packages)).Should().OnlyContain(e => e.Group == PlatformActivityGroups.Packages).And.NotBeEmpty();
+        entries.Where(e => ProfileTimeline.IsShown(e, null)).Should().HaveCount(entries.Count(e => e.Group != PlatformActivityGroups.Packages));
+        // With nothing but releases there is no filter to pick them with, so they show.
+        entries.Where(e => ProfileTimeline.IsShown(e, null, hasTypeFilter: false)).Should().HaveCount(entries.Count);
     }
 
     [Fact]

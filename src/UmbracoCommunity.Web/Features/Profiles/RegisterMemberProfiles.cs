@@ -68,6 +68,14 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.Configure<ProfileMatchingOptions>(builder.Config.GetSection(ProfileMatchingOptions.SectionName));
         builder.Services.AddScoped<ProfileLinkMatchingService>();
 
+        // NuGet's package index, to tell a package's first release from a routine one.
+        builder.Services.AddHttpClient<IPackageFirstVersionLookup, NuGetFirstVersionLookup>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.nuget.org/");
+            client.Timeout = TimeSpan.FromSeconds(3);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
+        });
+
         builder.Services.AddHttpClient<GitHubProfileClient>(client =>
         {
             client.BaseAddress = new Uri("https://api.github.com/");
