@@ -744,6 +744,59 @@
     margin-bottom: var(--unit-lg);
 }
 
+.community-profile__building {
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__building-text {
+    margin: 0 0 var(--unit-sm);
+}
+
+.community-profile__building-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-sm);
+    max-width: 32rem;
+}
+
+.community-profile__building-bar progress {
+    flex: 1 1 auto;
+    height: 0.75rem;
+    appearance: none;
+    border: 0;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    background: var(--color-grey);
+    accent-color: var(--color-blue);
+}
+
+.community-profile__building-bar progress::-webkit-progress-bar {
+    background: var(--color-grey);
+}
+
+.community-profile__building-bar progress::-webkit-progress-value {
+    background: var(--color-blue);
+    border-radius: var(--radius-pill);
+    transition: width 0.4s ease;
+}
+
+.community-profile__building-bar progress::-moz-progress-bar {
+    background: var(--color-blue);
+    border-radius: var(--radius-pill);
+}
+
+.community-profile__building-percent {
+    font-weight: var(--font-weight-bold);
+    min-width: 3ch;
+    text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .community-profile__building-bar progress::-webkit-progress-value {
+        transition: none;
+    }
+}
+
 .community-profile__timeline-filters {
     display: flex;
     flex-wrap: wrap;

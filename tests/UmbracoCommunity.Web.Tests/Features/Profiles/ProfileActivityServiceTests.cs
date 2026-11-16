@@ -93,6 +93,31 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
+    public async Task LinkedIn_posts_join_the_social_posts_only_when_switched_on()
+    {
+        var now = DateTimeOffset.UtcNow;
+        PlatformActivity Post() => new("li1", "linkedin:post", "linkedin", null, "https://www.linkedin.com/posts/x-1", "Excited to share Content Lock", null, now);
+        FakeSyncClient NewClient()
+        {
+            var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+            client.Activities["linkedin"] = [Post()];
+            return client;
+        }
+
+        var off = NewClient();
+        var withoutLinkedIn = await CreateService(off).EnrichAsync(Profile);
+
+        withoutLinkedIn.SocialPosts.Should().BeEmpty();
+        off.RequestedGroups.Should().NotContain("linkedin");
+
+        var withLinkedIn = await CreateService(NewClient(), new ProfileActivityOptions { IncludeLinkedIn = true }).EnrichAsync(Profile);
+
+        var post = withLinkedIn.SocialPosts.Should().ContainSingle().Which;
+        (post.Platform, post.Text, post.Url).Should().Be(("linkedin", "Excited to share Content Lock", "https://www.linkedin.com/posts/x-1"));
+        withLinkedIn.ActivityCounts![PlatformActivityGroups.Social].Should().Be(1);
+    }
+
+    [Fact]
     public async Task A_quiet_section_keeps_its_newest_items_even_when_they_are_older_than_the_window()
     {
         var now = DateTimeOffset.UtcNow;

@@ -30,6 +30,7 @@ public sealed class ProfileActivityService
     private readonly IOptionsMonitor<ProfileActivityOptions> _options;
     private readonly ILogger<ProfileActivityService> _logger;
     private readonly IPackageFirstVersionLookup? _firstVersions;
+    private readonly ICrossPostJudge? _crossPostJudge;
 
     public ProfileActivityService(
         IProfileSyncClient syncClient,
@@ -39,9 +40,11 @@ public sealed class ProfileActivityService
         AppCaches appCaches,
         IOptionsMonitor<ProfileActivityOptions> options,
         ILogger<ProfileActivityService> logger,
-        IPackageFirstVersionLookup? firstVersions = null)
+        IPackageFirstVersionLookup? firstVersions = null,
+        ICrossPostJudge? crossPostJudge = null)
     {
         _firstVersions = firstVersions;
+        _crossPostJudge = crossPostJudge;
         _syncClient = syncClient;
         _activityEntryService = activityEntryService;
         _matchStore = matchStore;
@@ -68,6 +71,8 @@ public sealed class ProfileActivityService
                 ActivityCounts = activity.ActivityCounts,
                 Packages = activity.Packages,
                 SocialPosts = activity.SocialPosts,
+                SamePosts = activity.SamePosts,
+                JudgingProgress = activity.JudgingProgress,
                 Meetups = activity.Meetups,
             };
             enriched = WithoutRejectedSources(enriched, await GetRejectedSourcesAsync(profile.Slug, cancellationToken));
@@ -179,12 +184,29 @@ public sealed class ProfileActivityService
         };
     }
 
+    /// <summary>How long a fetched activity is kept: briefly while questions are left or the model is down, so the next visit carries on.</summary>
+    private static TimeSpan ActivityTtl(ProfileActivity? activity, ProfileActivityOptions options) =>
+        TimeSpan.FromMinutes(Math.Max(1, activity switch
+        {
+            { JudgingProgress: not null } => 5,
+            { RetrySoon: true } => options.FailureCacheMinutes,
+            _ => options.CacheMinutes,
+        }));
+
     private async Task<ProfileActivity?> GetActivityAsync(string handle, CancellationToken cancellationToken)
     {
         var key = CacheKeyPrefix + handle.ToLowerInvariant();
         if (_appCaches.RuntimeCache.Get(key) is CachedActivity cached)
         {
-            return cached.Activity;
+            if (cached.Activity is not { JudgingProgress: not null } pending)
+            {
+                return cached.Activity;
+            }
+
+            // Still building: every visit asks the next batch of questions, until none are left.
+            var updated = await ApplyJudgmentAsync(pending, cancellationToken);
+            _appCaches.RuntimeCache.Insert(key, () => new CachedActivity(updated), ActivityTtl(updated, _options.CurrentValue));
+            return updated;
         }
 
         CachedActivity result;
@@ -193,7 +215,7 @@ public sealed class ProfileActivityService
         try
         {
             result = new CachedActivity(await FetchAsync(handle, Math.Max(1, options.ItemsPerSection), cancellationToken));
-            ttl = TimeSpan.FromMinutes(Math.Max(1, options.CacheMinutes));
+            ttl = ActivityTtl(result.Activity, options);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -219,12 +241,29 @@ public sealed class ProfileActivityService
 
         // Each section's newest items, to show; and, to count, everything in the last 12 months (see CountWindowAsync).
         var windowStart = DateOnly.FromDateTime(DateTime.UtcNow).AddMonths(-12).AddDays(1);
-        var groups = await Task.WhenAll(PlatformActivityGroups.FromPlatform.Select(async group =>
+        var platformGroups = _options.CurrentValue.IncludeLinkedIn
+            ? [.. PlatformActivityGroups.FromPlatform, LinkedInGroup]
+            : PlatformActivityGroups.FromPlatform;
+        var fetched = await Task.WhenAll(platformGroups.Select(async group =>
         {
             var newest = await _syncClient.GetActivitiesAsync(platformProfile.Id, group, limit, cancellationToken);
             var window = await GetWindowAsync(platformProfile.Id, group, newest, limit, windowStart, handle, cancellationToken);
             return (Group: group, Newest: newest, Window: window);
         }));
+
+        // LinkedIn posts are social posts: their text is the post (they have no title), and they join the social section.
+        var groups = fetched.Where(g => g.Group != LinkedInGroup).ToArray();
+        if (fetched.FirstOrDefault(g => g.Group == LinkedInGroup) is { Group: not null } linkedIn)
+        {
+            IReadOnlyList<PlatformActivity> AsSocial(IReadOnlyList<PlatformActivity> posts) =>
+                posts.Select(a => string.IsNullOrWhiteSpace(a.Title) ? a with { Title = a.Summary, Platform = a.Platform ?? "linkedin" } : a).ToList();
+
+            var socialIndex = Array.FindIndex(groups, g => g.Group == PlatformActivityGroups.Social);
+            groups[socialIndex] = (
+                PlatformActivityGroups.Social,
+                groups[socialIndex].Newest.Concat(AsSocial(linkedIn.Newest)).ToList(),
+                groups[socialIndex].Window.Concat(AsSocial(linkedIn.Window)).ToList());
+        }
 
         IReadOnlyList<PlatformActivity> Newest(string group) => Usable(groups.First(g => g.Group == group).Newest, limit);
         IReadOnlyList<PlatformActivity> Window(string group) => Usable(groups.First(g => g.Group == group).Window, int.MaxValue);
@@ -250,13 +289,67 @@ public sealed class ProfileActivityService
             [PlatformActivityGroups.Forum] = counted.ForumPosts.Count(p => !p.IsSolution),
             [ProfileActivityGraph.SolvedKey] = counted.ForumPosts.Count(p => p.IsSolution),
             [PlatformActivityGroups.Meetups] = counted.Meetups.Count,
-            // A post shared on several platforms counts once, as on the timeline.
-            [PlatformActivityGroups.Social] = ProfileTimeline.MergeCrossPosts(counted.SocialPosts.Select(p => new ProfileTimelineEntry(
-                PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null))).Count,
         };
 
-        return shown with { ForumStats = forumStats, ActivityCounts = activityCounts };
+        var activity = shown with
+        {
+            ForumStats = forumStats,
+            ActivityCounts = activityCounts,
+            SocialToJudge = shown.SocialPosts.Concat(counted.SocialPosts).DistinctBy(p => p.ActivityId ?? p.Url).ToList(),
+            CountedSocialPosts = counted.SocialPosts,
+        };
+        return await ApplyJudgmentAsync(activity, cancellationToken);
     }
+
+    /// <summary>
+    /// Asks the model about the social post pairs still waiting (a batch at a time; answers already kept cost nothing),
+    /// and updates what depends on the answers: the merged pairs, the social count, and the progress while pairs are left.
+    /// </summary>
+    private async Task<ProfileActivity> ApplyJudgmentAsync(ProfileActivity activity, CancellationToken cancellationToken)
+    {
+        var judgment = await FindSamePostsAsync(activity.SocialToJudge, cancellationToken);
+        var counts = new Dictionary<string, int>(activity.ActivityCounts ?? new Dictionary<string, int>())
+        {
+            // A post shared more than once counts once, as on the timeline.
+            [PlatformActivityGroups.Social] = ProfileTimeline.MergeCrossPosts(activity.CountedSocialPosts.Select(p => new ProfileTimelineEntry(
+                PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null)), judgment.Same).Count,
+        };
+
+        return activity with
+        {
+            SamePosts = judgment.Same,
+            ActivityCounts = counts,
+            JudgingProgress = judgment.HasMoreToAsk ? new ProfileJudgingProgress(judgment.Answered, judgment.Total) : null,
+            RetrySoon = judgment.ModelUnavailable,
+        };
+    }
+
+    /// <summary>
+    /// The pairs of social posts a model says are the same post shared twice. Empty when the check is off,
+    /// there is no judge or model, or no posts could match; never throws, so a model problem can't lose the profile.
+    /// </summary>
+    private async Task<CrossPostJudgment> FindSamePostsAsync(IReadOnlyList<ProfileSocialPost> posts, CancellationToken cancellationToken)
+    {
+        if (_crossPostJudge is null || !_options.CurrentValue.AiCrossPostCheck)
+        {
+            return CrossPostJudgment.None;
+        }
+
+        try
+        {
+            var pairs = ProfileTimeline.CandidatePairs(posts.Select(p => new ProfileTimelineEntry(
+                PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null)));
+            return await _crossPostJudge.JudgeAsync(pairs, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Could not check for cross-posted social posts");
+            return new CrossPostJudgment(new HashSet<string>(), 0, 0, ModelUnavailable: true);
+        }
+    }
+
+    /// <summary>The platform's opt-in group for LinkedIn posts (not part of <see cref="PlatformActivityGroups.FromPlatform"/>).</summary>
+    private const string LinkedInGroup = "linkedin";
 
     /// <summary>The most items counted per section; a member with more is counted as having this many.</summary>
     private const int MaxCountedPerSection = 500;
@@ -445,6 +538,20 @@ public sealed class ProfileActivityService
         public PlatformForumStats? ForumStats { get; init; }
 
         public IReadOnlyDictionary<string, int>? ActivityCounts { get; init; }
+
+        public IReadOnlySet<string> SamePosts { get; init; } = new HashSet<string>();
+
+        /// <summary>The social posts the model is asked about (those shown and those counted).</summary>
+        public IReadOnlyList<ProfileSocialPost> SocialToJudge { get; init; } = [];
+
+        /// <summary>The social posts in the 12-month window, for the social count.</summary>
+        public IReadOnlyList<ProfileSocialPost> CountedSocialPosts { get; init; } = [];
+
+        /// <summary>Set while some pairs of social posts still wait for the model's answer; null once there are none left.</summary>
+        public ProfileJudgingProgress? JudgingProgress { get; init; }
+
+        /// <summary>True when the model could not be reached, so the result is kept only briefly and tried again.</summary>
+        public bool RetrySoon { get; init; }
     }
 
     // Wraps the (possibly null) answer so "nothing found" is cached too.

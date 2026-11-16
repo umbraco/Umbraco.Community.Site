@@ -332,6 +332,22 @@ else
             </section>
         }
 
+        @if (Model.JudgingProgress is { } building)
+        {
+            <section class="community-profile__building" aria-labelledby="community-profile-building-title">
+                <h2 class="community-profile__section-title" id="community-profile-building-title">Timeline</h2>
+                <dc-profile-building data-refresh-ms="2500">
+                    <p class="community-profile__building-text" role="status">
+                        Still building @(Model.IsOwnProfile ? "your" : "this") timeline, this page will refresh when done.
+                    </p>
+                    <div class="community-profile__building-bar">
+                        <progress value="@building.Done" max="@building.Total" aria-label="Timeline progress">@building.Percent%</progress>
+                        <span class="community-profile__building-percent" aria-hidden="true">@building.Percent%</span>
+                    </div>
+                </dc-profile-building>
+            </section>
+        }
+
         @if (Model.ActivityGraph is { } graph)
         {
             <section class="community-profile__graph" aria-labelledby="community-profile-graph-title">

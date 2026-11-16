@@ -55,6 +55,8 @@ public sealed class RegisterMemberProfiles : IComposer
 
         builder.Services.AddScoped<MemberProfileStore>();
         builder.Services.AddScoped<ProfileMatchStore>();
+        builder.Services.AddScoped<SocialPostJudgmentStore>();
+        builder.Services.AddScoped<ICrossPostJudge, AiCrossPostJudge>();
         builder.Services.AddScoped<MemberActivityEntryStore>();
         builder.Services.AddScoped<ProfileActivityEntryService>();
         builder.Services.AddScoped<ProfileAvatarUrlResolver>();
