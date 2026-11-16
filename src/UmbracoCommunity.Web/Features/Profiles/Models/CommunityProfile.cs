@@ -30,6 +30,19 @@ public sealed record CommunityProfile(
     /// <summary>What the member has chosen the activity sections show. Applied by <see cref="ProfileDisplay.Apply"/>.</summary>
     public ProfileDisplayChoices DisplayChoices { get; init; } = ProfileDisplayChoices.None;
 
+    /// <summary>
+    /// The member's forum counts over the last 12 months (topics, replies, accepted solutions) as the platform counts them,
+    /// or null when the platform has none. Replies are only ever counted, never listed.
+    /// </summary>
+    public PlatformForumStats? ForumStats { get; init; }
+
+    /// <summary>
+    /// How many items each activity section had over the last 12 months, counted exactly (not from the few items shown),
+    /// by section (see <see cref="PlatformActivityGroups"/>). A section with no key was not counted (the forum has its own
+    /// <see cref="ForumStats"/>). Null when the platform has none.
+    /// </summary>
+    public IReadOnlyDictionary<string, int>? ActivityCounts { get; init; }
+
     /// <summary>Activity the member added by hand that has no section of its own (a talk, a contribution, a podcast, anything else).</summary>
     public IReadOnlyList<ProfileOtherActivity> OtherActivities { get; init; } = [];
 
@@ -87,15 +100,17 @@ public sealed record ProfileVideo(
     string? Description = null,
     string? ActivityId = null);
 
-/// <summary>A post or reply on the Umbraco community forum.</summary>
+/// <summary>A topic the member started on the Umbraco community forum, or an answer of theirs that was accepted as the solution (<paramref name="IsSolution"/>).</summary>
 public sealed record ProfileForumPost(
     string Title,
     string Url,
     DateTimeOffset PostedAt,
     int? Replies,
-    string? ActivityId = null);
+    string? ActivityId = null,
+    bool IsSolution = false);
 
 /// <summary>A released package and its published versions (newest first).</summary>
+/// <param name="IsNew">True when this is the package's first release ever (its first version), not a routine one.</param>
 /// <param name="Date">When the package was last active (its latest release, or the date the member gave). Null when not known.</param>
 public sealed record ProfilePackage(
     string Name,
@@ -103,7 +118,8 @@ public sealed record ProfilePackage(
     IReadOnlyList<string> Versions,
     string? Description = null,
     string? ActivityId = null,
-    DateTimeOffset? Date = null);
+    DateTimeOffset? Date = null,
+    bool IsNew = false);
 
 /// <summary>A talk given by the member, sourced from Sessionize.</summary>
 public sealed record ProfileTalk(

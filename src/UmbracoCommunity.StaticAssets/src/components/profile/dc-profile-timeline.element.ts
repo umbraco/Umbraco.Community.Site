@@ -21,6 +21,7 @@ export class ProfileTimelineElement extends HTMLElement {
   };
 
   connectedCallback() {
+    this.#markOddShapedImages();
     this.#typeSelect = this.querySelector<HTMLSelectElement>("[data-timeline-type]");
     if (!this.#typeSelect) {
       this.apply();
@@ -42,6 +43,22 @@ export class ProfileTimelineElement extends HTMLElement {
     this.querySelector<HTMLFormElement>("form[data-timeline-filters]")?.removeEventListener("submit", this.#onSubmit);
   }
 
+  /**
+   * Card images fill a 16:9 box. One whose shape is far from that (a portrait or square photo) is marked
+   * `is-contained` so the CSS shows it whole instead of cropping most of it away.
+   */
+  #markOddShapedImages() {
+    this.querySelectorAll<HTMLImageElement>(".community-profile__timeline-card-picture").forEach((img) => {
+      const mark = () => {
+        if (!img.naturalWidth || !img.naturalHeight) return;
+        const ratio = img.naturalWidth / img.naturalHeight;
+        img.parentElement?.classList.toggle("is-contained", ratio < 1.4 || ratio > 2.4);
+      };
+      if (img.complete) mark();
+      else img.addEventListener("load", mark, { once: true });
+    });
+  }
+
   readonly #onSubmit = (event: Event) => {
     event.preventDefault();
     this.#onChange();
@@ -54,12 +71,15 @@ export class ProfileTimelineElement extends HTMLElement {
   /** Shows the entries that match the selected type (an empty value matches everything). */
   apply() {
     const type = this.#typeSelect?.value ?? "";
+    // With no type picked the timeline shows the highlights: routine package releases (`data-release`) only show under
+    // "Packages"; a package's first release is a highlight. Without a type filter there is no way to pick them, so they show.
+    const hideReleases = type === "" && this.#typeSelect !== null;
     let shown = 0;
 
     this.querySelectorAll<HTMLElement>("[data-timeline-month]").forEach((month) => {
       let shownInMonth = 0;
       month.querySelectorAll<HTMLElement>("[data-timeline-entry]").forEach((entry) => {
-        const matches = type === "" || entry.dataset.type === type;
+        const matches = type === "" ? !(hideReleases && entry.dataset.release === "true") : entry.dataset.type === type;
         entry.hidden = !matches;
         if (matches) shownInMonth++;
       });

@@ -10,7 +10,7 @@ const markup = (filters = true) => `
   ${filters
     ? `<form method="get" data-timeline-filters>
         <select name="type" data-timeline-type>
-          <option value="">Everything</option>
+          <option value="">Highlights</option>
           <option value="blog">Blog posts</option>
           <option value="videos">Videos</option>
           <option value="packages">Packages</option>
@@ -28,7 +28,8 @@ const markup = (filters = true) => `
   </section>
   <section data-timeline-month id="jun-2025">
     <ol>
-      <li data-timeline-entry data-type="packages" id="package-jun">A package</li>
+      <li data-timeline-entry data-type="packages" data-release="true" id="package-jun">A package</li>
+      <li data-timeline-entry data-type="packages" id="package-new-jun">A new package</li>
     </ol>
   </section>
   <section data-timeline-month id="may-2025">
@@ -81,10 +82,10 @@ describe("ProfileTimelineElement", () => {
     vi.restoreAllMocks();
   });
 
-  it("shows every entry to start with and hides the form's own button", () => {
+  it("shows the highlights to start with, with a new package but without routine releases, and hides the form's own button", () => {
     const element = mount();
 
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["blog-mar", "video-mar", "package-jun", "blog-may"]);
+    expect(shown(element, "[data-timeline-entry]")).toEqual(["blog-mar", "video-mar", "package-new-jun", "blog-may"]);
     expect(empty(element).hidden).toBe(true);
     expect(element.querySelector<HTMLElement>("[data-timeline-apply]")!.hidden).toBe(true);
   });
@@ -109,7 +110,15 @@ describe("ProfileTimelineElement", () => {
     expect(new URLSearchParams(search()).get("view")).toBe("everything");
   });
 
-  it("takes the type out of the address when everything is chosen again", () => {
+  it("shows package releases when Packages is chosen", () => {
+    const element = mount();
+
+    choose(element, "packages");
+
+    expect(shown(element, "[data-timeline-entry]")).toEqual(["package-jun", "package-new-jun"]);
+  });
+
+  it("takes the type out of the address when Highlights is chosen again", () => {
     const element = mount("/profiles/octocat?view=everything&type=blog");
 
     choose(element, "");
@@ -122,11 +131,11 @@ describe("ProfileTimelineElement", () => {
     const element = mount("/profiles/octocat?type=packages");
 
     expect(element.querySelector<HTMLSelectElement>("[data-timeline-type]")!.value).toBe("packages");
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["package-jun"]);
+    expect(shown(element, "[data-timeline-entry]")).toEqual(["package-jun", "package-new-jun"]);
     expect(shown(element, "[data-timeline-month]")).toEqual(["jun-2025"]);
   });
 
-  it("ignores an unknown type in the address and shows everything", () => {
+  it("ignores an unknown type in the address and shows the highlights", () => {
     const element = mount("/profiles/octocat?type=nonsense");
 
     expect(element.querySelector<HTMLSelectElement>("[data-timeline-type]")!.value).toBe("");
@@ -160,7 +169,7 @@ describe("ProfileTimelineElement", () => {
   it("lists everything when there is no filter", () => {
     const element = mount("/profiles/octocat?type=blog", false);
 
-    expect(shown(element, "[data-timeline-entry]")).toHaveLength(4);
+    expect(shown(element, "[data-timeline-entry]")).toHaveLength(5);
     expect(empty(element).hidden).toBe(true);
   });
 });

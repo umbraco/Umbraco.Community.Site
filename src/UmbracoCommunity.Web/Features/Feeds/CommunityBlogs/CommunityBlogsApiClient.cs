@@ -72,6 +72,40 @@ public sealed class CommunityBlogsApiClient
         return envelope?.Data ?? [];
     }
 
+    /// <summary>Fetches one page of a group's activity from <paramref name="from"/> (inclusive), newest first, following <paramref name="cursor"/>.</summary>
+    public async Task<ProfileActivitiesResponseDto> GetProfileActivitiesPageAsync(
+        string profileId, string group, DateOnly from, int limit, string? cursor, CancellationToken cancellationToken)
+    {
+        var requestUri = $"profiles/{Uri.EscapeDataString(profileId)}/activities"
+            + $"?group={Uri.EscapeDataString(group)}&limit={limit.ToString(CultureInfo.InvariantCulture)}"
+            + $"&from={from.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}";
+        if (!string.IsNullOrEmpty(cursor))
+        {
+            requestUri += $"&cursor={Uri.EscapeDataString(cursor)}";
+        }
+
+        using var response = await SendWithRetryAsync(
+            () => new HttpRequestMessage(HttpMethod.Get, requestUri),
+            cancellationToken);
+
+        var envelope = await response.Content.ReadFromJsonAsync<ProfileActivitiesResponseDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
+        return envelope ?? new ProfileActivitiesResponseDto([], new PaginationDto(null, false));
+    }
+
+    /// <summary>
+    /// Fetches the exact forum counts (topics created, replies, accepted solutions) for a platform profile over the
+    /// trailing <paramref name="months"/> UTC calendar months. Null when the platform returns no body.
+    /// </summary>
+    public async Task<ProfileForumStatsDto?> GetProfileForumStatsAsync(string profileId, int months, CancellationToken cancellationToken)
+    {
+        var requestUri = $"profiles/{Uri.EscapeDataString(profileId)}/forum-stats?months={months.ToString(CultureInfo.InvariantCulture)}";
+        using var response = await SendWithRetryAsync(
+            () => new HttpRequestMessage(HttpMethod.Get, requestUri),
+            cancellationToken);
+
+        return await response.Content.ReadFromJsonAsync<ProfileForumStatsDto>(CommunityBlogsJsonOptions.Default, cancellationToken);
+    }
+
     /// <summary>Fetches one page of blog posts. <paramref name="cursor"/> null fetches the first page.</summary>
     public async Task<PostsResponseDto?> GetBlogPostsAsync(string? cursor, int limit, CancellationToken cancellationToken)
     {
