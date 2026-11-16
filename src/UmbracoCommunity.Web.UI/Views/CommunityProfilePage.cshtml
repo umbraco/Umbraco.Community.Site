@@ -366,17 +366,18 @@ else
             </section>
         }
 
-        @if (Model.ShowEnrichedSections && Model.Timeline.Count > 0)
+        @if (Model.ShowEnrichedSections && Model.TimelineTypes.Count > 0)
         {
             <section class="community-profile__timeline" aria-labelledby="community-profile-timeline-title">
                 <h2 class="community-profile__section-title" id="community-profile-timeline-title">Timeline</h2>
                 <dc-profile-timeline>
                     @if (Model.TimelineTypes.Count > 1)
                     {
-                        // A plain GET form, so the filter also works without JavaScript; <dc-profile-timeline> filters in place
-                        // and keeps ?type= in the address. Other query string values (e.g. the DevRel view) are carried along.
+                        // A plain GET form: choosing a type reloads the page with ?type= (<dc-profile-timeline> submits it on
+                        // change, so the button is only needed without JavaScript). Other query string values (e.g. the DevRel
+                        // view) are carried along; the page number is not, so a new filter starts on page 1.
                         <form class="community-profile__timeline-filters" method="get" data-timeline-filters>
-                            @foreach (var parameter in Context.Request.Query.Where(q => !string.Equals(q.Key, ProfileTimeline.TypeQueryKey, StringComparison.OrdinalIgnoreCase)))
+                            @foreach (var parameter in Context.Request.Query.Where(q => !string.Equals(q.Key, ProfileTimeline.TypeQueryKey, StringComparison.OrdinalIgnoreCase) && !string.Equals(q.Key, ProfileTimeline.PageQueryKey, StringComparison.OrdinalIgnoreCase)))
                             {
                                 foreach (var value in parameter.Value)
                                 {
@@ -396,18 +397,19 @@ else
                             <button class="btn is-transparent community-profile__timeline-apply" type="submit" data-timeline-apply>Show</button>
                         </form>
                     }
-                    <p class="community-profile__timeline-empty" data-timeline-empty role="status" hidden="@Model.TimelineHasShownEntries">Nothing here for this filter.</p>
+                    @if (Model.TimelineTotal == 0)
+                    {
+                        <p class="community-profile__timeline-empty" role="status">Nothing here for this filter.</p>
+                    }
                     @foreach (var month in Model.Timeline)
                     {
-                        <section class="community-profile__timeline-month" data-timeline-month aria-labelledby="community-profile-timeline-@month.Key"
-                                 hidden="@(!month.Entries.Any(e => ProfileTimeline.IsShown(e, Model.TimelineType, Model.TimelineTypes.Count > 1)))">
+                        <section class="community-profile__timeline-month" aria-labelledby="community-profile-timeline-@month.Key">
                             <h3 class="community-profile__timeline-month-title" id="community-profile-timeline-@month.Key">@month.Label</h3>
                             <ol class="community-profile__timeline-list">
                                 @foreach (var entry in month.Entries)
                                 {
                                     var typeLabel = ProfileDisplay.SectionLabel(entry.Group);
-                                    <li class="community-profile__timeline-entry@(entry.Card != null ? " community-profile__timeline-entry--card" : "")"
-                                        data-timeline-entry data-type="@entry.Group" data-release="@(entry.IsRoutineRelease ? "true" : null)" hidden="@(!ProfileTimeline.IsShown(entry, Model.TimelineType, Model.TimelineTypes.Count > 1))">
+                                    <li class="community-profile__timeline-entry@(entry.Card != null ? " community-profile__timeline-entry--card" : "")">
                                         <span class="community-profile__timeline-icon" title="@typeLabel">
                                             @await Html.PartialAsync("~/Views/Partials/Profiles/_KindIcon.cshtml", entry.IconKey)
                                             <span class="sr-only">@typeLabel:</span>
@@ -460,6 +462,61 @@ else
                                 }
                             </ol>
                         </section>
+                    }
+                    @if (Model.TimelinePageCount > 1)
+                    {
+                        // Page links keep the other query string values (the type, the DevRel view) and stay on the timeline.
+                        string PageUrl(int page)
+                        {
+                            var query = Context.Request.Query
+                                .Where(q => !string.Equals(q.Key, ProfileTimeline.PageQueryKey, StringComparison.OrdinalIgnoreCase))
+                                .SelectMany(q => q.Value.Select(v => new KeyValuePair<string, string?>(q.Key, v)))
+                                .ToList();
+                            if (page > 1)
+                            {
+                                query.Add(new KeyValuePair<string, string?>(ProfileTimeline.PageQueryKey, page.ToString()));
+                            }
+
+                            return Context.Request.Path + QueryString.Create(query) + "#community-profile-timeline-title";
+                        }
+
+                        var shownPages = new[] { 1, Model.TimelinePage - 1, Model.TimelinePage, Model.TimelinePage + 1, Model.TimelinePageCount }
+                            .Where(n => n >= 1 && n <= Model.TimelinePageCount).Distinct().OrderBy(n => n).ToList();
+                        <nav class="community-profile__pager" aria-label="Timeline pages">
+                            <ul class="community-profile__pager-list">
+                                <li>
+                                    @if (Model.TimelinePage > 1)
+                                    {
+                                        <a class="community-profile__pager-link" href="@PageUrl(Model.TimelinePage - 1)" rel="prev">Previous</a>
+                                    }
+                                </li>
+                                @for (var i = 0; i < shownPages.Count; i++)
+                                {
+                                    var number = shownPages[i];
+                                    if (i > 0 && number - shownPages[i - 1] > 1)
+                                    {
+                                        <li aria-hidden="true"><span class="community-profile__pager-gap">…</span></li>
+                                    }
+
+                                    <li>
+                                        @if (number == Model.TimelinePage)
+                                        {
+                                            <span class="community-profile__pager-link is-current" aria-current="page">@number</span>
+                                        }
+                                        else
+                                        {
+                                            <a class="community-profile__pager-link" href="@PageUrl(number)" aria-label="Page @number">@number</a>
+                                        }
+                                    </li>
+                                }
+                                <li>
+                                    @if (Model.TimelinePage < Model.TimelinePageCount)
+                                    {
+                                        <a class="community-profile__pager-link" href="@PageUrl(Model.TimelinePage + 1)" rel="next">Next</a>
+                                    }
+                                </li>
+                            </ul>
+                        </nav>
                     }
                 </dc-profile-timeline>
             </section>

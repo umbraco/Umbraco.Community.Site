@@ -970,6 +970,55 @@
     text-decoration: underline;
 }
 
+/* Timeline pages: previous / numbers / next, in the same pill style as the filter. */
+.community-profile__pager {
+    margin-top: var(--unit-md);
+}
+
+.community-profile__pager-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--unit-xxs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__pager-list li:empty {
+    display: none;
+}
+
+.community-profile__pager-link,
+.community-profile__pager-gap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding-inline: var(--unit-sm);
+    border-radius: var(--radius-pill);
+    color: var(--color-blue);
+}
+
+#main-content .community-profile a.community-profile__pager-link {
+    background: var(--color-white);
+    border: 1px solid var(--color-light-grey);
+    text-decoration: none;
+}
+
+#main-content .community-profile a.community-profile__pager-link:hover,
+#main-content .community-profile a.community-profile__pager-link:focus-visible {
+    border-color: var(--color-blue);
+}
+
+.community-profile__pager-link.is-current {
+    background: var(--color-blue);
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
+}
+
 /* Departments — compact sections, 2–3 abreast */
 
 .community-profile__departments {
