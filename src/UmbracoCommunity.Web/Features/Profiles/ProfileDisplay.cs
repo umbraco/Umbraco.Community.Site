@@ -27,9 +27,9 @@ public static class ProfileDisplay
     public static string SectionLabel(string group) => group switch
     {
         PlatformActivityGroups.Blog => "Blog posts",
-        PlatformActivityGroups.Forum => "Forum activity",
+        PlatformActivityGroups.Forum => "Forum highlights",
         PlatformActivityGroups.Packages => "Packages",
-        PlatformActivityGroups.Meetups => "Meet-ups",
+        PlatformActivityGroups.Meetups => "Events",
         PlatformActivityGroups.Videos => "Videos",
         PlatformActivityGroups.Social => "Social activity",
         PlatformActivityGroups.Other => "Other activity",
@@ -254,6 +254,10 @@ public static class ProfileDisplay
             Videos = Shown(PlatformActivityGroups.Videos, profile.Videos, v => v.ActivityId),
             SocialPosts = Shown(PlatformActivityGroups.Social, profile.SocialPosts, p => p.ActivityId),
             OtherActivities = Shown(PlatformActivityGroups.Other, profile.OtherActivities, a => a.ActivityId),
+            ForumStats = hiddenSections.Contains(PlatformActivityGroups.Forum) ? null : profile.ForumStats,
+            ActivityCounts = profile.ActivityCounts?
+                .Where(c => !hiddenSections.Contains(c.Key))
+                .ToDictionary(c => c.Key, c => c.Value),
         };
 
         var loadedIds = ActivityItems(profile).Select(i => i.ActivityId).ToHashSet(StringComparer.Ordinal);

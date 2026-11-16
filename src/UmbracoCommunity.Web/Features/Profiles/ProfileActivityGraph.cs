@@ -19,6 +19,68 @@ public sealed record ProfileActivityGraph(
     /// <summary>True when nothing happened in the window; the graph is not shown then.</summary>
     public bool IsEmpty => Weeks.All(w => w.Count == 0);
 
+    /// <summary>What happened in the window, by type, e.g. "3 packages updated"; empty when the graph has none. See <see cref="Summarise"/>.</summary>
+    public IReadOnlyList<ProfileActivitySummaryItem> Summary { get; init; } = [];
+
+    /// <summary>
+    /// One figure per type for the 12 months up to and including <paramref name="today"/>, in the order of
+    /// <see cref="Models.PlatformActivityGroups.All"/>. Types with nothing in the window are left out. Each timeline
+    /// entry counts once, and a package is one entry however many releases it had, so "packages updated" counts
+    /// packages, not releases. <paramref name="windowCounts"/> (exact, by section) replace what the timeline holds. Forum topics, replies and solved answers use <paramref name="forumStats"/> (the
+    /// platform's exact counts; replies are never listed) when there are any, else the timeline.
+    /// </summary>
+    public static IReadOnlyList<ProfileActivitySummaryItem> Summarise(
+        IEnumerable<ProfileTimelineEntry> entries, DateOnly today, Models.PlatformForumStats? forumStats = null,
+        IReadOnlyDictionary<string, int>? windowCounts = null)
+    {
+        var windowStart = today.AddMonths(-12).AddDays(1);
+        var inWindow = entries
+            .Where(e => DateOnly.FromDateTime(e.Date.UtcDateTime) is var d && d >= windowStart && d <= today)
+            .ToList();
+        var counts = inWindow
+            .Where(e => !e.IsSolution)
+            .GroupBy(e => e.Group)
+            .ToDictionary(g => g.Key, g => g.Key == Models.PlatformActivityGroups.Packages ? PackageReleases.CountPackages(g.Select(e => e.Url ?? e.Title)) : g.Count());
+        // The timeline only holds the newest few items of a section; the exact counts cover the whole window.
+        foreach (var (group, count) in windowCounts ?? new Dictionary<string, int>())
+        {
+            counts[group] = count;
+        }
+
+        if (forumStats != null)
+        {
+            // The three forum figures share one window (calendar months), so topics come from the counts too.
+            counts[Models.PlatformActivityGroups.Forum] = forumStats.TopicsCreated;
+        }
+
+        var solved = forumStats?.Solutions ?? inWindow.Count(e => e.IsSolution);
+        var replies = forumStats?.Replies ?? 0;
+
+        var items = new List<ProfileActivitySummaryItem>();
+        foreach (var group in Models.PlatformActivityGroups.All)
+        {
+            if (counts.TryGetValue(group, out var count) && count > 0)
+            {
+                items.Add(new ProfileActivitySummaryItem(count, Label(group, count), ProfileTimeline.IconKey(group)));
+            }
+
+            if (group == Models.PlatformActivityGroups.Forum)
+            {
+                if (replies > 0)
+                {
+                    items.Add(new ProfileActivitySummaryItem(replies, replies == 1 ? "forum reply" : "forum replies", "reply"));
+                }
+
+                if (solved > 0)
+                {
+                    items.Add(new ProfileActivitySummaryItem(solved, solved == 1 ? "solved answer" : "solved answers", "solved"));
+                }
+            }
+        }
+
+        return items;
+    }
+
     /// <summary>
     /// Buckets <paramref name="dates"/> into the weeks of the 12 months up to and including <paramref name="today"/>.
     /// Dates outside the window are ignored.
@@ -55,6 +117,22 @@ public sealed record ProfileActivityGraph(
         return new ProfileActivityGraph(weeks, months);
     }
 
+    /// <summary>The words that go with a count, e.g. "blog posts" (singular for 1).</summary>
+    private static string Label(string group, int count)
+    {
+        var one = count == 1;
+        return group switch
+        {
+            Models.PlatformActivityGroups.Blog => one ? "blog post" : "blog posts",
+            Models.PlatformActivityGroups.Videos => one ? "video" : "videos",
+            Models.PlatformActivityGroups.Packages => one ? "package updated" : "packages updated",
+            Models.PlatformActivityGroups.Meetups => one ? "event" : "events",
+            Models.PlatformActivityGroups.Forum => one ? "forum post" : "forum posts",
+            Models.PlatformActivityGroups.Social => one ? "social post" : "social posts",
+            _ => one ? "other activity" : "other activities",
+        };
+    }
+
     /// <summary>How a week is shaded: 0 for nothing, then 1, 2, 3–4, and 5 or more items.</summary>
     public static int Level(int count) => count switch
     {
@@ -77,3 +155,6 @@ public sealed record ProfileActivityGraphWeek(DateOnly Start, int Count, int Lev
 
 /// <summary>A month of the activity graph's text alternative, e.g. "Mar 2026".</summary>
 public sealed record ProfileActivityGraphMonth(string Label, int Count);
+
+/// <summary>One figure of the activity summary, e.g. 3 and "packages updated".</summary>
+public sealed record ProfileActivitySummaryItem(int Count, string Label, string IconKey);

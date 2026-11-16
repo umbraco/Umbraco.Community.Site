@@ -74,7 +74,7 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     public string? TimelineType { get; init; }
 
     /// <summary>True when the timeline has a month with an entry that matches <see cref="TimelineType"/>.</summary>
-    public bool TimelineHasShownEntries => Timeline.Any(m => m.Entries.Any(e => ProfileTimeline.IsShown(e, TimelineType)));
+    public bool TimelineHasShownEntries => Timeline.Any(m => m.Entries.Any(e => ProfileTimeline.IsShown(e, TimelineType, TimelineTypes.Count > 1)));
 
     /// <summary>The activity graph, unless the member switched it off, when there was activity in the last 12 months.</summary>
     public ProfileActivityGraph? ActivityGraph { get; init; }

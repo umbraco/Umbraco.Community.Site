@@ -125,6 +125,14 @@ public sealed class ProfileTimelineImageStore
     /// <summary>The file name (without extension) for a picture's address: a hash, so nothing from the address reaches the path.</summary>
     public static string FileName(string sourceUrl) => ProfileTimelinePreviewStore.Hash(sourceUrl)[..32];
 
+    /// <summary>
+    /// Some hosts (NuGet's package icons, for one) serve a real image as a generic binary for some files. That
+    /// type says nothing against it; the bytes are checked with <see cref="Sniff"/> either way, so it is let through.
+    /// </summary>
+    private static bool IsGenericBinary(string mediaType) =>
+        mediaType.Equals("application/octet-stream", StringComparison.OrdinalIgnoreCase)
+        || mediaType.Equals("binary/octet-stream", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>The accepted image format <paramref name="bytes"/> start with, or null.</summary>
     public static (string Extension, string MediaType)? Sniff(ReadOnlySpan<byte> bytes)
     {
@@ -188,7 +196,7 @@ public sealed class ProfileTimelineImageStore
                 var mediaType = response.Content.Headers.ContentType?.MediaType;
                 if (!response.IsSuccessStatusCode
                     || mediaType is null
-                    || !AcceptedMediaTypes.Contains(mediaType)
+                    || !(AcceptedMediaTypes.Contains(mediaType) || IsGenericBinary(mediaType))
                     || response.Content.Headers.ContentLength > MaxBytes)
                 {
                     return null;

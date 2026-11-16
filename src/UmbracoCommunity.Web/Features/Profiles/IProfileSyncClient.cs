@@ -23,6 +23,19 @@ public interface IProfileSyncClient
     Task<IReadOnlyList<PlatformActivity>> GetActivitiesAsync(string platformProfileId, string group, int limit, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Every activity of one <paramref name="group"/> from <paramref name="from"/> on, newest first, following the
+    /// platform's pages until the end or <paramref name="maxItems"/>. Used to count a window exactly, not to show items.
+    /// Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<IReadOnlyList<PlatformActivity>> GetActivitiesSinceAsync(string platformProfileId, string group, DateOnly from, int maxItems, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The exact forum counts for a platform profile over the last <paramref name="months"/> months (1 to 24), or null
+    /// when the platform is not configured. Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<PlatformForumStats?> GetForumStatsAsync(string platformProfileId, int months, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Asks whether the platform already ties each of <paramref name="urls"/> to the profile of the GitHub user
     /// <paramref name="handle"/>. Only https addresses are sent. Returns an empty list when the platform is not
     /// configured. Throws when the platform cannot be reached or errors.

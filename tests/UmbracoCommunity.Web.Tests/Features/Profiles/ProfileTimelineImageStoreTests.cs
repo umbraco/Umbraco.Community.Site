@@ -78,10 +78,28 @@ public class ProfileTimelineImageStoreTests
     [Theory]
     [InlineData("text/html")]
     [InlineData("image/svg+xml")]
-    [InlineData("application/octet-stream")]
     public async Task A_response_that_is_not_an_accepted_image_type_is_refused(string mediaType)
     {
         var (store, _) = Create(_ => Image(Png, mediaType));
+
+        (await store.GetOrStoreAsync(ImageUrl, CancellationToken.None)).Should().BeNull();
+        _media.Files.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("application/octet-stream")]
+    [InlineData("binary/octet-stream")]
+    public async Task An_image_served_as_a_generic_binary_is_kept_because_its_bytes_are_checked(string mediaType)
+    {
+        var (store, _) = Create(_ => Image(Png, mediaType));
+
+        (await store.GetOrStoreAsync(ImageUrl, CancellationToken.None)).Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task A_generic_binary_that_is_not_an_image_is_refused()
+    {
+        var (store, _) = Create(_ => Image(Encoding.UTF8.GetBytes("<svg onload=alert(1)></svg>"), "application/octet-stream"));
 
         (await store.GetOrStoreAsync(ImageUrl, CancellationToken.None)).Should().BeNull();
         _media.Files.Should().BeEmpty();

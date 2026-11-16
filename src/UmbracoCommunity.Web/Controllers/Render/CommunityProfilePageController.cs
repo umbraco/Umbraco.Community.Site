@@ -88,7 +88,9 @@ public class CommunityProfilePageController : RenderController
             timeline = await _timelinePreviewService.AddCardsAsync(ProfileTimeline.Entries(profile), profile.DisplayChoices, cancellationToken);
             if (!profile.DisplayChoices.HideActivityGraph)
             {
-                var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), DateOnly.FromDateTime(DateTime.UtcNow));
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), today)
+                    with { Summary = ProfileActivityGraph.Summarise(timeline, today, profile.ForumStats, profile.ActivityCounts) };
                 graph = built.IsEmpty ? null : built;
             }
         }
