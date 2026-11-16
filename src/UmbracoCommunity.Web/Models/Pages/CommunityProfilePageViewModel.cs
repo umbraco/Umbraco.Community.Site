@@ -59,8 +59,8 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     public bool IsShowingEverything { get; init; }
 
     /// <summary>
-    /// The profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the enriched sections
-    /// are not shown or there is nothing dated.
+    /// The current page of the profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the
+    /// enriched sections are not shown, there is nothing dated, or nothing matches the type filter.
     /// </summary>
     public IReadOnlyList<ProfileTimelineMonth> Timeline { get; init; } = [];
 
@@ -73,8 +73,14 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     /// </summary>
     public string? TimelineType { get; init; }
 
-    /// <summary>True when the timeline has a month with an entry that matches <see cref="TimelineType"/>.</summary>
-    public bool TimelineHasShownEntries => Timeline.Any(m => m.Entries.Any(e => ProfileTimeline.IsShown(e, TimelineType, TimelineTypes.Count > 1)));
+    /// <summary>Which page of the timeline this is (from 1); <see cref="Timeline"/> holds just that page.</summary>
+    public int TimelinePage { get; init; } = 1;
+
+    /// <summary>How many pages the timeline has for <see cref="TimelineType"/>.</summary>
+    public int TimelinePageCount { get; init; } = 1;
+
+    /// <summary>How many entries match <see cref="TimelineType"/> across all pages.</summary>
+    public int TimelineTotal { get; init; }
 
     /// <summary>The activity graph, unless the member switched it off, when there was activity in the last 12 months.</summary>
     public ProfileActivityGraph? ActivityGraph { get; init; }

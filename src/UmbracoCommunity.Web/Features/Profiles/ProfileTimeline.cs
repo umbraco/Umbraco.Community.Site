@@ -15,6 +15,26 @@ public static class ProfileTimeline
     /// <summary>The query string parameter that selects the type filter, e.g. <c>?type=blog</c>.</summary>
     public const string TypeQueryKey = "type";
 
+    /// <summary>The query string parameter that selects the timeline's page, e.g. <c>?page=2</c>.</summary>
+    public const string PageQueryKey = "page";
+
+    /// <summary>How many entries a page of the timeline holds.</summary>
+    public const int PageSize = 30;
+
+    /// <summary>
+    /// One page of the timeline: the entries that match the type filter (see <see cref="IsShown"/>), newest first, cut into
+    /// pages of <see cref="PageSize"/>. <paramref name="requestedPage"/> is the raw <c>?page=</c> value; anything that isn't
+    /// a page number, or is past the end, gives the nearest real page (so a bad address shows the first or last page).
+    /// </summary>
+    public static ProfileTimelinePage Paginate(
+        IReadOnlyList<ProfileTimelineEntry> entries, string? selectedType, bool hasTypeFilter, string? requestedPage)
+    {
+        var matching = entries.Where(e => IsShown(e, selectedType, hasTypeFilter)).ToList();
+        var pageCount = Math.Max(1, (matching.Count + PageSize - 1) / PageSize);
+        var page = int.TryParse(requestedPage, out var number) ? Math.Clamp(number, 1, pageCount) : 1;
+        return new ProfileTimelinePage(matching.Skip((page - 1) * PageSize).Take(PageSize).ToList(), page, pageCount, matching.Count);
+    }
+
     /// <summary>A month heading with a three-letter month name, e.g. "Mar 2026".</summary>
     public static string MonthLabel(int year, int month) =>
         new DateTime(year, month, 1).ToString("MMM yyyy", CultureInfo.InvariantCulture);
@@ -283,3 +303,6 @@ public sealed record ProfileTimelineMonth(string Label, string Key, IReadOnlyLis
 
 /// <summary>An option of the timeline's type filter.</summary>
 public sealed record ProfileTimelineType(string Key, string Label);
+
+/// <summary>One page of the timeline: its <paramref name="Entries"/>, which page it is (from 1), how many pages there are, and how many entries match in all.</summary>
+public sealed record ProfileTimelinePage(IReadOnlyList<ProfileTimelineEntry> Entries, int Page, int PageCount, int Total);

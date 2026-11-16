@@ -19,15 +19,16 @@ public sealed record ProfileActivityGraph(
     /// <summary>True when nothing happened in the window; the graph is not shown then.</summary>
     public bool IsEmpty => Weeks.All(w => w.Count == 0);
 
-    /// <summary>What happened in the window, by type, e.g. "3 packages updated"; empty when the graph has none. See <see cref="Summarise"/>.</summary>
+    /// <summary>What happened in the window, by type, e.g. "3 package releases"; empty when the graph has none. See <see cref="Summarise"/>.</summary>
     public IReadOnlyList<ProfileActivitySummaryItem> Summary { get; init; } = [];
 
     /// <summary>
     /// One figure per type for the 12 months up to and including <paramref name="today"/>, in the order of
     /// <see cref="Models.PlatformActivityGroups.All"/>. Types with nothing in the window are left out. Each timeline
-    /// entry counts once, and a package is one entry however many releases it had, so "packages updated" counts
-    /// packages, not releases. <paramref name="windowCounts"/> (exact, by section) replace what the timeline holds. Forum topics, replies and solved answers use <paramref name="forumStats"/> (the
-    /// platform's exact counts; replies are never listed) when there are any, else the timeline.
+    /// entry counts once; a package release is an entry of its own, so "package releases" counts releases.
+    /// <paramref name="windowCounts"/> (exact, by section) replace what the timeline holds, and forum topics, replies and
+    /// solved answers use <paramref name="forumStats"/> (the platform's exact counts; replies are never listed) when there
+    /// are any, else the timeline.
     /// </summary>
     public static IReadOnlyList<ProfileActivitySummaryItem> Summarise(
         IEnumerable<ProfileTimelineEntry> entries, DateOnly today, Models.PlatformForumStats? forumStats = null,
@@ -40,7 +41,7 @@ public sealed record ProfileActivityGraph(
         var counts = inWindow
             .Where(e => !e.IsSolution)
             .GroupBy(e => e.Group)
-            .ToDictionary(g => g.Key, g => g.Key == Models.PlatformActivityGroups.Packages ? PackageReleases.CountPackages(g.Select(e => e.Url ?? e.Title)) : g.Count());
+            .ToDictionary(g => g.Key, g => g.Count());
         // The timeline only holds the newest few items of a section; the exact counts cover the whole window.
         foreach (var (group, count) in windowCounts ?? new Dictionary<string, int>())
         {
@@ -125,7 +126,7 @@ public sealed record ProfileActivityGraph(
         {
             Models.PlatformActivityGroups.Blog => one ? "blog post" : "blog posts",
             Models.PlatformActivityGroups.Videos => one ? "video" : "videos",
-            Models.PlatformActivityGroups.Packages => one ? "package updated" : "packages updated",
+            Models.PlatformActivityGroups.Packages => one ? "package release" : "package releases",
             Models.PlatformActivityGroups.Meetups => one ? "event" : "events",
             Models.PlatformActivityGroups.Forum => one ? "forum post" : "forum posts",
             Models.PlatformActivityGroups.Social => one ? "social post" : "social posts",
@@ -156,5 +157,5 @@ public sealed record ProfileActivityGraphWeek(DateOnly Start, int Count, int Lev
 /// <summary>A month of the activity graph's text alternative, e.g. "Mar 2026".</summary>
 public sealed record ProfileActivityGraphMonth(string Label, int Count);
 
-/// <summary>One figure of the activity summary, e.g. 3 and "packages updated".</summary>
+/// <summary>One figure of the activity summary, e.g. 3 and "package releases".</summary>
 public sealed record ProfileActivitySummaryItem(int Count, string Label, string IconKey);

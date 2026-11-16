@@ -229,16 +229,22 @@ public sealed class ProfileActivityService
         IReadOnlyList<PlatformActivity> Newest(string group) => Usable(groups.First(g => g.Group == group).Newest, limit);
         IReadOnlyList<PlatformActivity> Window(string group) => Usable(groups.First(g => g.Group == group).Window, int.MaxValue);
 
-        var forumStats = await forumStatsTask;
-        var firstReleases = await FindFirstReleasesAsync(Newest(PlatformActivityGroups.Packages), cancellationToken);
+        // What the profile holds: everything from the last 12 months, plus the newest few of a quiet section, which may
+        // be older (so a profile with little recent activity still has something to show).
+        IReadOnlyList<PlatformActivity> Held(string group) =>
+            Newest(group).Concat(Window(group)).DistinctBy(a => a.Id).OrderByDescending(a => a.OccurredAt).ToList();
 
-        var shown = BuildActivity(platformProfile, Newest, firstReleases);
+        var forumStats = await forumStatsTask;
+        var firstReleases = await FindFirstReleasesAsync(Held(PlatformActivityGroups.Packages), cancellationToken);
+
+        var shown = BuildActivity(platformProfile, Held, firstReleases);
         var counted = BuildActivity(platformProfile, Window, firstReleases);
         var activityCounts = new Dictionary<string, int>
         {
             [PlatformActivityGroups.Blog] = counted.BlogPosts.Count,
             [PlatformActivityGroups.Videos] = counted.Videos.Count,
-            [PlatformActivityGroups.Packages] = PackageReleases.CountPackages(counted.Packages.Select(p => p.Url)),
+            // Every release counts, not just each package once: updates released is the figure of interest.
+            [PlatformActivityGroups.Packages] = counted.Packages.Count,
             [PlatformActivityGroups.Meetups] = counted.Meetups.Count,
             // A post shared on several platforms counts once, as on the timeline.
             [PlatformActivityGroups.Social] = ProfileTimeline.MergeCrossPosts(counted.SocialPosts.Select(p => new ProfileTimelineEntry(
@@ -321,6 +327,11 @@ public sealed class ProfileActivityService
                 .Select(a => new ProfileMeetup(MeetupAction(a.Type), a.Title!, null, a.OccurredAt, a.Url, a.Id))
                 .ToList());
 
+    /// <summary>The most packages asked NuGet about for one profile (the newest releases first), and how many at once.</summary>
+    private const int MaxPackagesLookedUp = 40;
+
+    private const int MaxConcurrentLookups = 4;
+
     /// <summary>
     /// The ids of the release activities that are a package's very first release: the version released is the first
     /// version NuGet lists for the package. A package NuGet can't be asked about, or that can't be reached, is
@@ -337,9 +348,21 @@ public sealed class ProfileActivityService
         var byPackage = releases
             .Where(r => PackageReleases.IdOf(r.Url) != null && PackageReleases.VersionOf(r.Url) != null)
             .GroupBy(r => PackageReleases.IdOf(r.Url)!)
+            .Take(MaxPackagesLookedUp)
             .ToList();
+        using var gate = new SemaphoreSlim(MaxConcurrentLookups);
         var firstVersions = await Task.WhenAll(byPackage.Select(async g =>
-            (Releases: g, First: await _firstVersions.GetFirstVersionAsync(g.Key, cancellationToken))));
+        {
+            await gate.WaitAsync(cancellationToken);
+            try
+            {
+                return (Releases: g, First: await _firstVersions.GetFirstVersionAsync(g.Key, cancellationToken));
+            }
+            finally
+            {
+                gate.Release();
+            }
+        }));
 
         foreach (var (group, first) in firstVersions)
         {
