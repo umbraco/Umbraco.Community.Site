@@ -123,6 +123,20 @@ public class ProfileActivityGraphTests
     }
 
     [Fact]
+    public void Solved_answers_are_counted_over_the_same_rolling_window_not_the_forum_counts_calendar_months()
+    {
+        var forum = Web.Features.Profiles.Models.PlatformActivityGroups.Forum;
+        var summary = ProfileActivityGraph.Summarise(
+            [],
+            Today,
+            // The forum counts (whole calendar months) miss the answers of the window's first weeks; the listed ones don't.
+            new Web.Features.Profiles.Models.PlatformForumStats(9, 17, 0),
+            new Dictionary<string, int> { [forum] = 10, [ProfileActivityGraph.SolvedKey] = 2 });
+
+        summary.Select(i => (i.Count, i.Label)).Should().Equal((10, "forum posts"), (17, "forum replies"), (2, "solved answers"));
+    }
+
+    [Fact]
     public void Exact_counts_replace_what_the_timeline_holds()
     {
         var groups = Web.Features.Profiles.Models.PlatformActivityGroups.Packages;

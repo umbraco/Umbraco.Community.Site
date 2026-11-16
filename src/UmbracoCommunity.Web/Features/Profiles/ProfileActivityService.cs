@@ -245,6 +245,10 @@ public sealed class ProfileActivityService
             [PlatformActivityGroups.Videos] = counted.Videos.Count,
             // Every release counts, not just each package once: updates released is the figure of interest.
             [PlatformActivityGroups.Packages] = counted.Packages.Count,
+            // Topics and accepted answers are both listed in the forum section; the forum counts cover calendar months,
+            // which would drop answers from the first weeks of the rolling window.
+            [PlatformActivityGroups.Forum] = counted.ForumPosts.Count(p => !p.IsSolution),
+            [ProfileActivityGraph.SolvedKey] = counted.ForumPosts.Count(p => p.IsSolution),
             [PlatformActivityGroups.Meetups] = counted.Meetups.Count,
             // A post shared on several platforms counts once, as on the timeline.
             [PlatformActivityGroups.Social] = ProfileTimeline.MergeCrossPosts(counted.SocialPosts.Select(p => new ProfileTimelineEntry(

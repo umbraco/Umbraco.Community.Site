@@ -256,7 +256,7 @@ public static class ProfileDisplay
             OtherActivities = Shown(PlatformActivityGroups.Other, profile.OtherActivities, a => a.ActivityId),
             ForumStats = hiddenSections.Contains(PlatformActivityGroups.Forum) ? null : profile.ForumStats,
             ActivityCounts = profile.ActivityCounts?
-                .Where(c => !hiddenSections.Contains(c.Key))
+                .Where(c => !hiddenSections.Contains(c.Key == ProfileActivityGraph.SolvedKey ? PlatformActivityGroups.Forum : c.Key))
                 .ToDictionary(c => c.Key, c => c.Value),
         };
 
