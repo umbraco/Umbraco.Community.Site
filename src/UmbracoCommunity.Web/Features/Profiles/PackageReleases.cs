@@ -17,13 +17,6 @@ public static partial class PackageReleases
     /// <summary>The version of a NuGet package address that names one, or null.</summary>
     public static string? VersionOf(string? url) => Segments(url) is { Version: { } v } ? v : null;
 
-    /// <summary>
-    /// How many different packages the release addresses are for. Each release is its own address, so releases of one
-    /// package count once; an address that isn't a NuGet package address counts as its own package.
-    /// </summary>
-    public static int CountPackages(IEnumerable<string> releaseUrls) =>
-        releaseUrls.Select(url => IdOf(url) ?? url).Distinct(StringComparer.Ordinal).Count();
-
     /// <summary>True when two versions are the same, ignoring case and build metadata (<c>+...</c>).</summary>
     public static bool SameVersion(string? a, string? b) =>
         a != null && b != null

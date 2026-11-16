@@ -94,7 +94,7 @@ public class ProfileActivityGraphTests
     {
         var summary = ProfileActivityGraph.Summarise(
             [
-                // Four releases of two packages: the summary counts packages.
+                // Four releases of two packages: the summary counts the releases.
                 Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 11, 1), "https://www.nuget.org/packages/Cultiv.Hangfire/5.5.2"),
                 Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 9, 1), "https://www.nuget.org/packages/Cultiv.Hangfire/5.5.1"),
                 Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 7, 1), "https://www.nuget.org/packages/cultiv.hangfire/5.4.0"),
@@ -104,7 +104,7 @@ public class ProfileActivityGraphTests
             ],
             Today);
 
-        summary.Should().Equal(new ProfileActivitySummaryItem(1, "blog post", "blog"), new ProfileActivitySummaryItem(2, "packages updated", "package"));
+        summary.Should().Equal(new ProfileActivitySummaryItem(1, "blog post", "blog"), new ProfileActivitySummaryItem(4, "package releases", "package"));
     }
 
     [Fact]
@@ -131,6 +131,6 @@ public class ProfileActivityGraphTests
             Today,
             windowCounts: new Dictionary<string, int> { [Web.Features.Profiles.Models.PlatformActivityGroups.Social] = 214, [groups] = 7 });
 
-        summary.Select(i => (i.Count, i.Label)).Should().Equal((7, "packages updated"), (214, "social posts"));
+        summary.Select(i => (i.Count, i.Label)).Should().Equal((7, "package releases"), (214, "social posts"));
     }
 }

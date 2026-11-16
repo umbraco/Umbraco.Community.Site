@@ -74,7 +74,7 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
-    public async Task Counts_cover_the_whole_window_not_just_the_items_shown()
+    public async Task The_whole_window_is_held_and_counted_not_just_the_newest_items()
     {
         // Ten items are shown (the limit); twenty-five exist in the window.
         var now = DateTimeOffset.UtcNow;
@@ -87,8 +87,22 @@ public class ProfileActivityServiceTests
 
         var result = await CreateService(client).EnrichAsync(Profile);
 
-        result.BlogPosts.Should().HaveCount(10);
+        // Everything in the window is held for the timeline, not just the ten newest.
+        result.BlogPosts.Should().HaveCount(25);
         result.ActivityCounts![PlatformActivityGroups.Blog].Should().Be(25);
+    }
+
+    [Fact]
+    public async Task A_quiet_section_keeps_its_newest_items_even_when_they_are_older_than_the_window()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities[PlatformActivityGroups.Blog] = [Activity("Recent", "https://blog.example/1", now.AddDays(-5), "blog"), Activity("Old", "https://blog.example/2", now.AddYears(-3), "blog")];
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.BlogPosts.Select(p => p.Title).Should().Equal("Recent", "Old");
+        result.ActivityCounts![PlatformActivityGroups.Blog].Should().Be(1);
     }
 
     [Fact]

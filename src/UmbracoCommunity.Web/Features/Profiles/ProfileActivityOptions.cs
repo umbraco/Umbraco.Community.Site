@@ -10,6 +10,9 @@ public sealed class ProfileActivityOptions
     /// <summary>How long an empty answer is kept after the platform could not be reached or errored.</summary>
     public int FailureCacheMinutes { get; set; } = 2;
 
-    /// <summary>How many items to show per section.</summary>
+    /// <summary>
+    /// The newest items kept per section, however old. Everything from the last 12 months is kept as well (up to 500 per
+    /// section), so this mostly matters for a quiet section.
+    /// </summary>
     public int ItemsPerSection { get; set; } = 10;
 }

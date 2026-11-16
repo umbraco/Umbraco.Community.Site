@@ -85,7 +85,7 @@ public class CommunityProfilePageController : RenderController
         ProfileActivityGraph? graph = null;
         if (profile != null && access.Show)
         {
-            timeline = await _timelinePreviewService.AddCardsAsync(ProfileTimeline.Entries(profile), profile.DisplayChoices, cancellationToken);
+            timeline = ProfileTimeline.Entries(profile);
             if (!profile.DisplayChoices.HideActivityGraph)
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -96,6 +96,13 @@ public class CommunityProfilePageController : RenderController
         }
 
         var timelineTypes = ProfileTimeline.Types(timeline);
+        var timelineType = ProfileTimeline.SelectedType(Request.Query[ProfileTimeline.TypeQueryKey].FirstOrDefault(), timelineTypes);
+
+        // Only the entries on the shown page get preview cards, so outside work is spent on what is actually in view.
+        var timelinePage = ProfileTimeline.Paginate(timeline, timelineType, timelineTypes.Count > 1, Request.Query[ProfileTimeline.PageQueryKey].FirstOrDefault());
+        var pageEntries = profile != null && access.Show
+            ? await _timelinePreviewService.AddCardsAsync(timelinePage.Entries, profile.DisplayChoices, cancellationToken)
+            : timelinePage.Entries;
         var viewModel = new CommunityProfilePageViewModel(currentPage)
         {
             Handle = handle,
@@ -106,9 +113,12 @@ public class CommunityProfilePageController : RenderController
                 ? currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider)
                 : null,
             ShowEnrichedSections = access.Show,
-            Timeline = ProfileTimeline.ByMonth(timeline),
+            Timeline = ProfileTimeline.ByMonth(pageEntries),
             TimelineTypes = timelineTypes,
-            TimelineType = ProfileTimeline.SelectedType(Request.Query[ProfileTimeline.TypeQueryKey].FirstOrDefault(), timelineTypes),
+            TimelineType = timelineType,
+            TimelinePage = timelinePage.Page,
+            TimelinePageCount = timelinePage.PageCount,
+            TimelineTotal = timelinePage.Total,
             ActivityGraph = graph,
             IsGated = access.IsGated,
             IsDevRelView = isDevRelView,
