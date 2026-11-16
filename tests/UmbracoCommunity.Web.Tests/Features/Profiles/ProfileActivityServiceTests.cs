@@ -211,6 +211,9 @@ public class ProfileActivityServiceTests
 
         result.ForumStats.Should().Be(new PlatformForumStats(13, 31, 2));
         result.ForumPosts.Select(p => p.IsSolution).Should().Equal(false, true);
+        // Topics and accepted answers in the window are counted from the listed items.
+        result.ActivityCounts![PlatformActivityGroups.Forum].Should().Be(1);
+        result.ActivityCounts[ProfileActivityGraph.SolvedKey].Should().Be(1);
     }
 
     [Fact]

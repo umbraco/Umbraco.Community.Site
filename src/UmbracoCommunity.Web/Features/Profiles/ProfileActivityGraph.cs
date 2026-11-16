@@ -16,6 +16,9 @@ public sealed record ProfileActivityGraph(
 {
     public const int MaxLevel = 4;
 
+    /// <summary>The key of the solved-answers count among the window counts (it isn't a section of its own).</summary>
+    public const string SolvedKey = "solved";
+
     /// <summary>True when nothing happened in the window; the graph is not shown then.</summary>
     public bool IsEmpty => Weeks.All(w => w.Count == 0);
 
@@ -45,16 +48,24 @@ public sealed record ProfileActivityGraph(
         // The timeline only holds the newest few items of a section; the exact counts cover the whole window.
         foreach (var (group, count) in windowCounts ?? new Dictionary<string, int>())
         {
-            counts[group] = count;
+            if (group != SolvedKey)
+            {
+                counts[group] = count;
+            }
         }
 
-        if (forumStats != null)
+        // Topics and solved answers are listed, so they are counted over the same rolling window as everything else (they
+        // are in windowCounts). Replies are never listed, so they come from the forum counts, which cover whole calendar
+        // months and so can start a little after the window does. Without the window's counts, the forum counts stand in
+        // for topics and solved answers too.
+        if (forumStats != null && windowCounts?.ContainsKey(Models.PlatformActivityGroups.Forum) != true)
         {
-            // The three forum figures share one window (calendar months), so topics come from the counts too.
             counts[Models.PlatformActivityGroups.Forum] = forumStats.TopicsCreated;
         }
 
-        var solved = forumStats?.Solutions ?? inWindow.Count(e => e.IsSolution);
+        var solved = windowCounts != null && windowCounts.TryGetValue(SolvedKey, out var listedSolved)
+            ? listedSolved
+            : forumStats?.Solutions ?? inWindow.Count(e => e.IsSolution);
         var replies = forumStats?.Replies ?? 0;
 
         var items = new List<ProfileActivitySummaryItem>();
