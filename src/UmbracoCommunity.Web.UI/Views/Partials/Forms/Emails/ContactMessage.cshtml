@@ -1,5 +1,5 @@
-@using Umbraco.Forms.Core.Persistence.Dtos
-@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Record>
+@using Umbraco.Forms.Core.Models
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<FormsHtmlModel>
 @*
     Minimal email template for contact-style forms: shows only the sender's
     name, email and message, instead of every submitted field.
@@ -8,11 +8,9 @@
     follow that convention.
 *@
 @{
-    string Value(string alias) => Model.GetRecordFieldByAlias(alias)?.ValuesAsString(false) ?? string.Empty;
-
-    var name = Value("name");
-    var email = Value("email");
-    var message = Value("message");
+    var name = Model.GetValue("name")?.ToString() ?? string.Empty;
+    var email = Model.GetValue("email")?.ToString() ?? string.Empty;
+    var message = Model.GetValue("message")?.ToString() ?? string.Empty;
 }
 <!DOCTYPE html>
 <html lang="en">
