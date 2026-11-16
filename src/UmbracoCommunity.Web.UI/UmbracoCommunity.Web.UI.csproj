@@ -28,6 +28,7 @@
     <PackageReference Include="Umbraco.AI.Agent.Copilot.Workspace" />
     <PackageReference Include="Umbraco.AI.Amazon" />
     <PackageReference Include="Umbraco.AI.Anthropic" />
+    <PackageReference Include="Umbraco.AI.TypeSafe" />
     <PackageReference Include="Umbraco.AI.Google" />
     <PackageReference Include="Umbraco.AI.MicrosoftFoundry" />
     <PackageReference Include="Umbraco.AI.OpenAI" />

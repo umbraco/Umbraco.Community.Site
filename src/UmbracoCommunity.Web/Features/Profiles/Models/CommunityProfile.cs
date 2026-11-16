@@ -43,6 +43,18 @@ public sealed record CommunityProfile(
     /// </summary>
     public IReadOnlyDictionary<string, int>? ActivityCounts { get; init; }
 
+    /// <summary>
+    /// Pairs of social posts (<c>ProfileTimeline.PairKey</c>) a model judged to be the same post shared on two
+    /// platforms. Merged on the timeline.
+    /// </summary>
+    public IReadOnlySet<string> SamePosts { get; init; } = new HashSet<string>();
+
+    /// <summary>
+    /// Set while the timeline is still being built: some social posts are still being checked for copies of each other.
+    /// The page then shows a progress bar instead of the activity graph and timeline. Null when done.
+    /// </summary>
+    public ProfileJudgingProgress? JudgingProgress { get; init; }
+
     /// <summary>Activity the member added by hand that has no section of its own (a talk, a contribution, a podcast, anything else).</summary>
     public IReadOnlyList<ProfileOtherActivity> OtherActivities { get; init; } = [];
 
@@ -176,3 +188,10 @@ public sealed record ProfileOtherActivity(
     DateTimeOffset Date,
     string? Description = null,
     string? ActivityId = null);
+
+/// <summary>How far the check of social posts for copies has got: <paramref name="Done"/> of <paramref name="Total"/> pairs.</summary>
+public sealed record ProfileJudgingProgress(int Done, int Total)
+{
+    /// <summary>Whole percent done, 0 to 99 (100 only once nothing is left).</summary>
+    public int Percent => Total <= 0 ? 0 : Math.Min(99, (int)(100L * Done / Total));
+}

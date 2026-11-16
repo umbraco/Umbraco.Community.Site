@@ -16,6 +16,7 @@ public class MemberProfilesDbContext : DbContext
     public DbSet<MemberPinnedItemEntity> MemberPinnedItems { get; set; } = null!;
     public DbSet<MemberActivityEntryEntity> MemberActivityEntries { get; set; } = null!;
     public DbSet<ProfileTimelinePreviewEntity> ProfileTimelinePreviews { get; set; } = null!;
+    public DbSet<SocialPostJudgmentEntity> SocialPostJudgments { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -95,6 +96,16 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(ProfileTimelinePreviewEntity.MaxDescriptionLength);
 
             entity.HasIndex(e => e.PageUrlHash).IsUnique();
+        });
+
+        modelBuilder.Entity<SocialPostJudgmentEntity>(entity =>
+        {
+            entity.ToTable("SocialPostJudgments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.PairKey).IsRequired().HasMaxLength(SocialPostJudgmentEntity.MaxPairKeyLength);
+
+            entity.HasIndex(e => e.PairKey).IsUnique();
         });
 
         modelBuilder.Entity<MemberFeedEntity>(entity =>
