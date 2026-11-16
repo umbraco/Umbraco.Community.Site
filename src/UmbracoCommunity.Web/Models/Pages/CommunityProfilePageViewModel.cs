@@ -85,6 +85,9 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     /// <summary>The activity graph, unless the member switched it off, when there was activity in the last 12 months.</summary>
     public ProfileActivityGraph? ActivityGraph { get; init; }
 
+    /// <summary>Set while the timeline is still being built; the page then shows a progress bar and refreshes itself instead of the graph and timeline.</summary>
+    public ProfileJudgingProgress? JudgingProgress { get; init; }
+
     /// <summary>Link to the profile as the public sees it. Set for a DevRel view only.</summary>
     public string? DevRelPublicViewUrl { get; init; }
 

@@ -303,6 +303,27 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.ToTable("ProfileTimelinePreviews", (string)null);
                 });
 
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.SocialPostJudgmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("JudgedUtc");
+
+                    b.Property<string>("PairKey")
+                        .IsRequired()
+                        .HasMaxLength(300);
+
+                    b.Property<double>("Probability");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PairKey")
+                        .IsUnique();
+
+                    b.ToTable("SocialPostJudgments", (string)null);
+                });
+
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>
                 {
                     b.HasOne("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberProfileEntity", "MemberProfile")

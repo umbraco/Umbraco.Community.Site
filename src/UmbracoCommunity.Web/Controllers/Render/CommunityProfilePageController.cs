@@ -83,7 +83,8 @@ public class CommunityProfilePageController : RenderController
         // The timeline and the activity graph are built from the activity shown, so they sit behind the same gate.
         IReadOnlyList<ProfileTimelineEntry> timeline = [];
         ProfileActivityGraph? graph = null;
-        if (profile != null && access.Show)
+        var isBuilding = profile is { JudgingProgress: not null } && access.Show;
+        if (profile != null && access.Show && !isBuilding)
         {
             timeline = ProfileTimeline.Entries(profile);
             if (!profile.DisplayChoices.HideActivityGraph)
@@ -120,6 +121,7 @@ public class CommunityProfilePageController : RenderController
             TimelinePageCount = timelinePage.PageCount,
             TimelineTotal = timelinePage.Total,
             ActivityGraph = graph,
+            JudgingProgress = isBuilding ? profile!.JudgingProgress : null,
             IsGated = access.IsGated,
             IsDevRelView = isDevRelView,
             IsHiddenFromPublic = viewable.IsHiddenFromPublic,

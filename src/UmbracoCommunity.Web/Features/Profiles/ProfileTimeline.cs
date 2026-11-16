@@ -103,7 +103,7 @@ public static class ProfileTimeline
         }));
 
         entries.AddRange(MergeCrossPosts(profile.SocialPosts.Select(p => new ProfileTimelineEntry(
-            PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null))));
+            PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null)), profile.SamePosts));
 
         entries.AddRange(profile.OtherActivities.Select(a => new ProfileTimelineEntry(
             PlatformActivityGroups.Other, a.ActivityId, a.Title, a.Url, a.Description, a.Date, a.Kind, null)));
@@ -117,106 +117,87 @@ public static class ProfileTimeline
             .ToList();
     }
 
-    /// <summary>How far apart two posts can be and still be the same post shared on two platforms.</summary>
-    internal static readonly TimeSpan CrossPostWindow = TimeSpan.FromDays(2);
-
-    /// <summary>How alike two posts' texts must be (0 to 1) to count as the same post.</summary>
-    internal const double CrossPostSimilarity = 0.8;
+    /// <summary>How far apart two posts can be and still be the same post shared twice.</summary>
+    internal static readonly TimeSpan CrossPostWindow = TimeSpan.FromHours(6);
 
     /// <summary>
-    /// Folds a post that was shared on more than one platform (e.g. Mastodon and Bluesky) into one entry. Two posts
-    /// on different platforms, close in time, whose texts are nearly identical (see <see cref="TextSimilarity"/>) are
-    /// the same post (similar as characters or as words): the newest stays, linking to its own post, and its meta lists the platforms ("bluesky, mastodon").
-    /// Posts on the same platform are never merged.
+    /// Folds a post that was shared more than once (on Mastodon and Bluesky, or twice on one platform) into one entry. Which posts are
+    /// the same post is decided by a model (see <see cref="ICrossPostJudge"/>); <paramref name="confirmedSamePosts"/> holds
+    /// the pairs it confirmed (see <see cref="PairKey"/>). A post joins a group when it is the same post as any member, so
+    /// four copies join up even when the newest and the oldest don't match each other directly. The newest stays, linking
+    /// to its own post, and its meta lists the platforms ("bluesky, mastodon"). A copy on the same platform (posted twice) is merged too.
     /// </summary>
-    internal static IReadOnlyList<ProfileTimelineEntry> MergeCrossPosts(IEnumerable<ProfileTimelineEntry> posts)
+    internal static IReadOnlyList<ProfileTimelineEntry> MergeCrossPosts(
+        IEnumerable<ProfileTimelineEntry> posts,
+        IReadOnlySet<string>? confirmedSamePosts = null)
     {
-        var groups = new List<(ProfileTimelineEntry Lead, string Text, List<string> Platforms)>();
+        var groups = new List<(ProfileTimelineEntry Lead, List<ProfileTimelineEntry> Members)>();
         foreach (var post in posts.OrderByDescending(p => p.Date))
         {
-            var platform = post.Meta ?? string.Empty;
-            var text = NormaliseSocialText(post.Title);
-            var match = groups.FindIndex(g =>
-                !g.Platforms.Contains(platform, StringComparer.OrdinalIgnoreCase)
-                && (g.Lead.Date - post.Date).Duration() <= CrossPostWindow
-                && Math.Max(TextSimilarity(g.Text, text), WordOverlap(g.Text, text)) >= CrossPostSimilarity);
+            var match = confirmedSamePosts is { Count: > 0 }
+                ? groups.FindIndex(g => g.Members.Any(m => confirmedSamePosts.Contains(PairKey(m.ActivityId, post.ActivityId))))
+                : -1;
 
             if (match < 0)
             {
-                groups.Add((post, text, [platform]));
+                groups.Add((post, [post]));
             }
             else
             {
-                groups[match].Platforms.Add(platform);
+                groups[match].Members.Add(post);
             }
         }
 
         return groups
-            .Select(g => g.Platforms.Count == 1
+            .Select(g => g.Members.Count == 1
                 ? g.Lead
-                : g.Lead with { Meta = string.Join(", ", g.Platforms.Where(p => p.Length > 0).Order(StringComparer.OrdinalIgnoreCase)) })
+                : g.Lead with
+                {
+                    Meta = string.Join(", ", g.Members
+                        .Select(m => m.Meta ?? string.Empty)
+                        .Where(p => p.Length > 0)
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .Order(StringComparer.OrdinalIgnoreCase)),
+                })
             .ToList();
     }
 
-    /// <summary>Lower-cased words only, without the "Attached: 4 images" note some platforms put in front.</summary>
-    private static string NormaliseSocialText(string text)
-    {
-        var withoutNote = System.Text.RegularExpressions.Regex.Replace(
-            text, @"^\s*Attached:\s*\d+\s+images?\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        var words = System.Text.RegularExpressions.Regex.Matches(withoutNote.ToLowerInvariant(), @"[\p{L}\p{N}#@]+")
-            .Select(m => m.Value);
-        return string.Join(' ', words);
-    }
+    /// <summary>An order-independent key for two posts' activity ids, or an empty string when either has none.</summary>
+    internal static string PairKey(string? idA, string? idB) =>
+        string.IsNullOrEmpty(idA) || string.IsNullOrEmpty(idB)
+            ? string.Empty
+            : string.CompareOrdinal(idA, idB) <= 0 ? $"{idA}|{idB}" : $"{idB}|{idA}";
 
     /// <summary>
-    /// How many of the words two normalised texts share, from 0 to 1 (the Dice coefficient over their word sets).
-    /// Catches the same post with a clause reworded or moved, which an edit distance counts as a big change.
+    /// Pairs of posts that could be the same post shared twice: at most
+    /// <see cref="CrossPostWindow"/> apart, on any platforms, the closest in time first. Whether they are the same is for the model to say.
     /// </summary>
-    internal static double WordOverlap(string a, string b)
+    internal static IReadOnlyList<(ProfileTimelineEntry A, ProfileTimelineEntry B)> CandidatePairs(IEnumerable<ProfileTimelineEntry> posts)
     {
-        var first = a.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
-        var second = b.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
-        return first.Count == 0 || second.Count == 0
-            ? 0
-            : 2.0 * first.Intersect(second).Count() / (first.Count + second.Count);
-    }
+        var items = posts
+            .Where(p => !string.IsNullOrEmpty(p.ActivityId) && !string.IsNullOrWhiteSpace(p.Title))
+            .DistinctBy(p => p.ActivityId)
+            .OrderByDescending(p => p.Date)
+            .ToList();
 
-    /// <summary>
-    /// How alike two normalised texts are, from 0 to 1: one minus the Levenshtein edit distance over the longer
-    /// length. A text that is a truncated start of the other (ending "...") compares on the shorter length.
-    /// </summary>
-    internal static double TextSimilarity(string a, string b)
-    {
-        if (a.Length == 0 || b.Length == 0)
+        var pairs = new List<(ProfileTimelineEntry, ProfileTimelineEntry)>();
+        for (var i = 0; i < items.Count; i++)
         {
-            return 0;
-        }
-
-        // Compare like with like: cut the longer one down to the shorter's length, so a truncated copy still matches.
-        var length = Math.Min(a.Length, b.Length);
-        if (Math.Max(a.Length, b.Length) > length * 1.25)
-        {
-            return 0;
-        }
-
-        a = a[..length];
-        b = b[..length];
-
-        var previous = Enumerable.Range(0, length + 1).ToArray();
-        var current = new int[length + 1];
-        for (var i = 1; i <= length; i++)
-        {
-            current[0] = i;
-            for (var j = 1; j <= length; j++)
+            for (var j = i + 1; j < items.Count; j++)
             {
-                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
-                current[j] = Math.Min(Math.Min(current[j - 1] + 1, previous[j] + 1), previous[j - 1] + cost);
-            }
+                // Newest first: every later item is older still, so none further along is close enough either.
+                if (items[i].Date - items[j].Date > CrossPostWindow)
+                {
+                    break;
+                }
 
-            (previous, current) = (current, previous);
+                pairs.Add((items[i], items[j]));
+            }
         }
 
-        return 1.0 - (double)previous[length] / length;
+        // Closest in time first: a post shared twice goes out within minutes or hours, so these are the likeliest
+        // matches and the ones to ask about first when only some pairs can be.
+        return pairs.OrderBy(p => (p.Item1.Date - p.Item2.Date).Duration()).ToList();
     }
 
     /// <summary>The entries grouped by calendar month (UTC), newest month first, keeping their order within a month.</summary>

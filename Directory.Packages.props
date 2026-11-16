@@ -39,6 +39,7 @@
     <PackageVersion Include="Umbraco.AI.OpenAI" Version="18.3.3" />
     <PackageVersion Include="Umbraco.AI.Prompt" Version="18.4.1" />
     <PackageVersion Include="Umbraco.AI.Search" Version="18.0.6" />
+    <PackageVersion Include="Umbraco.AI.TypeSafe" Version="18.0.1" />
     <PackageVersion Include="Umbraco.AI.Search.Db.Sqlite" Version="18.0.6" />
     <PackageVersion Include="Umbraco.AI.Search.Db.SqlServer" Version="18.0.6" />
     <!-- Umbraco Automate -->
