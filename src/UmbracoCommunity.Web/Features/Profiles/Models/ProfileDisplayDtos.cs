@@ -39,4 +39,42 @@ public sealed record ProfileDisplayResponse(
 
 public sealed record ProfileDisplaySection(string Key, string Label, IReadOnlyList<ProfileDisplayItem> Items);
 
-public sealed record ProfileDisplayItem(string Id, string Title, DateTimeOffset? Date);
+/// <summary>
+/// An item in one of the member's activity sections, with what the account page needs to draw it as the public
+/// timeline does (see <see cref="ProfileTimeline"/>). The timeline fields are filled from the same
+/// <see cref="ProfileTimelineEntry"/> the profile page renders, so the two can't drift.
+/// </summary>
+public sealed record ProfileDisplayItem(string Id, string Title, DateTimeOffset? Date)
+{
+    /// <summary>The activity section it comes from (see <see cref="PlatformActivityGroups"/>).</summary>
+    public string? Group { get; init; }
+
+    /// <summary>The icon to draw it with (see <c>_KindIcon.cshtml</c> and <c>profile-kind-icons.ts</c>).</summary>
+    public string? IconKey { get; init; }
+
+    /// <summary>Where it links to. Null for an item without a page.</summary>
+    public string? Url { get; init; }
+
+    /// <summary>The short line of context the timeline shows after the date, e.g. the blog it was posted on.</summary>
+    public string? Meta { get; init; }
+
+    public string? Description { get; init; }
+
+    /// <summary>True for a routine package release, which the timeline's highlights leave out (see <see cref="ProfileTimeline.IsShown"/>).</summary>
+    public bool IsRoutineRelease { get; init; }
+
+    /// <summary>
+    /// Its preview card when one is ready, whatever the member's card choices: the account page applies those itself,
+    /// so switching cards on or off shows straight away. Null when there is no picture (yet).
+    /// </summary>
+    public ProfileTimelineCard? Card { get; init; }
+
+    /// <summary>The month the timeline lists it under, as <c>yyyy-MM</c>. Null when it has no date.</summary>
+    public string? MonthKey { get; init; }
+
+    /// <summary>The month heading, e.g. "Mar 2026" (see <see cref="ProfileTimeline.MonthLabel"/>). Null when it has no date.</summary>
+    public string? MonthLabel { get; init; }
+
+    /// <summary>Its place on the whole timeline across every section, from 0 (the newest).</summary>
+    public int Order { get; init; }
+}

@@ -1,5 +1,6 @@
 namespace UmbracoCommunity.ProfileMatchReview.Api.Models;
 
+/// <summary>An activity entry for moderation. <c>ImageUrl</c> is the picture the member attached (served from the site), or null.</summary>
 public sealed record ActivityEntryResponse(
     int Id,
     string Handle,
@@ -14,7 +15,8 @@ public sealed record ActivityEntryResponse(
     string? RejectionReason,
     string? DecidedByUserName,
     DateTime? DecidedUtc,
-    DateTime CreatedUtc);
+    DateTime CreatedUtc,
+    string? ImageUrl);
 
 public sealed record ActivityEntryListResponse(IReadOnlyList<ActivityEntryResponse> Items, int Total);
 

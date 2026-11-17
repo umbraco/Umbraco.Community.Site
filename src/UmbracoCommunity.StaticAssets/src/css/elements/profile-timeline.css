@@ -1,0 +1,337 @@
+@import "../base/media-queries.css";
+
+/* A profile timeline: the type filter, month headings and entries (kind icon, preview card or plain row, date and
+   meta line). Shared by the public profile page (Views/CommunityProfilePage.cshtml) and the account page's display
+   editor (components/profile/profile-timeline-entry.ts), so both draw entries alike. Imported by the
+   _communityprofilepage and _accountpage entrypoints. */
+
+/* The kind icons (Views/Partials/Profiles/_KindIcon.cshtml, svg/profile-kind-icons.ts). */
+.community-profile__icon {
+    flex-shrink: 0;
+}
+
+.community-profile__timeline-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--unit-sm) var(--unit);
+    margin-bottom: var(--unit);
+}
+
+.community-profile__timeline-apply[hidden],
+.community-profile__timeline-empty[hidden],
+.community-profile__timeline-month[hidden],
+.community-profile__timeline-entry[hidden] {
+    display: none;
+}
+
+.community-profile__timeline-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit-xxs);
+    min-width: 0;
+    flex: 1 1 12rem;
+    max-width: 20rem;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+}
+
+.community-profile__timeline-filter select {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--unit-xxs) var(--unit-xs);
+    border: var(--base-border);
+    border-radius: var(--border-radius);
+    background: var(--color-white);
+    font: inherit;
+    font-weight: normal;
+}
+
+.community-profile__timeline-empty {
+    margin: 0;
+    padding-block: var(--unit);
+    color: var(--color-dark-grey);
+}
+
+.community-profile__timeline-month + .community-profile__timeline-month {
+    margin-top: var(--unit);
+}
+
+.community-profile__timeline-month-title {
+    margin: 0 0 var(--unit-xs);
+    font-size: var(--font-size-sm);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-dark-grey);
+}
+
+.community-profile__timeline-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.community-profile__timeline-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--unit-sm);
+    padding-block: var(--unit-sm);
+    border-bottom: 1px solid var(--color-light-grey);
+}
+
+.community-profile__timeline-entry:last-child {
+    border-bottom: none;
+}
+
+.community-profile__timeline-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    color: var(--color-identity-blue);
+}
+
+.community-profile__timeline-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit-xxs);
+    min-width: 0;
+    flex: 1;
+}
+
+/* The button <dc-profile-timeline> lays over a card's picture to open it enlarged. It sits exactly on the picture:
+   full width above the text on small screens, the fixed-size box at the card's start from --sm up. */
+.community-profile__timeline-body {
+    position: relative;
+}
+
+.community-profile__timeline-enlarge {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    display: grid;
+    place-items: end;
+    width: calc(100% - 2px);
+    aspect-ratio: 16 / 9;
+    padding: var(--unit-xs);
+    border: none;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    background: none;
+    color: var(--color-white);
+    cursor: zoom-in;
+
+    @media (--sm) {
+        width: calc(7.5rem * 16 / 9);
+        height: calc(7.5rem - 2px);
+        aspect-ratio: auto;
+        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+    }
+}
+
+/* The corner badge that says the picture can be enlarged: always there on touch screens, on hover or focus elsewhere. */
+.community-profile__timeline-enlarge svg {
+    box-sizing: content-box;
+    width: 16px;
+    height: 16px;
+    padding: 4px;
+    border-radius: var(--border-radius);
+    background: rgb(0 0 0 / 70%);
+
+    @media (hover: hover) {
+        opacity: 0;
+        transition: opacity 120ms ease;
+    }
+}
+
+.community-profile__timeline-enlarge:hover svg,
+.community-profile__timeline-enlarge:focus-visible svg {
+    opacity: 1;
+}
+
+.community-profile__timeline-enlarge:focus-visible {
+    outline: var(--focus-outline);
+    outline-offset: calc(var(--focus-outline-offset) * -1);
+}
+
+/* The enlarged picture: at its own size, scaled down only to fit the window. */
+dialog.dc-picture-dialog {
+    width: fit-content;
+    height: fit-content;
+    max-width: 96vw;
+    max-height: 94vh;
+    margin: auto;
+    padding: 0;
+    overflow: visible;
+    border-radius: var(--border-radius-md);
+    background: none;
+    box-shadow: none;
+}
+
+dialog.dc-picture-dialog::backdrop {
+    background: rgb(0 0 0 / 80%);
+}
+
+.dc-picture-dialog__image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 96vw;
+    max-height: 94vh;
+    border-radius: var(--border-radius-md);
+    background: var(--color-white);
+}
+
+.dc-picture-dialog__close {
+    position: absolute;
+    top: var(--unit-xs);
+    right: var(--unit-xs);
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 70%);
+    color: var(--color-white);
+    cursor: pointer;
+}
+
+.community-profile__timeline-title {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-blue);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.community-profile__timeline-desc {
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+    color: var(--color-light-blue);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.community-profile__timeline-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-dark-grey);
+}
+
+/* A preview card: the picture above the text when narrow, in a fixed-width column beside it from --sm up,
+   so every card's image has the same width and crop whatever the source ratio. */
+.community-profile__timeline-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-light-grey);
+    border-radius: var(--border-radius-md);
+    background: var(--color-white);
+    color: inherit;
+}
+
+/* Every image gets the same 16:9 box and fills it (cropped a little, as a link preview would be). An image whose
+   shape is far from 16:9 (a portrait or square, e.g. a profile photo) would lose too much that way, so
+   <dc-profile-timeline> marks it `is-contained`: shown whole over a blurred, enlarged copy of itself. */
+.community-profile__timeline-card-image {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-light);
+}
+
+.community-profile__timeline-card-backdrop,
+.community-profile__timeline-card-picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.community-profile__timeline-card-picture {
+    object-fit: cover;
+}
+
+.community-profile__timeline-card-backdrop {
+    display: none;
+    object-fit: cover;
+    filter: blur(16px) saturate(1.1);
+    transform: scale(1.3);
+    opacity: 0.8;
+}
+
+.community-profile__timeline-card-image.is-contained .community-profile__timeline-card-backdrop {
+    display: block;
+}
+
+.community-profile__timeline-card-image.is-contained .community-profile__timeline-card-picture {
+    object-fit: contain;
+}
+
+.community-profile__timeline-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--unit-xxs);
+    flex: 1;
+    min-width: 0;
+    padding: var(--unit-sm);
+}
+
+@media (--sm) {
+    /* One fixed height, so every row is the same size; the title and description are clamped to fit. */
+    .community-profile__timeline-card {
+        flex-direction: row;
+        height: 7.5rem;
+    }
+
+    .community-profile__timeline-card-text {
+        overflow: hidden;
+    }
+
+    .community-profile__timeline-card-text .community-profile__timeline-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .community-profile__timeline-card-image {
+        flex: 0 0 calc(7.5rem * 16 / 9);
+        width: calc(7.5rem * 16 / 9);
+        aspect-ratio: auto;
+        align-self: stretch;
+    }
+}
+
+/* Entries without a preview image get a placeholder tile with the kind icon, same size as a picture. */
+.community-profile__timeline-card-placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--color-identity-blue);
+}
+
+.community-profile__timeline-card-placeholder svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.community-profile__timeline-card--plain .community-profile__timeline-card-text {
+    justify-content: center;
+}
+
+#main-content .community-profile a.community-profile__timeline-card:hover,
+#main-content .account-page a.community-profile__timeline-card:hover {
+    text-decoration: none;
+}
+
+#main-content .community-profile a.community-profile__timeline-card:hover .community-profile__timeline-title,
+#main-content .account-page a.community-profile__timeline-card:hover .community-profile__timeline-title {
+    text-decoration: underline;
+}

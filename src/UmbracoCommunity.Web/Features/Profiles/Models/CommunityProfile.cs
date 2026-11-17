@@ -59,6 +59,12 @@ public sealed record CommunityProfile(
     public IReadOnlyList<ProfileOtherActivity> OtherActivities { get; init; } = [];
 
     /// <summary>
+    /// The pictures the member attached to activity they added by hand, by activity id, at their address on this site
+    /// (see <see cref="ProfileActivityImageStore"/>). Shown on the item's timeline card instead of whatever its page offers.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> ActivityImages { get; init; } = new Dictionary<string, string>();
+
+    /// <summary>
     /// The member's pinned activities, in their order. Empty until <see cref="ProfileDisplay.Apply"/> has run,
     /// and when nothing pinned can be shown.
     /// </summary>

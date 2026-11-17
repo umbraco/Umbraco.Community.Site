@@ -1,5 +1,6 @@
 import { LitElement, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
 import {
   isPlatformSourced,
   MemberFeedsService,
@@ -7,6 +8,7 @@ import {
   type MemberFeedMatchStatus,
 } from "../../services/member-feeds.service.js";
 import { iconEye, iconEyeOff, iconX } from "../../svg/lucide-icons.js";
+import { moveItem, renderMoveButtons, SortableDragController } from "../sortable/sortable-list.js";
 
 const elementName = "dc-feed-manager";
 
@@ -51,14 +53,22 @@ export class FeedManagerElement extends LitElement {
   @state()
   private _editUrlDraft = "";
 
+  /** Announces reordering to screen reader users. */
   @state()
-  private _draggingId: number | null = null;
+  private _statusMessage = "";
 
   @state()
   private _removingId: number | null = null;
 
   @state()
   private _removeReasonDraft = "";
+
+  /** Links are dragged within their own group (synced or added by the member), as the order is kept per group. */
+  readonly #drag = new SortableDragController<number>(
+    this,
+    (id, targetId, after) => void this.#moveBefore(id, targetId, after),
+    (id, targetId) => this.#groupOf(id) === this.#groupOf(targetId)
+  );
 
   // Render in light DOM so the site's existing form/button styles apply without duplication.
   protected createRenderRoot() {
@@ -128,31 +138,49 @@ export class FeedManagerElement extends LitElement {
     }
   }
 
-  /** Moves a link to where another one currently sits, then stores the new order. */
-  async #moveBefore(feedId: number, targetId: number, after = false) {
-    if (feedId === targetId) return;
+  #groupOf(id: number): boolean | undefined {
+    const feed = this._feeds.find((f) => f.id === id);
+    return feed ? isPlatformSourced(feed) : undefined;
+  }
+
+  /** Moves a link to just before (or after) another one, then stores the new order. */
+  async #moveBefore(feedId: number, targetId: number, after = false, focus?: "up" | "down") {
     const previous = this._feeds;
-    const moving = previous.find((f) => f.id === feedId);
-    if (!moving) return;
+    const reordered = moveItem(previous, (f) => f.id, feedId, targetId, after);
+    if (!reordered) return;
 
-    const rest = previous.filter((f) => f.id !== feedId);
-    const targetIndex = rest.findIndex((f) => f.id === targetId);
-    if (targetIndex < 0) return;
-    rest.splice(targetIndex + (after ? 1 : 0), 0, moving);
+    this._feeds = reordered;
+    const moved = reordered.find((f) => f.id === feedId)!;
+    const group = reordered.filter((f) => isPlatformSourced(f) === isPlatformSourced(moved));
+    this._statusMessage = `${moved.platform} moved to position ${group.indexOf(moved) + 1} of ${group.length}.`;
 
-    this._feeds = rest;
+    if (focus) {
+      // Keep keyboard focus on the link that moved.
+      await this.updateComplete;
+      this.#focusMoveButton(feedId, focus);
+    }
+
     try {
-      await MemberFeedsService.reorder(rest.map((f) => f.id));
+      await MemberFeedsService.reorder(reordered.map((f) => f.id));
       this._errorMessage = "";
     } catch (error) {
       this._feeds = previous;
+      this._statusMessage = "";
       this._errorMessage = error instanceof Error ? error.message : "Couldn't save the new order.";
     }
   }
 
   #moveByStep(feed: MemberFeed, group: MemberFeed[], step: -1 | 1) {
     const neighbour = group[group.indexOf(feed) + step];
-    if (neighbour) void this.#moveBefore(feed.id, neighbour.id, step === 1);
+    if (neighbour) void this.#moveBefore(feed.id, neighbour.id, step === 1, step === -1 ? "up" : "down");
+  }
+
+  #focusMoveButton(feedId: number, preferred: "up" | "down") {
+    const row = this.querySelector<HTMLElement>(`[data-feed-id="${feedId}"]`);
+    const button =
+      row?.querySelector<HTMLButtonElement>(`[data-action="${preferred}"]:not(:disabled)`) ??
+      row?.querySelector<HTMLButtonElement>(`[data-action="up"]:not(:disabled), [data-action="down"]:not(:disabled)`);
+    button?.focus();
   }
 
   #startRemove(feed: MemberFeed) {
@@ -250,59 +278,50 @@ export class FeedManagerElement extends LitElement {
 
     return html`
       <li
-        class="dc-feed-manager__item ${feed.isHidden ? "dc-feed-manager__item--hidden" : ""}"
-        draggable="true"
-        @dragstart=${() => (this._draggingId = feed.id)}
-        @dragend=${() => (this._draggingId = null)}
-        @dragover=${(event: DragEvent) => event.preventDefault()}
-        @drop=${(event: DragEvent) => {
-          event.preventDefault();
-          if (this._draggingId !== null && group.some((f) => f.id === this._draggingId)) {
-            void this.#moveBefore(this._draggingId, feed.id, group.findIndex((f) => f.id === this._draggingId) < position);
-          }
-          this._draggingId = null;
-        }}
+        class=${classMap({
+          ...this.#drag.rowClasses(feed.id),
+          "dc-feed-manager__item": true,
+          "dc-feed-manager__item--sortable": true,
+          "dc-feed-manager__item--hidden": feed.isHidden,
+        })}
+        data-sortable-row
+        data-feed-id=${feed.id}
+        @dragover=${(event: DragEvent) => this.#drag.over(event, feed.id)}
+        @drop=${(event: DragEvent) => this.#drag.drop(event, feed.id)}
       >
-        <div class="dc-feed-manager__item-info">
-          <span class="dc-feed-manager__platform">
-            ${feed.faviconUrl ? html`<img class="dc-feed-manager__favicon" src=${feed.faviconUrl} alt="" width="16" height="16" loading="lazy" />` : ""}
-            ${feed.platform}
-          </span>
-          <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
-          <span class="dc-feed-manager__badge dc-feed-manager__badge--${feed.status.toLowerCase()}">${statusLabel}</span>
-          ${feed.matchStatus && matchStatusLabels[feed.matchStatus]
-            ? html`<span class="dc-feed-manager__match dc-feed-manager__match--${feed.matchStatus.toLowerCase()}">${matchStatusLabels[feed.matchStatus]}</span>`
-            : ""}
-        </div>
-        <div class="dc-feed-manager__item-actions">
-          <button
-            class="link-action"
-            type="button"
-            ?disabled=${position === 0}
-            aria-label="Move ${feed.platform} up"
-            @click=${() => this.#moveByStep(feed, group, -1)}
-          >
-            ↑
-          </button>
-          <button
-            class="link-action"
-            type="button"
-            ?disabled=${position === group.length - 1}
-            aria-label="Move ${feed.platform} down"
-            @click=${() => this.#moveByStep(feed, group, 1)}
-          >
-            ↓
-          </button>
-          <button class="link-action" type="button" @click=${() => this.#startEdit(feed)}>Edit</button>
-          ${this.#canHide(feed)
-            ? html`<button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
-                ${feed.isHidden ? iconEye : iconEyeOff}
-                ${feed.isHidden ? "Show on profile" : "Hide from profile"}
-              </button>`
-            : ""}
-          <button class="link-action" type="button" @click=${() => this.#startRemove(feed)}>
-            ${iconX} ${isThisFeedPlatformSourced ? "This isn't me" : "Remove"}
-          </button>
+        ${group.length > 1 ? this.#drag.handle(feed.id) : ""}
+        <div class="dc-feed-manager__item-main">
+          <div class="dc-feed-manager__item-info">
+            <span class="dc-feed-manager__platform">
+              ${feed.faviconUrl ? html`<img class="dc-feed-manager__favicon" src=${feed.faviconUrl} alt="" width="16" height="16" loading="lazy" />` : ""}
+              ${feed.platform}
+            </span>
+            <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
+            <span class="dc-feed-manager__badge dc-feed-manager__badge--${feed.status.toLowerCase()}">${statusLabel}</span>
+            ${feed.matchStatus && matchStatusLabels[feed.matchStatus]
+              ? html`<span class="dc-feed-manager__match dc-feed-manager__match--${feed.matchStatus.toLowerCase()}">${matchStatusLabels[feed.matchStatus]}</span>`
+              : ""}
+          </div>
+          <div class="dc-feed-manager__item-actions">
+            ${group.length > 1
+              ? renderMoveButtons({
+                  name: feed.platform,
+                  isFirst: position === 0,
+                  isLast: position === group.length - 1,
+                  onMove: (step) => this.#moveByStep(feed, group, step),
+                })
+              : ""}
+            <button class="link-action" type="button" @click=${() => this.#startEdit(feed)}>Edit</button>
+            ${this.#canHide(feed)
+              ? html`<button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
+                  ${feed.isHidden ? iconEye : iconEyeOff}
+                  ${feed.isHidden ? "Show on profile" : "Hide from profile"}
+                </button>`
+              : ""}
+            <button class="link-action" type="button" @click=${() => this.#startRemove(feed)}>
+              ${iconX} ${isThisFeedPlatformSourced ? "This isn't me" : "Remove"}
+            </button>
+          </div>
         </div>
       </li>
     `;
@@ -361,13 +380,15 @@ export class FeedManagerElement extends LitElement {
 
     return html`
       ${this._errorMessage ? html`<p class="dc-feed-manager__error" role="alert">${this._errorMessage}</p>` : ""}
+      <p class="dc-feed-manager__status sr-only" role="status" aria-live="polite">${this._statusMessage}</p>
       ${this._feeds.length === 0
         ? html`<p class="dc-feed-manager__empty">
             We don't have any feeds linked to your profile yet — add your blog, LinkedIn, or other social links below.
           </p>`
         : html`
             <p class="dc-feed-manager__hint">
-              Hiding a feed keeps it here for you to manage, but removes it from your public profile. Drag a link, or use the arrows, to change the order it appears in.
+              Hiding a feed keeps it here for you to manage, but removes it from your public profile. Drag a link by its handle,
+              or use the up and down buttons, to change the order it appears in.
             </p>
             ${this.#renderGroup("Synced automatically", platformFeeds)}
             ${this.#renderGroup("Added by you", memberFeeds)}

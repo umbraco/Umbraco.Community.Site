@@ -9,11 +9,55 @@ export const MAX_PIN_REASON_LENGTH = 200;
 // Keep in sync with ProfileDisplay.MaxHiddenItems, which also limits the items shown without a preview card.
 export const MAX_NO_CARD_ITEMS = 500;
 
+/** A preview card for an item: our stored copy of its page's picture, its title and description. */
+export interface ProfileDisplayCard {
+  imageUrl: string;
+  title: string;
+  description?: string | null;
+}
+
+/**
+ * An item in one of the member's activity sections. Besides its id, title and date it carries what the profile's timeline
+ * draws for it (built server side from the same timeline entry the profile page renders); those fields are optional
+ * so an older response still works.
+ */
 export interface ProfileDisplayItem {
   id: string;
   title: string;
   date: string | null;
+  /** The activity section it comes from. */
+  group?: string;
+  /** The kind icon (see svg/profile-kind-icons.ts). */
+  iconKey?: string;
+  url?: string | null;
+  /** The short line of context after the date. */
+  meta?: string | null;
+  description?: string | null;
+  /** A routine package release, which the timeline's highlights leave out. */
+  isRoutineRelease?: boolean;
+  /** Its preview card when one is ready, whatever the card choices; null for a plain line. */
+  card?: ProfileDisplayCard | null;
+  /** The month it is listed under, as yyyy-MM; null when it has no date. */
+  monthKey?: string | null;
+  /** The month heading, e.g. "Mar 2026". */
+  monthLabel?: string | null;
+  /** Its place on the whole timeline across every section, from 0 (the newest). */
+  order?: number;
 }
+
+// Mirrors ProfileTimeline.IconKey, for an item that comes without its icon.
+const sectionIcons: Record<string, string> = {
+  blog: "blog",
+  videos: "video",
+  packages: "package",
+  meetups: "meetup",
+  forum: "forum",
+  social: "social",
+};
+
+/** The icon for an item: its own, otherwise its section's. */
+export const itemIconKey = (item: ProfileDisplayItem, sectionKey: string): string =>
+  item.iconKey ?? sectionIcons[item.group ?? sectionKey] ?? "other";
 
 /** One activity section of the member's profile, with every item in it (hidden ones too). */
 export interface ProfileDisplaySection {

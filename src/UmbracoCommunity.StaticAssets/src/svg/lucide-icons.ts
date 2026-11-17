@@ -103,6 +103,10 @@ export const iconArrowRight = html`<svg class="lucide-icon" xmlns="http://www.w3
   <path d="m12 5 7 7-7 7"/>
 </svg>`;
 
+export const iconChevronUp = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="m18 15-6-6-6 6"/>
+</svg>`;
+
 export const iconChevronDown = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
   <path d="m6 9 6 6 6-6"/>
 </svg>`;
@@ -111,6 +115,11 @@ export const iconChevronDown = html`<svg class="lucide-icon" xmlns="http://www.w
 export const iconX = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
   <path d="M18 6 6 18"/>
   <path d="m6 6 12 12"/>
+</svg>`;
+
+export const iconPencil = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+  <path d="m15 5 4 4"/>
 </svg>`;
 
 export const iconEye = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -123,4 +132,26 @@ export const iconEyeOff = html`<svg class="lucide-icon" xmlns="http://www.w3.org
   <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/>
   <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/>
   <path d="m2 2 20 20"/>
+</svg>`;
+
+// Sortable lists: the drag handle at the start of each row.
+export const iconGripVertical = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <circle cx="9" cy="12" r="1"/>
+  <circle cx="9" cy="5" r="1"/>
+  <circle cx="9" cy="19" r="1"/>
+  <circle cx="15" cy="12" r="1"/>
+  <circle cx="15" cy="5" r="1"/>
+  <circle cx="15" cy="19" r="1"/>
+</svg>`;
+
+export const iconPin = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M12 17v5"/>
+  <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
+</svg>`;
+
+/** Lucide "text": a plain line, without a preview card. */
+export const iconText = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M17 6.1H3"/>
+  <path d="M21 12.1H3"/>
+  <path d="M15.1 18H3"/>
 </svg>`;

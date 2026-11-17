@@ -138,6 +138,54 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
         handler.Requests.Select(r => r.AbsolutePath).Should().BeEquivalentTo("/b2", "/share-b2.png");
     }
 
+    private const string OwnPicture = "/media/profile-activity/0123456789abcdef0123456789abcdef.png";
+
+    [Fact]
+    public async Task A_picture_the_member_attached_is_the_card_picture_ahead_of_the_page_and_nothing_is_fetched()
+    {
+        var (service, handler) = Create(Site);
+
+        var result = await service.AddCardsAsync(
+            [
+                Entry("added:1", description: "In the member's words") with { OwnImageUrl = OwnPicture },
+                Entry("added:2", imageUrl: $"{Host}/thumb.png") with { OwnImageUrl = OwnPicture },
+            ],
+            CardsOn,
+            CancellationToken.None);
+
+        result.Should().OnlyContain(e => e.Card != null && e.Card.ImageUrl == OwnPicture);
+        result[0].Card!.Description.Should().Be("In the member's words");
+        result[1].Card!.Description.Should().BeNull("the page isn't read, so it offers no description");
+        handler.Requests.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task A_picture_the_member_attached_still_respects_their_choice_of_no_cards()
+    {
+        var (service, _) = Create(Site);
+        var entry = Entry("added:1") with { OwnImageUrl = OwnPicture };
+
+        (await service.AddCardsAsync([entry], ProfileDisplayChoices.None with { HideTimelineCards = true }, CancellationToken.None))
+            .Single().Card.Should().BeNull();
+        (await service.AddCardsAsync([entry], ProfileDisplayChoices.None with { NoCardActivityIds = ["added:1"] }, CancellationToken.None))
+            .Single().Card.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Entries_with_their_own_picture_leave_the_outside_work_to_the_others()
+    {
+        var (service, handler) = Create(Site);
+        var entries = Enumerable.Range(1, ProfileTimelinePreviewService.MaxFetchesPerRender)
+            .Select(i => Entry($"added:{i}") with { OwnImageUrl = OwnPicture })
+            .Append(Entry("b1"))
+            .ToList();
+
+        var result = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+
+        result.Should().OnlyContain(e => e.Card != null);
+        Pages(handler).Should().Be(1);
+    }
+
     [Fact]
     public async Task Pages_that_are_not_https_or_point_inside_are_never_fetched()
     {

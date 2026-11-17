@@ -1,0 +1,88 @@
+/* Reorderable lists (components/sortable/sortable-list.ts): a grab handle at the start of each row, up/down buttons
+   for keyboard users, and while dragging the rows slide out of the way to open the slot the dragged row will land in.
+   Shared by the feed manager and the profile display editor's pinned items. */
+
+.dc-sortable__row {
+  position: relative;
+  /* The controller shifts rows with a transform while dragging. */
+  transition: transform 160ms ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/* The dragged row sits in the open slot as a faded placeholder. */
+.dc-sortable__row.is-dragging {
+  opacity: 0.4;
+  outline: 2px dashed var(--color-identity-blue);
+  outline-offset: -2px;
+}
+
+/* 24×32px: above the WCAG 2.5.8 minimum target size. */
+.dc-sortable__handle {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  min-height: 32px;
+  border-radius: var(--border-radius);
+  color: var(--color-dark-grey);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.dc-sortable__handle:hover {
+  color: var(--color-identity-blue);
+  background: var(--color-light);
+}
+
+.dc-sortable__handle:active {
+  cursor: grabbing;
+}
+
+.dc-sortable__handle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.dc-sortable__moves {
+  display: inline-flex;
+  gap: var(--unit-xxs);
+}
+
+.dc-sortable__move {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-light-blue);
+  border-radius: var(--border-radius);
+  background: var(--color-white);
+  color: var(--color-identity-blue);
+  cursor: pointer;
+}
+
+.dc-sortable__move:hover:not(:disabled) {
+  border-color: var(--color-identity-blue);
+  background: var(--color-light);
+}
+
+.dc-sortable__move:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Disabled: faded and flat, so the end of the list reads clearly (inactive controls are exempt from contrast rules). */
+.dc-sortable__move:disabled {
+  border-color: var(--color-light-grey);
+  color: var(--color-light-grey);
+  cursor: not-allowed;
+}
+
+.dc-sortable__move svg {
+  width: 18px;
+  height: 18px;
+}

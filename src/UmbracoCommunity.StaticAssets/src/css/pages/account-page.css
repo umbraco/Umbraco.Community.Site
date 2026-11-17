@@ -1,8 +1,8 @@
 @import "../base/media-queries.css";
 
-/* Settings-page style, not the bold public-profile look. */
+/* Settings-page style, not the bold public-profile look, at the site's normal content width. */
 .account-page-wrapper {
-  max-width: 1040px;
+  max-width: var(--max-width);
   margin-inline: auto;
   padding: var(--unit-lg) var(--unit);
 }
@@ -25,6 +25,47 @@
 
 .account-page__identity {
   min-width: 0;
+}
+
+.account-page__avatar {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-light);
+}
+
+.account-page__name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-xs);
+}
+
+/* Opens the public profile in a new tab; 32px target. */
+#main-content .account-page .account-page__profile-link {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius);
+  color: var(--color-identity-blue);
+  background: none;
+}
+
+#main-content .account-page .account-page__profile-link:hover {
+  background: var(--color-light);
+}
+
+#main-content .account-page .account-page__profile-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.account-page__profile-link svg {
+  width: 18px;
+  height: 18px;
 }
 
 .account-page__name {
@@ -66,19 +107,168 @@
   word-break: break-word;
 }
 
-/* margin-left: auto keeps the identity on the left and sign-out on the right. */
-.account-page__header-logout {
-  margin-left: auto;
-  flex-shrink: 0;
-  align-self: flex-start;
+/* Side menu and panels (<dc-account-nav>): a row of links above the panel on small screens, a menu beside it from
+   --md up. Without JavaScript every panel shows, one after the other, and the links jump to them. */
+.account-page__body {
+  /* Clear of the site's fixed header once the page has scrolled. */
+  --account-page-sticky-top: 6rem;
+
+  display: grid;
+  gap: var(--unit-md);
+  margin-top: var(--unit-md);
+
+  @media (--md) {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    align-items: start;
+  }
 }
 
-/* One-sided divider spacing — avoids doubling the gap. */
+.account-page__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-xs);
+  min-width: 0;
+  overflow-x: auto;
+  /* Room for the focus ring of the links in the scrolling row. */
+  padding: var(--unit-xxs);
+  margin: calc(var(--unit-xxs) * -1);
+  border-bottom: 1px solid var(--color-light-grey);
+  scrollbar-width: thin;
+
+  @media (--md) {
+    flex-direction: column;
+    align-items: stretch;
+    overflow-x: visible;
+    padding: 0;
+    margin: 0;
+    border-bottom: none;
+    /* Stays in view below the site header while a long panel scrolls. */
+    position: sticky;
+    top: var(--account-page-sticky-top);
+  }
+}
+
+.account-page__nav-list {
+  display: flex;
+  gap: var(--unit-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (--md) {
+    flex-direction: column;
+  }
+}
+
+/* 44px tall: comfortably above the WCAG 2.5.8 minimum target size. */
+#main-content .account-page .account-page__nav-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--unit-sm);
+  border-radius: var(--border-radius-md);
+  color: var(--color-identity-blue);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  text-decoration: none;
+  background: none;
+}
+
+#main-content .account-page .account-page__nav-link:hover {
+  background: var(--color-light);
+  text-decoration: underline;
+}
+
+#main-content .account-page .account-page__nav-link:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-outline-offset) * -1);
+}
+
+/* The open panel: filled, with a pink edge so it doesn't rely on colour alone. */
+#main-content .account-page .account-page__nav-link[aria-current="page"] {
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+  box-shadow: inset 4px 0 0 var(--color-pink);
+}
+
+.account-page__nav-logout {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-inline: var(--unit-sm);
+
+  @media (--md) {
+    margin: var(--unit-sm) 0 0;
+    padding-top: var(--unit-sm);
+    border-top: 1px solid var(--color-light-grey);
+  }
+}
+
+.account-page__nav-logout .link-action {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.account-page__panels {
+  min-width: 0;
+}
+
+/* The site's <main> hides sideways overflow, which makes it a scroll container and stops the menu sticking to the
+   window. `clip` hides the same overflow without that side effect; only on this page. */
+main:has(.account-page) {
+  overflow-x: clip;
+}
+
+/* A panel jumped to (a menu link, or the address's hash) lands below the site's fixed header, level with the menu. */
+.account-page__panel {
+  scroll-margin-top: var(--account-page-sticky-top);
+}
+
+/* With the room the panel has from --md up, a feed's actions sit beside its details instead of under them. */
+.account-page .dc-feed-manager__item-main {
+  @media (--md) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* Hidden by <dc-account-nav> when another panel is open. */
+.account-page__panel[hidden] {
+  display: none;
+}
+
+/* Without JavaScript the panels stack, with a divider between them. */
+.account-page__panel + .account-page__panel {
+  margin-top: var(--unit-md);
+  padding-top: var(--unit-md);
+  border-top: 1px solid var(--color-light-grey);
+}
+
+.account-page__panel-title {
+  margin: 0 0 var(--unit-sm);
+  font-size: 1.35rem;
+  color: var(--color-identity-blue);
+}
+
+.account-page__panel-title:focus {
+  outline: none;
+}
+
+.account-page__panel-title:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* A part of a panel; one-sided divider spacing avoids doubling the gap. */
 .account-page__section {
   padding-top: var(--unit-sm);
   padding-bottom: var(--unit-sm);
   border-bottom: 1px solid var(--color-light-grey);
-  margin-top: var(--unit-sm);
+}
+
+.account-page__section:first-of-type {
+  padding-top: 0;
 }
 
 .account-page__section:last-of-type {
@@ -86,7 +276,7 @@
   padding-bottom: 0;
 }
 
-.account-page__section h2 {
+.account-page__section-title {
   margin: 0 0 var(--unit-xs);
   font-size: 1.1rem;
   color: var(--color-identity-blue);
@@ -414,14 +604,17 @@
   outline-offset: var(--focus-outline-offset);
 }
 
-/* Profile display editor: pinned items, then one switch and item list per activity section. */
+/* Profile display editor: the pinned items (sortable, see elements/sortable.css), the section and timeline switches,
+   then the member's activity drawn as the profile's timeline (elements/profile-timeline.css) with actions per entry. */
 .dc-profile-display-editor__heading {
-  margin: var(--unit-sm) 0 var(--unit-xxs);
-  font-size: 1rem;
+  margin: var(--unit-md) 0 var(--unit-xxs);
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: var(--font-weight-bold);
   color: var(--color-identity-blue);
 }
 
-.dc-profile-display-editor__heading:first-child {
+.dc-profile-display-editor > .dc-profile-display-editor__heading:first-child {
   margin-top: 0;
 }
 
@@ -433,29 +626,47 @@
 }
 
 .dc-profile-display-editor__pins,
-.dc-profile-display-editor__sections,
-.dc-profile-display-editor__items {
+.dc-profile-display-editor__switch-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.dc-profile-display-editor__pins {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xs);
+}
+
 .dc-profile-display-editor__pin {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--unit-xs) var(--unit-sm);
+  padding: var(--unit-xs);
+  border: 1px solid var(--color-light-grey);
+  border-radius: var(--border-radius-md);
+  background: var(--color-white);
+}
+
+.dc-profile-display-editor__pin-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--unit-xxs) var(--unit-sm);
-  padding: var(--unit-xs) 0;
-  border-bottom: 1px solid var(--color-light-grey);
+  gap: var(--unit-xxs);
+  flex: 1 1 16rem;
+  min-width: 0;
 }
 
-.dc-profile-display-editor__pin-title,
-.dc-profile-display-editor__reason-label,
-.dc-profile-display-editor__reason {
-  grid-column: 1 / -1;
+.dc-profile-display-editor__pin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
 }
 
-.dc-profile-display-editor__pin-title,
-.dc-profile-display-editor__item-title {
+.dc-profile-display-editor__pin-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--unit-xs);
   font-weight: 700;
   color: var(--color-identity-blue);
   overflow-wrap: anywhere;
@@ -466,50 +677,101 @@
   color: var(--color-dark-grey);
 }
 
+.dc-profile-display-editor__reason {
+  width: 100%;
+  min-height: 40px;
+  padding: var(--unit-xxs) var(--unit-xs);
+  border: var(--base-border);
+  border-radius: var(--border-radius);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.dc-profile-display-editor__reason:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
 .dc-profile-display-editor__count {
   font-size: var(--font-size-xs);
   color: var(--color-light-blue);
 }
 
-.dc-profile-display-editor__section {
-  padding: var(--unit-xs) 0;
-  border-bottom: 1px solid var(--color-light-grey);
+/* The switches: sections and timeline options side by side from --sm up, apart from the items. */
+.dc-profile-display-editor__settings {
+  display: grid;
+  gap: var(--unit-sm) var(--unit-md);
+  margin-top: var(--unit-md);
+  padding: var(--unit-sm);
+  border-radius: var(--border-radius-md);
+  background: var(--color-light);
+
+  @media (--sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.dc-profile-display-editor__section:last-child {
-  border-bottom: none;
+.dc-profile-display-editor__switches {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.dc-profile-display-editor__section .dc-profile-display-editor__empty {
-  margin: var(--unit-xxs) 0 0;
+.dc-profile-display-editor__switches > .dc-profile-display-editor__heading {
+  margin-top: 0;
 }
 
-.dc-profile-display-editor__items {
-  margin-top: var(--unit-xs);
+.dc-profile-display-editor__switch-list {
+  display: grid;
+  gap: var(--unit-xs);
 }
 
-.dc-profile-display-editor__item {
+.dc-profile-display-editor__switch-list label {
+  min-height: 32px;
+}
+
+.dc-profile-display-editor__filter-hint {
+  align-self: center;
+  margin: 0;
+}
+
+/* An entry's state and actions, under its date line. */
+.dc-profile-display-editor__entry-controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--unit-xxs) var(--unit-sm);
-  padding: var(--unit-xxs) 0;
+  align-items: center;
+  gap: var(--unit-xs) var(--unit-sm);
+  margin-top: var(--unit-xxs);
 }
 
-.dc-profile-display-editor__item-title {
-  flex: 1 1 16rem;
-  min-width: 0;
-  font-weight: 600;
+.dc-profile-display-editor__badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xxs);
 }
 
-.dc-profile-display-editor__item--hidden .dc-profile-display-editor__item-title {
-  color: var(--color-dark-grey);
-  text-decoration: line-through;
+.dc-profile-display-editor__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem var(--unit-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-light);
+  color: var(--color-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.dc-profile-display-editor__item-meta {
-  font-size: var(--font-size-sm);
-  color: var(--color-dark-grey);
+.dc-profile-display-editor__badge--hidden {
+  background: var(--color-dark-grey);
+  color: var(--color-white);
+}
+
+.dc-profile-display-editor__badge--pinned {
+  background: var(--color-identity-blue);
+  color: var(--color-white);
 }
 
 .dc-profile-display-editor__actions {
@@ -519,18 +781,109 @@
   gap: var(--unit-xs);
 }
 
-.dc-profile-display-editor__status:not(:empty),
-.dc-profile-display-editor__error {
-  margin: var(--unit-xs) 0 0;
+/* Small outlined buttons with an icon and a label, at least 32px tall (WCAG 2.5.8). */
+.dc-profile-display-editor__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--unit-xxs);
+  min-height: 32px;
+  padding: 0 var(--unit-xs);
+  border: 1px solid var(--color-light-blue);
+  border-radius: var(--border-radius);
+  background: var(--color-white);
+  color: var(--color-identity-blue);
+  font: inherit;
   font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dc-profile-display-editor__action:hover:not(:disabled) {
+  border-color: var(--color-identity-blue);
+  background: var(--color-light);
+}
+
+.dc-profile-display-editor__action:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+.dc-profile-display-editor__action[aria-pressed="true"] {
+  border-color: var(--color-identity-blue);
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+}
+
+.dc-profile-display-editor__action:disabled {
+  border-color: var(--color-light-grey);
+  color: var(--color-dark-grey);
+  cursor: not-allowed;
+}
+
+.dc-profile-display-editor__action svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* A hidden entry is dimmed: a dashed outline, a faded grey picture and icon, grey text. The text itself isn't faded
+   with opacity, so it keeps AA contrast; the controls stay at full strength. */
+.dc-profile-display-editor__entry--hidden .community-profile__timeline-card {
+  border-style: dashed;
+  border-color: var(--color-dark-grey);
+}
+
+.dc-profile-display-editor__entry--hidden .community-profile__timeline-card-image,
+.dc-profile-display-editor__entry--hidden .community-profile__timeline-icon {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.dc-profile-display-editor__entry--hidden .community-profile__timeline-title,
+.dc-profile-display-editor__entry--hidden .community-profile__timeline-desc {
+  color: var(--color-dark-grey);
+}
+
+.dc-profile-display-editor__entry--pinned .community-profile__timeline-icon {
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+}
+
+.dc-profile-display-editor__more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-sm);
+  margin: var(--unit) 0 0;
+}
+
+.dc-profile-display-editor__more-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+/* Save messages stay in view at the bottom of the screen while the long timeline is scrolled. */
+.dc-profile-display-editor__status:not(:empty) {
+  position: sticky;
+  bottom: var(--unit-sm);
+  z-index: 1;
+  width: fit-content;
+  margin: var(--unit-sm) 0 0;
+  padding: var(--unit-xxs) var(--unit-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--base-box-shadow);
 }
 
 .dc-profile-display-editor__status {
   margin: 0;
-  color: var(--color-dark-grey);
 }
 
 .dc-profile-display-editor__error {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
   color: var(--color-red);
 }
 
@@ -565,45 +918,72 @@
   border-color: var(--color-identity-blue);
 }
 
+/* The link comes first, with a button to fill in the form from the page. */
+.dc-profile-activity-editor__link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xs);
+  align-items: center;
+}
+
+.dc-profile-activity-editor__link input {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.dc-profile-activity-editor__form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xs);
+}
+
+/* The entry being edited in the form above. */
+.dc-profile-activity-editor__entry.is-editing {
+  outline: 2px dashed var(--color-identity-blue);
+  outline-offset: var(--unit-xxs);
+  border-radius: var(--radius-card);
+}
+
 .dc-profile-activity-editor__hint {
   margin: var(--unit-xxs) 0 0;
   font-size: var(--font-size-sm);
   color: var(--color-light-blue);
 }
 
-.dc-profile-activity-editor__entries {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.dc-profile-activity-editor__entry {
+/* Each entry is drawn like the profile timeline (see profile-timeline.css); these are the extras under it. */
+.dc-profile-activity-editor__entry-tools {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--unit-xxs);
-  padding: var(--unit-xs) 0;
-  border-bottom: 1px solid var(--color-light-grey);
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xs);
+  margin-top: var(--unit-xxs);
 }
 
-.dc-profile-activity-editor__entry-title {
-  font-weight: 700;
-  overflow-wrap: anywhere;
-}
-
-.dc-profile-activity-editor__entry-meta,
 .dc-profile-activity-editor__state {
-  font-size: var(--font-size-sm);
-  color: var(--color-dark-grey);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem var(--unit-xs);
+  border-radius: var(--radius-pill);
+  background: var(--color-light);
+  color: var(--color-dark);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
 }
 
-.dc-profile-activity-editor__state--rejected,
+.dc-profile-activity-editor__state--verified {
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+}
+
+.dc-profile-activity-editor__state--rejected {
+  background: var(--color-dark-grey);
+  color: var(--color-white);
+}
+
 .dc-profile-activity-editor__reason {
+  flex-basis: 100%;
+  font-size: var(--font-size-sm);
   color: var(--color-red);
-}
-
-.dc-profile-activity-editor__reason {
-  font-size: var(--font-size-sm);
 }
 
 .dc-profile-activity-editor__status:not(:empty) {
