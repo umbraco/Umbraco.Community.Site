@@ -266,7 +266,7 @@ public class ProfileActivityLinkLookupTests : IDisposable
             .ReturnsAsync(new List<string> { inEarlyAccess ? ProfileAccessService.EarlyAccessGroupName : "Community Members" });
         var provider = new MemberProfileDataProvider(
             store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>(), Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             TestImageProxy.Create());
         var images = new ProfileActivityImageStore(_media.FileSystem, NullLogger<ProfileActivityImageStore>.Instance);
         var entries = new ProfileActivityEntryService(

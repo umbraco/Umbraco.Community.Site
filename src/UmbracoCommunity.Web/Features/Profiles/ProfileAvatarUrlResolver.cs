@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Extensions;
@@ -16,11 +17,16 @@ public class ProfileAvatarUrlResolver
 {
     private readonly IPublishedContentQuery _contentQuery;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
+    private readonly IImageUrlGenerator _imageUrlGenerator;
 
-    public ProfileAvatarUrlResolver(IPublishedContentQuery contentQuery, IPublishedUrlProvider publishedUrlProvider)
+    public ProfileAvatarUrlResolver(
+        IPublishedContentQuery contentQuery,
+        IPublishedUrlProvider publishedUrlProvider,
+        IImageUrlGenerator imageUrlGenerator)
     {
         _contentQuery = contentQuery;
         _publishedUrlProvider = publishedUrlProvider;
+        _imageUrlGenerator = imageUrlGenerator;
     }
 
     /// <summary>Large enough for the profile page's avatar on a high-density screen.</summary>
@@ -36,8 +42,13 @@ public class ProfileAvatarUrlResolver
             var media = _contentQuery.Media(avatarMediaKey.Value);
             if (media != null)
             {
-                return media.GetCropUrl(width: size, height: size, imageCropMode: ImageCropMode.Crop)
-                    ?? media.Url(_publishedUrlProvider);
+                var url = media.Url(_publishedUrlProvider);
+                return _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(url)
+                {
+                    Width = size,
+                    Height = size,
+                    ImageCropMode = ImageCropMode.Crop,
+                }) ?? url;
             }
         }
 

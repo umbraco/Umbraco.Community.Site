@@ -77,7 +77,7 @@ public class ProfileActivityEntryImageTests : IDisposable
 
         var provider = new MemberProfileDataProvider(
             _store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>(), Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             TestImageProxy.Create());
         var access = new ProfileAccessService(memberManager.Object, provider, NullLogger<ProfileAccessService>.Instance);
         return new ProfileActivityEntryApiController(
@@ -459,7 +459,7 @@ public class ProfileActivityEntryImageTests : IDisposable
         var added = Added(await CreateController().Add(Form(Upload(Png))));
         var provider = new MemberProfileDataProvider(
             _store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>(), Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             TestImageProxy.Create());
 
         var enriched = await CreateActivityService().EnrichAsync((await provider.GetProfileAsync(Handle, includeHidden: true))!);
