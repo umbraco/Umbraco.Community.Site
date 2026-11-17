@@ -35,7 +35,8 @@ public sealed record ProfileLookupDto(
     string Id,
     IReadOnlyList<int>? MvpYears,
     IReadOnlyList<ProfileIdentityDto>? Identities = null,
-    IReadOnlyList<ProfileFeedDto>? Feeds = null);
+    IReadOnlyList<ProfileFeedDto>? Feeds = null,
+    bool IsTeammate = false);
 
 /// <summary>An account on another platform that the content platform ties to the profile.</summary>
 public sealed record ProfileIdentityDto(

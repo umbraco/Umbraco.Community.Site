@@ -20,7 +20,7 @@ public class RegisterGitHubAuth : IComposer
         if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
             return;
 
-        builder.AddNotificationAsyncHandler<MemberLoginSuccessNotification, MvpEarlyAccessLoginHandler>();
+        builder.AddNotificationAsyncHandler<MemberLoginSuccessNotification, EarlyAccessLoginHandler>();
 
         builder.AddMemberExternalLogins(logins =>
         {

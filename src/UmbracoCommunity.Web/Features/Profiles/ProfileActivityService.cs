@@ -255,9 +255,7 @@ public sealed class ProfileActivityService
 
         // Each section's newest items, to show; and, to count, everything in the last 12 months (see CountWindowAsync).
         var windowStart = DateOnly.FromDateTime(DateTime.UtcNow).AddMonths(-12).AddDays(1);
-        var platformGroups = _options.CurrentValue.IncludeLinkedIn
-            ? [.. PlatformActivityGroups.FromPlatform, LinkedInGroup]
-            : PlatformActivityGroups.FromPlatform;
+        string[] platformGroups = [.. PlatformActivityGroups.FromPlatform, LinkedInGroup];
         var fetched = await Task.WhenAll(platformGroups.Select(async group =>
         {
             var newest = await _syncClient.GetActivitiesAsync(platformProfile.Id, group, limit, cancellationToken);
@@ -362,7 +360,11 @@ public sealed class ProfileActivityService
         }
     }
 
-    /// <summary>The platform's opt-in group for LinkedIn posts (not part of <see cref="PlatformActivityGroups.FromPlatform"/>).</summary>
+    /// <summary>
+    /// The platform's group for LinkedIn posts. It only returns them when asked for by name, and they are shown with
+    /// the other social posts, so the group is not a section of its own in <see cref="PlatformActivityGroups.FromPlatform"/>.
+    /// A person can have more than one LinkedIn identity, so some profiles may show fewer posts than expected.
+    /// </summary>
     private const string LinkedInGroup = "linkedin";
 
     /// <summary>The most items counted per section; a member with more is counted as having this many.</summary>

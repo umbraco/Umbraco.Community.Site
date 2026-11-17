@@ -279,6 +279,28 @@ public class ProfileLinkMatchingServiceTests : IDisposable
     }
 
     [Fact]
+    public async Task A_linkedin_account_is_suggested_by_its_name_but_not_by_its_internal_member_id()
+    {
+        await ProfileAsync();
+        _syncClient
+            .Setup(c => c.FindProfileAsync(Handle, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PlatformProfile("p1", [])
+            {
+                Identities =
+                [
+                    new PlatformIdentity("linkedin", "octo-cat", "https://www.linkedin.com/in/octo-cat"),
+                    new PlatformIdentity("linkedin", "ACoAAB123456", "https://www.linkedin.com/in/ACoAAB123456/"),
+                    new PlatformIdentity("linkedin", "Octo Cat", "https://www.linkedin.com/in/ACoAAC654321"),
+                ],
+            });
+
+        var suggestions = await _service.GetSuggestionsAsync(Handle, []);
+
+        suggestions.Should().Equal(
+            new LinkSuggestion("https://www.linkedin.com/in/octo-cat", "linkedin", "octo-cat", LinkSuggestionKinds.Account));
+    }
+
+    [Fact]
     public async Task There_are_no_suggestions_when_the_platform_fails_or_has_no_profile()
     {
         await ProfileAsync();

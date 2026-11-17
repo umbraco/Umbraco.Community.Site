@@ -38,6 +38,7 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
 
         return new PlatformProfile(profile.Id, profile.MvpYears ?? [])
         {
+            IsTeammate = profile.IsTeammate,
             Identities = (profile.Identities ?? [])
                 .Where(i => !string.IsNullOrWhiteSpace(i.ProfileUrl))
                 .Select(i => new PlatformIdentity(i.Platform, i.Username, i.ProfileUrl!.Trim()))

@@ -169,6 +169,7 @@ public sealed class ProfileLinkMatchingService
         var known = new HashSet<string>(memberLinkUrls.Concat(rejected).Select(NormalizeUrl), StringComparer.Ordinal);
 
         var candidates = profile.Identities
+            .Where(i => !IsLinkedInMemberId(i))
             .Select(i => new LinkSuggestion(i.ProfileUrl.Trim(), i.Platform, i.Username, LinkSuggestionKinds.Account))
             .Concat(profile.Feeds.Select(f => new LinkSuggestion(f.Url.Trim(), null, f.Name, LinkSuggestionKinds.Feed)));
 
@@ -203,6 +204,24 @@ public sealed class ProfileLinkMatchingService
         }
 
         return await _matchStore.RecordMemberRejectionAsync(memberProfileId, url, [MemberRejectionSignal], cancellationToken) != null;
+    }
+
+    /// <summary>
+    /// True for a LinkedIn account the platform only knows by LinkedIn's internal member id (it starts with
+    /// <c>ACoA</c>) rather than the name in the member's profile address. It is the same account as the named one and
+    /// not an address anyone would recognise, so it is never suggested.
+    /// </summary>
+    internal static bool IsLinkedInMemberId(PlatformIdentity identity)
+    {
+        const string MemberIdPrefix = "ACoA";
+        if (!string.Equals(identity.Platform, "linkedin", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var lastSegment = identity.ProfileUrl.Split('?')[0].TrimEnd('/').Split('/')[^1];
+        return lastSegment.StartsWith(MemberIdPrefix, StringComparison.OrdinalIgnoreCase)
+            || identity.Username?.StartsWith(MemberIdPrefix, StringComparison.OrdinalIgnoreCase) == true;
     }
 
     /// <summary>True when <paramref name="url"/> is https://github.com/{handle}, ignoring case and a trailing slash.</summary>
