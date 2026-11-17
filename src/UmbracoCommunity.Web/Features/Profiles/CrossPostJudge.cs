@@ -126,7 +126,7 @@ public sealed class AiCrossPostJudge : ICrossPostJudge
                     asked++;
                     await _store.SaveAsync(key, probability, cancellationToken);
                 }
-                catch (Exception ex) when (ex is not OperationCanceledException)
+                catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
                 {
                     _logger.LogWarning(ex, "Could not ask the decision model whether two posts are the same; trying again in a few minutes");
                     _appCaches.RuntimeCache.Insert(FailedCacheKey, () => true, FailureCacheDuration);

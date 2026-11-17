@@ -121,7 +121,7 @@ public sealed class ProfileActivityLinkLookupService
                 }
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not look up the kept page pictures of a member's entries");
         }
@@ -163,7 +163,7 @@ public sealed class ProfileActivityLinkLookupService
         {
             await _previewStore.SaveAsync(address, preview.ImageUrl!, preview.Description, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not keep the timeline preview for a link on {Host}", new Uri(address).Host);
         }

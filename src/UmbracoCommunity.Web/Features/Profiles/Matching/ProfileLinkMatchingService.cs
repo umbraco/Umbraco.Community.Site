@@ -103,7 +103,7 @@ public sealed class ProfileLinkMatchingService
                 }
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not check the links of profile {MemberProfileId}; they stay unchecked", memberProfileId);
         }
@@ -134,7 +134,7 @@ public sealed class ProfileLinkMatchingService
 
             return statuses;
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the link decisions of profile {MemberProfileId}", memberProfileId);
             return new Dictionary<string, string>();
@@ -160,7 +160,7 @@ public sealed class ProfileLinkMatchingService
 
             rejected = await _matchStore.GetRejectedSourcesAsync(handle, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load link suggestions for {Handle}", handle);
             return [];

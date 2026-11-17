@@ -259,7 +259,7 @@ public sealed class ProfileTimelinePreviewService
         {
             return await _previewStore.GetAsync(pageUrls, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the kept timeline previews");
             return new Dictionary<string, Data.Entities.ProfileTimelinePreviewEntity>();

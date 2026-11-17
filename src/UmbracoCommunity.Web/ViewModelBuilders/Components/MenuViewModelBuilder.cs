@@ -79,7 +79,7 @@ internal class MenuViewModelBuilder : IAsyncViewModelBuilder<MenuViewModel>
         {
             var member = await _memberManager.GetCurrentMemberAsync();
             var profile = member != null ? await _memberProfileStore.GetByMemberKeyAsync(member.Key) : null;
-            viewModel.MemberAvatarUrl = _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle);
+            viewModel.MemberAvatarUrl = _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle, ProfileAvatarUrlResolver.SmallSize);
             viewModel.MemberDisplayName = profile?.DisplayNameOverride ?? claimsDisplayName;
         }
         catch (Exception ex)

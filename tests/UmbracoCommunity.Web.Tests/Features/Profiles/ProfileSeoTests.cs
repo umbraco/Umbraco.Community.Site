@@ -66,6 +66,7 @@ public class ProfileSeoTests
         static string Resize(string u, int size) => $"{u}?width={size}&hmac=x";
 
         ProfileSeo.ShareImageUrl(With("/media/a/me.png", true), Resize).Should().Be("/media/a/me.png?width=600&hmac=x");
+        ProfileSeo.ShareImageUrl(With("/media/a/me.png?width=512&height=512&hmac=y", true), Resize).Should().Be("/media/a/me.png?width=600&hmac=x");
         ProfileSeo.ShareImageUrl(With("/media/a/me.svg", true), Resize).Should().Be("/media/a/me.svg");
         ProfileSeo.ShareImageUrl(With("https://github.com/octocat.png", false), Resize).Should().Be("https://github.com/octocat.png?size=600");
         ProfileSeo.ShareImageUrl(With("", false), Resize).Should().BeNull();
