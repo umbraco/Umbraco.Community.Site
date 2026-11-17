@@ -5,6 +5,15 @@ namespace UmbracoCommunity.Web.Models.Pages;
 public class AccountPageViewModel(IPublishedContent currentPage) : PageViewModelBase(currentPage)
 {
     public string? DisplayName { get; set; }
+
+    /// <summary>
+    /// The handle of the member a profile admin is editing (see <c>ProfileEditSubjectResolver</c>), or null on the
+    /// member's own account page. The page then shows a banner, and its API calls name this member.
+    /// </summary>
+    public string? EditAsHandle { get; set; }
+
+    /// <summary>True when a profile admin is editing someone else's profile.</summary>
+    public bool IsEditAs => EditAsHandle != null;
     public string? GitHubHandle { get; set; }
     public string? Email { get; set; }
     public string? AvatarUrl { get; set; }

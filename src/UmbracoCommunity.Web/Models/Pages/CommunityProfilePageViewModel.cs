@@ -17,6 +17,12 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
 
     public CommunityProfile? Profile { get; init; }
 
+    /// <summary>
+    /// For a signed-in member of the DevRel group viewing someone else's profile: the account page link that
+    /// edits this member's profile (<c>?edit-as={handle}</c>). Null for everyone else.
+    /// </summary>
+    public string? EditAsUrl { get; init; }
+
     /// <summary>True when the current logged-in member's own handle matches this profile.</summary>
     public bool IsOwnProfile { get; init; }
 

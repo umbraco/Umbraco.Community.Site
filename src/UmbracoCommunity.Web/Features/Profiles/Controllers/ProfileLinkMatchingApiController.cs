@@ -11,12 +11,14 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
 /// The links found for the signed-in member, and their way to say a source is not theirs (see
-/// <see cref="ProfileLinkMatchingService"/>). Always scoped to the current member, never trusting an id from the caller,
+/// <see cref="ProfileLinkMatchingService"/>). Always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the member a
+/// profile admin edits), never trusting an id from the caller,
 /// and only for members whose links are checked (see <see cref="ProfileAccessService.CanMatchLinksAsync"/>). Every POST
 /// must carry the antiforgery request token from <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
+[ProfileEditAudit]
 [Route("api/profile/links")]
 public class ProfileLinkMatchingApiController : ControllerBase
 {
@@ -25,18 +27,18 @@ public class ProfileLinkMatchingApiController : ControllerBase
     private const string InvalidUrlError = "Please provide a valid https URL.";
     private const string CannotRejectError = "That link can't be marked as not yours.";
 
-    private readonly IMemberManager _memberManager;
+    private readonly ProfileEditSubjectResolver _subjects;
     private readonly MemberProfileStore _profileStore;
     private readonly ProfileAccessService _profileAccessService;
     private readonly ProfileLinkMatchingService _linkMatching;
 
     public ProfileLinkMatchingApiController(
-        IMemberManager memberManager,
+        ProfileEditSubjectResolver subjects,
         MemberProfileStore profileStore,
         ProfileAccessService profileAccessService,
         ProfileLinkMatchingService linkMatching)
     {
-        _memberManager = memberManager;
+        _subjects = subjects;
         _profileStore = profileStore;
         _profileAccessService = profileAccessService;
         _linkMatching = linkMatching;
@@ -81,18 +83,18 @@ public class ProfileLinkMatchingApiController : ControllerBase
 
     private async Task<(MemberProfileEntity? Profile, IActionResult? Failure)> ResolveProfileAsync(CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return (null, Unauthorized());
+            return (null, resolved.FailureResult()!);
         }
 
-        if (!await _profileAccessService.CanMatchLinksAsync())
+        if (!await _profileAccessService.CanMatchLinksAsync(subject))
         {
             return (null, StatusCode(StatusCodes.Status403Forbidden, new { error = NotOfferedError }));
         }
 
-        var profile = await _profileStore.GetByMemberKeyAsync(member.Key, cancellationToken);
+        var profile = await _profileStore.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
         return profile?.OnboardingStatus == OnboardingStatus.Completed
             ? (profile, null)
             : (null, BadRequest(new { error = NoProfileError }));

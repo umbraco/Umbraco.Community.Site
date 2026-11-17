@@ -49,7 +49,7 @@ public class ProfileApiControllerTests : IDisposable
             .Setup(m => m.GetCurrentMemberAsync())
             .ReturnsAsync(signedIn ? new MemberIdentityUser { Key = _memberKey, UserName = Handle } : null);
 
-        return new ProfileApiController(memberManager.Object, _store, null!, null!, null!, null!);
+        return new ProfileApiController(TestProfileEditSubjects.Resolver(memberManager.Object, store: _store), _store, null!, null!, null!, null!);
     }
 
     private static ProfileDetailsResponse Details(IActionResult result) =>

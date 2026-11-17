@@ -94,7 +94,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
         }
 
         var accessService = new ProfileAccessService(memberManager.Object, _provider, NullLogger<ProfileAccessService>.Instance);
-        return new ProfileDisplayApiController(memberManager.Object, _store, accessService, _provider, CreateActivityService(), CreatePreviewService());
+        return new ProfileDisplayApiController(TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _store), _store, accessService, _provider, CreateActivityService(), CreatePreviewService());
     }
 
     private ProfileTimelinePreviewService CreatePreviewService()

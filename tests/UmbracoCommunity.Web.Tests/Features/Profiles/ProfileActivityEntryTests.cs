@@ -80,7 +80,7 @@ public class ProfileActivityEntryTests : IDisposable
 
         var access = new ProfileAccessService(memberManager.Object, _provider, NullLogger<ProfileAccessService>.Instance);
         return new ProfileActivityEntryApiController(
-            memberManager.Object, _store, access, _activityEntryService, _images, ProfileActivityLinkLookupTests.Create(_database, _media));
+            TestProfileEditSubjects.Resolver(memberManager.Object, access, _store), _store, access, _activityEntryService, _images, ProfileActivityLinkLookupTests.Create(_database, _media));
     }
 
     private ProfileActivityService CreateActivityService() =>

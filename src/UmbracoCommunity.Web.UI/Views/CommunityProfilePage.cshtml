@@ -254,6 +254,13 @@ else
                             <a class="btn is-transparent" href="@Model.AccountPageUrl">Edit profile</a>
                         </p>
                     }
+                    else if (!string.IsNullOrEmpty(Model.EditAsUrl))
+                    {
+                        @* Only for a member of the DevRel group, on someone else's profile. *@
+                        <p class="community-profile__edit">
+                            <a class="btn is-transparent" href="@Model.EditAsUrl">Edit profile</a>
+                        </p>
+                    }
                 </div>
             </div>
         </header>

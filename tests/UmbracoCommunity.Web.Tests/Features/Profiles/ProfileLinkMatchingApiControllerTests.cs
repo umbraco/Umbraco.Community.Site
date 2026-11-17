@@ -76,7 +76,7 @@ public class ProfileLinkMatchingApiControllerTests : IDisposable
             _matchStore,
             Mock.Of<IOptionsMonitor<ProfileMatchingOptions>>(o => o.CurrentValue == new ProfileMatchingOptions()),
             NullLogger<ProfileLinkMatchingService>.Instance);
-        return new ProfileLinkMatchingApiController(memberManager.Object, _profileStore, accessService, matching);
+        return new ProfileLinkMatchingApiController(TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _profileStore), _profileStore, accessService, matching);
     }
 
     [Fact]

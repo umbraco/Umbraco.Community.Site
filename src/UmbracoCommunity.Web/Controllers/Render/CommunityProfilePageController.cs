@@ -74,6 +74,16 @@ public class CommunityProfilePageController : RenderController
             DevRelProfileView.PreventCaching(Response);
         }
 
+        // A profile admin gets a button to edit someone else's profile on the account page. Only that page is kept out
+        // of caches; everyone else's page is unchanged.
+        string? editAsUrl = null;
+        if (viewable.Profile != null && !isOwnProfile && await _profileAccessService.IsCurrentMemberProfileAdminAsync()
+            && currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider) is { Length: > 0 } accountUrl && accountUrl != "#")
+        {
+            editAsUrl = $"{accountUrl}?{ProfileEditSubjectResolver.QueryKey}={Uri.EscapeDataString(handle)}";
+            DevRelProfileView.PreventCaching(Response);
+        }
+
         // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
         // The member's choices of what the sections show (sections off, hidden and pinned items) apply on top.
         var profile = viewable.Profile != null && access.Show
@@ -109,6 +119,7 @@ public class CommunityProfilePageController : RenderController
             Handle = handle,
             Profile = profile,
             IsOwnProfile = isOwnProfile,
+            EditAsUrl = editAsUrl,
             IsHiddenPreview = viewable.IsHiddenPreview,
             AccountPageUrl = isOwnProfile
                 ? currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider)

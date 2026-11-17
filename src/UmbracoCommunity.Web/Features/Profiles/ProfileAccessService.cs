@@ -33,7 +33,8 @@ public sealed class ProfileAccessService
     /// <summary>
     /// The member group (created on start-up by <see cref="Members.Groups.CreateDevRelMemberGroupMigration"/>) whose
     /// members can open any member's profile, including a hidden one, with the enriched sections shown and, on
-    /// request, the links, items and sections the owner hid.
+    /// request, the links, items and sections the owner hid. They may also edit another member's profile from the
+    /// account page (see <see cref="ProfileEditSubjectResolver"/>).
     /// </summary>
     public const string DevRelGroupName = "DevRel";
 
@@ -251,6 +252,26 @@ public sealed class ProfileAccessService
 
         return _isInDevRel.Value;
     }
+
+    /// <summary>
+    /// True when the signed-in member may edit another member's profile, which is when they are in the
+    /// <see cref="DevRelGroupName"/> member group.
+    /// </summary>
+    public Task<bool> IsCurrentMemberProfileAdminAsync() => IsCurrentMemberInDevRelAsync();
+
+    /// <summary>
+    /// <see cref="CanChooseProfileDisplayAsync()"/> for the profile being edited: on a profile admin's edit-as request
+    /// always true (the admin gets every panel, whatever groups the member is in, if any); otherwise the signed-in
+    /// member's own answer.
+    /// </summary>
+    public Task<bool> CanChooseProfileDisplayAsync(ProfileEditSubject subject) =>
+        subject.IsEditAs ? Task.FromResult(true) : CanChooseProfileDisplayAsync();
+
+    /// <summary><see cref="CanAddActivityAsync()"/> for the profile being edited (always true on an edit-as request).</summary>
+    public Task<bool> CanAddActivityAsync(ProfileEditSubject subject) => CanChooseProfileDisplayAsync(subject);
+
+    /// <summary><see cref="CanMatchLinksAsync()"/> for the profile being edited (always true on an edit-as request).</summary>
+    public Task<bool> CanMatchLinksAsync(ProfileEditSubject subject) => CanChooseProfileDisplayAsync(subject);
 
     // Deliberately not IMemberManager.IsMemberAuthorizedAsync: in Umbraco 18 that method
     // int.Parse()s the identity Id, which is a GUID for lightweight external members, so it

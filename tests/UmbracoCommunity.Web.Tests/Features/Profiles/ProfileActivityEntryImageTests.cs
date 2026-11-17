@@ -81,7 +81,7 @@ public class ProfileActivityEntryImageTests : IDisposable
             TestImageProxy.Create());
         var access = new ProfileAccessService(memberManager.Object, provider, NullLogger<ProfileAccessService>.Instance);
         return new ProfileActivityEntryApiController(
-            memberManager.Object, _store, access, _activityEntryService, _images, ProfileActivityLinkLookupTests.Create(_database, _media));
+            TestProfileEditSubjects.Resolver(memberManager.Object, access, _store), _store, access, _activityEntryService, _images, ProfileActivityLinkLookupTests.Create(_database, _media));
     }
 
     private ProfileActivityService CreateActivityService() =>

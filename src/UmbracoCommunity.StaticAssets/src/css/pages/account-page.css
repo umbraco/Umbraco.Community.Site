@@ -7,6 +7,29 @@
   padding: var(--unit-lg) var(--unit);
 }
 
+/* Shown above the page while a profile admin edits someone else's profile. */
+.account-page__edit-as {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--unit-xs) var(--unit);
+  margin-bottom: var(--unit);
+  padding: var(--unit-sm) var(--unit);
+  border-radius: var(--border-radius-md);
+  background: var(--color-identity-yellow);
+  color: var(--color-identity-dark);
+}
+
+#main-content .account-page__edit-as-text {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+#main-content .account-page__edit-as-link {
+  color: var(--color-identity-dark);
+}
+
 .account-page {
   background: var(--color-white);
   border-radius: var(--border-radius-xl);
