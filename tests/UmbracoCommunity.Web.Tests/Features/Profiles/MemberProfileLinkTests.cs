@@ -24,7 +24,7 @@ public class MemberProfileLinkTests : IDisposable
         _store = new MemberProfileStore(_database);
         _provider = new MemberProfileDataProvider(
             _store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>(), Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             TestImageProxy.Create());
     }
 

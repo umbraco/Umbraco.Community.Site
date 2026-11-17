@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,7 @@ public class AccountPageController : RenderController
     private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
     private readonly ProfileAccessService _profileAccessService;
     private readonly MvpBadgeService _mvpBadgeService;
+    private readonly ProfileEditSubjectResolver _subjects;
 
     public AccountPageController(
         ILogger<AccountPageController> logger,
@@ -40,7 +42,8 @@ public class AccountPageController : RenderController
         IProfileSyncClient profileSyncClient,
         GitHubProfileDefaultsService gitHubDefaultsService,
         ProfileAccessService profileAccessService,
-        MvpBadgeService mvpBadgeService)
+        MvpBadgeService mvpBadgeService,
+        ProfileEditSubjectResolver subjects)
         : base(logger, compositeViewEngine, umbracoContextAccessor)
     {
         _memberManager = memberManager;
@@ -51,6 +54,7 @@ public class AccountPageController : RenderController
         _gitHubDefaultsService = gitHubDefaultsService;
         _profileAccessService = profileAccessService;
         _mvpBadgeService = mvpBadgeService;
+        _subjects = subjects;
     }
 
     [NonAction]
@@ -62,13 +66,29 @@ public class AccountPageController : RenderController
             return Redirect("/");
 
         var currentPage = CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null.");
-        var member = await _memberManager.GetCurrentMemberAsync();
 
-        var handle = member?.UserName;
+        // Whose account page this is: the signed-in member's own, or, for a profile admin, the member named in ?edit-as=.
+        // Anyone else naming a member, or a handle without a profile, gets the tenant's not-found page.
+        var requested = Request.Query.TryGetValue(ProfileEditSubjectResolver.QueryKey, out var editAs) ? editAs.ToString().Trim() : null;
+        var resolved = await _subjects.ResolveAsync(requested, cancellationToken);
+        if (resolved.Subject is not { } subject)
+        {
+            return resolved.Failure == ProfileEditSubjectFailure.NotSignedIn ? Redirect("/") : TenantNotFound(currentPage);
+        }
 
-        // Neither depends on the other's result (both only need handle/member.Key, resolved
+        // On an edit-as request there may be no Umbraco member behind the profile, and the signed-in member's own
+        // details (name, email) never stand in for it.
+        var ownMember = subject.IsEditAs ? null : subject.SignedInMember;
+        if (subject.IsEditAs)
+        {
+            Response.Headers.CacheControl = "private, no-store";
+        }
+
+        var handle = subject.Handle.Length > 0 ? subject.Handle : null;
+
+        // Neither depends on the other's result (both only need the handle/member key, resolved
         // above), so they run concurrently rather than as two serialized round-trips.
-        var profileTask = member != null ? _store.GetByMemberKeyAsync(member.Key, cancellationToken) : Task.FromResult<MemberProfileEntity?>(null);
+        var profileTask = _store.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
         var lastSyncedTask = handle != null ? _profileSyncClient.GetLastSyncedAtAsync(handle, cancellationToken) : Task.FromResult<DateTimeOffset?>(null);
         await Task.WhenAll(profileTask, lastSyncedTask);
 
@@ -84,22 +104,22 @@ public class AccountPageController : RenderController
 
         var viewModel = new AccountPageViewModel(currentPage)
         {
-            DisplayName = profile?.EffectiveDisplayName ?? member?.Name,
+            DisplayName = profile?.EffectiveDisplayName ?? ownMember?.Name ?? handle,
             GitHubHandle = handle,
-            Email = member?.Email,
+            Email = ownMember?.Email,
             AvatarUrl = handle != null ? _avatarUrlResolver.Resolve(profile?.AvatarMediaKey, handle) : null,
             OnboardingCompleted = onboardingCompleted,
             IsProfileVisible = profile?.IsProfileVisible ?? false,
             HasCustomAvatar = profile?.AvatarMediaKey.HasValue ?? false,
             CustomDisplayName = profile?.DisplayNameOverride,
-            DefaultDisplayName = profile?.DisplayName ?? member?.Name,
+            DefaultDisplayName = profile?.DisplayName ?? ownMember?.Name ?? handle,
             CustomHeadline = profile?.Headline,
             GitHubHeadline = profile?.GitHubCompany,
             CustomBio = profile?.Bio,
             GitHubBio = profile?.GitHubBio,
-            CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(),
-            CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(),
-            CanMatchLinks = onboardingCompleted && await _profileAccessService.CanMatchLinksAsync(),
+            CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(subject),
+            CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(subject),
+            CanMatchLinks = onboardingCompleted && await _profileAccessService.CanMatchLinksAsync(subject),
         };
 
         if (onboardingCompleted && handle != null)
@@ -120,6 +140,14 @@ public class AccountPageController : RenderController
 
         viewModel.LastSyncedAt = lastSyncedTask.Result;
 
+        // A profile admin editing someone else's profile sees what that member edits, without their email address or
+        // the self-only sections (the MVP badge).
+        if (subject.IsEditAs)
+        {
+            AccountPageEditAs.Apply(viewModel, subject);
+            return CurrentTemplate(viewModel);
+        }
+
         if (await _mvpBadgeService.GetDownloadableYearAsync(handle, cancellationToken) is { } mvpBadgeYear)
         {
             viewModel.MvpBadgeYear = mvpBadgeYear;
@@ -128,5 +156,18 @@ public class AccountPageController : RenderController
         }
 
         return CurrentTemplate(viewModel);
+    }
+
+    // The tenant's normal not-found page, as a 404.
+    private IActionResult TenantNotFound(IPublishedContent currentPage)
+    {
+        if (currentPage.GetSingletonPage<PageNotFound>() is not { } notFoundPage)
+        {
+            return NotFound();
+        }
+
+        var view = View("~/Views/PageNotFound.cshtml", notFoundPage);
+        view.StatusCode = StatusCodes.Status404NotFound;
+        return view;
     }
 }

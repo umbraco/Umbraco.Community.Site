@@ -21,7 +21,18 @@
 }
 
 <div class="account-page-wrapper">
-    <article class="account-page">
+    @if (Model.IsEditAs)
+    {
+        @* A profile admin editing someone else's profile: every API call from this page names that member. *@
+        <div class="account-page__edit-as" role="note">
+            <p class="account-page__edit-as-text">You are editing @Model.DisplayName's profile.</p>
+            @if (!string.IsNullOrEmpty(Model.ProfileUrl))
+            {
+                <a class="account-page__edit-as-link" href="@Model.ProfileUrl">Back to @Model.DisplayName's profile</a>
+            }
+        </div>
+    }
+    <article class="account-page" data-profile-edit-as="@Model.EditAsHandle">
         <header class="account-page__header">
             @if (!string.IsNullOrEmpty(Model.AvatarUrl))
             {

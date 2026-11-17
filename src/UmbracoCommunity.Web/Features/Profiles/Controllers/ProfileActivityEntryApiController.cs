@@ -10,20 +10,22 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// <summary>
 /// Lets the signed-in member add activity to their own profile by hand, edit it and withdraw it again (see
 /// <see cref="ProfileActivityEntry"/>). An entry shows on the profile as soon as it is added; a moderator can remove it
-/// afterwards. Always scoped to the current member, never trusting an id from the caller, and only for members who are
+/// afterwards. Always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the member a
+/// profile admin edits), never trusting an id from the caller, and only for members who are
 /// offered it (see <see cref="ProfileAccessService.CanAddActivityAsync"/>). Every POST, PUT and DELETE must carry the
 /// antiforgery request token from <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header. An entry is
 /// added and edited as <c>multipart/form-data</c> (see <see cref="AddActivityEntryForm"/>) so it can carry a picture.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
+[ProfileEditAudit]
 [Route("api/profile/activity")]
 public class ProfileActivityEntryApiController : ControllerBase
 {
     private const string NotOfferedError = "Adding activity to your profile isn't available to you yet.";
     private const string NoProfileError = "Finish setting up your profile first.";
 
-    private readonly IMemberManager _memberManager;
+    private readonly ProfileEditSubjectResolver _subjects;
     private readonly MemberProfileStore _profileStore;
     private readonly ProfileAccessService _profileAccessService;
     private readonly ProfileActivityEntryService _activityEntryService;
@@ -31,7 +33,7 @@ public class ProfileActivityEntryApiController : ControllerBase
     private readonly ProfileActivityLinkLookupService _linkLookupService;
 
     public ProfileActivityEntryApiController(
-        IMemberManager memberManager,
+        ProfileEditSubjectResolver subjects,
         MemberProfileStore profileStore,
         ProfileAccessService profileAccessService,
         ProfileActivityEntryService activityEntryService,
@@ -39,7 +41,7 @@ public class ProfileActivityEntryApiController : ControllerBase
         ProfileActivityLinkLookupService linkLookupService)
     {
         _linkLookupService = linkLookupService;
-        _memberManager = memberManager;
+        _subjects = subjects;
         _profileStore = profileStore;
         _profileAccessService = profileAccessService;
         _activityEntryService = activityEntryService;
@@ -169,18 +171,18 @@ public class ProfileActivityEntryApiController : ControllerBase
 
     private async Task<(MemberProfileEntity? Profile, IActionResult? Failure)> ResolveProfileAsync(CancellationToken cancellationToken = default)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return (null, Unauthorized());
+            return (null, resolved.FailureResult()!);
         }
 
-        if (!await _profileAccessService.CanAddActivityAsync())
+        if (!await _profileAccessService.CanAddActivityAsync(subject))
         {
             return (null, StatusCode(StatusCodes.Status403Forbidden, new { error = NotOfferedError }));
         }
 
-        var profile = await _profileStore.GetByMemberKeyAsync(member.Key, cancellationToken);
+        var profile = await _profileStore.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
         return profile?.OnboardingStatus == OnboardingStatus.Completed
             ? (profile, null)
             : (null, BadRequest(new { error = NoProfileError }));
