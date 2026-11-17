@@ -4,13 +4,6 @@ public sealed class ProfileActivityOptions
 {
     public const string SectionName = "ProfileActivity";
 
-    /// <summary>
-    /// EXPERIMENT: also show the member's LinkedIn posts, with their other social posts. The platform only returns them
-    /// when asked for (<c>group=linkedin</c>), and a person can have two LinkedIn identities, so some profiles may show
-    /// fewer posts than expected. Off unless switched on: LinkedIn activity was left out of profiles on purpose.
-    /// </summary>
-    public bool IncludeLinkedIn { get; set; }
-
     /// <summary>How long a member's activity is kept before it is fetched again.</summary>
     public int CacheMinutes { get; set; } = 30;
 

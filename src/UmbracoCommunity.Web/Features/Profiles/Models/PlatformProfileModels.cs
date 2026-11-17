@@ -8,6 +8,9 @@ public sealed record PlatformProfile(string Id, IReadOnlyList<int> MvpYears)
 
     /// <summary>Feeds that the platform ties to this profile.</summary>
     public IReadOnlyList<PlatformFeed> Feeds { get; init; } = [];
+
+    /// <summary>True when the platform marks the profile as a teammate (someone who works at Umbraco).</summary>
+    public bool IsTeammate { get; init; }
 }
 
 /// <summary>An account on another platform (e.g. a social network) that the content platform ties to a profile.</summary>

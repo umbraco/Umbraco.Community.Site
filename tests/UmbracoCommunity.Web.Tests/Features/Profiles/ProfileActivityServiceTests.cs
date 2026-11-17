@@ -93,28 +93,19 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
-    public async Task LinkedIn_posts_join_the_social_posts_only_when_switched_on()
+    public async Task LinkedIn_posts_join_the_social_posts()
     {
-        var now = DateTimeOffset.UtcNow;
-        PlatformActivity Post() => new("li1", "linkedin:post", "linkedin", null, "https://www.linkedin.com/posts/x-1", "Excited to share Content Lock", null, now);
-        FakeSyncClient NewClient()
-        {
-            var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
-            client.Activities["linkedin"] = [Post()];
-            return client;
-        }
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities["linkedin"] =
+        [
+            new("li1", "linkedin:post", "linkedin", null, "https://www.linkedin.com/posts/x-1", "Excited to share Content Lock", null, DateTimeOffset.UtcNow),
+        ];
 
-        var off = NewClient();
-        var withoutLinkedIn = await CreateService(off).EnrichAsync(Profile);
+        var result = await CreateService(client).EnrichAsync(Profile);
 
-        withoutLinkedIn.SocialPosts.Should().BeEmpty();
-        off.RequestedGroups.Should().NotContain("linkedin");
-
-        var withLinkedIn = await CreateService(NewClient(), new ProfileActivityOptions { IncludeLinkedIn = true }).EnrichAsync(Profile);
-
-        var post = withLinkedIn.SocialPosts.Should().ContainSingle().Which;
+        var post = result.SocialPosts.Should().ContainSingle().Which;
         (post.Platform, post.Text, post.Url).Should().Be(("linkedin", "Excited to share Content Lock", "https://www.linkedin.com/posts/x-1"));
-        withLinkedIn.ActivityCounts![PlatformActivityGroups.Social].Should().Be(1);
+        result.ActivityCounts![PlatformActivityGroups.Social].Should().Be(1);
     }
 
     [Fact]
@@ -498,7 +489,7 @@ public class ProfileActivityServiceTests
         await CreateService(client, new ProfileActivityOptions { ItemsPerSection = 3 }).EnrichAsync(Profile);
 
         client.RequestedLimits.Should().OnlyContain(l => l == 3);
-        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.FromPlatform);
+        client.RequestedGroups.Should().BeEquivalentTo([.. PlatformActivityGroups.FromPlatform, "linkedin"]);
     }
 
     private sealed class FakeSyncClient : IProfileSyncClient
