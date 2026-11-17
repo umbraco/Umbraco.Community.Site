@@ -100,7 +100,8 @@ public static class ProfileSeo
 
         if (identity.HasCustomAvatar && url.StartsWith('/') && !url.Split('?')[0].EndsWith(".svg", StringComparison.OrdinalIgnoreCase))
         {
-            return resizeMedia(url, ShareImageSize);
+            // The avatar URL already asks for its own size; the share image is resized from the upload itself.
+            return resizeMedia(url.Split('?')[0], ShareImageSize);
         }
 
         return Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Host.Equals("github.com", StringComparison.OrdinalIgnoreCase)

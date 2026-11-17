@@ -95,7 +95,7 @@ public sealed class ProfileActivityService
         {
             return await _activityEntryService.GetVerifiedAsync(handle, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the activity {Handle} added by hand", handle);
             return [];
@@ -108,7 +108,7 @@ public sealed class ProfileActivityService
         {
             return await _matchStore.GetRejectedSourcesAsync(handle, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the rejected sources of {Handle}; showing all platform activity", handle);
             return [];
@@ -231,7 +231,7 @@ public sealed class ProfileActivityService
             result = new CachedActivity(await FetchAsync(handle, Math.Max(1, options.ItemsPerSection), cancellationToken));
             ttl = ActivityTtl(result.Activity, options);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load activity for {Handle} from the content platform", handle);
             result = new CachedActivity(null);
@@ -355,7 +355,7 @@ public sealed class ProfileActivityService
                 PlatformActivityGroups.Social, p.ActivityId, p.Text, p.Url, null, p.PostedAt, p.Platform, null)));
             return await _crossPostJudge.JudgeAsync(pairs, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not check for cross-posted social posts");
             return new CrossPostJudgment(new HashSet<string>(), 0, 0, ModelUnavailable: true);
@@ -393,7 +393,7 @@ public sealed class ProfileActivityService
         {
             return await _syncClient.GetActivitiesSinceAsync(platformProfileId, group, windowStart, MaxCountedPerSection, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not count the {Group} activity of {Handle} from the content platform", group, handle);
             return inWindow;
@@ -495,7 +495,7 @@ public sealed class ProfileActivityService
         {
             return await _syncClient.GetForumStatsAsync(platformProfileId, ForumStatsMonths, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the forum counts of {Handle} from the content platform", handle);
             return null;

@@ -448,6 +448,25 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
+    public async Task A_platform_timeout_gets_the_profile_unchanged()
+    {
+        var result = await CreateService(new FakeSyncClient { TimesOut = true }).EnrichAsync(Profile);
+
+        result.Should().BeSameAs(Profile);
+    }
+
+    [Fact]
+    public async Task A_cancelled_request_is_not_swallowed()
+    {
+        using var cancelled = new CancellationTokenSource();
+        await cancelled.CancelAsync();
+
+        var enrich = () => CreateService(new FakeSyncClient { TimesOut = true }).EnrichAsync(Profile, cancelled.Token);
+
+        await enrich.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
     public async Task The_answer_is_cached_per_handle_ignoring_case()
     {
         var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
@@ -486,6 +505,7 @@ public class ProfileActivityServiceTests
     {
         public PlatformProfile? Profile { get; init; }
         public bool Throws { get; init; }
+        public bool TimesOut { get; init; }
         public Dictionary<string, IReadOnlyList<PlatformActivity>> Activities { get; } = new();
         public PlatformForumStats? ForumStats { get; init; }
         public int LookupCount { get; private set; }
@@ -495,6 +515,12 @@ public class ProfileActivityServiceTests
         public Task<PlatformProfile?> FindProfileAsync(string handle, CancellationToken cancellationToken = default)
         {
             LookupCount++;
+            if (TimesOut)
+            {
+                // What HttpClient throws when its own Timeout passes: a cancellation the caller did not ask for.
+                throw new TaskCanceledException("simulated timeout", new TimeoutException());
+            }
+
             return Throws ? throw new HttpRequestException("simulated") : Task.FromResult(Profile);
         }
 
