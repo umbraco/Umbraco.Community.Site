@@ -160,6 +160,7 @@ public class ProfileActivityServiceTests
         return new ProfileActivityEntryService(
             new MemberActivityEntryStore(database),
             client,
+            new ProfileActivityImageStore(new InMemoryMediaFileSystem().FileSystem, NullLogger<ProfileActivityImageStore>.Instance),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             NullLogger<ProfileActivityEntryService>.Instance);
     }
@@ -346,8 +347,9 @@ public class ProfileActivityServiceTests
         var database = CreateDatabase();
         var profile = await new MemberProfileStore(database).GetOrStartOnboardingAsync(Guid.NewGuid(), Handle, "The Octocat");
         var entries = new MemberActivityEntryStore(database);
-        var handAdded = await entries.AddAsync(profile.Id, new AddActivityEntryRequest("blog", "My own post", "https://not-mine.example/my-own-post", new DateOnly(2026, 1, 1), null));
-        await entries.DecideAsync(handAdded!.Id, verify: true, null, null, "Admin");
+        // On the profile as soon as it is added.
+        (await entries.AddAsync(profile.Id, new AddActivityEntryRequest("blog", "My own post", "https://not-mine.example/my-own-post", new DateOnly(2026, 1, 1), null)))
+            .Saved.Should().BeTrue();
 
         var client = new FakeSyncClient
         {

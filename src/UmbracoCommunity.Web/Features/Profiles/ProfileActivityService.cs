@@ -78,7 +78,7 @@ public sealed class ProfileActivityService
             enriched = WithoutRejectedSources(enriched, await GetRejectedSourcesAsync(profile.Slug, cancellationToken));
         }
 
-        return AddVerifiedActivity(enriched, await GetVerifiedActivityAsync(profile.Slug, cancellationToken));
+        return AddVerifiedActivity(enriched, await GetVerifiedActivityAsync(profile.Slug, cancellationToken), _activityEntryService.ImageUrl);
     }
 
     /// <summary>
@@ -141,13 +141,26 @@ public sealed class ProfileActivityService
 
     /// <summary>
     /// Adds verified hand-added activity to the section its kind belongs to, newest first. A link the platform already
-    /// reports for the member is not shown twice.
+    /// reports for the member is not shown twice. The pictures members attached (their address from
+    /// <paramref name="imageUrl"/>) go in <see cref="CommunityProfile.ActivityImages"/>, for the timeline cards.
     /// </summary>
-    internal static CommunityProfile AddVerifiedActivity(CommunityProfile profile, IReadOnlyList<ActivityEntryRecord> entries)
+    internal static CommunityProfile AddVerifiedActivity(
+        CommunityProfile profile,
+        IReadOnlyList<ActivityEntryRecord> entries,
+        Func<ActivityEntryRecord, string?>? imageUrl = null)
     {
         if (entries.Count == 0)
         {
             return profile;
+        }
+
+        var images = new Dictionary<string, string>(profile.ActivityImages, StringComparer.Ordinal);
+        foreach (var entry in entries)
+        {
+            if (imageUrl?.Invoke(entry) is { Length: > 0 } url)
+            {
+                images[ProfileActivityEntry.ActivityId(entry.Id)] = url;
+            }
         }
 
         DateTimeOffset At(ActivityEntryRecord entry) => new(entry.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
@@ -181,6 +194,7 @@ public sealed class ProfileActivityService
                     .Select(e => new ProfileOtherActivity(ProfileActivityEntry.KindLabel(e.Kind), e.Title, e.Url, At(e), e.Description, ProfileActivityEntry.ActivityId(e.Id))))
                 .OrderByDescending(a => a.Date)
                 .ToList(),
+            ActivityImages = images,
         };
     }
 

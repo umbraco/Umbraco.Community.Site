@@ -66,4 +66,48 @@ describe("ProfileTimelineElement", () => {
       expect(withImage(1600, 900).classList.contains("is-contained")).toBe(false);
     });
   });
+
+  describe("enlarging a card picture", () => {
+    const card = `
+      <ol><li><div class="community-profile__timeline-body">
+        <a class="community-profile__timeline-card" href="https://example.com/post">
+          <span class="community-profile__timeline-card-image">
+            <img class="community-profile__timeline-card-picture" src="/media/profile-timeline/a.png" alt="" />
+          </span>
+          <span class="community-profile__timeline-card-text"><span class="community-profile__timeline-title">A post</span></span>
+        </a>
+      </div></li></ol>`;
+
+    it("adds a labelled button beside the card, not inside the link", () => {
+      const element = mount(card);
+
+      const button = element.querySelector<HTMLButtonElement>(".community-profile__timeline-enlarge")!;
+      expect(button.getAttribute("aria-label")).toBe("Show the picture enlarged: A post");
+      expect(button.closest("a")).toBeNull();
+      expect(button.previousElementSibling?.classList.contains("community-profile__timeline-card")).toBe(true);
+    });
+
+    it("opens the picture in a dialog and removes it again on close, giving focus back", () => {
+      // jsdom has no modal dialogs.
+      HTMLDialogElement.prototype.showModal = vi.fn();
+      HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+        this.dispatchEvent(new Event("close"));
+      });
+      const element = mount(card);
+      const button = element.querySelector<HTMLButtonElement>(".community-profile__timeline-enlarge")!;
+
+      button.click();
+
+      const dialog = document.querySelector<HTMLDialogElement>("dialog.dc-picture-dialog")!;
+      expect(dialog.querySelector("img")!.src).toMatch(/\/media\/profile-timeline\/a\.png$/);
+      expect(dialog.querySelector("img")!.alt).toBe("A post");
+      expect(document.body.classList.contains("dialog-open")).toBe(true);
+
+      dialog.querySelector<HTMLButtonElement>(".dc-picture-dialog__close")!.click();
+
+      expect(document.querySelector("dialog")).toBeNull();
+      expect(document.body.classList.contains("dialog-open")).toBe(false);
+      expect(document.activeElement).toBe(button);
+    });
+  });
 });

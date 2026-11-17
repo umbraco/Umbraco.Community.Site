@@ -74,6 +74,7 @@ public class MemberProfilesDbContext : DbContext
             entity.Property(e => e.Url).IsRequired().HasMaxLength(MemberActivityEntryEntity.MaxUrlLength);
             entity.Property(e => e.Description).HasMaxLength(MemberActivityEntryEntity.MaxDescriptionLength);
             entity.Property(e => e.RejectionReason).HasMaxLength(MemberActivityEntryEntity.MaxReasonLength);
+            entity.Property(e => e.ImagePath).HasMaxLength(MemberActivityEntryEntity.MaxImagePathLength);
             entity.Property(e => e.DecidedByUserName).HasMaxLength(200);
 
             entity.HasOne(e => e.MemberProfile)

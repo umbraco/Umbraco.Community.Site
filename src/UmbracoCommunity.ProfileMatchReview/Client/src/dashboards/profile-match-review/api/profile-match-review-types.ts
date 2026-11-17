@@ -23,6 +23,10 @@ export interface ProfileMatchList {
   total: number;
 }
 
+/**
+ * Where a hand-added entry stands: "Verified" = on the member's profile (every new entry), "Rejected" = removed by a
+ * moderator, "Pending" = legacy, added while entries were still checked first and not decided yet.
+ */
 export type ActivityEntryState = "Pending" | "Verified" | "Rejected";
 
 export interface ActivityEntry {
@@ -41,6 +45,8 @@ export interface ActivityEntry {
   decidedByUserName: string | null;
   decidedUtc: string | null;
   createdUtc: string;
+  /** The picture the member attached (served from the site), shown publicly on the timeline while the entry is on the profile; or null. */
+  imageUrl: string | null;
 }
 
 export interface ActivityEntryList {

@@ -18,29 +18,28 @@ public class MemberActivityEntryStore
     }
 
     /// <summary>
-    /// Adds an entry that waits for a check. Returns <c>null</c> when the member already has
-    /// <see cref="ProfileActivityEntry.MaxPendingEntries"/> waiting, or the same link is already waiting or verified.
-    /// Expects values from <see cref="ProfileActivityEntry.TryNormalize"/>.
+    /// Adds an entry, shown on the profile at once (<see cref="ActivityEntryState.Verified"/>). Refused when the member
+    /// already has an entry with the same link (or had one a moderator removed). There is deliberately no cap on how
+    /// many entries a member adds; moderators remove what doesn't belong. Expects values from
+    /// <see cref="ProfileActivityEntry.TryNormalize"/>, and <paramref name="imagePath"/> from
+    /// <see cref="ProfileActivityImageStore.SaveAsync"/>.
     /// </summary>
-    public async Task<ActivityEntryRecord?> AddAsync(int memberProfileId, AddActivityEntryRequest entry, CancellationToken ct = default)
+    public async Task<ActivityEntryChange> AddAsync(
+        int memberProfileId,
+        AddActivityEntryRequest entry,
+        string? imagePath = null,
+        CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         var profile = await context.MemberProfiles.AsNoTracking().FirstOrDefaultAsync(p => p.Id == memberProfileId, ct);
         if (profile == null)
         {
-            return null;
+            return new ActivityEntryChange(ActivityEntryChangeOutcome.NotFound);
         }
 
-        var open = await context.MemberActivityEntries
-            .AsNoTracking()
-            .Where(e => e.MemberProfileId == memberProfileId
-                && (e.State == ActivityEntryState.Pending || e.State == ActivityEntryState.Verified))
-            .Select(e => new { e.State, e.Url })
-            .ToListAsync(ct);
-        if (open.Count(e => e.State == ActivityEntryState.Pending) >= ProfileActivityEntry.MaxPendingEntries
-            || open.Any(e => string.Equals(e.Url, entry.Url, StringComparison.OrdinalIgnoreCase)))
+        if (await LinkConflictAsync(context, memberProfileId, entry.Url!, exceptEntryId: null, ct) is { } conflict)
         {
-            return null;
+            return new ActivityEntryChange(conflict);
         }
 
         var entity = new MemberActivityEntryEntity
@@ -49,17 +48,92 @@ public class MemberActivityEntryStore
             Kind = entry.Kind!,
             Title = entry.Title!,
             Url = entry.Url!,
-            DateUtc = entry.Date!.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
+            DateUtc = ToDateUtc(entry.Date!.Value),
             Description = entry.Description,
-            State = ActivityEntryState.Pending,
+            ImagePath = imagePath,
+            State = ActivityEntryState.Verified,
             CreatedUtc = DateTime.UtcNow,
         };
         context.MemberActivityEntries.Add(entity);
         await context.SaveChangesAsync(ct);
-        return ToRecord(entity, profile);
+        return new ActivityEntryChange(ActivityEntryChangeOutcome.Saved, ToRecord(entity, profile));
     }
 
-    /// <summary>The member's entries that are waiting, verified or rejected, newest first.</summary>
+    /// <summary>
+    /// Changes one of the member's own entries to <paramref name="entry"/> (values from <see cref="ProfileActivityEntry.TryNormalize"/>)
+    /// and its picture as <paramref name="image"/> says. The entry keeps its id and its state: one on the profile stays
+    /// on it, a legacy waiting one keeps waiting. One a moderator removed can't be edited
+    /// (<see cref="ActivityEntryChangeOutcome.RemovedByModerator"/>); a link another of the member's entries has, or had
+    /// before a moderator removed it, is refused as when adding. A pin of the entry has its stored copy of the item
+    /// refreshed in the same save (see <see cref="ProfileDisplay.TryTakeSnapshots"/>). Returns the entry as it was
+    /// (<c>Before</c>, whose <see cref="ActivityEntryRecord.ImagePath"/> names the picture to delete when it was replaced
+    /// or removed) and as it is now. No file is touched here.
+    /// </summary>
+    public async Task<(ActivityEntryChange Change, ActivityEntryRecord? Before)> UpdateAsync(
+        int memberProfileId,
+        int entryId,
+        AddActivityEntryRequest entry,
+        ActivityEntryImageChange image,
+        CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberActivityEntries
+            .Include(e => e.MemberProfile)
+            .FirstOrDefaultAsync(e => e.Id == entryId && e.MemberProfileId == memberProfileId, ct);
+        if (entity == null || entity.State == ActivityEntryState.Withdrawn)
+        {
+            return (new ActivityEntryChange(ActivityEntryChangeOutcome.NotFound), null);
+        }
+
+        if (entity.State == ActivityEntryState.Rejected)
+        {
+            return (new ActivityEntryChange(ActivityEntryChangeOutcome.RemovedByModerator), null);
+        }
+
+        if (await LinkConflictAsync(context, memberProfileId, entry.Url!, exceptEntryId: entryId, ct) is { } conflict)
+        {
+            return (new ActivityEntryChange(conflict), null);
+        }
+
+        var before = ToRecord(entity, entity.MemberProfile!);
+        entity.Kind = entry.Kind!;
+        entity.Title = entry.Title!;
+        entity.Url = entry.Url!;
+        entity.DateUtc = ToDateUtc(entry.Date!.Value);
+        entity.Description = entry.Description;
+        if (image.NewPath != null)
+        {
+            entity.ImagePath = image.NewPath;
+        }
+        else if (image.Remove)
+        {
+            entity.ImagePath = null;
+        }
+
+        var after = ToRecord(entity, entity.MemberProfile!);
+        var activityId = ProfileActivityEntry.ActivityId(entryId);
+        var pins = await context.MemberPinnedItems
+            .Where(p => p.MemberProfileId == memberProfileId && p.ActivityId == activityId)
+            .ToListAsync(ct);
+        if (pins.Count > 0)
+        {
+            var item = ProfileActivityEntry.FeaturedItem(after);
+            foreach (var pin in pins)
+            {
+                pin.Group = item.Group;
+                pin.Title = item.Title;
+                pin.Url = item.Url;
+                pin.Description = item.Description;
+                pin.DateUtc = item.Date?.UtcDateTime;
+                pin.Source = item.Source;
+            }
+        }
+
+        await context.SaveChangesAsync(ct);
+        return (new ActivityEntryChange(ActivityEntryChangeOutcome.Saved, after), before);
+    }
+
+    /// <summary>The member's entries that are shown, (legacy) waiting or removed by a moderator, newest first.</summary>
     public async Task<IReadOnlyList<ActivityEntryRecord>> ListForMemberAsync(int memberProfileId, CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
@@ -108,8 +182,11 @@ public class MemberActivityEntryStore
     }
 
     /// <summary>
-    /// Withdraws one of the member's own entries, whether it is waiting or already shown; <c>WasVerified</c> says
-    /// which. Returns <c>null</c> when the member has no such entry that can be withdrawn.
+    /// Withdraws one of the member's own entries, whether it is shown, (legacy) waiting or removed by a moderator;
+    /// <c>WasVerified</c> says whether it was shown. The entry stops pointing at its picture; the returned record still
+    /// names it (<see cref="ActivityEntryRecord.ImagePath"/>), so the caller can delete the file. A removed entry keeps
+    /// the moderator's note, which is what keeps its link from being added again (see <see cref="AddAsync"/>). Returns
+    /// <c>null</c> when the member has no such entry that can be withdrawn.
     /// </summary>
     public async Task<(ActivityEntryRecord Entry, bool WasVerified)?> WithdrawAsync(int memberProfileId, int entryId, CancellationToken ct = default)
     {
@@ -117,20 +194,22 @@ public class MemberActivityEntryStore
         var entity = await context.MemberActivityEntries
             .Include(e => e.MemberProfile)
             .FirstOrDefaultAsync(e => e.Id == entryId && e.MemberProfileId == memberProfileId, ct);
-        if (entity == null || entity.State is not (ActivityEntryState.Pending or ActivityEntryState.Verified))
+        if (entity == null || entity.State == ActivityEntryState.Withdrawn)
         {
             return null;
         }
 
         var wasVerified = entity.State == ActivityEntryState.Verified;
+        var imagePath = entity.ImagePath;
         entity.State = ActivityEntryState.Withdrawn;
+        entity.ImagePath = null;
         await context.SaveChangesAsync(ct);
-        return (ToRecord(entity, entity.MemberProfile!), wasVerified);
+        return (ToRecord(entity, entity.MemberProfile!) with { ImagePath = imagePath }, wasVerified);
     }
 
     /// <summary>
-    /// Records an admin's decision on an entry: verified, or rejected with a note for the member. An admin can
-    /// change their mind either way; <c>WasVerified</c> says whether the entry was shown before. Returns <c>null</c>
+    /// Records a moderator's decision on an entry: shown (a legacy waiting entry, or restoring a removed one), or
+    /// removed with a note for the member. A moderator can change their mind either way; <c>WasVerified</c> says whether the entry was shown before. Returns <c>null</c>
     /// when there is no such entry, it was withdrawn, or it already has that decision.
     /// </summary>
     public async Task<(ActivityEntryRecord Entry, bool WasVerified)?> DecideAsync(
@@ -161,6 +240,39 @@ public class MemberActivityEntryStore
         return (ToRecord(entity, entity.MemberProfile!), wasVerified);
     }
 
+    /// <summary>
+    /// Why the member can't have another entry with <paramref name="url"/>, or null when they can: another of their
+    /// entries is shown or waiting with it (<see cref="ActivityEntryChangeOutcome.DuplicateLink"/>), or a moderator
+    /// removed one with it (<see cref="ActivityEntryChangeOutcome.RemovedLink"/>), even if the member then withdrew that
+    /// one: with entries shown at once, adding a removed link again must not put it straight back on the profile.
+    /// Links match ignoring case, as <see cref="ProfileActivityService.AddVerifiedActivity"/> does.
+    /// </summary>
+    private static async Task<ActivityEntryChangeOutcome?> LinkConflictAsync(
+        MemberProfilesDbContext context,
+        int memberProfileId,
+        string url,
+        int? exceptEntryId,
+        CancellationToken ct)
+    {
+        var others = await context.MemberActivityEntries
+            .AsNoTracking()
+            .Where(e => e.MemberProfileId == memberProfileId
+                && (exceptEntryId == null || e.Id != exceptEntryId)
+                && (e.State != ActivityEntryState.Withdrawn || e.RejectionReason != null))
+            .Select(e => new { e.State, e.Url })
+            .ToListAsync(ct);
+
+        var sameLink = others.Where(e => string.Equals(e.Url, url, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (sameLink.Any(e => e.State is ActivityEntryState.Rejected or ActivityEntryState.Withdrawn))
+        {
+            return ActivityEntryChangeOutcome.RemovedLink;
+        }
+
+        return sameLink.Count > 0 ? ActivityEntryChangeOutcome.DuplicateLink : null;
+    }
+
+    private static DateTime ToDateUtc(DateOnly date) => date.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+
     private static ActivityEntryRecord ToRecord(MemberActivityEntryEntity entity, MemberProfileEntity profile) =>
         new(
             entity.Id,
@@ -175,5 +287,6 @@ public class MemberActivityEntryStore
             entity.RejectionReason,
             entity.DecidedByUserName,
             entity.DecidedUtc,
-            entity.CreatedUtc);
+            entity.CreatedUtc,
+            entity.ImagePath);
 }

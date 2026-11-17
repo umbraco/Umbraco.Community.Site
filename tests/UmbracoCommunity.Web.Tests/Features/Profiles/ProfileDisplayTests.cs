@@ -423,4 +423,35 @@ public class ProfileDisplayTests
         result.BlogPosts.Should().HaveCount(2);
         ProfileDisplay.HidesAnything(choices).Should().BeFalse();
     }
+
+    [Fact]
+    public void Display_items_follow_the_timeline_and_carry_what_it_draws_for_them()
+    {
+        var card = new ProfileTimelineCard("/media/timeline/b1.png", "First post", "About things");
+        var timeline = ProfileTimeline.Entries(Profile)
+            .Select(e => e.ActivityId == "b1" ? e with { Card = card } : e)
+            .ToList();
+
+        var items = ProfileDisplay.DisplayItems(ProfileDisplay.ActivityItems(Profile), timeline);
+
+        // The timeline's order across sections; the package without a date isn't on the timeline, so it comes last.
+        items.Select(i => i.Id).Should().Equal(timeline.Select(e => e.ActivityId!).Append("p1"));
+        items.Select(i => i.Order).Should().Equal(Enumerable.Range(0, items.Count));
+
+        items.Single(i => i.Id == "b1").Should().BeEquivalentTo(new
+        {
+            Group = PlatformActivityGroups.Blog,
+            IconKey = "blog",
+            Url = "https://example.dev/1",
+            Meta = "example.dev",
+            Card = card,
+            MonthKey = "2026-11",
+            MonthLabel = "Nov 2026",
+        });
+
+        var package = items.Single(i => i.Id == "p1");
+        package.IconKey.Should().Be("package");
+        package.MonthKey.Should().BeNull();
+        package.Card.Should().BeNull();
+    }
 }

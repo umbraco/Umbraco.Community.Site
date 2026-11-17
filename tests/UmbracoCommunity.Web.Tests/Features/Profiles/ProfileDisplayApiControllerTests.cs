@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +19,7 @@ using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Controllers;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
+using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 using UmbracoCommunity.Web.Features.Profiles.Models;
 using Xunit;
 
@@ -30,12 +33,19 @@ public class ProfileDisplayApiControllerTests : IDisposable
 {
     private const string Handle = "octocat";
 
+    // Address literals need no DNS lookup, so reading the display (which looks for preview cards) never touches the network.
+    private const string Host = "https://93.184.216.34";
+
     private static readonly DateTimeOffset Now = new(2026, 11, 1, 12, 0, 0, TimeSpan.Zero);
 
     private readonly MemberProfilesTestDatabase _database = new();
     private readonly MemberProfileStore _store;
     private readonly MemberProfileDataProvider _provider;
     private readonly Guid _memberKey = Guid.NewGuid();
+    private readonly InMemoryMediaFileSystem _media = new();
+
+    // What the members' pages answer when their preview card is looked for: nothing, unless a test says otherwise.
+    private Func<HttpRequestMessage, HttpResponseMessage> _respond = _ => new HttpResponseMessage(HttpStatusCode.NotFound);
 
     // The member's latest activity as the external content platform returns it, per section.
     private readonly Dictionary<string, IReadOnlyList<PlatformActivity>> _activity = new()
@@ -84,10 +94,22 @@ public class ProfileDisplayApiControllerTests : IDisposable
         }
 
         var accessService = new ProfileAccessService(memberManager.Object, _provider, NullLogger<ProfileAccessService>.Instance);
-        return new ProfileDisplayApiController(memberManager.Object, _store, accessService, _provider, CreateActivityService());
+        return new ProfileDisplayApiController(memberManager.Object, _store, accessService, _provider, CreateActivityService(), CreatePreviewService());
     }
 
-    private static PlatformActivity At(string id, string title) => new(id, "x:y", "web", title, $"https://example.dev/{id}", null, null, Now);
+    private ProfileTimelinePreviewService CreatePreviewService()
+    {
+        var client = new LinkPreviewHttpClient(new HttpClient(new ProfileTimelineImageStoreTests.StubHandler(request => _respond(request))));
+        var caches = new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance));
+        return new ProfileTimelinePreviewService(
+            new LinkPreviewService(client, NullLogger<LinkPreviewService>.Instance),
+            new ProfileTimelinePreviewStore(_database),
+            new ProfileTimelineImageStore(_media.FileSystem, client, caches, NullLogger<ProfileTimelineImageStore>.Instance),
+            caches,
+            NullLogger<ProfileTimelinePreviewService>.Instance);
+    }
+
+    private static PlatformActivity At(string id, string title) => new(id, "x:y", "web", title, $"{Host}/{id}", null, null, Now);
 
     private ProfileActivityService CreateActivityService()
     {
@@ -106,6 +128,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
             new ProfileActivityEntryService(
                 new MemberActivityEntryStore(_database),
                 syncClient.Object,
+                new ProfileActivityImageStore(new InMemoryMediaFileSystem().FileSystem, NullLogger<ProfileActivityImageStore>.Instance),
                 new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
                 NullLogger<ProfileActivityEntryService>.Instance),
             new ProfileMatchStore(_database),
@@ -248,7 +271,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
             Reason = "Proud",
             Group = PlatformActivityGroups.Blog,
             Title = "Second post",
-            Url = "https://example.dev/b2",
+            Url = $"{Host}/b2",
             DateUtc = Now.UtcDateTime,
             Source = "web",
         });
@@ -265,8 +288,8 @@ public class ProfileDisplayApiControllerTests : IDisposable
         var profile = await PublicProfileAsync();
         profile.BlogPosts.Select(p => p.Title).Should().Equal("Newer post", "Second post");
         profile.FeaturedItems.Select(i => (i.ActivityId, i.Title, i.Url, i.Reason)).Should().Equal(
-            ("b1", "First post", "https://example.dev/b1", "Proud"),
-            ("v1", "A video", "https://example.dev/v1", null));
+            ("b1", "First post", $"{Host}/b1", "Proud"),
+            ("v1", "A video", $"{Host}/v1", null));
     }
 
     [Fact]
@@ -495,5 +518,111 @@ public class ProfileDisplayApiControllerTests : IDisposable
         var choices = ProfileDisplay.StoredChoices(entity);
         choices.HideActivityGraph.Should().BeFalse();
         choices.HideTimelineCards.Should().BeFalse();
+    }
+
+    private async Task<ProfileDisplayResponse> ReadAsync() =>
+        (await CreateController().Get(default)).Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeOfType<ProfileDisplayResponse>().Subject;
+
+    // Pages offer a share picture at /share-{page}.png.
+    private static HttpResponseMessage SiteWithPictures(HttpRequestMessage request)
+    {
+        var path = request.RequestUri!.AbsolutePath;
+        return path.EndsWith(".png", StringComparison.Ordinal)
+            ? ProfileTimelineImageStoreTests.Image(ProfileTimelineImageStoreTests.Png)
+            : new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    $"""<html><head><meta property="og:image" content="/share-{path.Trim('/')}.png"><meta property="og:description" content="What the page says"></head></html>""",
+                    Encoding.UTF8,
+                    "text/html"),
+            };
+    }
+
+    [Fact]
+    public async Task Reading_gives_each_item_what_the_timeline_draws_for_it_in_timeline_order()
+    {
+        await CreateProfileAsync();
+
+        var response = await ReadAsync();
+
+        var blog = response.Sections.Single(s => s.Key == PlatformActivityGroups.Blog).Items;
+        blog.Select(i => i.Id).Should().Equal("b1", "b2");
+        blog[0].Should().BeEquivalentTo(new
+        {
+            Title = "First post",
+            Group = PlatformActivityGroups.Blog,
+            IconKey = "blog",
+            Url = $"{Host}/b1",
+            Meta = "web",
+            IsRoutineRelease = false,
+            MonthKey = "2026-11",
+            MonthLabel = "Nov 2026",
+        });
+
+        var video = response.Sections.Single(s => s.Key == PlatformActivityGroups.Videos).Items.Single();
+        video.IconKey.Should().Be("video");
+
+        // One timeline across the sections: same date, so in the timeline's section order.
+        var all = response.Sections.SelectMany(s => s.Items).OrderBy(i => i.Order).Select(i => i.Id).ToList();
+        all.Should().HaveCount(4);
+        all.Take(3).Should().Equal("b1", "b2", "v1");
+        response.Sections.SelectMany(s => s.Items).Select(i => i.Order).Should().OnlyHaveUniqueItems();
+    }
+
+    [Fact]
+    public async Task Reading_gives_hidden_items_their_timeline_details_too()
+    {
+        await CreateProfileAsync();
+        await CreateController().Update(Choices(hiddenSections: [PlatformActivityGroups.Videos], hiddenItemIds: ["b1"]), default);
+
+        var response = await ReadAsync();
+
+        response.Sections.Single(s => s.Key == PlatformActivityGroups.Blog).Items.First(i => i.Id == "b1").IconKey.Should().Be("blog");
+        response.Sections.Single(s => s.Key == PlatformActivityGroups.Videos).Items.Single().MonthLabel.Should().Be("Nov 2026");
+    }
+
+    [Fact]
+    public async Task Reading_gives_items_their_preview_card_even_when_the_member_switched_cards_off()
+    {
+        await CreateProfileAsync();
+        await CreateController().Update(new UpdateProfileDisplayRequest([], [], [], HideTimelineCards: true, NoCardItemIds: ["b2"]), default);
+        _respond = SiteWithPictures;
+
+        var response = await ReadAsync();
+
+        var blog = response.Sections.Single(s => s.Key == PlatformActivityGroups.Blog).Items;
+        blog.Should().AllSatisfy(i => i.Card.Should().NotBeNull());
+        blog[0].Card!.Title.Should().Be("First post");
+        blog[0].Card!.Description.Should().Be("What the page says");
+        blog[0].Card!.ImageUrl.Should().NotStartWith(Host, "only our stored copy of a picture is ever shown");
+        response.Choices.HideTimelineCards.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Reading_does_outside_work_for_no_more_entries_than_a_profile_render_may()
+    {
+        await CreateProfileAsync();
+        // More entries than one render may fetch for, yet fewer than a section holds (ProfileActivityOptions.ItemsPerSection).
+        const int count = ProfileTimelinePreviewService.MaxFetchesPerRender + 3;
+        _activity[PlatformActivityGroups.Blog] = Enumerable.Range(1, count)
+            .Select(i => At($"b{i}", $"Post {i}"))
+            .ToList();
+        var pages = 0;
+        _respond = request =>
+        {
+            if (!request.RequestUri!.AbsolutePath.EndsWith(".png", StringComparison.Ordinal))
+            {
+                Interlocked.Increment(ref pages);
+            }
+
+            return SiteWithPictures(request);
+        };
+
+        var response = await ReadAsync();
+
+        pages.Should().BeLessThanOrEqualTo(ProfileTimelinePreviewService.MaxFetchesPerRender);
+        response.Sections.Single(s => s.Key == PlatformActivityGroups.Blog).Items
+            .Should().HaveCount(count);
     }
 }
