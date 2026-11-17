@@ -22,6 +22,7 @@ internal sealed class InMemoryMediaFileSystem
                 stream.CopyTo(copy);
                 Files[path] = copy.ToArray();
             });
+        fileSystem.Setup(f => f.DeleteFile(It.IsAny<string>())).Callback((string path) => Files.Remove(path));
         FileSystem = fileSystem.Object;
     }
 

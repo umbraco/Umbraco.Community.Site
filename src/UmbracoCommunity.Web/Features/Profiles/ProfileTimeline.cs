@@ -113,9 +113,15 @@ public static class ProfileTimeline
             .Select((entry, index) => (entry, index))
             .OrderByDescending(e => e.entry.Date)
             .ThenBy(e => e.index)
-            .Select(e => e.entry)
+            .Select(e => WithOwnImage(e.entry, profile.ActivityImages))
             .ToList();
     }
+
+    /// <summary>The entry with the picture the member attached to it (see <see cref="CommunityProfile.ActivityImages"/>), if any.</summary>
+    private static ProfileTimelineEntry WithOwnImage(ProfileTimelineEntry entry, IReadOnlyDictionary<string, string> images) =>
+        entry.ActivityId != null && images.TryGetValue(entry.ActivityId, out var image)
+            ? entry with { OwnImageUrl = image }
+            : entry;
 
     /// <summary>How far apart two posts can be and still be the same post shared twice.</summary>
     internal static readonly TimeSpan CrossPostWindow = TimeSpan.FromHours(6);
@@ -261,6 +267,12 @@ public sealed record ProfileTimelineEntry(
 {
     /// <summary>The preview card to show, or null for a plain line. Set by <see cref="ProfileTimelinePreviewService"/>.</summary>
     public ProfileTimelineCard? Card { get; init; }
+
+    /// <summary>
+    /// A picture the member attached to the entry themselves (activity added by hand), already served from this site.
+    /// When the member wants a card, it is the card's picture, ahead of <see cref="ImageUrl"/> and the page's own.
+    /// </summary>
+    public string? OwnImageUrl { get; init; }
 
     /// <summary>True for the release that is a package's very first (a brand-new package), which is a highlight; other releases are routine.</summary>
     public bool IsNewPackage { get; init; }

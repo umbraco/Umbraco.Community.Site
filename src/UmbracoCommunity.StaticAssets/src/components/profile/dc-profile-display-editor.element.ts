@@ -1,6 +1,8 @@
 import { LitElement, html, nothing, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { classMap } from "lit/directives/class-map.js";
 import {
+  itemIconKey,
   MAX_NO_CARD_ITEMS,
   MAX_PIN_REASON_LENGTH,
   MAX_PINNED_ITEMS,
@@ -10,8 +12,15 @@ import {
   type ProfileDisplaySection,
   type ProfilePin,
 } from "../../services/profile-display.service.js";
+import { iconEye, iconEyeOff, iconPin, iconText, iconX } from "../../svg/lucide-icons.js";
+import { profileKindIcon } from "../../svg/profile-kind-icons.js";
+import { moveItem, renderMoveButtons, SortableDragController } from "../sortable/sortable-list.js";
+import { formatTimelineMonth, renderProfileTimelineEntry } from "./profile-timeline-entry.js";
 
 const elementName = "dc-profile-display-editor";
+
+/** How many timeline entries show at first, and how many more each "Show more" adds. Matches ProfileTimeline.PageSize. */
+export const TIMELINE_PAGE_SIZE = 30;
 
 const emptyChoices = (): ProfileDisplayChoices => ({
   hiddenSections: [],
@@ -30,14 +39,29 @@ const withDefaults = (choices: ProfileDisplayChoices): ProfileDisplayChoices => 
   noCardItemIds: choices.noCardItemIds ?? [],
 });
 
+/** An item with the section it is in. */
+interface TimelineItem {
+  item: ProfileDisplayItem;
+  section: ProfileDisplaySection;
+}
+
+/** A month heading with its items, as the profile's timeline groups them. */
+interface TimelineMonth {
+  key: string;
+  label: string;
+  items: TimelineItem[];
+}
+
 let instanceCount = 0;
 
 /**
- * Lets the member choose what the activity sections of their profile show: switch whole sections
- * off, hide single items, and pin up to three items to the Featured block with a short note on why,
- * in an order they choose. Also switches the activity graph off or on again, and the timeline's preview
- * cards, for the whole timeline or one item at a time. Every change shows straight away and is saved
- * in the background, in the order it was made; if saving fails, the editor goes back to what was last saved.
+ * Lets the member choose what the activity sections of their profile show: switch whole sections off, hide single
+ * items, and pin up to three items to the Featured block with a short note on why, in an order they choose (drag the
+ * handle, or use the up and down buttons). Also switches the activity graph off or on again, and the timeline's preview
+ * cards, for the whole timeline or one item at a time. The items are listed as the profile's timeline shows them
+ * (newest first, by month, with the same icons, cards and meta lines), filtered by type and a page at a time.
+ * Every change shows straight away and is saved in the background, in the order it was made; if saving fails, the
+ * editor goes back to what was last saved.
  */
 @customElement(elementName)
 export class ProfileDisplayEditorElement extends LitElement {
@@ -63,12 +87,22 @@ export class ProfileDisplayEditorElement extends LitElement {
   @state()
   private _reasonDrafts: Record<string, string> = {};
 
+  /** The timeline's type filter: a section key, or "" for the highlights. */
+  @state()
+  private _type = "";
+
+  /** How many timeline entries are shown. */
+  @state()
+  private _shown = TIMELINE_PAGE_SIZE;
+
   /** The choices as the server last stored them. */
   #stored: ProfileDisplayChoices = emptyChoices();
   #saveQueue: Promise<void> = Promise.resolve();
   #pendingSaves = 0;
 
   readonly #idPrefix = `${elementName}-${++instanceCount}`;
+
+  readonly #drag = new SortableDragController<string>(this, (id, targetId, after) => void this.#moveTo(id, targetId, after));
 
   // Render in light DOM so the site's existing styles apply without duplication.
   protected createRenderRoot() {
@@ -94,10 +128,10 @@ export class ProfileDisplayEditorElement extends LitElement {
     }
   }
 
-  #findItem(id: string): ProfileDisplayItem | undefined {
+  #findItem(id: string): TimelineItem | undefined {
     for (const section of this._sections) {
       const item = section.items.find((i) => i.id === id);
-      if (item) return item;
+      if (item) return { item, section };
     }
     return undefined;
   }
@@ -139,6 +173,11 @@ export class ProfileDisplayEditorElement extends LitElement {
   }
 
   #setSectionShown(section: ProfileDisplaySection, shown: boolean) {
+    // The type filter can't stay on a section that is no longer listed.
+    if (!shown && this._type === section.key) {
+      this._type = "";
+      this._shown = TIMELINE_PAGE_SIZE;
+    }
     void this.#update(
       (c) => ({
         ...c,
@@ -204,28 +243,39 @@ export class ProfileDisplayEditorElement extends LitElement {
     void this.#update((c) => ({ ...c, pins: c.pins.filter((p) => p.id !== pin.id) }), `“${title}” is unpinned.`);
   }
 
-  async #move(pin: ProfilePin, title: string, step: -1 | 1) {
-    const from = this._choices.pins.findIndex((p) => p.id === pin.id);
-    const to = from + step;
-    if (from < 0 || to < 0 || to >= this._choices.pins.length) return;
+  #pinTitle(pin: ProfilePin): string {
+    return this.#findItem(pin.id)?.item.title ?? pin.title ?? "An item that's no longer in your recent activity";
+  }
 
-    const saved = this.#update((c) => {
-      const pins = [...c.pins];
-      [pins[from], pins[to]] = [pins[to], pins[from]];
-      return { ...c, pins };
-    }, `“${title}” moved to position ${to + 1} of ${this._choices.pins.length}.`);
+  /** Moves a pin to just before (or after) another, keeping keyboard focus on it when `focus` says which button had it. */
+  async #moveTo(id: string, targetId: string, after: boolean, focus?: "up" | "down") {
+    const pins = moveItem(this._choices.pins, (p) => p.id, id, targetId, after);
+    if (!pins) return;
 
-    // Keep keyboard focus on the item that moved.
-    await this.updateComplete;
-    this.#focusMoveButton(pin.id, step === -1 ? "up" : "down");
+    const pin = pins.find((p) => p.id === id)!;
+    const saved = this.#update(
+      (c) => ({ ...c, pins: moveItem(c.pins, (p) => p.id, id, targetId, after) ?? c.pins }),
+      `“${this.#pinTitle(pin)}” moved to position ${pins.indexOf(pin) + 1} of ${pins.length}.`
+    );
+
+    if (focus) {
+      await this.updateComplete;
+      this.#focusMoveButton(id, focus);
+    }
     await saved;
+  }
+
+  #move(pin: ProfilePin, step: -1 | 1) {
+    const pins = this._choices.pins;
+    const neighbour = pins[pins.findIndex((p) => p.id === pin.id) + step];
+    if (neighbour) void this.#moveTo(pin.id, neighbour.id, step === 1, step === -1 ? "up" : "down");
   }
 
   #focusMoveButton(pinId: string, preferred: "up" | "down") {
     const row = [...this.querySelectorAll<HTMLElement>("[data-pin-id]")].find((el) => el.dataset.pinId === pinId);
     const button =
       row?.querySelector<HTMLButtonElement>(`[data-action="${preferred}"]:not(:disabled)`) ??
-      row?.querySelector<HTMLButtonElement>(`[data-action]:not(:disabled)`);
+      row?.querySelector<HTMLButtonElement>(`[data-action="up"]:not(:disabled), [data-action="down"]:not(:disabled)`);
     button?.focus();
   }
 
@@ -242,12 +292,61 @@ export class ProfileDisplayEditorElement extends LitElement {
     );
   }
 
-  #formatDate(value: string | null): string {
-    if (!value) return "";
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? ""
-      : date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  /** Every item in a shown section, in timeline order (newest first). */
+  #timelineItems(): TimelineItem[] {
+    const items: TimelineItem[] = [];
+    for (const section of this._sections) {
+      if (this._choices.hiddenSections.includes(section.key)) continue;
+      for (const item of section.items) items.push({ item, section });
+    }
+    // Items from an older response have no order; they keep the order they came in.
+    return items
+      .map((entry, index) => ({ entry, index }))
+      .sort((a, b) => (a.entry.item.order ?? a.index) - (b.entry.item.order ?? b.index) || a.index - b.index)
+      .map(({ entry }) => entry);
+  }
+
+  /** The type filter's options: the shown sections that have items. */
+  #types(items: TimelineItem[]): ProfileDisplaySection[] {
+    const keys = new Set(items.map((i) => i.section.key));
+    return this._sections.filter((s) => keys.has(s.key));
+  }
+
+  /**
+   * The items the type filter picks, as on the profile (ProfileTimeline.IsShown): one section's, or the highlights,
+   * which leave out routine package releases (unless there is no filter to pick them with).
+   */
+  #filtered(items: TimelineItem[], hasTypeFilter: boolean): TimelineItem[] {
+    if (this._type) return items.filter((i) => i.section.key === this._type);
+    return hasTypeFilter ? items.filter((i) => !i.item.isRoutineRelease) : items;
+  }
+
+  #byMonth(items: TimelineItem[]): TimelineMonth[] {
+    const months: TimelineMonth[] = [];
+    for (const entry of items) {
+      const key = entry.item.monthKey ?? (entry.item.date ? entry.item.date.slice(0, 7) : "undated");
+      const last = months.at(-1);
+      if (last?.key === key) {
+        last.items.push(entry);
+      } else {
+        const label = entry.item.monthLabel ?? (formatTimelineMonth(entry.item.date) || "No date");
+        months.push({ key, label, items: [entry] });
+      }
+    }
+    return months;
+  }
+
+  #onTypeChange(event: Event) {
+    this._type = (event.target as HTMLSelectElement).value;
+    this._shown = TIMELINE_PAGE_SIZE;
+  }
+
+  async #showMore() {
+    const firstNew = this._shown;
+    this._shown += TIMELINE_PAGE_SIZE;
+    // Carry on from the first entry that just appeared.
+    await this.updateComplete;
+    this.querySelectorAll<HTMLElement>("[data-item-id]")[firstNew]?.querySelector<HTMLButtonElement>("button")?.focus();
   }
 
   #renderPins(): TemplateResult {
@@ -256,9 +355,10 @@ export class ProfileDisplayEditorElement extends LitElement {
       <h3 class="dc-profile-display-editor__heading">Featured</h3>
       <p class="dc-profile-display-editor__hint">
         Pinned items show at the top of your profile, in this order. ${pins.length} of ${MAX_PINNED_ITEMS} pinned.
+        ${pins.length > 1 ? "Drag an item by its handle, or use the up and down buttons, to change the order." : nothing}
       </p>
       ${pins.length === 0
-        ? html`<p class="dc-profile-display-editor__empty">Nothing pinned yet. Use Pin next to an item below.</p>`
+        ? html`<p class="dc-profile-display-editor__empty">Nothing pinned yet. Use Pin on an item in your activity below.</p>`
         : html`<ol class="dc-profile-display-editor__pins">
             ${pins.map((pin, index) => this.#renderPin(pin, index, pins.length))}
           </ol>`}
@@ -266,48 +366,54 @@ export class ProfileDisplayEditorElement extends LitElement {
   }
 
   #renderPin(pin: ProfilePin, index: number, count: number): TemplateResult {
-    const title = this.#findItem(pin.id)?.title ?? pin.title ?? "An item that's no longer in your recent activity";
+    const found = this.#findItem(pin.id);
+    const title = this.#pinTitle(pin);
     const inputId = `${this.#idPrefix}-reason-${index}`;
     const countId = `${inputId}-count`;
     const draft = this._reasonDrafts[pin.id] ?? pin.reason ?? "";
     return html`
-      <li class="dc-profile-display-editor__pin" data-pin-id=${pin.id}>
-        <span class="dc-profile-display-editor__pin-title">${title}</span>
-        <label class="dc-profile-display-editor__reason-label" for=${inputId}>Why you're proud of it (optional)</label>
-        <input
-          id=${inputId}
-          class="dc-profile-display-editor__reason"
-          type="text"
-          maxlength=${MAX_PIN_REASON_LENGTH}
-          aria-describedby=${countId}
-          .value=${draft}
-          @input=${(event: Event) => this.#onReasonInput(pin, event)}
-          @change=${(event: Event) => this.#onReasonChange(pin, title, event)}
-        />
-        <span id=${countId} class="dc-profile-display-editor__count">${draft.length} / ${MAX_PIN_REASON_LENGTH}</span>
-        <div class="dc-profile-display-editor__actions">
+      <li
+        class=${classMap({ ...this.#drag.rowClasses(pin.id), "dc-profile-display-editor__pin": true })}
+        data-sortable-row
+        data-pin-id=${pin.id}
+        @dragover=${(event: DragEvent) => this.#drag.over(event, pin.id)}
+        @drop=${(event: DragEvent) => this.#drag.drop(event, pin.id)}
+      >
+        ${count > 1 ? this.#drag.handle(pin.id) : nothing}
+        <div class="dc-profile-display-editor__pin-main">
+          <span class="dc-profile-display-editor__pin-title">
+            ${found ? profileKindIcon(itemIconKey(found.item, found.section.key)) : nothing}
+            <span>${title}</span>
+          </span>
+          <label class="dc-profile-display-editor__reason-label" for=${inputId}>Why you're proud of it (optional)</label>
+          <input
+            id=${inputId}
+            class="dc-profile-display-editor__reason"
+            type="text"
+            maxlength=${MAX_PIN_REASON_LENGTH}
+            aria-describedby=${countId}
+            .value=${draft}
+            @input=${(event: Event) => this.#onReasonInput(pin, event)}
+            @change=${(event: Event) => this.#onReasonChange(pin, title, event)}
+          />
+          <span id=${countId} class="dc-profile-display-editor__count">${draft.length} / ${MAX_PIN_REASON_LENGTH}</span>
+        </div>
+        <div class="dc-profile-display-editor__pin-actions">
+          ${count > 1
+            ? renderMoveButtons({
+                name: `“${title}”`,
+                isFirst: index === 0,
+                isLast: index === count - 1,
+                onMove: (step) => this.#move(pin, step),
+              })
+            : nothing}
           <button
-            class="link-action"
+            class="dc-profile-display-editor__action"
             type="button"
-            data-action="up"
-            ?disabled=${index === 0}
-            aria-label="Move “${title}” up"
-            @click=${() => this.#move(pin, title, -1)}
+            aria-label="Unpin “${title}”"
+            @click=${() => this.#unpin(pin, title)}
           >
-            ↑
-          </button>
-          <button
-            class="link-action"
-            type="button"
-            data-action="down"
-            ?disabled=${index === count - 1}
-            aria-label="Move “${title}” down"
-            @click=${() => this.#move(pin, title, 1)}
-          >
-            ↓
-          </button>
-          <button class="link-action" type="button" aria-label="Unpin “${title}”" @click=${() => this.#unpin(pin, title)}>
-            Unpin
+            ${iconX} Unpin
           </button>
         </div>
       </li>
@@ -332,100 +438,160 @@ export class ProfileDisplayEditorElement extends LitElement {
     `;
   }
 
-  #renderTimelineChoices(): TemplateResult {
+  /** The switches: which sections show at all, and the timeline's options. Separate from the items themselves. */
+  #renderSettings(): TemplateResult {
     return html`
-      <h3 class="dc-profile-display-editor__heading">Timeline</h3>
+      <div class="dc-profile-display-editor__settings">
+        <fieldset class="dc-profile-display-editor__switches">
+          <legend class="dc-profile-display-editor__heading">Sections</legend>
+          <p class="dc-profile-display-editor__hint">Switch a section off to leave all of it off your profile.</p>
+          <ul class="dc-profile-display-editor__switch-list">
+            ${this._sections.map(
+              (section, index) => html`<li>
+                ${this.#renderSwitch(
+                  `${this.#idPrefix}-section-${index}`,
+                  section.label,
+                  !this._choices.hiddenSections.includes(section.key),
+                  (checked) => this.#setSectionShown(section, checked)
+                )}
+              </li>`
+            )}
+          </ul>
+        </fieldset>
+        <fieldset class="dc-profile-display-editor__switches">
+          <legend class="dc-profile-display-editor__heading">Timeline</legend>
+          <p class="dc-profile-display-editor__hint">
+            An item whose page has a picture shows as a card. You can also switch single items to a plain line below.
+          </p>
+          <ul class="dc-profile-display-editor__switch-list">
+            <li>
+              ${this.#renderSwitch(`${this.#idPrefix}-cards`, "Show preview cards", !this._choices.hideTimelineCards, (checked) =>
+                this.#setCardsShown(checked)
+              )}
+            </li>
+            <li>
+              ${this.#renderSwitch(
+                `${this.#idPrefix}-graph`,
+                "Show an activity graph of the last 12 months",
+                !this._choices.hideActivityGraph,
+                (checked) => this.#setGraphShown(checked)
+              )}
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+    `;
+  }
+
+  #renderTimeline(): TemplateResult {
+    const all = this.#timelineItems();
+    const types = this.#types(all);
+    const hasTypeFilter = types.length > 1;
+    const matching = this.#filtered(all, hasTypeFilter);
+    const shown = matching.slice(0, this._shown);
+    const hiddenSections = this._sections.filter((s) => this._choices.hiddenSections.includes(s.key) && s.items.length > 0);
+    const hasRoutineReleases = !this._type && hasTypeFilter && all.some((i) => i.item.isRoutineRelease);
+    const filterId = `${this.#idPrefix}-type`;
+
+    return html`
+      <h3 class="dc-profile-display-editor__heading">Your activity</h3>
       <p class="dc-profile-display-editor__hint">
-        Your activity shows in a timeline, newest first. An item whose page has a picture shows as a card.
+        Newest first, as your profile's timeline shows it. Hide what you'd rather leave off, and pin what you're proud of.
       </p>
-      <ul class="dc-profile-display-editor__sections">
-        <li class="dc-profile-display-editor__section">
-          ${this.#renderSwitch(
-            `${this.#idPrefix}-cards`,
-            "Show preview cards",
-            !this._choices.hideTimelineCards,
-            (checked) => this.#setCardsShown(checked)
-          )}
-        </li>
-        <li class="dc-profile-display-editor__section">
-          ${this.#renderSwitch(
-            `${this.#idPrefix}-graph`,
-            "Show an activity graph of the last 12 months",
-            !this._choices.hideActivityGraph,
-            (checked) => this.#setGraphShown(checked)
-          )}
-        </li>
-      </ul>
+      ${hiddenSections.length > 0
+        ? html`<p class="dc-profile-display-editor__hint">
+            Not listed, as the section is switched off: ${hiddenSections.map((s) => s.label).join(", ")}.
+          </p>`
+        : nothing}
+      ${hasTypeFilter
+        ? html`<div class="community-profile__timeline-filters">
+            <div class="community-profile__timeline-filter">
+              <label for=${filterId}>Type</label>
+              <select id=${filterId} data-timeline-type .value=${this._type} @change=${this.#onTypeChange}>
+                <option value="" ?selected=${this._type === ""}>Highlights</option>
+                ${types.map((t) => html`<option value=${t.key} ?selected=${this._type === t.key}>${t.label}</option>`)}
+              </select>
+            </div>
+            ${hasRoutineReleases
+              ? html`<p class="dc-profile-display-editor__hint dc-profile-display-editor__filter-hint">
+                  Highlights leave out routine package releases. Choose Packages to see them.
+                </p>`
+              : nothing}
+          </div>`
+        : nothing}
+      ${matching.length === 0
+        ? html`<p class="community-profile__timeline-empty">
+            ${all.length === 0 ? "Nothing in your activity yet." : "Nothing here for this filter."}
+          </p>`
+        : nothing}
+      <div class="dc-profile-display-editor__timeline">
+        ${this.#byMonth(shown).map((month) => this.#renderMonth(month))}
+      </div>
+      ${matching.length > shown.length
+        ? html`<p class="dc-profile-display-editor__more">
+            <button class="btn is-transparent" type="button" data-action="more" @click=${this.#showMore}>
+              Show more
+            </button>
+            <span class="dc-profile-display-editor__more-count">Showing ${shown.length} of ${matching.length}</span>
+          </p>`
+        : nothing}
     `;
   }
 
-  #renderSection(section: ProfileDisplaySection, index: number): TemplateResult {
-    const shown = !this._choices.hiddenSections.includes(section.key);
-    const switchId = `${this.#idPrefix}-section-${index}`;
+  #renderMonth(month: TimelineMonth): TemplateResult {
+    const headingId = `${this.#idPrefix}-month-${month.key}`;
     return html`
-      <li class="dc-profile-display-editor__section">
-        <label class="dc-profile-display-editor__switch" for=${switchId}>
-          <input
-            id=${switchId}
-            class="dc-profile-display-editor__switch-input"
-            type="checkbox"
-            role="switch"
-            .checked=${shown}
-            @change=${(event: Event) => this.#setSectionShown(section, (event.target as HTMLInputElement).checked)}
-          />
-          <span class="dc-profile-display-editor__switch-track" aria-hidden="true"></span>
-          <span>Show ${section.label.toLowerCase()}</span>
-        </label>
-        ${!shown
-          ? html`<p class="dc-profile-display-editor__empty">Not shown on your profile.</p>`
-          : section.items.length === 0
-            ? html`<p class="dc-profile-display-editor__empty">Nothing here yet.</p>`
-            : html`<ul class="dc-profile-display-editor__items" aria-label=${section.label}>
-                ${section.items.map((item) => this.#renderItem(item))}
-              </ul>`}
-      </li>
+      <section class="community-profile__timeline-month" aria-labelledby=${headingId}>
+        <h4 class="community-profile__timeline-month-title" id=${headingId}>${month.label}</h4>
+        <ol class="community-profile__timeline-list">
+          ${month.items.map((entry) => this.#renderItem(entry))}
+        </ol>
+      </section>
     `;
   }
 
-  #renderItem(item: ProfileDisplayItem): TemplateResult {
+  #renderItem({ item, section }: TimelineItem): TemplateResult {
     const hidden = this._choices.hiddenItemIds.includes(item.id);
     const pinned = this.#isPinned(item.id);
-    const canPin = !hidden && !pinned && this._choices.pins.length < MAX_PINNED_ITEMS;
+    const canPin = !hidden && this._choices.pins.length < MAX_PINNED_ITEMS;
     const noCard = this.#hasNoCard(item.id);
     // Per-item cards only matter while cards are on for the timeline and the item is shown.
     const offerCard = !hidden && !this._choices.hideTimelineCards;
     const canSwitchCardOff = noCard || (this._choices.noCardItemIds ?? []).length < MAX_NO_CARD_ITEMS;
-    const date = this.#formatDate(item.date);
-    const notes = [date, hidden ? "Hidden" : "", pinned ? "Pinned" : "", offerCard && noCard ? "No card" : ""].filter(Boolean);
-    return html`
-      <li class="dc-profile-display-editor__item ${hidden ? "dc-profile-display-editor__item--hidden" : ""}" data-item-id=${item.id}>
-        <span class="dc-profile-display-editor__item-title">${item.title}</span>
-        <span class="dc-profile-display-editor__item-meta">${notes.join(" · ")}</span>
+    const showCard = !!item.card && !this._choices.hideTimelineCards && !noCard;
+
+    const controls = html`
+      <div class="dc-profile-display-editor__entry-controls">
+        ${hidden || pinned || (offerCard && noCard)
+          ? html`<span class="dc-profile-display-editor__badges">
+              ${hidden ? html`<span class="dc-profile-display-editor__badge dc-profile-display-editor__badge--hidden">Hidden</span>` : nothing}
+              ${pinned ? html`<span class="dc-profile-display-editor__badge dc-profile-display-editor__badge--pinned">Pinned</span>` : nothing}
+              ${offerCard && noCard ? html`<span class="dc-profile-display-editor__badge">No card</span>` : nothing}
+            </span>`
+          : nothing}
         <div class="dc-profile-display-editor__actions">
           <button
-            class="link-action"
+            class="dc-profile-display-editor__action"
             type="button"
             data-action="hide"
             aria-label="${hidden ? "Show" : "Hide"} “${item.title}”"
             @click=${() => this.#setItemHidden(item, !hidden)}
           >
-            ${hidden ? "Show" : "Hide"}
+            ${hidden ? iconEye : iconEyeOff} ${hidden ? "Show" : "Hide"}
           </button>
-          ${pinned
-            ? nothing
-            : html`<button
-                class="link-action"
-                type="button"
-                data-action="pin"
-                ?disabled=${!canPin}
-                aria-label="Pin “${item.title}”"
-                @click=${() => this.#pin(item)}
-              >
-                Pin
-              </button>`}
+          <button
+            class="dc-profile-display-editor__action"
+            type="button"
+            data-action=${pinned ? "unpin" : "pin"}
+            ?disabled=${!pinned && !canPin}
+            aria-label="${pinned ? "Unpin" : "Pin"} “${item.title}”"
+            @click=${() => (pinned ? this.#unpin({ id: item.id, reason: null }, item.title) : this.#pin(item))}
+          >
+            ${pinned ? iconX : iconPin} ${pinned ? "Unpin" : "Pin"}
+          </button>
           ${offerCard
             ? html`<button
-                class="link-action"
+                class="dc-profile-display-editor__action"
                 type="button"
                 data-action="card"
                 aria-pressed=${noCard ? "true" : "false"}
@@ -433,12 +599,33 @@ export class ProfileDisplayEditorElement extends LitElement {
                 aria-label="Show “${item.title}” as a plain line"
                 @click=${() => this.#setItemCard(item, noCard)}
               >
-                Plain line
+                ${iconText} Plain line
               </button>`
             : nothing}
         </div>
-      </li>
+      </div>
     `;
+
+    return renderProfileTimelineEntry(
+      {
+        title: item.title,
+        iconKey: itemIconKey(item, section.key),
+        typeLabel: section.label,
+        url: item.url,
+        date: item.date,
+        meta: item.meta,
+        card: showCard ? item.card : null,
+      },
+      {
+        itemId: item.id,
+        classes: {
+          "dc-profile-display-editor__entry": true,
+          "dc-profile-display-editor__entry--hidden": hidden,
+          "dc-profile-display-editor__entry--pinned": pinned,
+        },
+        extra: controls,
+      }
+    );
   }
 
   render(): TemplateResult {
@@ -449,14 +636,7 @@ export class ProfileDisplayEditorElement extends LitElement {
     return html`
       <div class="dc-profile-display-editor" aria-busy=${this._saving ? "true" : "false"}>
         ${this._sections.length > 0
-          ? html`
-              ${this.#renderPins()}
-              ${this.#renderTimelineChoices()}
-              <h3 class="dc-profile-display-editor__heading">Sections</h3>
-              <ul class="dc-profile-display-editor__sections">
-                ${this._sections.map((section, index) => this.#renderSection(section, index))}
-              </ul>
-            `
+          ? html`${this.#renderPins()} ${this.#renderSettings()} ${this.#renderTimeline()}`
           : nothing}
         <p class="dc-profile-display-editor__status" role="status" aria-live="polite">${this._statusMessage}</p>
         ${this._errorMessage

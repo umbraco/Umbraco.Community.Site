@@ -27,22 +27,29 @@ public class ProfileDisplayApiController : ControllerBase
     private readonly ProfileAccessService _profileAccessService;
     private readonly IProfileDataProvider _profileDataProvider;
     private readonly ProfileActivityService _profileActivityService;
+    private readonly ProfileTimelinePreviewService _timelinePreviewService;
 
     public ProfileDisplayApiController(
         IMemberManager memberManager,
         MemberProfileStore store,
         ProfileAccessService profileAccessService,
         IProfileDataProvider profileDataProvider,
-        ProfileActivityService profileActivityService)
+        ProfileActivityService profileActivityService,
+        ProfileTimelinePreviewService timelinePreviewService)
     {
         _memberManager = memberManager;
         _store = store;
         _profileAccessService = profileAccessService;
         _profileDataProvider = profileDataProvider;
         _profileActivityService = profileActivityService;
+        _timelinePreviewService = timelinePreviewService;
     }
 
-    /// <summary>The member's activity sections with every item in them, hidden ones included, and their stored choices.</summary>
+    /// <summary>
+    /// The member's activity sections with every item in them, hidden ones included, and their stored choices. Each item
+    /// carries what the profile's timeline draws for it (icon, link, meta line, preview card, month), and items are in
+    /// timeline order, newest first.
+    /// </summary>
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
@@ -63,16 +70,27 @@ public class ProfileDisplayApiController : ControllerBase
             return BadRequest(new { error = NoProfileError });
         }
 
-        var items = await ActivityItemsAsync(entity, cancellationToken);
+        var profile = await EnrichedProfileAsync(entity, cancellationToken);
+        var activity = profile != null ? ProfileDisplay.ActivityItems(profile).ToList() : [];
 
+        // The same timeline entries the profile page renders, so the account page draws each item as the profile does.
+        // Only the member's own items are kept: those are the ones that can be hidden or pinned.
+        var ids = activity.Select(i => i.ActivityId).ToHashSet(StringComparer.Ordinal);
+        IReadOnlyList<ProfileTimelineEntry> timeline = profile != null
+            ? ProfileTimeline.Entries(profile).Where(e => e.ActivityId != null && ids.Contains(e.ActivityId)).ToList()
+            : [];
+
+        // Cards whatever the member's card choices (the page applies those itself, so a switch shows straight away).
+        // Outside work is held to the same per-render limit and time budget as a profile page, newest entries first;
+        // the rest show as plain lines until a later visit has their cards ready.
+        timeline = await _timelinePreviewService.AddCardsAsync(timeline, ProfileDisplayChoices.None, cancellationToken);
+
+        var items = ProfileDisplay.DisplayItems(activity, timeline);
         var sections = PlatformActivityGroups.All
             .Select(group => new ProfileDisplaySection(
                 group,
                 ProfileDisplay.SectionLabel(group),
-                items
-                    .Where(i => i.Group == group)
-                    .Select(i => new ProfileDisplayItem(i.ActivityId, i.Title, i.Date))
-                    .ToList()))
+                items.Where(i => i.Group == group).ToList()))
             .ToList();
 
         return Ok(new ProfileDisplayResponse(sections, ToChoicesResponse(ProfileDisplay.StoredChoices(entity))));
@@ -131,12 +149,16 @@ public class ProfileDisplayApiController : ControllerBase
     /// Every item in the member's activity sections. The owner's own request, so a hidden profile is included.
     /// Choices are not applied: the member needs to see hidden items to show them again.
     /// </summary>
-    private async Task<IReadOnlyList<ProfileFeaturedItem>> ActivityItemsAsync(MemberProfileEntity entity, CancellationToken cancellationToken)
+    private async Task<IReadOnlyList<ProfileFeaturedItem>> ActivityItemsAsync(MemberProfileEntity entity, CancellationToken cancellationToken) =>
+        await EnrichedProfileAsync(entity, cancellationToken) is { } profile
+            ? ProfileDisplay.ActivityItems(profile).ToList()
+            : [];
+
+    /// <summary>The member's profile with its activity loaded, choices not applied. The owner's own request, so a hidden profile is included.</summary>
+    private async Task<CommunityProfile?> EnrichedProfileAsync(MemberProfileEntity entity, CancellationToken cancellationToken)
     {
         var profile = await _profileDataProvider.GetProfileAsync(entity.GitHubHandle, includeHidden: true, cancellationToken: cancellationToken);
-        return profile != null
-            ? ProfileDisplay.ActivityItems(await _profileActivityService.EnrichAsync(profile, cancellationToken)).ToList()
-            : [];
+        return profile != null ? await _profileActivityService.EnrichAsync(profile, cancellationToken) : null;
     }
 
     private static ProfileDisplayChoicesResponse ToChoicesResponse(ProfileDisplayChoices choices) =>

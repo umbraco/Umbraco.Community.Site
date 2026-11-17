@@ -245,6 +245,9 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500);
 
+                    b.Property<string>("ImagePath")
+                        .HasMaxLength(300);
+
                     b.Property<string>("Kind")
                         .IsRequired()
                         .HasMaxLength(50);

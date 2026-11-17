@@ -42,6 +42,21 @@ dc-feed-manager {
   border-radius: var(--border-radius);
 }
 
+/* A link that can be reordered: the grab handle beside the details and actions. */
+.dc-feed-manager__item--sortable {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--unit-xs);
+}
+
+.dc-feed-manager__item-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xs);
+  flex: 1;
+  min-width: 0;
+}
+
 .dc-feed-manager__item--hidden {
   opacity: 0.6;
 }
@@ -99,10 +114,6 @@ dc-feed-manager {
 
 .dc-feed-manager__empty {
   color: var(--color-light-blue);
-}
-
-.dc-feed-manager__item[draggable="true"] {
-  cursor: grab;
 }
 
 .dc-feed-manager__favicon {

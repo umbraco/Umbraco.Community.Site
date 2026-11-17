@@ -24,12 +24,18 @@ public static class ProfileActivityEntry
     /// <summary>What a hand-added entry can be, in the order members are offered them.</summary>
     public static readonly IReadOnlyList<string> Kinds = [Blog, Video, Package, Event, Talk, Contribution, Podcast, Other];
 
-    /// <summary>How many entries a member can have waiting for a check at once.</summary>
-    public const int MaxPendingEntries = 10;
-
     public const int MaxTitleLength = MemberActivityEntryEntity.MaxTitleLength;
     public const int MaxDescriptionLength = MemberActivityEntryEntity.MaxDescriptionLength;
     public const int MaxReasonLength = MemberActivityEntryEntity.MaxReasonLength;
+
+    /// <summary>The largest picture a member can attach to an entry (see <see cref="ProfileActivityImageStore"/>).</summary>
+    public const int MaxImageBytes = 2_000_000;
+
+    /// <summary>
+    /// The largest request that adds or edits an entry: the picture plus room for the typed fields and the multipart
+    /// framing, so a picture of exactly <see cref="MaxImageBytes"/> still fits.
+    /// </summary>
+    public const long MaxAddRequestBytes = MaxImageBytes + 64_000;
 
     private static readonly DateOnly EarliestDate = new(1990, 1, 1);
 
@@ -58,7 +64,40 @@ public static class ProfileActivityEntry
     };
 
     /// <summary>The id the entry has in the profile's activity sections, so it can be hidden or pinned like the rest.</summary>
-    public static string ActivityId(int entryId) => $"added:{entryId}";
+    public static string ActivityId(int entryId) => $"{ActivityIdPrefix}{entryId}";
+
+    /// <summary>True when <paramref name="activityId"/> is the id of a hand-added entry (see <see cref="ActivityId"/>).</summary>
+    public static bool IsActivityId(string? activityId) =>
+        activityId != null && activityId.StartsWith(ActivityIdPrefix, StringComparison.Ordinal);
+
+    private const string ActivityIdPrefix = "added:";
+
+    /// <summary>
+    /// The entry as the Featured block and a pin's stored copy see it: the same item <see cref="ProfileDisplay.ActivityItems"/>
+    /// gives for it once <see cref="ProfileActivityService.AddVerifiedActivity"/> has put it in its section. Keep the two in step.
+    /// </summary>
+    public static ProfileFeaturedItem FeaturedItem(ActivityEntryRecord entry)
+    {
+        var group = Group(entry.Kind);
+        var date = new DateTimeOffset(entry.Date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero);
+        var (description, source) = group switch
+        {
+            PlatformActivityGroups.Meetups => (null, "Took part in"),
+            PlatformActivityGroups.Other => (entry.Description, KindLabel(entry.Kind)),
+            _ => (entry.Description, (string?)null),
+        };
+        return new ProfileFeaturedItem(group, ActivityId(entry.Id), entry.Title, entry.Url, description, date, source, null);
+    }
+
+    /// <summary>What the member is told when an entry can't be added or changed, or null when it was.</summary>
+    public static string? ChangeError(ActivityEntryChangeOutcome outcome) => outcome switch
+    {
+        ActivityEntryChangeOutcome.Saved => null,
+        ActivityEntryChangeOutcome.DuplicateLink => "You've already added that link.",
+        ActivityEntryChangeOutcome.RemovedLink => "A moderator removed that link from your profile, so it can't be added again.",
+        ActivityEntryChangeOutcome.RemovedByModerator => "A moderator removed this entry, so it can't be changed. You can withdraw it instead.",
+        _ => "That entry can't be found.",
+    };
 
     /// <summary>
     /// Checks what the member typed and returns it trimmed and with the kind in its canonical form. Returns
