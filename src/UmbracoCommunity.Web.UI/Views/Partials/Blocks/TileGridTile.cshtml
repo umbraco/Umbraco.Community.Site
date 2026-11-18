@@ -1,0 +1,105 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TileGridTile, SettingsTileGridTile>>
+
+@{
+    var hasBg = Model.Settings.HasBg();
+    var image = Model.Settings?.BackgroundImage;
+    var imagePosition = string.IsNullOrEmpty(Model.Settings?.BackgroundImagePosition) ? "fill" : Model.Settings.BackgroundImagePosition;
+    var alignment = string.IsNullOrEmpty(Model.Settings?.ContentAlignment) ? "top" : Model.Settings.ContentAlignment;
+    var hasContent = Model.Content.TileContent?.Any() == true;
+    var isImageOnly = image != null && !hasContent;
+    var isTextOverImage = image != null && hasContent && imagePosition == "fill";
+    var isDark = isTextOverImage || (hasBg && Model.Settings.IsDark());
+    var imageAlt = isImageOnly ? Model.Settings?.BackgroundImageAltText ?? string.Empty : string.Empty;
+
+    var classes = new List<string> { "dc-tile", $"dc-tile--align-{alignment}" };
+    if (image != null) classes.Add($"dc-tile--image-{imagePosition}");
+    if (isTextOverImage) classes.Add("dc-tile--text-over-image");
+    if (isImageOnly) classes.Add("dc-tile--image-only");
+    var gridBackground = (ViewData["TileGridBackground"] as string)?.TrimStart('#');
+    var blendsIn = hasBg && !isTextOverImage && !isImageOnly &&
+        string.Equals(gridBackground, Model.Settings!.BackgroundColour!.Color.TrimStart('#'), StringComparison.OrdinalIgnoreCase);
+    if (blendsIn) classes.Add("dc-tile--outlined");
+    if (hasBg) classes.Add("has-bg");
+    if (isDark) classes.Add("bg-dark");
+
+    var tabletColumns = Model.ColumnSpan <= 6 ? 6 : 12;
+    var style = $"--tile-columns: {Model.ColumnSpan}; --tile-columns-sm: {tabletColumns}; --tile-rows: {Model.RowSpan};";
+    if (hasBg) style += $" --tile-background-color: {Model.Settings!.BackgroundColour!.Color};";
+}
+
+@if (hasContent || image != null)
+{
+    <div class="@string.Join(" ", classes)" style="@style">
+        @if (image != null)
+        {
+            <img class="dc-tile__image"
+                 srcset="@image.GetCropUrl(width: 600) 600w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 1800) 1800w"
+                 sizes="(min-width: 1024px) 50vw, 100vw"
+                 src="@image.GetCropUrl(width: 1200)" alt="@imageAlt" loading="lazy" />
+        }
+        @if (hasContent)
+        {
+            <div class="dc-tile__content">
+                @foreach (var block in Model.Content.TileContent!)
+                {
+                    await RenderItem(block);
+                }
+            </div>
+        }
+    </div>
+}
+
+@functions {
+    async Task RenderItem(BlockListItem block)
+    {
+        switch (block.Content)
+        {
+            case EyebrowBlock eyebrow when !string.IsNullOrWhiteSpace(eyebrow.Text):
+                <p class="dc-tile__eyebrow">@eyebrow.Text</p>
+                break;
+
+            case StatBlock stat when !string.IsNullOrWhiteSpace(stat.Number):
+                <p class="dc-tile-stat @(stat.LabelBesideNumber ? "dc-tile-stat--label-beside" : string.Empty)">
+                    <span class="dc-tile-stat__number">@stat.Number</span>
+                    @if (!string.IsNullOrWhiteSpace(stat.Label))
+                    {
+                        <span class="dc-tile-stat__label">@stat.Label</span>
+                    }
+                </p>
+                break;
+
+            case TextBlock text when !text.Text.IsEmptyHtmlString():
+                <div class="dc-tile__text">@Html.Raw(text.Text)</div>
+                break;
+
+            case ImageBlock imageBlock when imageBlock.Image != null:
+                <img class="dc-tile__inline-image"
+                     src="@imageBlock.Image.GetCropUrl("desktop")" alt="@imageBlock.AltText"
+                     width="@imageBlock.Image.GetCropSize("desktop")?.Width" height="@imageBlock.Image.GetCropSize("desktop")?.Height"
+                     loading="lazy" />
+                break;
+
+            case IconBlock icon when icon.Icon != null:
+                var iconColour = icon.Colour?.Color;
+                var iconSize = string.IsNullOrEmpty(icon.IconSize) ? "md" : icon.IconSize;
+                <div class="row-item-icon row-item-icon--@iconSize @(iconColour != null ? "has-colour" : string.Empty)" style="@(iconColour != null ? $"color: {iconColour}" : null)">
+                    <svg-src media="@icon.Icon" alt-text="@icon.AltText"></svg-src>
+                </div>
+                break;
+
+            case CallToActionLinkBlock cta when cta.CallToActionLink != null:
+                var buttonColour = (block.Settings as SettingsCallToActionLinkBlock)?.ButtonColour ?? "blue";
+                var linkText = string.IsNullOrWhiteSpace(cta.CallToActionLinkText) ? cta.CallToActionLink.Name : cta.CallToActionLinkText;
+                var linkTarget = cta.CallToActionLink.Target ?? "_self";
+                <div class="dc-tile__cta">
+                    <a href="@cta.CallToActionLink.Url" class="btn arrow cta is-@buttonColour" target="@linkTarget" rel="@linkTarget.NewTabRel()">
+                        @linkText
+                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g><path d="M6.41675 6.41663H15.5834V15.5833" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M6.41675 15.5833L15.5834 6.41663" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
+                    </a>
+                </div>
+                break;
+        }
+        await Task.CompletedTask;
+    }
+}

@@ -1,0 +1,9 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<CallToActionLinkBlock, SettingsCallToActionLinkBlock>>
+
+@if (Model.Content.CallToActionLink != null)
+{
+    var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
+    <div class="dc-tile__cta">
+        <span class="btn arrow cta is-@(Model.Settings?.ButtonColour ?? "blue")">@linkText</span>
+    </div>
+}

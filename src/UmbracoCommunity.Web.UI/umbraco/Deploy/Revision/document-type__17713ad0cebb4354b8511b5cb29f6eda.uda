@@ -1,0 +1,47 @@
+{
+  "Name": "Eyebrow block",
+  "Alias": "eyebrowBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-tag",
+  "Thumbnail": "folder.png",
+  "Description": "A small uppercase label, e.g. a heading above a stat or a footnote below it.",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "61dffeea-368b-40e2-8b71-758c67badc14",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "1bb3ed84-d7d3-4d78-bf02-fc0f16c18957",
+          "Alias": "text",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Mandatory": true,
+          "Name": "Text"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/17713ad0cebb4354b8511b5cb29f6eda",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

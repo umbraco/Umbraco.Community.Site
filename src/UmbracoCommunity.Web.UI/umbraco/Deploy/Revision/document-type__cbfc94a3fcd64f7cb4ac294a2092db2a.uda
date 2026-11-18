@@ -1,0 +1,47 @@
+{
+  "Name": "Tile grid tile",
+  "Alias": "tileGridTile",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-stop",
+  "Thumbnail": "folder.png",
+  "Description": "One tile in a Tile grid.",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "fd1b40e7-c752-47b1-873d-d962d12d0528",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "841d6c3b-c944-4425-af30-63bd0c432a8e",
+          "Alias": "tileContent",
+          "DataType": "umb://data-type/1e7f1eec91d24551ab9c2c4422f88036",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
+          "Description": "Leave empty for an image-only tile: set a background image with the Fill position in the tile settings.",
+          "Name": "Tile content"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/cbfc94a3fcd64f7cb4ac294a2092db2a",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/1e7f1eec91d24551ab9c2c4422f88036",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

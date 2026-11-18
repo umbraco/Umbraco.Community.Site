@@ -1,0 +1,6 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<EyebrowBlock>>
+
+@if (!string.IsNullOrWhiteSpace(Model.Content.Text))
+{
+    <p class="dc-tile__eyebrow">@Model.Content.Text</p>
+}
