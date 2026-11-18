@@ -937,18 +937,6 @@ ol.no-margin p {
     color: #6b7280;
 }
 
-.video-showcase-item-preview__accent {
-    flex: 0 0 auto;
-    font-size: 12px;
-    color: #6b7280;
-}
-
-.video-showcase-item-preview__accent svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-}
-
 /* Column comparison */
 .plan-comparison__columns {
     display: grid;

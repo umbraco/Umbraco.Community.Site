@@ -4,9 +4,7 @@
 
 @{
     var video = Model.Content?.Video;
-    var thumbnail = video?.Poster?.GetCropUrl(width: 320, height: 180, imageCropMode: ImageCropMode.Crop);
-    var accent = Model.Content?.AccentColour?.Color.GetOptionalColor();
-}
+    var thumbnail = video?.Poster?.GetCropUrl(width: 320, height: 180, imageCropMode: ImageCropMode.Crop);}
 
 <div class="video-showcase-item-preview">
     <span class="video-showcase-preview__thumb @(thumbnail == null ? "is-empty" : null)">
@@ -20,16 +18,6 @@
         @if (Model.Content?.Byline != null)
         {
             <span class="video-showcase-item-preview__byline">@Model.Content.Byline</span>
-        }
-    </span>
-    <span class="video-showcase-item-preview__accent" title="@(accent == null ? "Accent from the brand palette" : "Accent " + accent)">
-        @if (accent != null)
-        {
-            <svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="5" fill="@accent" /></svg>
-        }
-        else
-        {
-            <span>Auto</span>
         }
     </span>
 </div>

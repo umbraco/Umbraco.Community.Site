@@ -53,15 +53,6 @@
           "Description": "A sentence or two about the talk.",
           "Name": "Description",
           "SortOrder": 3
-        },
-        {
-          "Key": "9c4e5f6a-7b8c-4d9e-bfa0-2b3c4d5e6f7a",
-          "Alias": "accentColour",
-          "DataType": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
-          "ValueType": "Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter\u002BPickedColor",
-          "Description": "Optional. Leave empty to take the next colour from the brand palette.",
-          "Name": "Accent colour",
-          "SortOrder": 4
         }
       ]
     }
@@ -71,10 +62,6 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://data-type/24a48b7b72ef40b88e7a084c44133095",
       "Ordering": true
     },
     {

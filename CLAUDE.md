@@ -465,7 +465,7 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 
 A Codegarden-only block (in the `eventsHome` Block Restrictions rule) for surfacing past talks from YouTube, with a link out to more on the channel.
 
-**Content** (`VideoShowcaseBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Videos` (Block List of `VideoShowcaseItem`, 1–6), `MoreVideosLink` (optional). Each `VideoShowcaseItem` has `Video` (YouTube video picker), `Speaker`, `Edition`, `Description` and an `AccentColour` that is no longer rendered. The partial in `Models/ContentModels/VideoShowcaseBlock.cs` adds `PlayableVideos` (skips items without a video, caps at `MaxVideos` = 6), `IsGrid(settings)`, `HasPlaylistOnLeft(settings)` and the item `Byline`.
+**Content** (`VideoShowcaseBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Videos` (Block List of `VideoShowcaseItem`, 1–6), `MoreVideosLink` (optional). Each `VideoShowcaseItem` has `Video` (YouTube video picker), `Speaker`, `Edition`, `Description`. The partial in `Models/ContentModels/VideoShowcaseBlock.cs` adds `PlayableVideos` (skips items without a video, caps at `MaxVideos` = 6), `IsGrid(settings)`, `HasPlaylistOnLeft(settings)` and the item `Byline`.
 
 **Settings** (`SettingsVideoShowcaseBlock`, with `ISettingsBlockId` + `ISettingsColour`): `Layout`, `list` (default) or `grid`; `PlaylistPosition` (generic "Radio button list - left or right" data type), `right` (default) or `left`, list layout only.
 
