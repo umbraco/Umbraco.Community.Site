@@ -45,6 +45,25 @@ public class VideoHelperTests
         url.GetYouTubeLink(null).Should().Be("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=90");
     }
 
+    [Theory]
+    [InlineData("https://youtu.be/dQw4w9WgXcQ?t=1m30s", 90)]
+    [InlineData("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1h2m3s", 3723)]
+    [InlineData("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=2m", 120)]
+    [InlineData("https://www.youtube.com/watch?v=dQw4w9WgXcQ&start=45", 45)]
+    public void Understands_youtube_start_time_formats(string url, int seconds)
+    {
+        url.GetYouTubeLink(null).Should().Be($"https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start={seconds}");
+    }
+
+    [Theory]
+    [InlineData("https://youtu.be/dQw4w9WgXcQ?t=0")]
+    [InlineData("https://youtu.be/dQw4w9WgXcQ?t=soon")]
+    [InlineData("https://youtu.be/dQw4w9WgXcQ?t=1x30")]
+    public void Ignores_a_missing_or_unreadable_start_time(string url)
+    {
+        url.GetYouTubeLink(null).Should().Be("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ");
+    }
+
     [Fact]
     public void Returns_empty_for_an_unsupported_url()
     {

@@ -5,6 +5,21 @@ export interface EmbeddedYouTube {
 }
 
 const IFRAME_STYLE = 'width:100%;height:100%;border:0;display:block';
+const PLAY_EVENT = 'dc-youtube:play';
+
+/** Tells every other player on the page that `owner` started a video, so only one plays at a time. */
+export function announcePlay(owner: object) {
+    document.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: owner }));
+}
+
+/** Calls `stop` whenever another player starts a video. Returns a function that stops listening. */
+export function stopWhenOtherPlays(owner: object, stop: () => void): () => void {
+    const listener = (event: Event) => {
+        if ((event as CustomEvent).detail !== owner) stop();
+    };
+    document.addEventListener(PLAY_EVENT, listener);
+    return () => document.removeEventListener(PLAY_EVENT, listener);
+}
 
 /** A plain YouTube iframe for an embed URL, optionally asking it to start playing. */
 export function createYouTubeIframe(source: string, title: string, allow = '', startPlaying = false): HTMLIFrameElement {

@@ -19,5 +19,6 @@ public sealed class RegisterYouTube : IComposer
 
         builder.DeployValueConnectors().Add<YouTubeVideoValueConnector>();
         builder.AddNotificationHandler<ContentSavingNotification, LegacyVideoBlockGuard>();
+        builder.AddNotificationHandler<ContentPublishingNotification, LegacyVideoBlockGuard>();
     }
 }

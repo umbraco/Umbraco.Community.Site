@@ -11,8 +11,11 @@ namespace UmbracoCommunity.Web.Features.YouTube;
 /// <summary>
 /// Refuses saves that add a new legacy Video block. Existing ones keep working: they can't simply be removed from
 /// the block editors, because Umbraco then flags them as invalid and editors couldn't save those pages at all.
+/// Publishing is checked too, as Save and publish doesn't raise a saving notification.
 /// </summary>
-public sealed class LegacyVideoBlockGuard : INotificationHandler<ContentSavingNotification>
+public sealed class LegacyVideoBlockGuard :
+    INotificationHandler<ContentSavingNotification>,
+    INotificationHandler<ContentPublishingNotification>
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IContentService _contentService;
@@ -23,28 +26,43 @@ public sealed class LegacyVideoBlockGuard : INotificationHandler<ContentSavingNo
         _contentService = contentService;
     }
 
-    public void Handle(ContentSavingNotification notification)
+    public void Handle(ContentSavingNotification notification) => Guard(notification.SavedEntities, notification.CancelOperation);
+
+    public void Handle(ContentPublishingNotification notification) => Guard(notification.PublishedEntities, notification.CancelOperation);
+
+    private void Guard(IEnumerable<IContent> entities, Action<EventMessage> cancel)
     {
         if (_contentTypeService.Get(VideoBlock.ModelTypeAlias)?.Key is not { } legacyTypeKey) return;
 
-        foreach (var content in notification.SavedEntities)
+        if (entities.Any(content => AddsLegacyBlock(content, legacyTypeKey)))
         {
-            var current = BlockKeys(content, legacyTypeKey);
-            if (current.Count == 0) continue;
-
-            var previous = content.HasIdentity && _contentService.GetById(content.Id) is { } saved
-                ? BlockKeys(saved, legacyTypeKey)
-                : [];
-
-            if (current.Except(previous).Any())
-            {
-                notification.CancelOperation(new EventMessage(
-                    "Use the Video block",
-                    "The legacy Video block can't be added any more. Add a Video block instead; legacy videos already on this page are kept.",
-                    EventMessageType.Error));
-                return;
-            }
+            cancel(new EventMessage(
+                "Use the Video block",
+                "The legacy Video block can't be added any more. Add a Video block instead; legacy videos already on this page are kept.",
+                EventMessageType.Error));
         }
+    }
+
+    // Blocks from any earlier version count as existing, so rolling back to an older version still works.
+    private bool AddsLegacyBlock(IContent content, Guid legacyTypeKey)
+    {
+        var added = BlockKeys(content, legacyTypeKey);
+        if (added.Count == 0) return false;
+        if (!content.HasIdentity) return true;
+
+        if (_contentService.GetById(content.Id) is { } saved)
+        {
+            added.ExceptWith(BlockKeys(saved, legacyTypeKey));
+            if (added.Count == 0) return false;
+        }
+
+        foreach (var version in _contentService.GetVersions(content.Id))
+        {
+            added.ExceptWith(BlockKeys(version, legacyTypeKey));
+            if (added.Count == 0) return false;
+        }
+
+        return true;
     }
 
     private static HashSet<string> BlockKeys(IContentBase content, Guid blockTypeKey)

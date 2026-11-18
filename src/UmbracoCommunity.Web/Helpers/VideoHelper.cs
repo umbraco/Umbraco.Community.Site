@@ -23,8 +23,7 @@ namespace UmbracoCommunity.Web.Helpers
 
             var queryString = HttpUtility.ParseQueryString(string.Empty);
             var sourceQuery = HttpUtility.ParseQueryString(new Uri(videoUrl).Query);
-            var start = sourceQuery["t"] ?? sourceQuery["start"];
-            if (int.TryParse(start?.TrimEnd('s'), out var startSeconds) && startSeconds > 0)
+            if (ParseStartSeconds(sourceQuery["t"] ?? sourceQuery["start"]) is { } startSeconds)
             {
                 queryString["start"] = startSeconds.ToString();
             }
@@ -69,6 +68,23 @@ namespace UmbracoCommunity.Web.Helpers
             return id is not null && YouTubeIdRegex.IsMatch(id) ? id : null;
         }
 
+        /// <summary>Seconds from a YouTube start time such as <c>90</c>, <c>90s</c>, <c>1m30s</c> or <c>1h2m3s</c>.</summary>
+        internal static int? ParseStartSeconds(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || StartTimeRegex.Match(value.Trim()) is not { Success: true } match)
+            {
+                return null;
+            }
+
+            int Part(string name) => match.Groups[name].Success ? int.Parse(match.Groups[name].Value) : 0;
+            var seconds = Part("h") * 3600 + Part("m") * 60 + Part("s");
+            return seconds > 0 ? seconds : null;
+        }
+
         private static readonly Regex YouTubeIdRegex = new("^[A-Za-z0-9_-]{11}$", RegexOptions.Compiled);
+
+        private static readonly Regex StartTimeRegex = new(
+            @"^(?:(?<s>\d{1,6})s?|(?:(?<h>\d{1,3})h)?(?:(?<m>\d{1,4})m)?(?:(?<s>\d{1,6})s)?)$",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
     }
 }

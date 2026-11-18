@@ -118,7 +118,7 @@
 
         @if (hasIntro)
         {
-            <div class="dc-video-showcase-block__intro align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
+            <div class="dc-video-showcase-block__intro align-center" id="@(string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId)">
                 @if (!string.IsNullOrEmpty(Model.Content.Title))
                 {
                     <h2 class="block-title" id="@id-title">@Model.Content.Title</h2>

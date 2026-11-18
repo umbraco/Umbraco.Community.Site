@@ -2,7 +2,9 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -22,10 +24,14 @@ public interface IYouTubePosterService
     /// <summary>The video's title and up to four stills to choose a poster from, or <c>null</c> for a link that isn't a YouTube video.</summary>
     Task<YouTubeVideoPreview?> GetPreviewAsync(string url, CancellationToken cancellationToken);
 
-    /// <summary>Copies a still into <c>Video thumbnails/&lt;site name&gt;</c> in the Media library, reusing an earlier import of the same still.</summary>
-    Task<YouTubePoster?> ImportStillAsync(string url, string variant, Guid? contentKey, string? title, int userId, CancellationToken cancellationToken);
+    /// <summary>Whether <paramref name="user"/> may import stills, which needs access to the root of the Media library.</summary>
+    Task<bool> CanImportAsync(IUser user);
 
-    YouTubePoster? GetPoster(Guid mediaKey);
+    /// <summary>Copies a still into <c>Video thumbnails/&lt;site name&gt;</c> in the Media library, reusing an earlier import of the same still.</summary>
+    Task<YouTubePoster?> ImportStillAsync(string url, string variant, Guid? contentKey, string? title, IUser user, CancellationToken cancellationToken);
+
+    /// <summary>The poster, or <c>null</c> if it doesn't exist or <paramref name="user"/> can't access it.</summary>
+    Task<YouTubePoster?> GetPosterAsync(Guid mediaKey, IUser user);
 }
 
 internal sealed class YouTubePosterService : IYouTubePosterService
@@ -34,6 +40,10 @@ internal sealed class YouTubePosterService : IYouTubePosterService
     public const string RootFolderName = "Video thumbnails";
     private const string SharedFolderName = "Shared";
     private const int MaxImageBytes = 5 * 1024 * 1024;
+    private const int PageSize = 500;
+
+    // Finding or creating folders and posters is check-then-create, so two imports at once would make duplicates.
+    private static readonly SemaphoreSlim ImportLock = new(1, 1);
 
     // Each slot lists its image from best to worst; the 1280px versions only exist for HD videos.
     private static readonly (string Label, string[] Variants)[] Slots =
@@ -51,6 +61,7 @@ internal sealed class YouTubePosterService : IYouTubePosterService
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
+    private readonly IMediaPermissionAuthorizer _mediaPermissions;
     private readonly ILogger<YouTubePosterService> _logger;
 
     public YouTubePosterService(
@@ -61,8 +72,10 @@ internal sealed class YouTubePosterService : IYouTubePosterService
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IShortStringHelper shortStringHelper,
         IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+        IMediaPermissionAuthorizer mediaPermissions,
         ILogger<YouTubePosterService> logger)
     {
+        _mediaPermissions = mediaPermissions;
         _httpClientFactory = httpClientFactory;
         _mediaService = mediaService;
         _contentService = contentService;
@@ -91,10 +104,25 @@ internal sealed class YouTubePosterService : IYouTubePosterService
         return new YouTubeVideoPreview(videoId, title, author, stills);
     }
 
-    public async Task<YouTubePoster?> ImportStillAsync(string url, string variant, Guid? contentKey, string? title, int userId, CancellationToken cancellationToken)
-    {
-        if (VideoHelper.GetYouTubeVideoId(url) is not { } videoId || LabelFor(variant) is not { } label) return null;
+    public async Task<bool> CanImportAsync(IUser user) => !await _mediaPermissions.IsDeniedAtRootLevelAsync(user);
 
+    public async Task<YouTubePoster?> ImportStillAsync(string url, string variant, Guid? contentKey, string? title, IUser user, CancellationToken cancellationToken)
+    {
+        if (VideoHelper.GetYouTubeVideoId(url) is not { } videoId || LabelFor(variant) is not { } label || !await CanImportAsync(user)) return null;
+
+        await ImportLock.WaitAsync(cancellationToken);
+        try
+        {
+            return await ImportStillLockedAsync(videoId, variant, label, contentKey, title, user.Id, cancellationToken);
+        }
+        finally
+        {
+            ImportLock.Release();
+        }
+    }
+
+    private async Task<YouTubePoster?> ImportStillLockedAsync(string videoId, string variant, string label, Guid? contentKey, string? title, int userId, CancellationToken cancellationToken)
+    {
         var siteFolder = GetOrCreateFolder(GetSiteName(contentKey), GetOrCreateFolder(RootFolderName, null, userId).Id, userId);
         var name = $"{(string.IsNullOrWhiteSpace(title) ? videoId : title.Trim())} – {label}";
 
@@ -130,8 +158,10 @@ internal sealed class YouTubePosterService : IYouTubePosterService
         return ToPoster(media);
     }
 
-    public YouTubePoster? GetPoster(Guid mediaKey)
-        => _mediaService.GetById(mediaKey) is { Trashed: false } media ? ToPoster(media) : null;
+    public async Task<YouTubePoster?> GetPosterAsync(Guid mediaKey, IUser user)
+        => _mediaService.GetById(mediaKey) is { Trashed: false } media && !await _mediaPermissions.IsDeniedAsync(user, mediaKey)
+            ? ToPoster(media)
+            : null;
 
     private static async Task<YouTubeStill?> FirstAvailableStillAsync(HttpClient client, string videoId, (string Label, string[] Variants) slot, CancellationToken cancellationToken)
     {
@@ -143,8 +173,9 @@ internal sealed class YouTubePosterService : IYouTubePosterService
                 using var response = await client.SendAsync(request, cancellationToken);
                 if (response.IsSuccessStatusCode) return new YouTubeStill(variant, slot.Label, StillUrl(videoId, variant));
             }
-            catch (HttpRequestException)
+            catch (Exception ex) when (ex is HttpRequestException || (ex is TaskCanceledException && !cancellationToken.IsCancellationRequested))
             {
+                // A failed or timed-out still just falls back to the next variant.
             }
         }
 
@@ -196,7 +227,15 @@ internal sealed class YouTubePosterService : IYouTubePosterService
     }
 
     private IEnumerable<IMedia> GetChildren(int parentId)
-        => _mediaService.GetPagedChildren(parentId, 0, 1000, out _, null, null);
+    {
+        for (long page = 0, total = 1; page * PageSize < total; page++)
+        {
+            foreach (var media in _mediaService.GetPagedChildren(parentId, page, PageSize, out total, null, null))
+            {
+                yield return media;
+            }
+        }
+    }
 
     private YouTubePoster ToPoster(IMedia media)
     {

@@ -37,11 +37,20 @@ public sealed class YouTubeVideoApiController : UmbracoCommunityExtensionsApiCon
     [HttpPost("youtube/posters")]
     [ProducesResponseType<YouTubePoster>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     public async Task<ActionResult<YouTubePoster>> ImportPoster(ImportYouTubePosterRequest request, CancellationToken cancellationToken)
     {
         if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not { } user) return Forbid();
+        if (!await _posters.CanImportAsync(user))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
+            {
+                Title = "Can't import stills",
+                Detail = "Importing a still needs access to the whole Media library. Choose an image from the Media library instead.",
+            });
+        }
 
-        var poster = await _posters.ImportStillAsync(request.Url, request.Variant, request.ContentKey, request.Title, user.Id, cancellationToken);
+        var poster = await _posters.ImportStillAsync(request.Url, request.Variant, request.ContentKey, request.Title, user, cancellationToken);
         return poster is null
             ? BadRequest(new ProblemDetails { Title = "Couldn't import the still", Detail = "Check the link is a public YouTube video, then try another still." })
             : poster;
@@ -50,8 +59,10 @@ public sealed class YouTubeVideoApiController : UmbracoCommunityExtensionsApiCon
     [HttpGet("youtube/posters/{mediaKey:guid}")]
     [ProducesResponseType<YouTubePoster>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<YouTubePoster> GetPoster(Guid mediaKey)
-        => _posters.GetPoster(mediaKey) is { } poster ? poster : NotFound();
+    public async Task<ActionResult<YouTubePoster>> GetPoster(Guid mediaKey)
+        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is { } user && await _posters.GetPosterAsync(mediaKey, user) is { } poster
+            ? poster
+            : NotFound();
 
     private BadRequestObjectResult NotAYouTubeVideo()
         => BadRequest(new ProblemDetails { Title = "Not a YouTube video", Detail = "Paste a link to a single YouTube video, such as https://www.youtube.com/watch?v=…" });

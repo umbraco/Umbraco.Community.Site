@@ -1,8 +1,8 @@
 import { customElement } from "lit/decorators.js";
-import { playYouTube, type EmbeddedYouTube } from "../video-pickers/youtube-player";
+import { lockBodyScroll, unlockBodyScroll } from "../dialog/scroll-lock";
+import { announcePlay, playYouTube, stopWhenOtherPlays, type EmbeddedYouTube } from "../video-pickers/youtube-player";
 
 const elementName = "dc-video-showcase";
-const PLAY_EVENT = "dc-video-showcase:play";
 const SIDE_BY_SIDE = "(min-width: 1024px)";
 
 /**
@@ -16,6 +16,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
     #playing?: HTMLElement;
     #request = 0;
     #current = -1;
+    #stopListening?: () => void;
 
     get #items() {
         return [...this.querySelectorAll<HTMLElement>("[data-showcase-item]")];
@@ -32,7 +33,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
         this.addEventListener("keydown", this.#onKeydown);
         this.#dialog?.addEventListener("close", this.#onDialogClose);
         this.#sideBySide?.addEventListener("change", this.#onLayoutChange);
-        document.addEventListener(PLAY_EVENT, this.#onOtherPlay);
+        this.#stopListening = stopWhenOtherPlays(this, () => this.stop());
     }
 
     disconnectedCallback() {
@@ -40,7 +41,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
         this.removeEventListener("keydown", this.#onKeydown);
         this.#dialog?.removeEventListener("close", this.#onDialogClose);
         this.#sideBySide?.removeEventListener("change", this.#onLayoutChange);
-        document.removeEventListener(PLAY_EVENT, this.#onOtherPlay);
+        this.#stopListening?.();
         this.stop();
         this.#unlockScroll();
     }
@@ -93,7 +94,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
         this.#current = index;
         this.#fill(dialog, index);
         if (!dialog.open) {
-            this.#lockScroll();
+            lockBodyScroll();
             dialog.showModal();
         }
 
@@ -116,7 +117,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
 
     async #start(player: HTMLElement, source: string, title = "YouTube video", onEnded?: () => void) {
         this.stop();
-        document.dispatchEvent(new CustomEvent(PLAY_EVENT, { detail: this }));
+        announcePlay(this);
         const request = this.#request;
         const frame = document.createElement("div");
         frame.className = "dc-video-showcase__frame";
@@ -160,15 +161,8 @@ export class DcVideoShowcaseElement extends HTMLElement {
         });
     }
 
-    #lockScroll() {
-        document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
-        document.body.classList.add("dialog-open");
-    }
-
     #unlockScroll() {
-        if (!this.#dialog) return;
-        document.body.style.paddingRight = "";
-        document.body.classList.remove("dialog-open");
+        if (this.#dialog) unlockBodyScroll();
     }
 
     #indexOf(element: Element) {
@@ -185,10 +179,6 @@ export class DcVideoShowcaseElement extends HTMLElement {
     #onLayoutChange = () => {
         const noneOpen = !this.#items.some((item) => item.classList.contains("is-selected"));
         if (this.#sideBySide?.matches && noneOpen) this.select(0);
-    };
-
-    #onOtherPlay = (event: Event) => {
-        if ((event as CustomEvent).detail !== this) this.stop();
     };
 
     #onClick = (event: MouseEvent) => {

@@ -363,6 +363,10 @@ export type ImportPosterErrors = {
      * The resource is protected and requires an authentication token
      */
     401: unknown;
+    /**
+     * Forbidden
+     */
+    403: ProblemDetails;
 };
 
 export type ImportPosterError = ImportPosterErrors[keyof ImportPosterErrors];

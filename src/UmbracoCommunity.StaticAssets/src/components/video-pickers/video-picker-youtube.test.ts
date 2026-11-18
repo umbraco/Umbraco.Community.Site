@@ -193,6 +193,32 @@ describe('VideoPickerYouTubeElement', () => {
       expect(created).toHaveLength(1)
     })
 
+    it('stops and shows its poster again when another video on the page starts', async () => {
+      installYouTube()
+      const first = await create()
+      const second = await create()
+
+      await first.playVideo()
+      await second.playVideo()
+      await first.updateComplete
+
+      expect(created[0].player.destroy).toHaveBeenCalledTimes(1)
+      expect(first.querySelector('[slot="video"]')).toBeNull()
+      expect(first.shadowRoot?.querySelector('.poster')).toBeTruthy()
+      expect(created[1].player.destroy).not.toHaveBeenCalled()
+    })
+
+    it('can be played again after being stopped', async () => {
+      installYouTube()
+      const element = await create()
+
+      await element.playVideo()
+      element.stop()
+      await element.playVideo()
+
+      expect(created).toHaveLength(2)
+    })
+
     it('loads the player API only once, after the click', async () => {
       const element = await create()
 
