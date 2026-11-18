@@ -5,7 +5,6 @@
   "HistoryCleanup": {},
   "Icon": "icon-tag",
   "Thumbnail": "folder.png",
-  "Description": "A small uppercase label, e.g. a heading above a stat or a footnote below it.",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []

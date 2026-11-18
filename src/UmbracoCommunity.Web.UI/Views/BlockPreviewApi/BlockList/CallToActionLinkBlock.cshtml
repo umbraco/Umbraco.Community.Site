@@ -2,8 +2,7 @@
 
 @if (Model.Content.CallToActionLink != null)
 {
-    var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
     <div class="dc-tile__cta">
-        <span class="btn arrow cta is-@(Model.Settings?.ButtonColour ?? "blue")">@linkText</span>
+        <partial name="~/Views/Partials/Components/CallToActionLink.cshtml" model="@((Model.Content.CallToActionLink, Model.Content.CallToActionLinkText, Model.Settings?.ButtonColour))" />
     </div>
 }

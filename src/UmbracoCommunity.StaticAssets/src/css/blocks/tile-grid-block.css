@@ -112,8 +112,8 @@
     background: rgb(0 0 0 / 55%);
 }
 
-.dc-tile--image-right {
-    @media (--sm) {
+.dc-tile--image-right.dc-tile--wide-md {
+    @media (--md) {
         padding-right: calc(50% + var(--tile-padding));
     }
 }
@@ -126,8 +126,10 @@
     height: 14rem;
     margin: var(--tile-padding) calc(-1 * var(--tile-padding)) calc(-1 * var(--tile-padding));
     object-fit: cover;
+}
 
-    @media (--sm) {
+.dc-tile--image-right.dc-tile--wide-md .dc-tile__image {
+    @media (--md) {
         position: absolute;
         inset: 0 0 0 50%;
         width: 50%;
@@ -145,8 +147,10 @@
     max-height: 10rem;
     margin-top: var(--unit);
     object-fit: contain;
+}
 
-    @media (--sm) {
+.dc-tile--image-bottom-right.dc-tile--wide-md .dc-tile__image {
+    @media (--md) {
         position: absolute;
         right: var(--tile-padding);
         bottom: var(--tile-padding);
@@ -156,19 +160,23 @@
     }
 }
 
-.dc-tile--image-bottom-right .dc-tile__content {
-    @media (--sm) {
+.dc-tile--image-bottom-right.dc-tile--wide-md .dc-tile__content {
+    @media (--md) {
         padding-right: 40%;
     }
 }
 
-.dc-tile__eyebrow {
-    margin: 0;
-    font-size: 0.875rem;
+.dc-tile__eyebrow,
+.dc-tile-stat--label-beside .dc-tile-stat__label {
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.08em;
     line-height: 1.4;
     text-transform: uppercase;
+}
+
+.dc-tile__eyebrow {
+    margin: 0;
 }
 
 .dc-tile-stat {
@@ -198,10 +206,6 @@
 
 .dc-tile-stat--label-beside .dc-tile-stat__label {
     padding-top: 0.5em;
-    font-size: 0.875rem;
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
 }
 
 .dc-tile__text > :first-child {
@@ -221,6 +225,14 @@
     border-radius: calc(var(--radius-card) / 2);
 }
 
+.dc-tile__inline-image.is-circle {
+    flex: none;
+    width: min(100%, 12rem);
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
 .dc-tile__cta {
     margin-top: auto;
 }
@@ -231,9 +243,9 @@
 }
 
 .dc-tile--outlined {
-    border: 1px solid rgb(40 58 151 / 20%);
+    border: 1px solid color-mix(in srgb, var(--color-blue) 20%, transparent);
 }
 
 .dc-tile--outlined.bg-dark {
-    border-color: rgb(255 255 255 / 30%);
+    border-color: color-mix(in srgb, var(--color-white) 30%, transparent);
 }

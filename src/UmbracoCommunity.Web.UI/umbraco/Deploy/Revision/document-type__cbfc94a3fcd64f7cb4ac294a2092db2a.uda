@@ -1,11 +1,10 @@
 {
-  "Name": "Tile grid tile",
-  "Alias": "tileGridTile",
+  "Name": "Tile grid item",
+  "Alias": "tileGridItem",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
   "Icon": "icon-stop",
   "Thumbnail": "folder.png",
-  "Description": "One tile in a Tile grid.",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []

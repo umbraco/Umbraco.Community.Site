@@ -50,20 +50,20 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		// properties
 
 		///<summary>
-		/// Subtitle
-		///</summary>
-		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
-		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
-		[ImplementPropertyType("subtitle")]
-		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Subtitle => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetSubtitle(this, _publishedValueFallback);
-
-		///<summary>
 		/// Tiles
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("tiles")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel Tiles => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockGridModel>(_publishedValueFallback, "tiles");
+
+		///<summary>
+		/// Subtitle
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("subtitle")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Subtitle => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetSubtitle(this, _publishedValueFallback);
 
 		///<summary>
 		/// Title

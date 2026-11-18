@@ -2062,27 +2062,59 @@ dc-image-slider img {
     background: rgb(0 0 0 / 55%);
 }
 
-.dc-tile--image-right {
-    padding-right: calc(50% + 1.5rem);
+.dc-tile--image-right .dc-tile__image,
+.dc-tile--image-bottom-right .dc-tile__image {
+    position: relative;
+    order: 1;
+    margin-top: 1rem;
 }
 
 .dc-tile--image-right .dc-tile__image {
-    inset: 0 0 0 50%;
-    width: 50%;
-    height: 100%;
+    width: 100%;
+    height: 8rem;
     object-fit: cover;
+    border-radius: 10px;
 }
 
 .dc-tile--image-bottom-right .dc-tile__image {
+    align-self: flex-end;
+    max-width: 50%;
+    max-height: 6rem;
+    object-fit: contain;
+}
+
+.dc-tile--image-right.dc-tile--wide-md {
+    padding-right: calc(50% + 1.5rem);
+}
+
+.dc-tile--image-right.dc-tile--wide-md .dc-tile__image {
+    position: absolute;
+    inset: 0 0 0 50%;
+    width: 50%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+}
+
+.dc-tile--image-bottom-right.dc-tile--wide-md .dc-tile__image {
+    position: absolute;
     right: 1.5rem;
     bottom: 1.5rem;
     max-width: 40%;
     max-height: 60%;
-    object-fit: contain;
+    margin: 0;
 }
 
-.dc-tile--image-bottom-right .dc-tile__content {
+.dc-tile--image-bottom-right.dc-tile--wide-md .dc-tile__content {
     padding-right: 40%;
+}
+
+.dc-tile__inline-image.is-circle {
+    flex: none;
+    width: min(100%, 10rem);
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
 }
 
 .dc-tile__eyebrow,

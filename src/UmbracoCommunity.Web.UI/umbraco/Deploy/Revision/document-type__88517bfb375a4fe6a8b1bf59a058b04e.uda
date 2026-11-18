@@ -5,7 +5,6 @@
   "HistoryCleanup": {},
   "Icon": "icon-chart",
   "Thumbnail": "folder.png",
-  "Description": "A big number with a label, e.g. 1,732 Media / press attendees.",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []

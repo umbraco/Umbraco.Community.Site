@@ -31,6 +31,35 @@ namespace UmbracoCommunity.Web.Helpers
                 !string.Equals(colourSettings.BackgroundColour.Color, "#ffffff", StringComparison.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// WCAG contrast ratio between two hex colours, from 1 (identical) to 21 (black on white), or <c>null</c> if either isn't a hex colour.
+        /// </summary>
+        public static double? ContrastRatio(string? first, string? second)
+        {
+            if (RelativeLuminance(first) is not { } a || RelativeLuminance(second) is not { } b) return null;
+            return (Math.Max(a, b) + 0.05) / (Math.Min(a, b) + 0.05);
+        }
+
+        private static double? RelativeLuminance(string? colour)
+        {
+            var hex = colour?.Trim().TrimStart('#');
+            if (hex is not { Length: 6 or 8 } ||
+                !int.TryParse(hex[..2], System.Globalization.NumberStyles.HexNumber, null, out var r) ||
+                !int.TryParse(hex[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g) ||
+                !int.TryParse(hex[4..6], System.Globalization.NumberStyles.HexNumber, null, out var b))
+            {
+                return null;
+            }
+
+            static double Linear(int channel)
+            {
+                var c = channel / 255d;
+                return c <= 0.03928 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+            }
+
+            return 0.2126 * Linear(r) + 0.7152 * Linear(g) + 0.0722 * Linear(b);
+        }
+
         private static bool ColourIsDark(string colour)
         {
             var hex = colour.TrimStart('#');
