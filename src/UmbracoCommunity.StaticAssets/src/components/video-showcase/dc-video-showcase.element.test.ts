@@ -88,6 +88,26 @@ describe('DcVideoShowcaseElement', () => {
       expect(items(element).map(item => item.querySelector<HTMLElement>('[data-showcase-panel]')!.hidden)).toEqual([true, false, true])
     })
 
+    it('closes the open video from its trigger on small screens', () => {
+      const element = create('list')
+
+      click(items(element)[0].querySelector('[data-showcase-trigger]'))
+
+      expect(items(element).map(item => item.classList.contains('is-selected'))).toEqual([false, false, false])
+      expect(items(element).map(item => item.querySelector<HTMLElement>('[data-showcase-panel]')!.hidden)).toEqual([true, true, true])
+      expect(items(element)[0].querySelector('[data-showcase-trigger]')!.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('keeps the open video open when side by side', () => {
+      vi.stubGlobal('matchMedia', vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })))
+      const element = create('list')
+
+      click(items(element)[0].querySelector('[data-showcase-trigger]'))
+
+      expect(items(element)[0].classList.contains('is-selected')).toBe(true)
+      vi.unstubAllGlobals()
+    })
+
     it('steps to the next video and keeps focus on the step button', () => {
       const element = create('list')
 

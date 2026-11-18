@@ -3,6 +3,7 @@ import { playYouTube, type EmbeddedYouTube } from "../video-pickers/youtube-play
 
 const elementName = "dc-video-showcase";
 const PLAY_EVENT = "dc-video-showcase:play";
+const SIDE_BY_SIDE = "(min-width: 1024px)";
 
 /**
  * Enhances the server-rendered Video showcase block. In the list layout a trigger per video selects it
@@ -24,10 +25,13 @@ export class DcVideoShowcaseElement extends HTMLElement {
         return this.querySelector<HTMLDialogElement>("[data-showcase-dialog]");
     }
 
+    #sideBySide = window.matchMedia?.(SIDE_BY_SIDE);
+
     connectedCallback() {
         this.addEventListener("click", this.#onClick);
         this.addEventListener("keydown", this.#onKeydown);
         this.#dialog?.addEventListener("close", this.#onDialogClose);
+        this.#sideBySide?.addEventListener("change", this.#onLayoutChange);
         document.addEventListener(PLAY_EVENT, this.#onOtherPlay);
     }
 
@@ -35,6 +39,7 @@ export class DcVideoShowcaseElement extends HTMLElement {
         this.removeEventListener("click", this.#onClick);
         this.removeEventListener("keydown", this.#onKeydown);
         this.#dialog?.removeEventListener("close", this.#onDialogClose);
+        this.#sideBySide?.removeEventListener("change", this.#onLayoutChange);
         document.removeEventListener(PLAY_EVENT, this.#onOtherPlay);
         this.stop();
         this.#unlockScroll();
@@ -52,6 +57,19 @@ export class DcVideoShowcaseElement extends HTMLElement {
             item.querySelector("[data-showcase-trigger]")?.setAttribute("aria-expanded", String(selected));
             const panel = item.querySelector<HTMLElement>("[data-showcase-panel]");
             if (panel) panel.hidden = !selected;
+        });
+    }
+
+    /** Closes the open video in the list's accordion (small screens). */
+    collapse() {
+        if (this.#dialog) return;
+
+        this.stop();
+        this.#items.forEach((item) => {
+            item.classList.remove("is-selected");
+            item.querySelector("[data-showcase-trigger]")?.setAttribute("aria-expanded", "false");
+            const panel = item.querySelector<HTMLElement>("[data-showcase-panel]");
+            if (panel) panel.hidden = true;
         });
     }
 
@@ -164,6 +182,11 @@ export class DcVideoShowcaseElement extends HTMLElement {
         this.#items[this.#current]?.querySelector<HTMLElement>("[data-showcase-open]")?.focus();
     };
 
+    #onLayoutChange = () => {
+        const noneOpen = !this.#items.some((item) => item.classList.contains("is-selected"));
+        if (this.#sideBySide?.matches && noneOpen) this.select(0);
+    };
+
     #onOtherPlay = (event: Event) => {
         if ((event as CustomEvent).detail !== this) this.stop();
     };
@@ -206,7 +229,10 @@ export class DcVideoShowcaseElement extends HTMLElement {
 
         const trigger = target.closest("[data-showcase-trigger]");
         if (trigger) {
-            this.select(this.#indexOf(trigger));
+            const index = this.#indexOf(trigger);
+            const isOpen = this.#items[index]?.classList.contains("is-selected");
+            if (isOpen && !this.#sideBySide?.matches) this.collapse();
+            else this.select(index);
             return;
         }
 
