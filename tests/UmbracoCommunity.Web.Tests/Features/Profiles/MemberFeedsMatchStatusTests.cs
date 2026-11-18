@@ -73,7 +73,7 @@ public class MemberFeedsMatchStatusTests : IDisposable
             NullLogger<LinkPreviewService>.Instance);
 
         return new MemberFeedsApiController(
-            memberManager.Object, _profileStore, _syncClient.Object, linkPreviews, TestImageProxy.Create(), accessService, matching);
+            TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _profileStore), _profileStore, _syncClient.Object, linkPreviews, TestImageProxy.Create(), accessService, matching);
     }
 
     private static MemberFeedResponse Response(IActionResult result) =>

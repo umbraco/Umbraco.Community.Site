@@ -1,166 +1,113 @@
-import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { ProfileTimelineElement } from "./dc-profile-timeline.element";
 
 if (!customElements.get("dc-profile-timeline")) {
   customElements.define("dc-profile-timeline", ProfileTimelineElement);
 }
 
-// The markup the profile page renders: a plain GET form for the type filter.
-const markup = (filters = true) => `
-  ${filters
-    ? `<form method="get" data-timeline-filters>
-        <select name="type" data-timeline-type>
-          <option value="">Everything</option>
-          <option value="blog">Blog posts</option>
-          <option value="videos">Videos</option>
-          <option value="packages">Packages</option>
-          <option value="other">Other activity</option>
-        </select>
-        <button type="submit" data-timeline-apply>Show</button>
-      </form>`
-    : ""}
-  <p data-timeline-empty hidden>Nothing here for this filter.</p>
-  <section data-timeline-month id="mar-2026">
-    <ol>
-      <li data-timeline-entry data-type="blog" id="blog-mar">A post</li>
-      <li data-timeline-entry data-type="videos" id="video-mar">A video</li>
-    </ol>
-  </section>
-  <section data-timeline-month id="jun-2025">
-    <ol>
-      <li data-timeline-entry data-type="packages" id="package-jun">A package</li>
-    </ol>
-  </section>
-  <section data-timeline-month id="may-2025">
-    <ol>
-      <li data-timeline-entry data-type="blog" id="blog-may">An older post</li>
-    </ol>
-  </section>
-`;
+const mount = (html: string) => {
+  document.body.innerHTML = `<dc-profile-timeline>${html}</dc-profile-timeline>`;
+  return document.querySelector("dc-profile-timeline") as ProfileTimelineElement;
+};
 
-// The test setup replaces window.location with a plain object, so the address is kept there by hand.
-function setAddress(address: string) {
-  const url = new URL(address, "http://localhost:3000");
-  (window as { location: unknown }).location = {
-    href: url.href,
-    search: url.search,
-    pathname: url.pathname,
-    hostname: url.hostname,
-  };
-}
-
-function mount(address = "/profiles/octocat", filters = true): ProfileTimelineElement {
-  setAddress(address);
-  const element = document.createElement("dc-profile-timeline") as ProfileTimelineElement;
-  element.innerHTML = markup(filters);
-  document.body.appendChild(element);
-  return element;
-}
-
-function choose(element: ProfileTimelineElement, value: string) {
-  const select = element.querySelector<HTMLSelectElement>("[data-timeline-type]")!;
-  select.value = value;
-  select.dispatchEvent(new Event("change"));
-}
-
-const shown = (element: ProfileTimelineElement, selector: string) =>
-  [...element.querySelectorAll<HTMLElement>(selector)].filter((el) => !el.hidden).map((el) => el.id);
-
-const empty = (element: ProfileTimelineElement) => element.querySelector<HTMLElement>("[data-timeline-empty]")!;
-
-const search = () => window.location.search;
+const filterForm = `
+  <form method="get">
+    <select name="type" data-timeline-type>
+      <option value="">Highlights</option>
+      <option value="blog">Blog posts</option>
+    </select>
+    <button type="submit" data-timeline-apply>Show</button>
+  </form>`;
 
 describe("ProfileTimelineElement", () => {
-  beforeEach(() => {
-    vi.spyOn(window.history, "replaceState").mockImplementation((_state, _title, url) => setAddress(String(url)));
-  });
-
   afterEach(() => {
     document.body.innerHTML = "";
-    setAddress("/");
     vi.restoreAllMocks();
   });
 
-  it("shows every entry to start with and hides the form's own button", () => {
-    const element = mount();
+  it("hides the form's own button, which is only for browsers without JavaScript", () => {
+    const element = mount(filterForm);
 
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["blog-mar", "video-mar", "package-jun", "blog-may"]);
-    expect(empty(element).hidden).toBe(true);
     expect(element.querySelector<HTMLElement>("[data-timeline-apply]")!.hidden).toBe(true);
   });
 
-  it("filters by type and hides the months left empty", () => {
-    const element = mount();
+  it("submits the filter form when a type is chosen", () => {
+    const element = mount(filterForm);
+    const submit = vi.fn();
+    element.querySelector("form")!.requestSubmit = submit;
 
-    choose(element, "blog");
+    const select = element.querySelector<HTMLSelectElement>("[data-timeline-type]")!;
+    select.value = "blog";
+    select.dispatchEvent(new Event("change"));
 
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["blog-mar", "blog-may"]);
-    expect(shown(element, "[data-timeline-month]")).toEqual(["mar-2026", "may-2025"]);
-    expect(empty(element).hidden).toBe(true);
+    expect(submit).toHaveBeenCalledOnce();
   });
 
-  it("puts the chosen type in the address, keeping the other query values", () => {
-    const element = mount("/profiles/octocat?view=everything");
-
-    choose(element, "videos");
-
-    expect(window.location.pathname).toBe("/profiles/octocat");
-    expect(new URLSearchParams(search()).get("type")).toBe("videos");
-    expect(new URLSearchParams(search()).get("view")).toBe("everything");
+  it("copes with a timeline that has no filter", () => {
+    expect(() => mount("<ol><li>An entry</li></ol>")).not.toThrow();
   });
 
-  it("takes the type out of the address when everything is chosen again", () => {
-    const element = mount("/profiles/octocat?view=everything&type=blog");
+  describe("card images", () => {
+    const withImage = (naturalWidth: number, naturalHeight: number) => {
+      const element = mount(`<span class="community-profile__timeline-card-image"><img class="community-profile__timeline-card-picture" src="/x.png" alt="" /></span>`);
+      const img = element.querySelector("img")!;
+      Object.defineProperty(img, "naturalWidth", { value: naturalWidth });
+      Object.defineProperty(img, "naturalHeight", { value: naturalHeight });
+      Object.defineProperty(img, "complete", { value: false });
+      img.dispatchEvent(new Event("load"));
+      return element.querySelector(".community-profile__timeline-card-image")!;
+    };
 
-    choose(element, "");
+    it("marks a square image as contained", () => {
+      expect(withImage(400, 400).classList.contains("is-contained")).toBe(true);
+    });
 
-    expect(search()).toBe("?view=everything");
-    expect(shown(element, "[data-timeline-entry]")).toHaveLength(4);
+    it("leaves a 16:9 image to fill the box", () => {
+      expect(withImage(1600, 900).classList.contains("is-contained")).toBe(false);
+    });
   });
 
-  it("applies the type from the address on load", () => {
-    const element = mount("/profiles/octocat?type=packages");
+  describe("enlarging a card picture", () => {
+    const card = `
+      <ol><li><div class="community-profile__timeline-body">
+        <a class="community-profile__timeline-card" href="https://example.com/post">
+          <span class="community-profile__timeline-card-image">
+            <img class="community-profile__timeline-card-picture" src="/media/profile-timeline/a.png" alt="" />
+          </span>
+          <span class="community-profile__timeline-card-text"><span class="community-profile__timeline-title">A post</span></span>
+        </a>
+      </div></li></ol>`;
 
-    expect(element.querySelector<HTMLSelectElement>("[data-timeline-type]")!.value).toBe("packages");
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["package-jun"]);
-    expect(shown(element, "[data-timeline-month]")).toEqual(["jun-2025"]);
-  });
+    it("adds a labelled button beside the card, not inside the link", () => {
+      const element = mount(card);
 
-  it("ignores an unknown type in the address and shows everything", () => {
-    const element = mount("/profiles/octocat?type=nonsense");
+      const button = element.querySelector<HTMLButtonElement>(".community-profile__timeline-enlarge")!;
+      expect(button.getAttribute("aria-label")).toBe("Show the picture enlarged: A post");
+      expect(button.closest("a")).toBeNull();
+      expect(button.previousElementSibling?.classList.contains("community-profile__timeline-card")).toBe(true);
+    });
 
-    expect(element.querySelector<HTMLSelectElement>("[data-timeline-type]")!.value).toBe("");
-    expect(shown(element, "[data-timeline-entry]")).toHaveLength(4);
-    expect(empty(element).hidden).toBe(true);
-  });
+    it("opens the picture in a dialog and removes it again on close, giving focus back", () => {
+      // jsdom has no modal dialogs.
+      HTMLDialogElement.prototype.showModal = vi.fn();
+      HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+        this.dispatchEvent(new Event("close"));
+      });
+      const element = mount(card);
+      const button = element.querySelector<HTMLButtonElement>(".community-profile__timeline-enlarge")!;
 
-  it("says so when nothing matches", () => {
-    const element = mount();
+      button.click();
 
-    choose(element, "other");
+      const dialog = document.querySelector<HTMLDialogElement>("dialog.dc-picture-dialog")!;
+      expect(dialog.querySelector("img")!.src).toMatch(/\/media\/profile-timeline\/a\.png$/);
+      expect(dialog.querySelector("img")!.alt).toBe("A post");
+      expect(document.body.classList.contains("dialog-open")).toBe(true);
 
-    expect(shown(element, "[data-timeline-entry]")).toEqual([]);
-    expect(shown(element, "[data-timeline-month]")).toEqual([]);
-    expect(empty(element).hidden).toBe(false);
-    expect(empty(element).textContent).toBe("Nothing here for this filter.");
-  });
+      dialog.querySelector<HTMLButtonElement>(".dc-picture-dialog__close")!.click();
 
-  it("filters in place when the form is submitted", () => {
-    const element = mount();
-    element.querySelector<HTMLSelectElement>("[data-timeline-type]")!.value = "videos";
-
-    const form = element.querySelector<HTMLFormElement>("form")!;
-    const submitted = form.dispatchEvent(new Event("submit", { cancelable: true }));
-
-    expect(submitted).toBe(false);
-    expect(shown(element, "[data-timeline-entry]")).toEqual(["video-mar"]);
-    expect(new URLSearchParams(search()).get("type")).toBe("videos");
-  });
-
-  it("lists everything when there is no filter", () => {
-    const element = mount("/profiles/octocat?type=blog", false);
-
-    expect(shown(element, "[data-timeline-entry]")).toHaveLength(4);
-    expect(empty(element).hidden).toBe(true);
+      expect(document.querySelector("dialog")).toBeNull();
+      expect(document.body.classList.contains("dialog-open")).toBe(false);
+      expect(document.activeElement).toBe(button);
+    });
   });
 });

@@ -9,19 +9,22 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using UmbracoCommunity.Web.Features.Members;
 using UmbracoCommunity.Web.Features.Mvp.Infrastructure;
 using UmbracoCommunity.Web.Features.Mvp.Models;
+using UmbracoCommunity.Web.Features.Profiles;
+using UmbracoCommunity.Web.Features.Profiles.Models;
 using Xunit;
 
 namespace UmbracoCommunity.Web.Tests.Features.Members;
 
-public class MvpEarlyAccessLoginHandlerTests
+public class EarlyAccessLoginHandlerTests
 {
     private static readonly Guid MemberKey = Guid.NewGuid();
 
     private readonly Mock<IExternalMemberService> _externalMemberService = new();
     private readonly Mock<IMvpDataService> _mvpDataService = new();
+    private readonly Mock<IProfileSyncClient> _syncClient = new();
     private string[] _roles = [];
 
-    public MvpEarlyAccessLoginHandlerTests()
+    public EarlyAccessLoginHandlerTests()
     {
         _externalMemberService
             .Setup(s => s.GetRolesAsync(MemberKey))
@@ -52,6 +55,61 @@ public class MvpEarlyAccessLoginHandlerTests
         await Handle();
 
         _externalMemberService.Verify(s => s.AssignRolesAsync(It.IsAny<Guid>(), It.IsAny<string[]>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Teammate_is_added_to_early_access()
+    {
+        SetMember("hq-person");
+        _syncClient
+            .Setup(c => c.FindProfileAsync("hq-person", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PlatformProfile("p1", []) { IsTeammate = true });
+
+        await Handle();
+
+        _externalMemberService.Verify(
+            s => s.AssignRolesAsync(MemberKey, It.Is<string[]>(r => r.SequenceEqual(new[] { "Early access" }))),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task Member_the_platform_does_not_mark_as_a_teammate_is_left_alone()
+    {
+        SetMember("someone-else");
+        _syncClient
+            .Setup(c => c.FindProfileAsync("someone-else", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PlatformProfile("p1", []));
+
+        await Handle();
+
+        _externalMemberService.Verify(s => s.AssignRolesAsync(It.IsAny<Guid>(), It.IsAny<string[]>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task A_failing_platform_neither_adds_the_member_nor_blocks_the_sign_in()
+    {
+        SetMember("hq-person");
+        _syncClient
+            .Setup(c => c.FindProfileAsync("hq-person", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TaskCanceledException("simulated timeout"));
+
+        var act = Handle;
+
+        await act.Should().NotThrowAsync();
+        _externalMemberService.Verify(s => s.AssignRolesAsync(It.IsAny<Guid>(), It.IsAny<string[]>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task The_platform_is_not_asked_about_a_current_mvp_or_a_member_already_in_early_access()
+    {
+        SetMember("octocat");
+        await Handle();
+
+        SetMember("hq-person");
+        _roles = ["Early access"];
+        await Handle();
+
+        _syncClient.Verify(c => c.FindProfileAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -105,7 +163,7 @@ public class MvpEarlyAccessLoginHandlerTests
             .ReturnsAsync(new ExternalMemberIdentity { Key = MemberKey, UserName = userName });
 
     private Task Handle() =>
-        new MvpEarlyAccessLoginHandler(_externalMemberService.Object, _mvpDataService.Object, NullLogger<MvpEarlyAccessLoginHandler>.Instance)
+        new EarlyAccessLoginHandler(_externalMemberService.Object, _mvpDataService.Object, _syncClient.Object, NullLogger<EarlyAccessLoginHandler>.Instance)
             .HandleAsync(new MemberLoginSuccessNotification("127.0.0.1", MemberKey), CancellationToken.None);
 
     private static MvpMember Mvp(string name, string handle) => new(name, false, "", null, handle);

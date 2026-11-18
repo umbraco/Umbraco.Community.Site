@@ -30,8 +30,39 @@ public sealed record CommunityProfile(
     /// <summary>What the member has chosen the activity sections show. Applied by <see cref="ProfileDisplay.Apply"/>.</summary>
     public ProfileDisplayChoices DisplayChoices { get; init; } = ProfileDisplayChoices.None;
 
+    /// <summary>
+    /// The member's forum counts over the last 12 months (topics, replies, accepted solutions) as the platform counts them,
+    /// or null when the platform has none. Replies are only ever counted, never listed.
+    /// </summary>
+    public PlatformForumStats? ForumStats { get; init; }
+
+    /// <summary>
+    /// How many items each activity section had over the last 12 months, counted exactly (not from the few items shown),
+    /// by section (see <see cref="PlatformActivityGroups"/>). A section with no key was not counted (the forum has its own
+    /// <see cref="ForumStats"/>). Null when the platform has none.
+    /// </summary>
+    public IReadOnlyDictionary<string, int>? ActivityCounts { get; init; }
+
+    /// <summary>
+    /// Pairs of social posts (<c>ProfileTimeline.PairKey</c>) a model judged to be the same post shared on two
+    /// platforms. Merged on the timeline.
+    /// </summary>
+    public IReadOnlySet<string> SamePosts { get; init; } = new HashSet<string>();
+
+    /// <summary>
+    /// Set while the timeline is still being built: some social posts are still being checked for copies of each other.
+    /// The page then shows a progress bar instead of the activity graph and timeline. Null when done.
+    /// </summary>
+    public ProfileJudgingProgress? JudgingProgress { get; init; }
+
     /// <summary>Activity the member added by hand that has no section of its own (a talk, a contribution, a podcast, anything else).</summary>
     public IReadOnlyList<ProfileOtherActivity> OtherActivities { get; init; } = [];
+
+    /// <summary>
+    /// The pictures the member attached to activity they added by hand, by activity id, at their address on this site
+    /// (see <see cref="ProfileActivityImageStore"/>). Shown on the item's timeline card instead of whatever its page offers.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> ActivityImages { get; init; } = new Dictionary<string, string>();
 
     /// <summary>
     /// The member's pinned activities, in their order. Empty until <see cref="ProfileDisplay.Apply"/> has run,
@@ -60,6 +91,9 @@ public sealed record ProfileIdentity(
 {
     /// <summary>True when the newest of <see cref="MvpYears"/> is the current MVP year. Set by <see cref="ProfileMvp"/>.</summary>
     public bool IsCurrentMvp { get; init; }
+
+    /// <summary>True when <see cref="Headline"/> is the company from the member's GitHub profile, not something they wrote.</summary>
+    public bool HeadlineIsCompany { get; init; }
 }
 
 /// <summary>A blog post or article the member has written, from any source.</summary>
@@ -84,15 +118,17 @@ public sealed record ProfileVideo(
     string? Description = null,
     string? ActivityId = null);
 
-/// <summary>A post or reply on the Umbraco community forum.</summary>
+/// <summary>A topic the member started on the Umbraco community forum, or an answer of theirs that was accepted as the solution (<paramref name="IsSolution"/>).</summary>
 public sealed record ProfileForumPost(
     string Title,
     string Url,
     DateTimeOffset PostedAt,
     int? Replies,
-    string? ActivityId = null);
+    string? ActivityId = null,
+    bool IsSolution = false);
 
 /// <summary>A released package and its published versions (newest first).</summary>
+/// <param name="IsNew">True when this is the package's first release ever (its first version), not a routine one.</param>
 /// <param name="Date">When the package was last active (its latest release, or the date the member gave). Null when not known.</param>
 public sealed record ProfilePackage(
     string Name,
@@ -100,7 +136,8 @@ public sealed record ProfilePackage(
     IReadOnlyList<string> Versions,
     string? Description = null,
     string? ActivityId = null,
-    DateTimeOffset? Date = null);
+    DateTimeOffset? Date = null,
+    bool IsNew = false);
 
 /// <summary>A talk given by the member, sourced from Sessionize.</summary>
 public sealed record ProfileTalk(
@@ -157,3 +194,10 @@ public sealed record ProfileOtherActivity(
     DateTimeOffset Date,
     string? Description = null,
     string? ActivityId = null);
+
+/// <summary>How far the check of social posts for copies has got: <paramref name="Done"/> of <paramref name="Total"/> pairs.</summary>
+public sealed record ProfileJudgingProgress(int Done, int Total)
+{
+    /// <summary>Whole percent done, 0 to 99 (100 only once nothing is left).</summary>
+    public int Percent => Total <= 0 ? 0 : Math.Min(99, (int)(100L * Done / Total));
+}

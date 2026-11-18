@@ -76,7 +76,7 @@ public class MenuViewModelBuilderTests : IDisposable
             new HttpContextAccessor { HttpContext = httpContext },
             memberManager,
             store,
-            new ProfileAvatarUrlResolver(contentQuery.Object, urlProvider.Object),
+            new ProfileAvatarUrlResolver(contentQuery.Object, urlProvider.Object, Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             NullLogger<MenuViewModelBuilder>.Instance);
     }
 

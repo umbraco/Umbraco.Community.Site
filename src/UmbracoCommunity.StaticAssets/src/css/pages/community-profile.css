@@ -455,10 +455,6 @@
     color: var(--color-identity-blue);
 }
 
-.community-profile__icon {
-    flex-shrink: 0;
-}
-
 .community-profile__highlight-title {
     font-size: var(--font-size-large);
     font-weight: var(--font-weight-bold);
@@ -662,6 +658,56 @@
     row-gap: var(--unit-xxs);
 }
 
+.community-profile__graph-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: var(--unit-sm);
+    margin: var(--unit-sm) 0 var(--unit-md);
+    padding: 0;
+    list-style: none;
+}
+
+/* A stat tile in the same white card style as the timeline: icon, big figure, label. */
+.community-profile__graph-stat {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+        "icon count"
+        "label label";
+    align-items: center;
+    column-gap: var(--unit-xs);
+    row-gap: var(--unit-xxs);
+    padding: var(--unit-sm);
+    border: 1px solid var(--color-light-grey);
+    border-radius: var(--border-radius-md);
+    background: var(--color-white);
+}
+
+.community-profile__graph-stat-icon {
+    grid-area: icon;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-light);
+    color: var(--color-identity-blue);
+}
+
+.community-profile__graph-stat-count {
+    grid-area: count;
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-bold);
+    line-height: 1;
+    color: var(--color-identity-blue);
+}
+
+.community-profile__graph-stat-label {
+    grid-area: label;
+    font-size: var(--font-size-sm);
+    color: var(--color-dark-grey);
+}
+
 .community-profile__graph-cell {
     aspect-ratio: 1;
     border-radius: 2px;
@@ -694,155 +740,108 @@
     margin-bottom: var(--unit-lg);
 }
 
-.community-profile__timeline-filters {
+.community-profile__building {
+    margin-bottom: var(--unit-lg);
+}
+
+.community-profile__building-text {
+    margin: 0 0 var(--unit-sm);
+}
+
+.community-profile__building-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--unit-sm);
+    max-width: 32rem;
+}
+
+.community-profile__building-bar progress {
+    flex: 1 1 auto;
+    height: 0.75rem;
+    appearance: none;
+    border: 0;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    background: var(--color-grey);
+    accent-color: var(--color-blue);
+}
+
+.community-profile__building-bar progress::-webkit-progress-bar {
+    background: var(--color-grey);
+}
+
+.community-profile__building-bar progress::-webkit-progress-value {
+    background: var(--color-blue);
+    border-radius: var(--radius-pill);
+    transition: width 0.4s ease;
+}
+
+.community-profile__building-bar progress::-moz-progress-bar {
+    background: var(--color-blue);
+    border-radius: var(--radius-pill);
+}
+
+.community-profile__building-percent {
+    font-weight: var(--font-weight-bold);
+    min-width: 3ch;
+    text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .community-profile__building-bar progress::-webkit-progress-value {
+        transition: none;
+    }
+}
+
+/* The timeline's filter, months and entries are in elements/profile-timeline.css, shared with the account page. */
+
+/* Timeline pages: previous / numbers / next, in the same pill style as the filter. */
+.community-profile__pager {
+    margin-top: var(--unit-md);
+}
+
+.community-profile__pager-list {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--unit-sm) var(--unit);
-    margin-bottom: var(--unit);
-}
-
-.community-profile__timeline-apply[hidden],
-.community-profile__timeline-empty[hidden],
-.community-profile__timeline-month[hidden],
-.community-profile__timeline-entry[hidden] {
-    display: none;
-}
-
-.community-profile__timeline-filter {
-    display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: var(--unit-xxs);
-    min-width: 0;
-    flex: 1 1 12rem;
-    max-width: 20rem;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-bold);
-}
-
-.community-profile__timeline-filter select {
-    width: 100%;
-    min-height: 44px;
-    padding: var(--unit-xxs) var(--unit-xs);
-    border: var(--base-border);
-    border-radius: var(--border-radius);
-    background: var(--color-white);
-    font: inherit;
-    font-weight: normal;
-}
-
-.community-profile__timeline-empty {
-    margin: 0;
-    padding-block: var(--unit);
-    color: var(--color-dark-grey);
-}
-
-.community-profile__timeline-month + .community-profile__timeline-month {
-    margin-top: var(--unit);
-}
-
-.community-profile__timeline-month-title {
-    margin: 0 0 var(--unit-xs);
-    font-size: var(--font-size-sm);
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--color-dark-grey);
-}
-
-.community-profile__timeline-list {
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.community-profile__timeline-entry {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--unit-sm);
-    padding-block: var(--unit-sm);
-    border-bottom: 1px solid var(--color-light-grey);
+.community-profile__pager-list li:empty {
+    display: none;
 }
 
-.community-profile__timeline-entry:last-child {
-    border-bottom: none;
-}
-
-.community-profile__timeline-icon {
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background: var(--color-light);
-    color: var(--color-identity-blue);
-}
-
-.community-profile__timeline-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--unit-xxs);
-    min-width: 0;
-    flex: 1;
-}
-
-.community-profile__timeline-title {
-    font-weight: var(--font-weight-bold);
+.community-profile__pager-link,
+.community-profile__pager-gap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding-inline: var(--unit-sm);
+    border-radius: var(--radius-pill);
     color: var(--color-blue);
-    text-decoration: none;
-    overflow-wrap: anywhere;
 }
 
-.community-profile__timeline-desc {
-    font-size: var(--font-size-sm);
-    line-height: 1.4;
-    color: var(--color-light-blue);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.community-profile__timeline-meta {
-    font-size: var(--font-size-sm);
-    color: var(--color-dark-grey);
-}
-
-/* A preview card: the picture above the text when narrow, beside it when there is room. */
-.community-profile__timeline-card {
-    display: flex;
-    flex-wrap: wrap;
-    overflow: hidden;
-    border: 1px solid var(--color-light-grey);
-    border-radius: var(--border-radius-md);
+#main-content .community-profile a.community-profile__pager-link {
     background: var(--color-white);
-    color: inherit;
-}
-
-.community-profile__timeline-card-image {
-    flex: 1 1 10rem;
-    max-height: 12rem;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    background: var(--color-light);
-}
-
-.community-profile__timeline-card-text {
-    display: flex;
-    flex-direction: column;
-    gap: var(--unit-xxs);
-    flex: 999 1 14rem;
-    min-width: 0;
-    padding: var(--unit-sm);
-}
-
-#main-content .community-profile a.community-profile__timeline-card:hover {
+    border: 1px solid var(--color-light-grey);
     text-decoration: none;
 }
 
-#main-content .community-profile a.community-profile__timeline-card:hover .community-profile__timeline-title {
-    text-decoration: underline;
+#main-content .community-profile a.community-profile__pager-link:hover,
+#main-content .community-profile a.community-profile__pager-link:focus-visible {
+    border-color: var(--color-blue);
+}
+
+.community-profile__pager-link.is-current {
+    background: var(--color-blue);
+    color: var(--color-white);
+    font-weight: var(--font-weight-bold);
 }
 
 /* Departments — compact sections, 2–3 abreast */

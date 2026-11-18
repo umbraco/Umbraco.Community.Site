@@ -245,6 +245,9 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500);
 
+                    b.Property<string>("ImagePath")
+                        .HasMaxLength(300);
+
                     b.Property<string>("Kind")
                         .IsRequired()
                         .HasMaxLength(50);
@@ -301,6 +304,27 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("ProfileTimelinePreviews", (string)null);
+                });
+
+            modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.SocialPostJudgmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("JudgedUtc");
+
+                    b.Property<string>("PairKey")
+                        .IsRequired()
+                        .HasMaxLength(300);
+
+                    b.Property<double>("Probability");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PairKey")
+                        .IsUnique();
+
+                    b.ToTable("SocialPostJudgments", (string)null);
                 });
 
             modelBuilder.Entity("UmbracoCommunity.Web.Features.Profiles.Data.Entities.MemberFeedEntity", b =>

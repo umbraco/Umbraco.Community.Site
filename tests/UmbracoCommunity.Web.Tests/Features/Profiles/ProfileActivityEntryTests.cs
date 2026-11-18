@@ -21,9 +21,9 @@ using Xunit;
 namespace UmbracoCommunity.Web.Tests.Features.Profiles;
 
 /// <summary>
-/// Activity added by hand, end to end: submitted through the member API into the real store, checked through the
-/// activity entry service as an admin would, and read back through the profile provider and activity service as the profile
-/// page does.
+/// Activity added by hand, end to end: added and edited through the member API into the real store (on the profile at
+/// once), removed or restored through the activity entry service as a moderator would, and read back through the profile
+/// provider and activity service as the profile page does.
 /// </summary>
 public class ProfileActivityEntryTests : IDisposable
 {
@@ -36,17 +36,21 @@ public class ProfileActivityEntryTests : IDisposable
     private readonly Mock<IProfileSyncClient> _syncClient = new();
     private readonly ProfileActivityEntryService _activityEntryService;
     private readonly Guid _memberKey = Guid.NewGuid();
+    private readonly InMemoryMediaFileSystem _media = new();
+    private readonly ProfileActivityImageStore _images;
 
     public ProfileActivityEntryTests()
     {
+        _images = new ProfileActivityImageStore(_media.FileSystem, NullLogger<ProfileActivityImageStore>.Instance);
         _store = new MemberProfileStore(_database);
         _provider = new MemberProfileDataProvider(
             _store,
-            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>()),
+            new ProfileAvatarUrlResolver(Mock.Of<IPublishedContentQuery>(), Mock.Of<IPublishedUrlProvider>(), Mock.Of<Umbraco.Cms.Core.Media.IImageUrlGenerator>()),
             TestImageProxy.Create());
         _activityEntryService = new ProfileActivityEntryService(
             new MemberActivityEntryStore(_database),
             _syncClient.Object,
+            _images,
             Caches(),
             NullLogger<ProfileActivityEntryService>.Instance);
 
@@ -75,7 +79,8 @@ public class ProfileActivityEntryTests : IDisposable
             .ReturnsAsync(new List<string> { inEarlyAccess ? ProfileAccessService.EarlyAccessGroupName : "Community Members" });
 
         var access = new ProfileAccessService(memberManager.Object, _provider, NullLogger<ProfileAccessService>.Instance);
-        return new ProfileActivityEntryApiController(memberManager.Object, _store, access, _activityEntryService);
+        return new ProfileActivityEntryApiController(
+            TestProfileEditSubjects.Resolver(memberManager.Object, access, _store), _store, access, _activityEntryService, _images, ProfileActivityLinkLookupTests.Create(_database, _media));
     }
 
     private ProfileActivityService CreateActivityService() =>
@@ -97,8 +102,58 @@ public class ProfileActivityEntryTests : IDisposable
     private static AddActivityEntryRequest Entry(string url = Link, string kind = "blog") =>
         new(kind, "My post", url, new DateOnly(2026, 10, 1), "About a thing.");
 
+    /// <summary>The entry as the account page posts it, with an optional picture.</summary>
+    private static AddActivityEntryForm Form(AddActivityEntryRequest request, IFormFile? image = null) =>
+        new()
+        {
+            Kind = request.Kind,
+            Title = request.Title,
+            Url = request.Url,
+            Date = request.Date?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+            Description = request.Description,
+            Image = image,
+        };
+
     private static MemberActivityEntryResponse Added(IActionResult result) =>
         result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeOfType<MemberActivityEntryResponse>().Subject;
+
+    private static string? Error(IActionResult result) =>
+        ((ObjectResult)result).Value!.GetType().GetProperty("error")!.GetValue(((ObjectResult)result).Value) as string;
+
+    private async Task<IReadOnlyList<MemberActivityEntryResponse>> MineAsync(ProfileActivityEntryApiController controller) =>
+        (await controller.Get()).Should().BeOfType<OkObjectResult>()
+            .Which.Value.Should().BeAssignableTo<IReadOnlyList<MemberActivityEntryResponse>>().Subject;
+
+    /// <summary>An entry added while entries were still checked first, and never decided: stored as waiting.</summary>
+    private async Task<int> AddLegacyWaitingEntryAsync(string url = Link)
+    {
+        var profile = await _store.GetByMemberKeyAsync(_memberKey);
+        await using var context = _database.CreateDbContext();
+        var entity = new MemberActivityEntryEntity
+        {
+            MemberProfileId = profile!.Id,
+            Kind = "blog",
+            Title = "Old post",
+            Url = url,
+            DateUtc = new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc),
+            State = ActivityEntryState.Pending,
+            CreatedUtc = DateTime.UtcNow.AddDays(-30),
+        };
+        context.MemberActivityEntries.Add(entity);
+        await context.SaveChangesAsync();
+        return entity.Id;
+    }
+
+    private static UpdateActivityEntryForm EditForm(AddActivityEntryRequest request, bool removeImage = false) =>
+        new()
+        {
+            Kind = request.Kind,
+            Title = request.Title,
+            Url = request.Url,
+            Date = request.Date?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+            Description = request.Description,
+            RemoveImage = removeImage,
+        };
 
     // ---- rules ----
 
@@ -139,28 +194,35 @@ public class ProfileActivityEntryTests : IDisposable
         ProfileActivityEntry.TryNormalize(Entry() with { Description = new string('a', ProfileActivityEntry.MaxDescriptionLength + 1) }, today, out _, out _).Should().BeFalse();
     }
 
-    // ---- submit ----
+    // ---- add ----
 
     [Fact]
-    public async Task A_submitted_entry_waits_and_is_not_on_the_profile()
+    public async Task An_added_entry_is_on_the_profile_at_once_and_the_platform_is_told()
     {
         await CreateProfileAsync();
-
-        var added = Added(await CreateController().Add(Entry()));
-
-        added.State.Should().Be("Pending");
-        added.KindLabel.Should().Be("Blog post");
+        // Loaded once, so a stale cached copy would show if adding didn't clear it.
         (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+
+        var added = Added(await CreateController().Add(Form(Entry())));
+
+        added.State.Should().Be("Verified");
+        added.KindLabel.Should().Be("Blog post");
+        var post = (await ProfileAsync()).BlogPosts.Should().ContainSingle().Subject;
+        post.Title.Should().Be("My post");
+        post.Url.Should().Be(Link);
+        post.ActivityId.Should().Be(ProfileActivityEntry.ActivityId(added.Id));
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.Is<ActivityEntryRecord>(e => e.Url == Link && e.Id == added.Id), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task Members_outside_early_access_cannot_add_or_see_activity()
+    public async Task Members_outside_early_access_cannot_add_edit_or_see_activity()
     {
         await CreateProfileAsync();
         var controller = CreateController(inEarlyAccess: false);
 
-        (await controller.Add(Entry())).Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        (await controller.Add(Form(Entry()))).Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
         (await controller.Get()).Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
+        (await controller.Update(1, EditForm(Entry()))).Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
     }
 
     [Fact]
@@ -169,45 +231,44 @@ public class ProfileActivityEntryTests : IDisposable
         await CreateProfileAsync();
         var controller = CreateController();
 
-        (await controller.Add(Entry("http://example.dev/a"))).Should().BeOfType<BadRequestObjectResult>();
+        (await controller.Add(Form(Entry("http://example.dev/a")))).Should().BeOfType<BadRequestObjectResult>();
 
-        (await controller.Get()).Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeAssignableTo<IEnumerable<MemberActivityEntryResponse>>().Which.Should().BeEmpty();
+        (await MineAsync(controller)).Should().BeEmpty();
     }
 
     [Fact]
-    public async Task The_same_link_cannot_be_added_twice_and_too_many_waiting_entries_are_refused()
+    public async Task The_same_link_cannot_be_added_twice_but_there_is_no_cap_on_how_many_entries()
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        Added(await controller.Add(Entry()));
+        Added(await controller.Add(Form(Entry())));
 
-        (await controller.Add(Entry(Link.ToUpperInvariant().Replace("HTTPS", "https")))).Should().BeOfType<ConflictObjectResult>();
+        var again = await controller.Add(Form(Entry(Link.ToUpperInvariant().Replace("HTTPS", "https"))));
+        again.Should().BeOfType<ConflictObjectResult>();
+        Error(again).Should().Be("You've already added that link.");
 
-        for (var i = 1; i < ProfileActivityEntry.MaxPendingEntries; i++)
+        for (var i = 1; i <= 25; i++)
         {
-            Added(await controller.Add(Entry($"https://example.dev/post-{i}")));
+            Added(await controller.Add(Form(Entry($"https://example.dev/post-{i}"))));
         }
 
-        (await controller.Add(Entry("https://example.dev/one-more"))).Should().BeOfType<ConflictObjectResult>();
+        (await MineAsync(controller)).Should().HaveCount(26);
+    }
+
+    [Fact]
+    public async Task A_platform_failure_does_not_undo_an_add()
+    {
+        _syncClient
+            .Setup(c => c.NotifyActivityVerifiedAsync(It.IsAny<string>(), It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("simulated"));
+        await CreateProfileAsync();
+
+        Added(await CreateController().Add(Form(Entry())));
+
+        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
     }
 
     // ---- withdraw ----
-
-    [Fact]
-    public async Task A_waiting_entry_can_be_withdrawn_and_then_cannot_be_verified()
-    {
-        await CreateProfileAsync();
-        var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-
-        (await controller.Withdraw(added.Id)).Should().BeOfType<NoContentResult>();
-
-        (await controller.Get()).Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeAssignableTo<IEnumerable<MemberActivityEntryResponse>>().Which.Should().BeEmpty();
-        (await _activityEntryService.VerifyAsync(added.Id, null, "Admin")).Should().BeNull();
-        _syncClient.Verify(c => c.NotifyActivityRemovedAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
-    }
 
     [Fact]
     public async Task Another_entry_id_or_an_unknown_one_cannot_be_withdrawn()
@@ -217,34 +278,33 @@ public class ProfileActivityEntryTests : IDisposable
         (await CreateController().Withdraw(9999)).Should().BeOfType<NotFoundObjectResult>();
     }
 
-    // ---- verify ----
-
     [Fact]
-    public async Task A_verified_entry_appears_in_its_section_and_the_platform_is_told()
-    {
-        await CreateProfileAsync();
-        var added = Added(await CreateController().Add(Entry()));
-
-        var verified = await _activityEntryService.VerifyAsync(added.Id, Guid.NewGuid(), "Admin");
-
-        verified!.State.Should().Be(ActivityEntryState.Verified);
-        verified.DecidedByUserName.Should().Be("Admin");
-        var post = (await ProfileAsync()).BlogPosts.Should().ContainSingle().Subject;
-        post.Title.Should().Be("My post");
-        post.Url.Should().Be(Link);
-        post.ActivityId.Should().Be(ProfileActivityEntry.ActivityId(added.Id));
-        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.Is<ActivityEntryRecord>(e => e.Url == Link), It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    [Fact]
-    public async Task Verified_entries_land_in_their_own_section_and_can_be_hidden_like_any_item()
+    public async Task Withdrawing_an_entry_takes_it_off_the_profile_at_once_and_it_cannot_be_restored()
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        var video = Added(await controller.Add(Entry("https://example.dev/v", "videos")));
-        var package = Added(await controller.Add(Entry("https://example.dev/p", "packages")));
-        await _activityEntryService.VerifyAsync(video.Id, null, "Admin");
-        await _activityEntryService.VerifyAsync(package.Id, null, "Admin");
+        var added = Added(await controller.Add(Form(Entry())));
+        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
+
+        (await controller.Withdraw(added.Id)).Should().BeOfType<NoContentResult>();
+
+        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+        (await MineAsync(controller)).Should().BeEmpty();
+        _syncClient.Verify(c => c.NotifyActivityRemovedAsync(Handle, Link, It.IsAny<CancellationToken>()), Times.Once);
+        (await _activityEntryService.VerifyAsync(added.Id, null, "Moderator")).Should().BeNull();
+        // A link the member withdrew themselves can be added again.
+        Added(await controller.Add(Form(Entry())));
+    }
+
+    // ---- where each kind shows ----
+
+    [Fact]
+    public async Task Entries_land_in_their_own_section_and_can_be_hidden_like_any_item()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var video = Added(await controller.Add(Form(Entry("https://example.dev/v", "videos"))));
+        var package = Added(await controller.Add(Form(Entry("https://example.dev/p", "packages"))));
 
         var profile = await ProfileAsync();
 
@@ -255,11 +315,10 @@ public class ProfileActivityEntryTests : IDisposable
     }
 
     [Fact]
-    public async Task A_verified_event_appears_under_meet_ups()
+    public async Task An_event_appears_under_meet_ups()
     {
         await CreateProfileAsync();
-        var added = Added(await CreateController().Add(Entry("https://example.dev/e", "event")));
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
+        var added = Added(await CreateController().Add(Form(Entry("https://example.dev/e", "event"))));
 
         var meetup = (await ProfileAsync()).Meetups.Should().ContainSingle().Subject;
 
@@ -276,8 +335,7 @@ public class ProfileActivityEntryTests : IDisposable
     public async Task Other_kinds_appear_under_other_activity_and_can_be_hidden_like_any_item(string kind, string label)
     {
         await CreateProfileAsync();
-        var added = Added(await CreateController().Add(Entry("https://example.dev/o", kind)));
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
+        Added(await CreateController().Add(Form(Entry("https://example.dev/o", kind))));
 
         var profile = await ProfileAsync();
 
@@ -291,26 +349,27 @@ public class ProfileActivityEntryTests : IDisposable
         }).OtherActivities.Should().BeEmpty();
     }
 
-    [Fact]
-    public async Task A_platform_failure_does_not_undo_a_verification()
+    [Theory]
+    [InlineData("blog")]
+    [InlineData("videos")]
+    [InlineData("packages")]
+    [InlineData("event")]
+    [InlineData("talk")]
+    public async Task The_featured_copy_of_an_entry_matches_the_item_on_the_profile(string kind)
     {
-        _syncClient
-            .Setup(c => c.NotifyActivityVerifiedAsync(It.IsAny<string>(), It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new HttpRequestException("simulated"));
         await CreateProfileAsync();
-        var added = Added(await CreateController().Add(Entry()));
+        var added = Added(await CreateController().Add(Form(Entry("https://example.dev/f", kind))));
+        var record = (await _activityEntryService.ListForMemberAsync((await _store.GetByMemberKeyAsync(_memberKey))!.Id)).Single();
 
-        (await _activityEntryService.VerifyAsync(added.Id, null, "Admin")).Should().NotBeNull();
-
-        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
+        ProfileActivityEntry.FeaturedItem(record).Should().Be(
+            ProfileDisplay.ActivityItems(await ProfileAsync()).Single(i => i.ActivityId == ProfileActivityEntry.ActivityId(added.Id)));
     }
 
     [Fact]
     public async Task A_link_the_platform_already_reports_is_not_shown_twice()
     {
         await CreateProfileAsync();
-        var added = Added(await CreateController().Add(Entry()));
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
+        Added(await CreateController().Add(Form(Entry())));
         _syncClient
             .Setup(c => c.FindProfileAsync(Handle, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new PlatformProfile("platform-1", []));
@@ -324,39 +383,24 @@ public class ProfileActivityEntryTests : IDisposable
         (await ProfileAsync()).BlogPosts.Should().ContainSingle().Which.ActivityId.Should().Be("b1");
     }
 
+    // ---- moderators remove and restore ----
+
     [Fact]
-    public async Task Withdrawing_a_verified_entry_takes_it_off_the_profile_at_once()
+    public async Task A_moderator_removes_an_entry_with_a_note_and_it_stops_showing_at_once()
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
+        var added = Added(await controller.Add(Form(Entry())));
         (await ProfileAsync()).BlogPosts.Should().ContainSingle();
 
-        (await controller.Withdraw(added.Id)).Should().BeOfType<NoContentResult>();
+        var removed = await _activityEntryService.RejectAsync(added.Id, "That page isn't yours.", Guid.NewGuid(), "Moderator");
 
+        removed!.State.Should().Be(ActivityEntryState.Rejected);
         (await ProfileAsync()).BlogPosts.Should().BeEmpty();
         _syncClient.Verify(c => c.NotifyActivityRemovedAsync(Handle, Link, It.IsAny<CancellationToken>()), Times.Once);
-    }
-
-    // ---- reject ----
-
-    [Fact]
-    public async Task A_rejected_entry_keeps_its_reason_for_the_member_and_never_shows()
-    {
-        await CreateProfileAsync();
-        var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-
-        var rejected = await _activityEntryService.RejectAsync(added.Id, "That page isn't yours.", Guid.NewGuid(), "Admin");
-
-        rejected!.State.Should().Be(ActivityEntryState.Rejected);
-        var mine = (await controller.Get()).Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeAssignableTo<IEnumerable<MemberActivityEntryResponse>>().Subject.Single();
+        var mine = (await MineAsync(controller)).Single();
         mine.State.Should().Be("Rejected");
         mine.RejectionReason.Should().Be("That page isn't yours.");
-        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
-        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(It.IsAny<string>(), It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -364,52 +408,253 @@ public class ProfileActivityEntryTests : IDisposable
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-        await _activityEntryService.RejectAsync(added.Id, "No.", null, "Admin");
-        (await _activityEntryService.RejectAsync(added.Id, "Again.", null, "Admin")).Should().BeNull();
+        var added = Added(await controller.Add(Form(Entry())));
+        (await _activityEntryService.VerifyAsync(added.Id, null, "Moderator")).Should().BeNull();
 
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
-        (await _activityEntryService.VerifyAsync(added.Id, null, "Admin")).Should().BeNull();
+        await _activityEntryService.RejectAsync(added.Id, "No.", null, "Moderator");
+        (await _activityEntryService.RejectAsync(added.Id, "Again.", null, "Moderator")).Should().BeNull();
+
+        await _activityEntryService.VerifyAsync(added.Id, null, "Moderator");
+        (await _activityEntryService.VerifyAsync(added.Id, null, "Moderator")).Should().BeNull();
 
         await controller.Withdraw(added.Id);
-        (await _activityEntryService.VerifyAsync(added.Id, null, "Admin")).Should().BeNull();
-        (await _activityEntryService.RejectAsync(added.Id, "Too late.", null, "Admin")).Should().BeNull();
+        (await _activityEntryService.VerifyAsync(added.Id, null, "Moderator")).Should().BeNull();
+        (await _activityEntryService.RejectAsync(added.Id, "Too late.", null, "Moderator")).Should().BeNull();
     }
 
     [Fact]
-    public async Task A_verified_entry_can_be_rejected_after_all_and_stops_showing_at_once()
+    public async Task A_removed_entry_can_be_restored_and_then_shows_without_its_note()
+    {
+        await CreateProfileAsync();
+        var added = Added(await CreateController().Add(Form(Entry())));
+        await _activityEntryService.RejectAsync(added.Id, "Not sure.", null, "Moderator");
+
+        var restored = await _activityEntryService.VerifyAsync(added.Id, Guid.NewGuid(), "Other moderator");
+
+        restored!.State.Should().Be(ActivityEntryState.Verified);
+        restored.RejectionReason.Should().BeNull();
+        restored.DecidedByUserName.Should().Be("Other moderator");
+        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
+        // Once when added, once when restored.
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
+
+    [Fact]
+    public async Task A_member_can_withdraw_a_removed_entry_but_cannot_add_its_link_again()
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-        await _activityEntryService.VerifyAsync(added.Id, null, "Admin");
-        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
+        var added = Added(await controller.Add(Form(Entry())));
+        await _activityEntryService.RejectAsync(added.Id, "Spam.", null, "Moderator");
 
-        var rejected = await _activityEntryService.RejectAsync(added.Id, "On second thought, no.", null, "Other admin");
+        var readded = await controller.Add(Form(Entry()));
+        readded.Should().BeOfType<ConflictObjectResult>();
+        Error(readded).Should().Contain("moderator removed that link");
 
-        rejected!.State.Should().Be(ActivityEntryState.Rejected);
-        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+        (await controller.Withdraw(added.Id)).Should().BeOfType<NoContentResult>();
+        (await MineAsync(controller)).Should().BeEmpty();
+        // No "removed" call: it had already stopped showing.
         _syncClient.Verify(c => c.NotifyActivityRemovedAsync(Handle, Link, It.IsAny<CancellationToken>()), Times.Once);
-        var mine = (await controller.Get()).Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeAssignableTo<IEnumerable<MemberActivityEntryResponse>>().Subject.Single();
-        mine.State.Should().Be("Rejected");
-        mine.RejectionReason.Should().Be("On second thought, no.");
+
+        (await controller.Add(Form(Entry()))).Should().BeOfType<ConflictObjectResult>();
+        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task A_rejected_entry_can_be_verified_after_all_and_then_shows_without_its_reason()
+    public async Task A_pinned_entry_a_moderator_removed_is_no_longer_featured()
+    {
+        await CreateProfileAsync();
+        var added = Added(await CreateController().Add(Form(Entry())));
+        var activityId = ProfileActivityEntry.ActivityId(added.Id);
+        var item = ProfileDisplay.ActivityItems(await ProfileAsync()).Single(i => i.ActivityId == activityId);
+        await _store.SetDisplayChoicesAsync(_memberKey, new ProfileDisplayChoices([], [], [new ProfilePin(activityId, "Proud", item)]));
+        ProfileDisplay.Apply(await ProfileAsync()).FeaturedItems.Should().ContainSingle();
+
+        await _activityEntryService.RejectAsync(added.Id, "Spam.", null, "Moderator");
+
+        ProfileDisplay.Apply(await ProfileAsync()).FeaturedItems.Should().BeEmpty();
+    }
+
+    // ---- legacy entries still waiting ----
+
+    [Fact]
+    public async Task A_legacy_waiting_entry_stays_off_the_profile_and_is_listed_for_the_member_and_moderators()
+    {
+        await CreateProfileAsync();
+        var id = await AddLegacyWaitingEntryAsync();
+
+        (await MineAsync(CreateController())).Should().ContainSingle().Which.State.Should().Be("Pending");
+        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+        (await _activityEntryService.ListAsync(ActivityEntryState.Pending, 0, 10)).Items.Should().ContainSingle(e => e.Id == id);
+
+        var shown = await _activityEntryService.VerifyAsync(id, null, "Moderator");
+
+        shown!.State.Should().Be(ActivityEntryState.Verified);
+        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.Is<ActivityEntryRecord>(e => e.Id == id), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task A_legacy_waiting_entry_can_be_removed_withdrawn_or_edited_and_keeps_waiting()
     {
         await CreateProfileAsync();
         var controller = CreateController();
-        var added = Added(await controller.Add(Entry()));
-        await _activityEntryService.RejectAsync(added.Id, "Not sure.", null, "Admin");
+        var edited = await AddLegacyWaitingEntryAsync("https://example.dev/a");
+        var withdrawn = await AddLegacyWaitingEntryAsync("https://example.dev/b");
+        var removed = await AddLegacyWaitingEntryAsync("https://example.dev/c");
 
-        var verified = await _activityEntryService.VerifyAsync(added.Id, Guid.NewGuid(), "Other admin");
+        var after = Added(await controller.Update(edited, EditForm(Entry("https://example.dev/a") with { Title = "Better title" })));
+        (await controller.Withdraw(withdrawn)).Should().BeOfType<NoContentResult>();
+        (await _activityEntryService.RejectAsync(removed, "No.", null, "Moderator")).Should().NotBeNull();
 
-        verified!.State.Should().Be(ActivityEntryState.Verified);
-        verified.RejectionReason.Should().BeNull();
-        verified.DecidedByUserName.Should().Be("Other admin");
-        (await ProfileAsync()).BlogPosts.Should().ContainSingle();
-        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()), Times.Once);
+        after.State.Should().Be("Pending");
+        after.Title.Should().Be("Better title");
+        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(It.IsAny<string>(), It.IsAny<ActivityEntryRecord>(), It.IsAny<CancellationToken>()), Times.Never);
+        _syncClient.Verify(c => c.NotifyActivityRemovedAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    // ---- edit ----
+
+    [Fact]
+    public async Task Editing_an_entry_keeps_its_id_and_state_updates_the_profile_and_announces_it_again()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+        (await ProfileAsync()).BlogPosts.Single().Title.Should().Be("My post");
+
+        var edited = Added(await controller.Update(added.Id, EditForm(Entry() with { Title = "My better post", Description = "Now with words." })));
+
+        edited.Id.Should().Be(added.Id);
+        edited.State.Should().Be("Verified");
+        edited.Title.Should().Be("My better post");
+        var post = (await ProfileAsync()).BlogPosts.Should().ContainSingle().Subject;
+        post.Title.Should().Be("My better post");
+        post.ActivityId.Should().Be(ProfileActivityEntry.ActivityId(added.Id));
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.Is<ActivityEntryRecord>(e => e.Title == "My better post"), It.IsAny<CancellationToken>()), Times.Once);
+        _syncClient.Verify(c => c.NotifyActivityRemovedAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Changing_the_link_removes_the_old_one_and_announces_the_new_one()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+
+        Added(await controller.Update(added.Id, EditForm(Entry("https://example.dev/moved"))));
+
+        _syncClient.Verify(c => c.NotifyActivityRemovedAsync(Handle, Link, It.IsAny<CancellationToken>()), Times.Once);
+        _syncClient.Verify(c => c.NotifyActivityVerifiedAsync(Handle, It.Is<ActivityEntryRecord>(e => e.Url == "https://example.dev/moved"), It.IsAny<CancellationToken>()), Times.Once);
+        (await ProfileAsync()).BlogPosts.Single().Url.Should().Be("https://example.dev/moved");
+    }
+
+    [Fact]
+    public async Task Changing_the_kind_moves_the_entry_to_its_new_section()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+
+        Added(await controller.Update(added.Id, EditForm(Entry(kind: "videos"))));
+
+        var profile = await ProfileAsync();
+        profile.BlogPosts.Should().BeEmpty();
+        profile.Videos.Should().ContainSingle().Which.ActivityId.Should().Be(ProfileActivityEntry.ActivityId(added.Id));
+    }
+
+    [Fact]
+    public async Task An_edit_cannot_take_the_link_of_another_entry_but_may_keep_its_own()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var first = Added(await controller.Add(Form(Entry())));
+        var second = Added(await controller.Add(Form(Entry("https://example.dev/second"))));
+
+        var taken = await controller.Update(second.Id, EditForm(Entry(Link)));
+        taken.Should().BeOfType<ConflictObjectResult>();
+        Error(taken).Should().Be("You've already added that link.");
+
+        Added(await controller.Update(first.Id, EditForm(Entry(Link.Replace("my-post", "MY-POST")))));
+        Added(await controller.Update(second.Id, EditForm(Entry("https://example.dev/second"))));
+    }
+
+    [Fact]
+    public async Task An_edit_cannot_take_a_link_a_moderator_removed()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var spam = Added(await controller.Add(Form(Entry("https://example.dev/spam"))));
+        var other = Added(await controller.Add(Form(Entry())));
+        await _activityEntryService.RejectAsync(spam.Id, "Spam.", null, "Moderator");
+        await controller.Withdraw(spam.Id);
+
+        (await controller.Update(other.Id, EditForm(Entry("https://example.dev/spam")))).Should().BeOfType<ConflictObjectResult>();
+    }
+
+    [Fact]
+    public async Task An_entry_a_moderator_removed_cannot_be_edited_back_onto_the_profile()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+        await _activityEntryService.RejectAsync(added.Id, "Spam.", null, "Moderator");
+
+        var result = await controller.Update(added.Id, EditForm(Entry() with { Title = "Totally different" }));
+
+        result.Should().BeOfType<ConflictObjectResult>();
+        Error(result).Should().Contain("A moderator removed this entry");
+        var mine = (await MineAsync(controller)).Single();
+        mine.State.Should().Be("Rejected");
+        mine.Title.Should().Be("My post");
+        (await ProfileAsync()).BlogPosts.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Unknown_withdrawn_or_other_members_entries_cannot_be_edited()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+        await controller.Withdraw(added.Id);
+
+        (await controller.Update(added.Id, EditForm(Entry()))).Should().BeOfType<NotFoundObjectResult>();
+        (await controller.Update(9999, EditForm(Entry()))).Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async Task An_edit_with_bad_values_is_a_400_and_changes_nothing()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+
+        (await controller.Update(added.Id, EditForm(Entry("http://example.dev/a")))).Should().BeOfType<BadRequestObjectResult>();
+        (await controller.Update(added.Id, EditForm(Entry() with { Date = new DateOnly(2999, 1, 1) }))).Should().BeOfType<BadRequestObjectResult>();
+
+        (await MineAsync(controller)).Single().Url.Should().Be(Link);
+    }
+
+    [Fact]
+    public async Task Editing_a_pinned_entry_refreshes_the_pins_stored_copy()
+    {
+        await CreateProfileAsync();
+        var controller = CreateController();
+        var added = Added(await controller.Add(Form(Entry())));
+        var activityId = ProfileActivityEntry.ActivityId(added.Id);
+        var item = ProfileDisplay.ActivityItems(await ProfileAsync()).Single(i => i.ActivityId == activityId);
+        await _store.SetDisplayChoicesAsync(_memberKey, new ProfileDisplayChoices([], [], [new ProfilePin(activityId, "Proud", item)]));
+
+        Added(await controller.Update(added.Id, EditForm(Entry("https://example.dev/talk", "talk") with { Title = "Renamed" })));
+
+        var pin = (await _provider.GetProfileAsync(Handle, includeHidden: true))!.DisplayChoices.Pins.Single();
+        pin.ActivityId.Should().Be(activityId);
+        pin.Reason.Should().Be("Proud");
+        pin.Snapshot!.Title.Should().Be("Renamed");
+        pin.Snapshot.Url.Should().Be("https://example.dev/talk");
+        pin.Snapshot.Group.Should().Be(PlatformActivityGroups.Other);
+        pin.Snapshot.Source.Should().Be("Talk");
+        ProfileDisplay.Apply(await ProfileAsync()).FeaturedItems.Single().Title.Should().Be("Renamed");
     }
 }

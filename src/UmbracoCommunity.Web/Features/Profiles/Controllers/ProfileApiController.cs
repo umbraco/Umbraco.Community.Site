@@ -10,16 +10,18 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// <summary>
 /// Onboarding + ongoing profile-editing API. Covers both the onboarding wizard and later
 /// Account-page edits (avatar/name/headline/bio are the same operation regardless of when they happen) —
-/// always scoped to the current signed-in member, never trusting an id from the caller.
+/// always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the
+/// member a profile admin edits; onboarding is the signed-in member's own only), never trusting an id from the caller.
 /// Every POST, PUT and DELETE must carry the antiforgery request token from
 /// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
+[ProfileEditAudit]
 [Route("api/profile")]
 public class ProfileApiController : ControllerBase
 {
-    private readonly IMemberManager _memberManager;
+    private readonly ProfileEditSubjectResolver _subjects;
     private readonly MemberProfileStore _store;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly AvatarUploadService _avatarUploadService;
@@ -27,14 +29,14 @@ public class ProfileApiController : ControllerBase
     private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
 
     public ProfileApiController(
-        IMemberManager memberManager,
+        ProfileEditSubjectResolver subjects,
         MemberProfileStore store,
         ProfileAvatarUrlResolver avatarUrlResolver,
         AvatarUploadService avatarUploadService,
         IProfileSyncClient profileSyncClient,
         GitHubProfileDefaultsService gitHubDefaultsService)
     {
-        _memberManager = memberManager;
+        _subjects = subjects;
         _store = store;
         _avatarUrlResolver = avatarUrlResolver;
         _avatarUploadService = avatarUploadService;
@@ -46,13 +48,19 @@ public class ProfileApiController : ControllerBase
     [HttpPost("onboarding/start")]
     public async Task<IActionResult> Start(CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member?.UserName == null)
+        var resolved = await _subjects.ResolveSelfOnlyAsync(Request);
+        if (resolved.Subject is not { } subject)
+        {
+            return resolved.FailureResult(ProfileEditSubjectResult.SelfOnlyError)!;
+        }
+
+        if (subject.Handle.Length == 0)
         {
             return Unauthorized();
         }
 
-        var entity = await _store.GetOrStartOnboardingAsync(member.Key, member.UserName, member.Name ?? member.UserName, cancellationToken);
+
+        var entity = await _store.GetOrStartOnboardingAsync(subject.MemberKey, subject.Handle, subject.SignedInMember.Name ?? subject.Handle, cancellationToken);
         await _gitHubDefaultsService.EnsureGitHubDefaultsAsync(entity, cancellationToken);
 
         return Ok(new OnboardingStateResponse(
@@ -69,10 +77,10 @@ public class ProfileApiController : ControllerBase
     [HttpPut("bio")]
     public async Task<IActionResult> UpdateBio([FromBody] UpdateBioRequest request, CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
         if (ProfileText.Normalize(request.Bio) is { Length: > ProfileText.MaxBioLength })
@@ -80,7 +88,7 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = $"Bio must be {ProfileText.MaxBioLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateBioAsync(member.Key, request.Bio, cancellationToken);
+        var entity = await _store.UpdateBioAsync(subject.MemberKey, request.Bio, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -93,10 +101,10 @@ public class ProfileApiController : ControllerBase
     [HttpPut("headline")]
     public async Task<IActionResult> UpdateHeadline([FromBody] UpdateHeadlineRequest request, CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
         if (ProfileText.Normalize(request.Headline) is { Length: > ProfileText.MaxHeadlineLength })
@@ -104,7 +112,7 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = $"Headline must be {ProfileText.MaxHeadlineLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateHeadlineAsync(member.Key, request.Headline, cancellationToken);
+        var entity = await _store.UpdateHeadlineAsync(subject.MemberKey, request.Headline, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -117,10 +125,10 @@ public class ProfileApiController : ControllerBase
     [HttpPut("display-name")]
     public async Task<IActionResult> UpdateDisplayName([FromBody] UpdateDisplayNameRequest request, CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
         if (ProfileText.Normalize(request.DisplayName) is { Length: > ProfileText.MaxDisplayNameLength })
@@ -128,7 +136,7 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = $"Display name must be {ProfileText.MaxDisplayNameLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateDisplayNameAsync(member.Key, request.DisplayName, cancellationToken);
+        var entity = await _store.UpdateDisplayNameAsync(subject.MemberKey, request.DisplayName, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -144,13 +152,13 @@ public class ProfileApiController : ControllerBase
     [HttpPut("visibility")]
     public async Task<IActionResult> UpdateVisibility([FromBody] UpdateProfileVisibilityRequest request, CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
-        var updated = await _store.SetProfileVisibleAsync(member.Key, request.Visible, cancellationToken);
+        var updated = await _store.SetProfileVisibleAsync(subject.MemberKey, request.Visible, cancellationToken);
         if (!updated)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -163,10 +171,10 @@ public class ProfileApiController : ControllerBase
     [RequestSizeLimit(AvatarUploadService.MaxBytes)]
     public async Task<IActionResult> UpdateAvatar(IFormFile file, CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
         if (file.Length == 0)
@@ -175,28 +183,28 @@ public class ProfileApiController : ControllerBase
         }
 
         await using var stream = file.OpenReadStream();
-        var result = await _avatarUploadService.UploadAsync(member.Key, file.FileName, file.Length, stream, cancellationToken);
+        var result = await _avatarUploadService.UploadAsync(subject.MemberKey, file.FileName, file.Length, stream, cancellationToken);
         if (!result.Succeeded)
         {
             return BadRequest(new { error = result.Error });
         }
 
-        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, member.UserName ?? string.Empty), true));
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, subject.Handle), true));
     }
 
     /// <summary>Removes the member's uploaded avatar, reverting display to their GitHub default.</summary>
     [HttpDelete("avatar")]
     public async Task<IActionResult> RemoveAvatar(CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult()!;
         }
 
-        await _avatarUploadService.RemoveAsync(member.Key, cancellationToken);
+        await _avatarUploadService.RemoveAsync(subject.MemberKey, cancellationToken);
 
-        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, member.UserName ?? string.Empty), false));
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, subject.Handle), false));
     }
 
     /// <summary>
@@ -206,13 +214,13 @@ public class ProfileApiController : ControllerBase
     [HttpPost("onboarding/complete")]
     public async Task<IActionResult> Complete(CancellationToken cancellationToken)
     {
-        var member = await _memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        var resolved = await _subjects.ResolveSelfOnlyAsync(Request);
+        if (resolved.Subject is not { } subject)
         {
-            return Unauthorized();
+            return resolved.FailureResult(ProfileEditSubjectResult.SelfOnlyError)!;
         }
 
-        var entity = await _store.CompleteOnboardingAsync(member.Key, cancellationToken);
+        var entity = await _store.CompleteOnboardingAsync(subject.MemberKey, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });

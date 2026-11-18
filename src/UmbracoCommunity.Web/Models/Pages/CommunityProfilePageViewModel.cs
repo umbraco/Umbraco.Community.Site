@@ -17,6 +17,12 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
 
     public CommunityProfile? Profile { get; init; }
 
+    /// <summary>
+    /// For a signed-in member of the DevRel group viewing someone else's profile: the account page link that
+    /// edits this member's profile (<c>?edit-as={handle}</c>). Null for everyone else.
+    /// </summary>
+    public string? EditAsUrl { get; init; }
+
     /// <summary>True when the current logged-in member's own handle matches this profile.</summary>
     public bool IsOwnProfile { get; init; }
 
@@ -59,8 +65,8 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     public bool IsShowingEverything { get; init; }
 
     /// <summary>
-    /// The profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the enriched sections
-    /// are not shown or there is nothing dated.
+    /// The current page of the profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the
+    /// enriched sections are not shown, there is nothing dated, or nothing matches the type filter.
     /// </summary>
     public IReadOnlyList<ProfileTimelineMonth> Timeline { get; init; } = [];
 
@@ -73,11 +79,20 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     /// </summary>
     public string? TimelineType { get; init; }
 
-    /// <summary>True when the timeline has a month with an entry that matches <see cref="TimelineType"/>.</summary>
-    public bool TimelineHasShownEntries => Timeline.Any(m => m.Entries.Any(e => ProfileTimeline.IsShown(e, TimelineType)));
+    /// <summary>Which page of the timeline this is (from 1); <see cref="Timeline"/> holds just that page.</summary>
+    public int TimelinePage { get; init; } = 1;
+
+    /// <summary>How many pages the timeline has for <see cref="TimelineType"/>.</summary>
+    public int TimelinePageCount { get; init; } = 1;
+
+    /// <summary>How many entries match <see cref="TimelineType"/> across all pages.</summary>
+    public int TimelineTotal { get; init; }
 
     /// <summary>The activity graph, unless the member switched it off, when there was activity in the last 12 months.</summary>
     public ProfileActivityGraph? ActivityGraph { get; init; }
+
+    /// <summary>Set while the timeline is still being built; the page then shows a progress bar and refreshes itself instead of the graph and timeline.</summary>
+    public ProfileJudgingProgress? JudgingProgress { get; init; }
 
     /// <summary>Link to the profile as the public sees it. Set for a DevRel view only.</summary>
     public string? DevRelPublicViewUrl { get; init; }

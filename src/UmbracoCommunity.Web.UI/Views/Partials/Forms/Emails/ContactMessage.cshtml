@@ -1,0 +1,25 @@
+@using Umbraco.Forms.Core.Models
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<FormsHtmlModel>
+@*
+    Minimal email template for contact-style forms: shows only the sender's
+    name, email and message, instead of every submitted field.
+    Looks fields up by alias ("name", "email", "message"); a form that uses
+    different aliases will show empty values, so use this only on forms that
+    follow that convention.
+*@
+@{
+    var name = Model.GetValue("name")?.ToString() ?? string.Empty;
+    var email = Model.GetValue("email")?.ToString() ?? string.Empty;
+    var message = Model.GetValue("message")?.ToString() ?? string.Empty;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1b264f;">
+    <p><strong>From:</strong> @name (<a href="mailto:@email">@email</a>)</p>
+    <p><strong>Message:</strong></p>
+    <p style="white-space: pre-wrap;">@message</p>
+</body>
+</html>

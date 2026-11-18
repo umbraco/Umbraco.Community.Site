@@ -41,6 +41,19 @@ public class MemberProfileStore
             .FirstOrDefaultAsync(p => p.GitHubHandle.ToLower() == handle.ToLower(), ct);
     }
 
+    /// <summary>The handle and last change of every profile that finished onboarding and is shown, by handle.</summary>
+    public async Task<IReadOnlyList<(string Handle, DateTime UpdatedUtc)>> ListVisibleAsync(CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var rows = await context.MemberProfiles
+            .AsNoTracking()
+            .Where(p => p.IsProfileVisible && p.OnboardingStatus == OnboardingStatus.Completed)
+            .OrderBy(p => p.GitHubHandle)
+            .Select(p => new { p.GitHubHandle, p.UpdatedUtc })
+            .ToListAsync(ct);
+        return [.. rows.Select(r => (r.GitHubHandle, r.UpdatedUtc))];
+    }
+
     /// <summary>Idempotently creates (on first call) or fetches the member's profile row, marking onboarding in progress.</summary>
     public async Task<MemberProfileEntity> GetOrStartOnboardingAsync(Guid memberKey, string gitHubHandle, string displayName, CancellationToken ct = default)
     {

@@ -16,6 +16,8 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// pictures) for at most <see cref="MaxFetchesPerRender"/> entries, a few at a time across all requests, and waits no
 /// longer than <see cref="RenderBudget"/>; anything not ready by then is shown as a plain line, so a slow or failing
 /// site never makes the profile slow or fail. Pictures are never loaded from the other site by the visitor's browser.
+/// An entry with a picture the member attached themselves (<see cref="ProfileTimelineEntry.OwnImageUrl"/>) gets its card
+/// from that picture straight away, with no outside work, still only when the member wants a card for it.
 /// </summary>
 public sealed class ProfileTimelinePreviewService
 {
@@ -87,7 +89,7 @@ public sealed class ProfileTimelinePreviewService
         // What each page offered: remembered in memory, otherwise kept in the database.
         var pages = new Dictionary<string, PagePreview>(StringComparer.Ordinal);
         var unknownPages = new List<string>();
-        foreach (var url in wanted.Where(e => e.ImageUrl == null).Select(e => e.Url!).Distinct(StringComparer.Ordinal))
+        foreach (var url in wanted.Where(e => e.OwnImageUrl == null && e.ImageUrl == null).Select(e => e.Url!).Distinct(StringComparer.Ordinal))
         {
             if (_appCaches.RuntimeCache.Get(CacheKeyPrefix + url) is PagePreview cached)
             {
@@ -109,6 +111,13 @@ public sealed class ProfileTimelinePreviewService
         var toFetch = new List<ProfileTimelineEntry>();
         foreach (var entry in wanted)
         {
+            // The member's own picture comes first, and is already ours.
+            if (entry.OwnImageUrl != null)
+            {
+                cards[entry] = Card(entry, entry.OwnImageUrl, null);
+                continue;
+            }
+
             var page = entry.ImageUrl == null ? pages.GetValueOrDefault(entry.Url!) : null;
             if (entry.ImageUrl == null && page == null)
             {
@@ -250,7 +259,7 @@ public sealed class ProfileTimelinePreviewService
         {
             return await _previewStore.GetAsync(pageUrls, cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogWarning(ex, "Could not load the kept timeline previews");
             return new Dictionary<string, Data.Entities.ProfileTimelinePreviewEntity>();

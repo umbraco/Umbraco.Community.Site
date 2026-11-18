@@ -74,6 +74,16 @@ public class CommunityProfilePageController : RenderController
             DevRelProfileView.PreventCaching(Response);
         }
 
+        // A profile admin gets a button to edit someone else's profile on the account page. Only that page is kept out
+        // of caches; everyone else's page is unchanged.
+        string? editAsUrl = null;
+        if (viewable.Profile != null && !isOwnProfile && await _profileAccessService.IsCurrentMemberProfileAdminAsync()
+            && currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider) is { Length: > 0 } accountUrl && accountUrl != "#")
+        {
+            editAsUrl = $"{accountUrl}?{ProfileEditSubjectResolver.QueryKey}={Uri.EscapeDataString(handle)}";
+            DevRelProfileView.PreventCaching(Response);
+        }
+
         // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
         // The member's choices of what the sections show (sections off, hidden and pinned items) apply on top.
         var profile = viewable.Profile != null && access.Show
@@ -83,31 +93,46 @@ public class CommunityProfilePageController : RenderController
         // The timeline and the activity graph are built from the activity shown, so they sit behind the same gate.
         IReadOnlyList<ProfileTimelineEntry> timeline = [];
         ProfileActivityGraph? graph = null;
-        if (profile != null && access.Show)
+        var isBuilding = profile is { JudgingProgress: not null } && access.Show;
+        if (profile != null && access.Show && !isBuilding)
         {
-            timeline = await _timelinePreviewService.AddCardsAsync(ProfileTimeline.Entries(profile), profile.DisplayChoices, cancellationToken);
+            timeline = ProfileTimeline.Entries(profile);
             if (!profile.DisplayChoices.HideActivityGraph)
             {
-                var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), DateOnly.FromDateTime(DateTime.UtcNow));
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), today)
+                    with { Summary = ProfileActivityGraph.Summarise(timeline, today, profile.ForumStats, profile.ActivityCounts) };
                 graph = built.IsEmpty ? null : built;
             }
         }
 
         var timelineTypes = ProfileTimeline.Types(timeline);
+        var timelineType = ProfileTimeline.SelectedType(Request.Query[ProfileTimeline.TypeQueryKey].FirstOrDefault(), timelineTypes);
+
+        // Only the entries on the shown page get preview cards, so outside work is spent on what is actually in view.
+        var timelinePage = ProfileTimeline.Paginate(timeline, timelineType, timelineTypes.Count > 1, Request.Query[ProfileTimeline.PageQueryKey].FirstOrDefault());
+        var pageEntries = profile != null && access.Show
+            ? await _timelinePreviewService.AddCardsAsync(timelinePage.Entries, profile.DisplayChoices, cancellationToken)
+            : timelinePage.Entries;
         var viewModel = new CommunityProfilePageViewModel(currentPage)
         {
             Handle = handle,
             Profile = profile,
             IsOwnProfile = isOwnProfile,
+            EditAsUrl = editAsUrl,
             IsHiddenPreview = viewable.IsHiddenPreview,
             AccountPageUrl = isOwnProfile
                 ? currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider)
                 : null,
             ShowEnrichedSections = access.Show,
-            Timeline = ProfileTimeline.ByMonth(timeline),
+            Timeline = ProfileTimeline.ByMonth(pageEntries),
             TimelineTypes = timelineTypes,
-            TimelineType = ProfileTimeline.SelectedType(Request.Query[ProfileTimeline.TypeQueryKey].FirstOrDefault(), timelineTypes),
+            TimelineType = timelineType,
+            TimelinePage = timelinePage.Page,
+            TimelinePageCount = timelinePage.PageCount,
+            TimelineTotal = timelinePage.Total,
             ActivityGraph = graph,
+            JudgingProgress = isBuilding ? profile!.JudgingProgress : null,
             IsGated = access.IsGated,
             IsDevRelView = isDevRelView,
             IsHiddenFromPublic = viewable.IsHiddenFromPublic,

@@ -76,7 +76,10 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
                 GitHubHandle: entity.GitHubHandle,
                 YouTubeChannelUrl: null,
                 SocialLinks: socialLinks,
-                HasCustomAvatar: entity.AvatarMediaKey.HasValue),
+                HasCustomAvatar: entity.AvatarMediaKey.HasValue)
+            {
+                HeadlineIsCompany = entity.Headline == null && !string.IsNullOrWhiteSpace(entity.GitHubCompany),
+            },
             BlogPosts: [],
             Videos: [],
             ForumPosts: [],

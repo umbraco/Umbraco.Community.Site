@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
+using UmbracoCommunity.Web.Features.OpenBadges;
 
 namespace UmbracoCommunity.Web.Extensions
 {
@@ -42,6 +43,14 @@ namespace UmbracoCommunity.Web.Extensions
                   action = "Index"
               });
 
+            // Register routes for the Open Badges 2.0 "Umbraco MVP" badges (issuer, badge classes,
+            // hosted assertions, artwork, and the signed-in member's baked download)
+            MapOpenBadgesRoute(builder, OpenBadgesRoutes.Names.Issuer, OpenBadgesRoutes.IssuerPattern, "Issuer");
+            MapOpenBadgesRoute(builder, OpenBadgesRoutes.Names.MvpBadgeClass, OpenBadgesRoutes.MvpBadgeClassPattern, "MvpBadgeClass");
+            MapOpenBadgesRoute(builder, OpenBadgesRoutes.Names.MvpImage, OpenBadgesRoutes.MvpImagePattern, "MvpImage");
+            MapOpenBadgesRoute(builder, OpenBadgesRoutes.Names.Assertion, OpenBadgesRoutes.AssertionPattern, "Assertion");
+            MapOpenBadgesRoute(builder, OpenBadgesRoutes.Names.MvpDownload, OpenBadgesRoutes.MvpDownloadPattern, "MvpDownload");
+
             // Register route for the aggregated community blogs RSS feed
             builder.EndpointRouteBuilder.MapControllerRoute(
               "CommunityBlogsFeed",
@@ -54,5 +63,15 @@ namespace UmbracoCommunity.Web.Extensions
 
             return builder;
         }
+
+        private static void MapOpenBadgesRoute(IUmbracoEndpointBuilderContext builder, string name, string pattern, string action) =>
+            builder.EndpointRouteBuilder.MapControllerRoute(
+              name,
+              pattern,
+              new
+              {
+                  controller = OpenBadgesRoutes.Controller,
+                  action
+              });
     }
 }

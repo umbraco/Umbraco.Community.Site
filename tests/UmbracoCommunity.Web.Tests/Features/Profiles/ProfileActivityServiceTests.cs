@@ -29,7 +29,8 @@ public class ProfileActivityServiceTests
         ProfileActivityOptions? options = null,
         IMvpDataService? mvp = null,
         ProfileActivityEntryService? activityEntryService = null,
-        MemberProfilesTestDatabase? database = null)
+        MemberProfilesTestDatabase? database = null,
+        IPackageFirstVersionLookup? firstVersions = null)
     {
         database ??= CreateDatabase();
         return new(
@@ -39,7 +40,99 @@ public class ProfileActivityServiceTests
             mvp ?? Listed(),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             new TestOptionsMonitor(options ?? new ProfileActivityOptions()),
-            NullLogger<ProfileActivityService>.Instance);
+            NullLogger<ProfileActivityService>.Instance,
+            firstVersions);
+    }
+
+    private sealed class FakeFirstVersions(Dictionary<string, string> firstVersions) : IPackageFirstVersionLookup
+    {
+        public Task<string?> GetFirstVersionAsync(string packageId, CancellationToken cancellationToken = default) =>
+            Task.FromResult(firstVersions.GetValueOrDefault(packageId));
+    }
+
+    [Fact]
+    public async Task A_packages_first_release_is_marked_new_and_later_releases_are_not()
+    {
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities =
+            {
+                [PlatformActivityGroups.Packages] =
+                [
+                    Activity("Released New Thing v1.0.0", "https://www.nuget.org/packages/New.Thing/1.0.0", DateTimeOffset.UtcNow, "umbraco-marketplace:package:version_released"),
+                    Activity("Released Old Thing v5.5.2", "https://www.nuget.org/packages/Old.Thing/5.5.2", DateTimeOffset.UtcNow.AddDays(-1), "umbraco-marketplace:package:version_released"),
+                    Activity("Released Old Thing v5.5.1", "https://www.nuget.org/packages/Old.Thing/5.5.1", DateTimeOffset.UtcNow.AddDays(-2), "umbraco-marketplace:package:version_released"),
+                ],
+            },
+        };
+        var firstVersions = new FakeFirstVersions(new() { ["new.thing"] = "1.0.0", ["old.thing"] = "2.0.0" });
+
+        var result = await CreateService(client, firstVersions: firstVersions).EnrichAsync(Profile);
+
+        result.Packages.Select(p => p.IsNew).Should().Equal(true, false, false);
+    }
+
+    [Fact]
+    public async Task The_whole_window_is_held_and_counted_not_just_the_newest_items()
+    {
+        // Ten items are shown (the limit); twenty-five exist in the window.
+        var now = DateTimeOffset.UtcNow;
+        var everything = Enumerable.Range(0, 25)
+            .Select(i => Activity("Post " + i, "https://blog.example/" + i, now.AddDays(-i), "blog"))
+            .ToList();
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities[PlatformActivityGroups.Blog] = everything.Take(10).ToList();
+        client.Since[PlatformActivityGroups.Blog] = everything;
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        // Everything in the window is held for the timeline, not just the ten newest.
+        result.BlogPosts.Should().HaveCount(25);
+        result.ActivityCounts![PlatformActivityGroups.Blog].Should().Be(25);
+    }
+
+    [Fact]
+    public async Task LinkedIn_posts_join_the_social_posts()
+    {
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities["linkedin"] =
+        [
+            new("li1", "linkedin:post", "linkedin", null, "https://www.linkedin.com/posts/x-1", "Excited to share Content Lock", null, DateTimeOffset.UtcNow),
+        ];
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        var post = result.SocialPosts.Should().ContainSingle().Which;
+        (post.Platform, post.Text, post.Url).Should().Be(("linkedin", "Excited to share Content Lock", "https://www.linkedin.com/posts/x-1"));
+        result.ActivityCounts![PlatformActivityGroups.Social].Should().Be(1);
+    }
+
+    [Fact]
+    public async Task A_quiet_section_keeps_its_newest_items_even_when_they_are_older_than_the_window()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities[PlatformActivityGroups.Blog] = [Activity("Recent", "https://blog.example/1", now.AddDays(-5), "blog"), Activity("Old", "https://blog.example/2", now.AddYears(-3), "blog")];
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.BlogPosts.Select(p => p.Title).Should().Equal("Recent", "Old");
+        result.ActivityCounts![PlatformActivityGroups.Blog].Should().Be(1);
+    }
+
+    [Fact]
+    public async Task A_section_that_was_not_cut_off_is_counted_from_what_was_fetched()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
+        client.Activities[PlatformActivityGroups.Blog] = [Activity("One", "https://blog.example/1", now, "blog"), Activity("Old", "https://blog.example/2", now.AddYears(-3), "blog")];
+        client.Since[PlatformActivityGroups.Blog] = Enumerable.Range(0, 99).Select(i => Activity("x" + i, "https://x.example/" + i, now, "blog")).ToList();
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        // Fewer than the limit came back, so that is everything; the older item is outside the window.
+        result.ActivityCounts![PlatformActivityGroups.Blog].Should().Be(1);
     }
 
     internal static MemberProfilesTestDatabase CreateDatabase()
@@ -58,6 +151,7 @@ public class ProfileActivityServiceTests
         return new ProfileActivityEntryService(
             new MemberActivityEntryStore(database),
             client,
+            new ProfileActivityImageStore(new InMemoryMediaFileSystem().FileSystem, NullLogger<ProfileActivityImageStore>.Instance),
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             NullLogger<ProfileActivityEntryService>.Instance);
     }
@@ -92,7 +186,7 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
-    public async Task Attended_meetups_show_as_attended()
+    public async Task Rsvps_and_attendances_both_show_as_signed_up()
     {
         var client = new FakeSyncClient
         {
@@ -103,13 +197,63 @@ public class ProfileActivityServiceTests
                 [
                     Activity("UmbLeeds", "https://meetup.example/1", DateTimeOffset.UtcNow, "meetup:attended"),
                     Activity("UmbYork", "https://meetup.example/2", DateTimeOffset.UtcNow.AddDays(-1), "meetup:rsvp"),
+                    Activity("UmbLeeds", "https://meetup.example/1", DateTimeOffset.UtcNow.AddDays(-2), "meetup:rsvp"),
                 ],
             },
         };
 
         var result = await CreateService(client).EnrichAsync(Profile);
 
-        result.Meetups.Select(m => m.Action).Should().Equal("Attended", "RSVP'd yes to");
+        result.Meetups.Select(m => m.Action).Should().Equal("Signed up", "Signed up");
+    }
+
+    [Fact]
+    public async Task Forum_counts_and_solved_answers_are_added_and_solutions_are_flagged()
+    {
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            ForumStats = new PlatformForumStats(13, 31, 2),
+            Activities =
+            {
+                [PlatformActivityGroups.Forum] =
+                [
+                    Activity("A topic", "https://forum.example/t/1", DateTimeOffset.UtcNow, "discourse:topic:created"),
+                    Activity("Accepted answer in: Other", "https://forum.example/t/2/2", DateTimeOffset.UtcNow.AddDays(-1), "discourse:solution:accepted"),
+                ],
+            },
+        };
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.ForumStats.Should().Be(new PlatformForumStats(13, 31, 2));
+        result.ForumPosts.Select(p => p.IsSolution).Should().Equal(false, true);
+        // Topics and accepted answers in the window are counted from the listed items.
+        result.ActivityCounts![PlatformActivityGroups.Forum].Should().Be(1);
+        result.ActivityCounts[ProfileActivityGraph.SolvedKey].Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Speaking_and_hosting_win_over_signing_up_for_the_same_event()
+    {
+        var client = new FakeSyncClient
+        {
+            Profile = new PlatformProfile("p1", []),
+            Activities =
+            {
+                [PlatformActivityGroups.Meetups] =
+                [
+                    Activity("Talk night", "https://meetup.example/1", DateTimeOffset.UtcNow, "meetup:event:rsvped"),
+                    Activity("Talk night", "https://meetup.example/1", DateTimeOffset.UtcNow.AddDays(-1), "meetup:event:spoke"),
+                    Activity("Hack night", "https://meetup.example/2", DateTimeOffset.UtcNow.AddDays(-2), "meetup:event:hosted"),
+                    Activity("Hack night", "https://meetup.example/2", DateTimeOffset.UtcNow.AddDays(-2), "meetup:event:attended"),
+                ],
+            },
+        };
+
+        var result = await CreateService(client).EnrichAsync(Profile);
+
+        result.Meetups.Select(m => (m.EventName, m.Action)).Should().Equal(("Talk night", "Spoke at"), ("Hack night", "Hosted"));
     }
 
     [Fact]
@@ -194,8 +338,9 @@ public class ProfileActivityServiceTests
         var database = CreateDatabase();
         var profile = await new MemberProfileStore(database).GetOrStartOnboardingAsync(Guid.NewGuid(), Handle, "The Octocat");
         var entries = new MemberActivityEntryStore(database);
-        var handAdded = await entries.AddAsync(profile.Id, new AddActivityEntryRequest("blog", "My own post", "https://not-mine.example/my-own-post", new DateOnly(2026, 1, 1), null));
-        await entries.DecideAsync(handAdded!.Id, verify: true, null, null, "Admin");
+        // On the profile as soon as it is added.
+        (await entries.AddAsync(profile.Id, new AddActivityEntryRequest("blog", "My own post", "https://not-mine.example/my-own-post", new DateOnly(2026, 1, 1), null)))
+            .Saved.Should().BeTrue();
 
         var client = new FakeSyncClient
         {
@@ -294,6 +439,25 @@ public class ProfileActivityServiceTests
     }
 
     [Fact]
+    public async Task A_platform_timeout_gets_the_profile_unchanged()
+    {
+        var result = await CreateService(new FakeSyncClient { TimesOut = true }).EnrichAsync(Profile);
+
+        result.Should().BeSameAs(Profile);
+    }
+
+    [Fact]
+    public async Task A_cancelled_request_is_not_swallowed()
+    {
+        using var cancelled = new CancellationTokenSource();
+        await cancelled.CancelAsync();
+
+        var enrich = () => CreateService(new FakeSyncClient { TimesOut = true }).EnrichAsync(Profile, cancelled.Token);
+
+        await enrich.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
     public async Task The_answer_is_cached_per_handle_ignoring_case()
     {
         var client = new FakeSyncClient { Profile = new PlatformProfile("p1", []) };
@@ -325,14 +489,16 @@ public class ProfileActivityServiceTests
         await CreateService(client, new ProfileActivityOptions { ItemsPerSection = 3 }).EnrichAsync(Profile);
 
         client.RequestedLimits.Should().OnlyContain(l => l == 3);
-        client.RequestedGroups.Should().BeEquivalentTo(PlatformActivityGroups.FromPlatform);
+        client.RequestedGroups.Should().BeEquivalentTo([.. PlatformActivityGroups.FromPlatform, "linkedin"]);
     }
 
     private sealed class FakeSyncClient : IProfileSyncClient
     {
         public PlatformProfile? Profile { get; init; }
         public bool Throws { get; init; }
+        public bool TimesOut { get; init; }
         public Dictionary<string, IReadOnlyList<PlatformActivity>> Activities { get; } = new();
+        public PlatformForumStats? ForumStats { get; init; }
         public int LookupCount { get; private set; }
         public List<int> RequestedLimits { get; } = [];
         public List<string> RequestedGroups { get; } = [];
@@ -340,6 +506,12 @@ public class ProfileActivityServiceTests
         public Task<PlatformProfile?> FindProfileAsync(string handle, CancellationToken cancellationToken = default)
         {
             LookupCount++;
+            if (TimesOut)
+            {
+                // What HttpClient throws when its own Timeout passes: a cancellation the caller did not ask for.
+                throw new TaskCanceledException("simulated timeout", new TimeoutException());
+            }
+
             return Throws ? throw new HttpRequestException("simulated") : Task.FromResult(Profile);
         }
 
@@ -353,6 +525,15 @@ public class ProfileActivityServiceTests
 
             return Task.FromResult(Activities.TryGetValue(group, out var items) ? items : []);
         }
+
+        /// <summary>What the paged "everything since" fetch returns, by group; the newest items when not set.</summary>
+        public Dictionary<string, IReadOnlyList<PlatformActivity>> Since { get; } = new();
+
+        public Task<IReadOnlyList<PlatformActivity>> GetActivitiesSinceAsync(string platformProfileId, string group, DateOnly from, int maxItems, CancellationToken cancellationToken = default) =>
+            Task.FromResult(Since.TryGetValue(group, out var items) ? items : Activities.TryGetValue(group, out var all) ? all : []);
+
+        public Task<PlatformForumStats?> GetForumStatsAsync(string platformProfileId, int months, CancellationToken cancellationToken = default) =>
+            Task.FromResult(ForumStats);
 
         public Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<PlatformLinkCheck>>([]);

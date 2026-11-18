@@ -23,6 +23,19 @@ public interface IProfileSyncClient
     Task<IReadOnlyList<PlatformActivity>> GetActivitiesAsync(string platformProfileId, string group, int limit, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Every activity of one <paramref name="group"/> from <paramref name="from"/> on, newest first, following the
+    /// platform's pages until the end or <paramref name="maxItems"/>. Used to count a window exactly, not to show items.
+    /// Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<IReadOnlyList<PlatformActivity>> GetActivitiesSinceAsync(string platformProfileId, string group, DateOnly from, int maxItems, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// The exact forum counts for a platform profile over the last <paramref name="months"/> months (1 to 24), or null
+    /// when the platform is not configured. Throws when the platform cannot be reached or errors.
+    /// </summary>
+    Task<PlatformForumStats?> GetForumStatsAsync(string platformProfileId, int months, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Asks whether the platform already ties each of <paramref name="urls"/> to the profile of the GitHub user
     /// <paramref name="handle"/>. Only https addresses are sent. Returns an empty list when the platform is not
     /// configured. Throws when the platform cannot be reached or errors.
@@ -38,10 +51,14 @@ public interface IProfileSyncClient
 
     Task NotifyFeedRemovedAsync(string handle, string url, string? reason, CancellationToken cancellationToken = default);
 
-    /// <summary>A member's hand-added activity was verified and now shows on their profile.</summary>
+    /// <summary>
+    /// A member's hand-added activity shows on their profile: it was just added, a moderator showed or restored it, or the
+    /// member edited it (sent again with the new title, description and date). Treat it as add-or-update keyed by the
+    /// entry's url; when an edit changes the url, <see cref="NotifyActivityRemovedAsync"/> is sent for the old one first.
+    /// </summary>
     Task NotifyActivityVerifiedAsync(string handle, ActivityEntryRecord entry, CancellationToken cancellationToken = default);
 
-    /// <summary>Activity that was verified is no longer shown on the profile.</summary>
+    /// <summary>Hand-added activity no longer shows on the profile at <paramref name="url"/>: withdrawn, removed by a moderator, or its link edited.</summary>
     Task NotifyActivityRemovedAsync(string handle, string url, CancellationToken cancellationToken = default);
 
     /// <summary>

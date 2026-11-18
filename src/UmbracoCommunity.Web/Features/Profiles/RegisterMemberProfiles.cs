@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -55,17 +56,34 @@ public sealed class RegisterMemberProfiles : IComposer
 
         builder.Services.AddScoped<MemberProfileStore>();
         builder.Services.AddScoped<ProfileMatchStore>();
+        builder.Services.AddScoped<SocialPostJudgmentStore>();
+        builder.Services.AddScoped<ICrossPostJudge, AiCrossPostJudge>();
         builder.Services.AddScoped<MemberActivityEntryStore>();
         builder.Services.AddScoped<ProfileActivityEntryService>();
+
+        // Pictures members attach to activity they add by hand live in the media file system, like uploaded avatars.
+        builder.Services.AddScoped(sp => new ProfileActivityImageStore(
+            sp.GetRequiredService<MediaFileManager>().FileSystem,
+            sp.GetRequiredService<ILogger<ProfileActivityImageStore>>()));
         builder.Services.AddScoped<ProfileAvatarUrlResolver>();
         builder.Services.AddScoped<AvatarUploadService>();
         builder.Services.AddScoped<IProfileDataProvider, MemberProfileDataProvider>();
         builder.Services.AddScoped<ProfileAccessService>();
+        builder.Services.AddScoped<ProfileEditSubjectResolver>();
+        builder.Services.AddScoped<ProfileSitemapService>();
         builder.Services.AddScoped<IProfileSyncClient, PlatformProfileSyncClient>();
         builder.Services.Configure<ProfileActivityOptions>(builder.Config.GetSection(ProfileActivityOptions.SectionName));
         builder.Services.AddScoped<ProfileActivityService>();
         builder.Services.Configure<ProfileMatchingOptions>(builder.Config.GetSection(ProfileMatchingOptions.SectionName));
         builder.Services.AddScoped<ProfileLinkMatchingService>();
+
+        // NuGet's package index, to tell a package's first release from a routine one.
+        builder.Services.AddHttpClient<IPackageFirstVersionLookup, NuGetFirstVersionLookup>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.nuget.org/");
+            client.Timeout = TimeSpan.FromSeconds(3);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
+        });
 
         builder.Services.AddHttpClient<GitHubProfileClient>(client =>
         {
@@ -99,6 +117,11 @@ public sealed class RegisterMemberProfiles : IComposer
             sp.GetRequiredService<AppCaches>(),
             sp.GetRequiredService<ILogger<ProfileTimelineImageStore>>()));
         builder.Services.AddScoped<ProfileTimelinePreviewService>();
+
+        // Fills in the add-activity form from the page behind the link; the throttle on its page reads is per server.
+        builder.Services.TryAddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<ProfileActivityLinkLookupThrottle>();
+        builder.Services.AddScoped<ProfileActivityLinkLookupService>();
 
         // Append so built-in content finders match first. Ours only fires under the tenant's
         // Community Profile page for a plausible-handle trailing segment (e.g. /community/profiles/octocat).

@@ -27,9 +27,9 @@ public static class ProfileDisplay
     public static string SectionLabel(string group) => group switch
     {
         PlatformActivityGroups.Blog => "Blog posts",
-        PlatformActivityGroups.Forum => "Forum activity",
+        PlatformActivityGroups.Forum => "Forum highlights",
         PlatformActivityGroups.Packages => "Packages",
-        PlatformActivityGroups.Meetups => "Meet-ups",
+        PlatformActivityGroups.Meetups => "Events",
         PlatformActivityGroups.Videos => "Videos",
         PlatformActivityGroups.Social => "Social activity",
         PlatformActivityGroups.Other => "Other activity",
@@ -254,6 +254,10 @@ public static class ProfileDisplay
             Videos = Shown(PlatformActivityGroups.Videos, profile.Videos, v => v.ActivityId),
             SocialPosts = Shown(PlatformActivityGroups.Social, profile.SocialPosts, p => p.ActivityId),
             OtherActivities = Shown(PlatformActivityGroups.Other, profile.OtherActivities, a => a.ActivityId),
+            ForumStats = hiddenSections.Contains(PlatformActivityGroups.Forum) ? null : profile.ForumStats,
+            ActivityCounts = profile.ActivityCounts?
+                .Where(c => !hiddenSections.Contains(c.Key == ProfileActivityGraph.SolvedKey ? PlatformActivityGroups.Forum : c.Key))
+                .ToDictionary(c => c.Key, c => c.Value),
         };
 
         var loadedIds = ActivityItems(profile).Select(i => i.ActivityId).ToHashSet(StringComparer.Ordinal);
@@ -261,7 +265,9 @@ public static class ProfileDisplay
             .DistinctBy(i => i.ActivityId, StringComparer.Ordinal)
             .ToDictionary(i => i.ActivityId, StringComparer.Ordinal);
 
-        // The loaded item when it is there, so it is up to date; otherwise the copy kept with the pin.
+        // The loaded item when it is there, so it is up to date; otherwise the copy kept with the pin. Not for activity
+        // added by hand: every shown entry is loaded, so one that isn't was withdrawn or removed by a moderator, and its
+        // copy must not keep it featured.
         ProfileFeaturedItem? Featured(ProfilePin pin)
         {
             if (loadedIds.Contains(pin.ActivityId))
@@ -269,7 +275,7 @@ public static class ProfileDisplay
                 return shownItems.GetValueOrDefault(pin.ActivityId);
             }
 
-            return pin.Snapshot is { } snapshot && !hiddenSections.Contains(snapshot.Group) && !hiddenIds.Contains(pin.ActivityId)
+            return !ProfileActivityEntry.IsActivityId(pin.ActivityId) && pin.Snapshot is { } snapshot && !hiddenSections.Contains(snapshot.Group) && !hiddenIds.Contains(pin.ActivityId)
                 ? snapshot
                 : null;
         }
@@ -334,6 +340,59 @@ public static class ProfileDisplay
                 yield return item;
             }
         }
+    }
+
+    /// <summary>
+    /// The member's activity <paramref name="items"/> (choices not applied) as the account page lists them: in timeline
+    /// order across every section (newest first), each with what the timeline draws for it, taken from its entry in
+    /// <paramref name="timeline"/> (<see cref="ProfileTimeline.Entries"/>, cards added by
+    /// <see cref="ProfileTimelinePreviewService"/>). An item with no entry of its own (a package without a date, or a
+    /// post folded into the same post shared elsewhere) keeps its own details and is placed by its date, undated last.
+    /// </summary>
+    public static IReadOnlyList<ProfileDisplayItem> DisplayItems(
+        IEnumerable<ProfileFeaturedItem> items,
+        IReadOnlyList<ProfileTimelineEntry> timeline)
+    {
+        var entries = new Dictionary<string, (ProfileTimelineEntry Entry, int Index)>(StringComparer.Ordinal);
+        for (var index = 0; index < timeline.Count; index++)
+        {
+            if (timeline[index].ActivityId is { } id)
+            {
+                entries.TryAdd(id, (timeline[index], index));
+            }
+        }
+
+        return items
+            .DistinctBy(i => i.ActivityId, StringComparer.Ordinal)
+            .Select((item, index) =>
+            {
+                var found = entries.TryGetValue(item.ActivityId, out var e);
+                return (Item: item, Index: index, Entry: found ? e.Entry : null, Position: found ? e.Index : int.MaxValue);
+            })
+            // Entries are newest first with ties in section order, so date then entry position keeps the timeline's order.
+            .OrderByDescending(x => x.Item.Date ?? DateTimeOffset.MinValue)
+            .ThenBy(x => x.Position)
+            .ThenBy(x => x.Index)
+            .Select((x, order) =>
+            {
+                var entry = x.Entry;
+                var date = entry?.Date ?? x.Item.Date;
+                var month = date?.UtcDateTime;
+                return new ProfileDisplayItem(x.Item.ActivityId, x.Item.Title, x.Item.Date)
+                {
+                    Group = x.Item.Group,
+                    IconKey = entry?.IconKey ?? ProfileTimeline.IconKey(x.Item.Group),
+                    Url = entry != null ? entry.Url : x.Item.Url,
+                    Meta = entry != null ? entry.Meta : x.Item.Source,
+                    Description = entry != null ? entry.Description : x.Item.Description,
+                    IsRoutineRelease = entry?.IsRoutineRelease ?? false,
+                    Card = entry?.Card,
+                    MonthKey = month is { } m ? $"{m.Year:D4}-{m.Month:D2}" : null,
+                    MonthLabel = month is { } l ? ProfileTimeline.MonthLabel(l.Year, l.Month) : null,
+                    Order = order,
+                };
+            })
+            .ToList();
     }
 
     private static bool TryNormalizeId(

@@ -38,6 +38,7 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
 
         return new PlatformProfile(profile.Id, profile.MvpYears ?? [])
         {
+            IsTeammate = profile.IsTeammate,
             Identities = (profile.Identities ?? [])
                 .Where(i => !string.IsNullOrWhiteSpace(i.ProfileUrl))
                 .Select(i => new PlatformIdentity(i.Platform, i.Username, i.ProfileUrl!.Trim()))
@@ -87,6 +88,44 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
         return activities
             .Select(a => new PlatformActivity(a.Id, a.Type, a.Platform, a.Title, a.Url, a.Summary, a.ImageUrl, a.OccurredAt))
             .ToList();
+    }
+
+    public async Task<IReadOnlyList<PlatformActivity>> GetActivitiesSinceAsync(
+        string platformProfileId, string group, DateOnly from, int maxItems, CancellationToken cancellationToken = default)
+    {
+        const int PageSize = 100;
+        var items = new List<PlatformActivity>();
+        if (!_apiClient.IsConfigured)
+        {
+            return items;
+        }
+
+        string? cursor = null;
+        while (items.Count < maxItems)
+        {
+            var page = await _apiClient.GetProfileActivitiesPageAsync(platformProfileId, group, from, PageSize, cursor, cancellationToken);
+            items.AddRange(page.Data.Select(a => new PlatformActivity(a.Id, a.Type, a.Platform, a.Title, a.Url, a.Summary, a.ImageUrl, a.OccurredAt)));
+            if (!page.Pagination.HasMore || string.IsNullOrEmpty(page.Pagination.NextCursor) || page.Data.Count == 0)
+            {
+                break;
+            }
+
+            cursor = page.Pagination.NextCursor;
+        }
+
+        return items;
+    }
+
+    public async Task<PlatformForumStats?> GetForumStatsAsync(
+        string platformProfileId, int months, CancellationToken cancellationToken = default)
+    {
+        if (!_apiClient.IsConfigured)
+        {
+            return null;
+        }
+
+        var stats = await _apiClient.GetProfileForumStatsAsync(platformProfileId, months, cancellationToken);
+        return stats == null ? null : new PlatformForumStats(stats.TopicsCreated, stats.Replies, stats.Solutions);
     }
 
     public Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default)

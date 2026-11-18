@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Schema.NET;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using UmbracoCommunity.Web.Extensions;
 using UmbracoCommunity.Web.Features.Profiles;
+using UmbracoCommunity.Web.Features.Profiles.Models;
 using UmbracoCommunity.Web.Features.Sessionize.Infrastructure;
 using UmbracoCommunity.Web.Models.PublishedModels;
 using UmbracoCommunity.Web.Models.ViewModels.Components;
@@ -27,6 +29,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
     private readonly UrlUtilities _urlUtilities;
     private readonly IDocumentationService _documentationService;
     private readonly ProfileAccessService _profileAccessService;
+    private readonly IImageUrlGenerator _imageUrlGenerator;
 
     public SeoDataService(
         IImageUrlBuilder imageUrlBuilder,
@@ -37,7 +40,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         BreadcrumbSchemaBuilder breadcrumbSchemaBuilder,
         UrlUtilities urlUtilities,
         IDocumentationService documentationService,
-        ProfileAccessService profileAccessService)
+        ProfileAccessService profileAccessService,
+        IImageUrlGenerator imageUrlGenerator)
     {
         _imageUrlBuilder = imageUrlBuilder;
         _httpContextAccessor = httpContextAccessor;
@@ -48,6 +52,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         _urlUtilities = urlUtilities;
         _documentationService = documentationService;
         _profileAccessService = profileAccessService;
+        _imageUrlGenerator = imageUrlGenerator;
     }
 
     public async Task<MetaTagsViewModel> BuildAsync(IPublishedContent currentPage)
@@ -201,7 +206,8 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         viewModel.MetaTitle = viewable.Profile.Identity.DisplayName;
 
         // A DevRel member's view of someone else's profile is not what the public sees, so it must not be indexed.
-        if (await _profileAccessService.IsDevRelViewAsync(handle))
+        var isDevRelView = await _profileAccessService.IsDevRelViewAsync(handle);
+        if (isDevRelView)
         {
             viewModel.Robots = "noindex, follow";
             return;
@@ -220,6 +226,36 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         if (access.IsGated)
         {
             viewModel.Robots = "noindex, follow";
+            return;
+        }
+
+        // Share previews and structured data are for the page everyone sees, which is only the case
+        // once the tenant has opened the profile sections to everyone.
+        if (ProfileSeo.IsPubliclyVisible(viewable, access, isDevRelView))
+        {
+            ApplyPublicProfileSeo(viewModel, viewable.Profile);
+        }
+    }
+
+    private void ApplyPublicProfileSeo(MetaTagsViewModel viewModel, CommunityProfile profile)
+    {
+        var description = ProfileSeo.Description(profile.Identity);
+        if (description.Length > 0)
+        {
+            viewModel.MetaDescription = description;
+        }
+
+        viewModel.OpenGraphType = "profile";
+        viewModel.TwitterCard = "summary";
+        viewModel.OpenGraphImageSize = (ProfileSeo.ShareImageSize, ProfileSeo.ShareImageSize);
+
+        var imageUrl = _urlUtilities.MakeAbsoluteUrl(ProfileSeo.ShareImageUrl(profile.Identity, GetResizedMediaUrl));
+        Uri? imageUri = Uri.TryCreate(imageUrl, UriKind.Absolute, out var parsed) ? parsed : null;
+        viewModel.OpenGraphImageUrl = imageUri?.ToString() ?? string.Empty;
+
+        if (Uri.TryCreate(viewModel.CanonicalUrl, UriKind.Absolute, out var pageUrl))
+        {
+            viewModel.AddSchemaMarkup(ProfileSeo.Schema(profile, pageUrl, imageUri).ToHtmlEscapedString());
         }
     }
 
@@ -278,6 +314,17 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         return _urlUtilities.GetAbsoluteUrl(content);
     }
+
+    // The signed URL has to come from the generator: the image processor refuses a query string it did not sign.
+    private string GetResizedMediaUrl(string mediaUrl, int size) =>
+        _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(mediaUrl)
+        {
+            Width = size,
+            Height = size,
+            ImageCropMode = ImageCropMode.Crop,
+            Quality = 80,
+            FurtherOptions = "format=jpg",
+        }) ?? mediaUrl;
 
     private string GetOpenGraphImageUrl(MediaWithCrops? mediaWithCrops, SocialSettings? socialSettings)
     {

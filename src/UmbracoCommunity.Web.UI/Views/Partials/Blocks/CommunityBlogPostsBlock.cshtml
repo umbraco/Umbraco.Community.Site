@@ -101,7 +101,7 @@
         <div class="dc-community-blogs__grid">
             @foreach (var post in result.Items)
             {
-                <a class="dc-community-blogs__card" href="@post.Url" target="_blank" rel="noopener noreferrer">
+                <a class="dc-community-blogs__card" href="@OutboundLinkTagger.WithUtm(post.Url, Context.Request.Host.Host)" target="_blank" rel="noopener noreferrer">
                     <figure class="dc-community-blogs__media">
                         <img src="@(string.IsNullOrEmpty(post.CoverImageUrl) ? "/img/community-blogs/placeholder-cover.svg" : BuildSignedImageUrl(post.CoverImageUrl, "width=800&format=webp"))" alt="" loading="lazy" />
                     </figure>

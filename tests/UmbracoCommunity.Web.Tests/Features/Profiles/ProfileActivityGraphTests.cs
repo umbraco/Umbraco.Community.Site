@@ -85,4 +85,66 @@ public class ProfileActivityGraphTests
         ProfileActivityGraph.Build([], Today).IsEmpty.Should().BeTrue();
         ProfileActivityGraph.Build([On(2026, 10, 1)], Today).IsEmpty.Should().BeFalse();
     }
+
+    private static ProfileTimelineEntry Entry(string group, DateTimeOffset date, string? url = null) =>
+        new(group, null, "x", url, null, date, null, null);
+
+    [Fact]
+    public void The_summary_counts_each_type_in_the_window_and_skips_the_rest()
+    {
+        var summary = ProfileActivityGraph.Summarise(
+            [
+                // Four releases of two packages: the summary counts the releases.
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 11, 1), "https://www.nuget.org/packages/Cultiv.Hangfire/5.5.2"),
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 9, 1), "https://www.nuget.org/packages/Cultiv.Hangfire/5.5.1"),
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 7, 1), "https://www.nuget.org/packages/cultiv.hangfire/5.4.0"),
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Packages, On(2026, 7, 2), "https://www.nuget.org/packages/Umbraco.Community.ManifestPeek/19.0.0"),
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Blog, On(2026, 10, 1)),
+                Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Videos, On(2024, 1, 1)),
+            ],
+            Today);
+
+        summary.Should().Equal(new ProfileActivitySummaryItem(1, "blog post", "blog"), new ProfileActivitySummaryItem(4, "package releases", "package"));
+    }
+
+    [Fact]
+    public void Forum_figures_come_from_the_counts_and_solutions_do_not_count_as_posts()
+    {
+        var forum = Web.Features.Profiles.Models.PlatformActivityGroups.Forum;
+        var summary = ProfileActivityGraph.Summarise(
+            [
+                Entry(forum, On(2026, 11, 1)),
+                Entry(forum, On(2026, 10, 1)) with { IsSolution = true },
+            ],
+            Today,
+            new Web.Features.Profiles.Models.PlatformForumStats(13, 31, 2));
+
+        summary.Select(i => (i.Count, i.Label)).Should().Equal((13, "forum posts"), (31, "forum replies"), (2, "solved answers"));
+    }
+
+    [Fact]
+    public void Solved_answers_are_counted_over_the_same_rolling_window_not_the_forum_counts_calendar_months()
+    {
+        var forum = Web.Features.Profiles.Models.PlatformActivityGroups.Forum;
+        var summary = ProfileActivityGraph.Summarise(
+            [],
+            Today,
+            // The forum counts (whole calendar months) miss the answers of the window's first weeks; the listed ones don't.
+            new Web.Features.Profiles.Models.PlatformForumStats(9, 17, 0),
+            new Dictionary<string, int> { [forum] = 10, [ProfileActivityGraph.SolvedKey] = 2 });
+
+        summary.Select(i => (i.Count, i.Label)).Should().Equal((10, "forum posts"), (17, "forum replies"), (2, "solved answers"));
+    }
+
+    [Fact]
+    public void Exact_counts_replace_what_the_timeline_holds()
+    {
+        var groups = Web.Features.Profiles.Models.PlatformActivityGroups.Packages;
+        var summary = ProfileActivityGraph.Summarise(
+            [Entry(Web.Features.Profiles.Models.PlatformActivityGroups.Social, On(2026, 11, 1))],
+            Today,
+            windowCounts: new Dictionary<string, int> { [Web.Features.Profiles.Models.PlatformActivityGroups.Social] = 214, [groups] = 7 });
+
+        summary.Select(i => (i.Count, i.Label)).Should().Equal((7, "package releases"), (214, "social posts"));
+    }
 }

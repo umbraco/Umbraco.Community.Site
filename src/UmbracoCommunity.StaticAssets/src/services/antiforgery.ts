@@ -1,3 +1,5 @@
+import { withEditAs } from "./profile-edit-as";
+
 /**
  * Antiforgery protection for the signed-in member APIs. The server requires a request token
  * in the RequestVerificationToken header on every POST, PUT and DELETE to these APIs. The
@@ -47,18 +49,19 @@ function sameOriginPath(url: string): string | null {
   }
 }
 
+/** True when the URL is one of the signed-in member APIs (same origin, under {@link PROTECTED_API_PREFIXES}). */
+export function isMemberApi(url: string): boolean {
+  const path = sameOriginPath(url)?.toLowerCase();
+  return !!path && PROTECTED_API_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
 /** True when a request to this URL with this method must carry the token. */
 export function requiresAntiforgeryToken(url: string, method: string): boolean {
   if (SAFE_METHODS.has(method.toUpperCase())) {
     return false;
   }
 
-  const path = sameOriginPath(url)?.toLowerCase();
-  if (!path) {
-    return false;
-  }
-
-  return PROTECTED_API_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+  return isMemberApi(url);
 }
 
 async function fetchToken(): Promise<AntiforgeryToken> {
@@ -124,12 +127,13 @@ async function fetchWithToken(url: string, init: RequestInit): Promise<Response>
 }
 
 /**
- * fetch() that attaches the antiforgery token to mutating requests to the member APIs. If
+ * fetch() that names the member a profile admin is editing (see profile-edit-as.ts) and attaches the antiforgery token to mutating requests to the member APIs. If
  * such a request is rejected for its token (for example after signing in again in another
  * tab), the token is fetched again and the request retried once. Every other request is
  * passed straight to fetch().
  */
 export async function antiforgeryFetch(url: string, init: RequestInit = {}): Promise<Response> {
+  init = withEditAs(url, init) ?? init;
   if (!requiresAntiforgeryToken(url, init.method ?? "GET")) {
     return fetch(url, init);
   }

@@ -35,7 +35,8 @@ public sealed record ProfileLookupDto(
     string Id,
     IReadOnlyList<int>? MvpYears,
     IReadOnlyList<ProfileIdentityDto>? Identities = null,
-    IReadOnlyList<ProfileFeedDto>? Feeds = null);
+    IReadOnlyList<ProfileFeedDto>? Feeds = null,
+    bool IsTeammate = false);
 
 /// <summary>An account on another platform that the content platform ties to the profile.</summary>
 public sealed record ProfileIdentityDto(
@@ -71,6 +72,9 @@ public sealed record ProfileActivityDto(
     string? Summary,
     string? ImageUrl,
     DateTimeOffset OccurredAt);
+
+/// <summary>Response from GET /v1/profiles/{id}/forum-stats: exact counts over the trailing months, the current one included.</summary>
+public sealed record ProfileForumStatsDto(int TopicsCreated, int Replies, int Solutions);
 
 public static class CommunityBlogsJsonOptions
 {

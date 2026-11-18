@@ -8,6 +8,9 @@ public sealed record PlatformProfile(string Id, IReadOnlyList<int> MvpYears)
 
     /// <summary>Feeds that the platform ties to this profile.</summary>
     public IReadOnlyList<PlatformFeed> Feeds { get; init; } = [];
+
+    /// <summary>True when the platform marks the profile as a teammate (someone who works at Umbraco).</summary>
+    public bool IsTeammate { get; init; }
 }
 
 /// <summary>An account on another platform (e.g. a social network) that the content platform ties to a profile.</summary>
@@ -45,6 +48,9 @@ public sealed record PlatformActivity(
     string? Summary,
     string? ImageUrl,
     DateTimeOffset OccurredAt);
+
+/// <summary>The member's forum counts over the last months, as the platform counts them (exact, not from a page of items).</summary>
+public sealed record PlatformForumStats(int TopicsCreated, int Replies, int Solutions);
 
 /// <summary>The activity sections of the profile page. All but <see cref="Other"/> can also be filtered on the platform.</summary>
 public static class PlatformActivityGroups

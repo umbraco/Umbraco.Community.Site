@@ -1,8 +1,10 @@
 @model string
 @{
     // Small icon for a content type / platform. Model is the key:
-    // "package" | "talk" | "blog" | "video" | "forum" | "meetup" | "other"
+    // "package" | "talk" | "reply" | "solved" | "blog" | "video" | "forum" | "meetup" | "other"
     // | "linkedin" | "mastodon" | "bluesky".
+    // The account page draws the same icons client side from StaticAssets/src/svg/profile-kind-icons.ts:
+    // keep the two in sync (same keys, same paths, same attributes).
     const string attrs = "class=\"community-profile__icon\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"";
     // Brand glyphs (Simple Icons, single-path) are solid fills, not strokes.
     const string fillAttrs = "class=\"community-profile__icon\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"";
@@ -23,6 +25,12 @@
         break;
     case "forum":
         @Html.Raw($"<svg {attrs}><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>")
+        break;
+    case "reply":
+        @Html.Raw($"<svg {attrs}><polyline points=\"9 17 4 12 9 7\"/><path d=\"M20 18v-2a4 4 0 0 0-4-4H4\"/></svg>")
+        break;
+    case "solved":
+        @Html.Raw($"<svg {attrs}><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg>")
         break;
     case "other":
         @Html.Raw($"<svg {attrs}><path d=\"M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z\"/></svg>")
