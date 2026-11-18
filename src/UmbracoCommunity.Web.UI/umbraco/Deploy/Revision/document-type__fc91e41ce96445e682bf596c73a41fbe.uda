@@ -3,15 +3,13 @@
   "Alias": "settingsVideoShowcaseBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
+  "Icon": "icon-plugin",
   "Thumbnail": "folder.png",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
-  "PropertyTypes": [],
-  "Udi": "umb://document-type/fc91e41ce96445e682bf596c73a41fbe",
-  "Icon": "icon-plugin",
   "CompositionContentTypes": [
     "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
     "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
@@ -30,13 +28,28 @@
           "Description": "Defaults to List.",
           "Name": "Layout",
           "SortOrder": 101
+        },
+        {
+          "Key": "9b3cfade-17db-400e-b72b-df229e43643b",
+          "Alias": "playlistPosition",
+          "DataType": "umb://data-type/cbd47f04776443268c3d60e6d884a05d",
+          "ValueType": "System.String",
+          "Description": "Which side the playlist sits on in the List layout. Defaults to Right.",
+          "Name": "Playlist position",
+          "SortOrder": 102
         }
       ]
     }
   ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/fc91e41ce96445e682bf596c73a41fbe",
   "Dependencies": [
     {
       "Udi": "umb://data-type/4dda9c21fc3a4a51a2178d946ab2c4e9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/cbd47f04776443268c3d60e6d884a05d",
       "Ordering": true
     },
     {

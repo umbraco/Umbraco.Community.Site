@@ -5,24 +5,22 @@
 @{
     var videos = Model.Content.PlayableVideos;
     var isGrid = Model.Content.IsGrid(Model.Settings);
+    var playlistLeft = Model.Content.HasPlaylistOnLeft(Model.Settings);
     var id = Model.Content.IdHash;
     var hasBg = Model.Settings?.HasBg() ?? false;
     var bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
     var more = Model.Content.MoreVideosLink;
     var moreLabel = string.IsNullOrWhiteSpace(more?.Name) ? "More on YouTube" : more.Name;
-    var customAccents = videos.Select((item, index) => (item.AccentColour?.Color, index)).Where(accent => !string.IsNullOrEmpty(accent.Color)).ToList();
+    var hasIntro = !string.IsNullOrEmpty(Model.Content.Title) || !Model.Content.Subtitle.IsEmptyHtmlString();
+    var moreInIntro = isGrid && hasIntro && more != null;
+    var layoutClass = isGrid ? "dc-video-showcase-block--grid" : playlistLeft ? "dc-video-showcase-block--list dc-video-showcase-block--playlist-left" : "dc-video-showcase-block--list";
 }
 
 @functions {
-    private const int PaletteSize = 4;
-
     private static string Number(int index) => (index + 1).ToString("00");
 
     private static string TitleOf(VideoShowcaseItem item) =>
         string.IsNullOrWhiteSpace(item.Video?.Title) ? "Untitled video" : item.Video.Title;
-
-    private static string AccentClass(VideoShowcaseItem item, int index) =>
-        string.IsNullOrEmpty(item.AccentColour?.Color) ? $"accent-{index % PaletteSize}" : "has-accent";
 
     private void RenderPlayer(VideoShowcaseItem item, string sizes)
     {
@@ -45,6 +43,21 @@
         </div>
     }
 
+    private void RenderArrow()
+    {
+        <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+            <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+        </svg>
+    }
+
+    private void RenderMoreLink(Link more, string label, string? modifier)
+    {
+        <a class="dc-video-showcase__more @modifier" href="@more.Url" target="@more.Target" rel="@(more.Target == "_blank" ? "noopener" : null)">
+            <span>@label</span>
+            <span class="dc-video-showcase__more-arrow" aria-hidden="true">↗</span>
+        </a>
+    }
+
     private void RenderWatchLink(VideoShowcaseItem item)
     {
         <a class="dc-video-showcase__watch" href="@item.Video!.WatchUrl" target="_blank" rel="noopener">
@@ -57,7 +70,7 @@
 {
     <div class="video-showcase-preview">
         <div class="video-showcase-preview__header">
-            <p class="video-showcase-preview__eyebrow">Video showcase · @(isGrid ? "Grid" : "List")</p>
+            <p class="video-showcase-preview__eyebrow">Video showcase · @(isGrid ? "Grid" : playlistLeft ? "List, playlist left" : "List")</p>
             <p class="video-showcase-preview__title">@(string.IsNullOrWhiteSpace(Model.Content.Title) ? "No title" : Model.Content.Title)</p>
         </div>
         @if (videos.Count == 0)
@@ -92,7 +105,7 @@
 
 @if (videos.Count > 0)
 {
-    <section class="dc-video-showcase-block @(isGrid ? "dc-video-showcase-block--grid" : "dc-video-showcase-block--list") @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@id" aria-labelledby="@(string.IsNullOrEmpty(Model.Content.Title) ? null : id + "-title")">
+    <section class="dc-video-showcase-block @layoutClass @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@id" aria-labelledby="@(string.IsNullOrEmpty(Model.Content.Title) ? null : id + "-title")">
         <style asp-add-nonce="true">
             #@id {
                 --video-count: @videos.Count;
@@ -101,13 +114,9 @@
                     @:--block-background-color: @Model.Settings!.BackgroundColour!.Color.GetOptionalColor();
                 }
             }
-            @foreach (var (colour, index) in customAccents)
-            {
-                @:#@id-@index { --accent: @colour.GetOptionalColor(); --accent-fg: @(colour.IsDark() ? "var(--color-white)" : "var(--color-dark)"); }
-            }
         </style>
 
-        @if (!string.IsNullOrEmpty(Model.Content.Title) || !Model.Content.Subtitle.IsEmptyHtmlString())
+        @if (hasIntro)
         {
             <div class="dc-video-showcase-block__intro align-center" id="@(Model.Settings?.BlockId ?? string.Empty)">
                 @if (!string.IsNullOrEmpty(Model.Content.Title))
@@ -118,39 +127,84 @@
                 {
                     <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
                 }
+                @if (moreInIntro)
+                {
+                    RenderMoreLink(more!, moreLabel, "dc-video-showcase__more--intro");
+                }
             </div>
         }
 
         <dc-video-showcase class="dc-video-showcase" data-layout="@(isGrid ? "grid" : "list")" data-allow="@VideoHelper.YouTubeAllow">
             @if (isGrid)
             {
-                @for (var i = 0; i < videos.Count; i++)
-                {
-                    var item = videos[i];
-                    <article class="dc-video-showcase__item dc-video-showcase__card @AccentClass(item, i)" id="@id-@i" data-showcase-item aria-labelledby="@id-@i-title">
-                        @{ RenderPlayer(item, i == 0 ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"); }
-                        <div class="dc-video-showcase__body">
-                            <span class="dc-video-showcase__number" aria-hidden="true">@Number(i)</span>
-                            <h3 class="dc-video-showcase__title" id="@id-@i-title">@TitleOf(item)</h3>
-                            @if (item.Byline != null)
+                <ul class="dc-video-showcase__grid" role="list">
+                    @for (var i = 0; i < videos.Count; i++)
+                    {
+                        var item = videos[i];
+                        var video = item.Video!;
+                        var title = TitleOf(item);
+                        <li class="dc-video-showcase__item dc-video-showcase__card" id="@id-@i" data-showcase-item
+                            data-source="@video.EmbedUrl" data-title="@title" data-byline="@item.Byline" data-description="@item.Description"
+                            data-watch="@video.WatchUrl" data-thumb="@video.Poster?.GetCropUrl(width: 320, height: 180, imageCropMode: ImageCropMode.Crop)">
+                            <div class="dc-video-showcase__thumb">
+                                @if (video.Poster != null)
+                                {
+                                    <img src="@video.Poster.GetCropUrl(width: 640, height: 360, imageCropMode: ImageCropMode.Crop)"
+                                         srcset="@video.Poster.GetCropUrl(width: 640, height: 360, imageCropMode: ImageCropMode.Crop) 640w, @video.Poster.GetCropUrl(width: 960, height: 540, imageCropMode: ImageCropMode.Crop) 960w"
+                                         sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" alt="" loading="lazy" decoding="async" />
+                                }
+                                <span class="dc-video-showcase__play" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5Z" /></svg>
+                                </span>
+                            </div>
+                            <div class="dc-video-showcase__card-body">
+                                <span class="dc-video-showcase__number" aria-hidden="true">@Number(i)</span>
+                                <div class="dc-video-showcase__label">
+                                    <h3 class="dc-video-showcase__title">
+                                        <a class="dc-video-showcase__card-link" href="@video.WatchUrl" target="_blank" rel="noopener" data-showcase-open>@title</a>
+                                    </h3>
+                                    @if (item.Byline != null)
+                                    {
+                                        <p class="dc-video-showcase__byline">@item.Byline</p>
+                                    }
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+                <dialog class="dc-video-showcase__dialog" aria-labelledby="@id-dialog-title" data-showcase-dialog>
+                    <div class="dc-video-showcase__dialog-top">
+                        <p class="dc-video-showcase__dialog-count" data-showcase-dialog-count></p>
+                        <button type="button" class="dc-video-showcase__dialog-close" aria-label="Close video" data-showcase-close>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                        </button>
+                    </div>
+                    <div class="dc-video-showcase__player dc-video-showcase__dialog-player" data-showcase-dialog-player></div>
+                    <div class="dc-video-showcase__dialog-info">
+                        <h2 class="dc-video-showcase__dialog-title" id="@id-dialog-title" data-showcase-dialog-title></h2>
+                        <p class="dc-video-showcase__byline" data-showcase-dialog-byline></p>
+                        <p class="dc-video-showcase__description" data-showcase-dialog-description></p>
+                        <a class="dc-video-showcase__watch" href="#" target="_blank" rel="noopener" data-showcase-dialog-watch>
+                            Watch on YouTube <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span>
+                        </a>
+                    </div>
+                    @if (videos.Count > 1)
+                    {
+                        <div class="dc-video-showcase__dialog-nav">
+                            @foreach (var (step, label) in new[] { (-1, "Previous"), (1, "Up next") })
                             {
-                                <p class="dc-video-showcase__byline">@item.Byline</p>
+                                <button type="button" class="dc-video-showcase__dialog-step @(step < 0 ? "is-prev" : "is-next")" data-showcase-dialog-step="@step">
+                                    <span class="slider-arrow-btn @(step < 0 ? "slider-arrow-btn--prev" : null)" aria-hidden="true">@{ RenderArrow(); }</span>
+                                    <img class="dc-video-showcase__dialog-step-thumb" alt="" hidden data-showcase-dialog-step-thumb />
+                                    <span class="dc-video-showcase__dialog-step-text">
+                                        <span class="dc-video-showcase__dialog-step-label">@label</span>
+                                        <span class="dc-video-showcase__dialog-step-title" data-showcase-dialog-step-title></span>
+                                    </span>
+                                </button>
                             }
-                            @if (!string.IsNullOrWhiteSpace(item.Description))
-                            {
-                                <p class="dc-video-showcase__description">@item.Description</p>
-                            }
-                            @{ RenderWatchLink(item); }
                         </div>
-                    </article>
-                }
-                @if (more != null)
-                {
-                    <a class="dc-video-showcase__more-tile" href="@more.Url" target="@more.Target" rel="@(more.Target == "_blank" ? "noopener" : null)">
-                        <span class="dc-video-showcase__more-label">@moreLabel</span>
-                        <span class="dc-video-showcase__more-arrow" aria-hidden="true">↗</span>
-                    </a>
-                }
+                    }
+                </dialog>
             }
             else
             {
@@ -158,7 +212,7 @@
                 {
                     var item = videos[i];
                     var selected = i == 0;
-                    <div class="dc-video-showcase__item @AccentClass(item, i) @(selected ? "is-selected" : null)" id="@id-@i" data-showcase-item>
+                    <div class="dc-video-showcase__item @(selected ? "is-selected" : null)" id="@id-@i" data-showcase-item>
                         <h3 class="dc-video-showcase__heading">
                             <button type="button" class="dc-video-showcase__trigger" id="@id-@i-trigger" aria-expanded="@(selected ? "true" : "false")" aria-controls="@id-@i-panel" data-showcase-trigger>
                                 <span class="dc-video-showcase__number" aria-hidden="true">@Number(i)</span>
@@ -183,11 +237,11 @@
                                     @if (videos.Count > 1)
                                     {
                                         <div class="dc-video-showcase__steps">
-                                            <button type="button" class="dc-video-showcase__step" data-showcase-step="-1" disabled="@(i == 0)">
-                                                <span aria-hidden="true">←</span><span class="sr-only">Previous video</span>
+                                            <button type="button" class="slider-arrow-btn slider-arrow-btn--prev" aria-label="Previous video" data-showcase-step="-1" disabled="@(i == 0)">
+                                                @{ RenderArrow(); }
                                             </button>
-                                            <button type="button" class="dc-video-showcase__step" data-showcase-step="1" disabled="@(i == videos.Count - 1)">
-                                                <span aria-hidden="true">→</span><span class="sr-only">Next video</span>
+                                            <button type="button" class="slider-arrow-btn" aria-label="Next video" data-showcase-step="1" disabled="@(i == videos.Count - 1)">
+                                                @{ RenderArrow(); }
                                             </button>
                                         </div>
                                     }
@@ -197,13 +251,10 @@
                     </div>
                 }
             }
+            @if (more != null && !moreInIntro)
+            {
+                RenderMoreLink(more, moreLabel, null);
+            }
         </dc-video-showcase>
-
-        @if (more != null && !isGrid)
-        {
-            <p class="dc-video-showcase-block__more">
-                <a href="@more.Url" target="@more.Target" rel="@(more.Target == "_blank" ? "noopener" : null)">@moreLabel <span aria-hidden="true">↗</span></a>
-            </p>
-        }
     </section>
 }

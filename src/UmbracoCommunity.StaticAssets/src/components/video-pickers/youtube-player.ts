@@ -25,6 +25,8 @@ export function createYouTubeIframe(source: string, title: string, allow = '', s
 }
 
 const UNMUTE_CHECK_MS = 1000;
+const BLOCK_CHECK_MS = 750;
+const PLAYING = 1;
 
 // Shown when the browser only allows muted playback; a click on the page is allowed to turn the sound on.
 function showUnmuteButton(container: HTMLElement, player: YouTubePlayer): () => void {
@@ -60,7 +62,7 @@ function showUnmuteButton(container: HTMLElement, player: YouTubePlayer): () => 
  * is started through the player API. If the browser then blocks playback with sound, it plays muted and
  * offers a "Turn sound on" button. Falls back to a plain autoplaying iframe if the API can't load.
  */
-export async function playYouTube(container: HTMLElement, source: string, title: string, allow = ''): Promise<EmbeddedYouTube> {
+export async function playYouTube(container: HTMLElement, source: string, title: string, allow = '', onEnded?: () => void): Promise<EmbeddedYouTube> {
     const embed = new URL(source, window.location.href);
 
     let YT;
@@ -79,6 +81,7 @@ export async function playYouTube(container: HTMLElement, source: string, title:
 
     const start = Number(embed.searchParams.get('start')) || undefined;
     let removeUnmute: (() => void) | undefined;
+    let blockCheck: number | undefined;
     const player = new YT.Player(target, {
         host: embed.origin,
         videoId: embed.pathname.split('/').pop(),
@@ -93,16 +96,25 @@ export async function playYouTube(container: HTMLElement, source: string, title:
                 ready.playVideo();
                 if (!removeUnmute) iframe.focus();
             },
+            // YouTube can report a block for its own autoplay attempt even when our playVideo() then plays with sound.
             onAutoplayBlocked: ({ target: blocked }) => {
-                blocked.mute();
-                blocked.playVideo();
-                removeUnmute ??= showUnmuteButton(container, blocked);
+                window.clearTimeout(blockCheck);
+                blockCheck = window.setTimeout(() => {
+                    if (blocked.getPlayerState() === PLAYING && !blocked.isMuted()) return;
+                    blocked.mute();
+                    blocked.playVideo();
+                    removeUnmute ??= showUnmuteButton(container, blocked);
+                }, BLOCK_CHECK_MS);
+            },
+            onStateChange: ({ data }) => {
+                if (data === 0) onEnded?.();
             },
         },
     });
 
     return {
         destroy: () => {
+            window.clearTimeout(blockCheck);
             removeUnmute?.();
             player.destroy();
         },

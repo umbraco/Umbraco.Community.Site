@@ -18,7 +18,7 @@
               "name": "Grid",
               "value": "grid",
               "icon": "icon-grid",
-              "description": "A grid of cards. The chosen one opens full width."
+              "description": "A grid of videos. Each opens in a player with the previous and next videos alongside."
             }
           ]
         }

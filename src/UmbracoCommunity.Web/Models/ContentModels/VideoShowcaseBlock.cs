@@ -4,12 +4,15 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
     public partial class VideoShowcaseBlock
     {
-        public const int MaxVideos = 12;
+        public const int MaxVideos = 6;
 
         public string IdHash { get; } = "vs-" + StringUtilities.RandomString(5);
 
         public bool IsGrid(SettingsVideoShowcaseBlock? settings) =>
             string.Equals(settings?.Layout, "grid", StringComparison.OrdinalIgnoreCase);
+
+        public bool HasPlaylistOnLeft(SettingsVideoShowcaseBlock? settings) =>
+            string.Equals(settings?.PlaylistPosition, "left", StringComparison.OrdinalIgnoreCase);
 
         public IReadOnlyList<VideoShowcaseItem> PlayableVideos =>
             Videos?.Select(block => block.Content)

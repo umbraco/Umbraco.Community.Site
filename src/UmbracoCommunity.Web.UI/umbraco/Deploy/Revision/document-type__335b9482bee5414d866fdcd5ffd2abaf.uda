@@ -3,16 +3,14 @@
   "Alias": "videoShowcaseBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
+  "Icon": "icon-video",
   "Thumbnail": "folder.png",
+  "Description": "A set of past talks from YouTube as a list or a grid, with a link to more on YouTube. Nothing loads from YouTube until a video is played.",
   "Permissions": {
     "IsElementType": true,
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
-  "PropertyTypes": [],
-  "Udi": "umb://document-type/335b9482bee5414d866fdcd5ffd2abaf",
-  "Icon": "icon-video",
-  "Description": "A set of past talks from YouTube as a list or a grid, with a link to more on YouTube. Nothing loads from YouTube until a video is played.",
   "CompositionContentTypes": [
     "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
   ],
@@ -28,7 +26,7 @@
           "Alias": "videos",
           "DataType": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
           "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
-          "Description": "Up to 12 videos, shown in this order.",
+          "Description": "Up to 6 videos, shown in this order.",
           "Mandatory": true,
           "Name": "Videos"
         },
@@ -44,21 +42,23 @@
       ]
     }
   ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/335b9482bee5414d866fdcd5ffd2abaf",
   "Dependencies": [
-    {
-      "Udi": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
-      "Ordering": true
-    },
     {
       "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
       "Ordering": true
     },
     {
-      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Udi": "umb://data-type/b454aca24aed47cd93bfac1f156fa21e",
       "Ordering": true
     },
     {
       "Udi": "umb://document-type-container/f23f955ed79544199084b2cb575ca01f",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
       "Ordering": true
     }
   ],

@@ -58,6 +58,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string Layout => this.Value<string>(_publishedValueFallback, "layout");
 
 		///<summary>
+		/// Playlist position: Which side the playlist sits on in the List layout. Defaults to Right.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("playlistPosition")]
+		public virtual string PlaylistPosition => this.Value<string>(_publishedValueFallback, "playlistPosition");
+
+		///<summary>
 		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

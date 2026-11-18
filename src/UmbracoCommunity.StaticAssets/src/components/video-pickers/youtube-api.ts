@@ -4,6 +4,8 @@ export interface YouTubePlayer {
     mute(): void;
     unMute(): void;
     isMuted(): boolean;
+    /** 1 means playing. */
+    getPlayerState(): number;
     getIframe(): HTMLIFrameElement;
     destroy(): void;
 }
@@ -21,6 +23,8 @@ export interface YouTubeNamespace {
                 onReady?: (event: { target: YouTubePlayer }) => void;
                 /** Fires when the browser refuses playback, e.g. with sound before the visitor has interacted enough. */
                 onAutoplayBlocked?: (event: { target: YouTubePlayer }) => void;
+                /** `data` is the player state; 0 means the video ended. */
+                onStateChange?: (event: { target: YouTubePlayer; data: number }) => void;
             };
         },
     ) => YouTubePlayer;

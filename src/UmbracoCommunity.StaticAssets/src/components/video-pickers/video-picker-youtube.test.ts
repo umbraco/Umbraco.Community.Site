@@ -17,10 +17,12 @@ describe('VideoPickerYouTubeElement', () => {
     let muted = false
     return {
       iframe,
+      state: -1,
       playVideo: vi.fn(),
       mute: vi.fn(() => { muted = true }),
       unMute: vi.fn(() => { muted = false }),
       isMuted: () => muted,
+      getPlayerState() { return this.state },
       destroy: vi.fn(),
       getIframe: () => iframe,
     }
@@ -99,6 +101,7 @@ describe('VideoPickerYouTubeElement', () => {
     })
 
     it('plays muted only when the browser blocks playback with sound', async () => {
+      vi.useFakeTimers()
       installYouTube()
       const element = await create()
       await element.playVideo()
@@ -108,11 +111,44 @@ describe('VideoPickerYouTubeElement', () => {
       expect(player.mute).not.toHaveBeenCalled()
 
       options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
       expect(player.mute).toHaveBeenCalledTimes(1)
       expect(player.playVideo).toHaveBeenCalledTimes(2)
     })
 
+    it('ignores a reported block when the video plays with sound anyway', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      options.events.onReady({ target: player })
+      player.state = 1
+      vi.advanceTimersByTime(750)
+
+      expect(player.mute).not.toHaveBeenCalled()
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+    })
+
+    it('still offers the sound button when the video plays but YouTube muted it', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      player.mute()
+      player.state = 1
+      vi.advanceTimersByTime(750)
+
+      expect(element.querySelector('.dc-youtube-unmute')).not.toBeNull()
+    })
+
     it('offers a button to turn the sound on when it had to play muted', async () => {
+      vi.useFakeTimers()
       installYouTube()
       const element = await create()
       await element.playVideo()
@@ -121,6 +157,7 @@ describe('VideoPickerYouTubeElement', () => {
       expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
 
       options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
       const button = element.querySelector<HTMLButtonElement>('.dc-youtube-unmute')!
       expect(button.textContent).toContain('Turn sound on')
       expect(document.activeElement).toBe(button)
@@ -140,6 +177,7 @@ describe('VideoPickerYouTubeElement', () => {
       const { options, player } = created[0]
 
       options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
       player.unMute()
       vi.advanceTimersByTime(1000)
 
