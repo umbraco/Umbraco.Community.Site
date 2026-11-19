@@ -367,6 +367,9 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 - Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, while hovered or while focus is inside it, or when the tab is hidden
 - Respects `prefers-reduced-motion: reduce`
 - Optional pause/play toggle: a `<button data-image-slider-toggle aria-controls="{slider id}" hidden>` anywhere on the page. The slider unhides it only while auto-sliding and swaps its `aria-label` / `is-paused` class. Loop clones are `aria-hidden` and `inert`, so links in them aren't focusable
+- Optional arrows: `<button data-image-slider-action="prev|next" aria-controls="{slider id}" hidden>`. The slider unhides them only when it isn't auto-sliding (setting off, or reduced motion), scrolls one image per click and disables each arrow at its end
+- The loop clones the images on both sides of the originals and keeps the scroll position within the original set, so the area left of the first image (e.g. a carousel's start padding) shows the previous images rather than an empty gap
+- When the images fit inside the slider's padding box (checked on load and resize), it adds `is-static`: no auto-slide, drag, toggle or arrows, and the clones are hidden
 
 **CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/hero-image-slider-block.css`):
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
@@ -377,7 +380,7 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 
 A standalone image slider for content blocks (`imageCarouselBlock`): the slider from the hero above, without its text. It's allowed in the ROOT content block grid and in the `eventsHome` Block Restrictions rule (Codegarden only).
 
-**Content** (`ImageCarouselBlock`): `Images` (required Block List, *Image carousel items* data type) of `ImageCarouselItem`s:
+**Content** (`ImageCarouselBlock`): `Images` (required Block List, *Image carousel items* data type, minimum 5 so a looping carousel doesn't look sparse) of `ImageCarouselItem`s:
 - `Image` (required), `AltText` (falls back to the media item's name), `Title`, `Text` (max 255) and `Link` (max 1), all optional
 - The content-model partial (`Models/ContentModels/ImageCarouselBlock.cs`) adds `IdHash` and `Items` (items that have an image)
 
@@ -386,10 +389,13 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 
 **View** (`Views/Partials/Blocks/ImageCarouselBlock.cshtml`):
 - Reuses `<dc-image-slider>`; an item with a link renders as an `<a>` (image + caption), otherwise as a `<figure>` with a `<figcaption>`
-- With auto-slide on it renders the pause/play toggle below the slider (WCAG 2.2.2)
-- A background colour turns the block into a full-width band; dark colours switch the captions and toggle to white
+- Below the slider, right-aligned to the content width: the pause/play toggle when auto-slide is on (WCAG 2.2.2), otherwise previous/next arrows (the shared `.slider-arrow-btn` style from the Slider block)
+- A background colour turns the block into a full-width band; dark colours switch the captions and controls to white
 
-**CSS** (`css/blocks/image-carousel-block.css`): captions are kept to the image's width (`width: 0; min-width: 100%`), so long text wraps under its image.
+**CSS** (`css/blocks/image-carousel-block.css`):
+- The block keeps the normal content width. The slider still spans the viewport, but `padding-inline: calc(50vw - 50%)` puts the first image (and, at the end, the last one) on the content edge, so images scroll off the page from there
+- The background band reaches the viewport edges with `box-shadow: 0 0 0 100vmax` + `clip-path: inset(0 -100vmax)`, without moving the block out of the content width
+- Captions are kept to the image's width (`width: 0; min-width: 100%`), so long text wraps under its image
 
 **Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images.
 
