@@ -57,7 +57,6 @@ export class YouTubeVideoEditorElement extends UmbElementMixin(LitElement) imple
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       const config = authContext?.getOpenApiConfiguration();
       client.setConfig({
-        auth: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });
