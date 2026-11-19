@@ -26,6 +26,9 @@ export abstract class DcVideoBlockElement extends LitElement {
     @state()
     videoPlayed: boolean = false;
 
+    // Players that must not load before a click show a poster even without a thumbnail.
+    protected readonly posterWithoutThumbnail: boolean = false;
+
     abstract playVideo()
 
     #renderPlayBtn() {
@@ -37,7 +40,7 @@ export abstract class DcVideoBlockElement extends LitElement {
         const hasDetails = this.name && this.name?.length > 0 ? true : false;
 
         return html`
-            <div class="poster ${!hasDetails ? 'no-details' : ''}" style="background-image: url('${this.thumbnail}');" @click=${this.playVideo} role="button" tabindex="0" aria-label="Play video${this.name ? `: ${this.name}` : ''}" @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.playVideo(); }}}>
+            <div class="poster ${!hasDetails ? 'no-details' : ''}" style=${this.thumbnail ? `background-image: url('${this.thumbnail}');` : ''} @click=${this.playVideo} role="button" tabindex="0" aria-label="Play video${this.name ? `: ${this.name}` : ''}" @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.playVideo(); }}}>
                 <div class="details">
                     ${this.#renderPlayBtn()}
                     ${hasDetails ? html`<p>${this.name}<span>${this.length}</span></p>` : ''}
@@ -54,7 +57,7 @@ export abstract class DcVideoBlockElement extends LitElement {
                 }
             </style>
             <div class="video-picker">
-                ${(this.videoPlayed || this.autoPlay) || (!this.thumbnail || this.thumbnail.length === 0)
+                ${(this.videoPlayed || this.autoPlay) || (!this.thumbnail && !this.posterWithoutThumbnail)
                 ? html`<slot name="video"></slot>`
                 : this.#renderPoster()
             }
@@ -79,9 +82,15 @@ export abstract class DcVideoBlockElement extends LitElement {
                 top: 0;
                 height: 100%;
                 width: 100%;
+                background-color: var(--color-identity-blue, #283a97);
                 background-size: cover;
                 background-position: center;
                 cursor: pointer;
+            }
+
+            .poster:focus-visible {
+                outline: var(--focus-outline, 2px solid #283a97);
+                outline-offset: var(--focus-outline-offset, 2px);
             }
 
             .details {

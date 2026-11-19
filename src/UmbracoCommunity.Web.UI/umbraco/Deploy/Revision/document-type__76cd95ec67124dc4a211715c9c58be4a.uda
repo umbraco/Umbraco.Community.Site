@@ -1,5 +1,5 @@
 {
-  "Name": "[Settings] Video block",
+  "Name": "[Settings] Video (legacy)",
   "Alias": "settingsVideoBlock",
   "AllowedTemplates": [],
   "HistoryCleanup": {},
@@ -91,5 +91,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "18.2.0"
 }
