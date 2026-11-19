@@ -1,0 +1,12 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<StatBlock>>
+
+@if (!string.IsNullOrWhiteSpace(Model.Content.Number))
+{
+    <p class="dc-tile-stat @(Model.Content.LabelBesideNumber ? "dc-tile-stat--label-beside" : string.Empty)">
+        <span class="dc-tile-stat__number">@Model.Content.Number</span>
+        @if (!string.IsNullOrWhiteSpace(Model.Content.Label))
+        {
+            <span class="dc-tile-stat__label">@Model.Content.Label</span>
+        }
+    </p>
+}

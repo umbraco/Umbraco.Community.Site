@@ -1,0 +1,73 @@
+{
+  "Name": "Stat block",
+  "Alias": "statBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-chart",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "8f782fb8-7b2c-4e07-8e24-46ab67a36d35",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "35e0ed9e-1e6e-4873-a36b-5c4738b226f7",
+          "Alias": "labelBesideNumber",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Description": "Shows the label as a small uppercase label next to the number instead of below it.",
+          "Name": "Label beside number",
+          "SortOrder": 2
+        },
+        {
+          "Key": "abc4cd12-a399-4bad-86c0-3bf9e1140d03",
+          "Alias": "number",
+          "DataType": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+          "ValueType": "System.String",
+          "Description": "e.g. 1,732 or 500K\u002B",
+          "Mandatory": true,
+          "Name": "Number"
+        },
+        {
+          "Key": "f3a0c0b6-9de0-45c9-9812-e6b3ce7d8fe4",
+          "Alias": "label",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "e.g. Media / press attendees",
+          "Name": "Label",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/88517bfb375a4fe6a8b1bf59a058b04e",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/53cf277e9ddf4411800551211442dfac",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

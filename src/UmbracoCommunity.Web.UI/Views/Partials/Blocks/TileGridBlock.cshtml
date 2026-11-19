@@ -1,0 +1,32 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TileGridBlock, SettingsTileGridBlock>>
+
+@{
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    var blockStyle = hasBg ? $"--block-background-color: {Model.Settings!.BackgroundColour!.Color}" : null;
+    var tileViewData = new ViewDataDictionary(ViewData) { ["TileGridBackground"] = hasBg ? Model.Settings!.BackgroundColour!.Color : null };
+}
+
+@if (Model.Content.Tiles != null && Model.Content.Tiles.Any())
+{
+    <div class="dc-tile-grid align-center @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
+         id="@(string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId)" style="@blockStyle">
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+        }
+
+        <div class="dc-tile-grid__tiles">
+            @foreach (var item in Model.Content.Tiles)
+            {
+                <partial name="@($"~/Views/Partials/Blocks/{item.Content.ContentType.Alias}.cshtml")" model="item" view-data="tileViewData" />
+            }
+        </div>
+    </div>
+}

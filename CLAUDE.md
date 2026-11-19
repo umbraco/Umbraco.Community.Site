@@ -436,6 +436,20 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
 
+### Tile Grid Block
+
+A grid of tiles of different sizes (stats, text, images, a button), laid out by the editor. Allowed on `eventsHome` (Codegarden) only.
+
+**Content** (`TileGridBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Tiles` (Block Grid "Tile grid tiles", 12 columns, only `TileGridItem`). Editors set each tile's width (3 / 4 / 6 / 8 / 12 columns) and height (1 or 2 rows) with Block Grid's own resizing.
+
+**Tile** (`TileGridItem` + `SettingsTileGridTile`): `TileContent` is a Block List ("Tile content items") of `EyebrowBlock` (small uppercase label), `StatBlock` (`Number`, `Label`, `LabelBesideNumber`), and the existing `TextBlock`, `ImageBlock`, `IconBlock` and `CallToActionLinkBlock`. `TileContent` is optional. Settings: `BackgroundColour` (`ISettingsColour`), `BackgroundImage` with `BackgroundImagePosition` (`fill` / `right` / `bottom-right`) and `BackgroundImageAltText`, and `ContentAlignment` (`top` / `bottom` / `spread`). The view compares those exact values, so renaming an item value in the backoffice needs a matching change in `TileGridItem.cshtml`.
+
+**Layout** (`css/blocks/tile-grid-block.css`): tiles get their spans as `--tile-columns` / `--tile-rows` style properties. Below `--sm` every tile is full width; at `--sm` tiles up to 6 columns are half width and wider ones full width (`--tile-columns-sm`, set in the view); from `--md` the real spans and row spans apply. `spread` uses `space-between`, so put a label first and a stat or footnote last (an Eyebrow block works as a footnote). A `fill` image under text gets a 55% black overlay and white text so the text stays readable. A tile with a background image and no content is an image-only tile: the image always fills it, with no overlay, and its `BackgroundImageAltText` setting becomes the image's alt text (empty = decorative). *Right half* and *Bottom right* images sit beside the text only from `--md` on tiles at least 6 columns wide (`dc-tile--wide-md`); otherwise they stack under it. A tile whose colour (white when it has none) is too close to the block's to tell apart (`ColourHelper.ContrastRatio` under 1.1) gets `dc-tile--outlined`, a faint blue border (white on dark colours); the block passes its colour to the tiles as `ViewData["TileGridBackground"]`. The nested tile preview in the block's edit dialog doesn't get that colour, so it shows no outline.
+
+**Content partials**: `StatBlock`, `EyebrowBlock` and `IconBlock` render from `Views/Partials/Blocks/`, which the tile and the BlockPreview `ViewLocations` fallback both use. The button is `Views/Partials/Components/CallToActionLink.cshtml` (model: link, text, colour), shared with the rich text editor's CTA. An Image block honours *Image is circular*.
+
+**Backoffice preview**: the block and tiles render through their front-end partials. Styles in `wwwroot/css/styles.css`.
+
 ### Timeline Block
 
 A roadmap-style block for surfacing phased goals/milestones. Editors create one or more `TimelineEntryBlock` children (each representing a phase label such as "Now", "Next", "Future"), each containing a list of `TimelineGoalBlock` items with a title, optional rich text, and optional tags.
