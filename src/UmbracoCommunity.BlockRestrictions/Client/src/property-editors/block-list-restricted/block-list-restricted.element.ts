@@ -92,6 +92,15 @@ export default class BlockListRestrictedElement
    */
   private _isContentContext = false;
 
+  /** Whether the node is being created (not saved yet). Undefined until the workspace says. */
+  private _isNew: boolean | undefined;
+
+  /** Whether the parent context has reported a parent (which is the root, with no key, for a top-level page). */
+  private _parentKnown = false;
+
+  /** What the last restrictions request asked for, so repeated context callbacks don't repeat it. */
+  private _lastRequest: string | undefined;
+
   /** Reference to the imperatively-created native block list element. */
   private _innerElement: HTMLElement | null = null;
 
@@ -162,14 +171,25 @@ export default class BlockListRestrictedElement
       if (!context) return;
       this._isContentContext = true;
       this._contentTypeKey = context.getContentTypeUnique() ?? undefined;
-      this._tryLoad();
+      this.observe(context.isNew, (isNew) => {
+        this._isNew = isNew;
+        this._tryLoad();
+      });
     });
 
     // Consume parent entity context for parent node key (new content fallback).
     this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (parentContext) => {
       if (!parentContext) return;
-      const parent = parentContext.getParent();
-      this._parentKey = parent?.unique ?? undefined;
+      // Observed, not read once: for new content the parent is often set after this context
+      // resolves, and without it the server can't find the inherited rule (404, all blocks shown).
+      this.observe(parentContext.parent, (parent) => {
+        if (!parent) return;
+        const parentKey = parent.unique ?? undefined;
+        if (this._parentKnown && parentKey === this._parentKey) return;
+        this._parentKnown = true;
+        this._parentKey = parentKey;
+        this._tryLoad();
+      });
     });
   }
 
@@ -274,9 +294,19 @@ export default class BlockListRestrictedElement
    * (Content section), not when the property editor is instantiated in Settings.
    */
   private _tryLoad() {
-    if (this._authReady && this._entityKey && this._isContentContext) {
-      this._loadRestrictions();
-    }
+    if (!this._authReady || !this._entityKey || !this._isContentContext) return;
+    // A new node isn't on the server yet, so the lookup needs its parent: wait for it rather than
+    // asking without it (a 404) and asking again once it arrives.
+    if (this._isNew === undefined || (this._isNew && !this._parentKnown)) return;
+
+    // Several contexts call in here; only ask again when what we'd ask for has changed.
+    const request = this._isNew
+      ? `${this._entityKey}|${this._contentTypeKey ?? ""}|${this._parentKey ?? ""}`
+      : this._entityKey;
+    if (request === this._lastRequest) return;
+    this._lastRequest = request;
+
+    this._loadRestrictions();
   }
 
   /**
