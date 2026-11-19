@@ -397,7 +397,7 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 - The background band reaches the viewport edges with `box-shadow: 0 0 0 100vmax` + `clip-path: inset(0 -100vmax)`, without moving the block out of the content width
 - Captions are kept to the image's width (`width: 0; min-width: 100%`), so long text wraps under its image
 
-**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images.
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 
 ### Video Hero
 
