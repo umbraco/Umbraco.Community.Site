@@ -21,14 +21,14 @@ public sealed class SeedExportHostedService : RecurringHostedServiceBase
         ISeedExportService exportService,
         IServerRoleAccessor serverRoleAccessor,
         ILogger<SeedExportHostedService> logger)
-        : base(logger, Interval, ComputeInitialDelay(RunAtUtc, DateTimeOffset.UtcNow))
+        : base(logger, Interval, ComputeInitialDelay(RunAtUtc, DateTimeOffset.UtcNow), TimeProvider.System)
     {
         _exportService = exportService;
         _serverRoleAccessor = serverRoleAccessor;
         _logger = logger;
     }
 
-    public override async Task PerformExecuteAsync(object? state)
+    public override async Task PerformExecuteAsync(CancellationToken stoppingToken)
     {
         var role = _serverRoleAccessor.CurrentServerRole;
         if (role is not (ServerRole.SchedulingPublisher or ServerRole.Single))

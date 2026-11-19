@@ -45,7 +45,6 @@ export class ExternalMemberGroupsWorkspaceViewElement extends UmbElementMixin(Li
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       client.setConfig({
-        auth: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });

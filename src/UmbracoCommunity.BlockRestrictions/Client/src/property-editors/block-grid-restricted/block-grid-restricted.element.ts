@@ -12,7 +12,7 @@
  *    the "Block Grid (Restricted)" property editor UI (see manifest.ts).
  *
  * 2. On load, the element consumes two Umbraco contexts:
- *    - UMB_AUTH_CONTEXT — provides the Bearer token for authenticated API calls
+ *    - UMB_AUTH_CONTEXT — provides the base URL and credentials mode for API calls
  *    - UMB_ENTITY_CONTEXT — provides the content node's unique key (GUID)
  *
  * 3. Once both contexts are available, it calls the `allowed-blocks/{nodeKey}`
@@ -147,6 +147,15 @@ export default class BlockGridRestrictedElement
    */
   private _isContentContext = false;
 
+  /** Whether the node is being created (not saved yet). Undefined until the workspace says. */
+  private _isNew: boolean | undefined;
+
+  /** Whether the parent context has reported a parent (which is the root, with no key, for a top-level page). */
+  private _parentKnown = false;
+
+  /** What the last restrictions request asked for, so repeated context callbacks don't repeat it. */
+  private _lastRequest: string | undefined;
+
   /** Reference to the imperatively-created native block grid element. */
   private _innerElement: HTMLElement | null = null;
 
@@ -192,7 +201,7 @@ export default class BlockGridRestrictedElement
    *
    * Two contexts are consumed in parallel (they may resolve in any order):
    *
-   * 1. UMB_AUTH_CONTEXT — provides OpenAPI configuration (token, base URL, credentials)
+   * 1. UMB_AUTH_CONTEXT — provides OpenAPI configuration (base URL, credentials)
    *    needed for authenticated API calls to our .NET backend.
    *
    * 2. UMB_ENTITY_CONTEXT — provides the content node's unique identifier.
@@ -205,12 +214,11 @@ export default class BlockGridRestrictedElement
   constructor() {
     super();
 
-    // Consume the auth context to configure the API client with the Bearer token.
+    // Consume the auth context to configure the API client (the auth cookie is sent with the request).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
-        token: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });
@@ -239,7 +247,10 @@ export default class BlockGridRestrictedElement
       if (!context) return;
       this._isContentContext = true;
       this._contentTypeKey = context.getContentTypeUnique() ?? undefined;
-      this._tryLoad();
+      this.observe(context.isNew, (isNew) => {
+        this._isNew = isNew;
+        this._tryLoad();
+      });
     });
 
     // Consume the parent entity context to get the parent node key.
@@ -247,8 +258,16 @@ export default class BlockGridRestrictedElement
     // and find inherited restriction rules.
     this.consumeContext(UMB_PARENT_ENTITY_CONTEXT, (parentContext) => {
       if (!parentContext) return;
-      const parent = parentContext.getParent();
-      this._parentKey = parent?.unique ?? undefined;
+      // Observed, not read once: for new content the parent is often set after this context
+      // resolves, and without it the server can't find the inherited rule (404, all blocks shown).
+      this.observe(parentContext.parent, (parent) => {
+        if (!parent) return;
+        const parentKey = parent.unique ?? undefined;
+        if (this._parentKnown && parentKey === this._parentKey) return;
+        this._parentKnown = true;
+        this._parentKey = parentKey;
+        this._tryLoad();
+      });
     });
   }
 
@@ -381,9 +400,19 @@ export default class BlockGridRestrictedElement
    * (Content section), not when the property editor is instantiated in Settings.
    */
   private _tryLoad() {
-    if (this._authReady && this._entityKey && this._isContentContext) {
-      this._loadRestrictions();
-    }
+    if (!this._authReady || !this._entityKey || !this._isContentContext) return;
+    // A new node isn't on the server yet, so the lookup needs its parent: wait for it rather than
+    // asking without it (a 404) and asking again once it arrives.
+    if (this._isNew === undefined || (this._isNew && !this._parentKnown)) return;
+
+    // Several contexts call in here; only ask again when what we'd ask for has changed.
+    const request = this._isNew
+      ? `${this._entityKey}|${this._contentTypeKey ?? ""}|${this._parentKey ?? ""}`
+      : this._entityKey;
+    if (request === this._lastRequest) return;
+    this._lastRequest = request;
+
+    this._loadRestrictions();
   }
 
   /**

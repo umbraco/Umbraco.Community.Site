@@ -2,10 +2,9 @@ import type { MatchState, ProfileMatch, ProfileMatchList, ActivityEntry, Activit
 
 const BASE = "/umbraco/profilematchreview/api/v1";
 
-// Umbraco's Management API is bearer-authenticated. The dashboard root element consumes UMB_AUTH_CONTEXT and calls
-// setAuthConfig() with a token getter so each request attaches a fresh Authorization header.
+// Umbraco signs backoffice requests in with a cookie, so requests only need the base URL and
+// credentials mode. The dashboard root element takes both from UMB_AUTH_CONTEXT via setAuthConfig().
 interface ApiAuthConfig {
-  token?: () => Promise<string | undefined>;
   baseUrl?: string;
   credentials?: RequestCredentials;
 }
@@ -26,9 +25,7 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = await _authConfig.token?.();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const response = await fetch(`${_authConfig.baseUrl ?? ""}${BASE}${path}`, {
     ...init,
@@ -45,10 +42,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 /** True when the signed-in user is in the reviewer group. Any other failure is treated as no access. */
 export async function hasReviewAccess(): Promise<boolean> {
   try {
-    const token = await _authConfig.token?.();
     const response = await fetch(`${_authConfig.baseUrl ?? ""}${BASE}/access`, {
       credentials: _authConfig.credentials ?? "same-origin",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     return response.ok;
   } catch {

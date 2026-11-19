@@ -36,7 +36,6 @@ export class ProfileMatchReviewDashboardElement extends UmbElementMixin(LitEleme
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       if (!authContext) return;
       setAuthConfig({
-        token: () => authContext.getLatestToken(),
         baseUrl: authContext.getOpenApiConfiguration().base,
         credentials: authContext.getOpenApiConfiguration().credentials as RequestCredentials,
       });

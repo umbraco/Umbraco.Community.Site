@@ -3,7 +3,6 @@ import type { DailyCount, RangeQuery, SiteItem, SummaryResponse, TermListRespons
 const BASE = "/umbraco/searchtracker/api/v1";
 
 interface ApiAuthConfig {
-  token?: () => Promise<string | undefined>;
   baseUrl?: string;
   credentials?: RequestCredentials;
 }
@@ -15,9 +14,7 @@ export function setAuthConfig(config: ApiAuthConfig) {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = await _authConfig.token?.();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const response = await fetch(`${_authConfig.baseUrl ?? ""}${BASE}${path}`, {
     ...init,
