@@ -380,7 +380,7 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 
 A standalone image slider for content blocks (`imageCarouselBlock`): the slider from the hero above, without its text. It's allowed in the ROOT content block grid and in the `eventsHome` Block Restrictions rule (Codegarden only).
 
-**Content** (`ImageCarouselBlock`): `Images` (required Block List, *Image carousel items* data type, minimum 5 so a looping carousel doesn't look sparse) of `ImageCarouselItem`s:
+**Content** (`ImageCarouselBlock`, composes `IContentBlockIntro` for the usual `Title` / `Subtitle`, rendered above the slider): `Images` (required Block List, *Image carousel items* data type, minimum 5 so a looping carousel doesn't look sparse) of `ImageCarouselItem`s:
 - `Image` (required), `AltText` (falls back to the media item's name), `Title`, `Text` (max 255) and `Link` (max 1), all optional
 - The content-model partial (`Models/ContentModels/ImageCarouselBlock.cs`) adds `IdHash` and `Items` (items that have an image)
 

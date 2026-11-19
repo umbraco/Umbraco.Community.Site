@@ -1048,6 +1048,25 @@ dc-image-slider img {
     color: #ffffff;
 }
 
+.dc-image-carousel-preview .block-title {
+    color: inherit;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+    text-align: center;
+}
+
+.dc-image-carousel-preview .block-subtitle {
+    margin: 0 0 1rem;
+    font-size: 16px;
+    text-align: center;
+}
+
+.dc-image-carousel-preview .block-subtitle p {
+    margin: 0;
+}
+
 .dc-image-carousel-preview__items {
     display: flex;
     gap: 10px;

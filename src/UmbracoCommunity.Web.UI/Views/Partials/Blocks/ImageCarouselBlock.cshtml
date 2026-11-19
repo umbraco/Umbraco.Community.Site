@@ -21,6 +21,17 @@
             </style>
         }
 
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
         <dc-image-slider id="@sliderId" @(autoSlide ? "auto-slide" : string.Empty)>
             @for (var i = 0; i < items.Count; i++)
             {

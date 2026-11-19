@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Image carousel block</summary>
 	[PublishedModel("imageCarouselBlock")]
-	public partial class ImageCarouselBlock : PublishedElementModel
+	public partial class ImageCarouselBlock : PublishedElementModel, IContentBlockIntro
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -56,5 +56,21 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("images")]
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListModel Images => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListModel>(_publishedValueFallback, "images");
+
+		///<summary>
+		/// Subtitle
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("subtitle")]
+		public virtual global::Umbraco.Cms.Core.Strings.IHtmlEncodedString Subtitle => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetSubtitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// Title
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("title")]
+		public virtual string Title => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetTitle(this, _publishedValueFallback);
 	}
 }

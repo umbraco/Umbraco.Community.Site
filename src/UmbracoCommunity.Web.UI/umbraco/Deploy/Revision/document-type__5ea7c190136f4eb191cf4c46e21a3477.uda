@@ -10,11 +10,14 @@
     "AllowedChildContentTypes": []
   },
   "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
   "PropertyGroups": [
     {
       "Key": "4fd8d3ba-339a-4b3e-b10b-4fd83cbd617f",
       "Name": "Content",
+      "Type": 1,
       "Alias": "content",
       "PropertyTypes": [
         {
@@ -38,6 +41,10 @@
     },
     {
       "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
       "Ordering": true
     }
   ],

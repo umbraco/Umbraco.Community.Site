@@ -8,6 +8,15 @@
 }
 
 <div class="dc-image-carousel-preview @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@(hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+    }
+
     @if (items.Any())
     {
         <div class="dc-image-carousel-preview__items">
