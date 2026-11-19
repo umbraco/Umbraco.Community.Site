@@ -28,9 +28,9 @@
             }
         </dc-image-slider>
 
-        @if (autoSlide)
-        {
-            <div class="dc-image-carousel__controls">
+        <div class="dc-image-carousel__controls">
+            @if (autoSlide)
+            {
                 <button type="button" class="dc-image-carousel__toggle" data-image-slider-toggle aria-controls="@sliderId" aria-label="Pause image slider" hidden>
                     <svg class="dc-image-carousel__icon-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <rect x="6" y="4" width="4" height="16" rx="1" />
@@ -40,8 +40,16 @@
                         <path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z" />
                     </svg>
                 </button>
-            </div>
-        }
+            }
+            @foreach (var action in new[] { "prev", "next" })
+            {
+                <button class="slider-arrow-btn @(action == "prev" ? "slider-arrow-btn--prev" : null)" type="button" data-image-slider-action="@action" aria-controls="@sliderId" aria-label="@(action == "prev" ? "Previous image" : "Next image")" hidden>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                        <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                    </svg>
+                </button>
+            }
+        </div>
     </div>
 }
 

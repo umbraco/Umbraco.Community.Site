@@ -1,16 +1,14 @@
-@import "../base/media-queries.css";
-
 .dc-image-carousel {
     --image-carousel-text-color: var(--color-blue);
 
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
     color: var(--image-carousel-text-color);
 }
 
 .dc-image-carousel.has-bg {
-    background-color: var(--block-background-color);
     padding: var(--unit-md) 0;
+    background-color: var(--block-background-color);
+    box-shadow: 0 0 0 100vmax var(--block-background-color);
+    clip-path: inset(0 -100vmax);
 }
 
 .dc-image-carousel.bg-dark {
@@ -20,6 +18,7 @@
 
 .dc-image-carousel dc-image-slider {
     align-items: flex-start;
+    padding-inline: calc(50vw - 50%);
 }
 
 .dc-image-carousel__item {
@@ -66,9 +65,21 @@
 .dc-image-carousel__controls {
     display: flex;
     justify-content: flex-end;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--unit);
+    gap: var(--unit-xs);
+
+    &:not(:has(button:not([hidden]))) {
+        display: none;
+    }
+
+    .slider-arrow-btn[hidden] {
+        display: none;
+    }
+}
+
+.dc-image-carousel.bg-dark .slider-arrow-btn {
+    border-color: var(--color-white);
+    background-color: transparent;
+    color: var(--color-white);
 }
 
 .dc-image-carousel__toggle {
@@ -106,10 +117,4 @@
 
 .dc-image-carousel__toggle.is-paused .dc-image-carousel__icon-play {
     display: block;
-}
-
-@media (--md) {
-    .dc-image-carousel__controls {
-        padding: 0 var(--unit-md);
-    }
 }
