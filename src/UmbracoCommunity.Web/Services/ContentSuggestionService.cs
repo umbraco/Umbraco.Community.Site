@@ -6,6 +6,7 @@ using Umbraco.AI.Search.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Search;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Search.Core.Services;
 using UmbracoCommunity.Web.Abstract.Services;
@@ -137,7 +138,7 @@ internal sealed partial class ContentSuggestionService : IContentSuggestionServi
             return null;
         }
 
-        Umbraco.Cms.Search.Core.Models.Searching.SearchResult result;
+        Umbraco.Cms.Core.Search.Querying.SearchResult result;
         try
         {
             result = await searcher.SearchAsync(

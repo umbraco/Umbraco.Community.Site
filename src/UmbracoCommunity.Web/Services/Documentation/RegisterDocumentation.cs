@@ -2,7 +2,7 @@ using Examine;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Search.Provider.Examine.Lucene;
 using UmbracoCommunity.Web.Routing;
 using UmbracoCommunity.Web.Services.Documentation.Search;
 using UmbracoCommunity.Web.ViewModelBuilders.Pages;

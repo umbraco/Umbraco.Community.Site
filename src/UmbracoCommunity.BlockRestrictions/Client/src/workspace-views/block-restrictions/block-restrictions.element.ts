@@ -149,7 +149,7 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
    * Constructor — sets up three Umbraco context consumers:
    *
    * 1. UMB_NOTIFICATION_CONTEXT — for showing toast notifications on save/error
-   * 2. UMB_AUTH_CONTEXT — for configuring the API client with the Bearer token
+   * 2. UMB_AUTH_CONTEXT — for configuring the API client (base URL, credentials)
    * 3. UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT — for getting the document type's key
    *
    * The auth and workspace contexts both call `_tryLoad()`, which waits for both
@@ -163,14 +163,13 @@ export default class BlockRestrictionsElement extends UmbElementMixin(LitElement
       this._notificationContext = context;
     });
 
-    // Configure the API client with the auth token from Umbraco's auth context.
+    // Configure the API client from Umbraco's auth context (the auth cookie is sent with the request).
     // Guard against null/undefined to prevent clobbering the module-level auth
     // singleton during workspace transitions (which would cause 401s).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
-        token: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });

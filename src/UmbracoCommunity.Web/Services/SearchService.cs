@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Search.Provider.Examine.Services;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Abstract.Services;
 using UmbracoCommunity.Web.Extensions;
@@ -20,12 +21,25 @@ internal sealed class SearchService : ISearchService
 {
     private const int ExcerptMaxChars = 200;
     private const int MaxIndexFetch = 500;
-    private static readonly string IndexName = Umbraco.Cms.Core.Constants.UmbracoIndexes.ExternalIndexName;
+    private const string IndexAlias = Umbraco.Cms.Core.Constants.Search.IndexAliases.PublishedContent;
 
-    // Scope the managed query to author-content fields so editor identity
-    // (writerName/creatorName) and other system metadata don't surface as hits.
-    internal static readonly string[] BlockFields = ["bannerContent", "contentBlocks"];
-    private static readonly string[] SearchFields = ["nodeName", "metaTitle", "metaDescription", "teaser", .. BlockFields];
+    // Scope the query to author-content fields so system metadata doesn't surface as hits.
+    // Block editors index their text already extracted, one value per block property, with
+    // headings inside blocks in the lower-relevance r2/r3 fields.
+    private static readonly string MetaDescriptionField = PublishedContentIndexFields.Field("metaDescription");
+    private static readonly string TeaserField = PublishedContentIndexFields.Field("teaser");
+    private static readonly string ContentBlocksField = PublishedContentIndexFields.Field("contentBlocks");
+    private static readonly string[] SearchFields =
+    [
+        PublishedContentIndexFields.Name,
+        PublishedContentIndexFields.Field("metaTitle"),
+        MetaDescriptionField,
+        TeaserField,
+        PublishedContentIndexFields.Field("bannerContent"),
+        ContentBlocksField,
+        PublishedContentIndexFields.Field("contentBlocks", PublishedContentIndexFields.TextsR2),
+        PublishedContentIndexFields.Field("contentBlocks", PublishedContentIndexFields.TextsR3),
+    ];
     private static readonly string[] CommunitySearchFields =
     {
         CommunityBlogsSearchIndexer.FieldTitle,
@@ -39,7 +53,7 @@ internal sealed class SearchService : ISearchService
         DocumentationIndexFields.Excerpt,
         DocumentationIndexFields.Body,
     };
-    private static readonly string[] ContentFuzzyFields = ["nodeName", "metaTitle"];
+    private static readonly string[] ContentFuzzyFields = [PublishedContentIndexFields.Name, PublishedContentIndexFields.Field("metaTitle")];
     private static readonly string[] CommunityFuzzyFields = [CommunityBlogsSearchIndexer.FieldTitle];
     private static readonly string[] DocumentationFuzzyFields = [DocumentationIndexFields.Title, DocumentationIndexFields.Tags];
     private const string DocumentationCategory = "documentation";
@@ -47,6 +61,7 @@ internal sealed class SearchService : ISearchService
     private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
 
     private readonly IExamineManager _examineManager;
+    private readonly IActiveIndexManager _activeIndexManager;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly ICommunityBlogsService _communityBlogsService;
@@ -54,12 +69,14 @@ internal sealed class SearchService : ISearchService
 
     public SearchService(
         IExamineManager examineManager,
+        IActiveIndexManager activeIndexManager,
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedUrlProvider publishedUrlProvider,
         ICommunityBlogsService communityBlogsService,
         ILogger<SearchService> logger)
     {
         _examineManager = examineManager;
+        _activeIndexManager = activeIndexManager;
         _umbracoContextAccessor = umbracoContextAccessor;
         _publishedUrlProvider = publishedUrlProvider;
         _communityBlogsService = communityBlogsService;
@@ -80,9 +97,11 @@ internal sealed class SearchService : ISearchService
 
         if (skip < 0) skip = 0;
 
-        if (!_examineManager.TryGetIndex(IndexName, out var index))
+        // With zero-downtime indexing the alias maps to one of two physical indexes (_a/_b).
+        var indexName = _activeIndexManager.ResolveActiveIndexName(IndexAlias);
+        if (!_examineManager.TryGetIndex(indexName, out var index))
         {
-            _logger.LogWarning("Search: Examine index '{Index}' not found", IndexName);
+            _logger.LogWarning("Search: Examine index '{Index}' not found", indexName);
             return Task.FromResult<(IReadOnlyList<SearchResultItem>, int)>((Array.Empty<SearchResultItem>(), 0));
         }
 
@@ -96,12 +115,10 @@ internal sealed class SearchService : ISearchService
         ISearchResults? searchResults;
         try
         {
-            // ManagedQuery searches the default analyzed text fields across all indexed properties.
-            // Exclude pages flagged hideFromSearch and any node without a template (non-routable).
-            // Fetch up to MaxIndexFetch and apply tenant + current-page filtering in memory so
+            // The index only holds documents, so no category is needed. Fetch up to MaxIndexFetch and
+            // apply protection, tenant, current-page and searchability filtering in memory so
             // pagination totals stay accurate after filtering.
-            searchResults = Match(index.Searcher.CreateQuery("content"), query, SearchFields, "nodeName", ContentFuzzyFields)
-                .Not().Field("templateID", "0")
+            searchResults = Match(index.Searcher.CreateQuery(), query, SearchFields, PublishedContentIndexFields.Name, ContentFuzzyFields)
                 .Execute(QueryOptions.SkipTake(0, MaxIndexFetch));
         }
         catch (Exception ex)
@@ -116,13 +133,19 @@ internal sealed class SearchService : ISearchService
         var combined = new List<(double Score, SearchResultItem Item)>();
         foreach (var result in searchResults)
         {
-            if (!int.TryParse(result.Id, out var id)) continue;
+            // Unlike the old ExternalIndex, this index also holds member-protected pages. Search is
+            // anonymous, so only public pages are returned (checked in code rather than in the query).
+            if (!PublishedContentIndexFields.IsPublic(result.GetValues(PublishedContentIndexFields.Protection))) continue;
 
-            var content = umbracoContext.Content.GetById(id);
+            // result.Id is not a node id here (it can carry a culture suffix), so resolve by the stored key.
+            if (!Guid.TryParse(result.GetValues(PublishedContentIndexFields.Key).FirstOrDefault(), out var key)) continue;
+
+            var content = umbracoContext.Content.GetById(key);
             if (content is null) continue;
             if (content.Root().Id != tenantRootId) continue;
             if (content.Id == currentPage.Id) continue;
-            // Checked in code because nodes without the page-config composition have no hideFromSearch field to query.
+            // Also drops nodes without a template. Checked in code because nodes without the
+            // page-config composition have no hideFromSearch field to query.
             if (!content.IsSearchable()) continue;
 
             combined.Add((result.Score, new SearchResultItem
@@ -131,9 +154,9 @@ internal sealed class SearchService : ISearchService
                 Url = content.Url(_publishedUrlProvider),
                 ContentKey = content.Key,
                 Description =
-                    BuildExcerpt(result.GetValues("metaDescription").FirstOrDefault())
-                    ?? BuildExcerpt(result.GetValues("teaser").FirstOrDefault())
-                    ?? BuildExcerpt(result.GetValues("contentBlocks").FirstOrDefault()),
+                    BuildExcerpt(result.GetValues(MetaDescriptionField).FirstOrDefault())
+                    ?? BuildExcerpt(result.GetValues(TeaserField).FirstOrDefault())
+                    ?? BuildExcerpt(PublishedContentIndexFields.FirstProse(result.GetValues(ContentBlocksField))),
                 ContentTypeAlias = content.ContentType.Alias,
                 IsExternal = false,
             }));
@@ -141,7 +164,7 @@ internal sealed class SearchService : ISearchService
 
         // Community blog posts are global and marked external — except posts on a host in
         // CommunityBlogs:ExcludedListingHosts (the aggregator also picks up the site's own blog
-        // RSS). Those articles are already in ExternalIndex as content hits above, so they're
+        // RSS). Those articles are already in the published content index as content hits above, so they're
         // dropped here to avoid duplicates. Filtered in memory before the combined set is counted/paged, so
         // totals stay accurate. A missing index is not an error — it just contributes nothing.
         if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))

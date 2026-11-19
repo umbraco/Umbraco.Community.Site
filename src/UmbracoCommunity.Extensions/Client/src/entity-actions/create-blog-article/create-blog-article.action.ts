@@ -16,7 +16,6 @@ export class CreateBlogArticleAction extends UmbEntityActionBase<never> {
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       const config = authContext?.getOpenApiConfiguration();
       client.setConfig({
-        auth: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });
