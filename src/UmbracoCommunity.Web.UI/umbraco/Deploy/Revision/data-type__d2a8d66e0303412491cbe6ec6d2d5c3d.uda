@@ -10,7 +10,7 @@
       }
     ],
     "validationLimit": {
-      "min": 1
+      "min": 5
     }
   },
   "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
