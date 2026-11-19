@@ -381,7 +381,7 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 A standalone image slider for content blocks (`imageCarouselBlock`): the slider from the hero above, without its text. It's allowed in the ROOT content block grid and in the `eventsHome` Block Restrictions rule (Codegarden only).
 
 **Content** (`ImageCarouselBlock`, composes `IContentBlockIntro` for the usual `Title` / `Subtitle`, rendered above the slider): `Images` (required Block List, *Image carousel items* data type, minimum 5 so a looping carousel doesn't look sparse) of `ImageCarouselItem`s:
-- `Image` (required), `AltText` (falls back to the media item's name), `Title`, `Text` (max 255) and `Link` (max 1), all optional
+- `Image` (required), `AltText` (falls back to the media item's name), `Title` (max 40), `Text` (max 255) and `Link` (max 1), all optional
 - The content-model partial (`Models/ContentModels/ImageCarouselBlock.cs`) adds `IdHash` and `Items` (items that have an image)
 
 **Settings** (`SettingsImageCarouselBlock`, composes `ISettingsBlockId` + `ISettingsColour`):
@@ -395,7 +395,7 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 **CSS** (`css/blocks/image-carousel-block.css`):
 - The block keeps the normal content width. The slider still spans the viewport, but `padding-inline: calc(50vw - 50%)` puts the first image (and, at the end, the last one) on the content edge, so images scroll off the page from there
 - The background band reaches the viewport edges with `box-shadow: 0 0 0 100vmax` + `clip-path: inset(0 -100vmax)`, without moving the block out of the content width
-- Captions are kept to the image's width (`width: 0; min-width: 100%`), so long text wraps under its image
+- An item's `Title` sits in a blue (`--color-blue`, the footer colour) band across the bottom of the image (`.dc-image-carousel__media`, two lines at most); its `Text` is a small muted caption underneath, kept to the image's width (`width: 0; min-width: 100%`) so it wraps under its image
 
 **Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 

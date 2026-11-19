@@ -55,9 +55,9 @@
         {
           "Key": "c082cea0-4def-4781-8fe9-9bed9fe8c58b",
           "Alias": "title",
-          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
           "ValueType": "System.String",
-          "Description": "Optional heading shown under the image",
+          "Description": "Optional, max 40 characters. Shown on a band across the bottom of the image",
           "Name": "Title",
           "SortOrder": 2
         }
@@ -69,6 +69,10 @@
   "Dependencies": [
     {
       "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
       "Ordering": true
     },
     {

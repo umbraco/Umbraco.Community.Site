@@ -93,29 +93,28 @@
         var displayHeight = naturalWidth > 0 ? 1200 * naturalHeight / naturalWidth : 900;
         var alt = string.IsNullOrWhiteSpace(item.AltText) ? image.Name : item.AltText;
 
-        <img srcset="@image.GetCropUrl(width: 400) 400w, @image.GetCropUrl(width: 800) 800w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 2400) 2400w"
-             sizes="(max-width: 768px) 400px, 800px"
-             src="@image.GetCropUrl(width: 1200)"
-             width="1200"
-             height="@displayHeight"
-             alt="@alt"
-             loading="@(isFirst ? "eager" : "lazy")"
-             draggable="false" />
+        <div class="dc-image-carousel__media">
+            <img srcset="@image.GetCropUrl(width: 400) 400w, @image.GetCropUrl(width: 800) 800w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 2400) 2400w"
+                 sizes="(max-width: 768px) 400px, 800px"
+                 src="@image.GetCropUrl(width: 1200)"
+                 width="1200"
+                 height="@displayHeight"
+                 alt="@alt"
+                 loading="@(isFirst ? "eager" : "lazy")"
+                 draggable="false" />
+            @if (!string.IsNullOrWhiteSpace(item.Title))
+            {
+                <p class="dc-image-carousel__title">@item.Title</p>
+            }
+        </div>
     }
 
     void RenderCaption(ImageCarouselItem item, string tag)
     {
-        if (string.IsNullOrWhiteSpace(item.Title) && string.IsNullOrWhiteSpace(item.Text)) return;
+        if (string.IsNullOrWhiteSpace(item.Text)) return;
 
         @Html.Raw($"<{tag} class=\"dc-image-carousel__caption\">")
-        @if (!string.IsNullOrWhiteSpace(item.Title))
-        {
-            <p class="dc-image-carousel__title">@item.Title</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(item.Text))
-        {
-            <p class="dc-image-carousel__text">@item.Text</p>
-        }
+        @item.Text
         @Html.Raw($"</{tag}>")
     }
 }

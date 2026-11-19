@@ -23,11 +23,13 @@
             @foreach (var item in items)
             {
                 <div class="dc-image-carousel-preview__item">
-                    <img src="@item.Image!.GetCropUrl(height: 240)" alt="">
-                    @if (!string.IsNullOrWhiteSpace(item.Title))
-                    {
-                        <p class="dc-image-carousel-preview__title">@item.Title</p>
-                    }
+                    <div class="dc-image-carousel-preview__media">
+                        <img src="@item.Image!.GetCropUrl(height: 240)" alt="">
+                        @if (!string.IsNullOrWhiteSpace(item.Title))
+                        {
+                            <p class="dc-image-carousel-preview__title">@item.Title</p>
+                        }
+                    </div>
                     @if (!string.IsNullOrWhiteSpace(item.Text))
                     {
                         <p class="dc-image-carousel-preview__text">@item.Text</p>
