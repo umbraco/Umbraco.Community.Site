@@ -21,7 +21,9 @@
 @import "./feed-submission-block.css";
 @import "./image-and-text-block.css";
 @import "./big-cta-block.css";
+@import "./image-slider.css";
 @import "./hero-image-slider-block.css";
+@import "./image-carousel-block.css";
 @import "./video-hero-block.css";
 @import "./carousel/carousels.css";
 @import "./sliders/sliders.css";

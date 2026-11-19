@@ -1,0 +1,120 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageCarouselBlock, SettingsImageCarouselBlock>>
+
+@{
+    var items = Model.Content.Items.ToList();
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    bool autoSlide = Model.Settings?.AutoSlideImages ?? true;
+    var blockId = string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId;
+    var sliderId = $"{Model.Content.IdHash}-slider";
+}
+
+@if (items.Any())
+{
+    <div class="dc-image-carousel @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" data-image-carousel="@Model.Content.IdHash" id="@blockId">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                [data-image-carousel="@Model.Content.IdHash"] {
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                }
+            </style>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Content.Title))
+        {
+            <h2 class="block-title">@Model.Content.Title</h2>
+        }
+        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        <dc-image-slider id="@sliderId" @(autoSlide ? "auto-slide" : string.Empty)>
+            @for (var i = 0; i < items.Count; i++)
+            {
+                RenderItem(items[i], i == 0);
+            }
+        </dc-image-slider>
+
+        <div class="dc-image-carousel__controls">
+            @if (autoSlide)
+            {
+                <button type="button" class="dc-image-carousel__toggle" data-image-slider-toggle aria-controls="@sliderId" aria-label="Pause image slider" hidden>
+                    <svg class="dc-image-carousel__icon-pause" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                    </svg>
+                    <svg class="dc-image-carousel__icon-play" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M7 4.5v15a1 1 0 0 0 1.52.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5Z" />
+                    </svg>
+                </button>
+            }
+            @foreach (var action in new[] { "prev", "next" })
+            {
+                <button class="slider-arrow-btn @(action == "prev" ? "slider-arrow-btn--prev" : null)" type="button" data-image-slider-action="@action" aria-controls="@sliderId" aria-label="@(action == "prev" ? "Previous image" : "Next image")" hidden>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 33 33" fill="none" aria-hidden="true">
+                        <g><path d="M16.5967 9.87891L23.1568 16.4391L16.5967 22.9992" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0365 16.4391L23.1568 16.4391" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+                    </svg>
+                </button>
+            }
+        </div>
+    </div>
+}
+
+@functions {
+    void RenderItem(ImageCarouselItem item, bool isFirst)
+    {
+        var link = string.IsNullOrWhiteSpace(item.Link?.Url) ? null : item.Link;
+
+        if (link != null)
+        {
+            <a class="dc-image-carousel__item dc-image-carousel__link" href="@link.Url" target="@link.Target" rel="@(link.Target == "_blank" ? "noopener" : null)" draggable="false">
+                @{ RenderImage(item, isFirst); }
+                @{ RenderCaption(item, "div"); }
+            </a>
+        }
+        else
+        {
+            <figure class="dc-image-carousel__item">
+                @{ RenderImage(item, isFirst); }
+                @{ RenderCaption(item, "figcaption"); }
+            </figure>
+        }
+    }
+
+    void RenderImage(ImageCarouselItem item, bool isFirst)
+    {
+        var image = item.Image!;
+        var naturalWidth = image.Value<int>("umbracoWidth");
+        var naturalHeight = image.Value<int>("umbracoHeight");
+        var displayHeight = naturalWidth > 0 ? 1200 * naturalHeight / naturalWidth : 900;
+        var alt = string.IsNullOrWhiteSpace(item.AltText) ? image.Name : item.AltText;
+
+        <div class="dc-image-carousel__media">
+            <img srcset="@image.GetCropUrl(width: 400) 400w, @image.GetCropUrl(width: 800) 800w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 2400) 2400w"
+                 sizes="(max-width: 768px) 400px, 800px"
+                 src="@image.GetCropUrl(width: 1200)"
+                 width="1200"
+                 height="@displayHeight"
+                 alt="@alt"
+                 loading="@(isFirst ? "eager" : "lazy")"
+                 draggable="false" />
+            @if (!string.IsNullOrWhiteSpace(item.Title))
+            {
+                <p class="dc-image-carousel__title">@item.Title</p>
+            }
+        </div>
+    }
+
+    void RenderCaption(ImageCarouselItem item, string tag)
+    {
+        if (string.IsNullOrWhiteSpace(item.Text)) return;
+
+        @Html.Raw($"<{tag} class=\"dc-image-carousel__caption\">")
+        @item.Text
+        @Html.Raw($"</{tag}>")
+    }
+}
