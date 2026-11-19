@@ -131,12 +131,11 @@ export default class BlockListRestrictedElement
   constructor() {
     super();
 
-    // Consume auth context to configure the API client with Bearer token.
+    // Consume auth context to configure the API client (the auth cookie is sent with the request).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
-        token: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });

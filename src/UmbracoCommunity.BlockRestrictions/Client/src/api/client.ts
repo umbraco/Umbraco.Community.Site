@@ -6,8 +6,8 @@
  *
  * Auth lifecycle:
  *   1. Property editors and workspace view consume UMB_AUTH_CONTEXT
- *   2. They call setAuthConfig() with the token function, base URL, and credentials
- *   3. All subsequent fetchWithAuth() calls include the Bearer token automatically
+ *   2. They call setAuthConfig() with the base URL and credentials (Umbraco 19 signs in with a cookie)
+ *   3. All subsequent fetchWithAuth() calls send the cookie; a Bearer token is only added if one is configured
  *
  * The auth config is stored at module level (singleton). The property editors guard
  * against undefined authContext callbacks to prevent clobbering the stored token

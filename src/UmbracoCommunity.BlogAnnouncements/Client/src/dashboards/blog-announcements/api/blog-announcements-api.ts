@@ -9,11 +9,9 @@ import type {
 
 const BASE = "/umbraco/blogannouncements/api/v1";
 
-// Umbraco's Management API is bearer-authenticated. The dashboard root element consumes
-// UMB_AUTH_CONTEXT and calls setAuthConfig() with a token getter so each request attaches a
-// fresh Authorization header. Mirrors the NotFoundTracker typed fetch client.
+// Umbraco signs backoffice requests in with a cookie, so requests only need the base URL and
+// credentials mode. The dashboard root element takes both from UMB_AUTH_CONTEXT via setAuthConfig(). Mirrors the NotFoundTracker typed fetch client.
 interface ApiAuthConfig {
-  token?: () => Promise<string | undefined>;
   baseUrl?: string;
   credentials?: RequestCredentials;
 }
@@ -25,13 +23,11 @@ export function setAuthConfig(config: ApiAuthConfig) {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = await _authConfig.token?.();
   const baseUrl = _authConfig.baseUrl ?? "";
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(init?.headers as Record<string, string> | undefined),
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const response = await fetch(`${baseUrl}${BASE}${path}`, {
     ...init,

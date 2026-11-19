@@ -12,7 +12,7 @@
  *    the "Block Grid (Restricted)" property editor UI (see manifest.ts).
  *
  * 2. On load, the element consumes two Umbraco contexts:
- *    - UMB_AUTH_CONTEXT — provides the Bearer token for authenticated API calls
+ *    - UMB_AUTH_CONTEXT — provides the base URL and credentials mode for API calls
  *    - UMB_ENTITY_CONTEXT — provides the content node's unique key (GUID)
  *
  * 3. Once both contexts are available, it calls the `allowed-blocks/{nodeKey}`
@@ -192,7 +192,7 @@ export default class BlockGridRestrictedElement
    *
    * Two contexts are consumed in parallel (they may resolve in any order):
    *
-   * 1. UMB_AUTH_CONTEXT — provides OpenAPI configuration (token, base URL, credentials)
+   * 1. UMB_AUTH_CONTEXT — provides OpenAPI configuration (base URL, credentials)
    *    needed for authenticated API calls to our .NET backend.
    *
    * 2. UMB_ENTITY_CONTEXT — provides the content node's unique identifier.
@@ -205,12 +205,11 @@ export default class BlockGridRestrictedElement
   constructor() {
     super();
 
-    // Consume the auth context to configure the API client with the Bearer token.
+    // Consume the auth context to configure the API client (the auth cookie is sent with the request).
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
-        token: config?.token ?? undefined,
         baseUrl: config?.base ?? "",
         credentials: config?.credentials ?? "same-origin",
       });
