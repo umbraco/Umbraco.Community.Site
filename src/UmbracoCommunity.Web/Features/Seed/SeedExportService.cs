@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
 using Umbraco.Cms.Core.Extensions;
@@ -26,6 +27,8 @@ public sealed class SeedExportService : ISeedExportService
     private readonly IArtifactImportExportService _artifactImportExportService;
     private readonly IServiceConnectorFactory _serviceConnectorFactory;
     private readonly IFileTypeCollection _fileTypeCollection;
+    private readonly IOptionsMonitor<DeployEntityTypesOptions> _entityTypes;
+    private readonly IOptionsMonitor<Umbraco.Deploy.Core.Configuration.DeployConfiguration.DeploySettings> _deploySettings;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly ILogger<SeedExportService> _logger;
     private readonly TimeProvider _time;
@@ -43,6 +46,8 @@ public sealed class SeedExportService : ISeedExportService
         IArtifactImportExportService artifactImportExportService,
         IServiceConnectorFactory serviceConnectorFactory,
         IFileTypeCollection fileTypeCollection,
+        IOptionsMonitor<DeployEntityTypesOptions> entityTypes,
+        IOptionsMonitor<Umbraco.Deploy.Core.Configuration.DeployConfiguration.DeploySettings> deploySettings,
         IHostEnvironment hostEnvironment,
         ILogger<SeedExportService> logger,
         TimeProvider time)
@@ -50,6 +55,8 @@ public sealed class SeedExportService : ISeedExportService
         _artifactImportExportService = artifactImportExportService;
         _serviceConnectorFactory = serviceConnectorFactory;
         _fileTypeCollection = fileTypeCollection;
+        _entityTypes = entityTypes;
+        _deploySettings = deploySettings;
         _hostEnvironment = hostEnvironment;
         _logger = logger;
         _time = time;
@@ -84,7 +91,7 @@ public sealed class SeedExportService : ISeedExportService
             }
 
             var udi = new GuidUdi(Umbraco.Cms.Core.Constants.UdiEntityType.Document, CommunityRootKey);
-            var dependencyEntityTypes = DeployEntityTypes.GetEntityTypes(_fileTypeCollection, IncludeDependenciesFlags);
+            var dependencyEntityTypes = _entityTypes.CurrentValue.GetEntityTypes(_fileTypeCollection, IncludeDependenciesFlags, _deploySettings.CurrentValue, _ => true);
 
             _logger.LogInformation(
                 "Starting seed export for {Udi} (selector: {Selector}, deps: {Deps})",
