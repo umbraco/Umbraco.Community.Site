@@ -21,6 +21,14 @@ dc-image-slider.is-dragging {
     user-select: none;
 }
 
+dc-image-slider.is-static {
+    cursor: auto;
+}
+
+dc-image-slider.is-static > [inert] {
+    display: none;
+}
+
 dc-image-slider img {
     flex-shrink: 0;
     height: 15rem;
