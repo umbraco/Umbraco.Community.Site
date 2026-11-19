@@ -16,6 +16,10 @@ export class DcImageSlider extends HTMLElement {
     #observer: IntersectionObserver | null = null;
     #originalCount = 0;
     #cloneStartOffset = 0;
+    #isPaused = false;
+    #isHovered = false;
+    #hasFocus = false;
+    #toggle: HTMLButtonElement | null = null;
 
     connectedCallback() {
         this.addEventListener("mousedown", this.#onMouseDown);
@@ -34,6 +38,10 @@ export class DcImageSlider extends HTMLElement {
                 this.#isVisible = entry.isIntersecting;
             });
             this.#observer.observe(this);
+            this.addEventListener("mouseenter", this.#onMouseEnter);
+            this.addEventListener("focusin", this.#onFocusIn);
+            this.addEventListener("focusout", this.#onFocusOut);
+            this.#bindToggle();
             this.#startAutoSlide();
         }
     }
@@ -46,6 +54,10 @@ export class DcImageSlider extends HTMLElement {
         this.removeEventListener("click", this.#onClick, true);
         this.removeEventListener("touchstart", this.#onTouchStart);
         this.removeEventListener("touchend", this.#onTouchEnd);
+        this.removeEventListener("mouseenter", this.#onMouseEnter);
+        this.removeEventListener("focusin", this.#onFocusIn);
+        this.removeEventListener("focusout", this.#onFocusOut);
+        this.#toggle?.removeEventListener("click", this.#onToggle);
         this.#stopAutoSlide();
         this.#observer?.disconnect();
     }
@@ -58,6 +70,7 @@ export class DcImageSlider extends HTMLElement {
         for (const child of children) {
             const clone = child.cloneNode(true) as HTMLElement;
             clone.setAttribute("aria-hidden", "true");
+            clone.inert = true;
             this.appendChild(clone);
         }
     }
@@ -72,7 +85,7 @@ export class DcImageSlider extends HTMLElement {
                 }
             }
 
-            if (!this.#isDown && !this.#isTouching && this.#isVisible) {
+            if (!this.#isDown && !this.#isTouching && this.#isVisible && !this.#isPaused && !this.#isHovered && !this.#hasFocus) {
                 this.scrollLeft += this.#autoSlideSpeed;
 
                 if (this.#cloneStartOffset > 0 && this.scrollLeft >= this.#cloneStartOffset) {
@@ -91,6 +104,38 @@ export class DcImageSlider extends HTMLElement {
         }
     }
 
+    #bindToggle() {
+        if (!this.id) return;
+        this.#toggle = document.querySelector<HTMLButtonElement>(`[data-image-slider-toggle][aria-controls="${CSS.escape(this.id)}"]`);
+        if (!this.#toggle) return;
+        this.#toggle.addEventListener("click", this.#onToggle);
+        this.#toggle.hidden = false;
+        this.#renderToggle();
+    }
+
+    #renderToggle() {
+        if (!this.#toggle) return;
+        this.#toggle.classList.toggle("is-paused", this.#isPaused);
+        this.#toggle.setAttribute("aria-label", this.#isPaused ? "Play image slider" : "Pause image slider");
+    }
+
+    #onToggle = () => {
+        this.#isPaused = !this.#isPaused;
+        this.#renderToggle();
+    };
+
+    #onMouseEnter = () => {
+        this.#isHovered = true;
+    };
+
+    #onFocusIn = () => {
+        this.#hasFocus = true;
+    };
+
+    #onFocusOut = (e: FocusEvent) => {
+        this.#hasFocus = this.contains(e.relatedTarget as Node | null);
+    };
+
     #onMouseDown = (e: MouseEvent) => {
         this.#isDown = true;
         this.#hasDragged = false;
@@ -99,7 +144,8 @@ export class DcImageSlider extends HTMLElement {
         this.#scrollLeft = this.scrollLeft;
     };
 
-    #onMouseUp = () => {
+    #onMouseUp = (e: MouseEvent) => {
+        if (e.type === "mouseleave") this.#isHovered = false;
         if (!this.#isDown) return;
         this.#isDown = false;
         this.classList.remove("is-dragging");

@@ -63,7 +63,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 ### Motion and Animation
 
 - **Prefers-reduced-motion**: The site respects the user's motion preferences via `@media (prefers-reduced-motion: reduce)`
-- **Auto-sliding image slider**: The `<dc-image-slider>` component checks `prefers-reduced-motion` on connect and disables auto-slide entirely when the user prefers reduced motion. Cloned images used for infinite looping are marked `aria-hidden="true"` to avoid duplicate screen reader announcements.
+- **Auto-sliding image slider**: The `<dc-image-slider>` component checks `prefers-reduced-motion` on connect and disables auto-slide entirely when the user prefers reduced motion. Cloned images used for infinite looping are marked `aria-hidden="true"` and `inert` to avoid duplicate screen reader announcements and keep links in them out of the tab order. Auto-sliding pauses while the slider is hovered or has keyboard focus. The Image Carousel block adds a pause/play button (WCAG 2.2.2) that the slider shows only while it's auto-sliding; the Hero Banner with Image Slider doesn't have one yet.
 - **Animation timing**: Transitions use appropriate durations that don't cause discomfort
 
 ## CSS Architecture for Accessibility

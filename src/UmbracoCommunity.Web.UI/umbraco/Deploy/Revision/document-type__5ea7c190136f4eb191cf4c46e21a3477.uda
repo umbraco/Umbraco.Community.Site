@@ -1,0 +1,46 @@
+{
+  "Name": "Image carousel block",
+  "Alias": "imageCarouselBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-pictures-alt-2",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "4fd8d3ba-339a-4b3e-b10b-4fd83cbd617f",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "dd3739f3-1b37-4be9-be84-3ab28a13e895",
+          "Alias": "images",
+          "DataType": "umb://data-type/d2a8d66e0303412491cbe6ec6d2d5c3d",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
+          "Description": "Each image can have an optional title, text and link",
+          "Mandatory": true,
+          "Name": "Images"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5ea7c190136f4eb191cf4c46e21a3477",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/d2a8d66e0303412491cbe6ec6d2d5c3d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

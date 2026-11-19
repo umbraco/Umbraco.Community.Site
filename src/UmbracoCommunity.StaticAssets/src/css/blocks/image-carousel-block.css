@@ -1,0 +1,115 @@
+@import "../base/media-queries.css";
+
+.dc-image-carousel {
+    --image-carousel-text-color: var(--color-blue);
+
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    color: var(--image-carousel-text-color);
+}
+
+.dc-image-carousel.has-bg {
+    background-color: var(--block-background-color);
+    padding: var(--unit-md) 0;
+}
+
+.dc-image-carousel.bg-dark {
+    --image-carousel-text-color: var(--color-white);
+    --block-heading-color: var(--color-white);
+}
+
+.dc-image-carousel dc-image-slider {
+    align-items: flex-start;
+}
+
+.dc-image-carousel__item {
+    display: block;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.dc-image-carousel__link {
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--border-radius-xl);
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: var(--focus-outline-offset);
+    }
+
+    &:hover .dc-image-carousel__title {
+        text-decoration: underline;
+    }
+}
+
+.dc-image-carousel__caption {
+    width: 0;
+    min-width: 100%;
+    padding: var(--unit-sm) var(--unit-xxs) 0;
+    font-style: normal;
+}
+
+.dc-image-carousel__title {
+    margin: 0;
+    font-size: var(--font-size-h4);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-heading);
+}
+
+.dc-image-carousel__text {
+    margin: var(--unit-xxs) 0 0;
+    font-size: var(--font-size);
+    line-height: 1.4;
+}
+
+.dc-image-carousel__controls {
+    display: flex;
+    justify-content: flex-end;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--unit);
+}
+
+.dc-image-carousel__toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--image-carousel-text-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background: var(--image-carousel-text-color);
+        color: var(--block-background-color, var(--color-page-surface));
+    }
+
+    &:focus-visible {
+        outline: var(--focus-outline);
+        outline-offset: var(--focus-outline-offset);
+    }
+
+    &[hidden] {
+        display: none;
+    }
+}
+
+.dc-image-carousel__icon-play,
+.dc-image-carousel__toggle.is-paused .dc-image-carousel__icon-pause {
+    display: none;
+}
+
+.dc-image-carousel__toggle.is-paused .dc-image-carousel__icon-play {
+    display: block;
+}
+
+@media (--md) {
+    .dc-image-carousel__controls {
+        padding: 0 var(--unit-md);
+    }
+}

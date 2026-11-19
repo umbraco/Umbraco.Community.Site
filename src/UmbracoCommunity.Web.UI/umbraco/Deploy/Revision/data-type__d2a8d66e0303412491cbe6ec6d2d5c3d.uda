@@ -1,0 +1,29 @@
+{
+  "Name": "Image carousel items",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "20fab9dd-2555-46f4-a6a6-6227bd731739",
+        "label": "${ title || \u0022Image\u0022 }"
+      }
+    ],
+    "validationLimit": {
+      "min": 1
+    }
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/d2a8d66e0303412491cbe6ec6d2d5c3d",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/20fab9dd255546f4a6a66227bd731739"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

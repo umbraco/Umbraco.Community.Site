@@ -364,13 +364,34 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 **Frontend Component** (`src/UmbracoCommunity.StaticAssets/src/components/image-slider/dc-image-slider.element.ts`):
 - `<dc-image-slider>` — Provides mouse drag-to-scroll; touch scrolling handled natively via CSS overflow
 - `auto-slide` HTML attribute enables automatic scrolling with infinite loop (cloned children with seamless scroll reset)
-- Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, or when the tab is hidden
+- Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, while hovered or while focus is inside it, or when the tab is hidden
 - Respects `prefers-reduced-motion: reduce`
+- Optional pause/play toggle: a `<button data-image-slider-toggle aria-controls="{slider id}" hidden>` anywhere on the page. The slider unhides it only while auto-sliding and swaps its `aria-label` / `is-paused` class. Loop clones are `aria-hidden` and `inert`, so links in them aren't focusable
 
 **CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/hero-image-slider-block.css`):
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
-- Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
+- The shared `dc-image-slider` rules (full-viewport breakout via `width: 100vw; margin-left: calc(50% - 50vw)`, image heights per breakpoint) live in `css/blocks/image-slider.css`
 - Uses design system variables from `root.css`
+
+### Image Carousel Block
+
+A standalone image slider for content blocks (`imageCarouselBlock`): the slider from the hero above, without its text. It's allowed in the ROOT content block grid and in the `eventsHome` Block Restrictions rule (Codegarden only).
+
+**Content** (`ImageCarouselBlock`): `Images` (required Block List, *Image carousel items* data type) of `ImageCarouselItem`s:
+- `Image` (required), `AltText` (falls back to the media item's name), `Title`, `Text` (max 255) and `Link` (max 1), all optional
+- The content-model partial (`Models/ContentModels/ImageCarouselBlock.cs`) adds `IdHash` and `Items` (items that have an image)
+
+**Settings** (`SettingsImageCarouselBlock`, composes `ISettingsBlockId` + `ISettingsColour`):
+- `AutoSlideImages` uses the *On Off Toggle (default on)* data type, so new blocks auto-slide until an editor switches it off
+
+**View** (`Views/Partials/Blocks/ImageCarouselBlock.cshtml`):
+- Reuses `<dc-image-slider>`; an item with a link renders as an `<a>` (image + caption), otherwise as a `<figure>` with a `<figcaption>`
+- With auto-slide on it renders the pause/play toggle below the slider (WCAG 2.2.2)
+- A background colour turns the block into a full-width band; dark colours switch the captions and toggle to white
+
+**CSS** (`css/blocks/image-carousel-block.css`): captions are kept to the image's width (`width: 0; min-width: 100%`), so long text wraps under its image.
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images.
 
 ### Video Hero
 

@@ -1,0 +1,93 @@
+{
+  "Name": "Image carousel item",
+  "Alias": "imageCarouselItem",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-picture",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "3f252a63-3a20-4f8a-87ab-8a6e8bffcdc1",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "1668aa45-750d-445a-adce-9428ad87995d",
+          "Alias": "text",
+          "DataType": "umb://data-type/3e4b047aa9f74036b1d8c3837e213b0c",
+          "ValueType": "System.String",
+          "Description": "Optional short text shown under the image",
+          "Name": "Text",
+          "SortOrder": 3
+        },
+        {
+          "Key": "4a17b647-fa97-426f-9ed6-c5ec644f25d3",
+          "Alias": "altText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Describes the image for screen reader users. Leave empty to use the media item\u0027s name.",
+          "Name": "Alt text",
+          "SortOrder": 1
+        },
+        {
+          "Key": "7e9bff89-35e6-4712-bdfc-351cb40aa44d",
+          "Alias": "image",
+          "DataType": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Mandatory": true,
+          "Name": "Image"
+        },
+        {
+          "Key": "9d90ccfd-f3c9-4e93-aac4-05af2d1d8516",
+          "Alias": "link",
+          "DataType": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+          "ValueType": "Umbraco.Cms.Core.Models.Link",
+          "Description": "Optional link for the image",
+          "Name": "Link",
+          "SortOrder": 4
+        },
+        {
+          "Key": "c082cea0-4def-4781-8fe9-9bed9fe8c58b",
+          "Alias": "title",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Optional heading shown under the image",
+          "Name": "Title",
+          "SortOrder": 2
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/20fab9dd255546f4a6a66227bd731739",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0bdffabfddf745c5a93bc0c66930f43d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/3e4b047aa9f74036b1d8c3837e213b0c",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}
