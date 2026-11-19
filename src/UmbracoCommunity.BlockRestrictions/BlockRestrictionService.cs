@@ -140,7 +140,11 @@ public class BlockRestrictionService
             return await ResolveAllowedBlocksForNodeAsync(parentKey.Value);
         }
 
-        return null;
+        // A new top-level node whose document type has no rule: nothing restricts it.
+        return new AllowedBlocksResponse
+        {
+            HasRestrictions = false
+        };
     }
 
     /// <summary>

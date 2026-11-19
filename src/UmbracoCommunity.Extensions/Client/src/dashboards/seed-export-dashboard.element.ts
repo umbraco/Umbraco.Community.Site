@@ -28,7 +28,6 @@ export class SeedExportDashboardElement extends UmbElementMixin(LitElement) {
   @state() private _triggering = false;
   @state() private _baseUrl = "";
 
-  #tokenSource: string | (() => string | Promise<string>) | undefined;
   #pollHandle: ReturnType<typeof setInterval> | null = null;
   #notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
@@ -42,21 +41,8 @@ export class SeedExportDashboardElement extends UmbElementMixin(LitElement) {
     this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
       const config = authContext?.getOpenApiConfiguration();
       this._baseUrl = config?.base ?? window.location.origin;
-      this.#tokenSource = config?.token as
-        | string
-        | (() => string | Promise<string>)
-        | undefined;
       this.#refresh();
     });
-  }
-
-  async #authHeader(): Promise<Record<string, string>> {
-    if (!this.#tokenSource) return {};
-    const token =
-      typeof this.#tokenSource === "function"
-        ? await this.#tokenSource()
-        : this.#tokenSource;
-    return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
   connectedCallback() {
@@ -80,7 +66,6 @@ export class SeedExportDashboardElement extends UmbElementMixin(LitElement) {
     this._loading = true;
     try {
       const res = await fetch(`${this._baseUrl}${BASE_PATH}/status`, {
-        headers: await this.#authHeader(),
         credentials: "include",
       });
       if (!res.ok) throw new Error(`Status check failed: ${res.status}`);
@@ -98,7 +83,6 @@ export class SeedExportDashboardElement extends UmbElementMixin(LitElement) {
     try {
       const res = await fetch(`${this._baseUrl}${BASE_PATH}/regenerate`, {
         method: "POST",
-        headers: await this.#authHeader(),
         credentials: "include",
       });
       if (res.status === 202) {

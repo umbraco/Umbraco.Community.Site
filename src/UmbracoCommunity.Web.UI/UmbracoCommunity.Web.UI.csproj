@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CompressionEnabled>false</CompressionEnabled>
@@ -10,7 +10,6 @@
   <ItemGroup>
     <!-- Commented out packages will be enabled when pushing to Cloud (and Deploy.OnPrem removed) -->
     <!-- <PackageReference Include="Umbraco.Cloud.Cms" /> -->
-    <PackageReference Include="Flip.Umbraco" />
     <PackageReference Include="Umbraco.Cloud.StorageProviders.AzureBlob" />
     <PackageReference Include="Umbraco.Cms" />
     <PackageReference Include="Umbraco.Automate" />

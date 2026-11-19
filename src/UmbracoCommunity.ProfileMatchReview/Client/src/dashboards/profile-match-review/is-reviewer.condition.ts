@@ -24,7 +24,6 @@ export class IsReviewerCondition
       if (!authContext) return;
       const config = authContext.getOpenApiConfiguration();
       setAuthConfig({
-        token: () => authContext.getLatestToken(),
         baseUrl: config.base,
         credentials: config.credentials as RequestCredentials,
       });
