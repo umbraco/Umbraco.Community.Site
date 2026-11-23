@@ -39,6 +39,22 @@
           "Description": "in bytes",
           "Name": "Size",
           "SortOrder": 2
+        },
+        {
+          "Key": "5bc7e468-c53e-41a6-a522-2723f3b94514",
+          "Alias": "umbracoWidth",
+          "DataType": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
+          "ValueType": "System.Int32",
+          "Name": "Width",
+          "SortOrder": 3
+        },
+        {
+          "Key": "9e4c2b59-6bc6-4648-bb71-b0f45ddbc274",
+          "Alias": "umbracoHeight",
+          "DataType": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
+          "ValueType": "System.Int32",
+          "Name": "Height",
+          "SortOrder": 4
         }
       ]
     }
@@ -51,6 +67,10 @@
       "Ordering": true
     },
     {
+      "Udi": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
+      "Ordering": true
+    },
+    {
       "Udi": "umb://data-type/930861bfe2624eada704f99453565708",
       "Ordering": true
     },
@@ -60,5 +80,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.MediaTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

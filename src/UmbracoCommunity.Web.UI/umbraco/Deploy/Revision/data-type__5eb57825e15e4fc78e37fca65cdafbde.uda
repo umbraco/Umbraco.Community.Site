@@ -1,14 +1,13 @@
 {
   "Name": "Label (pixels)",
-  "EditorAlias": "Umbraco.Label",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Label",
+  "EditorAlias": "Umbraco.Label.Integer",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Label.Integer",
   "DatabaseType": "Integer",
   "Configuration": {
-    "umbracoDataValueType": "INT",
     "labelTemplate": "{=value}px"
   },
   "Udi": "umb://data-type/5eb57825e15e4fc78e37fca65cdafbde",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "19.0.0-rc1"
 }

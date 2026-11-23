@@ -1,7 +1,7 @@
 {
   "Name": "Post display dropdown",
-  "EditorAlias": "Umbraco.DropDown.Flexible",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
+  "EditorAlias": "Umbraco.DropDown.Single",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown.Single",
   "DatabaseType": "Nvarchar",
   "Configuration": {
     "items": [
@@ -12,5 +12,5 @@
   "Udi": "umb://data-type/5bdd4d7ef4954703aa2cc71f37bd49ce",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

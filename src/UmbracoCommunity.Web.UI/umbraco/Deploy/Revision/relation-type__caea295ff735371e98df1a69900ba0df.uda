@@ -1,0 +1,9 @@
+{
+  "Name": "Related External Block Element",
+  "Alias": "umbExternalBlockElement",
+  "IsDependency": true,
+  "Udi": "umb://relation-type/caea295ff735371e98df1a69900ba0df",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.RelationTypeArtifact",
+  "__version": "19.0.0-rc1"
+}
