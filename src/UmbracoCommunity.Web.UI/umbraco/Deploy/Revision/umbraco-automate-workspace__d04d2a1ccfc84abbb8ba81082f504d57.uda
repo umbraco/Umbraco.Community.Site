@@ -1,7 +1,6 @@
 {
   "Name": "Blog Announcements",
   "Alias": "blog-announcements",
-  "ServiceAccountKey": "1e70f841-c261-413b-abb2-2d68cdb96094",
   "UserGroups": [
     "e5e7f6c8-7f9c-4b5b-8d5d-9e1e5a4f7e4d"
   ],

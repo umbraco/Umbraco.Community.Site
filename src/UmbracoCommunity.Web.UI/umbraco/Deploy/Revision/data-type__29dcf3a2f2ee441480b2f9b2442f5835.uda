@@ -151,6 +151,30 @@
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
+        "contentElementTypeKey": "b1a7fb4d-21d3-4820-872a-79f99d8b0a47",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "e851dbeb-13d8-44bd-a65c-3b1ce4efb695",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
+        "contentElementTypeKey": "335b9482-bee5-414d-866f-dcd5ffd2abaf",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "fc91e41c-e964-45e6-82bf-596c73a41fbe",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
         "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -160,7 +184,7 @@
           }
         ],
         "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a",
-        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+        "groupKey": "86a5a9f2-f123-4638-a3f5-78d35615700a"
       },
       {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
@@ -263,6 +287,10 @@
       {
         "name": "Community blocks",
         "key": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f"
+      },
+      {
+        "key": "86a5a9f2-f123-4638-a3f5-78d35615700a",
+        "name": "Legacy"
       }
     ]
   },
@@ -302,6 +330,9 @@
     },
     {
       "Udi": "umb://document-type/2f672eb528f948d5ac111f805e3347d1"
+    },
+    {
+      "Udi": "umb://document-type/335b9482bee5414d866fdcd5ffd2abaf"
     },
     {
       "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
@@ -367,6 +398,9 @@
       "Udi": "umb://document-type/b196a0ee69a24c119b008ee7f1991b25"
     },
     {
+      "Udi": "umb://document-type/b1a7fb4d21d34820872a79f99d8b0a47"
+    },
+    {
       "Udi": "umb://document-type/b6be98c39ded4cfb9dfc574a85ac289c"
     },
     {
@@ -406,6 +440,9 @@
       "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
     },
     {
+      "Udi": "umb://document-type/e851dbeb13d844bda65c3b1ce4efb695"
+    },
+    {
       "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
     },
     {
@@ -413,6 +450,9 @@
     },
     {
       "Udi": "umb://document-type/f2a94d084ffc495dab473a70d9d1869a"
+    },
+    {
+      "Udi": "umb://document-type/fc91e41ce96445e682bf596c73a41fbe"
     },
     {
       "Udi": "umb://document-type/febb1073cf1446f697a599204a58a0ae"
