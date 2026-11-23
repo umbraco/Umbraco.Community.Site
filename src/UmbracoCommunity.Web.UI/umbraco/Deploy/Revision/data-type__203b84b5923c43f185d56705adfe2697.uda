@@ -1,12 +1,9 @@
 {
   "Name": "Video hero poster picker",
-  "EditorAlias": "Umbraco.MediaPicker3",
-  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "EditorAlias": "Umbraco.MediaPicker.Single",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker.Single",
   "Configuration": {
     "filter": "cc07b313-0843-4aa8-bbda-871c8da728c8",
-    "validationLimit": {
-      "max": 1
-    },
     "enableLocalFocalPoint": true,
     "crops": [
       {
@@ -42,5 +39,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "18.2.0"
+  "__version": "19.0.0-rc1"
 }
