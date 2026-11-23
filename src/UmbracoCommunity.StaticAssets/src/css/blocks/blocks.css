@@ -16,7 +16,9 @@
 @import "./spacing-block.css";
 @import "./headline-block.css";
 @import "./cards-block.css";
+@import "./tile-grid-block.css";
 @import "./blog-showcase-block.css";
+@import "./video-showcase-block.css";
 @import "./community-blogs-block.css";
 @import "./feed-submission-block.css";
 @import "./image-and-text-block.css";

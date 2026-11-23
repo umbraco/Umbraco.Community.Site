@@ -46,7 +46,11 @@
     "speakerItemBlock",
     "speakersBlock",
     "textBlock",
+    "tileGridBlock",
     "titleBlock",
-    "videoBlock"
+    "videoBlock",
+    "videoShowcaseBlock",
+    "videoShowcaseItem",
+    "youTubeVideoBlock"
   ]
 }

@@ -1,3 +1,5 @@
+import { lockBodyScroll, unlockBodyScroll } from "./scroll-lock";
+
 export class DcDialogHandler {
   #previouslyFocusedElement: HTMLElement | null = null;
 
@@ -32,10 +34,7 @@ export class DcDialogHandler {
       }
     });
 
-    // Lock body scroll and compensate for scrollbar width to prevent content jump
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.paddingRight = `${scrollbarWidth}px`;
-    document.body.classList.add("dialog-open");
+    lockBodyScroll();
 
     // Move focus to the dialog or first focusable element
     this.#setInitialFocus(dialogElement);
@@ -60,9 +59,7 @@ export class DcDialogHandler {
       if (element.parentNode === dialogElement) {
         dialogElement?.removeChild(element);
       }
-      // Unlock body scroll and remove scrollbar compensation
-      document.body.style.paddingRight = "";
-      document.body.classList.remove("dialog-open");
+      unlockBodyScroll();
 
       // Restore focus to the previously focused element
       this.#restoreFocus();

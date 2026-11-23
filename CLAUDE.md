@@ -312,9 +312,16 @@ Located in `UmbracoCommunity.Extensions/`, provides custom Umbraco backoffice fu
 **API Controllers** (`Controllers/`):
 - Blog article creation
 - External member groups (`ExternalMemberGroupsApiController`, Members section access): `GET`/`PUT members/{memberKey}/external-groups` — read and replace the member groups of a lightweight external member (logic in `UmbracoCommunity.Web/Features/Members/Groups/ExternalMemberGroupService.cs`)
+- YouTube video picker (`YouTubeVideoApiController`): `GET youtube/preview`, `POST youtube/posters`, `GET youtube/posters/{mediaKey}` (see "YouTube Videos" below)
 
 **Backoffice Dashboards** (`Client/src/dashboards/`):
 - Sessionize dashboard
+
+**Property Editors** (`Client/src/property-editors/`):
+- Event schedule (`Umbraco.Plain.Json` schema)
+- YouTube video picker (`UmbracoCommunity.YouTubeVideo` schema, see "YouTube Videos" below)
+
+The API client in `Client/src/api/` is generated: run `npm run generate-client` with the site running after changing a controller, rather than editing it by hand.
 
 **Workspace Views** (`Client/src/workspace-views/`):
 - "Groups" tab on the member workspace, shown only for external-only members via the `UmbracoCommunity.Condition.IsExternalMember` condition (`Client/src/conditions/`, observes the member workspace context's `kind`). Umbraco 18.3 shows an external member's groups read-only and its Management API refuses to update external members, so this is the only way to assign/remove groups (e.g. "Early access") from the backoffice.
@@ -399,6 +406,24 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 
 **Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 
+### YouTube Videos
+
+All YouTube input goes through the **YouTube video picker** data type (schema `UmbracoCommunity.YouTubeVideo`, UI `UmbracoCommunity.PropertyEditorUi.YouTubeVideo`). The **Video** block (`youTubeVideoBlock` + `settingsYouTubeVideoBlock`) uses it, and new video-based blocks should too.
+
+**Editor flow**: paste a link → the picker calls `GET youtube/preview`, which returns the oEmbed title/author and up to four stills (YouTube's thumbnail plus its three auto-generated frames, `maxres*` falling back to `sd*`/`hq*`) → picking a still calls `POST youtube/posters`, which downloads it into the Media library at `Video thumbnails/<site root name>/` (reusing an earlier import by name). Editors can also choose any image from the Media library. Stills are only shown in the backoffice (it has no CSP); the front end serves the imported image, so visitors never load anything from YouTube until they press play.
+
+**Server** (`UmbracoCommunity.Web/Features/YouTube/`):
+- `YouTubeVideoPropertyEditor` (schema, reports the poster as a media reference for "Used by"), `YouTubeVideoValue` (stored JSON: `url`, `videoId`, `title`, `posterKey`), `YouTubeVideoValueConverter` → `YouTubeVideo` (`EmbedUrl` on youtube-nocookie with any `?t=` start time, `WatchUrl`, `Poster`)
+- `YouTubeVideoValueConnector` makes Umbraco Deploy bring the poster media along
+- `YouTubePosterService` only fetches `i.ytimg.com` images for an 11-character video id and a fixed list of variants, so it can't be pointed at other URLs
+- Link parsing lives in `VideoHelper.GetYouTubeVideoId` (`watch?v=`, `youtu.be`, `/shorts/`, `/live/`, `/embed/`); the picker relies on the preview endpoint rather than parsing links itself
+
+**Picker element** (`Extensions/Client/src/property-editors/youtube-video/`): inside block editors the document workspace context isn't reachable (block modals render outside it), so the page key for the site folder comes from the `/workspace/document/edit/{key}` route instead.
+
+**Legacy Video block**: the old `videoBlock` ("Video (legacy)", link picker + thumbnail) is kept in the "Legacy" block group so existing videos keep rendering and stay editable. It can't simply be removed from the block editors or restricted — Umbraco then marks existing instances invalid (see the Block Restrictions notes). Instead `LegacyVideoBlockGuard` refuses any save that *adds* a legacy video block (compared by block key against the saved version).
+
+**Rendering**: `Views/Partials/Blocks/YouTubeVideoBlock.cshtml` renders `<dc-video-picker-youtube>` (the legacy block uses it too), which loads nothing from YouTube until the poster is played. Browsers (Chrome included) often ignore `autoplay=1` in an embed, leaving a second click on YouTube's own play button, so on click the component calls `playYouTube()` (`youtube-player.ts`, also used by the Video showcase), which loads YouTube's IFrame Player API once per page (`youtube-api.ts`), creates the player on youtube-nocookie and calls `playVideo()` on ready. Only if YouTube reports `onAutoplayBlocked` (sound refused) and the video still isn't playing 750 ms later (YouTube can report a block for its own autoplay attempt even when playback then goes ahead with sound) does it mute and play, and then it shows a "Turn sound on" button over the player (`.dc-youtube-unmute`, `css/elements/youtube-unmute.css`), which unmutes through the API and removes itself; it also goes if the visitor unmutes with YouTube's own control. If the API can't load it falls back to a plain `autoplay=1` iframe. The poster is cropped to the block's Format (16:9 or 4:3).
+
 ### Video Hero
 
 A full-width banner block (`heroBannerWithVideo`) that sits behind the site header and plays a muted, looping background video. It's allowed in the ROOT banner block grid and in the `home` / `eventsHome` Block Restrictions rules.
@@ -462,6 +487,36 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Slider variant defines `--blog-showcase-slide-width` per breakpoint (1 / 2 / 3 cards + 20% peek at base / `--sm` / `--md`), with column-gap of `var(--unit)`
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
+
+### Tile Grid Block
+
+A grid of tiles of different sizes (stats, text, images, a button), laid out by the editor. Allowed on `eventsHome` (Codegarden) only.
+
+**Content** (`TileGridBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Tiles` (Block Grid "Tile grid tiles", 12 columns, only `TileGridItem`). Editors set each tile's width (3 / 4 / 6 / 8 / 12 columns) and height (1 or 2 rows) with Block Grid's own resizing.
+
+**Tile** (`TileGridItem` + `SettingsTileGridTile`): `TileContent` is a Block List ("Tile content items") of `EyebrowBlock` (small uppercase label), `StatBlock` (`Number`, `Label`, `LabelBesideNumber`), and the existing `TextBlock`, `ImageBlock`, `IconBlock` and `CallToActionLinkBlock`. `TileContent` is optional. Settings: `BackgroundColour` (`ISettingsColour`), `BackgroundImage` with `BackgroundImagePosition` (`fill` / `right` / `bottom-right`) and `BackgroundImageAltText`, and `ContentAlignment` (`top` / `bottom` / `spread`). The view compares those exact values, so renaming an item value in the backoffice needs a matching change in `TileGridItem.cshtml`.
+
+**Layout** (`css/blocks/tile-grid-block.css`): tiles get their spans as `--tile-columns` / `--tile-rows` style properties. Below `--sm` every tile is full width; at `--sm` tiles up to 6 columns are half width and wider ones full width (`--tile-columns-sm`, set in the view); from `--md` the real spans and row spans apply. `spread` uses `space-between`, so put a label first and a stat or footnote last (an Eyebrow block works as a footnote). A `fill` image under text gets a 55% black overlay and white text so the text stays readable. A tile with a background image and no content is an image-only tile: the image always fills it, with no overlay, and its `BackgroundImageAltText` setting becomes the image's alt text (empty = decorative). *Right half* and *Bottom right* images sit beside the text only from `--md` on tiles at least 6 columns wide (`dc-tile--wide-md`); otherwise they stack under it. A tile whose colour (white when it has none) is too close to the block's to tell apart (`ColourHelper.ContrastRatio` under 1.1) gets `dc-tile--outlined`, a faint blue border (white on dark colours); the block passes its colour to the tiles as `ViewData["TileGridBackground"]`. The nested tile preview in the block's edit dialog doesn't get that colour, so it shows no outline.
+
+**Content partials**: `StatBlock`, `EyebrowBlock` and `IconBlock` render from `Views/Partials/Blocks/`, which the tile and the BlockPreview `ViewLocations` fallback both use. The button is `Views/Partials/Components/CallToActionLink.cshtml` (model: link, text, colour), shared with the rich text editor's CTA. An Image block honours *Image is circular*.
+
+**Backoffice preview**: the block and tiles render through their front-end partials. Styles in `wwwroot/css/styles.css`.
+
+### Video Showcase Block
+
+A Codegarden-only block (in the `eventsHome` Block Restrictions rule) for surfacing past talks from YouTube, with a link out to more on the channel.
+
+**Content** (`VideoShowcaseBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Videos` (Block List of `VideoShowcaseItem`, 1–6), `MoreVideosLink` (optional). Each `VideoShowcaseItem` has `Video` (YouTube video picker), `Speaker`, `Edition`, `Description`. The partial in `Models/ContentModels/VideoShowcaseBlock.cs` adds `PlayableVideos` (skips items without a video, caps at `MaxVideos` = 6), `IsGrid(settings)`, `HasPlaylistOnLeft(settings)` and the item `Byline`.
+
+**Settings** (`SettingsVideoShowcaseBlock`, with `ISettingsBlockId` + `ISettingsColour`): `Layout`, `list` (default) or `grid`; `PlaylistPosition` (generic "Radio button list - left or right" data type), `right` (default) or `left`, list layout only.
+
+**Layouts** (`Views/Partials/Blocks/VideoShowcaseBlock.cshtml`, `css/blocks/video-showcase-block.css`): the block has no surface of its own; only the editor's Background colour (`has-bg`) gives it one, and videos never get their own colours (one pink accent for the play button and current number). "More on YouTube" is a pill row inside the component.
+- List: player panel plus playlist from `--md` (`--playlist-left` modifier swaps the columns), with Previous/Next buttons; below `--md` it's an accordion where the open item is filled solid and its header closes it again (side by side, the first video reopens if none is open). Items use `display: contents` on desktop, and the open panel spans `grid-row: 1 / -1` over `repeat(var(--video-count), auto) 1fr` rows and stretches, so its footer (watch link + arrows) lines up with the "More" link in the last `1fr` row.
+- Grid: a plain card grid (1 / 2 / 3 columns); each card's title link (stretched over the card) opens a native `<dialog>` rendered once per block, which plays the video with a "02 / 06" count and Previous / Up next buttons (thumbnail + title) to step through the videos as a playlist. The next video starts when one ends (`playYouTube`'s `onEnded`). The dialog is full screen below `--sm`, and its player is capped at `52dvh` tall so the playlist row stays on screen. Card data for the dialog lives in `data-*` attributes on each `data-showcase-item`.
+
+**Behaviour** (`components/video-showcase/dc-video-showcase.element.ts`): enhances the server-rendered markup through `data-showcase-*` hooks (`item`, `trigger`, `panel`, `player`, `play`, `step`; grid: `open`, `dialog`, `dialog-*`, `close`). Closing the dialog stops the video, unlocks scrolling (`body.dialog-open`) and puts focus back on the card last played. Posters are links to YouTube; the element plays them in place through `playYouTube()` (`components/video-pickers/youtube-player.ts`, shared with `<dc-video-picker-youtube>`), so nothing loads from YouTube until a poster is played. Only one video on the page plays at a time, across showcases.
+
+**Backoffice preview**: the block renders a summary card (layout, title, video thumbnails); items use `Views/BlockPreviewApi/BlockList/VideoShowcaseItem.cshtml`. Styles in `wwwroot/css/styles.css`.
 
 ### Timeline Block
 
@@ -586,7 +641,7 @@ Uses `Joonasw.AspNetCore.SecurityHeaders` for CSP and security headers:
 - Nonce-based script security via `NonceTagHelper`
 - CSP can be disabled per-request via `DisableCspMiddleware`
 - HSTS enabled with preload and 1-year max age
-- Permissions-Policy configured in `Extensions/WebApplicationExtensions.cs` (includes `clipboard-write=(self)` for share functionality)
+- Permissions-Policy configured in `Extensions/WebApplicationExtensions.cs` (includes `clipboard-write=(self)` for share functionality, and delegates `autoplay`, `encrypted-media`, `fullscreen` and `picture-in-picture` to `www.youtube-nocookie.com` / `www.youtube.com`; without that, Chrome only lets YouTube embeds play muted)
 
 ## Key Dependencies
 

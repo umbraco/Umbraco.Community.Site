@@ -92,6 +92,25 @@ app.UseWhen(
     })
 );
 
+// Backoffice extensions under /App_Plugins (ours and third-party packages) use
+// stable filenames that are replaced on deploy, so they must be revalidated on
+// every load instead of being cached heuristically by browsers and the CDN.
+app.UseWhen(
+    n => n.Request.Path.StartsWithSegments("/App_Plugins", StringComparison.OrdinalIgnoreCase),
+    appBuilder => appBuilder.Use((context, next) =>
+    {
+        context.Response.OnStarting(() =>
+        {
+            if (context.Response.StatusCode is >= 200 and < 400)
+            {
+                context.Response.Headers["Cache-Control"] = "no-cache";
+            }
+            return Task.CompletedTask;
+        });
+        return next();
+    })
+);
+
 await app.BootUmbracoAsync();
 
 app.UseHttpsRedirection();
