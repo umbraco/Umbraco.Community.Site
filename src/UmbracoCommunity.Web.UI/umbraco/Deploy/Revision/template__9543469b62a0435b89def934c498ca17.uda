@@ -1,0 +1,15 @@
+{
+  "Name": "HomeReleases",
+  "Alias": "HomeReleases",
+  "LayoutTemplate": "umb://template/2c613d3d174c41de85f219326e92dcb1",
+  "Udi": "umb://template/9543469b62a0435b89def934c498ca17",
+  "Dependencies": [
+    {
+      "Udi": "umb://template/2c613d3d174c41de85f219326e92dcb1",
+      "Ordering": true,
+      "Mode": "Exist"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "19.0.0-rc1"
+}

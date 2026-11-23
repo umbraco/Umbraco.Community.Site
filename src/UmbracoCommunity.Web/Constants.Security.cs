@@ -39,7 +39,9 @@
 
             public static readonly string[] DefaultAllowScripts = ["*.youtube.com", "load.sst.umbraco.com"];
 
-            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "api.dicebear.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com", "cdn.sessionize.com"];
+            // load.sst.umbraco.com appears here as well as in script-src: the container pings its own /ay endpoint as
+            // an image, which is not consent-gated, so it is needed whatever happens to the marketing tags.
+            public static readonly string[] DefaultAllowImages = ["avatars.githubusercontent.com", "github.com", "api.dicebear.com", "images.pexels.com", "data:", "sessionize.com", "cache.sessionize.com", "assets.sessionize.com", "cdn.sessionize.com", "load.sst.umbraco.com"];
 
             public static readonly string[] DefaultAllowFormActions = ["github.com"];
 

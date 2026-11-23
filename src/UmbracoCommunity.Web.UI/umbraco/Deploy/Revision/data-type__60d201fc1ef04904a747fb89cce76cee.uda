@@ -1,7 +1,7 @@
 {
   "Name": "Single media item picker",
-  "EditorAlias": "Umbraco.MediaPicker3",
-  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "EditorAlias": "Umbraco.MediaPicker.Single",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker.Single",
   "Configuration": {
     "filter": "c4b1efcf-a9d5-41c4-9621-e9d273b52a9c,cc07b313-0843-4aa8-bbda-871c8da728c8",
     "crops": [
@@ -67,5 +67,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

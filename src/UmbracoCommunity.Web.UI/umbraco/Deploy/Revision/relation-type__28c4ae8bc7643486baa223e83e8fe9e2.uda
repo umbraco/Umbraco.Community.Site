@@ -1,0 +1,10 @@
+{
+  "Name": "Relate Parent Element Container On Element Delete",
+  "Alias": "relateParentElementContainerOnElementDelete",
+  "ParentObjectType": "2815b0cf-9706-499f-aa2a-8a4c7aef005d",
+  "ChildObjectType": "3d7b623c-94b1-487d-8554-a46ec37568be",
+  "Udi": "umb://relation-type/28c4ae8bc7643486baa223e83e8fe9e2",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.RelationTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

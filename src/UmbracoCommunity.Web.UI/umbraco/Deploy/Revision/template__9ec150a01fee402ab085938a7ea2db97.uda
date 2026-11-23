@@ -2,7 +2,7 @@
   "Name": "Content page",
   "Alias": "ContentPage",
   "File": "umb://template-file/ContentPage.cshtml",
-  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
+  "LayoutTemplate": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/9ec150a01fee402ab085938a7ea2db97",
   "Dependencies": [
     {
@@ -17,5 +17,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

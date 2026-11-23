@@ -1,13 +1,11 @@
 {
   "Name": "Label (datetime)",
-  "EditorAlias": "Umbraco.Label",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Label",
+  "EditorAlias": "Umbraco.Label.DateTime",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Label.DateTime",
   "DatabaseType": "Date",
-  "Configuration": {
-    "umbracoDataValueType": "DATETIME"
-  },
+  "Configuration": {},
   "Udi": "umb://data-type/0e9794ebf9b54f20a78893acd233a7e4",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "19.0.0-rc1"
 }

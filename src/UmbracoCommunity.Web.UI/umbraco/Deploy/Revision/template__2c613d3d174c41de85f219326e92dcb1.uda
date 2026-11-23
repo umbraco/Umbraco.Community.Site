@@ -1,0 +1,8 @@
+{
+  "Name": "LayoutReleases",
+  "Alias": "LayoutReleases",
+  "Udi": "umb://template/2c613d3d174c41de85f219326e92dcb1",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
+  "__version": "19.0.0-rc1"
+}

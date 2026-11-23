@@ -1,13 +1,11 @@
 {
   "Name": "Dropdown",
-  "EditorAlias": "Umbraco.DropDown.Flexible",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown",
+  "EditorAlias": "Umbraco.DropDown.Single",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Dropdown.Single",
   "DatabaseType": "Nvarchar",
-  "Configuration": {
-    "multiple": false
-  },
+  "Configuration": {},
   "Udi": "umb://data-type/0b6a45e744ba430d9da54e46060b9e03",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "19.0.0-rc1"
 }
