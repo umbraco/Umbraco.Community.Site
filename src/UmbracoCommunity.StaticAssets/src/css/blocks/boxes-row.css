@@ -241,6 +241,12 @@
     grid-row: 1 / 2;
 }
 
+.dc-boxes-row__item,
+.dc-boxes-row__item .dc-image-wrapper,
+.dc-boxes-row__item .dc-image {
+    min-width: 0;
+}
+
 .dc-boxes-row__item .dc-image-wrapper:has(.overlay) .dc-image {
     align-self: stretch;
     height: 100%;
