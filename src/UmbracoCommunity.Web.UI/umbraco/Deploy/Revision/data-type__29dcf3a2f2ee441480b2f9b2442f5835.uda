@@ -125,6 +125,20 @@
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       },
       {
+        "contentElementTypeKey": "d183a173-e525-4e82-8adb-cedd1844a486",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "label": "Tile grid",
+        "settingsElementTypeKey": "b196a0ee-69a2-4c11-9b00-8ee7f1991b25",
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "editorSize": "full",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
         "contentElementTypeKey": "9e262942-ee5f-4a65-831e-9a94e487875b",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -381,6 +395,9 @@
       "Udi": "umb://document-type/ae9343a6012e4d269e5d8beffbbcf1e0"
     },
     {
+      "Udi": "umb://document-type/b196a0ee69a24c119b008ee7f1991b25"
+    },
+    {
       "Udi": "umb://document-type/b1a7fb4d21d34820872a79f99d8b0a47"
     },
     {
@@ -409,6 +426,9 @@
     },
     {
       "Udi": "umb://document-type/cf29263f836d4c3c9260c408365fa346"
+    },
+    {
+      "Udi": "umb://document-type/d183a173e5254e828adbcedd1844a486"
     },
     {
       "Udi": "umb://document-type/d772969ac9e84809b9525d17ae4a899d"

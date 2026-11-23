@@ -1,0 +1,90 @@
+{
+  "Name": "[Settings] Tile grid tile",
+  "Alias": "settingsTileGridTile",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-settings",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+  "CompositionContentTypes": [
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "a1c72f95-0fb3-47b1-a1fc-71659d108713",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "11be81f2-0f62-410d-b776-c1a61085677e",
+          "Alias": "backgroundImagePosition",
+          "DataType": "umb://data-type/60bbc6ba90774681b7be3f607588e366",
+          "ValueType": "System.String",
+          "Description": "Fill covers the whole tile, so keep text short and readable over it.",
+          "Name": "Background image position",
+          "SortOrder": 1
+        },
+        {
+          "Key": "ad2bf3c8-660a-4bf1-b04b-5d0bfd5a37cf",
+          "Alias": "backgroundImage",
+          "DataType": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+          "ValueType": "Umbraco.Cms.Core.Models.MediaWithCrops",
+          "Description": "A photo or illustration placed behind or beside the content.",
+          "Name": "Background image"
+        },
+        {
+          "Key": "afa8786b-f19c-41ad-9970-cbf4775edaff",
+          "Alias": "backgroundImageAltText",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Only used when the tile has no content. Describe the image, or leave empty if it is decorative.",
+          "Name": "Background image alt text",
+          "SortOrder": 2
+        },
+        {
+          "Key": "b3b2d7d1-8dcd-4dbd-97f8-0a6c14412a70",
+          "Alias": "contentAlignment",
+          "DataType": "umb://data-type/ac7e0140fdfa4dc2b6dbb9557d71c9a4",
+          "ValueType": "System.String",
+          "Description": "Spread puts the first item at the top and the last at the bottom.",
+          "Name": "Content alignment",
+          "SortOrder": 3
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/5a2a71e1185b4141b1dd393859663e82",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/60bbc6ba90774681b7be3f607588e366",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ac7e0140fdfa4dc2b6dbb9557d71c9a4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/ad9f0cf2bda245d59ea1a63cfc873fd3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}
