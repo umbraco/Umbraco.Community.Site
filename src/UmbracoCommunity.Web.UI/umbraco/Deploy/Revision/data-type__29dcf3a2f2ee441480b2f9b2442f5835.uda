@@ -270,6 +270,14 @@
         "allowInAreas": true,
         "groupKey": "58854c83-8a13-458e-8fe2-d27bbfa7ea5f",
         "settingsElementTypeKey": "59f218cc-9543-47fb-bff1-b6c3b5c06acd"
+      },
+      {
+        "contentElementTypeKey": "5ea7c190-136f-4eb1-91cf-4c46e21a3477",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "858a88b9-eeb7-447d-8d3a-d3a67601045f",
+        "editorSize": "large",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       }
     ],
     "useLiveEditing": true,
@@ -365,6 +373,9 @@
       "Udi": "umb://document-type/5b6a23c2f36346849ebcfa49d0001aed"
     },
     {
+      "Udi": "umb://document-type/5ea7c190136f4eb191cf4c46e21a3477"
+    },
+    {
       "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
     },
     {
@@ -378,6 +389,9 @@
     },
     {
       "Udi": "umb://document-type/81482d2a227945ca87302d91f65e0835"
+    },
+    {
+      "Udi": "umb://document-type/858a88b9eeb7447d8d3ad3a67601045f"
     },
     {
       "Udi": "umb://document-type/9b898ccfe50346108e62b5348baa88e4"
@@ -459,5 +473,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "18.2.0"
+  "__version": "19.0.0-rc1"
 }

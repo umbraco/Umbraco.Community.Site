@@ -1,0 +1,55 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<ImageCarouselBlock, SettingsImageCarouselBlock>>
+
+@{
+    var items = Model.Content.Items.ToList();
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    bool autoSlide = Model.Settings?.AutoSlideImages ?? true;
+}
+
+<div class="dc-image-carousel-preview @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@(hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+    }
+
+    @if (items.Any())
+    {
+        <div class="dc-image-carousel-preview__items">
+            @foreach (var item in items)
+            {
+                <div class="dc-image-carousel-preview__item">
+                    <div class="dc-image-carousel-preview__media">
+                        <img src="@item.Image!.GetCropUrl(height: 240)" alt="">
+                        @if (!string.IsNullOrWhiteSpace(item.Title))
+                        {
+                            <p class="dc-image-carousel-preview__title">@item.Title</p>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.Text))
+                    {
+                        <p class="dc-image-carousel-preview__text">@item.Text</p>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="dc-image-carousel-preview__empty">Image carousel: add some images</p>
+    }
+
+    <ul class="dc-image-carousel-preview__meta">
+        <li>@items.Count @(items.Count == 1 ? "image" : "images")</li>
+        <li>Auto-slide @(autoSlide ? "on" : "off")</li>
+        @{ var linkCount = items.Count(i => !string.IsNullOrWhiteSpace(i.Link?.Url)); }
+        @if (linkCount > 0)
+        {
+            <li>@linkCount linked</li>
+        }
+    </ul>
+</div>

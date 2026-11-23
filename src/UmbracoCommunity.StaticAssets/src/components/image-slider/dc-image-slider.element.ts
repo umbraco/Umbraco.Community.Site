@@ -15,7 +15,14 @@ export class DcImageSlider extends HTMLElement {
     #prefersReducedMotion = false;
     #observer: IntersectionObserver | null = null;
     #originalCount = 0;
-    #cloneStartOffset = 0;
+    #loopWidth = 0;
+    #isPaused = false;
+    #isHovered = false;
+    #hasFocus = false;
+    #toggle: HTMLButtonElement | null = null;
+    #arrows: HTMLButtonElement[] = [];
+    #resizeObserver: ResizeObserver | null = null;
+    #isStatic = false;
 
     connectedCallback() {
         this.addEventListener("mousedown", this.#onMouseDown);
@@ -34,8 +41,20 @@ export class DcImageSlider extends HTMLElement {
                 this.#isVisible = entry.isIntersecting;
             });
             this.#observer.observe(this);
+            this.addEventListener("mouseenter", this.#onMouseEnter);
+            this.addEventListener("focusin", this.#onFocusIn);
+            this.addEventListener("focusout", this.#onFocusOut);
+            this.#bindToggle();
             this.#startAutoSlide();
+        } else {
+            this.#bindArrows();
         }
+
+        if ("ResizeObserver" in window) {
+            this.#resizeObserver = new ResizeObserver(this.#onResize);
+            this.#resizeObserver.observe(this);
+        }
+        this.#onResize();
     }
 
     disconnectedCallback() {
@@ -46,6 +65,13 @@ export class DcImageSlider extends HTMLElement {
         this.removeEventListener("click", this.#onClick, true);
         this.removeEventListener("touchstart", this.#onTouchStart);
         this.removeEventListener("touchend", this.#onTouchEnd);
+        this.removeEventListener("mouseenter", this.#onMouseEnter);
+        this.removeEventListener("focusin", this.#onFocusIn);
+        this.removeEventListener("focusout", this.#onFocusOut);
+        this.#toggle?.removeEventListener("click", this.#onToggle);
+        this.#arrows.forEach((arrow) => arrow.removeEventListener("click", this.#onArrow));
+        this.removeEventListener("scroll", this.#updateArrows);
+        this.#resizeObserver?.disconnect();
         this.#stopAutoSlide();
         this.#observer?.disconnect();
     }
@@ -55,29 +81,40 @@ export class DcImageSlider extends HTMLElement {
         this.#originalCount = children.length;
         if (this.#originalCount === 0) return;
 
-        for (const child of children) {
+        const makeClone = (child: Element) => {
             const clone = child.cloneNode(true) as HTMLElement;
             clone.setAttribute("aria-hidden", "true");
-            this.appendChild(clone);
-        }
+            clone.inert = true;
+            return clone;
+        };
+
+        this.prepend(...children.map(makeClone));
+        this.append(...children.map(makeClone));
+    }
+
+    #originals(): HTMLElement[] {
+        const count = this.#originalCount || this.children.length;
+        const start = this.#originalCount ? this.#originalCount : 0;
+        return Array.from(this.children).slice(start, start + count) as HTMLElement[];
     }
 
     #startAutoSlide() {
         const tick = () => {
-            // Recalculate offset as images load and gain their final width
-            if (this.#originalCount > 0) {
-                const firstClone = this.children[this.#originalCount] as HTMLElement;
-                if (firstClone) {
-                    this.#cloneStartOffset = firstClone.offsetLeft;
-                }
+            // Recalculate as images load and gain their final width
+            const first = this.children[0] as HTMLElement | undefined;
+            const firstOriginal = this.children[this.#originalCount] as HTMLElement | undefined;
+            if (first && firstOriginal) {
+                this.#loopWidth = firstOriginal.offsetLeft - first.offsetLeft;
             }
 
-            if (!this.#isDown && !this.#isTouching && this.#isVisible) {
+            if (!this.#isStatic && !this.#isDown && !this.#isTouching && this.#isVisible && !this.#isPaused && !this.#isHovered && !this.#hasFocus) {
                 this.scrollLeft += this.#autoSlideSpeed;
+            }
 
-                if (this.#cloneStartOffset > 0 && this.scrollLeft >= this.#cloneStartOffset) {
-                    this.scrollLeft -= this.#cloneStartOffset;
-                }
+            // Keep the scroll position within the original set, with a clone set either side
+            if (!this.#isStatic && !this.#isDown && !this.#isTouching && !this.#hasFocus && this.#loopWidth > 0) {
+                if (this.scrollLeft < this.#loopWidth) this.scrollLeft += this.#loopWidth;
+                else if (this.scrollLeft >= this.#loopWidth * 2) this.scrollLeft -= this.#loopWidth;
             }
             this.#autoSlideFrameId = requestAnimationFrame(tick);
         };
@@ -91,7 +128,86 @@ export class DcImageSlider extends HTMLElement {
         }
     }
 
+    #bindToggle() {
+        if (!this.id) return;
+        this.#toggle = document.querySelector<HTMLButtonElement>(`[data-image-slider-toggle][aria-controls="${CSS.escape(this.id)}"]`);
+        if (!this.#toggle) return;
+        this.#toggle.addEventListener("click", this.#onToggle);
+        this.#renderToggle();
+    }
+
+    #renderToggle() {
+        if (!this.#toggle) return;
+        this.#toggle.hidden = this.#isStatic;
+        this.#toggle.classList.toggle("is-paused", this.#isPaused);
+        this.#toggle.setAttribute("aria-label", this.#isPaused ? "Play image slider" : "Pause image slider");
+    }
+
+    #onToggle = () => {
+        this.#isPaused = !this.#isPaused;
+        this.#renderToggle();
+    };
+
+    #bindArrows() {
+        if (!this.id) return;
+        this.#arrows = Array.from(document.querySelectorAll<HTMLButtonElement>(`[data-image-slider-action][aria-controls="${CSS.escape(this.id)}"]`));
+        if (this.#arrows.length === 0) return;
+        this.#arrows.forEach((arrow) => arrow.addEventListener("click", this.#onArrow));
+        this.addEventListener("scroll", this.#updateArrows, { passive: true });
+    }
+
+    #updateArrows = () => {
+        const maxScroll = this.scrollWidth - this.clientWidth;
+        this.#arrows.forEach((arrow) => {
+            const isPrev = arrow.dataset.imageSliderAction === "prev";
+            arrow.hidden = this.#isStatic;
+            arrow.disabled = isPrev ? this.scrollLeft <= 1 : this.scrollLeft >= maxScroll - 1;
+        });
+    };
+
+    #onResize = () => {
+        const originals = this.#originals();
+        const first = originals[0];
+        const last = originals[originals.length - 1];
+        if (!first || !last) return;
+
+        const style = getComputedStyle(this);
+        const available = this.clientWidth - (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+        const contentWidth = last.offsetLeft + last.offsetWidth - first.offsetLeft;
+        const isStatic = contentWidth <= available + 1;
+
+        if (isStatic !== this.#isStatic) {
+            this.#isStatic = isStatic;
+            this.classList.toggle("is-static", isStatic);
+            if (isStatic) this.scrollLeft = 0;
+        }
+        this.#renderToggle();
+        this.#updateArrows();
+    };
+
+    #onArrow = (e: Event) => {
+        const isPrev = (e.currentTarget as HTMLElement).dataset.imageSliderAction === "prev";
+        const start = this.getBoundingClientRect().left + parseFloat(getComputedStyle(this).paddingLeft);
+        const offsets = Array.from(this.children).map((child) => child.getBoundingClientRect().left - start);
+        const target = isPrev ? offsets.filter((offset) => offset < -1).pop() : offsets.find((offset) => offset > 1);
+        if (target === undefined) return;
+        this.scrollBy({ left: target, behavior: this.#prefersReducedMotion ? "auto" : "smooth" });
+    };
+
+    #onMouseEnter = () => {
+        this.#isHovered = true;
+    };
+
+    #onFocusIn = () => {
+        this.#hasFocus = true;
+    };
+
+    #onFocusOut = (e: FocusEvent) => {
+        this.#hasFocus = this.contains(e.relatedTarget as Node | null);
+    };
+
     #onMouseDown = (e: MouseEvent) => {
+        if (this.#isStatic) return;
         this.#isDown = true;
         this.#hasDragged = false;
         this.classList.add("is-dragging");
@@ -99,7 +215,8 @@ export class DcImageSlider extends HTMLElement {
         this.#scrollLeft = this.scrollLeft;
     };
 
-    #onMouseUp = () => {
+    #onMouseUp = (e: MouseEvent) => {
+        if (e.type === "mouseleave") this.#isHovered = false;
         if (!this.#isDown) return;
         this.#isDown = false;
         this.classList.remove("is-dragging");

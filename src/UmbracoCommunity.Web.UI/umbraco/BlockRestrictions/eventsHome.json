@@ -27,6 +27,8 @@
     "highlightedSessionsConfig",
     "imageBlock",
     "imageBlockWithOverlay",
+    "imageCarouselBlock",
+    "imageCarouselItem",
     "linkItem",
     "linkWithIcon",
     "linkWithIconAndCaption",
