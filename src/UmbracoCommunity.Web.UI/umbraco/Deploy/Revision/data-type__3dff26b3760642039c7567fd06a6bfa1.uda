@@ -3,12 +3,11 @@
   "EditorAlias": "Umbraco.MultiUrlPicker",
   "EditorUiAlias": "Umb.PropertyEditorUi.MultiUrlPicker",
   "Configuration": {
-    "validationLimit": {
-      "max": 2
-    }
+    "minNumber": 0,
+    "maxNumber": 2
   },
   "Udi": "umb://data-type/3dff26b3760642039c7567fd06a6bfa1",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "19.0.0-rc1"
+  "__version": "17.1.0"
 }

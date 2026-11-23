@@ -91,6 +91,12 @@
         "settingsElementTypeKey": "1e173c4b-ebc9-4aa8-9753-bad29a376466"
       },
       {
+        "contentElementTypeKey": "81482d2a-2279-45ca-8730-2d91f65e0835",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "5b6a23c2-f363-4684-9ebc-fa49d0001aed"
+      },
+      {
         "contentElementTypeKey": "cdca4cc3-5b16-4081-9068-73e30005add5",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -136,6 +142,17 @@
         "areas": []
       },
       {
+        "contentElementTypeKey": "b1a7fb4d-21d3-4820-872a-79f99d8b0a47",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "columnSpanOptions": [
+          {
+            "columnSpan": 12
+          }
+        ],
+        "settingsElementTypeKey": "e851dbeb-13d8-44bd-a65c-3b1ce4efb695"
+      },
+      {
         "contentElementTypeKey": "a22baea7-24fa-4cc5-bab7-8f68e2d16028",
         "allowAtRoot": true,
         "allowInAreas": true,
@@ -144,16 +161,29 @@
             "columnSpan": 12
           }
         ],
-        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a"
+        "settingsElementTypeKey": "76cd95ec-6712-4dc4-a211-715c9c58be4a",
+        "groupKey": "86a5a9f2-f123-4638-a3f5-78d35615700a"
       },
       {
         "contentElementTypeKey": "f262c3eb-d440-4b63-8dbb-b6da83f86f71",
         "allowAtRoot": true,
         "allowInAreas": true,
         "editorSize": "full"
+      },
+      {
+        "contentElementTypeKey": "413d4195-9c14-4ac5-ad54-199b50811170",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "0ac6f64c-6c6a-4ebe-90a5-9c06e7ad1b61"
       }
     ],
-    "createLabel": "Add new content block"
+    "createLabel": "Add new content block",
+    "blockGroups": [
+      {
+        "key": "86a5a9f2-f123-4638-a3f5-78d35615700a",
+        "name": "Legacy"
+      }
+    ]
   },
   "Parent": "umb://data-type-container/14f6627220724f0b9e9ff0959e87dffa",
   "Udi": "umb://data-type/240aa2c4592b42f9aa5221c20f4a502e",
@@ -167,6 +197,9 @@
     },
     {
       "Udi": "umb://document-type/0a12408ae55043ffa50d331b2df9ae84"
+    },
+    {
+      "Udi": "umb://document-type/0ac6f64c6c6a4ebe90a59c06e7ad1b61"
     },
     {
       "Udi": "umb://document-type/0f95e9d4c3064a91a754b0b6e8427f24"
@@ -187,10 +220,16 @@
       "Udi": "umb://document-type/3c15228c45914313b75a120cee63a699"
     },
     {
+      "Udi": "umb://document-type/413d41959c144ac5ad54199b50811170"
+    },
+    {
       "Udi": "umb://document-type/471d520790044bd598c9db2351678562"
     },
     {
       "Udi": "umb://document-type/595d887872cc498aa966156a57ae5971"
+    },
+    {
+      "Udi": "umb://document-type/5b6a23c2f36346849ebcfa49d0001aed"
     },
     {
       "Udi": "umb://document-type/6f689d5b3cd64b0387f2720f626cf50a"
@@ -205,6 +244,9 @@
       "Udi": "umb://document-type/7ea7f6d833f048d5b0efdfb43b43fa4d"
     },
     {
+      "Udi": "umb://document-type/81482d2a227945ca87302d91f65e0835"
+    },
+    {
       "Udi": "umb://document-type/9e262942ee5f4a65831e9a94e487875b"
     },
     {
@@ -212,6 +254,9 @@
     },
     {
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
+    },
+    {
+      "Udi": "umb://document-type/b1a7fb4d21d34820872a79f99d8b0a47"
     },
     {
       "Udi": "umb://document-type/c39783fb08c34a3488a430949d342c17"
@@ -241,6 +286,9 @@
       "Udi": "umb://document-type/e6c6b0dcd60d480ab06e6e81febdac98"
     },
     {
+      "Udi": "umb://document-type/e851dbeb13d844bda65c3b1ce4efb695"
+    },
+    {
       "Udi": "umb://document-type/ed42a0f11bf248aeaf07c2227369aadf"
     },
     {
@@ -248,5 +296,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "19.0.0-rc1"
+  "__version": "18.2.0"
 }

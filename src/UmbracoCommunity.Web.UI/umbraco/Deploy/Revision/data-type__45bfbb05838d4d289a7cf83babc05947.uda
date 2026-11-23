@@ -16,16 +16,14 @@
             "alias": "footerLinksArea",
             "columnSpan": 2,
             "rowSpan": 1,
+            "minAllowed": 0,
             "specifiedAllowance": [
               {
                 "minAllowed": 0,
                 "elementTypeKey": "e68f26bd-5b02-4e7b-a3f0-86346793f5c5"
               }
             ],
-            "createLabel": "Create footer links block",
-            "validationLimit": {
-              "min": 0
-            }
+            "createLabel": "Create footer links block"
           }
         ],
         "columnSpanOptions": [
@@ -62,5 +60,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "19.0.0-rc1"
+  "__version": "17.1.0"
 }
