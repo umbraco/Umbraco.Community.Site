@@ -1,78 +1,269 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createTestContainer } from '../../test/test-utils'
-import { VideoPickerYouTubeElement } from './video-picker-youtube'
+import './video-picker-youtube'
+import type { VideoPickerYouTubeElement } from './video-picker-youtube'
+import { resetYouTubeApiForTests } from './youtube-api'
+
+const SOURCE = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=30'
+
+type PlayerOptions = { host: string; videoId: string; playerVars: Record<string, unknown>; events: { onReady: (e: { target: unknown }) => void; onAutoplayBlocked: (e: { target: unknown }) => void } }
 
 describe('VideoPickerYouTubeElement', () => {
   let container: HTMLElement
-  let element: VideoPickerYouTubeElement
+  let created: { element: HTMLElement; options: PlayerOptions; player: ReturnType<typeof fakePlayer> }[]
+
+  const fakePlayer = () => {
+    const iframe = document.createElement('iframe')
+    let muted = false
+    return {
+      iframe,
+      state: -1,
+      playVideo: vi.fn(),
+      mute: vi.fn(() => { muted = true }),
+      unMute: vi.fn(() => { muted = false }),
+      isMuted: () => muted,
+      getPlayerState() { return this.state },
+      destroy: vi.fn(),
+      getIframe: () => iframe,
+    }
+  }
+
+  const installYouTube = () => {
+    (window as any).YT = {
+      Player: vi.fn(function (element: HTMLElement, options: PlayerOptions) {
+        const player = fakePlayer()
+        element.replaceWith(player.iframe)
+        created.push({ element, options, player })
+        return player
+      }),
+    }
+  }
+
+  const create = async (attributes: Record<string, string> = {}) => {
+    const element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
+    element.setAttribute('source', SOURCE)
+    element.setAttribute('allow', 'autoplay; fullscreen')
+    for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value)
+    container.appendChild(element)
+    await element.updateComplete
+    return element
+  }
+
+  const youTubeScripts = () => [...document.querySelectorAll('script')].filter(s => s.src.includes('youtube.com'))
 
   beforeEach(() => {
-    // Mock the YouTube IFrame API global
-    (globalThis as any).YT = {
-      Player: vi.fn()
-    }
-
     container = createTestContainer()
-    element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
-    container.appendChild(element)
+    created = []
+    resetYouTubeApiForTests()
   })
 
   afterEach(() => {
-    delete (globalThis as any).YT
+    delete (window as any).YT
+    delete (window as any).onYouTubeIframeAPIReady
+    youTubeScripts().forEach(s => s.remove())
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
-  describe('initialization', () => {
-    it('should create an instance of VideoPickerYouTubeElement', () => {
-      expect(element).toBeInstanceOf(VideoPickerYouTubeElement)
+  describe('before play', () => {
+    it('creates no player and loads no YouTube script', async () => {
+      const element = await create({ thumbnail: 'poster.jpg' })
+
+      expect(element.querySelector('iframe')).toBeNull()
+      expect(youTubeScripts()).toHaveLength(0)
     })
 
-    it('should extend DcVideoBlockElement', () => {
-      expect(element).toBeInstanceOf(VideoPickerYouTubeElement)
-    })
+    it('shows a poster even without a thumbnail', async () => {
+      const element = await create()
 
-    it('should have default property values', () => {
-      expect(element.videoPlayed).toBe(false)
-    })
-  })
-
-  describe('playVideo method', () => {
-    it('should set videoPlayed to true', () => {
-      expect(element.videoPlayed).toBe(false)
-      
-      element.playVideo()
-      
-      expect(element.videoPlayed).toBe(true)
-    })
-
-    it('should only set videoPlayed flag', () => {
-      // YouTube videos don't need to call play() on a video element
-      // They just need to set the flag to show the embedded video
-      element.playVideo()
-      
-      expect(element.videoPlayed).toBe(true)
+      expect(element.shadowRoot?.querySelector('.poster')).toBeTruthy()
+      expect(element.shadowRoot?.querySelector('slot[name="video"]')).toBeNull()
     })
   })
 
-  describe('edge cases', () => {
-    it('should handle multiple playVideo calls', () => {
-      element.playVideo()
-      expect(element.videoPlayed).toBe(true)
-      
-      element.playVideo()
-      expect(element.videoPlayed).toBe(true)
+  describe('playVideo', () => {
+    it('starts the video through the player API on the embed host', async () => {
+      installYouTube()
+      const element = await create({ name: 'Keynote' })
+
+      await element.playVideo()
+
+      expect(created).toHaveLength(1)
+      const { options, player } = created[0]
+      expect(options.host).toBe('https://www.youtube-nocookie.com')
+      expect(options.videoId).toBe('dQw4w9WgXcQ')
+      expect(options.playerVars).toMatchObject({ autoplay: 1, playsinline: 1, start: 30 })
+
+      options.events.onReady({ target: player })
+      expect(player.playVideo).toHaveBeenCalledTimes(1)
+      expect(player.iframe.title).toBe('Keynote')
+      expect(element.querySelector('[slot="video"] iframe')).toBe(player.iframe)
     })
 
-    it('should work consistently', () => {
-      // Test that the method always sets videoPlayed to true
-      element.videoPlayed = false
-      element.playVideo()
-      expect(element.videoPlayed).toBe(true)
-      
-      element.videoPlayed = false
-      element.playVideo()
-      expect(element.videoPlayed).toBe(true)
+    it('plays muted only when the browser blocks playback with sound', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+
+      const { options, player } = created[0]
+      options.events.onReady({ target: player })
+      expect(player.mute).not.toHaveBeenCalled()
+
+      options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
+      expect(player.mute).toHaveBeenCalledTimes(1)
+      expect(player.playVideo).toHaveBeenCalledTimes(2)
+    })
+
+    it('ignores a reported block when the video plays with sound anyway', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      options.events.onReady({ target: player })
+      player.state = 1
+      vi.advanceTimersByTime(750)
+
+      expect(player.mute).not.toHaveBeenCalled()
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+    })
+
+    it('still offers the sound button when the video plays but YouTube muted it', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      player.mute()
+      player.state = 1
+      vi.advanceTimersByTime(750)
+
+      expect(element.querySelector('.dc-youtube-unmute')).not.toBeNull()
+    })
+
+    it('offers a button to turn the sound on when it had to play muted', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+      options.events.onReady({ target: player })
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+
+      options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
+      const button = element.querySelector<HTMLButtonElement>('.dc-youtube-unmute')!
+      expect(button.textContent).toContain('Turn sound on')
+      expect(document.activeElement).toBe(button)
+
+      button.click()
+      expect(player.unMute).toHaveBeenCalledTimes(1)
+      expect(player.playVideo).toHaveBeenCalledTimes(3)
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+      expect(document.activeElement).toBe(player.iframe)
+    })
+
+    it('removes the sound button once unmuted in the player itself', async () => {
+      vi.useFakeTimers()
+      installYouTube()
+      const element = await create()
+      await element.playVideo()
+      const { options, player } = created[0]
+
+      options.events.onAutoplayBlocked({ target: player })
+      vi.advanceTimersByTime(750)
+      player.unMute()
+      vi.advanceTimersByTime(1000)
+
+      expect(element.querySelector('.dc-youtube-unmute')).toBeNull()
+    })
+
+    it('only ever creates one player', async () => {
+      installYouTube()
+      const element = await create()
+
+      await Promise.all([element.playVideo(), element.playVideo()])
+
+      expect(created).toHaveLength(1)
+    })
+
+    it('stops and shows its poster again when another video on the page starts', async () => {
+      installYouTube()
+      const first = await create()
+      const second = await create()
+
+      await first.playVideo()
+      await second.playVideo()
+      await first.updateComplete
+
+      expect(created[0].player.destroy).toHaveBeenCalledTimes(1)
+      expect(first.querySelector('[slot="video"]')).toBeNull()
+      expect(first.shadowRoot?.querySelector('.poster')).toBeTruthy()
+      expect(created[1].player.destroy).not.toHaveBeenCalled()
+    })
+
+    it('can be played again after being stopped', async () => {
+      installYouTube()
+      const element = await create()
+
+      await element.playVideo()
+      element.stop()
+      await element.playVideo()
+
+      expect(created).toHaveLength(2)
+    })
+
+    it('loads the player API only once, after the click', async () => {
+      const element = await create()
+
+      const playing = element.playVideo()
+      expect(youTubeScripts()).toHaveLength(1)
+
+      installYouTube()
+      ;(window as any).onYouTubeIframeAPIReady()
+      await playing
+
+      expect(created).toHaveLength(1)
+    })
+
+    it('falls back to a plain autoplaying iframe if the API fails to load', async () => {
+      const element = await create()
+
+      const playing = element.playVideo()
+      youTubeScripts()[0].dispatchEvent(new Event('error'))
+      await playing
+
+      const iframe = element.querySelector('[slot="video"] iframe') as HTMLIFrameElement
+      expect(iframe).toBeTruthy()
+      expect(new URL(iframe.src).searchParams.get('autoplay')).toBe('1')
+      expect(new URL(iframe.src).searchParams.get('playsinline')).toBe('1')
+    })
+
+    it('does nothing without a source', async () => {
+      const element = document.createElement('dc-video-picker-youtube') as VideoPickerYouTubeElement
+      container.appendChild(element)
+
+      await element.playVideo()
+
+      expect(youTubeScripts()).toHaveLength(0)
+      expect(element.querySelector('iframe')).toBeNull()
+    })
+  })
+
+  describe('editor autoplay', () => {
+    it('creates the iframe straight away, using the source as given', async () => {
+      const element = await create({ 'auto-play': 'true' })
+
+      const iframe = element.querySelector('iframe')!
+      expect(iframe).toBeTruthy()
+      expect(new URL(iframe.src).searchParams.get('autoplay')).toBeNull()
+      expect(youTubeScripts()).toHaveLength(0)
     })
   })
 })
-

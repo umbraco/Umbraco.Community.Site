@@ -1,0 +1,57 @@
+@using Umbraco.Cms.Core.Models
+@using UmbracoCommunity.Web.Helpers
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<YouTubeVideoBlock, SettingsYouTubeVideoBlock>>
+
+@{
+    var video = Model.Content.Video;
+}
+
+@if (video is not null)
+{
+    var isFourThree = Model.Settings?.Format?.Contains("4:3") ?? false;
+    var poster = video.Poster?.GetCropUrl(width: 1280, height: isFourThree ? 960 : 720, imageCropMode: ImageCropMode.Crop);
+
+    if (Context.Request.IsBlockPreviewRequest())
+    {
+        var thumbnail = video.Poster?.GetCropUrl(width: 480, height: isFourThree ? 360 : 270, imageCropMode: ImageCropMode.Crop);
+
+        <div class="youtube-video-preview">
+            <div class="youtube-video-preview__poster @(isFourThree ? "is-four-three" : null) @(thumbnail == null ? "is-empty" : null)">
+                @if (thumbnail != null)
+                {
+                    <img src="@thumbnail" alt="" />
+                }
+                <svg class="youtube-video-preview__play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10-6.5a1 1 0 0 0 0-1.72l-10-6.5A1 1 0 0 0 8 5.5Z" /></svg>
+            </div>
+            <div class="youtube-video-preview__details">
+                <p class="youtube-video-preview__eyebrow">YouTube video</p>
+                <p class="youtube-video-preview__title">@(string.IsNullOrWhiteSpace(video.Title) ? "Untitled video" : video.Title)</p>
+                <p class="youtube-video-preview__url">@video.WatchUrl</p>
+                <ul class="youtube-video-preview__chips">
+                    <li>@(isFourThree ? "4:3" : "16:9")</li>
+                    @if (thumbnail == null)
+                    {
+                        <li class="is-warning">No poster picked</li>
+                    }
+                    else
+                    {
+                        var posterName = video.Poster!.Name;
+                        var stillLabel = posterName.LastIndexOf(" – ", StringComparison.Ordinal) is var dash and >= 0 ? posterName[(dash + 3)..] : posterName;
+                        <li title="@posterName">Poster: @stillLabel</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+    else
+    {
+        <dc-video-picker-youtube source="@video.EmbedUrl"
+                                 allow="@VideoHelper.YouTubeAllow"
+                                 name="@video.Title"
+                                 thumbnail="@poster"
+                                 format="@(isFourThree ? 43 : 169)"
+                                 id="@Model.Settings?.BlockId">
+            <a href="@video.WatchUrl" target="_blank" rel="noopener">Watch @(string.IsNullOrWhiteSpace(video.Title) ? "the video" : video.Title) on YouTube</a>
+        </dc-video-picker-youtube>
+    }
+}
