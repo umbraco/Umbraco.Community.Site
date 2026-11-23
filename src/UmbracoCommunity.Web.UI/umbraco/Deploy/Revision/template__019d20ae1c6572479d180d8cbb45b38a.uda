@@ -2,7 +2,7 @@
   "Name": "Page not found",
   "Alias": "PageNotFound",
   "File": "umb://template-file/PageNotFound.cshtml",
-  "LayoutTemplate": "umb://template/f894a6c7db394547be53d62c3c411be1",
+  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/019d20ae1c6572479d180d8cbb45b38a",
   "Dependencies": [
     {
@@ -17,5 +17,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
-  "__version": "19.0.0-rc1"
+  "__version": "17.1.0"
 }
