@@ -1,0 +1,8 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<CallToActionLinkBlock, SettingsCallToActionLinkBlock>>
+
+@if (Model.Content.CallToActionLink != null)
+{
+    <div class="dc-tile__cta">
+        <partial name="~/Views/Partials/Components/CallToActionLink.cshtml" model="@((Model.Content.CallToActionLink, Model.Content.CallToActionLinkText, Model.Settings?.ButtonColour))" />
+    </div>
+}

@@ -1,0 +1,19 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<ImageCarouselItem>>
+
+<div class="dc-image-carousel-item-preview">
+    @if (Model.Content.Image is not null)
+    {
+        <img src="@Model.Content.Image.GetCropUrl(height: 120)" alt="" height="60">
+    }
+    <div class="dc-image-carousel-item-preview__text">
+        <p class="dc-image-carousel-item-preview__title">@(string.IsNullOrWhiteSpace(Model.Content.Title) ? Model.Content.Image?.Name ?? "Image" : Model.Content.Title)</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Content.Text))
+        {
+            <p>@Model.Content.Text</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Content.Link?.Url))
+        {
+            <p class="dc-image-carousel-item-preview__link">Links to @(Model.Content.Link.Name ?? Model.Content.Link.Url)</p>
+        }
+    </div>
+</div>

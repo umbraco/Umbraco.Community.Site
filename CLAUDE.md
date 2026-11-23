@@ -371,13 +371,40 @@ A hero block combining CTA-style text content with a horizontally-scrollable ima
 **Frontend Component** (`src/UmbracoCommunity.StaticAssets/src/components/image-slider/dc-image-slider.element.ts`):
 - `<dc-image-slider>` — Provides mouse drag-to-scroll; touch scrolling handled natively via CSS overflow
 - `auto-slide` HTML attribute enables automatic scrolling with infinite loop (cloned children with seamless scroll reset)
-- Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, or when the tab is hidden
+- Uses `requestAnimationFrame` + `IntersectionObserver` — pauses when off-screen, during drag/touch, while hovered or while focus is inside it, or when the tab is hidden
 - Respects `prefers-reduced-motion: reduce`
+- Optional pause/play toggle: a `<button data-image-slider-toggle aria-controls="{slider id}" hidden>` anywhere on the page. The slider unhides it only while auto-sliding and swaps its `aria-label` / `is-paused` class. Loop clones are `aria-hidden` and `inert`, so links in them aren't focusable
+- Optional arrows: `<button data-image-slider-action="prev|next" aria-controls="{slider id}" hidden>`. The slider unhides them only when it isn't auto-sliding (setting off, or reduced motion), scrolls one image per click and disables each arrow at its end
+- The loop clones the images on both sides of the originals and keeps the scroll position within the original set, so the area left of the first image (e.g. a carousel's start padding) shows the previous images rather than an empty gap
+- When the images fit inside the slider's padding box (checked on load and resize), it adds `is-static`: no auto-slide, drag, toggle or arrows, and the clones are hidden
 
 **CSS** (`src/UmbracoCommunity.StaticAssets/src/css/blocks/hero-image-slider-block.css`):
 - Text styling matches the Call to Action block (centred, same responsive font sizes)
-- Slider spans full viewport width via `width: 100vw; margin-left: calc(50% - 50vw)` breakout
+- The shared `dc-image-slider` rules (full-viewport breakout via `width: 100vw; margin-left: calc(50% - 50vw)`, image heights per breakpoint) live in `css/blocks/image-slider.css`
 - Uses design system variables from `root.css`
+
+### Image Carousel Block
+
+A standalone image slider for content blocks (`imageCarouselBlock`): the slider from the hero above, without its text. It's allowed in the ROOT content block grid and in the `eventsHome` Block Restrictions rule (Codegarden only).
+
+**Content** (`ImageCarouselBlock`, composes `IContentBlockIntro` for the usual `Title` / `Subtitle`, rendered above the slider): `Images` (required Block List, *Image carousel items* data type, minimum 5 so a looping carousel doesn't look sparse) of `ImageCarouselItem`s:
+- `Image` (required), `AltText` (falls back to the media item's name), `Title` (max 40), `Text` (max 255) and `Link` (max 1), all optional
+- The content-model partial (`Models/ContentModels/ImageCarouselBlock.cs`) adds `IdHash` and `Items` (items that have an image)
+
+**Settings** (`SettingsImageCarouselBlock`, composes `ISettingsBlockId` + `ISettingsColour`):
+- `AutoSlideImages` uses the *On Off Toggle (default on)* data type, so new blocks auto-slide until an editor switches it off
+
+**View** (`Views/Partials/Blocks/ImageCarouselBlock.cshtml`):
+- Reuses `<dc-image-slider>`; an item with a link renders as an `<a>` (image + caption), otherwise as a `<figure>` with a `<figcaption>`
+- Below the slider, right-aligned to the content width: the pause/play toggle when auto-slide is on (WCAG 2.2.2), otherwise previous/next arrows (the shared `.slider-arrow-btn` style from the Slider block)
+- A background colour turns the block into a full-width band; dark colours switch the captions and controls to white
+
+**CSS** (`css/blocks/image-carousel-block.css`):
+- The block keeps the normal content width. The slider still spans the viewport, but `padding-inline: calc(50vw - 50%)` puts the first image (and, at the end, the last one) on the content edge, so images scroll off the page from there
+- The background band reaches the viewport edges with `box-shadow: 0 0 0 100vmax` + `clip-path: inset(0 -100vmax)`, without moving the block out of the content width
+- An item's `Title` sits in a blue (`--color-blue`, the footer colour) band across the bottom of the image (`.dc-image-carousel__media`, two lines at most); its `Text` is a small muted caption underneath, kept to the image's width (`width: 0; min-width: 100%`) so it wraps under its image
+
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 
 ### YouTube Videos
 
@@ -460,6 +487,20 @@ A block that surfaces recent articles from the tenant's Blog page, with optional
 - Slider variant defines `--blog-showcase-slide-width` per breakpoint (1 / 2 / 3 cards + 20% peek at base / `--sm` / `--md`), with column-gap of `var(--unit)`
 - Card hover uses an internal image zoom (`__media img` → `scale(1.06)`) instead of card-level `transform: scale()`, so the slides-wrapper's `overflow: hidden` doesn't clip the rounded corners
 - `has-bg` / `bg-dark` rules mirror the slider block's pattern; backoffice preview rules in `wwwroot/css/styles.css` are kept in sync
+
+### Tile Grid Block
+
+A grid of tiles of different sizes (stats, text, images, a button), laid out by the editor. Allowed on `eventsHome` (Codegarden) only.
+
+**Content** (`TileGridBlock`): `Title` / `Subtitle` (`IContentBlockIntro`), `Tiles` (Block Grid "Tile grid tiles", 12 columns, only `TileGridItem`). Editors set each tile's width (3 / 4 / 6 / 8 / 12 columns) and height (1 or 2 rows) with Block Grid's own resizing.
+
+**Tile** (`TileGridItem` + `SettingsTileGridTile`): `TileContent` is a Block List ("Tile content items") of `EyebrowBlock` (small uppercase label), `StatBlock` (`Number`, `Label`, `LabelBesideNumber`), and the existing `TextBlock`, `ImageBlock`, `IconBlock` and `CallToActionLinkBlock`. `TileContent` is optional. Settings: `BackgroundColour` (`ISettingsColour`), `BackgroundImage` with `BackgroundImagePosition` (`fill` / `right` / `bottom-right`) and `BackgroundImageAltText`, and `ContentAlignment` (`top` / `bottom` / `spread`). The view compares those exact values, so renaming an item value in the backoffice needs a matching change in `TileGridItem.cshtml`.
+
+**Layout** (`css/blocks/tile-grid-block.css`): tiles get their spans as `--tile-columns` / `--tile-rows` style properties. Below `--sm` every tile is full width; at `--sm` tiles up to 6 columns are half width and wider ones full width (`--tile-columns-sm`, set in the view); from `--md` the real spans and row spans apply. `spread` uses `space-between`, so put a label first and a stat or footnote last (an Eyebrow block works as a footnote). A `fill` image under text gets a 55% black overlay and white text so the text stays readable. A tile with a background image and no content is an image-only tile: the image always fills it, with no overlay, and its `BackgroundImageAltText` setting becomes the image's alt text (empty = decorative). *Right half* and *Bottom right* images sit beside the text only from `--md` on tiles at least 6 columns wide (`dc-tile--wide-md`); otherwise they stack under it. A tile whose colour (white when it has none) is too close to the block's to tell apart (`ColourHelper.ContrastRatio` under 1.1) gets `dc-tile--outlined`, a faint blue border (white on dark colours); the block passes its colour to the tiles as `ViewData["TileGridBackground"]`. The nested tile preview in the block's edit dialog doesn't get that colour, so it shows no outline.
+
+**Content partials**: `StatBlock`, `EyebrowBlock` and `IconBlock` render from `Views/Partials/Blocks/`, which the tile and the BlockPreview `ViewLocations` fallback both use. The button is `Views/Partials/Components/CallToActionLink.cshtml` (model: link, text, colour), shared with the rich text editor's CTA. An Image block honours *Image is circular*.
+
+**Backoffice preview**: the block and tiles render through their front-end partials. Styles in `wwwroot/css/styles.css`.
 
 ### Video Showcase Block
 

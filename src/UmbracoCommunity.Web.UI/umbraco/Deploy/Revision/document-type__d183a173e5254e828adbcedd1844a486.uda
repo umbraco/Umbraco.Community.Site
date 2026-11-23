@@ -1,0 +1,52 @@
+{
+  "Name": "Tile grid block",
+  "Alias": "tileGridBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-thumbnails",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "de6d14b7-b486-47ae-9866-616020981145",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "ede610e7-fa10-4f69-80f1-25f3fe329aac",
+          "Alias": "tiles",
+          "DataType": "umb://data-type/cb0cfe85bc74485b94b7ce872825e582",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockGridModel",
+          "Mandatory": true,
+          "Name": "Tiles"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/d183a173e5254e828adbcedd1844a486",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/cb0cfe85bc74485b94b7ce872825e582",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/6b1cb8202c844d5dbe0065ae378df8a3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "18.2.0"
+}

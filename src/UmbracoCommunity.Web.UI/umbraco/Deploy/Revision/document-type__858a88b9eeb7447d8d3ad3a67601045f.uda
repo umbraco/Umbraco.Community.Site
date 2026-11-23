@@ -1,0 +1,57 @@
+{
+  "Name": "[Settings] Image carousel block",
+  "Alias": "settingsImageCarouselBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-pictures-alt-2",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+  "CompositionContentTypes": [
+    "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+    "umb://document-type/a7706b68c3a3411d9550557f83a5d97d"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "3a91c057-4ea6-4168-aa53-10224adb892b",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "7714284e-b962-4694-bbdf-199147cdb033",
+          "Alias": "autoSlideImages",
+          "DataType": "umb://data-type/efa3434a4f3849ae90a77b7c82a3a965",
+          "ValueType": "System.Boolean",
+          "Description": "Scrolls the images automatically. Visitors can pause it.",
+          "Name": "Auto-slide images",
+          "SortOrder": -1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/858a88b9eeb7447d8d3ad3a67601045f",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/efa3434a4f3849ae90a77b7c82a3a965",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/518dd8bc0fa245688f7a67c30ae1c6f9",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/1eeeb1ee22cb44f690cce5c8785fefb7",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a7706b68c3a3411d9550557f83a5d97d",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

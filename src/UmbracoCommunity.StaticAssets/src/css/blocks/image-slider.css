@@ -1,0 +1,55 @@
+@import "../base/media-queries.css";
+
+dc-image-slider {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--unit);
+    padding: 1.5rem 0;
+    cursor: grab;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+dc-image-slider::-webkit-scrollbar {
+    display: none;
+}
+
+dc-image-slider.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+dc-image-slider.is-static {
+    cursor: auto;
+}
+
+dc-image-slider.is-static > [inert] {
+    display: none;
+}
+
+dc-image-slider img {
+    flex-shrink: 0;
+    height: 15rem;
+    width: auto;
+    border-radius: var(--border-radius-xl);
+    object-fit: cover;
+    pointer-events: none;
+}
+
+@media (--sm) {
+    dc-image-slider {
+        gap: var(--unit-sm);
+    }
+
+    dc-image-slider img {
+        height: 16.25rem;
+    }
+}
+
+@media (--xl) {
+    dc-image-slider img {
+        height: 20rem;
+    }
+}

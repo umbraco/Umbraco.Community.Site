@@ -16,13 +16,16 @@
 @import "./spacing-block.css";
 @import "./headline-block.css";
 @import "./cards-block.css";
+@import "./tile-grid-block.css";
 @import "./blog-showcase-block.css";
 @import "./video-showcase-block.css";
 @import "./community-blogs-block.css";
 @import "./feed-submission-block.css";
 @import "./image-and-text-block.css";
 @import "./big-cta-block.css";
+@import "./image-slider.css";
 @import "./hero-image-slider-block.css";
+@import "./image-carousel-block.css";
 @import "./video-hero-block.css";
 @import "./carousel/carousels.css";
 @import "./sliders/sliders.css";

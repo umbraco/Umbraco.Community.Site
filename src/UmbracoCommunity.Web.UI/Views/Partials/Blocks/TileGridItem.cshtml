@@ -1,0 +1,103 @@
+@using System.Globalization
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TileGridItem, SettingsTileGridTile>>
+
+@{
+    const double MinimumContrast = 1.1;
+
+    var hasBg = Model.Settings.HasBg();
+    var image = Model.Settings?.BackgroundImage;
+    var hasContent = Model.Content.TileContent?.Any() == true;
+    var isImageOnly = image != null && !hasContent;
+    var imagePosition = isImageOnly || string.IsNullOrEmpty(Model.Settings?.BackgroundImagePosition) ? "fill" : Model.Settings.BackgroundImagePosition;
+    var alignment = string.IsNullOrEmpty(Model.Settings?.ContentAlignment) ? "top" : Model.Settings.ContentAlignment;
+    var isTextOverImage = image != null && hasContent && imagePosition == "fill";
+    var isDark = isTextOverImage || (hasBg && Model.Settings.IsDark());
+    var imageAlt = isImageOnly ? Model.Settings?.BackgroundImageAltText ?? string.Empty : string.Empty;
+
+    var tabletColumns = Model.ColumnSpan <= 6 ? 6 : 12;
+    var isWideOnDesktop = Model.ColumnSpan >= 6;
+
+    var tileColour = hasBg ? Model.Settings!.BackgroundColour!.Color : "#ffffff";
+    var blendsIn = !isTextOverImage && !isImageOnly &&
+        ColourHelper.ContrastRatio(tileColour, ViewData["TileGridBackground"] as string) < MinimumContrast;
+
+    var classes = new List<string> { "dc-tile", $"dc-tile--align-{alignment}" };
+    if (image != null) classes.Add($"dc-tile--image-{imagePosition}");
+    if (isTextOverImage) classes.Add("dc-tile--text-over-image");
+    if (isImageOnly) classes.Add("dc-tile--image-only");
+    if (isWideOnDesktop) classes.Add("dc-tile--wide-md");
+    if (blendsIn) classes.Add("dc-tile--outlined");
+    if (hasBg) classes.Add("has-bg");
+    if (isDark) classes.Add("bg-dark");
+
+    var style = $"--tile-columns: {Model.ColumnSpan}; --tile-columns-sm: {tabletColumns}; --tile-rows: {Model.RowSpan};";
+    if (hasBg) style += $" --tile-background-color: {Model.Settings!.BackgroundColour!.Color};";
+}
+
+@if (hasContent || image != null)
+{
+    <div class="@string.Join(" ", classes)" style="@style">
+        @if (image != null)
+        {
+            <img class="dc-tile__image"
+                 srcset="@image.GetCropUrl(width: 600) 600w, @image.GetCropUrl(width: 1200) 1200w, @image.GetCropUrl(width: 1800) 1800w"
+                 sizes="@ImageSizes(imagePosition, Model.ColumnSpan, tabletColumns, isWideOnDesktop)"
+                 src="@image.GetCropUrl(width: 1200)" alt="@imageAlt" loading="lazy" />
+        }
+        @if (hasContent)
+        {
+            <div class="dc-tile__content">
+                @foreach (var block in Model.Content.TileContent!)
+                {
+                    await RenderItem(block);
+                }
+            </div>
+        }
+    </div>
+}
+
+@functions {
+    // How wide the background image is drawn: the tile's share of the grid, halved beside the text, smaller in the corner.
+    static string ImageSizes(string position, int columns, int tabletColumns, bool wideOnDesktop)
+    {
+        double Share(double tileShare, bool wide) => position switch
+        {
+            "right" when wide => tileShare / 2,
+            "bottom-right" => tileShare * (wide ? 0.4 : 0.5),
+            _ => tileShare,
+        };
+
+        string Vw(double share) => Math.Ceiling(share * 100).ToString(CultureInfo.InvariantCulture) + "vw";
+
+        return $"(min-width: 1024px) {Vw(Share(columns / 12d, wideOnDesktop))}, (min-width: 768px) {Vw(Share(tabletColumns / 12d, false))}, {Vw(Share(1, false))}";
+    }
+
+    async Task RenderItem(BlockListItem block)
+    {
+        switch (block.Content)
+        {
+            case TextBlock text when !text.Text.IsEmptyHtmlString():
+                <div class="dc-tile__text">@Html.Raw(text.Text)</div>
+                break;
+
+            case ImageBlock imageBlock when imageBlock.Image != null:
+                var isCircle = (block.Settings as SettingsImageBlock)?.ImageIsCircular == true;
+                <img class="dc-tile__inline-image @(isCircle ? "is-circle" : null)"
+                     src="@imageBlock.Image.GetCropUrl("desktop")" alt="@imageBlock.AltText"
+                     width="@imageBlock.Image.GetCropSize("desktop")?.Width" height="@imageBlock.Image.GetCropSize("desktop")?.Height"
+                     loading="lazy" />
+                break;
+
+            case CallToActionLinkBlock cta when cta.CallToActionLink != null:
+                <div class="dc-tile__cta">
+                    <partial name="~/Views/Partials/Components/CallToActionLink.cshtml" model="@((cta.CallToActionLink, cta.CallToActionLinkText, (block.Settings as SettingsCallToActionLinkBlock)?.ButtonColour))" />
+                </div>
+                break;
+
+            case EyebrowBlock or StatBlock or IconBlock:
+                <partial name="@($"~/Views/Partials/Blocks/{block.Content.ContentType.Alias}.cshtml")" model="block" />
+                break;
+        }
+    }
+}
