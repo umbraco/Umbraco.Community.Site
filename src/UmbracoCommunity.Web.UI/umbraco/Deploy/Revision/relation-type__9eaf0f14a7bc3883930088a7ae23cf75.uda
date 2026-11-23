@@ -1,9 +1,0 @@
-{
-  "Name": "Related Element",
-  "Alias": "umbElement",
-  "IsDependency": true,
-  "Udi": "umb://relation-type/9eaf0f14a7bc3883930088a7ae23cf75",
-  "Dependencies": [],
-  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.RelationTypeArtifact",
-  "__version": "19.0.0-rc1"
-}

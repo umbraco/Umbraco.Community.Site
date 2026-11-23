@@ -2,7 +2,7 @@
   "Name": "Home",
   "Alias": "Home",
   "File": "umb://template-file/Home.cshtml",
-  "LayoutTemplate": "umb://template/f894a6c7db394547be53d62c3c411be1",
+  "Master": "umb://template/f894a6c7db394547be53d62c3c411be1",
   "Udi": "umb://template/b65faffaeb5340c2a4cf72764cdf160d",
   "Dependencies": [
     {
@@ -17,5 +17,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.TemplateArtifact",
-  "__version": "19.0.0-rc1"
+  "__version": "17.1.0"
 }
