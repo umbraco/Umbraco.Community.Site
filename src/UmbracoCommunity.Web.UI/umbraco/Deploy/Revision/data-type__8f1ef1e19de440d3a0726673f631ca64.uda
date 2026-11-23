@@ -1,13 +1,11 @@
 {
   "Name": "Label (decimal)",
-  "EditorAlias": "Umbraco.Label",
-  "EditorUiAlias": "Umb.PropertyEditorUi.Label",
+  "EditorAlias": "Umbraco.Label.Decimal",
+  "EditorUiAlias": "Umb.PropertyEditorUi.Label.Decimal",
   "DatabaseType": "Decimal",
-  "Configuration": {
-    "umbracoDataValueType": "DECIMAL"
-  },
+  "Configuration": {},
   "Udi": "umb://data-type/8f1ef1e19de440d3a0726673f631ca64",
   "Dependencies": [],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.0.2"
+  "__version": "19.0.0-rc1"
 }

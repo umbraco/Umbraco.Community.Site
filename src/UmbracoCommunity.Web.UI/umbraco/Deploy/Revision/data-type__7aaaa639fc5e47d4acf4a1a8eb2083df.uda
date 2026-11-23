@@ -1,7 +1,7 @@
 {
   "Name": "Image block media picker",
-  "EditorAlias": "Umbraco.MediaPicker3",
-  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker",
+  "EditorAlias": "Umbraco.MediaPicker.Single",
+  "EditorUiAlias": "Umb.PropertyEditorUi.MediaPicker.Single",
   "Configuration": {
     "crops": [
       {
@@ -27,5 +27,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

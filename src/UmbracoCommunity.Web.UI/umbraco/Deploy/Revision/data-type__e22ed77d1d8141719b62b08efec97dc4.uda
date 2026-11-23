@@ -3,8 +3,6 @@
   "EditorAlias": "Umbraco.MultiNodeTreePicker",
   "EditorUiAlias": "Umb.PropertyEditorUi.ContentPicker",
   "Configuration": {
-    "minNumber": 0,
-    "maxNumber": 0,
     "startNode": {
       "type": "content",
       "dynamicRoot": {
@@ -35,5 +33,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

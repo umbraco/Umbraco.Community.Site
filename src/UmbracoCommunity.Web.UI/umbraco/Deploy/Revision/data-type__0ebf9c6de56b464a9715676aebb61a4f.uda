@@ -3,8 +3,6 @@
   "EditorAlias": "Umbraco.MultiNodeTreePicker",
   "EditorUiAlias": "Umb.PropertyEditorUi.ContentPicker",
   "Configuration": {
-    "minNumber": 0,
-    "maxNumber": 1,
     "startNode": {
       "type": "content",
       "dynamicRoot": {
@@ -20,7 +18,10 @@
         ]
       }
     },
-    "filter": "ef7bed66-053d-407a-bc31-715e5464aa38"
+    "filter": "ef7bed66-053d-407a-bc31-715e5464aa38",
+    "validationLimit": {
+      "max": 1
+    }
   },
   "Parent": "umb://data-type-container/08ed7e586e6743d389520ca5c663e32b",
   "Udi": "umb://data-type/0ebf9c6de56b464a9715676aebb61a4f",
@@ -35,5 +36,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
-  "__version": "17.1.0"
+  "__version": "19.0.0-rc1"
 }

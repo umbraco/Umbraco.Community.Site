@@ -15,7 +15,9 @@
     ]
   },
   "Parent": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
-  "CompositionContentTypes": [],
+  "CompositionContentTypes": [
+    "umb://document-type/4d016f38e18a41a083395d2fc72f465f"
+  ],
   "PropertyGroups": [
     {
       "Key": "0d0c4436-1f43-4ac0-9272-f81eec5ca817",
@@ -23,15 +25,6 @@
       "Type": 1,
       "Alias": "site",
       "PropertyTypes": [
-        {
-          "Key": "1521e851-83a9-417b-b42d-f62221e8ccb4",
-          "Alias": "showEnrichedProfileSections",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "ValueType": "System.Boolean",
-          "Description": "Decides whether the extra profile sections show to everyone on this site. When off, only members in the Early access group see them, and only on their own profile.",
-          "Name": "Show enriched profile sections",
-          "SortOrder": 11
-        },
         {
           "Key": "17c407e6-51e5-4823-8b81-03544b0ee799",
           "Alias": "siteName",
@@ -42,15 +35,6 @@
           "Name": "Site name"
         },
         {
-          "Key": "1e15e8b6-f07f-40bb-9eae-d35b2fd70af1",
-          "Alias": "customRobotsTxt",
-          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
-          "ValueType": "System.String",
-          "Description": "Overrides the generated robots.txt for this site entirely when set. Leave blank to use the default generated rules.",
-          "Name": "Custom robots.txt",
-          "SortOrder": 12
-        },
-        {
           "Key": "5ea21ec8-eb5c-480a-9ec3-c7d03ff7016f",
           "Alias": "favicon",
           "DataType": "umb://data-type/60d201fc1ef04904a747fb89cce76cee",
@@ -58,15 +42,6 @@
           "Description": "Select a square image. A favicon is the tiny icon a website shows in your browser tab, bookmarks, and shortcuts; the site\u0027s miniature logo.",
           "Name": "Favicon",
           "SortOrder": 3
-        },
-        {
-          "Key": "88a7dae1-3cd2-421e-a66c-c97eb50f6e2d",
-          "Alias": "enableMemberSignIn",
-          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-          "ValueType": "System.Boolean",
-          "Description": "Show the GitHub sign-in button in the header and enable the account page for this site.",
-          "Name": "Enable member sign-in",
-          "SortOrder": 10
         },
         {
           "Key": "f710ee6a-4668-419b-8bce-ef82faf7888d",
@@ -106,14 +81,6 @@
       "Ordering": true
     },
     {
-      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
-      "Ordering": true
-    },
-    {
-      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
-      "Ordering": true
-    },
-    {
       "Udi": "umb://document-type-container/c37cfb177f794609b765bc8894f976be",
       "Ordering": true
     },
@@ -130,6 +97,10 @@
       "Mode": "Exist"
     },
     {
+      "Udi": "umb://document-type/4d016f38e18a41a083395d2fc72f465f",
+      "Ordering": true
+    },
+    {
       "Udi": "umb://document-type/5ad4e21a40e142e0befaceb33ef9290e",
       "Mode": "Exist"
     },
@@ -139,5 +110,5 @@
     }
   ],
   "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
-  "__version": "18.1.1"
+  "__version": "19.0.0-rc1"
 }

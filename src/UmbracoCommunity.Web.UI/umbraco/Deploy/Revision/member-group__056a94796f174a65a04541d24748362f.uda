@@ -1,0 +1,7 @@
+{
+  "Name": "DevRel",
+  "Udi": "umb://member-group/056a94796f174a65a04541d24748362f",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.MemberGroupArtifact",
+  "__version": "19.0.0-rc1"
+}
