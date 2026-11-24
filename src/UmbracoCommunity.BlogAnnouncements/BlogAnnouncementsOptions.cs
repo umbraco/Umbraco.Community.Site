@@ -73,11 +73,21 @@ public sealed class MonitoringOptions
     public int RepeatAfterHours { get; set; } = 6;
 
     /// <summary>
-    /// Discord webhook for alerts. Secret — set as
-    /// <c>CommunityBlogs:Announcements:Monitoring:Discord:WebhookUrl</c>. This must be an
-    /// operations channel, never the public channel the announcements themselves go to.
+    /// Slack delivery for alerts. Alerts go to Slack rather than the community's Discord: they are
+    /// for whoever is on the hook for the site, not for the people reading the announcements.
     /// </summary>
-    public DiscordAnnouncementOptions Discord { get; set; } = new();
+    public SlackAlertOptions Slack { get; set; } = new();
+}
+
+public sealed class SlackAlertOptions
+{
+    /// <summary>
+    /// Slack incoming-webhook URL. Secret — set as
+    /// <c>CommunityBlogs:Announcements:Monitoring:Slack:WebhookUrl</c> in appsettings.Local.json
+    /// or a Cloud secret, never the committed appsettings. Empty by default, which switches
+    /// alerting off even when <see cref="MonitoringOptions.Enabled"/> is on.
+    /// </summary>
+    public string WebhookUrl { get; set; } = string.Empty;
 }
 
 public sealed class DiscordAnnouncementOptions

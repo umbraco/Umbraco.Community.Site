@@ -7,50 +7,68 @@ using Microsoft.Extensions.Options;
 namespace UmbracoCommunity.BlogAnnouncements.Monitoring;
 
 /// <summary>
-/// Posts stale-pipeline alerts to a Discord webhook. Deliberately separate from
-/// <c>DiscordWebhookAnnouncer</c>: this one must point at an operations channel, and it must keep
-/// working when the announcement path does not — that is the whole point of it.
+/// Posts stale-pipeline alerts to a Slack incoming webhook. Separate from the announcement path on
+/// purpose: announcements go to the community's Discord, these go to an operations channel, and
+/// this one has to keep working when the announcement path does not.
 /// </summary>
-public sealed class DiscordHeartbeatAlerter : IHeartbeatAlerter
+public sealed class SlackHeartbeatAlerter : IHeartbeatAlerter
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    /// <summary>Discord embed colour (red), so the alert reads as a problem at a glance.</summary>
-    private const int AlertColour = 0xE5484D;
-
     private readonly HttpClient _http;
     private readonly IOptionsMonitor<BlogAnnouncementsOptions> _options;
-    private readonly ILogger<DiscordHeartbeatAlerter> _logger;
+    private readonly ILogger<SlackHeartbeatAlerter> _logger;
 
-    public DiscordHeartbeatAlerter(
+    public SlackHeartbeatAlerter(
         HeartbeatAlerterHttpClient typedClient,
         IOptionsMonitor<BlogAnnouncementsOptions> options,
-        ILogger<DiscordHeartbeatAlerter> logger)
+        ILogger<SlackHeartbeatAlerter> logger)
     {
         _http = typedClient.Client;
         _options = options;
         _logger = logger;
     }
 
-    public static object BuildBody(StaleRunAlert alert) => new
+    private const string Headline = "Blog announcements have stopped";
+
+    public static object BuildBody(StaleRunAlert alert)
     {
-        username = "Blog Announcements Monitor",
-        embeds = new[]
+        var age = FormatAge(alert.Age);
+
+        // Invariant: ':' is a culture-dependent time separator, so a server running a
+        // non-invariant culture would otherwise render this as "08.46".
+        var lastRun = alert.LastRunUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+
+        return new
         {
-            new
+            // Slack shows `text` in push notifications and the channel sidebar, not the blocks —
+            // without it the alert arrives as "This content can't be displayed".
+            text = $"{Headline} — no cycle for {age}",
+            blocks = new object[]
             {
-                title = "Blog announcements have stopped",
-                description =
-                    $"No announcement cycle has completed for {FormatAge(alert.Age)}. " +
-                    // Invariant: ':' is a culture-dependent time separator, so a server running a
-                    // non-invariant culture would otherwise render this as "08.46".
-                    $"The last one ran at {alert.LastRunUtc.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)} UTC.\n\n" +
-                    "The pipeline runs every 15 minutes. If Umbraco Automate's engine failed to " +
-                    "start, scheduled triggers stay paused until the site is restarted.",
-                color = AlertColour,
+                new
+                {
+                    type = "header",
+                    // A header block only accepts plain_text; mrkdwn is rejected as invalid_blocks.
+                    text = new { type = "plain_text", text = Headline },
+                },
+                new
+                {
+                    type = "section",
+                    text = new
+                    {
+                        // Slack's mrkdwn: *single asterisks* for bold, `backticks` for code.
+                        type = "mrkdwn",
+                        text =
+                            $"No announcement cycle has completed for *{age}*. " +
+                            $"The last one ran at `{lastRun}` UTC.\n\n" +
+                            "The pipeline runs every 15 minutes. If Umbraco Automate's engine " +
+                            "failed to start, scheduled triggers stay paused until the site is restarted.",
+                    },
+                },
             },
-        },
-    };
+        };
+    }
 
     /// <summary>
     /// Plain words rather than a duration literal — the alert is read by a person deciding whether
@@ -84,7 +102,7 @@ public sealed class DiscordHeartbeatAlerter : IHeartbeatAlerter
 
     public async Task<bool> AlertAsync(StaleRunAlert alert, CancellationToken cancellationToken)
     {
-        var webhookUrl = _options.CurrentValue.Monitoring.Discord.WebhookUrl;
+        var webhookUrl = _options.CurrentValue.Monitoring.Slack.WebhookUrl;
         if (string.IsNullOrWhiteSpace(webhookUrl))
         {
             _logger.LogWarning(
@@ -103,9 +121,10 @@ public sealed class DiscordHeartbeatAlerter : IHeartbeatAlerter
                 return true;
             }
 
+            // Slack puts the reason in the body (e.g. invalid_payload, no_service), not the status.
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogWarning(
-                "Monitoring webhook returned {Status} sending a stale-pipeline alert. Response: {Response}",
+                "Slack webhook returned {Status} sending a stale-pipeline alert: {Response}",
                 (int)response.StatusCode, body);
             return false;
         }

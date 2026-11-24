@@ -86,15 +86,15 @@ public sealed class RegisterBlogAnnouncements : IComposer
 
         // Stale-pipeline alerting. This runs on Umbraco's own recurring-job runner rather than as
         // an Automate automation on purpose: the failure it watches for is Automate's engine not
-        // starting, which leaves every scheduled trigger paused. Its webhook is a separate
-        // (operations) channel from the announcement one — see MonitoringOptions.
+        // starting, which leaves every scheduled trigger paused. Alerts go to Slack, not the
+        // community's Discord — they are for whoever is on the hook for the site.
         builder.Services.TryAddSingleton(TimeProvider.System);
         builder.Services.AddHttpClient<HeartbeatAlerterHttpClient>(client =>
         {
             client.Timeout = TimeSpan.FromSeconds(15);
             client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
         });
-        builder.Services.AddSingleton<IHeartbeatAlerter, DiscordHeartbeatAlerter>();
+        builder.Services.AddSingleton<IHeartbeatAlerter, SlackHeartbeatAlerter>();
 
         // Singleton: it remembers which outage it has already alerted about, so a continuing
         // outage is a reminder every few hours rather than a message every check.
