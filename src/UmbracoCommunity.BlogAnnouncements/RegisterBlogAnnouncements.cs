@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
@@ -13,6 +14,8 @@ using UmbracoCommunity.BlogAnnouncements.Dashboard;
 using UmbracoCommunity.BlogAnnouncements.Delivery;
 using UmbracoCommunity.BlogAnnouncements.Detection;
 using UmbracoCommunity.BlogAnnouncements.Infrastructure;
+using UmbracoCommunity.BlogAnnouncements.Monitoring;
+using Umbraco.Extensions;
 
 namespace UmbracoCommunity.BlogAnnouncements;
 
@@ -80,6 +83,23 @@ public sealed class RegisterBlogAnnouncements : IComposer
         // Dashboard query + manual-dispatch service. Singleton so its in-flight guard is shared
         // across requests; it opens a fresh DbContext per call via the factory.
         builder.Services.AddSingleton<BlogAnnouncementDashboardService>();
+
+        // Stale-pipeline alerting. This runs on Umbraco's own recurring-job runner rather than as
+        // an Automate automation on purpose: the failure it watches for is Automate's engine not
+        // starting, which leaves every scheduled trigger paused. Its webhook is a separate
+        // (operations) channel from the announcement one — see MonitoringOptions.
+        builder.Services.TryAddSingleton(TimeProvider.System);
+        builder.Services.AddHttpClient<HeartbeatAlerterHttpClient>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(15);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
+        });
+        builder.Services.AddSingleton<IHeartbeatAlerter, DiscordHeartbeatAlerter>();
+
+        // Singleton: it remembers which outage it has already alerted about, so a continuing
+        // outage is a reminder every few hours rather than a message every check.
+        builder.Services.AddSingleton<IAnnouncementHeartbeatMonitor, AnnouncementHeartbeatMonitor>();
+        builder.Services.AddRecurringBackgroundJob<BlogAnnouncementHeartbeatJob>();
 
         // OpenAPI document for the backoffice management API (mirrors NotFoundTracker /
         // BlockRestrictions on Umbraco 18). WithBackOfficeAuthentication() wires up the Umbraco

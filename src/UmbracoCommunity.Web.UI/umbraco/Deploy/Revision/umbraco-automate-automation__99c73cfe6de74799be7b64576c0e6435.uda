@@ -12,38 +12,16 @@
   },
   "Steps": [
     {
-      "Id": "d2e3b0f6-bf98-47e7-8768-8b6beceecbe9",
-      "ActionAlias": "umbracoCommunity.httpGet",
-      "Name": "HTTP GET",
-      "Alias": "httpGet",
-      "ConnectionId": null,
-      "Settings": {
-        "authorizationHeaderValue": "$CommunityBlogs:ApiKey",
-        "headers": "",
-        "url": "https://sphere.umbraco.com/api/v1/blog-posts?limit=20"
-      },
-      "InputMappings": {},
-      "Position": {
-        "X": 249.1830065359477,
-        "Y": 160.55555555555557
-      },
-      "ErrorBehavior": 2,
-      "RetryInterval": null,
-      "MaxRetries": null
-    },
-    {
       "Id": "93557ad5-cefe-476c-b3fa-73bdf7a8ba53",
       "ActionAlias": "umbracoCommunity.pollBlogPosts",
       "Name": "Poll Blog Posts",
       "Alias": "pollBlogPosts",
       "ConnectionId": null,
-      "Settings": {
-        "responseBody": "${ steps.httpGet.responseBody }"
-      },
+      "Settings": {},
       "InputMappings": {},
       "Position": {
         "X": 249.1830065359477,
-        "Y": 340.55555555555554
+        "Y": 160.55555555555557
       },
       "ErrorBehavior": 2,
       "RetryInterval": null,
@@ -63,7 +41,7 @@
       "InputMappings": {},
       "Position": {
         "X": 249.1830065359477,
-        "Y": 520.5555555555555
+        "Y": 340.55555555555554
       },
       "ErrorBehavior": 2,
       "RetryInterval": null,
@@ -73,14 +51,6 @@
   "Connections": [
     {
       "SourceStepId": "00000000-0000-0000-0000-000000000000",
-      "SourceHandle": null,
-      "TargetStepId": "d2e3b0f6-bf98-47e7-8768-8b6beceecbe9",
-      "TargetHandle": null,
-      "Outcome": null,
-      "Filter": null
-    },
-    {
-      "SourceStepId": "d2e3b0f6-bf98-47e7-8768-8b6beceecbe9",
       "SourceHandle": null,
       "TargetStepId": "93557ad5-cefe-476c-b3fa-73bdf7a8ba53",
       "TargetHandle": null,

@@ -43,6 +43,41 @@ public sealed class BlogAnnouncementsOptions
 
     /// <summary>Discord delivery configuration.</summary>
     public DiscordAnnouncementOptions Discord { get; set; } = new();
+
+    /// <summary>Stale-pipeline alerting. Off by default — see <see cref="MonitoringOptions"/>.</summary>
+    public MonitoringOptions Monitoring { get; set; } = new();
+}
+
+/// <summary>
+/// Watches for the pipeline going silent. The failure this exists for is an *absence*: when the
+/// Automate engine fails to start, no run records are written, no automation run fails, and
+/// nothing surfaces anywhere — the pipeline simply stops, as it did for five days in November 2026.
+/// </summary>
+public sealed class MonitoringOptions
+{
+    /// <summary>
+    /// Off by default so local and test environments stay quiet; switch on where a webhook is set.
+    /// </summary>
+    public bool Enabled { get; set; }
+
+    /// <summary>
+    /// How long without a completed cycle before the pipeline counts as stale. The pipeline runs
+    /// every 15 minutes, so this tolerates several missed ticks before crying wolf.
+    /// </summary>
+    public int StaleAfterMinutes { get; set; } = 90;
+
+    /// <summary>
+    /// How long to wait before repeating an alert for an outage that is still going, so a long
+    /// outage is a reminder every few hours rather than a message every check.
+    /// </summary>
+    public int RepeatAfterHours { get; set; } = 6;
+
+    /// <summary>
+    /// Discord webhook for alerts. Secret — set as
+    /// <c>CommunityBlogs:Announcements:Monitoring:Discord:WebhookUrl</c>. This must be an
+    /// operations channel, never the public channel the announcements themselves go to.
+    /// </summary>
+    public DiscordAnnouncementOptions Discord { get; set; } = new();
 }
 
 public sealed class DiscordAnnouncementOptions
