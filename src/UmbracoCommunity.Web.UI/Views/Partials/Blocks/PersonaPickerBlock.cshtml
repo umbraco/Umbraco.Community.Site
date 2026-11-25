@@ -131,8 +131,15 @@
                     <div class="dc-persona-picker__email-header">
                         <h4 class="dc-persona-picker__heading">@block.ResolvedEmailHeading</h4>
                         <div class="dc-persona-picker__actions">
-                            <button type="button" class="btn is-blue" data-persona-copy hidden>Copy email</button>
-                            <a class="btn" href="@persona.MailtoUrl">Open in your email app</a>
+                            <button type="button" class="btn is-blue dc-persona-picker__copy" data-persona-copy hidden>
+                                <svg class="dc-persona-picker__icon-copy" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                <svg class="dc-persona-picker__icon-done" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                <span data-persona-copy-label>Copy email</span>
+                            </button>
+                            <a class="btn" href="@persona.MailtoUrl">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                Open in your email app
+                            </a>
                         </div>
                     </div>
                     <div class="dc-persona-picker__email" data-persona-email>

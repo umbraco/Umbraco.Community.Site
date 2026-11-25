@@ -62,14 +62,17 @@ export class DcPersonaPickerElement extends HTMLElement {
 
         const copied = await copyToClipboard(emailText(persona));
         const status = persona.querySelector<HTMLElement>("[data-persona-status]");
-        const label = button.dataset.label ?? button.textContent ?? "";
+        const labelElement = button.querySelector<HTMLElement>("[data-persona-copy-label]") ?? button;
+        const label = button.dataset.label ?? labelElement.textContent?.trim() ?? "";
         button.dataset.label = label;
 
-        button.textContent = copied ? "Copied" : "Copy failed";
+        labelElement.textContent = copied ? "Copied" : "Copy failed";
+        button.classList.toggle("is-copied", copied);
         if (status) status.textContent = copied ? "Email copied to the clipboard" : "Couldn't copy the email. Select the text and copy it instead.";
 
         window.setTimeout(() => {
-            button.textContent = label;
+            labelElement.textContent = label;
+            button.classList.remove("is-copied");
             if (status) status.textContent = "";
         }, COPIED_RESET_MS);
     };

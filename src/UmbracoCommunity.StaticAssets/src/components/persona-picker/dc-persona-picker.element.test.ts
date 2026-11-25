@@ -8,7 +8,7 @@ vi.mock('../../util/clipboard.js', () => clipboard)
 const persona = (slug: string, name: string) => `
   <section data-persona="${slug}">
     <p>${name}</p>
-    <button type="button" data-persona-copy hidden>Copy email</button>
+    <button type="button" data-persona-copy hidden><svg data-icon></svg><span data-persona-copy-label>Copy email</span></button>
     <p data-persona-subject>Can I go to Codegarden?</p>
     <p data-persona-body>Hi [name],
 
@@ -96,13 +96,17 @@ describe('dc-persona-picker', () => {
     expect(button.hidden).toBe(false)
 
     button.click()
-    await vi.waitFor(() => expect(button.textContent).toBe('Copied'))
+    const label = button.querySelector('[data-persona-copy-label]')!
+    await vi.waitFor(() => expect(label.textContent).toBe('Copied'))
+    expect(button.classList.contains('is-copied')).toBe(true)
+    expect(button.querySelector('[data-icon]')).not.toBeNull()
 
     expect(clipboard.copyToClipboard).toHaveBeenCalledWith("Subject: Can I go to Codegarden?\n\nHi [name],\n\nI'm a Developer.")
     expect(container.querySelector('[data-persona-status]')!.textContent).toBe('Email copied to the clipboard')
 
     vi.advanceTimersByTime(3000)
-    expect(button.textContent).toBe('Copy email')
+    expect(label.textContent).toBe('Copy email')
+    expect(button.classList.contains('is-copied')).toBe(false)
   })
 
   it('leaves out the subject line when there is none', () => {

@@ -198,6 +198,19 @@
     .btn[hidden] {
         display: none;
     }
+
+    .btn svg {
+        flex-shrink: 0;
+    }
+}
+
+.dc-persona-picker__icon-done,
+.dc-persona-picker__copy.is-copied .dc-persona-picker__icon-copy {
+    display: none;
+}
+
+.dc-persona-picker__copy.is-copied .dc-persona-picker__icon-done {
+    display: block;
 }
 
 .dc-persona-picker__email {
