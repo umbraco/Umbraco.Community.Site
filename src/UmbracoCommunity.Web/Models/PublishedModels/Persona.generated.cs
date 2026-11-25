@@ -90,7 +90,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.Blocks.BlockListModel Reasons => this.Value<global::Umbraco.Cms.Core.Models.Blocks.BlockListModel>(_publishedValueFallback, "reasons");
 
 		///<summary>
-		/// Role group: The group this persona is listed under in the dropdown. Personas next to each other in the same group are grouped.
+		/// Role group: The heading this persona is listed under in the dropdown. Personas in the same group are listed together, in the order they first appear.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]

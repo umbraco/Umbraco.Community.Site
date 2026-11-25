@@ -5,8 +5,8 @@ import { emailText } from './dc-persona-picker.element'
 const clipboard = vi.hoisted(() => ({ copyToClipboard: vi.fn(async () => true) }))
 vi.mock('../../util/clipboard.js', () => clipboard)
 
-const persona = (slug: string, name: string) => `
-  <section data-persona="${slug}">
+const persona = (slug: string, name: string, hidden = false) => `
+  <section data-persona="${slug}"${hidden ? ' hidden' : ''}>
     <p>${name}</p>
     <button type="button" data-persona-copy hidden><svg data-icon></svg><span data-persona-copy-label>Copy email</span></button>
     <p data-persona-subject>Can I go to Codegarden?</p>
@@ -16,7 +16,7 @@ I'm a ${name}.</p>
     <p data-persona-status></p>
   </section>`
 
-const markup = (withPicker = true) => `
+const markup = (withPicker = true, serverHidden = false) => `
   <dc-persona-picker>
     ${withPicker ? `<div data-persona-field hidden>
       <select data-persona-select>
@@ -25,8 +25,8 @@ const markup = (withPicker = true) => `
       </select>
     </div>` : ''}
     ${persona('developer', 'Developer')}
-    ${persona('tech-lead', 'Tech lead')}
-    ${persona('first-timer', 'First-timer')}
+    ${persona('tech-lead', 'Tech lead', serverHidden)}
+    ${persona('first-timer', 'First-timer', serverHidden)}
   </dc-persona-picker>`
 
 function setUrl(path: string) {
@@ -82,6 +82,12 @@ describe('dc-persona-picker', () => {
     setUrl('/page?persona=astronaut')
     container.innerHTML = markup()
     expect(visible(container)).toEqual(['developer'])
+  })
+
+  it('shows a server-hidden persona from the url', () => {
+    setUrl('/page?persona=first-timer')
+    container.innerHTML = markup(true, true)
+    expect(visible(container)).toEqual(['first-timer'])
   })
 
   it('shows every persona when there is no picker', () => {

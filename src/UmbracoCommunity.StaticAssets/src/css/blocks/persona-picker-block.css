@@ -143,43 +143,66 @@
 }
 
 .dc-persona-picker__quote {
+    --quote-badge-size: 44px;
+
+    position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
-    gap: var(--unit-sm);
+    gap: var(--unit);
     margin: 0;
-    padding: var(--unit);
-    background-color: var(--persona-picker-inset-background);
-    border-radius: var(--radius-card);
+    padding: calc(var(--quote-badge-size) + var(--unit-xs)) var(--unit) var(--unit);
+    color: var(--color-blue);
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background-color: var(--persona-picker-inset-background);
+        border-radius: var(--radius-card);
+        mask: radial-gradient(circle at calc(var(--quote-badge-size) / 2) calc(var(--quote-badge-size) / 2), transparent calc(var(--quote-badge-size) / 2 + 6px), #000 calc(var(--quote-badge-size) / 2 + 7px));
+    }
 
     blockquote {
         margin: 0;
-        font-size: 1.125rem;
-        line-height: 1.5;
     }
 
     blockquote p {
         margin: 0;
-        quotes: "\201C" "\201D";
-
-        &::before {
-            content: open-quote;
-        }
-
-        &::after {
-            content: close-quote;
-        }
+        font-size: var(--font-size);
+        line-height: 1.5;
     }
 
     figcaption {
+        display: flex;
+        flex-direction: column;
         margin: auto 0 0;
-        font-size: var(--font-size-sm);
         font-style: normal;
-        color: var(--persona-picker-muted-color);
     }
+}
 
-    strong {
-        color: var(--persona-picker-text-color);
+.dc-persona-picker__quote-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--quote-badge-size);
+    height: var(--quote-badge-size);
+    fill: var(--color-blue);
+
+    circle {
+        fill: var(--color-pink);
     }
+}
+
+.dc-persona-picker__quote-name {
+    font-size: var(--font-size);
+    font-weight: var(--font-weight-bold);
+}
+
+.dc-persona-picker__quote-role {
+    font-size: var(--font-size-sm);
+    opacity: 0.7;
 }
 
 .dc-persona-picker__email-header {
@@ -262,10 +285,6 @@
     .dc-persona-picker__reasons,
     .dc-persona-picker__quotes {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .dc-persona-picker__quote {
-        padding: var(--unit-md);
     }
 }
 

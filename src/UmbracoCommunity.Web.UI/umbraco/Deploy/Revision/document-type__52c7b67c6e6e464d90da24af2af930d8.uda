@@ -50,7 +50,7 @@
           "Alias": "roleGroup",
           "DataType": "umb://data-type/5d39b6884b8244489966beba83a651c2",
           "ValueType": "System.String",
-          "Description": "The group this persona is listed under in the dropdown. Personas next to each other in the same group are grouped.",
+          "Description": "The heading this persona is listed under in the dropdown. Personas in the same group are listed together, in the order they first appear.",
           "Name": "Role group",
           "SortOrder": 1
         },

@@ -22,24 +22,12 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
         public string ResolvedTestimonialsHeading => Fallback(TestimonialsHeading, "In their words");
         public string ResolvedEmailHeading => Fallback(EmailHeading, "Your email to your boss");
 
-        public IEnumerable<(string? Heading, List<Persona> Personas)> RoleGroups()
-        {
-            var groups = new List<(string? Heading, List<Persona> Personas)>();
-            foreach (var persona in Items)
-            {
-                var heading = string.IsNullOrWhiteSpace(persona.RoleGroup) ? null : persona.RoleGroup.Trim();
-                if (groups.Count > 0 && groups[^1].Heading == heading)
-                {
-                    groups[^1].Personas.Add(persona);
-                }
-                else
-                {
-                    groups.Add((heading, [persona]));
-                }
-            }
+        public IReadOnlyList<(string? Heading, List<Persona> Personas)> RoleGroups() =>
+            Items.GroupBy(persona => string.IsNullOrWhiteSpace(persona.RoleGroup) ? null : persona.RoleGroup.Trim())
+                .Select(group => (group.Key, group.ToList()))
+                .ToList();
 
-            return groups;
-        }
+        public Persona? DefaultPersona => RoleGroups().FirstOrDefault().Personas?.FirstOrDefault();
 
         public IReadOnlyDictionary<Persona, string> Slugs()
         {
