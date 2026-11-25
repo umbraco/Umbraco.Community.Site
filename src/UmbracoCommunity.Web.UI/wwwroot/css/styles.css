@@ -943,6 +943,21 @@ ol.no-margin p {
     grid-template-columns: repeat(4, 1fr);
 }
 
+.plan-comparison__columns--count-1 {
+    grid-template-columns: minmax(0, 28rem);
+    justify-content: center;
+}
+
+.plan-comparison__columns--count-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 66%;
+    margin-inline: auto;
+}
+
+.plan-comparison__columns--count-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
 .plan-column {
     padding: 0 20px;
 }
