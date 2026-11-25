@@ -667,8 +667,18 @@
 }
 
 @media (--lg) {
+  .plan-comparison__columns--count-1 {
+    max-width: calc((100% - 3rem) / 4);
+  }
+
+  .plan-comparison__columns--count-2 {
+    max-width: calc((100% - 3rem) / 2 + 1rem);
+  }
+
   .plan-comparison__columns--count-3 {
     grid-template-columns: repeat(3, 1fr);
+    max-width: calc((100% - 3rem) / 4 * 3 + 2rem);
+    margin-inline: auto;
   }
 }
 
