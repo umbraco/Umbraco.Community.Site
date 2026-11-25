@@ -1,0 +1,57 @@
+{
+  "Name": "Title and text item",
+  "Alias": "titleAndTextItem",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-document",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/0cd8e3b6edf8493baf3c38f9834528a6",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "df8495f5-a1bc-4be6-956f-e80497af2d42",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "11295fd7-c3c6-4066-b6b4-dba89c8aa251",
+          "Alias": "text",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Name": "Text",
+          "SortOrder": 1
+        },
+        {
+          "Key": "565b1267-e8d9-43a7-ae61-8eee2b4e9cac",
+          "Alias": "title",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Mandatory": true,
+          "Name": "Title"
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/a65a701cbf6c422bbef0cc99dbed5807",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/0cd8e3b6edf8493baf3c38f9834528a6",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

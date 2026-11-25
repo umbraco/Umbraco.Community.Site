@@ -406,6 +406,24 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 
 **Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 
+### Persona Picker Block
+
+A generic block (`personaPickerBlock`) where visitors pick who they are from a dropdown and get content written for them: a pitch, reasons, testimonials and an email to send. Built for Codegarden's *Convince your boss* page, so it's only in the `eventsHome` Block Restrictions rule for now.
+
+**Content** (`PersonaPickerBlock`, composes `IContentBlockIntro`): `Personas` (required Block List, *Personas*), plus optional `SelectLabel`, `ReasonsHeading`, `TestimonialsHeading`, `EmailHeading` (each falls back to the Convince your boss wording via the `Resolved…` helpers in `Models/ContentModels/PersonaPickerBlock.cs`) and `Footnote`. Settings (`SettingsPersonaPickerBlock`): `ISettingsBlockId` + `ISettingsColour`.
+
+**Persona** (`Persona`): `PersonaName`, `RoleGroup` (optional, *Dropdown - persona groups*: a fixed list, *My role* / *My Codegarden experience*, so editors can't invent new groups; consecutive personas in the same group share an `<optgroup>` whose label is the item's value, so renaming an item in the data type leaves existing personas on the old text until they're re-picked), `Pitch`, `Reasons` (generic *Title and text items (max 4)* Block List of `TitleAndTextItem`, sized for the 2×2 grid), `Testimonials` (*Testimonial picker*), `EmailSubject`, `EmailBody` (plain text, one full email per persona so editors can change each one).
+
+**Testimonials live in the Umbraco 19 Library**: `Testimonial` is an element type with *Allow in Library* on (`Quote`, `PersonName`, `JobTitle`, `Company`), and personas pick them with the Element Picker data type *Testimonial picker* (`IEnumerable<IPublishedElement>`, filtered with `OfType<Testimonial>()`). One quote can serve several personas. Keep them in the Library's *Testimonials* folder; the Library is shared by all sites. Getting the quoted person's permission is the events team's process; the code shows every picked testimonial.
+
+**View** (`Views/Partials/Blocks/PersonaPickerBlock.cshtml`): server-renders every persona as a `<section data-persona="{slug}">` (slugs from `PersonaName`, de-duplicated). The dropdown (`data-persona-field`) is only rendered with more than one persona and starts `hidden`; without JavaScript every persona shows one after another. Empty reasons/testimonials/email sections are left out. The email has *Copy email* (hidden until JS) and an *Open in your email app* `mailto:` link (CRLF line breaks, encoded server-side).
+
+**Behaviour** (`components/persona-picker/dc-persona-picker.element.ts`): unhides the dropdown, shows one persona at a time and keeps the choice in `?persona=` with `history.replaceState`, so a link opens on that persona (unknown values fall back to the first). Copy uses `util/clipboard.ts` and announces the result in a `role="status"` region.
+
+**CSS** (`css/blocks/persona-picker-block.css`): white cards on the page surface; reasons and quotes are one column below `--sm`, two from `--sm`. It resets the global italic `figcaption` style for the quote attribution.
+
+**Backoffice preview**: the block shows the title, the dropdown label and a card per persona with reason/testimonial counts (`Views/BlockPreviewApi/BlockGrid/PersonaPickerBlock.cshtml`); `Persona` and `TitleAndTextItem` list items have their own previews in `Views/BlockPreviewApi/BlockList/`. Styles in `wwwroot/css/styles.css`.
+
 ### YouTube Videos
 
 All YouTube input goes through the **YouTube video picker** data type (schema `UmbracoCommunity.YouTubeVideo`, UI `UmbracoCommunity.PropertyEditorUi.YouTubeVideo`). The **Video** block (`youTubeVideoBlock` + `settingsYouTubeVideoBlock`) uses it, and new video-based blocks should too.

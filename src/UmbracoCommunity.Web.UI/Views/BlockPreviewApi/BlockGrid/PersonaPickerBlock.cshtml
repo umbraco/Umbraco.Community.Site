@@ -1,0 +1,40 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<PersonaPickerBlock, SettingsPersonaPickerBlock>>
+
+@{
+    var personas = Model.Content.Items;
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+}
+
+<div class="dc-persona-picker-preview @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@(hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null)">
+    @if (!string.IsNullOrEmpty(Model.Content.Title))
+    {
+        <h2 class="block-title">@Model.Content.Title</h2>
+    }
+    @if (!Model.Content.Subtitle.IsEmptyHtmlString())
+    {
+        <div class="block-subtitle">@Html.Raw(Model.Content.Subtitle?.ToHtmlString())</div>
+    }
+
+    @if (personas.Any())
+    {
+        <p class="dc-persona-picker-preview__label">@Model.Content.ResolvedSelectLabel …</p>
+        <ul class="dc-persona-picker-preview__personas">
+            @foreach (var persona in personas)
+            {
+                var reasons = persona.ReasonItems.Count();
+                var testimonials = persona.TestimonialItems.Count();
+                var hasEmail = !string.IsNullOrWhiteSpace(persona.NormalisedEmailBody);
+
+                <li>
+                    <strong>@persona.PersonaName</strong>
+                    <span>@reasons @(reasons == 1 ? "reason" : "reasons") · @testimonials @(testimonials == 1 ? "testimonial" : "testimonials")@(hasEmail ? null : " · no email")</span>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="dc-persona-picker-preview__empty">Persona picker: add some personas</p>
+    }
+</div>

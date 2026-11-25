@@ -1,0 +1,150 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<PersonaPickerBlock, SettingsPersonaPickerBlock>>
+
+@{
+    var block = Model.Content;
+    var personas = block.Items;
+    var slugs = block.Slugs();
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    var blockId = string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId;
+    var selectId = $"{block.IdHash}-persona";
+}
+
+@if (personas.Any())
+{
+    <dc-persona-picker class="dc-persona-picker @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" data-persona-picker="@block.IdHash" id="@blockId">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                [data-persona-picker="@block.IdHash"] {
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                }
+            </style>
+        }
+
+        @if (!string.IsNullOrEmpty(block.Title))
+        {
+            <h2 class="block-title">@block.Title</h2>
+        }
+        @if (!block.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(block.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        @if (personas.Count > 1)
+        {
+            <div class="dc-persona-picker__picker" data-persona-field hidden>
+                <label for="@selectId">@block.ResolvedSelectLabel</label>
+                <select id="@selectId" data-persona-select aria-controls="@string.Join(" ", personas.Select(p => $"{block.IdHash}-{slugs[p]}"))">
+                    @foreach (var group in block.RoleGroups())
+                    {
+                        if (group.Heading != null)
+                        {
+                            <optgroup label="@group.Heading">
+                                @foreach (var persona in group.Personas)
+                                {
+                                    <option value="@slugs[persona]">@persona.PersonaName</option>
+                                }
+                            </optgroup>
+                        }
+                        else
+                        {
+                            foreach (var persona in group.Personas)
+                            {
+                                <option value="@slugs[persona]">@persona.PersonaName</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        }
+
+        @foreach (var persona in personas)
+        {
+            RenderPersona(block, persona, slugs[persona]);
+        }
+
+        @if (!string.IsNullOrWhiteSpace(block.Footnote))
+        {
+            <p class="dc-persona-picker__footnote">@block.Footnote</p>
+        }
+    </dc-persona-picker>
+}
+
+@functions {
+    void RenderPersona(PersonaPickerBlock block, Persona persona, string slug)
+    {
+        var id = $"{block.IdHash}-{slug}";
+        var reasons = persona.ReasonItems.ToList();
+        var testimonials = persona.TestimonialItems.ToList();
+
+        <section class="dc-persona-picker__persona" id="@id" data-persona="@slug" aria-labelledby="@id-name">
+            <div class="dc-persona-picker__intro">
+                <p class="dc-persona-picker__name" id="@id-name">@persona.PersonaName</p>
+                <h3 class="dc-persona-picker__pitch">@persona.Pitch</h3>
+            </div>
+
+            @if (reasons.Any())
+            {
+                <div class="dc-persona-picker__section">
+                    <h4 class="dc-persona-picker__heading">@block.ResolvedReasonsHeading</h4>
+                    <ul class="dc-persona-picker__reasons">
+                        @foreach (var reason in reasons)
+                        {
+                            <li class="dc-persona-picker__reason">
+                                <p class="dc-persona-picker__reason-title">@reason.Title</p>
+                                @if (!string.IsNullOrWhiteSpace(reason.Text))
+                                {
+                                    <p class="dc-persona-picker__reason-text">@reason.Text</p>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (testimonials.Any())
+            {
+                <div class="dc-persona-picker__section">
+                    <h4 class="dc-persona-picker__heading">@block.ResolvedTestimonialsHeading</h4>
+                    <div class="dc-persona-picker__quotes">
+                        @foreach (var testimonial in testimonials)
+                        {
+                            <figure class="dc-persona-picker__quote">
+                                <blockquote>
+                                    <p>@testimonial.Quote</p>
+                                </blockquote>
+                                <figcaption>
+                                    <strong>@testimonial.PersonName</strong>@(string.IsNullOrEmpty(testimonial.Attribution) ? null : $", {testimonial.Attribution}")
+                                </figcaption>
+                            </figure>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(persona.NormalisedEmailBody))
+            {
+                <div class="dc-persona-picker__section">
+                    <div class="dc-persona-picker__email-header">
+                        <h4 class="dc-persona-picker__heading">@block.ResolvedEmailHeading</h4>
+                        <div class="dc-persona-picker__actions">
+                            <button type="button" class="btn is-blue" data-persona-copy hidden>Copy email</button>
+                            <a class="btn" href="@persona.MailtoUrl">Open in your email app</a>
+                        </div>
+                    </div>
+                    <div class="dc-persona-picker__email" data-persona-email>
+                        @if (!string.IsNullOrWhiteSpace(persona.EmailSubject))
+                        {
+                            <p class="dc-persona-picker__subject"><span>Subject:</span> <span data-persona-subject>@persona.EmailSubject</span></p>
+                        }
+                        <p class="dc-persona-picker__body" data-persona-body>@persona.NormalisedEmailBody</p>
+                    </div>
+                    <p class="sr-only" role="status" data-persona-status></p>
+                </div>
+            }
+        </section>
+    }
+}

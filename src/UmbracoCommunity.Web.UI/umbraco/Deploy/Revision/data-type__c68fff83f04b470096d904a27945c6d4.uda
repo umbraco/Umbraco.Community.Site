@@ -1,0 +1,31 @@
+{
+  "Name": "Personas",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "52c7b67c-6e6e-464d-90da-24af2af930d8",
+        "label": "${ personaName }",
+        "editorSize": "large"
+      }
+    ],
+    "validationLimit": {
+      "min": 1
+    },
+    "createLabel": "Add persona"
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/c68fff83f04b470096d904a27945c6d4",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/52c7b67c6e6e464d90da24af2af930d8"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

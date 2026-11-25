@@ -1,0 +1,129 @@
+{
+  "Name": "Persona",
+  "Alias": "persona",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-user",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/45ffb4c48e1a479c84c2497a7e71670b",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "307b9be5-6bce-4a6e-bd07-af3ed69d9b13",
+      "Name": "Content",
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "28faa6c9-c060-4248-a1de-c0cdc80491a3",
+          "Alias": "reasons",
+          "DataType": "umb://data-type/63c26c7e344349809d4e7e153ea9f6a3",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
+          "Description": "What they bring back: up to 4, each a short title and a sentence",
+          "Name": "Reasons",
+          "SortOrder": 3
+        },
+        {
+          "Key": "994bd926-1523-4bf2-9eac-948567dc8b92",
+          "Alias": "testimonials",
+          "DataType": "umb://data-type/a260949187e243ae8c6a3e7919cd12ad",
+          "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.PublishedContent.IPublishedElement\u003E",
+          "Description": "Pick testimonials from the Library",
+          "Name": "Testimonials",
+          "SortOrder": 4
+        },
+        {
+          "Key": "9d81f3a3-7a06-4fac-a457-f46f353e7b14",
+          "Alias": "pitch",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Description": "One or two sentences, shown as the heading for this persona",
+          "Mandatory": true,
+          "Name": "Pitch",
+          "SortOrder": 2
+        },
+        {
+          "Key": "a1b2786a-16fb-454c-a855-b6629e237f9b",
+          "Alias": "roleGroup",
+          "DataType": "umb://data-type/5d39b6884b8244489966beba83a651c2",
+          "ValueType": "System.String",
+          "Description": "The group this persona is listed under in the dropdown. Personas next to each other in the same group are grouped.",
+          "Name": "Role group",
+          "SortOrder": 1
+        },
+        {
+          "Key": "a8921518-8f7e-4d46-8fe7-872e5742c762",
+          "Alias": "personaName",
+          "DataType": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+          "ValueType": "System.String",
+          "Description": "Shown in the dropdown and above the pitch, e.g. Developer",
+          "Mandatory": true,
+          "Name": "Name"
+        }
+      ]
+    },
+    {
+      "Key": "6000635b-a529-4162-b359-be18db1fd5c3",
+      "Name": "Email",
+      "SortOrder": 1,
+      "Alias": "email",
+      "PropertyTypes": [
+        {
+          "Key": "1763c2fb-dd09-4186-aacb-43c144b02f9d",
+          "Alias": "emailSubject",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Mandatory": true,
+          "Name": "Email subject"
+        },
+        {
+          "Key": "b0c322af-9519-4a8d-a07f-10b6449faa8f",
+          "Alias": "emailBody",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Description": "Plain text. Use [square brackets] for the parts visitors fill in themselves.",
+          "Mandatory": true,
+          "Name": "Email body",
+          "SortOrder": 1
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/52c7b67c6e6e464d90da24af2af930d8",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0beb12db7c11428e8abf060706a0a509",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/5d39b6884b8244489966beba83a651c2",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/63c26c7e344349809d4e7e153ea9f6a3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/a260949187e243ae8c6a3e7919cd12ad",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/45ffb4c48e1a479c84c2497a7e71670b",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}
