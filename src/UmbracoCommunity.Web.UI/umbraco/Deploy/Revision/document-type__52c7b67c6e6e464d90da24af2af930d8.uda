@@ -31,7 +31,7 @@
           "Alias": "testimonials",
           "DataType": "umb://data-type/a260949187e243ae8c6a3e7919cd12ad",
           "ValueType": "System.Collections.Generic.IEnumerable\u003CUmbraco.Cms.Core.Models.PublishedContent.IPublishedElement\u003E",
-          "Description": "Pick testimonials from the Library",
+          "Description": "Pick up to 4 testimonials from the Library",
           "Name": "Testimonials",
           "SortOrder": 4
         },

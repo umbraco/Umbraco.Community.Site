@@ -98,7 +98,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual string RoleGroup => this.Value<string>(_publishedValueFallback, "roleGroup");
 
 		///<summary>
-		/// Testimonials: Pick testimonials from the Library
+		/// Testimonials: Pick up to 4 testimonials from the Library
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
