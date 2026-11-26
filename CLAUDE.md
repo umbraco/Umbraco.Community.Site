@@ -338,6 +338,14 @@ The *Settings - intro layout* composition (`settingsIntroLayout`, toggle `introB
 - The title's cap height lines up with the first line of the content: both are trimmed with `text-box: trim-start cap alphabetic`, and the first FAQ item and the form lose their top padding. Firefox ignores `text-box`, so it's a few px off there.
 - The toggle has no effect on Image blocks yet.
 
+### Side-by-side Block Rows
+
+`ParseBlockGrid` groups consecutive content blocks into one `BlockGridRow` until their column spans add up to 12, and multi-block rows render with `Views/Partials/BlockRows/{row.Alias}.cshtml` (`ImageTextRow`, `TextRow`, `ImageRow`, `FormTextRow`, `AccordionImageRow`).
+
+- Text, Image, Image with overlay, Form and Accordion blocks can be 4, 6, 8 or 12 columns wide in the ROOT and General content block grids (#287), so editors can pair them as 6 + 6, 4 + 8 or 8 + 4.
+- Each row child gets `style="--row-span: {ColumnSpan}"`. From `--md` the row CSS (`image-and-text-block.css`, `faqs-and-image-block.css`) uses it as the flex-grow, so the widths follow the spans. Below `--md` the blocks stack as before.
+- A block that isn't paired, for example a lone 8-column block followed by a 12, still renders full width.
+
 ### Stepped Forms
 
 The form block supports an optional multi-step mode via the `EnableSteppedForm` toggle on `SettingsFormBlock`. When enabled, `FormBlock.cshtml` wraps the form in a `<dc-form-steps>` web component (`src/UmbracoCommunity.StaticAssets/src/components/form/form-steps.element.ts`) that:

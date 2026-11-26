@@ -35,14 +35,14 @@
                     var imageBlock = block.Content as ImageBlock;
                     if (imageBlock != null)
                     {
-                        RenderImageBlock(imageBlock);
+                        RenderImageBlock(imageBlock, block.ColumnSpan);
                     }
                     break;
                 case AccordionBlock.ModelTypeAlias:
                     var accordion = block.Content as AccordionBlock;
                     if (accordion != null)
                     {
-                        RenderAccordionBlock(accordion);
+                        RenderAccordionBlock(accordion, block.ColumnSpan);
                     }
                     break;
             }
@@ -51,7 +51,7 @@
 </div>
 
 @functions {
-    void RenderImageBlock(ImageBlock? block)
+    void RenderImageBlock(ImageBlock? block, int columnSpan)
     {
         @if (block?.Image != null)
         {
@@ -59,7 +59,7 @@
             var largeImage = block.Image.GetCropUrl(width: 750, height: 750);
             bool hasCaption = !string.IsNullOrWhiteSpace(block.ImageCaption);
 
-            <div class="dc-faqs-and-image-block__image-container">
+            <div class="dc-faqs-and-image-block__image-container" style="--row-span: @columnSpan">
                 @if (hasCaption)
                 {
                     <figure>
@@ -81,11 +81,11 @@
         }
     }
 
-    void RenderAccordionBlock(AccordionBlock? block)
+    void RenderAccordionBlock(AccordionBlock? block, int columnSpan)
     {
         @if (block != null && block.AccordionItems != null && block.AccordionItems.Any())
         {
-            <div class="dc-faqs-and-image-block__content-container">
+            <div class="dc-faqs-and-image-block__content-container" style="--row-span: @columnSpan">
                 <dl class="dc-faqs">
                     @{
                         var index = 0;

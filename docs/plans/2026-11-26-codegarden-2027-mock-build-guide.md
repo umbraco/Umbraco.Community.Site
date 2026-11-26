@@ -13,7 +13,7 @@ To set a block's background colour, anchor (*Block ID*) or *Title beside content
 
 The rich text editor's **Richtext styles** menu has the styles these pages use: *Lead paragraph*, *Callout* (a white rounded box), *Check-mark list*, *Numbered steps* (numbers in small circles, aligned with the text above) and *Pill links*. Its **Insert block** button also offers an inline **Icon**; as the first thing in a *Callout* it sits in a pink circle on the left.
 
-When two half-width blocks sit next to each other (for example an Image and a Text block, each resized to 6 of 12 columns), they render side by side as one row.
+When blocks that add up to 12 columns sit next to each other, they render side by side as one row. For example, an Image and a Text block can be resized to 6 + 6 (half and half), or 4 + 8 (a third and two thirds).
 
 ## What's different from the mocks, on every page
 
@@ -33,7 +33,7 @@ When two half-width blocks sit next to each other (for example an Image and a Te
 | 2 | **Tile grid** | Two tiles. Left tile (8 columns): Text with the *Lead paragraph* style plus a normal paragraph. Right tile (4 columns, pink background): Icon, Eyebrow *A little tip*, and Text with the heading *Book sooner rather than later* and a short paragraph. |
 | 3 | **Cards**: *Our partner hotels* | Settings: beige background, Block ID `partner-hotels`. Three 4-column cards, each with an Image (*Arch top* on) and a Text block. The Text block holds the name, address, description, a *Your stay includes* list in the *Check-mark list* style, and a booking button. |
 | 4 | **Text** (12 columns) | The "Good to know" bar: one paragraph in the *Callout* style that starts with an inline **Icon** (the info icon), then the bold label and the note about double beds. |
-| 5 | **Image + Text** (side by side, 6 + 6 columns) | The CABINN option. Image with *Arch top* on; Text with a heading, a *Lead paragraph*, a *Check-mark list*, a *How to book* list in the *Numbered steps* style, small print and a button. |
+| 5 | **Image + Text** (side by side, 4 + 8 columns) | The CABINN option. Image with *Arch top* on; Text with a heading, a *Lead paragraph*, a *Check-mark list*, a *How to book* list in the *Numbered steps* style, small print and a button. |
 | 6 | **Tile grid**: *A few things to know before booking* | Left tile (8 columns, beige): Text with a heading and the list of conditions. Right tile (4 columns, navy, alignment *spread*): Eyebrow *Booking deadline*, Stat *20 April* with the label *2027, subject to confirmation*, and a short Text. |
 | 7 | **Call to action** | Settings: pink background. *Questions about your stay?*, a subtitle with the events team's sign-off, and a `mailto:` button. |
 

@@ -176,8 +176,7 @@
 
   .dc-faqs-and-image-block__image-container,
   .dc-faqs-and-image-block__content-container {
-    flex: 1;
-    width: 50%;
+    flex: var(--row-span, 1) 1 0;
   }
 
   .dc-faqs-and-image-block__image-container img {

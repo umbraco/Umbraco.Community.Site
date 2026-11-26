@@ -22,7 +22,7 @@
             if (typedBlock?.Image != null) {
                 bool hasCaption = !string.IsNullOrWhiteSpace(typedBlock.ImageCaption);
                 var archClass = (block.Settings as SettingsImageBlock)?.ImageHasArchTop == true ? "is-arch" : null;
-                <div class="dc-image-and-text-block__image-container">
+                <div class="dc-image-and-text-block__image-container" style="--row-span: @block.ColumnSpan">
                     @if (hasCaption)
                     {
                         <figure>
@@ -48,7 +48,7 @@
         if (block.Content.ContentType.Alias == TextBlock.ModelTypeAlias)
         {
             var typedBlock = block.Content as TextBlock;
-            <div class="dc-image-and-text-block__content-container">
+            <div class="dc-image-and-text-block__content-container" style="--row-span: @block.ColumnSpan">
                 <div class="dc-image-and-text-block__content">
                     @Html.Raw(typedBlock?.Text?.ToHtmlString())
                 </div>
