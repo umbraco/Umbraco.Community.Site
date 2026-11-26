@@ -6,14 +6,14 @@
 @import "../base/media-queries.css";
 
 .dc-block-list {
-  gap: var(--unit-md);
+  --block-list-gap: var(--unit-md);
 
   &:not(:first-child) {
     margin-top: var(--unit-xs);
   }
 
   @media (--md) {
-    gap: var(--unit-xl);
+    --block-list-gap: var(--unit-xl);
 
     &:not(:first-child) {
       margin-top: var(--unit-md);

@@ -59,7 +59,7 @@ public static class HtmlHelperExtensions
         if (string.IsNullOrWhiteSpace(htmlString)) return true;
 
         string strippedInput = System.Text.RegularExpressions.Regex.Replace(htmlString, "<.*?>", string.Empty);
-        return string.IsNullOrWhiteSpace(strippedInput);
+        return string.IsNullOrWhiteSpace(HttpUtility.HtmlDecode(strippedInput));
     }
 
     public static IHtmlEncodedString ReplaceLineBreaks(string text)
