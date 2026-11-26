@@ -162,12 +162,13 @@ internal sealed class SearchService : ISearchService
             }));
         }
 
-        // Community blog posts are global and marked external — except posts on a host in
-        // CommunityBlogs:ExcludedListingHosts (the aggregator also picks up the site's own blog
-        // RSS). Those articles are already in the published content index as content hits above, so they're
-        // dropped here to avoid duplicates. Filtered in memory before the combined set is counted/paged, so
-        // totals stay accurate. A missing index is not an error — it just contributes nothing.
-        if (_examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))
+        // Community blog posts are external and only searched on the Community site (root `Home`), not
+        // Codegarden. Posts on a host in CommunityBlogs:ExcludedListingHosts (the aggregator also picks up
+        // the site's own blog RSS) are already content hits above, so they're dropped to avoid duplicates.
+        // Filtered in memory before the combined set is counted/paged, so totals stay accurate. A missing
+        // index is not an error — it just contributes nothing.
+        if (currentPage.Root() is Home
+            && _examineManager.TryGetIndex(CommunityBlogsSearchIndexer.IndexName, out var communityIndex))
         {
             try
             {
