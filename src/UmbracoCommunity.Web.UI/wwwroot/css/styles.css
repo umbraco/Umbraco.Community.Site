@@ -1339,6 +1339,14 @@ dc-image-slider img {
     overflow: hidden;
 }
 
+.dc-image-carousel-preview--spacing-medium .dc-image-carousel-preview__items {
+    gap: 18px;
+}
+
+.dc-image-carousel-preview--spacing-large .dc-image-carousel-preview__items {
+    gap: 36px;
+}
+
 .dc-image-carousel-preview__item {
     flex-shrink: 0;
 }

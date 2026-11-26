@@ -57,6 +57,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual bool AutoSlideImages => this.Value<bool>(_publishedValueFallback, "autoSlideImages");
 
 		///<summary>
+		/// Image spacing: Space between the images. Small is used when nothing is picked.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("imageSpacing")]
+		public virtual string ImageSpacing => this.Value<string>(_publishedValueFallback, "imageSpacing");
+
+		///<summary>
 		/// Block id: A unique id for this block in order to link directly to it. Max 25 chars. No spaces or special characters.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

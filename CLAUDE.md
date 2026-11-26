@@ -411,6 +411,7 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 
 **Settings** (`SettingsImageCarouselBlock`, composes `ISettingsBlockId` + `ISettingsColour`):
 - `AutoSlideImages` uses the *On Off Toggle (default on)* data type, so new blocks auto-slide until an editor switches it off
+- `ImageSpacing` (*Radio button list - small, medium or large*): `small` (or nothing picked) keeps the slider's normal gap, `medium` is about a tenth of an image's width and `large` about a fifth (`dc-image-carousel--spacing-*` in the view and CSS, which compare these exact values)
 
 **View** (`Views/Partials/Blocks/ImageCarouselBlock.cshtml`):
 - Reuses `<dc-image-slider>`; an item with a link renders as an `<a>` (image + caption), otherwise as a `<figure>` with a `<figcaption>`
@@ -422,7 +423,7 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 - The background band reaches the viewport edges with `box-shadow: 0 0 0 100vmax` + `clip-path: inset(0 -100vmax)`, without moving the block out of the content width
 - An item's `Title` sits in a blue (`--color-blue`, the footer colour) band across the bottom of the image (`.dc-image-carousel__media`, two lines at most); its `Text` is a small muted caption underneath, kept to the image's width (`width: 0; min-width: 100%`) so it wraps under its image
 
-**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
+**Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state, image spacing and number of linked images, with the thumbnails spaced to match. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
 
 ### Persona Picker Block
 

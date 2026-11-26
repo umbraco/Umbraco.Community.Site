@@ -7,11 +7,17 @@
     bool autoSlide = Model.Settings?.AutoSlideImages ?? true;
     var blockId = string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId;
     var sliderId = $"{Model.Content.IdHash}-slider";
+    var spacingClass = Model.Settings?.ImageSpacing switch
+    {
+        "medium" => "dc-image-carousel--spacing-medium",
+        "large" => "dc-image-carousel--spacing-large",
+        _ => string.Empty
+    };
 }
 
 @if (items.Any())
 {
-    <div class="dc-image-carousel @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" data-image-carousel="@Model.Content.IdHash" id="@blockId">
+    <div class="dc-image-carousel @spacingClass @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" data-image-carousel="@Model.Content.IdHash" id="@blockId">
         @if (hasBg)
         {
             <style asp-add-nonce="true">
