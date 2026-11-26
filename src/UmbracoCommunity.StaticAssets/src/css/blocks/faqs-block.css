@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .dc-faqs {
     margin-block: 0;
 
@@ -120,5 +122,33 @@
 
     dd {
         visibility: visible;
+    }
+}
+.dc-faqs.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: var(--radius-card);
+    padding: var(--unit);
+
+    @media (--sm) {
+        padding: var(--unit-md);
+    }
+
+    @media (--md) {
+        padding: var(--unit-lg);
+    }
+}
+
+.dc-faqs.bg-dark {
+    color: var(--color-white);
+    --block-heading-color: var(--color-white);
+
+    label:hover,
+    input:focus-visible + label,
+    .dc-faq-block:has(:checked) label {
+        color: var(--color-pink);
+    }
+
+    dt {
+        border-bottom-color: rgb(255 255 255 / 0.3);
     }
 }

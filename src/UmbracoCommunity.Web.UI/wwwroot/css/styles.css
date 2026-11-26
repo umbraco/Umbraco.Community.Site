@@ -578,6 +578,10 @@ ol.no-margin p {
     clip-path: circle();
 }
 
+.is-arch {
+    clip-path: inset(0 round 999px 999px 0 0);
+}
+
 /* page banners */
 
 .dc-page-banner-block__container {
@@ -2528,4 +2532,65 @@ dc-image-slider img {
 
 .dc-tile--outlined.bg-dark {
     border-color: rgb(255 255 255 / 30%);
+}
+p.lead-text {
+    font-size: 1.25em;
+    color: #283a97;
+}
+
+ul.check-list {
+    list-style: "\2713  ";
+}
+
+ul.pill-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+ul.pill-links li {
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 2px 12px;
+}
+
+ul.pill-links li p {
+    margin: 0;
+}
+
+ol.step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+}
+
+ol.step-list li {
+    position: relative;
+    padding-left: 2.25em;
+    counter-increment: step;
+}
+
+ol.step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 50%;
+    background-color: rgb(40 58 151 / 10%);
+    color: #283a97;
+    font-size: 0.85em;
+    font-weight: bold;
+    line-height: 1.6em;
+    text-align: center;
+}
+
+p.callout {
+    padding: 12px 16px;
+    border: 1px solid rgb(40 58 151 / 20%);
+    border-radius: 20px;
+    background-color: #fff;
+    color: #283a97;
 }

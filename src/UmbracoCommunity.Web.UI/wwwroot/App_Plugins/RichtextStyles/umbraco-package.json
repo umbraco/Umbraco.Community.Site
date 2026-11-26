@@ -71,6 +71,22 @@
               "data": { "tag": "p" }
             },
             {
+              "label": "Lead paragraph",
+              "data": {
+                "tag": "p",
+                "class": "lead-text"
+              },
+              "appearance": { "style": "font-size: 1.25em; color: #283a97;" }
+            },
+            {
+              "label": "Callout",
+              "data": {
+                "tag": "p",
+                "class": "callout"
+              },
+              "appearance": { "icon": "icon-info" }
+            },
+            {
               "label": "Blockquote",
               "data": { "tag": "blockquote" },
               "appearance": { "icon": "icon-blockquote" }
@@ -100,6 +116,30 @@
                 "class": "no-margin"
               },
               "appearance": { "icon": "icon-ordered-list" }
+            },
+            {
+              "label": "Numbered steps",
+              "data": {
+                "tag": "ol",
+                "class": "step-list"
+              },
+              "appearance": { "icon": "icon-ordered-list" }
+            },
+            {
+              "label": "Check-mark list",
+              "data": {
+                "tag": "ul",
+                "class": "check-list"
+              },
+              "appearance": { "icon": "icon-check" }
+            },
+            {
+              "label": "Pill links",
+              "data": {
+                "tag": "ul",
+                "class": "pill-links"
+              },
+              "appearance": { "icon": "icon-link" }
             }
           ]
         }

@@ -4,10 +4,11 @@
 {
     var settings = Model.Settings as SettingsImageBlock;
     var imgIsCircle = settings?.ImageIsCircular ?? false;
+    var imgShape = imgIsCircle ? "is-circle" : settings?.ImageHasArchTop == true ? "is-arch" : "";
 
     <div class="dc-image-block">
         <div class="dc-image-wrapper">
-            <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" loading="lazy" />
+            <img src="@Model.Content.Image.GetCropUrl(width: 800, height: 533)" alt="@Model.Content.AltText" class="dc-image @imgShape" loading="lazy" />
 
             @if (!Model.Content.OverlayText.IsEmptyHtmlString())
             {

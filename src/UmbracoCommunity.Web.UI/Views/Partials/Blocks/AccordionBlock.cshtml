@@ -3,7 +3,10 @@
 
 @if (Model.Content?.AccordionItems != null && Model.Content.AccordionItems.Any())
 {
-    <div class="dc-faqs @Model.Content.IntroLayoutClass(Model.Settings)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    <div class="dc-faqs @Model.Content.IntroLayoutClass(Model.Settings) @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)"
+         style="@(hasBg ? $"--block-background-color: {Model.Settings!.BackgroundColour!.Color}" : null)">
         <partial name="~/Views/Partials/Components/BlockIntro.cshtml" model="Model.Content" />
 
         <dl class="block-body dc-faqs__list">

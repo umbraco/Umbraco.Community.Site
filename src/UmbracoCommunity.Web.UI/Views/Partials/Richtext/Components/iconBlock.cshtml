@@ -1,0 +1,9 @@
+@using Umbraco.Cms.Core.Models.Blocks
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<RichTextBlockItem<IconBlock>>
+
+@if (Model?.Content?.Icon != null)
+{
+    var iconColour = Model.Content.Colour?.Color;
+
+    <span class="rte-icon @(iconColour != null ? "has-colour" : string.Empty)" style="@(iconColour != null ? $"color: {iconColour}" : null)"><svg-src media="@Model.Content.Icon" alt-text="@Model.Content.AltText"></svg-src></span>
+}

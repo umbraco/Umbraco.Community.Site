@@ -72,3 +72,19 @@
       padding-block: var(--unit-xl);
     }
 }
+
+.dc-page-banner-block__tagline {
+  display: block;
+  font-size: 12px;
+  line-height: 17px;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  margin-bottom: var(--unit-sm);
+  z-index: 1;
+
+  @media (--sm) {
+    font-size: 14px;
+    line-height: 19px;
+    letter-spacing: 1.12px;
+  }
+}

@@ -82,8 +82,9 @@
                 break;
 
             case ImageBlock imageBlock when imageBlock.Image != null:
-                var isCircle = (block.Settings as SettingsImageBlock)?.ImageIsCircular == true;
-                <img class="dc-tile__inline-image @(isCircle ? "is-circle" : null)"
+                var imageSettings = block.Settings as SettingsImageBlock;
+                var imageShape = imageSettings?.ImageIsCircular == true ? "is-circle" : imageSettings?.ImageHasArchTop == true ? "is-arch" : null;
+                <img class="dc-tile__inline-image @imageShape"
                      src="@imageBlock.Image.GetCropUrl("desktop")" alt="@imageBlock.AltText"
                      width="@imageBlock.Image.GetCropSize("desktop")?.Width" height="@imageBlock.Image.GetCropSize("desktop")?.Height"
                      loading="lazy" />

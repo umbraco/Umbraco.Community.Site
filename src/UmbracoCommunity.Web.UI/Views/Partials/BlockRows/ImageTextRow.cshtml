@@ -21,13 +21,14 @@
             var typedBlock = block.Content as ImageBlock;
             if (typedBlock?.Image != null) {
                 bool hasCaption = !string.IsNullOrWhiteSpace(typedBlock.ImageCaption);
+                var archClass = (block.Settings as SettingsImageBlock)?.ImageHasArchTop == true ? "is-arch" : null;
                 <div class="dc-image-and-text-block__image-container">
                     @if (hasCaption)
                     {
                         <figure>
                             <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
                                 sizes="(max-width: 400px) 386px, 906px"
-                                src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                                src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText" class="@archClass"
                                 width="@typedBlock.Image.GetCropSize("mobile")?.Width" height="@typedBlock.Image.GetCropSize("mobile")?.Height" style="@typedBlock.Image.GetCropRatioStyle()"
                                 loading="lazy" />
                             <figcaption>@typedBlock.ImageCaption</figcaption>
@@ -37,7 +38,7 @@
                     {
                         <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
                             sizes="(max-width: 400px) 386px, 906px"
-                            src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                            src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText" class="@archClass"
                             width="@typedBlock.Image.GetCropSize("mobile")?.Width" height="@typedBlock.Image.GetCropSize("mobile")?.Height" style="@typedBlock.Image.GetCropRatioStyle()"
                             loading="lazy" />
                     }
