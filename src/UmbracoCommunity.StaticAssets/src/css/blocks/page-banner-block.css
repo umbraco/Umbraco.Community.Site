@@ -41,6 +41,7 @@
   background-image: var(--page-banner-background-image);
   background-color: var(--page-banner-background-color);
   color: var(--page-banner-text-color);
+  --link-color: currentColor;
 
   .has-bg & {
     color: var(--color-white);

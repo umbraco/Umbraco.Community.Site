@@ -11,7 +11,7 @@ Every page is a **Content page** under the Codegarden root. In the backoffice yo
 
 To set a block's background colour, anchor (*Block ID*) or *Title beside content*, open the block and use its **Settings** tab.
 
-The rich text editor's **Richtext styles** menu has the styles these pages use: *Lead paragraph*, *Callout* (a white rounded box), *Check-mark list*, *Numbered steps* (numbers in small circles, aligned with the text above) and *Pill links*. Its **Insert block** button also offers an inline **Icon**; as the first thing in a *Callout* it sits in a pink circle on the left.
+The rich text editor's **Richtext styles** menu has the styles these pages use: *Lead paragraph*, *Callout* (a white rounded box), *Check-mark list* and *Numbered steps* (numbers in small circles, aligned with the text above). Its **Insert block** button also offers an inline **Icon**; as the first thing in a *Callout* it sits in a pink circle on the left.
 
 When blocks that add up to 12 columns sit next to each other, they render side by side as one row. For example, an Image and a Text block can be resized to 6 + 6 (half and half), or 4 + 8 (a third and two thirds).
 
@@ -54,7 +54,7 @@ When blocks that add up to 12 columns sit next to each other, they render side b
 
 | # | Block | How it's set up |
 |---|---|---|
-| 1 | **Banner** | Image: Øksnehallen. *Tagline*, *Title*, *Subtitle* with the intro and a list in the *Pill links* style linking to `#venue`, `#getting-there`, `#parking` and `#visas`. Both *Visas and letters* and *Accessibility* go to `#visas`, because they're in the same block. The mock's title says "Frequently asked questions", which looks like a copy-paste, so it's *Practical information* here. |
+| 1 | **Banner** | Image: Øksnehallen. *Tagline*, *Title*, *Subtitle* with the intro and a line of text links to `#venue`, `#getting-there`, `#parking` and `#visas`. Both *Visas and letters* and *Accessibility* go to `#visas`, because they're in the same block. The mock's title says "Frequently asked questions", which looks like a copy-paste, so it's *Practical information* here. |
 | 2 | **Tile grid** | Settings: Block ID `venue`. Left tile (8 columns): Text with a heading, a *Lead paragraph*, a paragraph and the address. Right tile (4 columns, pink): Icon, Eyebrow, Stat *8–9 min* with the label *on foot*. |
 | 3 | **Cards**: *How to get to the venue* | Settings: beige background, Block ID `getting-there`. Three cards, each with an Icon and Text with a button: train, car, bus/metro. A 12-column card holds the map image and the walking directions. The image sits above the text, not beside it. |
 | 4 | **Tile grid**: *Parking* | Settings: Block ID `parking`. Garage tile (8 columns, beige): the mock's two small white boxes become sub-headings, and the EasyPark support line sits at the bottom in small text. Outdoor-parking tile (4 columns, navy, alignment *spread*): Text, then the bold note in a second Text at the bottom. |
@@ -66,7 +66,7 @@ When blocks that add up to 12 columns sit next to each other, they render side b
 
 | # | Block | How it's set up |
 |---|---|---|
-| 1 | **Banner** | Image: the audience from behind. *Tagline*, *Title*, *Subtitle* with the intro (linking to Practical information) and *Pill links* to the four groups. |
+| 1 | **Banner** | Image: the audience from behind. *Tagline*, *Title*, *Subtitle* with the intro (linking to Practical information) and a line of text links to the four groups. |
 | 2 | **Accordion**: *General questions* | Settings: Block ID `general`, *Title beside content* on. The title and subtitle sit on the left, the questions on the right. |
 | 3 | **Accordion**: *In-person tickets* | Same as 2, with Block ID `tickets`. The mock had the "Can I get a refund?" question pasted inside another answer, so it's split back out here. |
 | 4 | **Accordion**: *Online* | Same as 2, with Block ID `online`. |

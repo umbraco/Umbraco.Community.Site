@@ -132,14 +132,6 @@
                 "class": "check-list"
               },
               "appearance": { "icon": "icon-check" }
-            },
-            {
-              "label": "Pill links",
-              "data": {
-                "tag": "ul",
-                "class": "pill-links"
-              },
-              "appearance": { "icon": "icon-link" }
             }
           ]
         }

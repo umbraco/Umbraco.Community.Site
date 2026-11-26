@@ -84,7 +84,7 @@ Ordered by impact relative to effort. None change existing blocks' default look.
 | S3 | A **"Lead paragraph"** option in the *Richtext styles* menu (`p.lead`: larger, light weight, blue) | The big light-blue intro paragraphs on Hotel, Call for speakers and Practical info, without misusing Heading 3 | Small: one menu entry + one CSS rule |
 | S4 | An opt-in **"Arch top"** setting (true/false) on Tile grid tiles, and possibly Image blocks, adding a class with `border-radius: 50vw 50vw var(--radius-card) var(--radius-card)`-style corners, Codegarden only via `[data-site="eventsHome"]` | The signature arch on tip boxes, deadline boxes and photos, which is the biggest visual difference from the mocks | Small to medium: one setting + one class per block. Needs a design check on narrow tiles where the arch gets very tall |
 | S5 | Allow the existing **Icon link cards** block on `eventsHome` (Block Restrictions rule only, no code) | Whole-tile link cards for "Our commitment" | Tiny: config only. Check it looks right on the Codegarden theme first |
-| S6 | A **"Pill links"** list style in the Richtext styles menu (`ul.pill-links`, inline, rounded outline links) | The anchor pills in the Practical info and FAQ heroes | Small: one menu entry + one CSS block. White outlined pills on navy need `bg-dark` handling |
+| S6 | ~~A "Pill links" list style~~ Dropped: the anchor links stay plain text links | The anchor pills in the Practical info and FAQ heroes | None |
 | S7 | **Check-mark list** style in the Richtext styles menu (`ul.check-list`) | "Your stay includes" lists on the hotel cards | Tiny: same mechanism as S3/S6 |
 
 S3, S6 and S7 are all the same kind of change (a style menu entry + CSS), so they could ship together.
