@@ -629,6 +629,59 @@
   }
 }
 
+@media (--sm) {
+  .plan-comparison__columns--count-1 {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 28rem;
+    margin-inline: auto;
+  }
+
+  .plan-comparison__columns--count-3 {
+    grid-template-columns: repeat(4, 1fr);
+
+    .plan-column {
+      grid-column: span 2;
+    }
+
+    .plan-column:last-child {
+      grid-column: 2 / span 2;
+    }
+  }
+}
+
+@media (--md) {
+  .plan-comparison__columns--count-3 {
+    grid-template-columns: repeat(3, 1fr);
+
+    .plan-column,
+    .plan-column:last-child {
+      grid-column: auto;
+    }
+  }
+
+  .plan-comparison__columns--count-2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: calc((100% - 2rem) / 3 * 2 + 1rem);
+    margin-inline: auto;
+  }
+}
+
+@media (--lg) {
+  .plan-comparison__columns--count-1 {
+    max-width: calc((100% - 3rem) / 4);
+  }
+
+  .plan-comparison__columns--count-2 {
+    max-width: calc((100% - 3rem) / 2 + 1rem);
+  }
+
+  .plan-comparison__columns--count-3 {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: calc((100% - 3rem) / 4 * 3 + 2rem);
+    margin-inline: auto;
+  }
+}
+
 @media (min-width: 1141px) and (max-width: 1408px) {
   .plan-comparison__columns {
     margin: auto;
