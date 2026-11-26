@@ -17,7 +17,7 @@
     @foreach (var block in Model.Blocks)
     {
         var typedBlock = block.Content as TextBlock;
-        <div class="dc-image-and-text-block__content-container">
+        <div class="dc-image-and-text-block__content-container" style="--row-span: @block.ColumnSpan">
             <div class="dc-image-and-text-block__content">
                 @Html.Raw(typedBlock?.Text?.ToHtmlString())
             </div>

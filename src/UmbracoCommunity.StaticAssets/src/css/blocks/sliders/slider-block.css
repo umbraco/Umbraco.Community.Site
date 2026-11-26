@@ -41,16 +41,6 @@
     padding: 0 var(--unit);
 }
 
-.block-tagline {
-    color: var(--block-heading-color, var(--color-blue));
-    text-align: center;
-    font-size: var(--tagline-size);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--tagline-spacing);
-    text-transform: uppercase;
-    margin: 0 0 var(--unit);
-}
-
 /* Slider area */
 .dc-slider-block__slider {
     display: block;

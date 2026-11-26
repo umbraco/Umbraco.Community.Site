@@ -12,6 +12,9 @@
 
     --page-banner-plain-inset: 0;
 
+    --icon-card-justify: flex-start;
+    --icon-card-align: stretch;
+
     @media (--sm) {
         --font-size-h1: 3.5rem;
         --font-size-h2: 34px;

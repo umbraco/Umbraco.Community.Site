@@ -82,3 +82,7 @@
 img.is-circle {
     clip-path: circle();
 }
+
+img.is-arch {
+    clip-path: inset(0 round 999px 999px 0 0);
+}

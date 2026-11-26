@@ -85,6 +85,11 @@
         "contentElementTypeKey": "50fbd3fd-639c-47ea-bd12-5d86285bef6c",
         "label": "{umbLink: callToActionLink}",
         "settingsElementTypeKey": "0291ecfb-d694-4c19-9ec2-10370ed47948"
+      },
+      {
+        "contentElementTypeKey": "6dbeafa2-f882-4582-9400-1611b49f0966",
+        "label": "Icon",
+        "displayInline": true
       }
     ]
   },
@@ -95,6 +100,9 @@
     },
     {
       "Udi": "umb://document-type/50fbd3fd639c47eabd125d86285bef6c"
+    },
+    {
+      "Udi": "umb://document-type/6dbeafa2f882458294001611b49f0966"
     },
     {
       "Udi": "umb://stylesheet/styles.css",

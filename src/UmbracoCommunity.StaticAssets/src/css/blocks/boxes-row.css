@@ -445,8 +445,8 @@
 .dc-boxes-row__item--icon-card {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: var(--icon-card-justify, center);
+    align-items: var(--icon-card-align, center);
     min-height: 320px;
 }
 

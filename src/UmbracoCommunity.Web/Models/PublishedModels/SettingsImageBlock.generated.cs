@@ -58,6 +58,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.PropertyEditors.ValueConverters.ColorPickerValueConverter.PickedColor BackgroundColour => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsColour.GetBackgroundColour(this, _publishedValueFallback);
 
 		///<summary>
+		/// Arch top: Rounds the top of the image into an arch. Works best with portrait or square images.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("imageHasArchTop")]
+		public virtual bool ImageHasArchTop => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsImage.GetImageHasArchTop(this, _publishedValueFallback);
+
+		///<summary>
 		/// Image is circular
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

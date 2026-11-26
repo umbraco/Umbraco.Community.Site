@@ -13,11 +13,11 @@
                 @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
             </div>
         }
-        <div class="plan-comparison__columns">
-            @foreach (var column in Model.Content.ColumnContentItems)
+        @{ var columns = Model.Content.ColumnContentItems.Where(c => c.Content is ColumnComparisonItem).ToList(); }
+        <div class="plan-comparison__columns plan-comparison__columns--count-@Math.Min(columns.Count, 4)">
+            @foreach (var column in columns)
             {
-                var typedColumn = column.Content as ColumnComparisonItem;
-                if (typedColumn == null) continue;
+                var typedColumn = (ColumnComparisonItem)column.Content;
                 var typedColumnSettings = column.Settings as SettingsColumnComparisonItem;
 
                 var bgIsDark = typedColumnSettings?.BackgroundColour != null && typedColumnSettings.IsDark();

@@ -176,8 +176,7 @@
 
   .dc-faqs-and-image-block__image-container,
   .dc-faqs-and-image-block__content-container {
-    flex: 1;
-    width: 50%;
+    flex: var(--row-span, 1) 1 0;
   }
 
   .dc-faqs-and-image-block__image-container img {
@@ -208,4 +207,14 @@
   .dc-faqs__answer {
     padding: 0 2rem;
   }
+}
+
+.dc-faqs-and-image-block.has-bg {
+  padding: var(--unit-md);
+  border-radius: var(--radius-card);
+}
+
+.dc-faqs-and-image-block.bg-dark {
+  --block-heading-color: var(--color-white);
+  color: var(--color-white);
 }

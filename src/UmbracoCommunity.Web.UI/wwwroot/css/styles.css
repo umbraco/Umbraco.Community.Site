@@ -578,6 +578,10 @@ ol.no-margin p {
     clip-path: circle();
 }
 
+.is-arch {
+    clip-path: inset(0 round 999px 999px 0 0);
+}
+
 /* page banners */
 
 .dc-page-banner-block__container {
@@ -591,6 +595,10 @@ ol.no-margin p {
     background-size: cover;
     background-position: center center;
     background-image: var(--page-banner-background-image);
+}
+
+.dc-page-banner-block__container a {
+    color: inherit;
 }
 
 .has-bg .dc-page-banner-block__container {
@@ -941,6 +949,21 @@ ol.no-margin p {
 .plan-comparison__columns {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+}
+
+.plan-comparison__columns--count-1 {
+    grid-template-columns: minmax(0, 28rem);
+    justify-content: center;
+}
+
+.plan-comparison__columns--count-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 66%;
+    margin-inline: auto;
+}
+
+.plan-comparison__columns--count-3 {
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .plan-column {
@@ -1371,6 +1394,138 @@ dc-image-slider img {
 
 .dc-image-carousel-preview.bg-dark .dc-image-carousel-preview__meta li {
     background: rgb(255 255 255 / 0.2);
+}
+
+.dc-persona-picker-preview {
+    color: #1b264f;
+}
+
+.dc-persona-picker-preview.has-bg {
+    padding: 1rem;
+    border-radius: 20px;
+    background-color: var(--block-background-color);
+}
+
+.dc-persona-picker-preview.bg-dark {
+    color: #ffffff;
+}
+
+.dc-persona-picker-preview .block-title {
+    color: inherit;
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+    text-align: center;
+}
+
+.dc-persona-picker-preview .block-subtitle {
+    margin: 0 0 1rem;
+    font-size: 16px;
+    text-align: center;
+}
+
+.dc-persona-picker-preview .block-subtitle p {
+    margin: 0;
+}
+
+.dc-persona-picker-preview__label {
+    margin: 0 0 0.5rem;
+    font-weight: 700;
+}
+
+.dc-persona-picker-preview__personas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dc-persona-picker-preview__personas li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #1b264f;
+}
+
+.dc-persona-picker-preview__personas span {
+    font-size: 12px;
+    color: #5e6279;
+}
+
+.dc-persona-picker-preview__empty {
+    margin: 0;
+    font-style: italic;
+}
+
+.dc-list-item-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 4px 0;
+    padding: 12px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1b264f;
+}
+
+.dc-list-item-preview p {
+    margin: 0;
+}
+
+.dc-list-item-preview__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.dc-list-item-preview .dc-list-item-preview__title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.dc-list-item-preview .dc-list-item-preview__text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #3b3f55;
+}
+
+.dc-list-item-preview__tag {
+    padding: 2px 10px;
+    border-radius: 100px;
+    background: #f5c1bc;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.dc-list-item-preview__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+}
+
+.dc-list-item-preview__meta li {
+    padding: 2px 10px;
+    border-radius: 100px;
+    background: rgb(40 58 151 / 0.1);
+}
+
+.dc-list-item-preview__meta li.is-warning {
+    background: rgb(229 20 0 / 0.12);
+    color: #a01000;
 }
 
 .dc-image-carousel-item-preview {
@@ -2528,4 +2683,132 @@ dc-image-slider img {
 
 .dc-tile--outlined.bg-dark {
     border-color: rgb(255 255 255 / 30%);
+}
+
+p.lead-text {
+    font-size: 1.25em;
+    color: #283a97;
+}
+
+ul.check-list {
+    list-style: "\2713  ";
+}
+
+ol.step-list {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+}
+
+ol.step-list li {
+    position: relative;
+    padding-left: 2.25em;
+    counter-increment: step;
+}
+
+ol.step-list li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    width: 1.6em;
+    height: 1.6em;
+    border-radius: 50%;
+    background-color: rgb(40 58 151 / 10%);
+    color: #283a97;
+    font-size: 0.85em;
+    font-weight: bold;
+    line-height: 1.6em;
+    text-align: center;
+}
+
+p.callout {
+    padding: 12px 16px;
+    border: 1px solid rgb(40 58 151 / 20%);
+    border-radius: 20px;
+    background-color: #fff;
+    color: #283a97;
+}
+
+.rte-icon {
+    display: inline-block;
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.35em;
+    vertical-align: -0.25em;
+}
+
+.rte-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.rte-icon.has-colour svg,
+.rte-icon.has-colour svg * {
+    stroke: currentColor;
+}
+
+p.callout {
+    position: relative;
+}
+
+p.callout:has(> .rte-icon:first-child) {
+    padding-left: calc(32px + 2.25em);
+}
+
+p.callout > .rte-icon:first-child {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    width: 2.25em;
+    height: 2.25em;
+    margin: 0;
+    padding: 0.5em;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: rgb(245 193 188 / 40%);
+    transform: translateY(-50%);
+}
+
+.dc-page-banner-block__tagline {
+    display: block;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 8px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.dc-faqs.has-bg,
+.dc-big-cta-block.has-bg {
+    background-color: var(--block-background-color);
+    border-radius: 20px;
+}
+
+.dc-faqs.has-bg {
+    padding: 20px;
+}
+
+.dc-faqs.bg-dark,
+.dc-big-cta-block.bg-dark {
+    color: #ffffff;
+}
+
+.dc-faqs.bg-dark .block-title,
+.dc-faqs.bg-dark .block-subtitle,
+.dc-faqs.bg-dark .block-tagline,
+.dc-faqs.bg-dark .dc-faq-block h4,
+.dc-faqs.bg-dark .dc-faq-block dd,
+.dc-big-cta-block.bg-dark .block-title,
+.dc-big-cta-block.bg-dark p {
+    color: #ffffff;
+}
+
+.dc-faqs.bg-dark .dc-faq-block {
+    border-color: rgb(255 255 255 / 30%);
+}
+
+.dc-faqs.bg-dark .dc-faq-block label::after {
+    border-color: #ffffff;
 }

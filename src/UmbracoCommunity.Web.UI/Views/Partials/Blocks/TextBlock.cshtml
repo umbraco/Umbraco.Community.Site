@@ -5,6 +5,8 @@
     bool hasBg = Model.Settings.HasBg();
     bool bgIsDark = hasBg && Model.Settings.IsDark() || Model.Settings?.BackgroundImage != null;
     bool hasImage = Model.Settings?.BackgroundImage != null;
+    var html = Model.Content.Text.ToHtmlString();
+    var split = Model.Settings?.IntroBesideContent == true ? BlockIntroExtensions.SplitLeadingHeading(html) : null;
 
     <div class="dc-text-block justify-center @(hasBg ? "has-bg" : "transparent") @(hasImage ? "has-image" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" id="@Model.Content.IdHash">
         @if (hasBg)
@@ -31,8 +33,16 @@
             </picture>
         }
 
-        <div class="dc-text-block__content" id="@Model.Settings?.BlockId">
-            @Html.Raw(Model.Content.Text.ToHtmlString())
+        <div class="dc-text-block__content @(split != null ? BlockIntroExtensions.IntroBesideClass : null)" id="@Model.Settings?.BlockId">
+            @if (split is { } parts)
+            {
+                <div class="block-intro">@Html.Raw(parts.Heading)</div>
+                <div class="block-body">@Html.Raw(parts.Body)</div>
+            }
+            else
+            {
+                @Html.Raw(html)
+            }
         </div>
     </div>
 }

@@ -92,7 +92,7 @@
 
   .dc-image-and-text-block__image-container {
     margin-bottom: 0;
-    flex: 1;
+    flex: var(--row-span, 1) 1 0;
   }
 
   .dc-image-and-text-block__image-container img {
@@ -102,7 +102,7 @@
   }
 
   .dc-image-and-text-block__content-container {
-    flex: 1;
+    flex: var(--row-span, 1) 1 0;
     align-items: flex-end;
     padding: 0;
   }

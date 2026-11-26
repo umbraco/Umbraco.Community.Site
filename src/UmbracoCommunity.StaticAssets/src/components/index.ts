@@ -12,6 +12,7 @@ export * from "./event-time/dc-event-time.element.js";
 export * from "./sessionize/index.js";
 export * from "./event-schedule/index.js";
 export * from "./timeline/dc-timeline.element.js";
+export * from "./persona-picker/dc-persona-picker.element.js";
 export * from "./video-showcase/dc-video-showcase.element.js";
 export * from "./video-hero/dc-video-hero.element.js";
 export * from "./feed-submission/dc-feed-submission.element.js";

@@ -329,6 +329,24 @@ The API client in `Client/src/api/` is generated: run `npm run generate-client` 
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
 
+### Title Beside Content
+
+The *Settings - intro layout* composition (`settingsIntroLayout`, toggle `introBesideContent` "Title beside content") lets editors put a block's title in a left column (⅓) beside its content (⅔). It's on the Text, Call to action, Accordion and Form block settings only. Blocks that fill the width (boxes, events, cards) deliberately don't get it.
+
+- `BlockIntroExtensions.IntroLayoutClass` adds `intro-beside` when the toggle is on and the block has a title or subtitle; `Views/Partials/Components/BlockIntro.cshtml` renders the shared `.block-intro`. Text blocks have no title field, so the toggle splits off a *leading heading* in the rich text (`SplitLeadingHeading`); without one the block renders as normal.
+- `css/blocks/block-intro.css`: `.block-intro` / `.block-body` are `display: contents` by default, so the stacked layout is unchanged. The grid only applies from `--md`, and only to blocks directly in `.dc-block-list` (not paired rows).
+- The title's cap height lines up with the first line of the content: both are trimmed with `text-box: trim-start cap alphabetic`, and the first FAQ item and the form lose their top padding. Firefox ignores `text-box`, so it's a few px off there.
+- The toggle has no effect on Image blocks yet.
+- *Content block tagline* (`contentBlockTagline`, `IContentBlockTagline`) adds an optional small uppercase label above the title (`.block-tagline` in `typography.css`). It's a separate composition because Banner and Slider blocks already have their own `tagline` property. Only the Accordion block uses it so far; `BlockIntro.cshtml` renders it for any block that composes it.
+
+### Side-by-side Block Rows
+
+`ParseBlockGrid` groups consecutive content blocks into one `BlockGridRow` until their column spans add up to 12, and multi-block rows render with `Views/Partials/BlockRows/{row.Alias}.cshtml` (`ImageTextRow`, `TextRow`, `ImageRow`, `FormTextRow`, `AccordionImageRow`).
+
+- Text, Image, Image with overlay, Form and Accordion blocks can be 4, 6, 8 or 12 columns wide in the ROOT and General content block grids (#287), so editors can pair them as 6 + 6, 4 + 8 or 8 + 4.
+- Each row child gets `style="--row-span: {ColumnSpan}"`. From `--md` the row CSS (`image-and-text-block.css`, `faqs-and-image-block.css`) uses it as the flex-grow, so the widths follow the spans. Below `--md` the blocks stack as before.
+- A block that isn't paired, for example a lone 8-column block followed by a 12, still renders full width.
+
 ### Stepped Forms
 
 The form block supports an optional multi-step mode via the `EnableSteppedForm` toggle on `SettingsFormBlock`. When enabled, `FormBlock.cshtml` wraps the form in a `<dc-form-steps>` web component (`src/UmbracoCommunity.StaticAssets/src/components/form/form-steps.element.ts`) that:
@@ -405,6 +423,24 @@ A standalone image slider for content blocks (`imageCarouselBlock`): the slider 
 - An item's `Title` sits in a blue (`--color-blue`, the footer colour) band across the bottom of the image (`.dc-image-carousel__media`, two lines at most); its `Text` is a small muted caption underneath, kept to the image's width (`width: 0; min-width: 100%`) so it wraps under its image
 
 **Backoffice preview** (`Views/BlockPreviewApi/BlockGrid/ImageCarouselBlock.cshtml`, styles in `wwwroot/css/styles.css`): image thumbnails with their titles, plus pills for the image count, auto-slide state and number of linked images. Inside the block editor each item in the Images list previews with `Views/BlockPreviewApi/BlockList/ImageCarouselItem.cshtml` (thumbnail, title or image name, text, link).
+
+### Persona Picker Block
+
+A generic block (`personaPickerBlock`) where visitors pick who they are from a dropdown and get content written for them: a pitch, reasons, testimonials and an email to send. Built for Codegarden's *Convince your boss* page, so it's only in the `eventsHome` Block Restrictions rule for now.
+
+**Content** (`PersonaPickerBlock`, composes `IContentBlockIntro`): `Personas` (required Block List, *Personas*), plus optional `SelectLabel`, `ReasonsHeading`, `TestimonialsHeading`, `EmailHeading` (each falls back to the Convince your boss wording via the `Resolved…` helpers in `Models/ContentModels/PersonaPickerBlock.cs`) and `Footnote`. Settings (`SettingsPersonaPickerBlock`): `ISettingsBlockId` + `ISettingsColour`.
+
+**Persona** (`Persona`): `PersonaName`, `RoleGroup` (optional, *Dropdown - persona groups*: a fixed list, *My role* / *My Codegarden experience*, so editors can't invent new groups; `RoleGroups()` collects personas into one `<optgroup>` per group in first-seen order (ungrouped personas get no heading), whose label is the item's value, so renaming an item in the data type leaves existing personas on the old text until they're re-picked), `Pitch`, `Reasons` (generic *Title and text items (max 4)* Block List of `TitleAndTextItem`, sized for the 2×2 grid), `Testimonials` (*Testimonial picker (max 4)*, also sized for the 2-column grid), `EmailSubject`, `EmailBody` (plain text, one full email per persona so editors can change each one).
+
+**Testimonials live in the Umbraco 19 Library**: `Testimonial` is an element type with *Allow in Library* on (`Quote`, `PersonName`, `JobTitle`, `Company`), and personas pick them with the Element Picker data type *Testimonial picker (max 4)* (`IEnumerable<IPublishedElement>`, filtered with `OfType<Testimonial>()`). One quote can serve several personas. Keep Codegarden's in the Library's *Codegarden → Testimonials* folder; the Library is shared by all sites, so a user group's *element start node* can limit editors to their site's folder (the picker respects it, as *Ignore user start nodes* is off). Getting the quoted person's permission is the events team's process; the code shows every picked testimonial.
+
+**View** (`Views/Partials/Blocks/PersonaPickerBlock.cshtml`): server-renders every persona as a `<section data-persona="{slug}">` (slugs from `PersonaName`, de-duplicated). The dropdown (`data-persona-field`) is only rendered with more than one persona and starts `hidden`. With more than one persona, every persona except `DefaultPersona` (the first in dropdown order) is rendered `hidden` so the block doesn't flash every persona before the script runs; a `<noscript>` style shows them all again without JavaScript. Empty reasons/testimonials/email sections are left out. The email has *Copy email* (hidden until JS) and an *Open in your email app* `mailto:` link (CRLF line breaks, encoded server-side).
+
+**Behaviour** (`components/persona-picker/dc-persona-picker.element.ts`): unhides the dropdown, shows one persona at a time and keeps the choice in `?persona=` with `history.replaceState`, so a link opens on that persona (unknown values fall back to the first). Copy uses `util/clipboard.ts` and announces the result in a `role="status"` region.
+
+**CSS** (`css/blocks/persona-picker-block.css`): white cards on the page surface; reasons and quotes are one column below `--sm`, two from `--sm`. It resets the global italic `figcaption` style for the quote attribution.
+
+**Backoffice preview**: the block shows the title, the dropdown label and a card per persona with reason/testimonial counts (`Views/BlockPreviewApi/BlockGrid/PersonaPickerBlock.cshtml`); `Persona` and `TitleAndTextItem` list items have their own previews in `Views/BlockPreviewApi/BlockList/`. Styles in `wwwroot/css/styles.css`.
 
 ### YouTube Videos
 

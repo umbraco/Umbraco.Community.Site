@@ -22,6 +22,10 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 	/// <summary>Settings - image</summary>
 	public partial interface ISettingsImage : IPublishedElement
 	{
+		/// <summary>Arch top</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		bool ImageHasArchTop { get; }
+
 		/// <summary>Image is circular</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
 		bool ImageIsCircular { get; }
@@ -57,6 +61,17 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		}
 
 		// properties
+
+		///<summary>
+		/// Arch top: Rounds the top of the image into an arch. Works best with portrait or square images.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("imageHasArchTop")]
+		public virtual bool ImageHasArchTop => GetImageHasArchTop(this, _publishedValueFallback);
+
+		/// <summary>Static getter for Arch top</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		public static bool GetImageHasArchTop(ISettingsImage that, IPublishedValueFallback publishedValueFallback) => that.Value<bool>(publishedValueFallback, "imageHasArchTop");
 
 		///<summary>
 		/// Image is circular

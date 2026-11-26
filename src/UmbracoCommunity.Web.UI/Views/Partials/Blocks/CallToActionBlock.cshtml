@@ -3,9 +3,13 @@
 @if (Model?.Content?.CallToActionLink != null)
 {
     bool hasImage = Model.Settings?.BackgroundImage != null;
+    bool hasBg = !hasImage && Model.Settings.HasBg();
+    bool bgIsDark = hasBg && Model.Settings.IsDark();
+    bool titleBeside = Model.Settings?.IntroBesideContent == true && !string.IsNullOrEmpty(Model.Content.Title);
     var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
     
-    <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
+    <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty) @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)"
+         style="@(hasBg ? $"--block-background-color: {Model.Settings!.BackgroundColour!.Color}" : null)">
         @if (hasImage)
         {
             <div class="dc-big-cta-block__background">
@@ -22,10 +26,12 @@
                 </picture>
             </div>
         }
-        <div class="dc-big-cta-block__content @(hasImage ? "image align-left" : "align-center")">
+        <div class="dc-big-cta-block__content @(hasImage ? "image align-left" : "align-center") @(bgIsDark ? "color" : null) @(titleBeside ? BlockIntroExtensions.IntroBesideClass : null)">
             @if (!string.IsNullOrEmpty(Model.Content.Title))
             {
-                <h2 class="block-title">@Model.Content.Title</h2>
+                <div class="block-intro">
+                    <h2 class="block-title">@Model.Content.Title</h2>
+                </div>
             }
             <div class="content-links">
                 @if (!Model.Content.Subtitle.IsEmptyHtmlString())
@@ -35,7 +41,7 @@
                     </div>
                 }
 
-                <a href="@Model.Content.CallToActionLink.Url" class="btn arrow cta is-@(hasImage ? "white" : "blue")" target="@Model.Content.CallToActionLink.Target" title="@Model.Content.CallToActionLink.Name">
+                <a href="@Model.Content.CallToActionLink.Url" class="btn arrow cta is-@(hasImage || bgIsDark ? "white" : "blue")" target="@Model.Content.CallToActionLink.Target" title="@Model.Content.CallToActionLink.Name">
                     @linkText
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g><path id="Vector" d="M6.41675 6.41663H15.5834V15.5833" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path id="Vector_2" d="M6.41675 15.5833L15.5834 6.41663" stroke="#283A97" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></g></svg>
                 </a>

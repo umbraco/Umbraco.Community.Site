@@ -33,6 +33,7 @@ The site aims to conform to **WCAG 2.1 Level AA** guidelines where applicable.
 - **Decorative elements**: All decorative SVGs and icons have `aria-hidden="true"` to hide from assistive technology
 - **Interactive icons**: Icons within buttons/links are hidden from screen readers; the parent element provides the accessible name
 - **Dialog components**: Dialogs use appropriate ARIA roles and labels
+- **Live status messages**: Copy-to-clipboard actions (e.g. the Persona picker email) announce their result in a visually hidden `role="status"` region as well as changing the button text
 
 ### Icons
 

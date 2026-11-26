@@ -10,7 +10,13 @@
         "allowInAreas": true,
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12
@@ -54,10 +60,16 @@
         "settingsElementTypeKey": "0a12408a-e550-43ff-a50d-331b2df9ae84",
         "columnSpanOptions": [
           {
-            "columnSpan": 12
+            "columnSpan": 4
           },
           {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
+          },
+          {
+            "columnSpan": 12
           }
         ],
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
@@ -75,10 +87,16 @@
         "allowInAreas": true,
         "columnSpanOptions": [
           {
-            "columnSpan": 12
+            "columnSpan": 4
           },
           {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
+          },
+          {
+            "columnSpan": 12
           }
         ],
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
@@ -91,7 +109,13 @@
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12
@@ -114,7 +138,13 @@
         "settingsElementTypeKey": "192ec43a-ea4a-42f7-a09d-48abf9c2e09f",
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12
@@ -278,6 +308,14 @@
         "settingsElementTypeKey": "858a88b9-eeb7-447d-8d3a-d3a67601045f",
         "editorSize": "large",
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
+      },
+      {
+        "contentElementTypeKey": "fdcd375a-8ea8-4f19-b712-34d49dbc4b5c",
+        "allowAtRoot": true,
+        "allowInAreas": true,
+        "settingsElementTypeKey": "add1d874-dd54-45db-b25c-2c805d9b608e",
+        "editorSize": "large",
+        "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
       }
     ],
     "useLiveEditing": true,
@@ -406,6 +444,9 @@
       "Udi": "umb://document-type/a801c7a3117e488bbf4105185c16a3ba"
     },
     {
+      "Udi": "umb://document-type/add1d874dd5445dbb25c2c805d9b608e"
+    },
+    {
       "Udi": "umb://document-type/ae9343a6012e4d269e5d8beffbbcf1e0"
     },
     {
@@ -467,6 +508,9 @@
     },
     {
       "Udi": "umb://document-type/fc91e41ce96445e682bf596c73a41fbe"
+    },
+    {
+      "Udi": "umb://document-type/fdcd375a8ea84f19b71234d49dbc4b5c"
     },
     {
       "Udi": "umb://document-type/febb1073cf1446f697a599204a58a0ae"

@@ -1,0 +1,9 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<TitleAndTextItem>>
+
+<div class="dc-list-item-preview">
+    <p class="dc-list-item-preview__title">@Model.Content.Title</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Content.Text))
+    {
+        <p class="dc-list-item-preview__text">@Model.Content.Text</p>
+    }
+</div>
