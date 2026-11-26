@@ -155,6 +155,15 @@ table {
   }
 }
 
+.block-tagline {
+  color: var(--block-heading-color, var(--color-blue));
+  text-align: center;
+  font-size: var(--tagline-size, var(--font-size-sm));
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tagline-spacing, 3px);
+  text-transform: uppercase;
+  margin: 0 0 var(--unit);
+}
 
 p.lead-text {
   font-size: var(--font-size-h4);

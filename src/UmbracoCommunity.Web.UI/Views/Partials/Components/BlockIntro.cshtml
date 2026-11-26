@@ -3,6 +3,10 @@
 @if (Model.HasIntro())
 {
     <div class="block-intro">
+        @if (Model is IContentBlockTagline taglined && !string.IsNullOrEmpty(taglined.Tagline))
+        {
+            <p class="block-tagline">@taglined.Tagline</p>
+        }
         @if (!string.IsNullOrEmpty(Model.Title))
         {
             <h2 class="block-title">@Model.Title</h2>

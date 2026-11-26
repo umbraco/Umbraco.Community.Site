@@ -10,7 +10,7 @@
 }
 
 @media (--md) {
-    .dc-block-list .intro-beside {
+    .dc-block-list .intro-beside:not(.dc-image-and-text-block *, .dc-faqs-and-image-block *) {
         --block-title-font-size: var(--font-size-display);
         --block-title-line-height: var(--line-height-lg);
 
@@ -57,6 +57,11 @@
             margin-top: 0;
         }
 
+        > .block-intro .block-tagline {
+            margin-bottom: var(--unit-xs);
+        }
+
+        > .block-intro .block-tagline,
         > .block-intro .block-title,
         > .block-intro .block-subtitle {
             text-align: left;
@@ -66,7 +71,7 @@
         }
     }
 
-    .dc-block-list .dc-form-block.intro-beside .dc-text-block {
+    .dc-block-list .dc-form-block.intro-beside:not(.dc-image-and-text-block *, .dc-faqs-and-image-block *) .dc-text-block {
         justify-content: flex-start;
     }
 

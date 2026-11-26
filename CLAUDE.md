@@ -337,6 +337,7 @@ The *Settings - intro layout* composition (`settingsIntroLayout`, toggle `introB
 - `css/blocks/block-intro.css`: `.block-intro` / `.block-body` are `display: contents` by default, so the stacked layout is unchanged. The grid only applies from `--md`, and only to blocks directly in `.dc-block-list` (not paired rows).
 - The title's cap height lines up with the first line of the content: both are trimmed with `text-box: trim-start cap alphabetic`, and the first FAQ item and the form lose their top padding. Firefox ignores `text-box`, so it's a few px off there.
 - The toggle has no effect on Image blocks yet.
+- *Content block tagline* (`contentBlockTagline`, `IContentBlockTagline`) adds an optional small uppercase label above the title (`.block-tagline` in `typography.css`). It's a separate composition because Banner and Slider blocks already have their own `tagline` property. Only the Accordion block uses it so far; `BlockIntro.cshtml` renders it for any block that composes it.
 
 ### Side-by-side Block Rows
 

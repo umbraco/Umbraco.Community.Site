@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .dc-page-banner-block {
   --page-banner-inset: var(--unit);
 

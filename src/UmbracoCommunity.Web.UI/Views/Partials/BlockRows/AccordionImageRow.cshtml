@@ -7,10 +7,17 @@
         .FirstOrDefault(block => block != null);
     var hasTitle = accordionBlock != null && !string.IsNullOrEmpty(accordionBlock.Title);
     var hasSubtitle = accordionBlock != null && !accordionBlock.Subtitle.IsEmptyHtmlString();
+    bool bgIsDark = Model.HasBg && Model.BackgroundColour.IsDark();
 }
 
-<div class="dc-faqs-and-image-block @(Model.Blocks.FirstOrDefault()?.Content.ContentType.Alias == ImageBlock.ModelTypeAlias ? "image-left" : "image-right")"
+<div class="dc-faqs-and-image-block @(Model.Blocks.FirstOrDefault()?.Content.ContentType.Alias == ImageBlock.ModelTypeAlias ? "image-left" : "image-right") @(Model.HasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)"
      id="@Model.IdHash">
+    @if (Model.HasBg)
+    {
+        <style asp-add-nonce="true">
+            #@Model.IdHash { background-color: @Model.BackgroundColour; }
+        </style>
+    }
     @if (hasTitle || hasSubtitle)
     {
         <div class="dc-faqs-and-image-block__header">

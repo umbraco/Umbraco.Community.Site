@@ -208,3 +208,13 @@
     padding: 0 2rem;
   }
 }
+
+.dc-faqs-and-image-block.has-bg {
+  padding: var(--unit-md);
+  border-radius: var(--radius-card);
+}
+
+.dc-faqs-and-image-block.bg-dark {
+  --block-heading-color: var(--color-white);
+  color: var(--color-white);
+}
