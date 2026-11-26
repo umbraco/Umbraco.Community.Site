@@ -1,0 +1,176 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<PersonaPickerBlock, SettingsPersonaPickerBlock>>
+
+@{
+    var block = Model.Content;
+    var personas = block.Items;
+    var slugs = block.Slugs();
+    bool hasBg = Model.Settings?.HasBg() ?? false;
+    bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
+    var blockId = string.IsNullOrWhiteSpace(Model.Settings?.BlockId) ? null : Model.Settings.BlockId;
+    var selectId = $"{block.IdHash}-persona";
+    var defaultPersona = personas.Count > 1 ? block.DefaultPersona : null;
+}
+
+@if (personas.Any())
+{
+    <dc-persona-picker class="dc-persona-picker @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" data-persona-picker="@block.IdHash" id="@blockId">
+        @if (hasBg)
+        {
+            <style asp-add-nonce="true">
+                [data-persona-picker="@block.IdHash"] {
+                    --block-background-color: @Model.Settings?.BackgroundColour?.Color;
+                }
+            </style>
+        }
+
+        @if (!string.IsNullOrEmpty(block.Title))
+        {
+            <h2 class="block-title">@block.Title</h2>
+        }
+        @if (!block.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(block.Subtitle?.ToHtmlString())
+            </div>
+        }
+
+        @if (personas.Count > 1)
+        {
+            <noscript>
+                <style asp-add-nonce="true">
+                    [data-persona-picker="@block.IdHash"] .dc-persona-picker__persona[hidden] {
+                        display: flex;
+                    }
+                </style>
+            </noscript>
+            <div class="dc-persona-picker__picker" data-persona-field hidden>
+                <label for="@selectId">@block.ResolvedSelectLabel</label>
+                <select id="@selectId" data-persona-select aria-controls="@string.Join(" ", personas.Select(p => $"{block.IdHash}-{slugs[p]}"))">
+                    @foreach (var group in block.RoleGroups())
+                    {
+                        if (group.Heading != null)
+                        {
+                            <optgroup label="@group.Heading">
+                                @foreach (var persona in group.Personas)
+                                {
+                                    <option value="@slugs[persona]">@persona.PersonaName</option>
+                                }
+                            </optgroup>
+                        }
+                        else
+                        {
+                            foreach (var persona in group.Personas)
+                            {
+                                <option value="@slugs[persona]">@persona.PersonaName</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        }
+
+        @foreach (var persona in personas)
+        {
+            RenderPersona(block, persona, slugs[persona], defaultPersona != null && persona != defaultPersona);
+        }
+
+        @if (!string.IsNullOrWhiteSpace(block.Footnote))
+        {
+            <p class="dc-persona-picker__footnote">@block.Footnote</p>
+        }
+    </dc-persona-picker>
+}
+
+@functions {
+    void RenderPersona(PersonaPickerBlock block, Persona persona, string slug, bool hidden)
+    {
+        var id = $"{block.IdHash}-{slug}";
+        var reasons = persona.ReasonItems.ToList();
+        var testimonials = persona.TestimonialItems.ToList();
+
+        <section class="dc-persona-picker__persona" id="@id" data-persona="@slug" aria-labelledby="@id-name" hidden="@hidden">
+            <div class="dc-persona-picker__intro">
+                <p class="dc-persona-picker__name" id="@id-name">@persona.PersonaName</p>
+                <h3 class="dc-persona-picker__pitch">@persona.Pitch</h3>
+            </div>
+
+            @if (reasons.Any())
+            {
+                <div class="dc-persona-picker__section">
+                    <h4 class="dc-persona-picker__heading">@block.ResolvedReasonsHeading</h4>
+                    <ul class="dc-persona-picker__reasons">
+                        @foreach (var reason in reasons)
+                        {
+                            <li class="dc-persona-picker__reason">
+                                <p class="dc-persona-picker__reason-title">@reason.Title</p>
+                                @if (!string.IsNullOrWhiteSpace(reason.Text))
+                                {
+                                    <p class="dc-persona-picker__reason-text">@reason.Text</p>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (testimonials.Any())
+            {
+                <div class="dc-persona-picker__section">
+                    <h4 class="dc-persona-picker__heading">@block.ResolvedTestimonialsHeading</h4>
+                    <div class="dc-persona-picker__quotes">
+                        @foreach (var testimonial in testimonials)
+                        {
+                            <figure class="dc-persona-picker__quote">
+                                <svg class="dc-persona-picker__quote-badge" xmlns="http://www.w3.org/2000/svg" width="58" height="58" viewBox="0 0 58 58" aria-hidden="true">
+                                    <circle cx="29" cy="29" r="29" />
+                                    <g transform="translate(18,18)">
+                                        <path d="M14.3845 22C13.3014 22 12.4102 21.1087 12.4102 20.0256V17.7692C12.4102 16.6862 13.3014 15.7949 14.3845 15.7949C15.163 15.7949 15.7948 15.1631 15.7948 14.3846V13.2564C15.7948 13.0985 15.6707 12.9744 15.5127 12.9744C13.7978 12.9744 12.4102 11.5867 12.4102 9.8718V3.10256C12.4102 1.38769 13.7978 0 15.5127 0H18.8973C20.6122 0 21.9999 1.38769 21.9999 3.10256V14.3846C21.9999 18.5815 18.5814 22 14.3845 22ZM15.5127 1.69231C14.7343 1.69231 14.1025 2.3241 14.1025 3.10256V9.8718C14.1025 10.6503 14.7343 11.2821 15.5127 11.2821C16.5958 11.2821 17.4871 12.1733 17.4871 13.2564V14.3846C17.4871 16.0995 16.0994 17.4872 14.3845 17.4872C14.2266 17.4872 14.1025 17.6113 14.1025 17.7692V20.0256C14.1025 20.1836 14.2266 20.3077 14.3845 20.3077C17.645 20.3077 20.3076 17.6451 20.3076 14.3846V3.10256C20.3076 2.3241 19.6758 1.69231 18.8973 1.69231H15.5127Z" />
+                                        <path d="M1.97436 22C0.891282 22 0 21.1087 0 20.0256V17.7692C0 16.6862 0.891282 15.7949 1.97436 15.7949C2.75282 15.7949 3.38462 15.1631 3.38462 14.3846V13.2564C3.38462 13.0985 3.26051 12.9744 3.10256 12.9744C1.38769 12.9744 0 11.5867 0 9.8718V3.10256C0 1.38769 1.38769 0 3.10256 0H6.48718C8.20205 0 9.58974 1.38769 9.58974 3.10256V14.3846C9.58974 18.5815 6.17128 22 1.97436 22ZM3.10256 1.69231C2.3241 1.69231 1.69231 2.3241 1.69231 3.10256V9.8718C1.69231 10.6503 2.3241 11.2821 3.10256 11.2821C4.18564 11.2821 5.07692 12.1733 5.07692 13.2564V14.3846C5.07692 16.0995 3.68923 17.4872 1.97436 17.4872C1.81641 17.4872 1.69231 17.6113 1.69231 17.7692V20.0256C1.69231 20.1836 1.81641 20.3077 1.97436 20.3077C5.24615 20.3077 7.89744 17.6451 7.89744 14.3846V3.10256C7.89744 2.3241 7.26564 1.69231 6.48718 1.69231H3.10256Z" />
+                                    </g>
+                                </svg>
+                                <blockquote>
+                                    <p>@testimonial.Quote</p>
+                                </blockquote>
+                                <figcaption>
+                                    <span class="dc-persona-picker__quote-name">@testimonial.PersonName</span>
+                                    @if (!string.IsNullOrEmpty(testimonial.Attribution))
+                                    {
+                                        <span class="dc-persona-picker__quote-role">@testimonial.Attribution</span>
+                                    }
+                                </figcaption>
+                            </figure>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(persona.NormalisedEmailBody))
+            {
+                <div class="dc-persona-picker__section">
+                    <div class="dc-persona-picker__email-header">
+                        <h4 class="dc-persona-picker__heading">@block.ResolvedEmailHeading</h4>
+                        <div class="dc-persona-picker__actions">
+                            <button type="button" class="btn is-blue dc-persona-picker__copy" data-persona-copy hidden>
+                                <svg class="dc-persona-picker__icon-copy" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                <svg class="dc-persona-picker__icon-done" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                <span data-persona-copy-label>Copy email</span>
+                            </button>
+                            <a class="btn" href="@persona.MailtoUrl">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                Open in your email app
+                            </a>
+                        </div>
+                    </div>
+                    <div class="dc-persona-picker__email" data-persona-email>
+                        @if (!string.IsNullOrWhiteSpace(persona.EmailSubject))
+                        {
+                            <p class="dc-persona-picker__subject"><span>Subject:</span> <span data-persona-subject>@persona.EmailSubject</span></p>
+                        }
+                        <p class="dc-persona-picker__body" data-persona-body>@persona.NormalisedEmailBody</p>
+                    </div>
+                    <p class="sr-only" role="status" data-persona-status></p>
+                </div>
+            }
+        </section>
+    }
+}

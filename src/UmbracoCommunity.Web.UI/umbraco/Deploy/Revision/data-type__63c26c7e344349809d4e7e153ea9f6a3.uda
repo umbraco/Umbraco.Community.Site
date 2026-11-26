@@ -1,0 +1,29 @@
+{
+  "Name": "Title and text items (max 4)",
+  "EditorAlias": "Umbraco.BlockList",
+  "EditorUiAlias": "Umb.PropertyEditorUi.BlockList",
+  "Configuration": {
+    "blocks": [
+      {
+        "contentElementTypeKey": "a65a701c-bf6c-422b-bef0-cc99dbed5807",
+        "label": "${ title }"
+      }
+    ],
+    "validationLimit": {
+      "max": 4
+    }
+  },
+  "Parent": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+  "Udi": "umb://data-type/63c26c7e344349809d4e7e153ea9f6a3",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type-container/4088bdcaefa84dde9cfde7281c63b076",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/a65a701cbf6c422bbef0cc99dbed5807"
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

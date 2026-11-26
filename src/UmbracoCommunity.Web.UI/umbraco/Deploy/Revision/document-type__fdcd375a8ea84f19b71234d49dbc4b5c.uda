@@ -1,0 +1,107 @@
+{
+  "Name": "Persona picker block",
+  "Alias": "personaPickerBlock",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-message",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/45ffb4c48e1a479c84c2497a7e71670b",
+  "CompositionContentTypes": [
+    "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8"
+  ],
+  "PropertyGroups": [
+    {
+      "Key": "49228c94-10e9-4de0-b2d6-2de73f62095b",
+      "Name": "Content",
+      "Type": 1,
+      "Alias": "content",
+      "PropertyTypes": [
+        {
+          "Key": "262cd55c-0256-42d7-9d35-d53fd3e5f35a",
+          "Alias": "testimonialsHeading",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Defaults to \u0027In their words\u0027",
+          "Name": "Testimonials heading",
+          "SortOrder": 13
+        },
+        {
+          "Key": "40322e2b-76a5-4ed4-a605-e311a5956ade",
+          "Alias": "personas",
+          "DataType": "umb://data-type/c68fff83f04b470096d904a27945c6d4",
+          "ValueType": "Umbraco.Cms.Core.Models.Blocks.BlockListModel",
+          "Description": "The first persona is shown until a visitor picks another",
+          "Mandatory": true,
+          "Name": "Personas",
+          "SortOrder": 10
+        },
+        {
+          "Key": "7ecb63b0-9d84-408d-a258-c9573d8d9676",
+          "Alias": "footnote",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Description": "Optional small print under the block, e.g. ticket prices and dates",
+          "Name": "Footnote",
+          "SortOrder": 15
+        },
+        {
+          "Key": "bb0f0e20-8456-48af-9d23-989a559975c6",
+          "Alias": "selectLabel",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Label next to the dropdown. Defaults to \u0027I am a\u0027.",
+          "Name": "Dropdown label",
+          "SortOrder": 11
+        },
+        {
+          "Key": "da7372d7-00d1-4ec8-8124-b62098a5370a",
+          "Alias": "emailHeading",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Defaults to \u0027Your email to your boss\u0027",
+          "Name": "Email heading",
+          "SortOrder": 14
+        },
+        {
+          "Key": "f7f93df6-39a6-4a09-8794-63bc2142382b",
+          "Alias": "reasonsHeading",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Description": "Defaults to \u0027What you bring back\u0027",
+          "Name": "Reasons heading",
+          "SortOrder": 12
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/fdcd375a8ea84f19b71234d49dbc4b5c",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c68fff83f04b470096d904a27945c6d4",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/45ffb4c48e1a479c84c2497a7e71670b",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type/535ffb6ef9e643fd8a59eb0aa09488f8",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

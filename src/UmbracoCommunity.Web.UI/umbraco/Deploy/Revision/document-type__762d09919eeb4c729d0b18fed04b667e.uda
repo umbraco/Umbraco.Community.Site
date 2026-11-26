@@ -1,0 +1,76 @@
+{
+  "Name": "Testimonial",
+  "Alias": "testimonial",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-quote",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedInLibrary": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "b359f856-cca1-4873-93a7-f1428949a15f",
+      "Name": "Testimonial",
+      "Alias": "testimonial",
+      "PropertyTypes": [
+        {
+          "Key": "5f027520-9d03-44ef-847b-503c00a897b8",
+          "Alias": "quote",
+          "DataType": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+          "ValueType": "System.String",
+          "Description": "Word for word, without quotation marks",
+          "Mandatory": true,
+          "Name": "Quote"
+        },
+        {
+          "Key": "66f8137e-a326-45ab-85b2-db3c79fa7ded",
+          "Alias": "personName",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Mandatory": true,
+          "Name": "Name",
+          "SortOrder": 1
+        },
+        {
+          "Key": "702a6097-8863-4ff0-801d-407fa4aa48e7",
+          "Alias": "jobTitle",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Name": "Job title",
+          "SortOrder": 2
+        },
+        {
+          "Key": "fda75b6e-3d5a-4a71-a2c2-eceeccb9b869",
+          "Alias": "company",
+          "DataType": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+          "ValueType": "System.String",
+          "Name": "Company",
+          "SortOrder": 3
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/762d09919eeb4c729d0b18fed04b667e",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/0cc0eba1996042c9bf9b60e150b429ae",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://data-type/c6bac0dd4ab945b18e30e4b619ee5da3",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/b557225c58ed4111aff5ce84664ed1dd",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

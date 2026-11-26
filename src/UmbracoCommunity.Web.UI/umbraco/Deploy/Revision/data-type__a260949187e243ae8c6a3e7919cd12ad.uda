@@ -1,0 +1,15 @@
+{
+  "Name": "Testimonial picker (max 4)",
+  "EditorAlias": "Umbraco.ElementPicker",
+  "EditorUiAlias": "Umb.PropertyEditorUi.ElementPicker",
+  "Configuration": {
+    "allowedContentTypes": "762d0991-9eeb-4c72-9d0b-18fed04b667e",
+    "validationLimit": {
+      "max": 4
+    }
+  },
+  "Udi": "umb://data-type/a260949187e243ae8c6a3e7919cd12ad",
+  "Dependencies": [],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.DataTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

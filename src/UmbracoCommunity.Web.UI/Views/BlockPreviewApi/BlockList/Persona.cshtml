@@ -1,0 +1,27 @@
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockListItem<Persona>>
+
+@{
+    var persona = Model.Content;
+    var reasons = persona.ReasonItems.Count();
+    var testimonials = persona.TestimonialItems.Count();
+    var hasEmail = !string.IsNullOrWhiteSpace(persona.NormalisedEmailBody);
+}
+
+<div class="dc-list-item-preview">
+    <div class="dc-list-item-preview__header">
+        <p class="dc-list-item-preview__title">@persona.PersonaName</p>
+        @if (!string.IsNullOrWhiteSpace(persona.RoleGroup))
+        {
+            <span class="dc-list-item-preview__tag">@persona.RoleGroup</span>
+        }
+    </div>
+    @if (!string.IsNullOrWhiteSpace(persona.Pitch))
+    {
+        <p class="dc-list-item-preview__text">@persona.Pitch</p>
+    }
+    <ul class="dc-list-item-preview__meta">
+        <li>@reasons @(reasons == 1 ? "reason" : "reasons")</li>
+        <li>@testimonials @(testimonials == 1 ? "testimonial" : "testimonials")</li>
+        <li class="@(hasEmail ? null : "is-warning")">@(hasEmail ? "Email ready" : "No email")</li>
+    </ul>
+</div>
