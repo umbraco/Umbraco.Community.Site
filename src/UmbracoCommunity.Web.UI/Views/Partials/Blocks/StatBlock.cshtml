@@ -3,7 +3,7 @@
 @if (!string.IsNullOrWhiteSpace(Model.Content.Number))
 {
     <p class="dc-tile-stat @(Model.Content.LabelBesideNumber ? "dc-tile-stat--label-beside" : string.Empty)">
-        <span class="dc-tile-stat__number">@Model.Content.Number</span>
+        <span class="dc-tile-stat__number" style="--stat-chars: @Model.Content.Number.Trim().Length">@Model.Content.Number</span>
         @if (!string.IsNullOrWhiteSpace(Model.Content.Label))
         {
             <span class="dc-tile-stat__label">@Model.Content.Label</span>

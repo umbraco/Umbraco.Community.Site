@@ -2657,9 +2657,14 @@ dc-image-slider img {
     margin: 0;
 }
 
+.dc-tile {
+    container-type: inline-size;
+}
+
 .dc-tile-stat__number {
-    font-size: 48px;
+    font-size: min(48px, 100cqi / (var(--stat-chars, 1) * 0.55));
     font-weight: 700;
+    overflow-wrap: anywhere;
     line-height: 1;
 }
 
