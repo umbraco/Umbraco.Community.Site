@@ -75,9 +75,13 @@
         justify-content: flex-start;
     }
 
+    /* Only a CTA without its own background or image needs the nudge; a band keeps its own padding. */
+    .dc-block-list .dc-big-cta-block:not(.has-bg, .has-image) .dc-big-cta-block__content.intro-beside {
+        padding-top: 0.5rem;
+    }
+
     .dc-block-list .dc-big-cta-block__content.intro-beside {
         width: auto;
-        padding-top: 0.5rem;
 
         .block-title {
             font-size: var(--block-title-font-size);
