@@ -539,10 +539,6 @@ body.hero-full-width.mobile .nav-header .nav-list {
     padding: 17px 3rem;
   }
 
-  body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
-    padding: 2rem 3rem;
-  }
-
   body.scroll .nav-header .nav .nav-list {
     padding-right: calc(-2rem - 44px);
   }
@@ -551,10 +547,6 @@ body.hero-full-width.mobile .nav-header .nav-list {
 @media(--lg) {
   body.scroll .nav-header .nav .nav-list {
     margin: 0 calc(-2rem - 44px) 0 3rem;
-  }
-
-  body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
-    padding: 2rem 5rem;
   }
 }
 
@@ -565,11 +557,6 @@ body.hero-full-width.mobile .nav-header .nav-list {
 
   .nav-header .nav-list__list {
     column-gap: 2rem;
-  }
-
-  body.hero-full-width:not(.mobile):not(.scroll) .nav-header .header {
-    padding: 2rem 6rem;
-    max-width: 1708px;
   }
 }
 
