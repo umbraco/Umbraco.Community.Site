@@ -3,6 +3,7 @@
     var cols = Model.GridColumns ?? 12;
     var imgWidth = 1360d * (Model.ColumnSpan / (double)cols);
     var imgIsCircle = Model.Settings?.ImageIsCircular ?? false;
+    var imgShape = imgIsCircle ? "is-circle" : Model.Settings?.ImageHasArchTop == true ? "is-arch" : "";
     var cropWidth = (int)Math.Round(imgWidth);
     var aspectRatio = Model.Content.Image.GetAspectRatioStyle();
     var attrHeight = Model.Content.Image.GetScaledHeight(386);
@@ -22,7 +23,7 @@
             </style>
         }
         <div class="dc-image-wrapper">
-            <img src="@Model.Content.Image.GetCropUrl(width: cropWidth)" alt="@Model.Content.AltText" class="dc-image @(imgIsCircle ? "is-circle" : "")" width="386" height="@attrHeight" style="@aspectRatio" loading="lazy" />
+            <img src="@Model.Content.Image.GetCropUrl(width: cropWidth)" alt="@Model.Content.AltText" class="dc-image @imgShape" width="386" height="@attrHeight" style="@aspectRatio" loading="lazy" />
 
             @if (!Model.Content.OverlayText.IsEmptyHtmlString())
             {

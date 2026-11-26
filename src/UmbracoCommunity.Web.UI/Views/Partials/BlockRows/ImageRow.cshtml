@@ -16,13 +16,15 @@
         if (typedBlock?.Image != null)
         {
             bool hasCaption = !string.IsNullOrWhiteSpace(typedBlock.ImageCaption);
-            <div class="dc-image-and-text-block__image-container">
+            var imageSettings = block.Settings as SettingsImageBlock;
+            var shapeClass = imageSettings?.ImageIsCircular == true ? "is-circle" : imageSettings?.ImageHasArchTop == true ? "is-arch" : null;
+            <div class="dc-image-and-text-block__image-container" style="--row-span: @block.ColumnSpan">
                 @if (hasCaption)
                 {
                     <figure>
                         <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
                              sizes="(max-width: 400px) 386px, 906px"
-                             src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                             src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText" class="@shapeClass"
                              width="@typedBlock.Image.GetCropSize("mobile")?.Width" height="@typedBlock.Image.GetCropSize("mobile")?.Height" style="@typedBlock.Image.GetCropRatioStyle()"
                              loading="lazy" />
                         <figcaption>@typedBlock.ImageCaption</figcaption>
@@ -32,7 +34,7 @@
                 {
                     <img srcset="@typedBlock.Image.GetCropUrl("mobile") 386w, @typedBlock.Image.GetCropUrl("desktop") 906w"
                          sizes="(max-width: 400px) 386px, 906px"
-                         src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText"
+                         src="@typedBlock.Image.GetCropUrl("desktop")" alt="@typedBlock.AltText" class="@shapeClass"
                          width="@typedBlock.Image.GetCropSize("mobile")?.Width" height="@typedBlock.Image.GetCropSize("mobile")?.Height" style="@typedBlock.Image.GetCropRatioStyle()"
                          loading="lazy" />
                 }

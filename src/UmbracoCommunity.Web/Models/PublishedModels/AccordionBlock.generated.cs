@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>Accordion block</summary>
 	[PublishedModel("accordionBlock")]
-	public partial class AccordionBlock : PublishedElementModel, IContentBlockIntro
+	public partial class AccordionBlock : PublishedElementModel, IContentBlockIntro, IContentBlockTagline
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -72,5 +72,13 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("title")]
 		public virtual string Title => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockIntro.GetTitle(this, _publishedValueFallback);
+
+		///<summary>
+		/// Tagline: Small label shown above the title
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("tagline")]
+		public virtual string Tagline => global::UmbracoCommunity.Web.Models.PublishedModels.ContentBlockTagline.GetTagline(this, _publishedValueFallback);
 	}
 }

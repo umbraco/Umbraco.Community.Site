@@ -1,0 +1,46 @@
+{
+  "Name": "Settings - intro layout",
+  "Alias": "settingsIntroLayout",
+  "AllowedTemplates": [],
+  "HistoryCleanup": {},
+  "Icon": "icon-frame color-green",
+  "Thumbnail": "folder.png",
+  "Permissions": {
+    "IsElementType": true,
+    "AllowedChildContentTypes": []
+  },
+  "Parent": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+  "CompositionContentTypes": [],
+  "PropertyGroups": [
+    {
+      "Key": "6f713765-53c1-4c95-b019-538fb4699c4b",
+      "Name": "Settings",
+      "Alias": "settings",
+      "PropertyTypes": [
+        {
+          "Key": "6d30db79-3e13-403e-868b-19d89d4f8cba",
+          "Alias": "introBesideContent",
+          "DataType": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+          "ValueType": "System.Boolean",
+          "Description": "On larger screens, show the title and subtitle in a column to the left of the block\u0027s content instead of above it.",
+          "Name": "Title beside content",
+          "SortOrder": 90
+        }
+      ]
+    }
+  ],
+  "PropertyTypes": [],
+  "Udi": "umb://document-type/c4f7bddd813840d197c174bfc0ef6d83",
+  "Dependencies": [
+    {
+      "Udi": "umb://data-type/d0708ebfa17a4b1792b42ffbf9962c8d",
+      "Ordering": true
+    },
+    {
+      "Udi": "umb://document-type-container/069dc573586b4223a70b853de3e0df65",
+      "Ordering": true
+    }
+  ],
+  "__type": "Umbraco.Deploy.Infrastructure,Umbraco.Deploy.Infrastructure.Artifacts.ContentType.DocumentTypeArtifact",
+  "__version": "19.0.0-rc1"
+}

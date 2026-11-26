@@ -25,7 +25,7 @@
                     <div class="row-item-image">
                         <img src="@imageItem.Image.GetCropUrl(width: 240, height: 160)"
                              alt="@imageItem.AltText"
-                             class="@(imgIsCircle ? "is-circle" : string.Empty)"
+                             class="@(imgIsCircle ? "is-circle" : imageSettings?.ImageHasArchTop == true ? "is-arch" : string.Empty)"
                              loading="lazy" />
                     </div>
                     break;

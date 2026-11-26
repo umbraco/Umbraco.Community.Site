@@ -3,36 +3,33 @@
 
 @if (Model.Content?.AccordionItems != null && Model.Content.AccordionItems.Any())
 {
-    <dl class="dc-faqs" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
-        @if (!string.IsNullOrEmpty(Model.Content.Title))
-        {
-            <h2 class="block-title">@Model.Content.Title</h2>
-        }
-        @if (!Model.Content.Subtitle.IsEmptyHtmlString())
-        {
-            <div class="block-subtitle">
-                @Html.Raw(Model.Content.Subtitle?.ToHtmlString())
-            </div>
-        }
-        @foreach (var item in Model.Content.AccordionItems)
-        {
-            var typedAccordionItem = item.Content as AccordionItemBlock;
-            if (typedAccordionItem == null) continue;
-            var checkboxIdentifier = StringUtilities.RandomString(5);
-            var panelId = $"panel-{checkboxIdentifier}";
-            <div class="dc-faq-block">
-                <dt>
-                    <input type="checkbox" id="cb-@checkboxIdentifier" class="dc-faqs__checkbox"
-                           aria-expanded="false" aria-controls="@panelId">
-                    <label for="cb-@checkboxIdentifier">
-                        <h4>@typedAccordionItem.Title</h4>
-                        <partial name="~/Views/Partials/Components/PlusSvg.cshtml" />
-                    </label>
-                </dt>
-                <div class="expand" id="@panelId" role="region" aria-labelledby="cb-@checkboxIdentifier">
-                    <dd>@Html.Raw(typedAccordionItem.Content)</dd>
+    var hasBg = Model.Settings.HasBg();
+    var bgIsDark = hasBg && Model.Settings.IsDark();
+    <div class="dc-faqs @Model.Content.IntroLayoutClass(Model.Settings) @(hasBg ? "has-bg" : null) @(bgIsDark ? "bg-dark" : null)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)"
+         style="@(hasBg ? $"--block-background-color: {Model.Settings!.BackgroundColour!.Color}" : null)">
+        <partial name="~/Views/Partials/Components/BlockIntro.cshtml" model="Model.Content" />
+
+        <dl class="block-body dc-faqs__list">
+            @foreach (var item in Model.Content.AccordionItems)
+            {
+                var typedAccordionItem = item.Content as AccordionItemBlock;
+                if (typedAccordionItem == null) continue;
+                var checkboxIdentifier = StringUtilities.RandomString(5);
+                var panelId = $"panel-{checkboxIdentifier}";
+                <div class="dc-faq-block">
+                    <dt>
+                        <input type="checkbox" id="cb-@checkboxIdentifier" class="dc-faqs__checkbox"
+                               aria-expanded="false" aria-controls="@panelId">
+                        <label for="cb-@checkboxIdentifier">
+                            <h4>@typedAccordionItem.Title</h4>
+                            <partial name="~/Views/Partials/Components/PlusSvg.cshtml" />
+                        </label>
+                    </dt>
+                    <div class="expand" id="@panelId" role="region" aria-labelledby="cb-@checkboxIdentifier">
+                        <dd>@Html.Raw(typedAccordionItem.Content)</dd>
+                    </div>
                 </div>
-            </div>
-        }
-    </dl>
+            }
+        </dl>
+    </div>
 }

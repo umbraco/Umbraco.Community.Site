@@ -329,6 +329,24 @@ The API client in `Client/src/api/` is generated: run `npm run generate-client` 
 
 The Extensions project has its own TypeScript/Vite build in `Client/` with output to `wwwroot/App_Plugins/UmbracoCommunityExtensions/`.
 
+### Title Beside Content
+
+The *Settings - intro layout* composition (`settingsIntroLayout`, toggle `introBesideContent` "Title beside content") lets editors put a block's title in a left column (⅓) beside its content (⅔). It's on the Text, Call to action, Accordion and Form block settings only. Blocks that fill the width (boxes, events, cards) deliberately don't get it.
+
+- `BlockIntroExtensions.IntroLayoutClass` adds `intro-beside` when the toggle is on and the block has a title or subtitle; `Views/Partials/Components/BlockIntro.cshtml` renders the shared `.block-intro`. Text blocks have no title field, so the toggle splits off a *leading heading* in the rich text (`SplitLeadingHeading`); without one the block renders as normal.
+- `css/blocks/block-intro.css`: `.block-intro` / `.block-body` are `display: contents` by default, so the stacked layout is unchanged. The grid only applies from `--md`, and only to blocks directly in `.dc-block-list` (not paired rows).
+- The title's cap height lines up with the first line of the content: both are trimmed with `text-box: trim-start cap alphabetic`, and the first FAQ item and the form lose their top padding. Firefox ignores `text-box`, so it's a few px off there.
+- The toggle has no effect on Image blocks yet.
+- *Content block tagline* (`contentBlockTagline`, `IContentBlockTagline`) adds an optional small uppercase label above the title (`.block-tagline` in `typography.css`). It's a separate composition because Banner and Slider blocks already have their own `tagline` property. Only the Accordion block uses it so far; `BlockIntro.cshtml` renders it for any block that composes it.
+
+### Side-by-side Block Rows
+
+`ParseBlockGrid` groups consecutive content blocks into one `BlockGridRow` until their column spans add up to 12, and multi-block rows render with `Views/Partials/BlockRows/{row.Alias}.cshtml` (`ImageTextRow`, `TextRow`, `ImageRow`, `FormTextRow`, `AccordionImageRow`).
+
+- Text, Image, Image with overlay, Form and Accordion blocks can be 4, 6, 8 or 12 columns wide in the ROOT and General content block grids (#287), so editors can pair them as 6 + 6, 4 + 8 or 8 + 4.
+- Each row child gets `style="--row-span: {ColumnSpan}"`. From `--md` the row CSS (`image-and-text-block.css`, `faqs-and-image-block.css`) uses it as the flex-grow, so the widths follow the spans. Below `--md` the blocks stack as before.
+- A block that isn't paired, for example a lone 8-column block followed by a 12, still renders full width.
+
 ### Stepped Forms
 
 The form block supports an optional multi-step mode via the `EnableSteppedForm` toggle on `SettingsFormBlock`. When enabled, `FormBlock.cshtml` wraps the form in a `<dc-form-steps>` web component (`src/UmbracoCommunity.StaticAssets/src/components/form/form-steps.element.ts`) that:

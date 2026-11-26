@@ -10,7 +10,13 @@
         "allowInAreas": true,
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12
@@ -54,10 +60,16 @@
         "settingsElementTypeKey": "0a12408a-e550-43ff-a50d-331b2df9ae84",
         "columnSpanOptions": [
           {
-            "columnSpan": 12
+            "columnSpan": 4
           },
           {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
+          },
+          {
+            "columnSpan": 12
           }
         ],
         "groupKey": "0fb3559d-50a3-4e9d-befd-fee52c418208"
@@ -75,10 +87,16 @@
         "allowInAreas": true,
         "columnSpanOptions": [
           {
-            "columnSpan": 12
+            "columnSpan": 4
           },
           {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
+          },
+          {
+            "columnSpan": 12
           }
         ],
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
@@ -91,7 +109,13 @@
         "settingsElementTypeKey": "c4e6e203-244c-4cf4-864a-eec650508a40",
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12
@@ -114,7 +138,13 @@
         "settingsElementTypeKey": "192ec43a-ea4a-42f7-a09d-48abf9c2e09f",
         "columnSpanOptions": [
           {
+            "columnSpan": 4
+          },
+          {
             "columnSpan": 6
+          },
+          {
+            "columnSpan": 8
           },
           {
             "columnSpan": 12

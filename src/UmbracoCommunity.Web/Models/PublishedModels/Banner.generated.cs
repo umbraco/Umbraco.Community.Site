@@ -58,6 +58,14 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		public virtual global::Umbraco.Cms.Core.Models.MediaWithCrops BackgroundImage => this.Value<global::Umbraco.Cms.Core.Models.MediaWithCrops>(_publishedValueFallback, "backgroundImage");
 
 		///<summary>
+		/// Tagline: Small label above the title
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
+		[ImplementPropertyType("tagline")]
+		public virtual string Tagline => this.Value<string>(_publishedValueFallback, "tagline");
+
+		///<summary>
 		/// Subtitle
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]

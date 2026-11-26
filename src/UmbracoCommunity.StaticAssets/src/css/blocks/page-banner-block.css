@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .dc-page-banner-block {
   --page-banner-inset: var(--unit);
 
@@ -39,6 +41,7 @@
   background-image: var(--page-banner-background-image);
   background-color: var(--page-banner-background-color);
   color: var(--page-banner-text-color);
+  --link-color: currentColor;
 
   .has-bg & {
     color: var(--color-white);
@@ -71,4 +74,20 @@
     .dc-page-banner-block__container {
       padding-block: var(--unit-xl);
     }
+}
+
+.dc-page-banner-block__tagline {
+  display: block;
+  font-size: 12px;
+  line-height: 17px;
+  letter-spacing: 0.96px;
+  text-transform: uppercase;
+  margin-bottom: var(--unit-sm);
+  z-index: 1;
+
+  @media (--sm) {
+    font-size: 14px;
+    line-height: 19px;
+    letter-spacing: 1.12px;
+  }
 }
