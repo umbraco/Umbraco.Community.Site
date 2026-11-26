@@ -3,7 +3,8 @@
 @if (Model?.Content?.CallToActionLink != null)
 {
     bool hasImage = Model.Settings?.BackgroundImage != null;
-    var linkText = string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
+    bool titleBeside = Model.Settings?.IntroBesideContent == true && !string.IsNullOrEmpty(Model.Content.Title);
+    var linkText =string.IsNullOrWhiteSpace(Model.Content.CallToActionLinkText) ? Model.Content.CallToActionLink.Name : Model.Content.CallToActionLinkText;
     
     <div class="dc-big-cta-block @(hasImage ? "has-image" : string.Empty)" id="@(Model.Settings?.BlockId != null ? Model.Settings?.BlockId : string.Empty)">
         @if (hasImage)
@@ -22,10 +23,12 @@
                 </picture>
             </div>
         }
-        <div class="dc-big-cta-block__content @(hasImage ? "image align-left" : "align-center")">
+        <div class="dc-big-cta-block__content @(hasImage ? "image align-left" : "align-center") @(titleBeside ? BlockIntroExtensions.IntroBesideClass : null)">
             @if (!string.IsNullOrEmpty(Model.Content.Title))
             {
-                <h2 class="block-title">@Model.Content.Title</h2>
+                <div class="block-intro">
+                    <h2 class="block-title">@Model.Content.Title</h2>
+                </div>
             }
             <div class="content-links">
                 @if (!Model.Content.Subtitle.IsEmptyHtmlString())

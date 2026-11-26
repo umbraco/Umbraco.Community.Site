@@ -1,0 +1,17 @@
+@model IContentBlockIntro
+
+@if (Model.HasIntro())
+{
+    <div class="block-intro">
+        @if (!string.IsNullOrEmpty(Model.Title))
+        {
+            <h2 class="block-title">@Model.Title</h2>
+        }
+        @if (!Model.Subtitle.IsEmptyHtmlString())
+        {
+            <div class="block-subtitle">
+                @Html.Raw(Model.Subtitle?.ToHtmlString())
+            </div>
+        }
+    </div>
+}

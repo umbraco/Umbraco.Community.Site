@@ -1,0 +1,85 @@
+@import "../base/media-queries.css";
+
+.block-intro,
+.block-body {
+    display: contents;
+}
+
+.dc-text-block__content > .block-intro > :first-child {
+    margin-top: 0;
+}
+
+@media (--md) {
+    .dc-block-list .intro-beside {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        column-gap: var(--unit-xl);
+        align-items: start;
+
+        > * {
+            grid-area: 1 / 2;
+            min-width: 0;
+            margin-top: 0;
+        }
+
+        > .block-intro {
+            grid-area: 1 / 1;
+        }
+
+        > .block-intro,
+        > .block-body {
+            display: block;
+        }
+
+        > .block-intro > :first-child,
+        > :not(.block-intro) > :first-child {
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        > .block-intro > :first-child,
+        > .block-body > :first-child,
+        .block-subtitle > :first-child,
+        .dc-faq-block:first-child h4,
+        .umbraco-forms-fieldset:first-of-type .umbraco-forms-field:first-child > .umbraco-forms-label {
+            text-box: trim-start cap alphabetic;
+        }
+
+        .dc-faq-block:first-child dt,
+        .umbraco-forms-form {
+            padding-top: 0;
+        }
+
+        .dc-faq-block:first-child h4 {
+            margin-top: 0;
+        }
+
+        > .block-intro .block-title,
+        > .block-intro .block-subtitle {
+            text-align: left;
+            align-self: auto;
+            max-width: none;
+            margin-inline: 0;
+        }
+    }
+
+    .dc-block-list .dc-form-block.intro-beside .dc-text-block {
+        justify-content: flex-start;
+    }
+
+    .dc-block-list .dc-big-cta-block__content.intro-beside {
+        width: auto;
+
+        > :not(.block-intro) {
+            align-items: flex-start;
+        }
+
+        p {
+            text-align: left;
+        }
+
+        .block-subtitle > :first-child {
+            padding-top: 0;
+        }
+    }
+}

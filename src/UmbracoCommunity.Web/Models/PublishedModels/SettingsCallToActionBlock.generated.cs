@@ -20,7 +20,7 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 {
 	/// <summary>[Settings] Call to action block</summary>
 	[PublishedModel("settingsCallToActionBlock")]
-	public partial class SettingsCallToActionBlock : PublishedElementModel, ISettingsBlockId
+	public partial class SettingsCallToActionBlock : PublishedElementModel, ISettingsBlockId, ISettingsIntroLayout
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -64,5 +64,11 @@ namespace UmbracoCommunity.Web.Models.PublishedModels
 		[global::System.Diagnostics.CodeAnalysis.MaybeNull]
 		[ImplementPropertyType("blockId")]
 		public virtual string BlockId => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsBlockId.GetBlockId(this, _publishedValueFallback);
+		///<summary>
+		/// Title beside content: On larger screens, show the title and subtitle in a column to the left of the block's content instead of above it.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "")]
+		[ImplementPropertyType("introBesideContent")]
+		public virtual bool IntroBesideContent => global::UmbracoCommunity.Web.Models.PublishedModels.SettingsIntroLayout.GetIntroBesideContent(this, _publishedValueFallback);
 	}
 }

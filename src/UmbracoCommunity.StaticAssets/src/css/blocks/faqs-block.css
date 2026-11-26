@@ -1,6 +1,10 @@
 .dc-faqs {
     margin-block: 0;
 
+    .dc-faqs__list {
+        margin-block: 0;
+    }
+
     .block-title,
     .block-subtitle {
         max-width: var(--narrow-width);
