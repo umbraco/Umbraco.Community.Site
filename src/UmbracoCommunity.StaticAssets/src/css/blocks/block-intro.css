@@ -11,6 +11,9 @@
 
 @media (--md) {
     .dc-block-list .intro-beside {
+        --block-title-font-size: var(--font-size-display);
+        --block-title-line-height: var(--line-height-lg);
+
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
         column-gap: var(--unit-xl);
@@ -69,6 +72,12 @@
 
     .dc-block-list .dc-big-cta-block__content.intro-beside {
         width: auto;
+        padding-top: 0.5rem;
+
+        .block-title {
+            font-size: var(--block-title-font-size);
+            line-height: var(--block-title-line-height);
+        }
 
         > :not(.block-intro) {
             align-items: flex-start;
