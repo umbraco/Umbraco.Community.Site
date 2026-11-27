@@ -13,6 +13,12 @@ public static partial class LinkPreviewHtmlParser
 {
     private const int MaxDescriptionLength = 300;
 
+    /// <summary>
+    /// The icon a site serves at its root (<c>/favicon.ico</c>), used when a page names no icon of its own, and for
+    /// links whose page we have not read (such as the links found for a member).
+    /// </summary>
+    public static string DefaultFaviconUrl(Uri pageUri) => new Uri(pageUri, "/favicon.ico").ToString();
+
     public static LinkPreview Parse(string html, Uri pageUri)
     {
         var headEnd = html.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
@@ -74,7 +80,7 @@ public static partial class LinkPreviewHtmlParser
 
         title ??= twitterTitle;
         title ??= TitlePattern().Match(head) is { Success: true } m ? Clean(m.Groups[1].Value, 200) : null;
-        icon ??= new Uri(pageUri, "/favicon.ico").ToString();
+        icon ??= DefaultFaviconUrl(pageUri);
         published ??= JsonLdDatePattern().Match(html) is { Success: true } jsonLd ? ParseDate(jsonLd.Groups[1].Value) : null;
         published ??= TimePattern().Match(html) is { Success: true } time ? ParseDate(time.Groups[1].Success ? time.Groups[1].Value : time.Groups[2].Value) : null;
 

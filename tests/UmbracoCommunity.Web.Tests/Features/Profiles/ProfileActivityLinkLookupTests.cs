@@ -276,7 +276,7 @@ public class ProfileActivityLinkLookupTests : IDisposable
             new AppCaches(new ObjectCacheAppCache(), NoAppCache.Instance, new IsolatedCaches(_ => NoAppCache.Instance)),
             NullLogger<ProfileActivityEntryService>.Instance);
         return new ProfileActivityEntryApiController(
-            TestProfileEditSubjects.Resolver(memberManager.Object, store: store),
+            memberManager.Object,
             store,
             new ProfileAccessService(memberManager.Object, provider, NullLogger<ProfileAccessService>.Instance),
             entries,

@@ -9,22 +9,20 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
 /// Lets the signed-in member choose what the activity sections of their own profile show (see
-/// <see cref="ProfileDisplay"/>). Always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the member a
-/// profile admin edits), never trusting an id from the caller,
+/// <see cref="ProfileDisplay"/>). Always scoped to the current member, never trusting an id from the caller,
 /// and only for members who are offered the choices (see <see cref="ProfileAccessService.CanChooseProfileDisplayAsync"/>).
 /// Every PUT must carry the antiforgery request token from <c>api/antiforgery/token</c> in the
 /// <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
-[ProfileEditAudit]
 [Route("api/profile/display")]
 public class ProfileDisplayApiController : ControllerBase
 {
     private const string NotOfferedError = "Choosing what your profile shows isn't available to you yet.";
     private const string NoProfileError = "Finish setting up your profile first.";
 
-    private readonly ProfileEditSubjectResolver _subjects;
+    private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly ProfileAccessService _profileAccessService;
     private readonly IProfileDataProvider _profileDataProvider;
@@ -32,14 +30,14 @@ public class ProfileDisplayApiController : ControllerBase
     private readonly ProfileTimelinePreviewService _timelinePreviewService;
 
     public ProfileDisplayApiController(
-        ProfileEditSubjectResolver subjects,
+        IMemberManager memberManager,
         MemberProfileStore store,
         ProfileAccessService profileAccessService,
         IProfileDataProvider profileDataProvider,
         ProfileActivityService profileActivityService,
         ProfileTimelinePreviewService timelinePreviewService)
     {
-        _subjects = subjects;
+        _memberManager = memberManager;
         _store = store;
         _profileAccessService = profileAccessService;
         _profileDataProvider = profileDataProvider;
@@ -55,24 +53,18 @@ public class ProfileDisplayApiController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
-        {
-            return resolved.FailureResult()!;
-        }
-
-        if (subject.Handle.Length == 0)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member?.UserName == null)
         {
             return Unauthorized();
         }
 
-
-        if (!await _profileAccessService.CanChooseProfileDisplayAsync(subject))
+        if (!await _profileAccessService.CanChooseProfileDisplayAsync())
         {
             return StatusCode(StatusCodes.Status403Forbidden, new { error = NotOfferedError });
         }
 
-        var entity = await _store.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
+        var entity = await _store.GetByMemberKeyAsync(member.Key, cancellationToken);
         if (entity?.OnboardingStatus != OnboardingStatus.Completed)
         {
             return BadRequest(new { error = NoProfileError });
@@ -88,10 +80,9 @@ public class ProfileDisplayApiController : ControllerBase
             ? ProfileTimeline.Entries(profile).Where(e => e.ActivityId != null && ids.Contains(e.ActivityId)).ToList()
             : [];
 
-        // Cards whatever the member's card choices (the page applies those itself, so a switch shows straight away).
         // Outside work is held to the same per-render limit and time budget as a profile page, newest entries first;
         // the rest show as plain lines until a later visit has their cards ready.
-        timeline = await _timelinePreviewService.AddCardsAsync(timeline, ProfileDisplayChoices.None, cancellationToken);
+        timeline = await _timelinePreviewService.AddCardsAsync(timeline, cancellationToken);
 
         var items = ProfileDisplay.DisplayItems(activity, timeline);
         var sections = PlatformActivityGroups.All
@@ -111,13 +102,13 @@ public class ProfileDisplayApiController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Update([FromBody] UpdateProfileDisplayRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        if (!await _profileAccessService.CanChooseProfileDisplayAsync(subject))
+        if (!await _profileAccessService.CanChooseProfileDisplayAsync())
         {
             return StatusCode(StatusCodes.Status403Forbidden, new { error = NotOfferedError });
         }
@@ -127,7 +118,7 @@ public class ProfileDisplayApiController : ControllerBase
             return BadRequest(new { error });
         }
 
-        var existing = await _store.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
+        var existing = await _store.GetByMemberKeyAsync(member.Key, cancellationToken);
         if (existing == null)
         {
             return BadRequest(new { error = NoProfileError });
@@ -144,7 +135,7 @@ public class ProfileDisplayApiController : ControllerBase
             return BadRequest(new { error });
         }
 
-        var entity = await _store.SetDisplayChoicesAsync(subject.MemberKey, withSnapshots, cancellationToken);
+        var entity = await _store.SetDisplayChoicesAsync(member.Key, withSnapshots, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = NoProfileError });
@@ -173,8 +164,5 @@ public class ProfileDisplayApiController : ControllerBase
         new(
             choices.HiddenSections,
             choices.HiddenActivityIds,
-            choices.Pins.Select(p => new ProfilePinResponse(p.ActivityId, p.Reason, p.Snapshot?.Title)).ToList(),
-            choices.HideActivityGraph,
-            choices.HideTimelineCards,
-            choices.NoCardActivityIds);
+            choices.Pins.Select(p => new ProfilePinResponse(p.ActivityId, p.Reason, p.Snapshot?.Title)).ToList());
 }

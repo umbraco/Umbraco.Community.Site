@@ -1,0 +1,145 @@
+@import "../base/media-queries.css";
+
+/* The account page's Badges panel (<dc-profile-badges-editor>): the member's forum badges, each with a checkbox to show
+   it on their profile. The ring round each icon shows the badge's kind, which is also written out under its name. */
+
+.dc-profile-badges-editor__fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.dc-profile-badges-editor__legend {
+  margin-bottom: var(--unit-sm);
+  padding: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.dc-profile-badges-editor__count {
+  color: var(--color-grey-dark);
+  font-weight: normal;
+}
+
+.dc-profile-badges-editor__list {
+  display: grid;
+  gap: var(--unit-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (--md) {
+  .dc-profile-badges-editor__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dc-profile-badges-editor__item {
+  --forum-badge-ring: var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--unit-sm);
+  align-items: center;
+  padding: var(--unit-xs) var(--unit-sm);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-white);
+}
+
+.dc-profile-badges-editor__item:has(.dc-profile-badges-editor__input:checked) {
+  border-color: var(--color-identity-blue);
+}
+
+.dc-profile-badges-editor__item--gold {
+  --forum-badge-ring: var(--color-identity-yellow);
+}
+
+.dc-profile-badges-editor__item--silver {
+  --forum-badge-ring: var(--color-grey);
+}
+
+.dc-profile-badges-editor__item--bronze {
+  --forum-badge-ring: var(--color-identity-orange);
+}
+
+.dc-profile-badges-editor__input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+  accent-color: var(--color-identity-blue);
+}
+
+.dc-profile-badges-editor__label {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-xs);
+  min-width: 0;
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.dc-profile-badges-editor__icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 2px;
+  border: 2px solid var(--forum-badge-ring);
+  border-radius: 50%;
+  background: var(--color-white);
+  color: var(--color-identity-blue);
+  object-fit: contain;
+}
+
+.dc-profile-badges-editor__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.dc-profile-badges-editor__hint {
+  grid-column: 2;
+  margin: var(--unit-xxs) 0 0;
+  color: var(--color-grey-dark);
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-badges-editor__kind,
+.dc-profile-badges-editor__description {
+  display: block;
+}
+
+.dc-profile-badges-editor__message,
+.dc-profile-badges-editor__forum {
+  margin: 0 0 var(--unit-sm);
+}
+
+.dc-profile-badges-editor__forum {
+  margin-top: var(--unit-sm);
+  color: var(--color-grey-dark);
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-badges-editor__status:not(:empty),
+.dc-profile-badges-editor__error {
+  margin: var(--unit-xs) 0 0;
+  font-size: var(--font-size-sm);
+}
+
+.dc-profile-badges-editor__status:empty {
+  margin: 0;
+}
+
+.dc-profile-badges-editor__error {
+  color: var(--color-error);
+}
+
+.dc-profile-badges-editor__link {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: var(--unit-xxs);
+  font-size: var(--font-size-sm);
+}

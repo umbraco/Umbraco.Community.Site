@@ -207,6 +207,32 @@ public sealed class ProfileLinkMatchingService
     }
 
     /// <summary>
+    /// Takes back the member's own "not mine" decision for <paramref name="sourceUrl"/> (compared like the other links
+    /// here: ignoring the case of the scheme and host, a fragment and a trailing slash), for when they add the link
+    /// again themselves. A decision made in the match review dashboard stays. Nothing here throws to the caller.
+    /// </summary>
+    public async Task UndoMemberRejectionAsync(int memberProfileId, string sourceUrl, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var normalized = NormalizeUrl(sourceUrl);
+            var matches = await _matchStore.GetForProfileAsync(memberProfileId, cancellationToken);
+            var rejected = matches.Values
+                .Where(m => m.DecidedBy == ProfileMatchDecider.Member
+                    && m.State == ProfileMatchState.Rejected
+                    && string.Equals(NormalizeUrl(m.SourceUrl), normalized, StringComparison.Ordinal))
+                .Select(m => m.SourceUrl)
+                .ToList();
+
+            await _matchStore.RemoveMemberRejectionsAsync(memberProfileId, rejected, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Could not take back a rejected link of profile {MemberProfileId}", memberProfileId);
+        }
+    }
+
+    /// <summary>
     /// True for a LinkedIn account the platform only knows by LinkedIn's internal member id (it starts with
     /// <c>ACoA</c>) rather than the name in the member's profile address. It is the same account as the named one and
     /// not an address anyone would recognise, so it is never suggested.

@@ -1,26 +1,27 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using UmbracoCommunity.Web.Extensions;
-using UmbracoCommunity.Web.Features.Profiles.Data;
-using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
+using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Models.PublishedModels;
 
 namespace UmbracoCommunity.Web.Middleware;
 
 /// <summary>
-/// Redirects a signed-in member who has never started onboarding to the Onboarding page,
-/// regardless of how they arrived (GitHub callback, a direct profile visit, a manually
-/// shared link). Fires on every request after Umbraco's own auth pipeline has run — the
-/// same technique as <see cref="BlogFolderRedirectMiddleware"/>.
+/// Onboards a signed-in member automatically the first time they're seen without a completed
+/// profile, and sends them straight to their account page. Fires on every request after Umbraco's
+/// own auth pipeline has run, regardless of how the member arrived (GitHub callback, a direct
+/// profile visit, a shared link) — the same technique as <see cref="BlogFolderRedirectMiddleware"/>.
 /// </summary>
 /// <remarks>
-/// Only <see cref="OnboardingStatus.NotStarted"/> (or no profile row at all) triggers the
-/// redirect. Once a member has started (<see cref="OnboardingStatus.InProgress"/>), they're
-/// left alone to navigate anywhere — e.g. the "email the DevRel team" link, or any other
-/// site link — rather than being funnelled back to onboarding on every single request,
-/// which would trap them with no way to leave the page.
+/// The setup itself (profile row, GitHub name/company/bio as the member's own text, onboarding
+/// completed, profile left hidden) is <see cref="ProfileAutoOnboardingService"/>. Once completed,
+/// a member costs one profile lookup per page request and is never redirected again. Only page
+/// requests are handled, since the account page is resolved from the current content's tenant
+/// (<see cref="PublishedContentExtensions.GetSingletonPage{T}"/>); a request already for the account
+/// page, or a tenant without one, continues without a redirect. Failures never block the request.
 /// </remarks>
 public class OnboardingRedirectMiddleware
 {
@@ -33,20 +34,23 @@ public class OnboardingRedirectMiddleware
     ];
 
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+    private readonly ILogger<OnboardingRedirectMiddleware> _logger;
     private readonly RequestDelegate _next;
 
     public OnboardingRedirectMiddleware(
         IUmbracoContextAccessor umbracoContextAccessor,
+        ILogger<OnboardingRedirectMiddleware> logger,
         RequestDelegate next)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
+        _logger = logger;
         _next = next;
     }
 
-    // IMemberManager/MemberProfileStore are scoped services — they must be resolved per
+    // IMemberManager/ProfileAutoOnboardingService are scoped services — they must be resolved per
     // request via InvokeAsync parameters (ASP.NET Core's DI convention for middleware),
     // not the constructor, which only ever runs once against the app's root provider.
-    public async Task InvokeAsync(HttpContext context, IMemberManager memberManager, MemberProfileStore store)
+    public async Task InvokeAsync(HttpContext context, IMemberManager memberManager, ProfileAutoOnboardingService autoOnboarding)
     {
         if (!ShouldCheck(context) || !memberManager.IsLoggedIn())
         {
@@ -54,42 +58,43 @@ public class OnboardingRedirectMiddleware
             return;
         }
 
-        var member = await memberManager.GetCurrentMemberAsync();
-        if (member == null)
+        // The account page is found relative to the requested page's tenant, so only page
+        // requests can be onboarded (and redirected); anything else waits for the next page.
+        if (!_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
+            || umbracoContext?.PublishedRequest?.PublishedContent is not { } currentContent)
         {
             await _next(context);
             return;
         }
 
-        var profile = await store.GetByMemberKeyAsync(member.Key, context.RequestAborted);
-        if (profile != null && profile.OnboardingStatus != OnboardingStatus.NotStarted)
+        bool onboarded;
+        try
         {
-            // Already started (in progress) or completed — let them navigate freely.
+            var member = await memberManager.GetCurrentMemberAsync();
+            onboarded = member != null
+                && await autoOnboarding.EnsureOnboardedAsync(member.Key, member.UserName, member.Name, context.RequestAborted);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !context.RequestAborted.IsCancellationRequested)
+        {
+            _logger.LogWarning(ex, "Automatic onboarding failed; continuing without it");
+            onboarded = false;
+        }
+
+        if (!onboarded
+            || string.Equals(currentContent.ContentType.Alias, AccountPage.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
+        {
             await _next(context);
             return;
         }
 
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out var umbracoContext)
-            && umbracoContext?.PublishedRequest?.PublishedContent is { } currentContent)
+        var accountPage = currentContent.GetSingletonPage<AccountPage>();
+        if (accountPage == null)
         {
-            // Already on the onboarding page — don't redirect to itself.
-            if (string.Equals(currentContent.ContentType.Alias, OnboardingPage.ModelTypeAlias, StringComparison.OrdinalIgnoreCase))
-            {
-                await _next(context);
-                return;
-            }
-
-            var onboardingPage = currentContent.GetSingletonPage<OnboardingPage>();
-
-            if (onboardingPage != null)
-            {
-                var returnUrl = Uri.EscapeDataString(context.Request.Path + context.Request.QueryString);
-                context.Response.Redirect($"{onboardingPage.Url()}?returnUrl={returnUrl}", permanent: false);
-                return;
-            }
+            await _next(context);
+            return;
         }
 
-        await _next(context);
+        context.Response.Redirect(accountPage.Url(), permanent: false);
     }
 
     private static bool ShouldCheck(HttpContext context)

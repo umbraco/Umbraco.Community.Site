@@ -7,29 +7,6 @@
   padding: var(--unit-lg) var(--unit);
 }
 
-/* Shown above the page while a profile admin edits someone else's profile. */
-.account-page__edit-as {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--unit-xs) var(--unit);
-  margin-bottom: var(--unit);
-  padding: var(--unit-sm) var(--unit);
-  border-radius: var(--border-radius-md);
-  background: var(--color-identity-yellow);
-  color: var(--color-identity-dark);
-}
-
-#main-content .account-page__edit-as-text {
-  margin: 0;
-  font-weight: var(--font-weight-bold);
-}
-
-#main-content .account-page__edit-as-link {
-  color: var(--color-identity-dark);
-}
-
 .account-page {
   background: var(--color-white);
   border-radius: var(--border-radius-xl);
@@ -37,80 +14,45 @@
   padding: var(--unit-md);
 }
 
-.account-page__header {
+/* The header: a preview of the public profile's hero (css/elements/profile-hero.css), with the member's account
+   details, a link to the public profile and, while it's hidden, a note saying so. The panels' card starts below it. */
+.account-page__profile .community-profile__hero {
+  margin-bottom: 0;
+}
+
+.account-page__hero-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--unit-xs);
+  margin-top: var(--unit);
+}
+
+.account-page__hero-details p {
+  margin: 0;
+}
+
+.account-page__hero-account {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--unit-sm);
-  padding-bottom: var(--unit-sm);
-  border-bottom: 1px solid var(--color-light-grey);
-}
-
-.account-page__identity {
-  min-width: 0;
-}
-
-.account-page__avatar {
-  flex-shrink: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--color-light);
-}
-
-.account-page__name-row {
-  display: flex;
-  align-items: center;
-  gap: var(--unit-xs);
-}
-
-/* Opens the public profile in a new tab; 32px target. */
-#main-content .account-page .account-page__profile-link {
-  display: inline-grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--border-radius);
-  color: var(--color-identity-blue);
-  background: none;
-}
-
-#main-content .account-page .account-page__profile-link:hover {
-  background: var(--color-light);
-}
-
-#main-content .account-page .account-page__profile-link:focus-visible {
-  outline: var(--focus-outline);
-  outline-offset: var(--focus-outline-offset);
-}
-
-.account-page__profile-link svg {
-  width: 18px;
-  height: 18px;
-}
-
-.account-page__name {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--color-identity-blue);
-  line-height: 1.2;
-}
-
-.account-page__handle {
-  margin: var(--unit-xxs) 0 0;
+  justify-content: center;
+  gap: var(--unit-xxs) var(--unit-sm);
   font-size: var(--font-size-sm);
-  color: var(--color-light-blue);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.account-page__handle a {
+#main-content .account-page__profile .account-page__handle {
   display: inline-flex;
   align-items: center;
   gap: var(--unit-xxs);
-  color: inherit;
-  text-decoration: none;
+  color: var(--color-white);
+}
+
+#main-content .account-page__profile .account-page__handle:focus-visible,
+#main-content .account-page__profile .account-page__hero-hidden a:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
 }
 
 .account-page__handle svg {
@@ -119,15 +61,201 @@
   height: 16px;
 }
 
-.account-page__handle a:hover {
+.account-page__email {
+  word-break: break-word;
+}
+
+.account-page__hero-note {
+  max-width: 60ch;
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Dark on yellow, like the MVP pill, so it reads as a status rather than more of the bio. */
+.account-page__hero-hidden {
+  padding: var(--unit-xxs) var(--unit-sm);
+  border-radius: var(--border-radius-xl);
+  background: var(--color-identity-yellow);
+  color: var(--color-identity-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+#main-content .account-page__profile .account-page__hero-hidden a {
+  color: inherit;
   text-decoration: underline;
 }
 
-.account-page__email {
-  margin: var(--unit-xxs) 0 0;
+.account-page__hero-actions .btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (--md) {
+  .account-page__hero-details,
+  .account-page__hero-account {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+}
+
+/* The compact profile bar (<dc-account-profile-hero> adds it after the hero): photo, name, headline and link pills in a
+   slim blue band that stays under the site header once the full hero has scrolled away, so the member can watch their
+   changes while working on the panels. From --md up only; on small screens it would take too much of the screen.
+
+   The wrapper and the hero element are `display: contents`, so the bar's sticky box belongs to <main> and stays stuck
+   for the whole page, not just the hero. The box itself is zero height (no layout shift) and sticks with its top at the
+   band's bottom edge; the band hangs above it. At the end of the page the band leaves with <main>'s last bit of
+   padding, never over the footer. */
+:root {
+  --account-profile-bar-height: 4.5rem;
+}
+
+.account-page__profile,
+dc-account-profile-hero {
+  display: contents;
+}
+
+.account-profile-bar {
+  display: none;
+
+  @media (--md) {
+    display: block;
+    position: sticky;
+    top: calc(var(--live-nav-height, var(--navigation-height)) + var(--account-profile-bar-height));
+    z-index: 1;
+    height: 0;
+  }
+}
+
+/* Full bleed, as the hero (css/elements/profile-hero.css). Hidden, and inert, until the hero has scrolled past. */
+.account-profile-bar__band {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  height: var(--account-profile-bar-height);
+  margin-left: -50vw;
+  background: var(--color-identity-blue);
+  color: var(--color-white);
+  box-shadow: var(--base-box-shadow);
+  visibility: hidden;
+  opacity: 0;
+}
+
+.account-profile-bar.is-compact .account-profile-bar__band {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .account-profile-bar__band {
+    transform: translateY(-0.5rem);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  .account-profile-bar.is-compact .account-profile-bar__band {
+    transform: none;
+    transition-delay: 0s;
+  }
+}
+
+.account-profile-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--unit-sm);
+  height: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--unit);
+}
+
+.account-profile-bar__avatar {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 3px var(--color-identity-pink);
+}
+
+.account-profile-bar__avatar--mvp {
+  box-shadow: 0 0 0 3px var(--color-identity-yellow);
+}
+
+.account-profile-bar__avatar[hidden] {
+  display: none;
+}
+
+/* Name over headline, each on one line, cut short with an ellipsis rather than wrapping. */
+.account-profile-bar__identity {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-width: 10rem;
+  max-width: 40%;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.account-profile-bar__name,
+.account-profile-bar__headline {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.account-profile-bar__name {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.account-profile-bar__headline {
   font-size: var(--font-size-sm);
-  color: var(--color-light-blue);
-  word-break: break-word;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.account-profile-bar__headline[hidden] {
+  display: none;
+}
+
+/* The hero's pills, on one row; any that don't fit fade out at the end. */
+.account-profile-bar__links {
+  display: flex;
+  flex: 1 1 0;
+  gap: var(--unit-xs);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+}
+
+.account-profile-bar__links[hidden] {
+  display: none;
+}
+
+.account-profile-bar__links li {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--unit-xs);
+  padding: var(--unit-xxs) var(--unit-sm);
+  border-radius: var(--border-radius-xl);
+  background: var(--color-page-surface);
+  color: var(--color-identity-blue);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* From --md up the bar takes room under the site header, so anchor jumps and focused fields land clear of both. */
+@media (--md) {
+  html:has(dc-account-profile-hero) {
+    scroll-padding-top: calc(var(--live-nav-height, var(--navigation-height)) + var(--account-profile-bar-height));
+  }
 }
 
 /* Side menu and panels (<dc-account-nav>): a row of links above the panel on small screens, a menu beside it from
@@ -141,6 +269,9 @@
   margin-top: var(--unit-md);
 
   @media (--md) {
+    /* Below the compact profile bar as well. */
+    --account-page-sticky-top: calc(var(--live-nav-height, var(--navigation-height)) + var(--account-profile-bar-height) + var(--unit-sm));
+
     grid-template-columns: 15rem minmax(0, 1fr);
     align-items: start;
   }
@@ -244,6 +375,11 @@ main:has(.account-page) {
 /* A panel jumped to (a menu link, or the address's hash) lands below the site's fixed header, level with the menu. */
 .account-page__panel {
   scroll-margin-top: var(--account-page-sticky-top);
+
+  /* The page's scroll padding already clears the header and the compact bar; this only lines it up with the menu. */
+  @media (--md) {
+    scroll-margin-top: var(--unit-sm);
+  }
 }
 
 /* With the room the panel has from --md up, a feed's actions sit beside its details instead of under them. */
@@ -1050,7 +1186,12 @@ main:has(.account-page) {
   min-width: 0;
 }
 
+/* Icon, name and platform in a row, like a link in "Your feeds" (the icon uses .dc-feed-manager__favicon). */
 .dc-link-suggestions__label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--unit-xxs);
   font-weight: 700;
   color: var(--color-identity-blue);
 }
@@ -1070,6 +1211,17 @@ main:has(.account-page) {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--unit-sm);
+}
+
+/* "This is not me" asks first, in place of the suggestion, with the confirmation from "Your feeds" (feed-manager.css). */
+.dc-link-suggestions__item--confirming > .dc-feed-manager__remove {
+  flex: 1 1 100%;
+}
+
+/* While saving, the buttons stay focusable (aria-disabled), so they only look unavailable. */
+.dc-link-suggestions__item--confirming .btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 .dc-link-suggestions__hint {

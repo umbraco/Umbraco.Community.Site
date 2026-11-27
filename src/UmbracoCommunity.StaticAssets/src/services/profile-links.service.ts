@@ -10,6 +10,8 @@ export interface LinkSuggestion {
   /** The account's username or the feed's name, when known. */
   name: string | null;
   kind: LinkSuggestionKind;
+  /** The site's icon through the same-origin image proxy, like a member feed's faviconUrl; null when not known. */
+  faviconUrl?: string | null;
 }
 
 export class ProfileLinksService {

@@ -22,23 +22,21 @@ public class ProfileSeoTests
     [Fact]
     public void A_shown_profile_with_open_sections_is_publicly_visible()
     {
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), Open, false).Should().BeTrue();
+        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), Open).Should().BeTrue();
     }
 
     [Fact]
     public void Gated_sections_keep_the_page_out()
     {
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), new(true, true), false).Should().BeFalse();
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), EnrichedSectionsAccess.None, false).Should().BeFalse();
+        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), new(true, true)).Should().BeFalse();
+        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), EnrichedSectionsAccess.None).Should().BeFalse();
     }
 
     [Fact]
-    public void Hidden_previews_devrel_views_and_missing_profiles_are_not_visible()
+    public void Hidden_previews_and_missing_profiles_are_not_visible()
     {
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), IsHiddenPreview: true), Open, false).Should().BeFalse();
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false, IsHiddenFromPublic: true), Open, false).Should().BeFalse();
-        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), false), Open, isDevRelView: true).Should().BeFalse();
-        ProfileSeo.IsPubliclyVisible(ViewableProfile.None, Open, false).Should().BeFalse();
+        ProfileSeo.IsPubliclyVisible(new ViewableProfile(Profile(), IsHiddenPreview: true), Open).Should().BeFalse();
+        ProfileSeo.IsPubliclyVisible(ViewableProfile.None, Open).Should().BeFalse();
     }
 
     [Fact]
@@ -73,18 +71,17 @@ public class ProfileSeoTests
     }
 
     [Fact]
-    public void Schema_has_the_name_and_only_shown_https_links()
+    public void Schema_has_the_name_and_only_https_links()
     {
         var profile = Profile(links:
         [
             new ProfileSocialLink("Blog", "https://example.com/me"),
             new ProfileSocialLink("Old", "http://example.com/old"),
-            new ProfileSocialLink("Hidden", "https://example.com/hidden", IsHiddenByMember: true),
         ]);
 
         var json = ProfileSeo.Schema(profile, new Uri("https://x.test/p/octocat/"), new Uri("https://github.com/octocat.png")).ToString();
 
         json.Should().Contain("ProfilePage").And.Contain("The Octocat").And.Contain("https://example.com/me");
-        json.Should().NotContain("example.com/old").And.NotContain("example.com/hidden").And.NotContain("they/them");
+        json.Should().NotContain("example.com/old").And.NotContain("they/them");
     }
 }

@@ -3,18 +3,11 @@ namespace UmbracoCommunity.Web.Features.Profiles.Models;
 /// <summary>
 /// Everything the member has chosen their profile's activity sections show. Replaces what was stored before,
 /// so a section or item left out is shown again and a pin left out is removed. Pins are kept in the order given.
-/// A switch left out is off, and an item left out of <see cref="NoCardItemIds"/> gets its preview card again.
 /// </summary>
-/// <param name="HideActivityGraph">Leave the activity graph off the profile.</param>
-/// <param name="HideTimelineCards">Show every timeline entry as a plain line, without preview cards.</param>
-/// <param name="NoCardItemIds">The ids of single timeline entries shown without a preview card.</param>
 public sealed record UpdateProfileDisplayRequest(
     IReadOnlyList<string>? HiddenSections,
     IReadOnlyList<string>? HiddenItemIds,
-    IReadOnlyList<UpdateProfilePinRequest>? Pins,
-    bool? HideActivityGraph = null,
-    bool? HideTimelineCards = null,
-    IReadOnlyList<string>? NoCardItemIds = null);
+    IReadOnlyList<UpdateProfilePinRequest>? Pins);
 
 public sealed record UpdateProfilePinRequest(string? Id, string? Reason);
 
@@ -27,10 +20,7 @@ public sealed record ProfilePinResponse(string Id, string? Reason, string? Title
 public sealed record ProfileDisplayChoicesResponse(
     IReadOnlyList<string> HiddenSections,
     IReadOnlyList<string> HiddenItemIds,
-    IReadOnlyList<ProfilePinResponse> Pins,
-    bool HideActivityGraph = false,
-    bool HideTimelineCards = false,
-    IReadOnlyList<string>? NoCardItemIds = null);
+    IReadOnlyList<ProfilePinResponse> Pins);
 
 /// <summary>The member's activity sections, with every item in them (hidden ones too), and their stored choices.</summary>
 public sealed record ProfileDisplayResponse(
@@ -63,10 +53,7 @@ public sealed record ProfileDisplayItem(string Id, string Title, DateTimeOffset?
     /// <summary>True for a routine package release, which the timeline's highlights leave out (see <see cref="ProfileTimeline.IsShown"/>).</summary>
     public bool IsRoutineRelease { get; init; }
 
-    /// <summary>
-    /// Its preview card when one is ready, whatever the member's card choices: the account page applies those itself,
-    /// so switching cards on or off shows straight away. Null when there is no picture (yet).
-    /// </summary>
+    /// <summary>Its preview card when one is ready. Null when there is no picture (yet).</summary>
     public ProfileTimelineCard? Card { get; init; }
 
     /// <summary>The month the timeline lists it under, as <c>yyyy-MM</c>. Null when it has no date.</summary>

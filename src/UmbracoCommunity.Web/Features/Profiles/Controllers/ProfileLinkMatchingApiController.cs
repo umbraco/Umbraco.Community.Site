@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Security;
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data;
 using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
@@ -11,14 +12,12 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
 /// The links found for the signed-in member, and their way to say a source is not theirs (see
-/// <see cref="ProfileLinkMatchingService"/>). Always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the member a
-/// profile admin edits), never trusting an id from the caller,
+/// <see cref="ProfileLinkMatchingService"/>). Always scoped to the current member, never trusting an id from the caller,
 /// and only for members whose links are checked (see <see cref="ProfileAccessService.CanMatchLinksAsync"/>). Every POST
 /// must carry the antiforgery request token from <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
-[ProfileEditAudit]
 [Route("api/profile/links")]
 public class ProfileLinkMatchingApiController : ControllerBase
 {
@@ -27,24 +26,30 @@ public class ProfileLinkMatchingApiController : ControllerBase
     private const string InvalidUrlError = "Please provide a valid https URL.";
     private const string CannotRejectError = "That link can't be marked as not yours.";
 
-    private readonly ProfileEditSubjectResolver _subjects;
+    private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _profileStore;
     private readonly ProfileAccessService _profileAccessService;
     private readonly ProfileLinkMatchingService _linkMatching;
+    private readonly FeedSubmissionImageProxyService _imageProxy;
 
     public ProfileLinkMatchingApiController(
-        ProfileEditSubjectResolver subjects,
+        IMemberManager memberManager,
         MemberProfileStore profileStore,
         ProfileAccessService profileAccessService,
-        ProfileLinkMatchingService linkMatching)
+        ProfileLinkMatchingService linkMatching,
+        FeedSubmissionImageProxyService imageProxy)
     {
-        _subjects = subjects;
+        _memberManager = memberManager;
         _profileStore = profileStore;
         _profileAccessService = profileAccessService;
         _linkMatching = linkMatching;
+        _imageProxy = imageProxy;
     }
 
-    /// <summary>Accounts and feeds that look like the member's and are not among their links yet.</summary>
+    /// <summary>
+    /// Accounts and feeds that look like the member's and are not among their links (current or removed), each with its site's icon
+    /// (through the image proxy, like the member's own links) so the list looks like the links they already have.
+    /// </summary>
     [HttpGet("suggestions")]
     public async Task<IActionResult> Suggestions(CancellationToken cancellationToken = default)
     {
@@ -54,8 +59,10 @@ public class ProfileLinkMatchingApiController : ControllerBase
             return failure!;
         }
 
-        var memberLinks = profile.Feeds.Where(f => !f.IsRemoved).Select(f => f.Url).ToList();
-        return Ok(await _linkMatching.GetSuggestionsAsync(profile.GitHubHandle, memberLinks, cancellationToken));
+        // Removed links count too: a link the member took off their profile ("This isn't me") is never offered again.
+        var memberLinks = profile.Feeds.Select(f => f.Url).ToList();
+        var suggestions = await _linkMatching.GetSuggestionsAsync(profile.GitHubHandle, memberLinks, cancellationToken);
+        return Ok(suggestions.Select(WithFavicon).ToList());
     }
 
     /// <summary>
@@ -81,20 +88,25 @@ public class ProfileLinkMatchingApiController : ControllerBase
             : BadRequest(new { error = CannotRejectError });
     }
 
+    private LinkSuggestion WithFavicon(LinkSuggestion suggestion) =>
+        ProfileLinkUrl.TryParse(suggestion.Url, out var uri)
+            ? suggestion with { FaviconUrl = _imageProxy.CreateProxyUrl(LinkPreviewHtmlParser.DefaultFaviconUrl(uri)) }
+            : suggestion;
+
     private async Task<(MemberProfileEntity? Profile, IActionResult? Failure)> ResolveProfileAsync(CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return (null, resolved.FailureResult()!);
+            return (null, Unauthorized());
         }
 
-        if (!await _profileAccessService.CanMatchLinksAsync(subject))
+        if (!await _profileAccessService.CanMatchLinksAsync())
         {
             return (null, StatusCode(StatusCodes.Status403Forbidden, new { error = NotOfferedError }));
         }
 
-        var profile = await _profileStore.GetByMemberKeyAsync(subject.MemberKey, cancellationToken);
+        var profile = await _profileStore.GetByMemberKeyAsync(member.Key, cancellationToken);
         return profile?.OnboardingStatus == OnboardingStatus.Completed
             ? (profile, null)
             : (null, BadRequest(new { error = NoProfileError }));

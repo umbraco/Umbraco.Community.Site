@@ -1,13 +1,17 @@
 import { LitElement, html, type TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
+import { repeat } from "lit/directives/repeat.js";
 import {
   isPlatformSourced,
+  MEMBER_FEEDS_CHANGED_EVENT,
   MemberFeedsService,
   type MemberFeed,
   type MemberFeedMatchStatus,
+  type MemberFeedsChangedDetail,
 } from "../../services/member-feeds.service.js";
-import { iconEye, iconEyeOff, iconX } from "../../svg/lucide-icons.js";
+import { iconEye, iconEyeOff } from "../../svg/lucide-icons.js";
+import { onFaviconError, onFaviconLoad } from "../../util/favicon.js";
 import { moveItem, renderMoveButtons, SortableDragController } from "../sortable/sortable-list.js";
 
 const elementName = "dc-feed-manager";
@@ -20,15 +24,6 @@ const matchStatusLabels: Record<MemberFeedMatchStatus, string> = {
 
 @customElement(elementName)
 export class FeedManagerElement extends LitElement {
-  /**
-   * When set, only platform-supplied feeds can be hidden — member-added feeds can only be
-   * removed. Used during onboarding, where hiding something you just added yourself (before
-   * you've even seen your profile) is a confusing first impression; the Account page doesn't
-   * set this, so once a member has seen their profile they can hide any feed.
-   */
-  @property({ attribute: "restrict-hide-to-platform", type: Boolean })
-  restrictHideToPlatform = false;
-
   @state()
   private _feeds: MemberFeed[] = [];
 
@@ -57,6 +52,7 @@ export class FeedManagerElement extends LitElement {
   @state()
   private _statusMessage = "";
 
+  /** The link whose "This isn't me" confirmation is open. */
   @state()
   private _removingId: number | null = null;
 
@@ -75,9 +71,33 @@ export class FeedManagerElement extends LitElement {
     return this;
   }
 
+  /**
+   * A link added anywhere on the page (such as "Add to my links" on a link we found) joins the list. Without this the
+   * list only ever showed what it loaded on arrival, so an added suggestion vanished from both lists until a reload.
+   */
+  readonly #onFeedsChanged = (event: Event) => {
+    const detail = (event as CustomEvent<MemberFeedsChangedDetail>).detail;
+    if (detail?.change === "added" && detail.feed) {
+      this.#upsert(detail.feed);
+    }
+  };
+
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener(MEMBER_FEEDS_CHANGED_EVENT, this.#onFeedsChanged);
     void this.#load();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener(MEMBER_FEEDS_CHANGED_EVENT, this.#onFeedsChanged);
+  }
+
+  /** Adds a link to the end of the list, or replaces it when it is already there (so an add is never shown twice). */
+  #upsert(feed: MemberFeed) {
+    this._feeds = this._feeds.some((f) => f.id === feed.id)
+      ? this._feeds.map((f) => (f.id === feed.id ? feed : f))
+      : [...this._feeds, feed];
   }
 
   async #load() {
@@ -98,7 +118,7 @@ export class FeedManagerElement extends LitElement {
 
     try {
       const feed = await MemberFeedsService.add(this._platformDraft.trim(), this._urlDraft.trim());
-      this._feeds = [...this._feeds, feed];
+      this.#upsert(feed);
       this._platformDraft = "";
       this._urlDraft = "";
       this._errorMessage = "";
@@ -183,65 +203,56 @@ export class FeedManagerElement extends LitElement {
     button?.focus();
   }
 
-  #startRemove(feed: MemberFeed) {
+  /** Opens the "This isn't me" confirmation (from the row's edit mode), with Cancel focused so Enter can't remove by accident. */
+  async #startRemove(feed: MemberFeed) {
+    this._editingId = null;
     this._removingId = feed.id;
     this._removeReasonDraft = "";
+    await this.updateComplete;
+    this.querySelector<HTMLButtonElement>(`[data-feed-id="${feed.id}"] [data-action="cancel-remove"]`)?.focus();
   }
 
-  #cancelRemove() {
+  async #cancelRemove(id: number) {
     this._removingId = null;
     this._removeReasonDraft = "";
+    await this.updateComplete;
+    this.querySelector<HTMLButtonElement>(`[data-feed-id="${id}"] [data-action="edit"]`)?.focus();
   }
 
-  async #confirmRemove(id: number) {
+  /**
+   * Takes the link off the profile completely. The server removes it and marks its address as not the member's in one
+   * request, so activity found through it stops showing and it isn't suggested again.
+   */
+  async #confirmRemove(feed: MemberFeed) {
+    const index = this._feeds.findIndex((f) => f.id === feed.id);
     try {
-      await MemberFeedsService.remove(id, this._removeReasonDraft.trim() || undefined);
-      this._feeds = this._feeds.filter((f) => f.id !== id);
+      await MemberFeedsService.remove(feed.id, this._removeReasonDraft.trim() || undefined);
+      this._feeds = this._feeds.filter((f) => f.id !== feed.id);
       this._removingId = null;
       this._removeReasonDraft = "";
+      this._errorMessage = "";
+      this._statusMessage = `${feed.platform} was removed from your profile.`;
+
+      // The row is gone, so put focus on the link that took its place (or the add form) rather than losing it.
+      await this.updateComplete;
+      const next = this._feeds[Math.min(index, this._feeds.length - 1)];
+      const target =
+        (next && this.querySelector<HTMLElement>(`[data-feed-id="${next.id}"] [data-action="edit"]`)) ??
+        this.querySelector<HTMLElement>("#dc-feed-manager-platform");
+      target?.focus();
     } catch (error) {
-      this._errorMessage = error instanceof Error ? error.message : "Couldn't remove that feed.";
+      this._errorMessage = error instanceof Error ? error.message : "Couldn't remove that link.";
     }
   }
 
-  #canHide(feed: MemberFeed): boolean {
-    return !this.restrictHideToPlatform || isPlatformSourced(feed);
-  }
-
   #renderFeed(feed: MemberFeed, group: MemberFeed[]): TemplateResult {
-    // Platform-synced feeds were matched to this member automatically, so removing one can mean
-    // "that's a mismatch, not mine" — the copy reflects that so the flag is meaningful when it's
-    // reported back. Member-added feeds were added deliberately, so removing one is just tidying
-    // up, not disputing an identity match.
-    const isThisFeedPlatformSourced = isPlatformSourced(feed);
-
     if (this._removingId === feed.id) {
-      return html`
-        <li class="dc-feed-manager__item dc-feed-manager__item--removing">
-          <p id="dc-feed-manager-reason-label-${feed.id}">
-            ${isThisFeedPlatformSourced
-              ? html`This isn't your <strong>${feed.platform}</strong>? We'll flag it so it can be corrected. Add any detail (optional):`
-              : html`Remove <strong>${feed.platform}</strong>? Let us know why (optional):`}
-          </p>
-          <textarea
-            rows="2"
-            aria-labelledby="dc-feed-manager-reason-label-${feed.id}"
-            .value=${this._removeReasonDraft}
-            @input=${(event: Event) => (this._removeReasonDraft = (event.target as HTMLTextAreaElement).value)}
-          ></textarea>
-          <div class="dc-feed-manager__item-actions">
-            <button class="btn" type="button" @click=${this.#cancelRemove}>Cancel</button>
-            <button class="btn is-blue" type="button" @click=${() => this.#confirmRemove(feed.id)}>
-              ${isThisFeedPlatformSourced ? "Confirm — this isn't me" : "Confirm removal"}
-            </button>
-          </div>
-        </li>
-      `;
+      return this.#renderRemoveConfirmation(feed);
     }
 
     if (this._editingId === feed.id) {
       return html`
-        <li class="dc-feed-manager__item dc-feed-manager__item--editing">
+        <li class="dc-feed-manager__item dc-feed-manager__item--editing" data-feed-id=${feed.id}>
           <form class="dc-feed-manager__add-form" @submit=${(event: Event) => this.#saveEdit(event, feed.id)}>
             <div class="dc-form-field">
               <label for="dc-feed-manager-edit-platform-${feed.id}">Platform</label>
@@ -268,6 +279,12 @@ export class FeedManagerElement extends LitElement {
               <button class="btn is-blue" type="submit">Save</button>
             </div>
           </form>
+          <p class="dc-feed-manager__not-me">
+            Not your link?
+            <button class="link-action" type="button" data-action="not-me" @click=${() => this.#startRemove(feed)}>
+              This isn't me
+            </button>
+          </p>
         </li>
       `;
     }
@@ -293,7 +310,18 @@ export class FeedManagerElement extends LitElement {
         <div class="dc-feed-manager__item-main">
           <div class="dc-feed-manager__item-info">
             <span class="dc-feed-manager__platform">
-              ${feed.faviconUrl ? html`<img class="dc-feed-manager__favicon" src=${feed.faviconUrl} alt="" width="16" height="16" loading="lazy" />` : ""}
+              ${feed.faviconUrl
+                ? html`<img
+                    class="dc-feed-manager__favicon"
+                    src=${feed.faviconUrl}
+                    alt=""
+                    width="16"
+                    height="16"
+                    loading="lazy"
+                    @load=${onFaviconLoad}
+                    @error=${onFaviconError}
+                  />`
+                : ""}
               ${feed.platform}
             </span>
             <a class="dc-feed-manager__url no-link-animation" href=${feed.url} target="_blank" rel="noopener noreferrer">${feed.url}</a>
@@ -311,15 +339,49 @@ export class FeedManagerElement extends LitElement {
                   onMove: (step) => this.#moveByStep(feed, group, step),
                 })
               : ""}
-            <button class="link-action" type="button" @click=${() => this.#startEdit(feed)}>Edit</button>
-            ${this.#canHide(feed)
-              ? html`<button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
-                  ${feed.isHidden ? iconEye : iconEyeOff}
-                  ${feed.isHidden ? "Show on profile" : "Hide from profile"}
-                </button>`
-              : ""}
-            <button class="link-action" type="button" @click=${() => this.#startRemove(feed)}>
-              ${iconX} ${isThisFeedPlatformSourced ? "This isn't me" : "Remove"}
+            <button class="link-action" type="button" data-action="edit" @click=${() => this.#startEdit(feed)}>Edit</button>
+            <button class="link-action" type="button" @click=${() => this.#toggleHidden(feed)}>
+              ${feed.isHidden ? iconEye : iconEyeOff}
+              ${feed.isHidden ? "Show on profile" : "Hide from profile"}
+            </button>
+          </div>
+        </div>
+      </li>
+    `;
+  }
+
+  /**
+   * The only way to take a link off: a confirmation in the row that says plainly what happens. Cancel comes first and
+   * gets focus, and the confirm button says exactly what it does.
+   */
+  #renderRemoveConfirmation(feed: MemberFeed): TemplateResult {
+    const titleId = `dc-feed-manager-remove-title-${feed.id}`;
+    const descriptionId = `dc-feed-manager-remove-description-${feed.id}`;
+    const reasonId = `dc-feed-manager-remove-reason-${feed.id}`;
+
+    return html`
+      <li class="dc-feed-manager__item dc-feed-manager__item--removing" data-feed-id=${feed.id}>
+        <div class="dc-feed-manager__remove" role="group" aria-labelledby=${titleId} aria-describedby=${descriptionId}>
+          <p id=${titleId} class="dc-feed-manager__remove-title">Remove <strong>${feed.platform}</strong> from your profile?</p>
+          <div id=${descriptionId} class="dc-feed-manager__remove-description">
+            <p>
+              If <span class="dc-feed-manager__url">${feed.url}</span> isn't yours, we'll remove it from your profile completely:
+              the link itself, and anything we found through it, such as posts from that address. We won't suggest it to you
+              again.
+            </p>
+            <p>Changed your mind later? You can add it again yourself with the form below your links.</p>
+          </div>
+          <label for=${reasonId}>Anything we should know? (optional)</label>
+          <textarea
+            id=${reasonId}
+            rows="2"
+            .value=${this._removeReasonDraft}
+            @input=${(event: Event) => (this._removeReasonDraft = (event.target as HTMLTextAreaElement).value)}
+          ></textarea>
+          <div class="dc-feed-manager__item-actions">
+            <button class="btn" type="button" data-action="cancel-remove" @click=${() => this.#cancelRemove(feed.id)}>Cancel</button>
+            <button class="btn dc-feed-manager__confirm-remove" type="button" data-action="confirm-remove" @click=${() => this.#confirmRemove(feed)}>
+              Yes, remove it from my profile
             </button>
           </div>
         </div>
@@ -330,11 +392,18 @@ export class FeedManagerElement extends LitElement {
   #renderGroup(title: string, feeds: MemberFeed[]): TemplateResult | string {
     if (feeds.length === 0) return "";
 
+    // Keyed by id, so a reordered row moves with its icon. Unkeyed, Lit kept the rows in place and gave each `<img>`
+    // another link's address, which the browser can request again (it does with its cache off or expired).
+
     return html`
       <div class="dc-feed-manager__group">
         <h3 class="dc-feed-manager__group-title">${title}</h3>
         <ul class="dc-feed-manager__list">
-          ${feeds.map((feed) => this.#renderFeed(feed, feeds))}
+          ${repeat(
+            feeds,
+            (feed) => feed.id,
+            (feed) => this.#renderFeed(feed, feeds)
+          )}
         </ul>
       </div>
     `;
@@ -387,8 +456,9 @@ export class FeedManagerElement extends LitElement {
           </p>`
         : html`
             <p class="dc-feed-manager__hint">
-              Hiding a feed keeps it here for you to manage, but removes it from your public profile. Drag a link by its handle,
-              or use the up and down buttons, to change the order it appears in.
+              Hiding a feed keeps it here for you to manage, but takes it off your public profile. Drag a link by its handle,
+              or use the up and down buttons, to change the order it appears in. If a link isn't yours, choose Edit, then
+              "This isn't me".
             </p>
             ${this.#renderGroup("Synced automatically", platformFeeds)}
             ${this.#renderGroup("Added by you", memberFeeds)}

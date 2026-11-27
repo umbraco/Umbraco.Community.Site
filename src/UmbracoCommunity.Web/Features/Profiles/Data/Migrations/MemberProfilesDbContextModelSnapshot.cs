@@ -174,6 +174,9 @@ namespace UmbracoCommunity.Web.Features.Profiles.Data.Migrations
                     b.Property<string>("PlatformProfileId")
                         .HasMaxLength(100);
 
+                    b.PrimitiveCollection<string>("ShownForumBadgeIds")
+                        .IsRequired();
+
                     b.Property<DateTime>("UpdatedUtc");
 
                     b.HasKey("Id");

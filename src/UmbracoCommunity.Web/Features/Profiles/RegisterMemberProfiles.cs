@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.ForumBadges;
 using UmbracoCommunity.Web.Features.Profiles.LinkPreviews;
 using UmbracoCommunity.Web.Features.Profiles.Matching;
 using UmbracoCommunity.Web.Routing;
@@ -69,7 +70,7 @@ public sealed class RegisterMemberProfiles : IComposer
         builder.Services.AddScoped<AvatarUploadService>();
         builder.Services.AddScoped<IProfileDataProvider, MemberProfileDataProvider>();
         builder.Services.AddScoped<ProfileAccessService>();
-        builder.Services.AddScoped<ProfileEditSubjectResolver>();
+        builder.Services.AddScoped<AccountProfileIdentityService>();
         builder.Services.AddScoped<ProfileSitemapService>();
         builder.Services.AddScoped<IProfileSyncClient, PlatformProfileSyncClient>();
         builder.Services.Configure<ProfileActivityOptions>(builder.Config.GetSection(ProfileActivityOptions.SectionName));
@@ -95,6 +96,19 @@ public sealed class RegisterMemberProfiles : IComposer
             client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunity/1.0");
         });
         builder.Services.AddScoped<GitHubProfileDefaultsService>();
+
+        // A member's Umbraco forum badges, from the forum's public badge endpoint. The host is fixed here; only a
+        // checked username goes into the path (see ForumProfileUrl).
+        builder.Services.AddHttpClient<ForumBadgeClient>(client =>
+        {
+            client.BaseAddress = new Uri($"https://{ForumProfileUrl.Host}/");
+            client.Timeout = TimeSpan.FromSeconds(4);
+            client.MaxResponseContentBufferSize = 2_000_000;
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UmbracoCommunitySite/1.0 (+https://community.umbraco.com)");
+        }).ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false });
+        builder.Services.AddScoped<ForumBadgeService>();
+        builder.Services.AddScoped<ProfileAutoOnboardingService>();
 
         // Fetches member-supplied link pages: no automatic redirects (the service follows them, re-checking each
         // hop) and connections restricted to public addresses.

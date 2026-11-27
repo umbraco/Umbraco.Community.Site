@@ -61,7 +61,7 @@ describe("antiforgery", () => {
   describe("requiresAntiforgeryToken", () => {
     it.each([
       ["/api/profile/bio", "PUT", true],
-      ["/api/profile/onboarding/start", "post", true],
+      ["/api/profile/avatar", "delete", true],
       ["/api/member-feeds/3", "DELETE", true],
       ["/api/member-feeds", "POST", true],
       ["/api/member-feeds", "GET", false],
