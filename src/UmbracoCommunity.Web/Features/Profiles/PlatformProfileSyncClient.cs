@@ -7,7 +7,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// <see cref="IProfileSyncClient"/> backed by the external content platform's API (the same address and key
 /// as <see cref="CommunityBlogsApiClient"/>). Reads and link checks are real; the platform has no endpoints yet for
-/// profile-claim, feed and activity notifications, so those calls just log what they would have sent.
+/// feed and activity notifications, so those calls just log what they would have sent.
 /// </summary>
 public sealed class PlatformProfileSyncClient : IProfileSyncClient
 {
@@ -126,14 +126,6 @@ public sealed class PlatformProfileSyncClient : IProfileSyncClient
 
         var stats = await _apiClient.GetProfileForumStatsAsync(platformProfileId, months, cancellationToken);
         return stats == null ? null : new PlatformForumStats(stats.TopicsCreated, stats.Replies, stats.Solutions);
-    }
-
-    public Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation(
-            "Profile sync: would notify profile claim for {Handle}",
-            handle);
-        return Task.CompletedTask;
     }
 
     public Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default)

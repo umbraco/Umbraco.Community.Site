@@ -70,7 +70,7 @@ public class ProfileAccessServiceTests
 
         viewable.Profile.Should().BeSameAs(HiddenProfile);
         viewable.IsHiddenPreview.Should().BeTrue();
-        provider.Verify(p => p.GetProfileAsync(Handle, true, It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Once);
+        provider.Verify(p => p.GetProfileAsync(Handle, true, It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public class ProfileAccessServiceTests
         var viewable = await service.GetViewableProfileAsync(Handle);
 
         viewable.Should().Be(ViewableProfile.None);
-        provider.Verify(p => p.GetProfileAsync(It.IsAny<string>(), true, It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Never);
+        provider.Verify(p => p.GetProfileAsync(It.IsAny<string>(), true, It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class ProfileAccessServiceTests
     {
         var provider = new Mock<IProfileDataProvider>();
         provider
-            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<CancellationToken>()))
             .ReturnsAsync(HiddenProfile);
         var service = new ProfileAccessService(MemberManagerFor(Handle).Object, provider.Object, NullLogger<ProfileAccessService>.Instance);
 
@@ -148,6 +148,28 @@ public class ProfileAccessServiceTests
         isInEarlyAccess.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task A_DevRel_member_gets_nothing_for_someone_elses_hidden_profile()
+    {
+        var provider = HiddenProfileProvider();
+        var service = new ProfileAccessService(DevRelMemberManager().Object, provider.Object, NullLogger<ProfileAccessService>.Instance);
+
+        var viewable = await service.GetViewableProfileAsync(Handle);
+
+        viewable.Should().Be(ViewableProfile.None);
+        provider.Verify(p => p.GetProfileAsync(It.IsAny<string>(), true, It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task A_DevRel_member_does_not_see_the_enriched_sections_on_someone_elses_profile()
+    {
+        var service = new ProfileAccessService(DevRelMemberManager().Object, HiddenProfileProvider().Object, NullLogger<ProfileAccessService>.Instance);
+
+        var access = await service.ResolveAsync(openToAll: false, Handle);
+
+        access.Should().Be(EnrichedSectionsAccess.None);
+    }
+
     private static (ProfileAccessService Service, Mock<IProfileDataProvider> Provider) CreateService(string? signedInHandle)
     {
         var provider = HiddenProfileProvider();
@@ -163,12 +185,23 @@ public class ProfileAccessServiceTests
     {
         var provider = new Mock<IProfileDataProvider>();
         provider
-            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, false, It.IsAny<CancellationToken>()))
             .ReturnsAsync((CommunityProfile?)null);
         provider
-            .Setup(p => p.GetProfileAsync(Handle, true, It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .Setup(p => p.GetProfileAsync(Handle, true, It.IsAny<CancellationToken>()))
             .ReturnsAsync(HiddenProfile);
         return provider;
+    }
+
+    // A signed-in member who is in the DevRel group (and early access), looking at someone else's profile.
+    private static Mock<IMemberManager> DevRelMemberManager()
+    {
+        var member = new MemberIdentityUser { Id = Guid.NewGuid().ToString(), UserName = "hubot", IsExternalOnly = true };
+        var memberManager = new Mock<IMemberManager>();
+        memberManager.Setup(m => m.IsLoggedIn()).Returns(true);
+        memberManager.Setup(m => m.GetCurrentMemberAsync()).ReturnsAsync(member);
+        memberManager.Setup(m => m.GetRolesAsync(member)).ReturnsAsync(["Community Members", "DevRel", ProfileAccessService.EarlyAccessGroupName]);
+        return memberManager;
     }
 
     private static Mock<IMemberManager> MemberManagerFor(string? signedInHandle)

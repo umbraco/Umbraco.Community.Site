@@ -52,14 +52,9 @@ public class CommunityProfilePageController : RenderController
             return NotFound();
         }
 
-        // A DevRel member looking at someone else's profile may ask for everything the member hid as well,
-        // their hidden links included.
-        var isDevRelViewer = await _profileAccessService.IsDevRelViewAsync(handle);
-        var showEverything = isDevRelViewer && DevRelProfileView.IsShowEverythingRequested(Request.Query);
-
-        // A hidden profile is loaded only for its signed-in owner and for DevRel; everyone else
-        // gets null, exactly as for a handle with no profile.
-        var viewable = await _profileAccessService.GetViewableProfileAsync(handle, includeHiddenLinks: showEverything, cancellationToken);
+        // A hidden profile is loaded only for its signed-in owner; everyone else gets null,
+        // exactly as for a handle with no profile.
+        var viewable = await _profileAccessService.GetViewableProfileAsync(handle, cancellationToken);
         var isOwnProfile = await _profileAccessService.IsOwnProfileAsync(handle);
 
         // Only an existing profile has sections to show.
@@ -67,27 +62,10 @@ public class CommunityProfilePageController : RenderController
             ? await _profileAccessService.ResolveAsync(currentPage, handle)
             : EnrichedSectionsAccess.None;
 
-        // The DevRel page is never stored by a browser or shared cache.
-        var isDevRelView = viewable.Profile != null && isDevRelViewer;
-        if (isDevRelView)
-        {
-            DevRelProfileView.PreventCaching(Response);
-        }
-
-        // A profile admin gets a button to edit someone else's profile on the account page. Only that page is kept out
-        // of caches; everyone else's page is unchanged.
-        string? editAsUrl = null;
-        if (viewable.Profile != null && !isOwnProfile && await _profileAccessService.IsCurrentMemberProfileAdminAsync()
-            && currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider) is { Length: > 0 } accountUrl && accountUrl != "#")
-        {
-            editAsUrl = $"{accountUrl}?{ProfileEditSubjectResolver.QueryKey}={Uri.EscapeDataString(handle)}";
-            DevRelProfileView.PreventCaching(Response);
-        }
-
         // Activity is only loaded for a viewer who may see it; everyone else gets the page as it was.
         // The member's choices of what the sections show (sections off, hidden and pinned items) apply on top.
         var profile = viewable.Profile != null && access.Show
-            ? ProfileDisplay.Apply(await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken), showHidden: showEverything)
+            ? ProfileDisplay.Apply(await _profileActivityService.EnrichAsync(viewable.Profile, cancellationToken))
             : viewable.Profile;
 
         // The timeline and the activity graph are built from the activity shown, so they sit behind the same gate.
@@ -97,13 +75,10 @@ public class CommunityProfilePageController : RenderController
         if (profile != null && access.Show && !isBuilding)
         {
             timeline = ProfileTimeline.Entries(profile);
-            if (!profile.DisplayChoices.HideActivityGraph)
-            {
-                var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), today)
-                    with { Summary = ProfileActivityGraph.Summarise(timeline, today, profile.ForumStats, profile.ActivityCounts) };
-                graph = built.IsEmpty ? null : built;
-            }
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var built = ProfileActivityGraph.Build(timeline.Select(e => e.Date), today)
+                with { Summary = ProfileActivityGraph.Summarise(timeline, today, profile.ForumStats, profile.ActivityCounts) };
+            graph = built.IsEmpty ? null : built;
         }
 
         var timelineTypes = ProfileTimeline.Types(timeline);
@@ -111,15 +86,23 @@ public class CommunityProfilePageController : RenderController
 
         // Only the entries on the shown page get preview cards, so outside work is spent on what is actually in view.
         var timelinePage = ProfileTimeline.Paginate(timeline, timelineType, timelineTypes.Count > 1, Request.Query[ProfileTimeline.PageQueryKey].FirstOrDefault());
-        var pageEntries = profile != null && access.Show
-            ? await _timelinePreviewService.AddCardsAsync(timelinePage.Entries, profile.DisplayChoices, cancellationToken)
-            : timelinePage.Entries;
+
+        // The Featured strip's pictures are found the same way as the timeline's cards, in the same batch (one wait,
+        // one budget), Featured first as it is above the fold.
+        var featured = profile != null ? ProfileFeatured.Highlights(profile) : [];
+        var featuredLookups = ProfileFeatured.ImageLookups(featured);
+        var timelineLookups = profile != null && access.Show ? timelinePage.Entries : [];
+        IReadOnlyList<ProfileTimelineEntry> carded = featuredLookups.Count + timelineLookups.Count > 0
+            ? await _timelinePreviewService.AddCardsAsync([.. featuredLookups, .. timelineLookups], cancellationToken)
+            : [];
+        featured = ProfileFeatured.WithImages(featured, carded.Take(featuredLookups.Count).ToList());
+        var pageEntries = timelineLookups.Count > 0 ? carded.Skip(featuredLookups.Count).ToList() : timelinePage.Entries;
         var viewModel = new CommunityProfilePageViewModel(currentPage)
         {
             Handle = handle,
             Profile = profile,
+            Featured = featured,
             IsOwnProfile = isOwnProfile,
-            EditAsUrl = editAsUrl,
             IsHiddenPreview = viewable.IsHiddenPreview,
             AccountPageUrl = isOwnProfile
                 ? currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider)
@@ -134,12 +117,6 @@ public class CommunityProfilePageController : RenderController
             ActivityGraph = graph,
             JudgingProgress = isBuilding ? profile!.JudgingProgress : null,
             IsGated = access.IsGated,
-            IsDevRelView = isDevRelView,
-            IsHiddenFromPublic = viewable.IsHiddenFromPublic,
-            HasHiddenSocialLinks = viewable.HasHiddenSocialLinks,
-            IsShowingEverything = showEverything,
-            DevRelPublicViewUrl = isDevRelView ? DevRelProfileView.PublicViewUrl(Request.Path) : null,
-            DevRelShowEverythingUrl = isDevRelView ? DevRelProfileView.ShowEverythingUrl(Request.Path) : null,
         };
 
         return CurrentTemplate(viewModel);

@@ -87,13 +87,19 @@ public class MemberProfileEntity
     /// <summary>The ids of single activities from the external content platform the member has hidden.</summary>
     public List<string> HiddenActivityIds { get; set; } = [];
 
-    /// <summary>True once the member has switched the activity graph off. The graph is shown by default.</summary>
+    /// <summary>
+    /// The ids of the Umbraco forum badges the member chose to show on their profile (see
+    /// <see cref="ForumBadges.ForumBadgeService"/>). Empty = none. A badge the member no longer holds is skipped when shown.
+    /// </summary>
+    public List<int> ShownForumBadgeIds { get; set; } = [];
+
+    // Unused since the activity graph switch was removed; drop with the next migration.
     public bool HideActivityGraph { get; set; }
 
-    /// <summary>True once the member has switched the timeline's preview cards off. Cards are shown by default.</summary>
+    // Unused since the preview cards switch was removed; drop with the next migration.
     public bool HideTimelineCards { get; set; }
 
-    /// <summary>The ids of single activities the member wants shown in the timeline without a preview card.</summary>
+    // Unused since the per-item "plain line" choice was removed; drop with the next migration.
     public List<string> NoCardActivityIds { get; set; } = [];
 
     public DateTime CreatedUtc { get; set; }

@@ -149,9 +149,8 @@ export const iconPin = html`<svg class="lucide-icon" xmlns="http://www.w3.org/20
   <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>
 </svg>`;
 
-/** Lucide "text": a plain line, without a preview card. */
-export const iconText = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <path d="M17 6.1H3"/>
-  <path d="M21 12.1H3"/>
-  <path d="M15.1 18H3"/>
+/** Lucide "award": a forum badge that has no picture of its own (kept in sync with Views/Partials/Icons/Award.cshtml). */
+export const iconAward = html`<svg class="lucide-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/>
+  <circle cx="12" cy="8" r="6"/>
 </svg>`;

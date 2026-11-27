@@ -21,364 +21,6 @@
     text-decoration: underline;
 }
 
-/* Hero masthead — full-bleed banner */
-
-.community-profile__hero {
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    background: var(--color-identity-blue);
-    color: var(--color-white);
-    padding-block: var(--unit-md);
-    margin-bottom: var(--unit-lg);
-}
-
-.community-profile__hero-inner {
-    max-width: var(--max-width);
-    margin-inline: auto;
-    padding-inline: var(--unit);
-    display: grid;
-    gap: var(--unit-md);
-    justify-items: center;
-    text-align: center;
-}
-
-.community-profile__portrait {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 320px;
-    height: 320px;
-}
-
-.community-profile__avatar {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.12), 0 0 0 12px var(--color-identity-pink);
-}
-
-.community-profile__name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: center;
-    gap: var(--unit-xs);
-    margin: 0;
-    font-size: clamp(2.5rem, 6vw, 4.75rem);
-    font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.02em;
-}
-
-.community-profile__pronouns {
-    font-size: var(--font-size);
-    font-weight: var(--font-weight-regular);
-    color: var(--color-identity-pink);
-}
-
-.community-profile__headline {
-    margin: var(--unit-xs) 0 0;
-    font-size: var(--font-size-large);
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.community-profile__bio {
-    margin: var(--unit) 0 0;
-    max-width: 60ch;
-    font-size: var(--font-size-large);
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.community-profile__meta,
-.community-profile__socials {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: var(--unit-xs);
-    margin: var(--unit) 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.community-profile__location {
-    padding: var(--unit-xxs) var(--unit-sm);
-    border-radius: var(--border-radius-xl);
-    background: rgba(255, 255, 255, 0.12);
-    font-size: var(--font-size-sm);
-}
-
-.community-profile__socials {
-    gap: var(--unit-xs);
-}
-
-.community-profile__socials li {
-    display: flex;
-}
-
-/* Each link is a pill in the page's soft surface colour, so favicons (designed for light backgrounds) stay
-   legible on the blue band without the harshness of pure white. */
-.community-profile__socials a {
-    display: flex;
-    align-items: center;
-    gap: var(--unit-xs);
-    padding: var(--unit-xxs) var(--unit-sm);
-    border-radius: var(--border-radius-xl);
-    background: var(--color-page-surface);
-    color: var(--color-identity-blue);
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-    font-weight: var(--font-weight-bold);
-    text-decoration: none;
-    transition: background-color 0.15s ease;
-}
-
-/* Outranks the global "#main-content .no-link-animation" rule, which zeroes padding-bottom and would
-   otherwise leave the pill's text sitting low. */
-#main-content .community-profile__socials a.no-link-animation {
-    padding: var(--unit-xxs) var(--unit-sm);
-}
-
-.community-profile__socials a:hover,
-.community-profile__socials a:focus-visible {
-    background: var(--color-white);
-}
-
-.community-profile__social-favicon {
-    flex: none;
-    width: 1rem;
-    height: 1rem;
-    object-fit: contain;
-}
-
-/* "Edit profile" link, only shown to the profile's owner. */
-.community-profile__edit {
-    margin: var(--unit) 0 0;
-}
-
-/* MVP mark — a current MVP gets a flat yellow ring round the photo and a badge at its lower left;
-   every MVP gets an "MVP × N" pill that lists the years on hover, focus or tap. */
-
-.community-profile__avatar--mvp {
-    box-shadow: 0 0 0 6px var(--color-identity-yellow);
-}
-
-.community-profile__mvp-badge {
-    position: absolute;
-    left: 74px;
-    top: 202px;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--color-identity-yellow);
-    border: 3px solid var(--color-identity-blue);
-    color: var(--color-identity-dark);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    line-height: 1;
-}
-
-.community-profile__mvp-pill {
-    position: relative;
-    display: inline-block;
-    margin-top: var(--unit-xs);
-    cursor: default;
-}
-
-.community-profile__mvp-pill-label {
-    display: inline-block;
-    padding: 0.25em 0.8em;
-    border-radius: 999px;
-    background: var(--color-identity-yellow);
-    color: var(--color-identity-dark);
-    font-size: var(--font-size-xs);
-    font-weight: 800;
-    letter-spacing: 0.03em;
-}
-
-.community-profile__mvp-years {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    z-index: 2;
-    display: none;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25em 0.5em;
-    width: max-content;
-    max-width: min(18rem, 80vw);
-    margin: 0.4em 0 0;
-    padding: 0.5em 0.75em;
-    list-style: none;
-    transform: translateX(-50%);
-    border-radius: 0.75em;
-    background: var(--color-white);
-    color: var(--color-identity-dark);
-    font-size: var(--font-size-xs);
-    font-weight: 700;
-}
-
-.community-profile__mvp-pill:hover .community-profile__mvp-years,
-.community-profile__mvp-pill:focus .community-profile__mvp-years,
-.community-profile__mvp-pill:focus-within .community-profile__mvp-years {
-    display: flex;
-}
-
-/* "Claim this profile" state — same hero shell as a real profile, with an empty silhouette
-   avatar and ghost lines standing in for the headline/bio nobody has written yet. */
-
-.community-profile__avatar--empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-.community-profile__ghost-lines {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--unit-xs);
-    width: 100%;
-    max-width: 60ch;
-    margin: var(--unit) 0 0;
-}
-
-.community-profile__ghost-line {
-    display: block;
-    width: 100%;
-    height: 14px;
-    border-radius: var(--border-radius);
-    background: rgba(255, 255, 255, 0.14);
-}
-
-.community-profile__ghost-line--headline {
-    max-width: 55%;
-    height: 20px;
-}
-
-.community-profile__ghost-line--short {
-    max-width: 70%;
-}
-
-.community-profile__claim {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--unit-sm);
-    margin-top: var(--unit-md);
-    text-align: center;
-}
-
-.community-profile__claim-text {
-    margin: 0;
-    max-width: 46ch;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-/* .btn.is-white:hover fills the button with identity blue but never overrides the base .btn
-   border colour (also identity blue), so on this blue hero the whole button — border
-   included — disappears into the background on hover. Keeping the border white here is what
-   .btn.is-transparent already does by default; this button just needs the same treatment. */
-.community-profile__claim .member-signin__btn:hover {
-    border-color: var(--color-white);
-}
-
-/* Badges bar — directly below the hero */
-
-.community-profile__badges-bar {
-    margin-bottom: var(--unit-lg);
-}
-
-.community-profile__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--unit-md);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-/* Sew-on patch: an outer "merrow" edge colour with the fill inset inside it,
-   a centred emblem + name, and a jaunty applied-by-hand angle. Shape, colours
-   and emblem vary by position. */
-.community-profile__award {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 144px;
-    height: 144px;
-    padding: var(--unit-sm);
-    text-align: center;
-    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.28));
-}
-
-.community-profile__award::before {
-    content: "";
-    position: absolute;
-    inset: 6px;
-    z-index: 0;
-    background: var(--patch-fill, var(--color-identity-blue));
-    clip-path: inherit;
-}
-
-.community-profile__award-name {
-    position: relative;
-    z-index: 1;
-    display: block;
-    padding: 6px;
-    color: var(--patch-text, var(--color-white));
-    font-size: 13px;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-}
-
-.community-profile__award-icon {
-    position: relative;
-    z-index: 1;
-    width: 32px;
-    height: 32px;
-}
-
-.community-profile__award:nth-child(4n + 1) {
-    clip-path: circle(50%);
-    background: var(--color-identity-yellow);
-    --patch-fill: var(--color-identity-blue);
-    --patch-emblem: "\2605";
-    transform: rotate(-3deg);
-}
-
-.community-profile__award:nth-child(4n + 2) {
-    clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
-    background: var(--color-identity-blue);
-    --patch-fill: var(--color-identity-orange);
-    --patch-text: var(--color-identity-dark);
-    --patch-emblem: "\2756";
-    transform: rotate(2.5deg);
-}
-
-.community-profile__award:nth-child(4n + 3) {
-    clip-path: polygon(50% 0, 100% 14%, 100% 56%, 50% 100%, 0 56%, 0 14%);
-    background: var(--color-identity-pink);
-    --patch-fill: var(--color-identity-blue);
-    --patch-emblem: "\2726";
-    transform: rotate(-1.5deg);
-}
-
-.community-profile__award:nth-child(4n + 4) {
-    clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
-    background: var(--color-green);
-    --patch-fill: var(--color-identity-dark);
-    --patch-emblem: "\2742";
-    transform: rotate(3deg);
-}
-
 /* Latest strip — most recent of each type, above the fold */
 
 .community-profile__latest {
@@ -416,9 +58,12 @@
     box-shadow: var(--box-shadow-blue);
 }
 
+/* The frame sets the size, so a picture and the placeholder below are exactly the same shape. */
 .community-profile__highlight-media {
     position: relative;
     display: block;
+    flex-shrink: 0;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: var(--border-radius);
     margin-bottom: var(--unit-xs);
@@ -427,8 +72,23 @@
 .community-profile__highlight-media img {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
+}
+
+/* A card without a picture of its own shows the default blog cover art (the same placeholder-cover.svg the
+   community blog cards use), sized by the img rule above. The background is the art's blue, so the frame
+   isn't blank while the SVG loads. The transparent border only shows in forced-colours mode, so the tile
+   still reads as a frame there. */
+.community-profile__highlight-media--placeholder {
+    border: 1px solid transparent;
+    background: var(--color-blue);
+}
+
+@media (forced-colors: active) {
+    .community-profile__highlight-media--placeholder {
+        border-color: CanvasText;
+    }
 }
 
 .community-profile__play {
@@ -473,7 +133,10 @@
     overflow: hidden;
 }
 
+/* Cards in a row stretch to the tallest (often one with a picture), so the meta line sits at the bottom of each,
+   lined up across the row, whether or not a card has a picture. */
 .community-profile__highlight-meta {
+    margin-top: auto;
     font-size: var(--font-size-sm);
     color: var(--color-dark-grey);
 }
@@ -935,44 +598,6 @@
 }
 
 @media (--md) {
-    .community-profile__hero {
-        padding-block: var(--unit-lg);
-    }
-
-    .community-profile__hero-inner {
-        grid-template-columns: 1fr auto;
-        grid-template-areas: "identity portrait";
-        align-items: center;
-        justify-items: start;
-        column-gap: var(--unit-lg);
-        text-align: left;
-    }
-
-    .community-profile__identity {
-        grid-area: identity;
-    }
-
-    .community-profile__portrait {
-        grid-area: portrait;
-    }
-
-    .community-profile__name,
-    .community-profile__meta,
-    .community-profile__socials {
-        justify-content: flex-start;
-    }
-
-    .community-profile__ghost-lines,
-    .community-profile__claim {
-        align-items: flex-start;
-        text-align: left;
-    }
-
-    .community-profile__ghost-line--headline,
-    .community-profile__ghost-line--short {
-        max-width: 40%;
-    }
-
     .community-profile__departments {
         columns: 2;
     }
@@ -1042,60 +667,4 @@
 .dc-profile-hidden-banner__action:disabled {
     opacity: 0.6;
     cursor: progress;
-}
-
-/* DevRel-only banner: a full-bleed dark strip above the hero, on every DevRel view that differs from the public page. */
-.community-profile__devrel-banner {
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    background: var(--color-identity-dark);
-    color: var(--color-white);
-    border-bottom: 4px solid var(--color-identity-yellow);
-}
-
-.community-profile__devrel-banner-inner {
-    max-width: var(--max-width);
-    margin-inline: auto;
-    padding: var(--unit-sm) var(--unit);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--unit-xs);
-}
-
-.community-profile__devrel-banner-title,
-.community-profile__devrel-banner-text {
-    margin: 0;
-}
-
-.community-profile__devrel-banner-title {
-    font-weight: 700;
-}
-
-.community-profile__devrel-banner-text {
-    font-size: var(--font-size-sm);
-}
-
-/* Marks a section or item the member hid, on a DevRel view that shows everything. Dark on yellow meets contrast. */
-.community-profile__hidden-label {
-    display: inline-block;
-    align-self: flex-start;
-    padding: 0.125rem 0.5rem;
-    border-radius: 999px;
-    background: var(--color-identity-yellow);
-    color: var(--color-identity-dark);
-    font-size: var(--font-size-sm);
-    font-weight: 700;
-    line-height: 1.4;
-    white-space: nowrap;
-}
-
-/* A hidden link keeps its pill, with the hidden label beside it. */
-.community-profile__socials li:has(.community-profile__hidden-label) {
-    align-items: center;
-    gap: var(--unit-xxs);
-}
-
-.community-profile__socials .community-profile__hidden-label {
-    align-self: center;
 }

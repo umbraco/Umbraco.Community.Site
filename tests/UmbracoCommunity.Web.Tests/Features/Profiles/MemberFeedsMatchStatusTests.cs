@@ -73,7 +73,7 @@ public class MemberFeedsMatchStatusTests : IDisposable
             NullLogger<LinkPreviewService>.Instance);
 
         return new MemberFeedsApiController(
-            TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _profileStore), _profileStore, _syncClient.Object, linkPreviews, TestImageProxy.Create(), accessService, matching);
+            memberManager.Object, _profileStore, _syncClient.Object, linkPreviews, TestImageProxy.Create(), accessService, matching);
     }
 
     private static MemberFeedResponse Response(IActionResult result) =>
@@ -116,6 +116,77 @@ public class MemberFeedsMatchStatusTests : IDisposable
         var moved = Response(await controller.Update(feed.Id, new UpdateFeedRequest("Mastodon", "https://social.example/@octo"), default));
         moved.MatchStatus.Should().Be("Held");
         (await _matchStore.GetForProfileAsync(profile.Id)).Keys.Should().Equal("https://social.example/@octo");
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task This_isnt_me_removes_the_link_and_rejects_its_source(bool inEarlyAccess)
+    {
+        var profile = await CreateProfileAsync();
+        var feed = await _profileStore.AddFeedAsync(_memberKey, "Mastodon", Mastodon);
+
+        var result = await CreateController(inEarlyAccess).Remove(feed!.Id, new RemoveFeedRequest("Someone else"), default);
+
+        result.Should().BeOfType<OkResult>();
+        (await _profileStore.GetActiveFeedsAsync(_memberKey)).Should().BeEmpty();
+        var match = (await _matchStore.GetForProfileAsync(profile.Id))[Mastodon];
+        match.State.Should().Be(ProfileMatchState.Rejected);
+        match.DecidedBy.Should().Be(ProfileMatchDecider.Member);
+        (await _matchStore.GetRejectedSourcesAsync(Handle)).Should().Equal(Mastodon);
+        _syncClient.Verify(c => c.NotifyFeedRemovedAsync(Handle, Mastodon, "Someone else", It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task This_isnt_me_still_removes_a_link_whose_source_cant_be_rejected()
+    {
+        var profile = await CreateProfileAsync();
+        var ownGitHub = $"https://github.com/{Handle}";
+        var feed = await _profileStore.AddFeedAsync(_memberKey, "GitHub", ownGitHub);
+
+        var result = await CreateController(inEarlyAccess: true).Remove(feed!.Id, null, default);
+
+        result.Should().BeOfType<OkResult>();
+        (await _profileStore.GetActiveFeedsAsync(_memberKey)).Should().BeEmpty();
+        (await _matchStore.GetForProfileAsync(profile.Id)).Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Removing_a_link_that_isnt_there_rejects_nothing()
+    {
+        var profile = await CreateProfileAsync();
+
+        var result = await CreateController(inEarlyAccess: true).Remove(12345, null, default);
+
+        result.Should().BeOfType<NotFoundResult>();
+        (await _matchStore.GetForProfileAsync(profile.Id)).Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Adding_a_removed_link_again_takes_back_the_members_rejection()
+    {
+        var profile = await CreateProfileAsync();
+        var feed = await _profileStore.AddFeedAsync(_memberKey, "Mastodon", Mastodon);
+        var controller = CreateController(inEarlyAccess: true);
+        await controller.Remove(feed!.Id, null, default);
+
+        var added = Response(await controller.Add(new AddFeedRequest("Mastodon", Mastodon + "/"), default));
+
+        (await _matchStore.GetRejectedSourcesAsync(Handle)).Should().BeEmpty();
+        added.MatchStatus.Should().Be("Held");
+        (await _matchStore.GetForProfileAsync(profile.Id)).Values.Should().OnlyContain(m => m.DecidedBy == ProfileMatchDecider.Automatic);
+    }
+
+    [Fact]
+    public async Task Adding_a_link_again_keeps_a_rejection_made_in_the_review_dashboard()
+    {
+        var profile = await CreateProfileAsync();
+        var record = await _matchStore.RecordAutomaticAsync(profile.Id, Mastodon, ProfileMatchState.Held, 0.5, []);
+        await _matchStore.DecideManuallyAsync(record!.Id, ProfileMatchState.Rejected, Guid.NewGuid(), "reviewer");
+
+        await CreateController(inEarlyAccess: false).Add(new AddFeedRequest("Mastodon", Mastodon), default);
+
+        (await _matchStore.GetRejectedSourcesAsync(Handle)).Should().Equal(Mastodon);
     }
 
     [Fact]

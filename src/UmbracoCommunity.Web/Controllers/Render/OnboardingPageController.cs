@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
@@ -37,22 +36,17 @@ public class OnboardingPageController : RenderController
     {
         var currentPage = CurrentPage ?? throw new InvalidOperationException($"Cannot build view model as {nameof(CurrentPage)} is null.");
 
-        // Anonymous visitors can land here directly (e.g. a devrel-shared "get your
-        // profile" link) — show a sign-in prompt in the view rather than bouncing them
-        // away, so a direct link to onboarding actually works without being signed in first.
-        var profilePage = currentPage.GetSingletonPage<CommunityProfilePage>();
-        var devRelContactLink = currentPage.As<OnboardingPage>().DevRelContactForm;
-        var viewModel = new OnboardingPageViewModel(currentPage)
+        // Members are onboarded automatically (see OnboardingRedirectMiddleware), so a signed-in
+        // member has nothing to do here: send them to their account page instead.
+        if (_memberManager.IsLoggedIn()
+            && currentPage.GetSingletonPage<AccountPage>()?.Url(_publishedUrlProvider) is { Length: > 0 } accountUrl)
         {
-            // Absolute so the wizard can show the member the actual link their profile will
-            // live at (scheme + host included) — this varies per environment (localhost in
-            // dev, the real domain elsewhere), which a relative path wouldn't communicate.
-            ProfileBaseUrl = profilePage?.Url(_publishedUrlProvider, mode: UrlMode.Absolute),
-            IsSignedIn = _memberManager.IsLoggedIn(),
-            DevRelContactUrl = devRelContactLink?.Url,
-            DevRelContactTarget = devRelContactLink?.Target,
-            DevRelContactTitle = devRelContactLink?.Name,
-        };
+            return Redirect(accountUrl);
+        }
+
+        // Anonymous visitors can land here directly (e.g. a devrel-shared "get your profile" link):
+        // the view shows them a GitHub sign-in prompt rather than bouncing them away.
+        var viewModel = new OnboardingPageViewModel(currentPage);
 
         return CurrentTemplate(viewModel);
     }

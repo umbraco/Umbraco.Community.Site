@@ -112,7 +112,7 @@ HashSet<string> blogContentTypeAliases = new() { Article.ModelTypeAlias, Blog.Mo
 HashSet<string> blogContentTypeAliases = new() { "article", "blog" };
 ```
 
-This shows up everywhere a content type needs identifying rather than casting: `BlogContentCacheInvalidationHandler` gating which published/unpublished events should evict the output cache, `PublishedContentExtensions` walking up to find a tenant's `Settings`/`NavigationSettings`/`SocialSettings` nodes, `OnboardingRedirectMiddleware` checking whether the current node is the `OnboardingPage`, `BlogFolderRedirectMiddleware` matching `BlogYearFolder`/`BlogMonthFolder` — and it applies in Razor too, not just C#, e.g. `Views/Partials/Blocks/CardsBlock.cshtml` comparing `c.Content.ContentType.Alias == ImageBlock.ModelTypeAlias` when a block needs to render differently per nested content type. See [`CODE_CONVENTIONS.md`](../../CODE_CONVENTIONS.md) for the canonical good/bad example.
+This shows up everywhere a content type needs identifying rather than casting: `BlogContentCacheInvalidationHandler` gating which published/unpublished events should evict the output cache, `PublishedContentExtensions` walking up to find a tenant's `Settings`/`NavigationSettings`/`SocialSettings` nodes, `OnboardingRedirectMiddleware` checking whether the current node is the `AccountPage`, `BlogFolderRedirectMiddleware` matching `BlogYearFolder`/`BlogMonthFolder` — and it applies in Razor too, not just C#, e.g. `Views/Partials/Blocks/CardsBlock.cshtml` comparing `c.Content.ContentType.Alias == ImageBlock.ModelTypeAlias` when a block needs to render differently per nested content type. See [`CODE_CONVENTIONS.md`](../../CODE_CONVENTIONS.md) for the canonical good/bad example.
 
 ## The `Models/` folder map
 

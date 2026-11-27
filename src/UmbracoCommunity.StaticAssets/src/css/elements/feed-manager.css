@@ -66,6 +66,47 @@ dc-feed-manager {
   box-sizing: border-box;
 }
 
+/* "This isn't me" sits quietly under the edit form, away from the everyday Edit and Hide actions. */
+.dc-feed-manager__not-me {
+  margin: 0;
+  padding-top: var(--unit-xs);
+  border-top: 1px solid var(--color-light-grey);
+  font-size: var(--font-size-sm);
+  color: var(--color-dark-grey);
+}
+
+.dc-feed-manager__remove {
+  display: flex;
+  flex-direction: column;
+  gap: var(--unit-xs);
+}
+
+.dc-feed-manager__remove-title {
+  margin: 0;
+  color: var(--color-identity-blue);
+}
+
+.dc-feed-manager__remove-description p {
+  margin: 0 0 var(--unit-xxs);
+  font-size: var(--font-size-sm);
+}
+
+.dc-feed-manager__remove label {
+  font-size: var(--font-size-sm);
+}
+
+/* The confirm button is the one that can't be undone here, so it stands out in the error colour. */
+.dc-feed-manager__confirm-remove.btn {
+  border-color: var(--color-error);
+  background-color: var(--color-error);
+  color: var(--color-white);
+}
+
+.dc-feed-manager__confirm-remove.btn:hover {
+  background-color: var(--color-white);
+  color: var(--color-error);
+}
+
 .dc-feed-manager__item-info {
   display: flex;
   flex-direction: column;

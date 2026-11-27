@@ -196,7 +196,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         viewModel.CanonicalUrl = $"{request.Scheme}://{request.Host}{path}";
 
-        // Same rules as the page itself: a hidden profile is loaded only for its owner and for DevRel.
+        // Same rules as the page itself: a hidden profile is loaded only for its owner.
         var viewable = await _profileAccessService.GetViewableProfileAsync(handle);
         if (viewable.Profile is null)
         {
@@ -204,14 +204,6 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
         }
 
         viewModel.MetaTitle = viewable.Profile.Identity.DisplayName;
-
-        // A DevRel member's view of someone else's profile is not what the public sees, so it must not be indexed.
-        var isDevRelView = await _profileAccessService.IsDevRelViewAsync(handle);
-        if (isDevRelView)
-        {
-            viewModel.Robots = "noindex, follow";
-            return;
-        }
 
         // The owner's preview of their hidden profile must not be indexed.
         if (viewable.IsHiddenPreview)
@@ -231,7 +223,7 @@ internal class SeoDataService : ViewModelBuilderBase, ISeoDataService
 
         // Share previews and structured data are for the page everyone sees, which is only the case
         // once the tenant has opened the profile sections to everyone.
-        if (ProfileSeo.IsPubliclyVisible(viewable, access, isDevRelView))
+        if (ProfileSeo.IsPubliclyVisible(viewable, access))
         {
             ApplyPublicProfileSeo(viewModel, viewable.Profile);
         }

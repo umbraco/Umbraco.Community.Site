@@ -76,7 +76,7 @@ public class ProfileLinkMatchingApiControllerTests : IDisposable
             _matchStore,
             Mock.Of<IOptionsMonitor<ProfileMatchingOptions>>(o => o.CurrentValue == new ProfileMatchingOptions()),
             NullLogger<ProfileLinkMatchingService>.Instance);
-        return new ProfileLinkMatchingApiController(TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _profileStore), _profileStore, accessService, matching);
+        return new ProfileLinkMatchingApiController(memberManager.Object, _profileStore, accessService, matching, TestImageProxy.Create());
     }
 
     [Fact]
@@ -88,7 +88,32 @@ public class ProfileLinkMatchingApiControllerTests : IDisposable
         var result = await CreateController().Suggestions();
 
         result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeAssignableTo<IReadOnlyList<LinkSuggestion>>()
-            .Which.Should().Equal(new LinkSuggestion("https://octo.example/rss", null, "Octo's blog", LinkSuggestionKinds.Feed));
+            .Which.Select(s => (s.Url, s.Platform, s.Name, s.Kind))
+            .Should().Equal(("https://octo.example/rss", (string?)null, (string?)"Octo's blog", LinkSuggestionKinds.Feed));
+    }
+
+    [Fact]
+    public async Task Suggestions_leave_out_links_the_member_removed()
+    {
+        await CreateProfileAsync();
+        var feed = await _profileStore.AddFeedAsync(_memberKey, "Blog", "https://octo.example/rss/");
+        await _profileStore.RemoveFeedAsync(_memberKey, feed!.Id, null);
+
+        var result = await CreateController().Suggestions();
+
+        result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeAssignableTo<IReadOnlyList<LinkSuggestion>>()
+            .Which.Select(s => s.Url).Should().Equal("https://social.example/@octocat");
+    }
+
+    [Fact]
+    public async Task Suggestions_carry_their_sites_icon_through_the_image_proxy()
+    {
+        await CreateProfileAsync();
+
+        var result = await CreateController().Suggestions();
+
+        var suggestions = result.Should().BeOfType<OkObjectResult>().Which.Value.Should().BeAssignableTo<IReadOnlyList<LinkSuggestion>>().Subject;
+        suggestions.Should().HaveCount(2).And.OnlyContain(s => s.FaviconUrl != null && s.FaviconUrl.StartsWith("/api/feed-submission/image-proxy?token="));
     }
 
     [Fact]

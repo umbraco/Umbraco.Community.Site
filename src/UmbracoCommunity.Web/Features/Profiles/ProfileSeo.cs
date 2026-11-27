@@ -15,14 +15,12 @@ public static class ProfileSeo
     public const int ShareImageSize = 600;
 
     /// <summary>
-    /// True when the page is what any visitor sees: the profile is shown, and is not a preview for its owner or a view
-    /// for DevRel, and the sections are open to everyone rather than shown only because of the viewer's member group.
+    /// True when the page is what any visitor sees: the profile is shown, and is not a preview for its owner, and the
+    /// sections are open to everyone rather than shown only because of the viewer's member group.
     /// </summary>
-    public static bool IsPubliclyVisible(ViewableProfile viewable, EnrichedSectionsAccess access, bool isDevRelView) =>
+    public static bool IsPubliclyVisible(ViewableProfile viewable, EnrichedSectionsAccess access) =>
         viewable.Profile is not null
         && !viewable.IsHiddenPreview
-        && !viewable.IsHiddenFromPublic
-        && !isDevRelView
         && access is { Show: true, IsGated: false };
 
     /// <summary>
@@ -69,7 +67,6 @@ public static class ProfileSeo
         }
 
         var sameAs = identity.SocialLinks
-            .Where(l => !l.IsHiddenByMember)
             .Select(l => Uri.TryCreate(l.Url, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri : null)
             .OfType<Uri>()
             .ToList();

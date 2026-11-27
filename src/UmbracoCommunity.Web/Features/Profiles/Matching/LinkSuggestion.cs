@@ -6,7 +6,11 @@ namespace UmbracoCommunity.Web.Features.Profiles.Matching;
 /// <param name="Platform">The platform an account is on (e.g. "mastodon"); null for a feed or when not known.</param>
 /// <param name="Name">The account's username or the feed's name, when known.</param>
 /// <param name="Kind">"Account" or "Feed", see <see cref="LinkSuggestionKinds"/>.</param>
-public sealed record LinkSuggestion(string Url, string? Platform, string? Name, string Kind);
+/// <param name="FaviconUrl">
+/// The site's icon through the same-origin image proxy, as the member's own links show theirs. Set by the API, null
+/// until then.
+/// </param>
+public sealed record LinkSuggestion(string Url, string? Platform, string? Name, string Kind, string? FaviconUrl = null);
 
 public static class LinkSuggestionKinds
 {

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -42,14 +43,37 @@ public class ProfileApiControllerTests : IDisposable
         await _store.GetOrStartOnboardingAsync(_memberKey, Handle, "The Octocat");
     }
 
-    private ProfileApiController CreateController(bool signedIn = true)
+    private ProfileApiController CreateController(bool signedIn = true, string? editAsHeader = null)
     {
         var memberManager = new Mock<IMemberManager>();
         memberManager
             .Setup(m => m.GetCurrentMemberAsync())
             .ReturnsAsync(signedIn ? new MemberIdentityUser { Key = _memberKey, UserName = Handle } : null);
 
-        return new ProfileApiController(TestProfileEditSubjects.Resolver(memberManager.Object, store: _store), _store, null!, null!, null!, null!);
+        var controller = new ProfileApiController(memberManager.Object, _store, null!, null!);
+        if (editAsHeader != null)
+        {
+            // The header the removed "edit as" feature used to send: it must not change whose profile is edited.
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-Profile-Edit-As"] = editAsHeader;
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
+        }
+
+        return controller;
+    }
+
+    [Fact]
+    public async Task A_request_naming_another_member_only_ever_changes_the_signed_in_members_profile()
+    {
+        await CreateProfileAsync();
+        var otherKey = Guid.NewGuid();
+        await _store.GetOrStartOnboardingAsync(otherKey, "hubot", "Hubot");
+
+        var result = await CreateController(editAsHeader: "hubot").UpdateBio(new UpdateBioRequest("Mine"), default);
+
+        Details(result).Bio.Should().Be("Mine");
+        (await _store.GetByMemberKeyAsync(_memberKey))!.Bio.Should().Be("Mine");
+        (await _store.GetByMemberKeyAsync(otherKey))!.Bio.Should().BeNull();
     }
 
     private static ProfileDetailsResponse Details(IActionResult result) =>

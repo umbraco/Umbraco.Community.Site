@@ -148,22 +148,22 @@ public sealed record ProfileTalk(
     string? Description = null);
 
 /// <summary>A badge earned by the member (e.g. from the forum profile).</summary>
+/// <param name="IconUrl">The badge's picture on this site (e.g. through the image proxy), or null to show the generic badge icon.</param>
+/// <param name="BadgeType">"Gold", "Silver" or "Bronze" for a forum badge, or null.</param>
+/// <param name="Url">The badge's page (for a forum badge, built by <c>ForumProfileUrl.BadgeUrl</c>), or null for no link.</param>
 public sealed record ProfileBadge(
     string Name,
     string? IconUrl,
     string? Description,
-    DateTimeOffset? AwardedAt);
+    DateTimeOffset? AwardedAt,
+    string? BadgeType = null,
+    string? Url = null);
 
 /// <summary>A link to the member's presence on an external platform.</summary>
-/// <param name="IsHiddenByMember">
-/// True when the member hid the link. Such a link is only included on a DevRel view that shows everything
-/// (see <see cref="ProfileAccessService.GetViewableProfileAsync"/>).
-/// </param>
 public sealed record ProfileSocialLink(
     string Platform,
     string Url,
-    string? FaviconUrl = null,
-    bool IsHiddenByMember = false);
+    string? FaviconUrl = null);
 
 /// <summary>A post the member made on a social platform (LinkedIn, Mastodon, Bluesky).</summary>
 public sealed record ProfileSocialPost(

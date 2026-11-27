@@ -125,6 +125,31 @@ public class ProfileMatchStore
         return ToRecord(entity, profile);
     }
 
+    /// <summary>
+    /// Forgets the member's own "not mine" decisions for the given sources (exact addresses), so the member can take a
+    /// source back. Decisions made by a backoffice user or a check are kept. Returns how many were forgotten.
+    /// </summary>
+    public async Task<int> RemoveMemberRejectionsAsync(int memberProfileId, IReadOnlyCollection<string> sourceUrls, CancellationToken ct = default)
+    {
+        if (sourceUrls.Count == 0)
+        {
+            return 0;
+        }
+
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var urls = sourceUrls.ToList();
+        var rows = await context.ProfileMatches
+            .Where(m => m.MemberProfileId == memberProfileId
+                && m.DecidedBy == ProfileMatchDecider.Member
+                && m.State == ProfileMatchState.Rejected
+                && urls.Contains(m.SourceUrl))
+            .ToListAsync(ct);
+
+        context.ProfileMatches.RemoveRange(rows);
+        await context.SaveChangesAsync(ct);
+        return rows.Count;
+    }
+
     /// <summary>The sources rejected for the profile with the given GitHub handle (ignoring case); empty when there is no such profile.</summary>
     public async Task<IReadOnlyList<string>> GetRejectedSourcesAsync(string gitHubHandle, CancellationToken ct = default)
     {

@@ -166,6 +166,7 @@ public class FeedSubmissionApiController : ControllerBase
     /// for the SSRF guard on the caller-supplied URL.
     /// </summary>
     [HttpGet("image-proxy")]
+    [EnableRateLimiting(FeedSubmissionRateLimiting.ImageProxyPolicyName)]
     public async Task<IActionResult> ImageProxy([FromQuery] string token, CancellationToken cancellationToken)
     {
         var result = await _imageProxy.FetchAsync(token, cancellationToken);

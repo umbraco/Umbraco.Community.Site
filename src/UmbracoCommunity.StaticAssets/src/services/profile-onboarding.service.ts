@@ -1,8 +1,7 @@
 import { ServiceBase } from "./service-base";
 import { antiforgeryFetch } from "./antiforgery";
 
-// Keep in sync with AvatarUploadService.MaxBytes — shared so the onboarding wizard and the
-// profile page's avatar editor both fail fast client-side with the same limit.
+// Keep in sync with AvatarUploadService.MaxBytes, so the avatar editor fails fast client-side.
 export const MAX_AVATAR_BYTES = 5_000_000;
 export const MAX_AVATAR_MB = MAX_AVATAR_BYTES / 1_000_000;
 
@@ -31,17 +30,21 @@ function notifyAvatarChanged(avatarUrl: string): void {
   );
 }
 
-export type OnboardingStatus = "NotStarted" | "InProgress" | "Completed";
+/**
+ * Dispatched on window after the member's display name, headline or bio is saved, with the details as now shown on
+ * their profile, so a preview of the profile on the page (the account page's header) can follow.
+ */
+export const PROFILE_DETAILS_CHANGED_EVENT = "dc-profile-details-changed";
 
-export interface OnboardingState {
-  handle: string;
-  displayName: string;
-  bio: string | null;
-  avatarUrl: string;
-  hasCustomAvatar: boolean;
-  onboardingStatus: OnboardingStatus;
-  /** The bio from the member's GitHub profile, used when they haven't written their own. */
-  gitHubBio: string | null;
+/** Dispatched on window after the member shows or hides their profile. */
+export const PROFILE_VISIBILITY_CHANGED_EVENT = "dc-profile-visibility-changed";
+
+export interface ProfileVisibilityChangedDetail {
+  visible: boolean;
+}
+
+function notifyDetailsChanged(details: ProfileDetails): void {
+  window.dispatchEvent(new CustomEvent<ProfileDetails>(PROFILE_DETAILS_CHANGED_EVENT, { detail: details }));
 }
 
 /**
@@ -64,38 +67,40 @@ export interface ProfileDetails {
 export class ProfileOnboardingService extends ServiceBase {
   private static readonly BASE_URL = "/api/profile";
 
-  /** Idempotently starts (or resumes) onboarding for the current member. */
-  static async start(): Promise<OnboardingState> {
-    const response = await ServiceBase.post(`${this.BASE_URL}/onboarding/start`, {});
-    if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
-  }
-
   /** Saves the member's own bio. An empty bio clears it, so their GitHub bio shows again. */
   static async updateBio(bio: string): Promise<ProfileDetails> {
     const response = await ServiceBase.put(`${this.BASE_URL}/bio`, { bio: bio.trim() || null });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const details: ProfileDetails = await response.json();
+    notifyDetailsChanged(details);
+    return details;
   }
 
   /** Saves the member's own headline. An empty headline clears it, so their GitHub company shows again. */
   static async updateHeadline(headline: string): Promise<ProfileDetails> {
     const response = await ServiceBase.put(`${this.BASE_URL}/headline`, { headline: headline.trim() || null });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const details: ProfileDetails = await response.json();
+    notifyDetailsChanged(details);
+    return details;
   }
 
   /** Saves the member's own display name. An empty name clears it, so their GitHub name shows again. */
   static async updateDisplayName(displayName: string): Promise<ProfileDetails> {
     const response = await ServiceBase.put(`${this.BASE_URL}/display-name`, { displayName: displayName.trim() || null });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const details: ProfileDetails = await response.json();
+    notifyDetailsChanged(details);
+    return details;
   }
 
   /** Shows or hides the current member's profile. */
   static async setProfileVisible(visible: boolean): Promise<void> {
     const response = await ServiceBase.put(`${this.BASE_URL}/visibility`, { visible });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
+    window.dispatchEvent(
+      new CustomEvent<ProfileVisibilityChangedDetail>(PROFILE_VISIBILITY_CHANGED_EVENT, { detail: { visible } })
+    );
   }
 
   static async uploadAvatar(file: File): Promise<{ avatarUrl: string; hasCustomAvatar: boolean }> {
@@ -120,11 +125,6 @@ export class ProfileOnboardingService extends ServiceBase {
     const result: { avatarUrl: string; hasCustomAvatar: boolean } = await response.json();
     notifyAvatarChanged(result.avatarUrl);
     return result;
-  }
-
-  static async complete(): Promise<void> {
-    const response = await ServiceBase.post(`${this.BASE_URL}/onboarding/complete`, {});
-    if (!response.ok) throw new Error(await this.#errorMessage(response));
   }
 
   static async #errorMessage(response: Response): Promise<string> {

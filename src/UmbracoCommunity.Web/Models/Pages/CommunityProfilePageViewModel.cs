@@ -17,11 +17,8 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
 
     public CommunityProfile? Profile { get; init; }
 
-    /// <summary>
-    /// For a signed-in member of the DevRel group viewing someone else's profile: the account page link that
-    /// edits this member's profile (<c>?edit-as={handle}</c>). Null for everyone else.
-    /// </summary>
-    public string? EditAsUrl { get; init; }
+    /// <summary>The profile's "Featured" strip (see <see cref="ProfileFeatured"/>), each card with its picture when it has a real one.</summary>
+    public IReadOnlyList<ProfileFeaturedHighlight> Featured { get; init; } = [];
 
     /// <summary>True when the current logged-in member's own handle matches this profile.</summary>
     public bool IsOwnProfile { get; init; }
@@ -42,27 +39,10 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
     public bool ShowEnrichedSections { get; init; }
 
     /// <summary>
-    /// True when the enriched sections are shown only because of the viewer's member group (the early access group
-    /// on their own profile, or the DevRel group). The page is then served with a noindex robots tag.
+    /// True when the enriched sections are shown only because the viewer is in the early access group looking at their
+    /// own profile. The page is then served with a noindex robots tag.
     /// </summary>
     public bool IsGated { get; init; }
-
-    /// <summary>
-    /// True when a member of the DevRel member group is looking at someone else's profile (see
-    /// <c>ProfileAccessService.IsDevRelViewAsync</c>).
-    /// </summary>
-    public bool IsDevRelView { get; init; }
-
-    /// <summary>True when the owner has hidden the whole profile and it is shown only because the viewer is DevRel.</summary>
-    public bool IsHiddenFromPublic { get; init; }
-
-    /// <summary>True when the member hid some of their links. Set for a DevRel view only.</summary>
-    public bool HasHiddenSocialLinks { get; init; }
-
-    /// <summary>
-    /// True when a DevRel viewer asked for everything: the sections and items the owner hid are shown, and marked.
-    /// </summary>
-    public bool IsShowingEverything { get; init; }
 
     /// <summary>
     /// The current page of the profile's timeline (see <see cref="ProfileTimeline"/>), newest month first. Empty when the
@@ -93,37 +73,4 @@ public class CommunityProfilePageViewModel(IPublishedContent currentPage) : Page
 
     /// <summary>Set while the timeline is still being built; the page then shows a progress bar and refreshes itself instead of the graph and timeline.</summary>
     public ProfileJudgingProgress? JudgingProgress { get; init; }
-
-    /// <summary>Link to the profile as the public sees it. Set for a DevRel view only.</summary>
-    public string? DevRelPublicViewUrl { get; init; }
-
-    /// <summary>Link to the profile with everything shown. Set for a DevRel view only.</summary>
-    public string? DevRelShowEverythingUrl { get; init; }
-
-    /// <summary>
-    /// True when the page shows a DevRel viewer something an anonymous visitor would not see, or could: the profile
-    /// is hidden, the activity sections are not open to the public, or the owner hid links, sections or items.
-    /// </summary>
-    public bool ShowDevRelBanner =>
-        IsDevRelView
-        && Profile != null
-        && (IsShowingEverything
-            || IsHiddenFromPublic
-            || IsGated
-            || HasHiddenSocialLinks
-            || ProfileDisplay.HidesAnything(Profile.DisplayChoices));
-
-    /// <summary>
-    /// True when the page shows everything and the member hid <paramref name="link"/>, so the view marks it as hidden.
-    /// </summary>
-    public bool IsMarkedHidden(ProfileSocialLink link) => IsShowingEverything && link.IsHiddenByMember;
-
-    /// <summary>
-    /// True when the page shows everything and the owner hid the section <paramref name="group"/>, or the item with
-    /// <paramref name="activityId"/>, so the view marks it as hidden.
-    /// </summary>
-    public bool IsMarkedHidden(string group, string? activityId = null) =>
-        IsShowingEverything
-        && Profile != null
-        && ProfileDisplay.IsHiddenByMember(Profile.DisplayChoices, group, activityId);
 }
