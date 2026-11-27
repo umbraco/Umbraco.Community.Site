@@ -103,15 +103,12 @@
 
                         <section class="account-page__section">
                             <h3 class="account-page__section-title">Your profile details</h3>
-                            <p class="account-page__section-hint">Your photo, name, headline and bio as they appear on your public profile. Leave a field empty to use what's on your GitHub profile.</p>
+                            <p class="account-page__section-hint">Your photo, name, headline and bio as they appear on your public profile. Leave the headline or bio empty to show none.</p>
                             <dc-profile-details-editor avatar-url="@Model.AvatarUrl"
                                                        has-custom-avatar="@Model.HasCustomAvatar"
-                                                       custom-display-name="@Model.CustomDisplayName"
-                                                       default-display-name="@Model.DefaultDisplayName"
-                                                       custom-headline="@Model.CustomHeadline"
-                                                       github-headline="@Model.GitHubHeadline"
-                                                       custom-bio="@Model.CustomBio"
-                                                       github-bio="@Model.GitHubBio"
+                                                       display-name="@Model.DisplayName"
+                                                       headline="@Model.Headline"
+                                                       bio="@Model.Bio"
                                                        profile-url="@Model.ProfileUrl"></dc-profile-details-editor>
                         </section>
                     }

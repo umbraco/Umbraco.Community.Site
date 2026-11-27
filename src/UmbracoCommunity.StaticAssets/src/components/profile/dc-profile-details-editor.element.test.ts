@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ProfileDetailsEditorElement } from "./dc-profile-details-editor.element";
-import { ProfileOnboardingService, MAX_AVATAR_BYTES, type ProfileDetails } from "../../services/profile-onboarding.service";
+import {
+  ProfileOnboardingService,
+  EMPTY_NAME_MESSAGE,
+  MAX_AVATAR_BYTES,
+  type ProfileDetails,
+} from "../../services/profile-onboarding.service";
 
 if (!customElements.get("dc-profile-details-editor")) {
   customElements.define("dc-profile-details-editor", ProfileDetailsEditorElement);
@@ -9,12 +14,9 @@ if (!customElements.get("dc-profile-details-editor")) {
 interface MountOptions {
   avatarUrl?: string;
   hasCustomAvatar?: boolean;
-  customDisplayName?: string;
-  defaultDisplayName?: string;
-  customHeadline?: string;
-  gitHubHeadline?: string;
-  customBio?: string;
-  gitHubBio?: string;
+  displayName?: string;
+  headline?: string;
+  bio?: string;
   profileUrl?: string;
 }
 
@@ -22,12 +24,9 @@ async function mount(options: MountOptions = {}): Promise<ProfileDetailsEditorEl
   const element = new ProfileDetailsEditorElement();
   element.avatarUrl = options.avatarUrl ?? "https://github.com/octocat.png";
   element.hasCustomAvatar = options.hasCustomAvatar ?? false;
-  element.customDisplayName = options.customDisplayName ?? "";
-  element.defaultDisplayName = options.defaultDisplayName ?? "The Octocat";
-  element.customHeadline = options.customHeadline ?? "";
-  element.gitHubHeadline = options.gitHubHeadline ?? "";
-  element.customBio = options.customBio ?? "";
-  element.gitHubBio = options.gitHubBio ?? "";
+  element.displayName = options.displayName ?? "The Octocat";
+  element.headline = options.headline ?? "";
+  element.bio = options.bio ?? "";
   element.profileUrl = options.profileUrl ?? "";
   document.body.appendChild(element);
   await element.updateComplete;
@@ -37,14 +36,8 @@ async function mount(options: MountOptions = {}): Promise<ProfileDetailsEditorEl
 function details(overrides: Partial<ProfileDetails> = {}): ProfileDetails {
   return {
     displayName: "The Octocat",
-    hasCustomDisplayName: false,
-    defaultDisplayName: "The Octocat",
     headline: null,
-    hasCustomHeadline: false,
-    gitHubHeadline: null,
     bio: null,
-    hasCustomBio: false,
-    gitHubBio: null,
     ...overrides,
   };
 }
@@ -109,26 +102,29 @@ describe("ProfileDetailsEditorElement", () => {
     document.body.innerHTML = "";
   });
 
-  it("renders labelled fields with the GitHub defaults as placeholders and a live status", async () => {
-    const element = await mount({ customHeadline: "Umbraco developer", gitHubHeadline: "umbraco", gitHubBio: "Bio from GitHub" });
+  it("renders labelled fields with the member's own text, no placeholders, and a live status", async () => {
+    const element = await mount({ headline: "Umbraco developer" });
 
     const name = field(element, "Name");
     const headline = field(element, "Headline");
     const bio = field(element, "Bio");
-    expect(name.value).toBe("");
-    expect(name.placeholder).toBe("The Octocat");
+    expect(name.value).toBe("The Octocat");
+    expect(name.required).toBe(true);
     expect(headline.value).toBe("Umbraco developer");
-    expect(headline.placeholder).toBe("umbraco");
+    expect(headline.required).toBe(false);
     expect(bio.tagName).toBe("TEXTAREA");
     expect(bio.value).toBe("");
-    expect(bio.placeholder).toBe("Bio from GitHub");
+    expect(bio.required).toBe(false);
+    for (const input of [name, headline, bio]) {
+      expect(input.placeholder).toBe("");
+    }
     const hint = (input: HTMLInputElement | HTMLTextAreaElement) =>
       element.querySelector(`#${input.id}-hint`)?.textContent?.trim();
-    expect(hint(name)).toBe("The name shown on your profile. Leave it empty to use your GitHub name.");
-    expect(hint(headline)).toBe("A short line shown under your name. Leave it empty to use your GitHub company.");
-    expect(hint(bio)).toBe("A few words about you. Leave it empty to use your GitHub bio.");
-    // The default values are placeholders only, never quoted in the hints.
-    expect(element.textContent).not.toContain("Bio from GitHub");
+    expect(hint(name)).toBe("The name shown on your profile.");
+    expect(hint(headline)).toBe("A short line shown under your name. Leave it empty to show no headline.");
+    expect(hint(bio)).toBe("A few words about you. Leave it empty to show no bio.");
+    expect(element.textContent).not.toContain("GitHub company");
+    expect(element.textContent).not.toContain("GitHub bio");
     expect(element.querySelector(".dc-profile-details-editor__save-status")?.getAttribute("role")).toBe("status");
     expect(element.querySelector(".dc-profile-details-editor__save-status")?.getAttribute("aria-live")).toBe("polite");
     expect(element.querySelector(".dc-profile-details-editor__status")?.getAttribute("aria-live")).toBe("polite");
@@ -138,20 +134,13 @@ describe("ProfileDetailsEditorElement", () => {
   it("saves changed fields", async () => {
     const nameSpy = vi
       .spyOn(ProfileOnboardingService, "updateDisplayName")
-      .mockResolvedValue(details({ displayName: "Octo", hasCustomDisplayName: true }));
+      .mockResolvedValue(details({ displayName: "Octo" }));
     const headlineSpy = vi
       .spyOn(ProfileOnboardingService, "updateHeadline")
-      .mockResolvedValue(details({ displayName: "Octo", hasCustomDisplayName: true, headline: "Umbraco developer", hasCustomHeadline: true }));
-    const bioSpy = vi.spyOn(ProfileOnboardingService, "updateBio").mockResolvedValue(
-      details({
-        displayName: "Octo",
-        hasCustomDisplayName: true,
-        headline: "Umbraco developer",
-        hasCustomHeadline: true,
-        bio: "My own words",
-        hasCustomBio: true,
-      })
-    );
+      .mockResolvedValue(details({ displayName: "Octo", headline: "Umbraco developer" }));
+    const bioSpy = vi
+      .spyOn(ProfileOnboardingService, "updateBio")
+      .mockResolvedValue(details({ displayName: "Octo", headline: "Umbraco developer", bio: "My own words" }));
     const element = await mount();
 
     await type(element, field(element, "Name"), " Octo ");
@@ -173,8 +162,8 @@ describe("ProfileDetailsEditorElement", () => {
     const headlineSpy = vi.spyOn(ProfileOnboardingService, "updateHeadline");
     const bioSpy = vi
       .spyOn(ProfileOnboardingService, "updateBio")
-      .mockResolvedValue(details({ headline: "Umbraco developer", hasCustomHeadline: true, bio: "Changed", hasCustomBio: true }));
-    const element = await mount({ customHeadline: "Umbraco developer", customBio: "Original" });
+      .mockResolvedValue(details({ headline: "Umbraco developer", bio: "Changed" }));
+    const element = await mount({ headline: "Umbraco developer", bio: "Original" });
 
     await type(element, field(element, "Bio"), "Changed");
     await submit(element);
@@ -184,34 +173,66 @@ describe("ProfileDetailsEditorElement", () => {
     expect(bioSpy).toHaveBeenCalledWith("Changed");
   });
 
-  it("restores a GitHub default by saving the field empty, with no reset buttons", async () => {
-    const bioSpy = vi
-      .spyOn(ProfileOnboardingService, "updateBio")
-      .mockResolvedValue(details({ bio: "Bio from GitHub", gitHubBio: "Bio from GitHub" }));
-    const element = await mount({ customBio: "My own words", gitHubBio: "Bio from GitHub" });
-    expect(field(element, "Bio").value).toBe("My own words");
-    expect(element.querySelectorAll("button").length).toBe(1);
+  it("clears the headline and bio by saving them empty, with no fallback or reset buttons", async () => {
+    const headlineSpy = vi.spyOn(ProfileOnboardingService, "updateHeadline").mockResolvedValue(details({ bio: "My own words" }));
+    const bioSpy = vi.spyOn(ProfileOnboardingService, "updateBio").mockResolvedValue(details());
+    const element = await mount({ headline: "Umbraco developer", bio: "My own words" });
 
+    await type(element, field(element, "Headline"), "   ");
     await type(element, field(element, "Bio"), "");
     await submit(element);
 
+    expect(headlineSpy).toHaveBeenCalledWith("");
     expect(bioSpy).toHaveBeenCalledWith("");
+    expect(field(element, "Headline").value).toBe("");
     expect(field(element, "Bio").value).toBe("");
-    expect(field(element, "Bio").placeholder).toBe("Bio from GitHub");
+    expect(field(element, "Bio").placeholder).toBe("");
     expect(status(element)).toBe("Saved.");
-    // Only the Save button: no reset or clear controls for the text fields.
+    // Only the Save button: no reset, hide or "use GitHub" controls for the text fields.
     expect(Array.from(element.querySelectorAll("button")).map((b) => b.textContent?.trim())).toEqual(["Save"]);
   });
 
-  it("clearing a headline with no GitHub default removes it", async () => {
-    const headlineSpy = vi.spyOn(ProfileOnboardingService, "updateHeadline").mockResolvedValue(details());
-    const element = await mount({ customHeadline: "Umbraco developer" });
+  describe("required name", () => {
+    const error = (element: ProfileDetailsEditorElement) =>
+      element.querySelector(`#${field(element, "Name").id}-error`);
+    const saveButton = (element: ProfileDetailsEditorElement) => buttonByText(element, "Save")!;
 
-    await type(element, field(element, "Headline"), "   ");
-    await submit(element);
+    it("shows an inline message and disables Save once the name is emptied", async () => {
+      const element = await mount();
+      const name = field(element, "Name");
+      expect(error(element)).toBeNull();
+      expect(name.getAttribute("aria-invalid")).toBe("false");
 
-    expect(headlineSpy).toHaveBeenCalledWith("");
-    expect(field(element, "Headline").value).toBe("");
+      await type(element, name, "   ");
+
+      expect(error(element)?.textContent?.trim()).toBe(EMPTY_NAME_MESSAGE);
+      expect(error(element)?.getAttribute("role")).toBe("alert");
+      expect(name.getAttribute("aria-invalid")).toBe("true");
+      expect(name.getAttribute("aria-describedby")).toContain(`${name.id}-error`);
+      expect(saveButton(element).disabled).toBe(true);
+
+      await type(element, name, "Octo");
+
+      expect(error(element)).toBeNull();
+      expect(name.getAttribute("aria-invalid")).toBe("false");
+      expect(saveButton(element).disabled).toBe(false);
+    });
+
+    it("never saves an empty name, and focuses the field", async () => {
+      const nameSpy = vi.spyOn(ProfileOnboardingService, "updateDisplayName");
+      const bioSpy = vi.spyOn(ProfileOnboardingService, "updateBio");
+      const element = await mount();
+      await type(element, field(element, "Bio"), "New words");
+      await type(element, field(element, "Name"), "");
+
+      await submit(element);
+
+      expect(nameSpy).not.toHaveBeenCalled();
+      expect(bioSpy).not.toHaveBeenCalled();
+      expect(error(element)?.textContent?.trim()).toBe(EMPTY_NAME_MESSAGE);
+      expect(document.activeElement).toBe(field(element, "Name"));
+      expect(status(element)).toBe("");
+    });
   });
 
   it("keeps the drafts and shows the error when saving fails", async () => {
@@ -290,7 +311,7 @@ describe("ProfileDetailsEditorElement", () => {
     function mockNameSave() {
       return vi
         .spyOn(ProfileOnboardingService, "updateDisplayName")
-        .mockResolvedValue(details({ displayName: "Octo", hasCustomDisplayName: true }));
+        .mockResolvedValue(details({ displayName: "Octo" }));
     }
 
     it("is absent before saving", async () => {

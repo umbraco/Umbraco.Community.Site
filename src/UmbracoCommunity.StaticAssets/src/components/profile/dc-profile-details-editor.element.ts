@@ -2,6 +2,7 @@ import { LitElement, html, type TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   ProfileOnboardingService,
+  EMPTY_NAME_MESSAGE,
   MAX_AVATAR_BYTES,
   MAX_AVATAR_MB,
   MAX_BIO_LENGTH,
@@ -24,6 +25,7 @@ interface FieldConfig {
   label: string;
   maxLength: number;
   multiline: boolean;
+  required: boolean;
   hint: string;
   save: (value: string) => Promise<ProfileDetails>;
 }
@@ -34,7 +36,8 @@ const FIELDS: FieldConfig[] = [
     label: "Name",
     maxLength: MAX_DISPLAY_NAME_LENGTH,
     multiline: false,
-    hint: "The name shown on your profile. Leave it empty to use your GitHub name.",
+    required: true,
+    hint: "The name shown on your profile.",
     save: (value) => ProfileOnboardingService.updateDisplayName(value),
   },
   {
@@ -42,7 +45,8 @@ const FIELDS: FieldConfig[] = [
     label: "Headline",
     maxLength: MAX_HEADLINE_LENGTH,
     multiline: false,
-    hint: "A short line shown under your name. Leave it empty to use your GitHub company.",
+    required: false,
+    hint: "A short line shown under your name. Leave it empty to show no headline.",
     save: (value) => ProfileOnboardingService.updateHeadline(value),
   },
   {
@@ -50,15 +54,16 @@ const FIELDS: FieldConfig[] = [
     label: "Bio",
     maxLength: MAX_BIO_LENGTH,
     multiline: true,
-    hint: "A few words about you. Leave it empty to use your GitHub bio.",
+    required: false,
+    hint: "A few words about you. Leave it empty to show no bio.",
     save: (value) => ProfileOnboardingService.updateBio(value),
   },
 ];
 
 /**
- * Edits the member's photo, display name, headline and bio on the Account page. GitHub supplies
- * the defaults: removing the photo shows the GitHub avatar again, and saving an empty name,
- * headline or bio shows the GitHub name, company or bio, which the empty field shows as its placeholder.
+ * Edits the member's photo, display name, headline and bio on the Account page. The text fields hold the member's own
+ * text and nothing else: there are no placeholders or GitHub fallbacks. The name is required; an empty headline or bio
+ * is simply not shown on the profile. (Removing an uploaded photo does go back to the GitHub avatar.)
  */
 @customElement(elementName)
 export class ProfileDetailsEditorElement extends LitElement {
@@ -68,26 +73,17 @@ export class ProfileDetailsEditorElement extends LitElement {
   @property({ type: Boolean, attribute: "has-custom-avatar" })
   hasCustomAvatar = false;
 
-  /** The member's own display name. Empty when the GitHub name is used. */
-  @property({ attribute: "custom-display-name" })
-  customDisplayName = "";
+  /** The member's display name. */
+  @property({ attribute: "display-name" })
+  displayName = "";
 
-  @property({ attribute: "default-display-name" })
-  defaultDisplayName = "";
+  /** The member's headline. Empty when they show none. */
+  @property()
+  headline = "";
 
-  /** The member's own headline. Empty when the GitHub company is used. */
-  @property({ attribute: "custom-headline" })
-  customHeadline = "";
-
-  @property({ attribute: "github-headline" })
-  gitHubHeadline = "";
-
-  /** The member's own bio. Empty when the GitHub bio is used. */
-  @property({ attribute: "custom-bio" })
-  customBio = "";
-
-  @property({ attribute: "github-bio" })
-  gitHubBio = "";
+  /** The member's bio. Empty when they show none. */
+  @property()
+  bio = "";
 
   /** The member's public profile URL, linked after a successful save. */
   @property({ attribute: "profile-url" })
@@ -99,15 +95,16 @@ export class ProfileDetailsEditorElement extends LitElement {
   @state()
   private _hasCustomAvatar = false;
 
-  /** The member's own saved values; empty when the GitHub default is used. */
+  /** The member's saved values, as shown on their profile. */
   @state()
   private _saved: FieldValues = { displayName: "", headline: "", bio: "" };
 
   @state()
-  private _defaults: FieldValues = { displayName: "", headline: "", bio: "" };
-
-  @state()
   private _drafts: FieldValues = { displayName: "", headline: "", bio: "" };
+
+  /** True once the member has emptied the name field (or tried to save it empty), until it has text again. */
+  @state()
+  private _nameInvalid = false;
 
   @state()
   private _savingPhoto = false;
@@ -145,28 +142,18 @@ export class ProfileDetailsEditorElement extends LitElement {
     this._avatarUrl = this.avatarUrl;
     this._hasCustomAvatar = this.hasCustomAvatar;
     this._saved = {
-      displayName: this.customDisplayName ?? "",
-      headline: this.customHeadline ?? "",
-      bio: this.customBio ?? "",
-    };
-    this._defaults = {
-      displayName: this.defaultDisplayName ?? "",
-      headline: this.gitHubHeadline ?? "",
-      bio: this.gitHubBio ?? "",
+      displayName: this.displayName ?? "",
+      headline: this.headline ?? "",
+      bio: this.bio ?? "",
     };
     this._drafts = { ...this._saved };
   }
 
   #applyDetails(details: ProfileDetails) {
     this._saved = {
-      displayName: details.hasCustomDisplayName ? details.displayName : "",
-      headline: details.hasCustomHeadline ? (details.headline ?? "") : "",
-      bio: details.hasCustomBio ? (details.bio ?? "") : "",
-    };
-    this._defaults = {
-      displayName: details.defaultDisplayName ?? "",
-      headline: details.gitHubHeadline ?? "",
-      bio: details.gitHubBio ?? "",
+      displayName: details.displayName ?? "",
+      headline: details.headline ?? "",
+      bio: details.bio ?? "",
     };
   }
 
@@ -238,6 +225,7 @@ export class ProfileDetailsEditorElement extends LitElement {
   #onInput(key: FieldKey, event: Event) {
     const value = (event.target as HTMLInputElement | HTMLTextAreaElement).value;
     this._drafts = { ...this._drafts, [key]: value };
+    if (key === "displayName") this._nameInvalid = value.trim() === "";
     // The saved profile no longer matches what's in the form.
     this._showProfileLink = false;
   }
@@ -256,6 +244,13 @@ export class ProfileDetailsEditorElement extends LitElement {
     this._detailsError = "";
     this._statusMessage = "";
     this._showProfileLink = false;
+
+    if (!trimmed.displayName) {
+      this._nameInvalid = true;
+      await this.updateComplete;
+      this.querySelector<HTMLInputElement>(`#${this.#fieldId("displayName")}`)?.focus();
+      return;
+    }
 
     if (changed.length === 0) {
       this._drafts = trimmed;
@@ -325,8 +320,8 @@ export class ProfileDetailsEditorElement extends LitElement {
   #renderField(field: FieldConfig): TemplateResult {
     const id = this.#fieldId(field.key);
     const draft = this._drafts[field.key];
-    const defaultValue = this._defaults[field.key];
-    const describedBy = `${id}-hint ${id}-count`;
+    const invalid = field.key === "displayName" && this._nameInvalid;
+    const describedBy = `${id}-hint ${id}-count${invalid ? ` ${id}-error` : ""}`;
     const onInput = (event: Event) => this.#onInput(field.key, event);
 
     return html`
@@ -337,7 +332,8 @@ export class ProfileDetailsEditorElement extends LitElement {
               id=${id}
               rows="4"
               maxlength=${field.maxLength}
-              placeholder=${defaultValue}
+              ?required=${field.required}
+              aria-invalid=${invalid ? "true" : "false"}
               aria-describedby=${describedBy}
               .value=${draft}
               @input=${onInput}
@@ -346,11 +342,15 @@ export class ProfileDetailsEditorElement extends LitElement {
               id=${id}
               type="text"
               maxlength=${field.maxLength}
-              placeholder=${defaultValue}
+              ?required=${field.required}
+              aria-invalid=${invalid ? "true" : "false"}
               aria-describedby=${describedBy}
               .value=${draft}
               @input=${onInput}
             />`}
+        ${invalid
+          ? html`<p id="${id}-error" class="dc-profile-details-editor__error" role="alert">${EMPTY_NAME_MESSAGE}</p>`
+          : ""}
         <div class="dc-profile-details-editor__field-footer">
           <p id="${id}-hint" class="dc-profile-details-editor__hint">${field.hint}</p>
           <p
@@ -368,10 +368,10 @@ export class ProfileDetailsEditorElement extends LitElement {
 
   #renderForm(): TemplateResult {
     return html`
-      <form class="dc-profile-details-editor__form" @submit=${this.#save}>
+      <form class="dc-profile-details-editor__form" novalidate @submit=${this.#save}>
         ${FIELDS.map((field) => this.#renderField(field))}
         <div class="dc-profile-details-editor__actions">
-          <button class="btn is-blue" type="submit" ?disabled=${this._savingDetails}>Save</button>
+          <button class="btn is-blue" type="submit" ?disabled=${this._savingDetails || this._nameInvalid}>Save</button>
           <p class="dc-profile-details-editor__save-status" role="status" aria-live="polite">
             ${this._statusMessage}
             ${this._showProfileLink && this.profileUrl

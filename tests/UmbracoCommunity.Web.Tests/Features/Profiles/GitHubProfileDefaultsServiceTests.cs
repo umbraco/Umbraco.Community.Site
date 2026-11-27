@@ -49,7 +49,7 @@ public class GitHubProfileDefaultsServiceTests : IDisposable
         var profile = await CreateProfileAsync();
         var service = CreateService(StubHandler.Json(GitHubProfileJson));
 
-        await service.EnsureGitHubDefaultsAsync(profile);
+        await service.BackfillFromGitHubOnceAsync(profile);
 
         profile.GitHubBio.Should().Be("Bio from GitHub");
         profile.GitHubCompany.Should().Be("umbraco");
@@ -59,8 +59,48 @@ public class GitHubProfileDefaultsServiceTests : IDisposable
         stored!.GitHubBio.Should().Be("Bio from GitHub");
         stored.GitHubCompany.Should().Be("umbraco");
         stored.GitHubFetchedUtc.Should().NotBeNull();
-        stored.Bio.Should().BeNull();
-        stored.Headline.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Copies_the_GitHub_bio_and_company_into_the_members_own_empty_bio_and_headline()
+    {
+        var profile = await CreateProfileAsync();
+
+        await CreateService(StubHandler.Json(GitHubProfileJson)).BackfillFromGitHubOnceAsync(profile);
+
+        profile.Bio.Should().Be("Bio from GitHub");
+        profile.Headline.Should().Be("umbraco");
+        var stored = await _store.GetByMemberKeyAsync(profile.MemberKey);
+        stored!.Bio.Should().Be("Bio from GitHub");
+        stored.Headline.Should().Be("umbraco");
+        stored.DisplayNameOverride.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Never_overwrites_text_the_member_already_has()
+    {
+        var profile = await CreateProfileAsync();
+        await _store.UpdateHeadlineAsync(profile.MemberKey, "Umbraco developer");
+        profile = (await _store.GetByMemberKeyAsync(profile.MemberKey))!;
+
+        await CreateService(StubHandler.Json(GitHubProfileJson)).BackfillFromGitHubOnceAsync(profile);
+
+        var stored = await _store.GetByMemberKeyAsync(profile.MemberKey);
+        stored!.Headline.Should().Be("Umbraco developer");
+        stored.Bio.Should().Be("Bio from GitHub");
+    }
+
+    [Fact]
+    public async Task Never_refills_text_the_member_cleared_after_the_one_fetch()
+    {
+        var profile = await CreateProfileAsync();
+        var service = CreateService(StubHandler.Json(GitHubProfileJson));
+        await service.BackfillFromGitHubOnceAsync(profile);
+        await _store.UpdateBioAsync(profile.MemberKey, "");
+
+        await service.BackfillFromGitHubOnceAsync((await _store.GetByMemberKeyAsync(profile.MemberKey))!);
+
+        (await _store.GetByMemberKeyAsync(profile.MemberKey))!.Bio.Should().BeNull();
     }
 
     [Fact]
@@ -70,8 +110,8 @@ public class GitHubProfileDefaultsServiceTests : IDisposable
         var handler = StubHandler.Json(GitHubProfileJson);
         var service = CreateService(handler);
 
-        await service.EnsureGitHubDefaultsAsync((await _store.GetByHandleAsync(Handle))!);
-        await service.EnsureGitHubDefaultsAsync((await _store.GetByHandleAsync(Handle))!);
+        await service.BackfillFromGitHubOnceAsync((await _store.GetByHandleAsync(Handle))!);
+        await service.BackfillFromGitHubOnceAsync((await _store.GetByHandleAsync(Handle))!);
 
         handler.CallCount.Should().Be(1);
     }
@@ -83,8 +123,8 @@ public class GitHubProfileDefaultsServiceTests : IDisposable
         var handler = StubHandler.Status(HttpStatusCode.NotFound);
         var service = CreateService(handler);
 
-        await service.EnsureGitHubDefaultsAsync((await _store.GetByHandleAsync(Handle))!);
-        await service.EnsureGitHubDefaultsAsync((await _store.GetByHandleAsync(Handle))!);
+        await service.BackfillFromGitHubOnceAsync((await _store.GetByHandleAsync(Handle))!);
+        await service.BackfillFromGitHubOnceAsync((await _store.GetByHandleAsync(Handle))!);
 
         handler.CallCount.Should().Be(1);
         var stored = await _store.GetByHandleAsync(Handle);
@@ -98,12 +138,12 @@ public class GitHubProfileDefaultsServiceTests : IDisposable
     {
         var profile = await CreateProfileAsync();
 
-        await CreateService(StubHandler.Throws()).EnsureGitHubDefaultsAsync(profile);
+        await CreateService(StubHandler.Throws()).BackfillFromGitHubOnceAsync(profile);
 
         profile.GitHubFetchedUtc.Should().BeNull();
         (await _store.GetByHandleAsync(Handle))!.GitHubFetchedUtc.Should().BeNull();
 
-        await CreateService(StubHandler.Json(GitHubProfileJson)).EnsureGitHubDefaultsAsync(profile);
+        await CreateService(StubHandler.Json(GitHubProfileJson)).BackfillFromGitHubOnceAsync(profile);
 
         var stored = await _store.GetByHandleAsync(Handle);
         stored!.GitHubBio.Should().Be("Bio from GitHub");

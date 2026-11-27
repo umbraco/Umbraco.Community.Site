@@ -35,7 +35,7 @@ public class ProfileApiController : ControllerBase
         _avatarUploadService = avatarUploadService;
     }
 
-    /// <summary>Sets the member's own bio. Empty or whitespace-only text clears it, so the GitHub bio shows again.</summary>
+    /// <summary>Sets the member's own bio. Empty or whitespace-only text clears it, so no bio is shown.</summary>
     [HttpPut("bio")]
     public async Task<IActionResult> UpdateBio([FromBody] UpdateBioRequest request, CancellationToken cancellationToken)
     {
@@ -59,7 +59,7 @@ public class ProfileApiController : ControllerBase
         return Ok(ToDetailsResponse(entity));
     }
 
-    /// <summary>Sets the member's own headline. Empty or whitespace-only text clears it, so the GitHub company shows again.</summary>
+    /// <summary>Sets the member's own headline. Empty or whitespace-only text clears it, so no headline is shown.</summary>
     [HttpPut("headline")]
     public async Task<IActionResult> UpdateHeadline([FromBody] UpdateHeadlineRequest request, CancellationToken cancellationToken)
     {
@@ -83,7 +83,7 @@ public class ProfileApiController : ControllerBase
         return Ok(ToDetailsResponse(entity));
     }
 
-    /// <summary>Sets the member's own display name. Empty or whitespace-only text clears it, so the GitHub name shows again.</summary>
+    /// <summary>Sets the member's own display name. A name is required: empty or whitespace-only text is refused.</summary>
     [HttpPut("display-name")]
     public async Task<IActionResult> UpdateDisplayName([FromBody] UpdateDisplayNameRequest request, CancellationToken cancellationToken)
     {
@@ -93,12 +93,18 @@ public class ProfileApiController : ControllerBase
             return Unauthorized();
         }
 
-        if (ProfileText.Normalize(request.DisplayName) is { Length: > ProfileText.MaxDisplayNameLength })
+        var displayName = ProfileText.Normalize(request.DisplayName);
+        if (displayName == null)
+        {
+            return BadRequest(new { error = "Please enter your name. It can't be empty." });
+        }
+
+        if (displayName.Length > ProfileText.MaxDisplayNameLength)
         {
             return BadRequest(new { error = $"Display name must be {ProfileText.MaxDisplayNameLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateDisplayNameAsync(member.Key, request.DisplayName, cancellationToken);
+        var entity = await _store.UpdateDisplayNameAsync(member.Key, displayName, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -170,14 +176,5 @@ public class ProfileApiController : ControllerBase
     }
 
     private static ProfileDetailsResponse ToDetailsResponse(MemberProfileEntity entity) =>
-        new(
-            entity.EffectiveDisplayName,
-            entity.DisplayNameOverride != null,
-            entity.DisplayName,
-            entity.EffectiveHeadline,
-            entity.Headline != null,
-            entity.GitHubCompany,
-            entity.EffectiveBio,
-            entity.Bio != null,
-            entity.GitHubBio);
+        new(entity.EffectiveDisplayName, entity.Headline, entity.Bio);
 }

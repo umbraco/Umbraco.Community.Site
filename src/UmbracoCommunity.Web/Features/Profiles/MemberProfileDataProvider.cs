@@ -21,8 +21,8 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// external content-aggregation integration, which is out of scope for this provider.
 /// Only <see cref="ProfileIdentity"/> (headline, bio, avatar, handle, feeds-as-social-links) and the
 /// forum badges the member chose to show (<see cref="ForumBadgeService"/>, empty if the forum can't be reached) are real.
-/// The display name, headline and bio are the member's own, falling back to the GitHub
-/// name, company and bio respectively.
+/// The display name, headline and bio are only ever the member's own text (copied from GitHub
+/// once, at onboarding): an empty headline or bio is not shown, never replaced by the GitHub one.
 /// </remarks>
 public sealed class MemberProfileDataProvider : IProfileDataProvider
 {
@@ -70,8 +70,8 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
             PlatformId: entity.PlatformProfileId,
             Identity: new ProfileIdentity(
                 DisplayName: entity.EffectiveDisplayName,
-                Headline: entity.EffectiveHeadline,
-                Bio: entity.EffectiveBio,
+                Headline: entity.Headline,
+                Bio: entity.Bio,
                 AvatarUrl: _avatarUrlResolver.Resolve(entity.AvatarMediaKey, entity.GitHubHandle),
                 Location: null,
                 Pronouns: null,
@@ -80,10 +80,7 @@ public sealed class MemberProfileDataProvider : IProfileDataProvider
                 GitHubHandle: entity.GitHubHandle,
                 YouTubeChannelUrl: null,
                 SocialLinks: socialLinks,
-                HasCustomAvatar: entity.AvatarMediaKey.HasValue)
-            {
-                HeadlineIsCompany = entity.Headline == null && !string.IsNullOrWhiteSpace(entity.GitHubCompany),
-            },
+                HasCustomAvatar: entity.AvatarMediaKey.HasValue),
             BlogPosts: [],
             Videos: [],
             ForumPosts: [],

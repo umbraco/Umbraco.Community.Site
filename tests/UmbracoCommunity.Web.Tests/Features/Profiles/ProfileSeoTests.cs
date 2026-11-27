@@ -49,11 +49,11 @@ public class ProfileSeoTests
     }
 
     [Fact]
-    public void A_company_headline_gets_an_office_emoji_and_capitalised_words()
+    public void The_headline_is_used_exactly_as_the_member_wrote_it()
     {
-        var identity = Profile(headline: "acme widgets GmbH").Identity with { HeadlineIsCompany = true };
-
-        ProfileSeo.Description(identity).Should().Be("🏢 Acme Widgets GmbH · Writes about Umbraco.");
+        // The headline is always the member's own text (even when it started as their GitHub company), so it is not
+        // dressed up as a company.
+        ProfileSeo.Description(Profile(headline: "acme widgets GmbH").Identity).Should().Be("acme widgets GmbH · Writes about Umbraco.");
     }
 
     [Fact]

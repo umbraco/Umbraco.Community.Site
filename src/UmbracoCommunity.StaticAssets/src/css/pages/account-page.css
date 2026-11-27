@@ -728,6 +728,11 @@ main:has(.account-page) {
   color: var(--color-red);
 }
 
+/* The name field, when it has been emptied: a name is required. */
+.dc-profile-details-editor [aria-invalid="true"] {
+  border-color: var(--color-red);
+}
+
 .dc-profile-details-editor__status:not(:empty) {
   margin: var(--unit-xs) 0 0;
   font-size: var(--font-size-sm);
@@ -763,7 +768,7 @@ main:has(.account-page) {
   outline-offset: var(--focus-outline-offset);
 }
 
-/* Profile display editor: the pinned items (sortable, see elements/sortable.css), the section and timeline switches,
+/* Profile display editor: the pinned items (sortable, see elements/sortable.css), the section switches,
    then the member's activity drawn as the profile's timeline (elements/profile-timeline.css) with actions per entry. */
 .dc-profile-display-editor__heading {
   margin: var(--unit-md) 0 var(--unit-xxs);
@@ -856,18 +861,12 @@ main:has(.account-page) {
   color: var(--color-light-blue);
 }
 
-/* The switches: sections and timeline options side by side from --sm up, apart from the items. */
+/* The section switches, in a full-width box apart from the items. */
 .dc-profile-display-editor__settings {
-  display: grid;
-  gap: var(--unit-sm) var(--unit-md);
   margin-top: var(--unit-md);
   padding: var(--unit-sm);
   border-radius: var(--border-radius-md);
   background: var(--color-light);
-
-  @media (--sm) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 .dc-profile-display-editor__switches {
@@ -881,13 +880,21 @@ main:has(.account-page) {
   margin-top: 0;
 }
 
+/* A wrapping row: each switch keeps its label beside it, and the row breaks between switches on narrow screens. */
 .dc-profile-display-editor__switch-list {
-  display: grid;
-  gap: var(--unit-xs);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--unit-xs) var(--unit-md);
+}
+
+.dc-profile-display-editor__switch-list > li {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .dc-profile-display-editor__switch-list label {
   min-height: 32px;
+  white-space: nowrap;
 }
 
 .dc-profile-display-editor__filter-hint {

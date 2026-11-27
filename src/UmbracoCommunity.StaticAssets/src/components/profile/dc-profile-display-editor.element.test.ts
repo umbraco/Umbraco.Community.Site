@@ -240,6 +240,26 @@ describe("ProfileDisplayEditorElement", () => {
     expect(item(element, "b1")).not.toBeNull();
   });
 
+  it("lists every section's switch, each with its label, in the one Sections list", async () => {
+    const save = mockSave();
+    const element = await mount();
+
+    const list = element.querySelector(".dc-profile-display-editor__switch-list")!;
+    const labels = [...list.querySelectorAll(":scope > li > label")].map((l) => l.textContent?.trim());
+    expect(labels).toEqual(["Blog posts", "Videos", "Packages", "Forum highlights"]);
+    // Each switch sits inside its own label, so the label stays with it when the list wraps.
+    for (const input of list.querySelectorAll<HTMLInputElement>("input[role='switch']")) {
+      expect(input.closest("label")?.getAttribute("for")).toBe(input.id);
+      expect(input.checked).toBe(true);
+    }
+
+    sectionSwitch(element, "Videos").click();
+    await settle(element);
+
+    expect(sectionSwitch(element, "Videos").checked).toBe(false);
+    expect(lastSaved(save).hiddenSections).toEqual(["videos"]);
+  });
+
   it("hides an item, which stays listed dimmed with a Hidden badge, and shows it again", async () => {
     const save = mockSave();
     const element = await mount();
@@ -481,8 +501,13 @@ describe("ProfileDisplayEditorElement", () => {
   it("offers no timeline switches or plain-line choice, and draws every item with a picture as a card", async () => {
     const element = await mount();
 
-    // Only the section switches are left.
+    // Only the section switches are left: one box holding the Sections fieldset, with no Timeline column beside it.
     expect(element.querySelectorAll(".dc-profile-display-editor__switch-list")).toHaveLength(1);
+    const settings = element.querySelector(".dc-profile-display-editor__settings")!;
+    expect(settings.children).toHaveLength(1);
+    expect(settings.firstElementChild?.tagName).toBe("FIELDSET");
+    expect(settings.textContent).not.toContain("Timeline");
+    expect(element.textContent).not.toContain("An item whose page has a picture shows as a card.");
     expect(element.textContent).not.toContain("Show preview cards");
     expect(element.textContent).not.toContain("activity graph");
     expect(element.textContent).not.toContain("Plain line");

@@ -28,36 +28,45 @@ public class MemberProfileEntity
 
     /// <summary>
     /// Denormalized cache of the member's display name from GitHub, synced when onboarding starts.
-    /// The default when the member hasn't chosen their own (see <see cref="DisplayNameOverride"/>).
+    /// Only read when <see cref="DisplayNameOverride"/> is somehow empty, so the profile always has a name.
     /// </summary>
     public string DisplayName { get; set; } = string.Empty;
 
-    /// <summary>The member's own display name. Null = use <see cref="DisplayName"/>.</summary>
+    /// <summary>
+    /// The member's own display name: copied from GitHub at onboarding, then theirs to change. Never
+    /// emptied by the member (the API refuses an empty name).
+    /// </summary>
     public string? DisplayNameOverride { get; set; }
 
-    /// <summary>The member's own headline. Null = use <see cref="GitHubCompany"/>.</summary>
+    /// <summary>
+    /// The member's own headline: copied from their GitHub company at onboarding, then theirs to change.
+    /// Null = no headline is shown. There is no fallback to <see cref="GitHubCompany"/>.
+    /// </summary>
     public string? Headline { get; set; }
 
-    /// <summary>The member's own bio. Null = use <see cref="GitHubBio"/>.</summary>
+    /// <summary>
+    /// The member's own bio: copied from their GitHub bio at onboarding, then theirs to change.
+    /// Null = no bio is shown. There is no fallback to <see cref="GitHubBio"/>.
+    /// </summary>
     public string? Bio { get; set; }
 
-    /// <summary>The bio from the member's public GitHub profile, cached so it is fetched once rather than per page view.</summary>
+    /// <summary>
+    /// The bio from the member's public GitHub profile, fetched once so onboarding can copy it into <see cref="Bio"/>.
+    /// Never shown itself.
+    /// </summary>
     public string? GitHubBio { get; set; }
 
-    /// <summary>The company from the member's public GitHub profile, cached alongside <see cref="GitHubBio"/>.</summary>
+    /// <summary>
+    /// The company from the member's public GitHub profile, fetched alongside <see cref="GitHubBio"/> so onboarding can
+    /// copy it into <see cref="Headline"/>. Never shown itself.
+    /// </summary>
     public string? GitHubCompany { get; set; }
 
     /// <summary>When <see cref="GitHubBio"/> and <see cref="GitHubCompany"/> were fetched. Null = not fetched yet.</summary>
     public DateTime? GitHubFetchedUtc { get; set; }
 
-    /// <summary>The display name to show: the member's own, otherwise the GitHub one.</summary>
-    public string EffectiveDisplayName => DisplayNameOverride ?? DisplayName;
-
-    /// <summary>The headline to show: the member's own, otherwise their GitHub company.</summary>
-    public string? EffectiveHeadline => Headline ?? GitHubCompany;
-
-    /// <summary>The bio to show: the member's own, otherwise their GitHub bio.</summary>
-    public string? EffectiveBio => Bio ?? GitHubBio;
+    /// <summary>The display name to show: the member's own (always set after onboarding), else the GitHub name cached at sign-up.</summary>
+    public string EffectiveDisplayName => ProfileText.Normalize(DisplayNameOverride) ?? DisplayName;
 
     /// <summary>Umbraco Media item key for an uploaded custom avatar. Null = use the GitHub avatar default.</summary>
     public Guid? AvatarMediaKey { get; set; }

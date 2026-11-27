@@ -45,14 +45,8 @@ function feed(overrides: Partial<MemberFeed> = {}): MemberFeed {
 function details(overrides: Partial<ProfileDetails> = {}): ProfileDetails {
   return {
     displayName: "The Octocat",
-    hasCustomDisplayName: false,
-    defaultDisplayName: "The Octocat",
     headline: null,
-    hasCustomHeadline: false,
-    gitHubHeadline: null,
     bio: "Hello",
-    hasCustomBio: true,
-    gitHubBio: null,
     ...overrides,
   };
 }
@@ -240,7 +234,7 @@ describe("dc-account-profile-hero", () => {
 
   it("follows a saved name, headline and bio", async () => {
     vi.spyOn(ServiceBase, "put").mockResolvedValue(
-      json(details({ displayName: "Mona", headline: "Developer at Octo", hasCustomHeadline: true, bio: null, hasCustomBio: false }))
+      json(details({ displayName: "Mona", headline: "Developer at Octo", bio: null }))
     );
 
     await ProfileOnboardingService.updateHeadline("Developer at Octo");
@@ -249,6 +243,24 @@ describe("dc-account-profile-hero", () => {
     expect(document.querySelector("img[data-member-avatar]")?.getAttribute("alt")).toBe("Mona");
     expect(slot("headline").textContent).toBe("Developer at Octo");
     expect(slot("headline").hidden).toBe(false);
+    expect(slot("bio").hidden).toBe(true);
+  });
+
+  it("hides the headline and bio when the member empties them", async () => {
+    vi.spyOn(ServiceBase, "put")
+      .mockResolvedValueOnce(json(details({ headline: "Developer at Octo", bio: "Hello" })))
+      .mockResolvedValueOnce(json(details({ headline: null, bio: "Hello" })))
+      .mockResolvedValueOnce(json(details({ headline: null, bio: null })));
+
+    await ProfileOnboardingService.updateHeadline("Developer at Octo");
+    expect(slot("headline").hidden).toBe(false);
+
+    await ProfileOnboardingService.updateHeadline("");
+    expect(slot("headline").textContent).toBe("");
+    expect(slot("headline").hidden).toBe(true);
+
+    await ProfileOnboardingService.updateBio("");
+    expect(slot("bio").textContent).toBe("");
     expect(slot("bio").hidden).toBe(true);
   });
 
@@ -352,7 +364,7 @@ describe("dc-account-profile-hero compact bar", () => {
     vi.spyOn(ServiceBase, "post").mockResolvedValue(json(added));
     vi.spyOn(ServiceBase, "get").mockResolvedValue(json([feed(), added]));
     vi.spyOn(ServiceBase, "put").mockResolvedValue(
-      json(details({ displayName: "Mona", headline: "Developer at Octo", hasCustomHeadline: true }))
+      json(details({ displayName: "Mona", headline: "Developer at Octo" }))
     );
 
     await MemberFeedsService.add("Mastodon", added.url);

@@ -79,11 +79,11 @@ public class AccountPageController : RenderController
         var profile = profileTask.Result;
         var onboardingCompleted = profile?.OnboardingStatus == OnboardingStatus.Completed;
 
-        // The profile details editor shows the GitHub bio and company as the defaults, so fetch
-        // them now if onboarding didn't manage to.
+        // If onboarding couldn't read the GitHub profile, copy its company and bio into the member's
+        // own (still empty) headline and bio now. Runs once per member; a failure is logged, never thrown.
         if (onboardingCompleted && profile != null)
         {
-            await _gitHubDefaultsService.EnsureGitHubDefaultsAsync(profile, cancellationToken);
+            await _gitHubDefaultsService.BackfillFromGitHubOnceAsync(profile, cancellationToken);
         }
 
         var viewModel = new AccountPageViewModel(currentPage)
@@ -95,12 +95,8 @@ public class AccountPageController : RenderController
             OnboardingCompleted = onboardingCompleted,
             IsProfileVisible = profile?.IsProfileVisible ?? false,
             HasCustomAvatar = profile?.AvatarMediaKey.HasValue ?? false,
-            CustomDisplayName = profile?.DisplayNameOverride,
-            DefaultDisplayName = profile?.DisplayName ?? member?.Name,
-            CustomHeadline = profile?.Headline,
-            GitHubHeadline = profile?.GitHubCompany,
-            CustomBio = profile?.Bio,
-            GitHubBio = profile?.GitHubBio,
+            Headline = profile?.Headline,
+            Bio = profile?.Bio,
             CanChooseProfileDisplay = onboardingCompleted && await _profileAccessService.CanChooseProfileDisplayAsync(),
             CanAddActivity = onboardingCompleted && await _profileAccessService.CanAddActivityAsync(),
             CanMatchLinks = onboardingCompleted && await _profileAccessService.CanMatchLinksAsync(),

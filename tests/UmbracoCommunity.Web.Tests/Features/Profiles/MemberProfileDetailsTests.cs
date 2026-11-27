@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Routing;
+using UmbracoCommunity.Web.Features.OpenBadges.Infrastructure;
+using UmbracoCommunity.Web.Features.OpenBadges.Models;
 using UmbracoCommunity.Web.Features.Profiles;
 using UmbracoCommunity.Web.Features.Profiles.Data;
+using UmbracoCommunity.Web.Features.Profiles.Data.Entities;
 using Xunit;
 
 namespace UmbracoCommunity.Web.Tests.Features.Profiles;
@@ -95,36 +98,33 @@ public class MemberProfileDetailsTests : IDisposable
     }
 
     [Fact]
-    public async Task The_profile_shows_the_GitHub_bio_when_the_member_has_no_bio_of_their_own()
+    public async Task The_profile_never_shows_the_GitHub_bio_or_company_when_the_member_has_none_of_their_own()
     {
         var memberKey = await CreateVisibleProfileAsync();
 
-        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", null, DateTime.UtcNow);
+        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", "umbraco", DateTime.UtcNow);
 
-        (await _provider.GetProfileAsync(Handle))!.Identity.Bio.Should().Be("Bio from GitHub");
+        var identity = (await _provider.GetProfileAsync(Handle))!.Identity;
+        identity.Bio.Should().BeNull();
+        identity.Headline.Should().BeNull();
     }
 
     [Fact]
-    public async Task The_members_own_bio_wins_over_the_GitHub_bio()
+    public async Task Clearing_the_bio_and_headline_hides_them_rather_than_showing_the_GitHub_ones()
     {
         var memberKey = await CreateVisibleProfileAsync();
-        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", null, DateTime.UtcNow);
-
+        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", "umbraco", DateTime.UtcNow);
         await _store.UpdateBioAsync(memberKey, "My own words");
-
+        await _store.UpdateHeadlineAsync(memberKey, "Umbraco developer");
         (await _provider.GetProfileAsync(Handle))!.Identity.Bio.Should().Be("My own words");
-    }
-
-    [Fact]
-    public async Task Clearing_the_bio_shows_the_GitHub_bio_again()
-    {
-        var memberKey = await CreateVisibleProfileAsync();
-        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", null, DateTime.UtcNow);
-        await _store.UpdateBioAsync(memberKey, "My own words");
 
         await _store.UpdateBioAsync(memberKey, "");
+        await _store.UpdateHeadlineAsync(memberKey, " ");
 
-        (await _provider.GetProfileAsync(Handle))!.Identity.Bio.Should().Be("Bio from GitHub");
+        var identity = (await _provider.GetProfileAsync(Handle))!.Identity;
+        identity.Bio.Should().BeNull();
+        identity.Headline.Should().BeNull();
+        ProfileSeo.Description(identity).Should().BeEmpty();
     }
 
     [Fact]
@@ -149,26 +149,32 @@ public class MemberProfileDetailsTests : IDisposable
     }
 
     [Fact]
-    public async Task The_profile_shows_the_GitHub_company_as_the_headline_when_the_member_has_none_of_their_own()
+    public async Task The_account_header_shows_no_headline_or_bio_once_they_are_cleared()
     {
         var memberKey = await CreateVisibleProfileAsync();
+        await _store.SetGitHubDefaultsAsync(memberKey, "Bio from GitHub", "umbraco", DateTime.UtcNow);
+        await _store.UpdateHeadlineAsync(memberKey, "Umbraco developer");
+        await _store.UpdateHeadlineAsync(memberKey, null);
+        var eligibility = new Mock<IMvpBadgeEligibility>();
+        eligibility.Setup(e => e.GetStatusAsync(Handle, It.IsAny<CancellationToken>())).ReturnsAsync(MvpStatus.None);
 
-        await _store.SetGitHubDefaultsAsync(memberKey, null, "umbraco", DateTime.UtcNow);
+        var identity = await new AccountProfileIdentityService(_provider, eligibility.Object).GetAsync(Handle);
 
-        (await _provider.GetProfileAsync(Handle))!.Identity.Headline.Should().Be("umbraco");
+        identity!.Headline.Should().BeNull();
+        identity.Bio.Should().BeNull();
     }
 
     [Fact]
-    public async Task The_members_own_headline_wins_and_clearing_it_shows_the_GitHub_company_again()
+    public async Task Filling_missing_profile_text_only_fills_fields_that_are_still_empty()
     {
         var memberKey = await CreateVisibleProfileAsync();
-        await _store.SetGitHubDefaultsAsync(memberKey, null, "umbraco", DateTime.UtcNow);
-
         await _store.UpdateHeadlineAsync(memberKey, "Umbraco developer");
-        (await _provider.GetProfileAsync(Handle))!.Identity.Headline.Should().Be("Umbraco developer");
 
-        await _store.UpdateHeadlineAsync(memberKey, " ");
-        (await _provider.GetProfileAsync(Handle))!.Identity.Headline.Should().Be("umbraco");
+        var updated = await _store.FillMissingProfileTextAsync(memberKey, "Octo", "umbraco", "Bio");
+
+        updated!.Headline.Should().Be("Umbraco developer");
+        updated.Bio.Should().Be("Bio");
+        updated.DisplayNameOverride.Should().Be("Octo");
     }
 
     [Fact]
@@ -184,18 +190,16 @@ public class MemberProfileDetailsTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public async Task Clearing_the_display_name_shows_the_GitHub_name_again(string? displayName)
+    public async Task The_store_refuses_an_empty_display_name(string displayName)
     {
         var memberKey = await CreateVisibleProfileAsync();
         await _store.UpdateDisplayNameAsync(memberKey, "Octo");
 
-        var updated = await _store.UpdateDisplayNameAsync(memberKey, displayName);
+        var act = () => _store.UpdateDisplayNameAsync(memberKey, displayName);
 
-        updated!.DisplayNameOverride.Should().BeNull();
-        updated.DisplayName.Should().Be("The Octocat");
-        (await _provider.GetProfileAsync(Handle))!.Identity.DisplayName.Should().Be("The Octocat");
+        await act.Should().ThrowAsync<ArgumentException>();
+        (await _provider.GetProfileAsync(Handle))!.Identity.DisplayName.Should().Be("Octo");
     }
 }

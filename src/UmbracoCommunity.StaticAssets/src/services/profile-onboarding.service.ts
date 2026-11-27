@@ -14,6 +14,9 @@ export const MAX_HEADLINE_LENGTH = 100;
 // Keep in sync with ProfileText.MaxDisplayNameLength.
 export const MAX_DISPLAY_NAME_LENGTH = 60;
 
+// Keep in sync with the empty-name message in ProfileApiController.UpdateDisplayName.
+export const EMPTY_NAME_MESSAGE = "Please enter your name. It can't be empty.";
+
 /**
  * Dispatched on window after the signed-in member's avatar is uploaded or removed, so other
  * parts of the page (such as the header avatar) can show the new image straight away.
@@ -48,26 +51,19 @@ function notifyDetailsChanged(details: ProfileDetails): void {
 }
 
 /**
- * The member's display name, headline and bio, as returned after any of them is saved. Each
- * shown value is the member's own when its `hasCustom…` flag is true, otherwise the GitHub
- * default next to it.
+ * The member's display name, headline and bio, as returned after any of them is saved: always the member's own text,
+ * never a GitHub fallback. A null headline or bio is not shown on the profile.
  */
 export interface ProfileDetails {
   displayName: string;
-  hasCustomDisplayName: boolean;
-  defaultDisplayName: string;
   headline: string | null;
-  hasCustomHeadline: boolean;
-  gitHubHeadline: string | null;
   bio: string | null;
-  hasCustomBio: boolean;
-  gitHubBio: string | null;
 }
 
 export class ProfileOnboardingService extends ServiceBase {
   private static readonly BASE_URL = "/api/profile";
 
-  /** Saves the member's own bio. An empty bio clears it, so their GitHub bio shows again. */
+  /** Saves the member's own bio. An empty bio clears it, so no bio is shown. */
   static async updateBio(bio: string): Promise<ProfileDetails> {
     const response = await ServiceBase.put(`${this.BASE_URL}/bio`, { bio: bio.trim() || null });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
@@ -76,7 +72,7 @@ export class ProfileOnboardingService extends ServiceBase {
     return details;
   }
 
-  /** Saves the member's own headline. An empty headline clears it, so their GitHub company shows again. */
+  /** Saves the member's own headline. An empty headline clears it, so no headline is shown. */
   static async updateHeadline(headline: string): Promise<ProfileDetails> {
     const response = await ServiceBase.put(`${this.BASE_URL}/headline`, { headline: headline.trim() || null });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
@@ -85,9 +81,14 @@ export class ProfileOnboardingService extends ServiceBase {
     return details;
   }
 
-  /** Saves the member's own display name. An empty name clears it, so their GitHub name shows again. */
+  /**
+   * Saves the member's own display name. A name is required: an empty one is refused here, without a request, and
+   * by the server.
+   */
   static async updateDisplayName(displayName: string): Promise<ProfileDetails> {
-    const response = await ServiceBase.put(`${this.BASE_URL}/display-name`, { displayName: displayName.trim() || null });
+    const name = displayName.trim();
+    if (!name) throw new Error(EMPTY_NAME_MESSAGE);
+    const response = await ServiceBase.put(`${this.BASE_URL}/display-name`, { displayName: name });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
     const details: ProfileDetails = await response.json();
     notifyDetailsChanged(details);

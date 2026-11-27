@@ -397,7 +397,7 @@ export class ProfileDisplayEditorElement extends LitElement {
     `;
   }
 
-  /** The switches for which sections show at all, and a note on the timeline's cards. Separate from the items themselves. */
+  /** The switches for which sections show at all. Separate from the items themselves. */
   #renderSettings(): TemplateResult {
     return html`
       <div class="dc-profile-display-editor__settings">
@@ -417,12 +417,6 @@ export class ProfileDisplayEditorElement extends LitElement {
             )}
           </ul>
         </fieldset>
-        <div class="dc-profile-display-editor__switches">
-          <h3 class="dc-profile-display-editor__heading">Timeline</h3>
-          <p class="dc-profile-display-editor__hint">
-            An item whose page has a picture shows as a card.
-          </p>
-        </div>
       </div>
     `;
   }
