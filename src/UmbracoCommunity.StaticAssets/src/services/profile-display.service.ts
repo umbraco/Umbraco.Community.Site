@@ -6,9 +6,6 @@ export const MAX_PINNED_ITEMS = 3;
 // Keep in sync with ProfileDisplay.MaxPinReasonLength.
 export const MAX_PIN_REASON_LENGTH = 200;
 
-// Keep in sync with ProfileDisplay.MaxHiddenItems, which also limits the items shown without a preview card.
-export const MAX_NO_CARD_ITEMS = 500;
-
 /** A preview card for an item: our stored copy of its page's picture, its title and description. */
 export interface ProfileDisplayCard {
   imageUrl: string;
@@ -35,7 +32,7 @@ export interface ProfileDisplayItem {
   description?: string | null;
   /** A routine package release, which the timeline's highlights leave out. */
   isRoutineRelease?: boolean;
-  /** Its preview card when one is ready, whatever the card choices; null for a plain line. */
+  /** Its preview card when one is ready; null for a plain line. */
   card?: ProfileDisplayCard | null;
   /** The month it is listed under, as yyyy-MM; null when it has no date. */
   monthKey?: string | null;
@@ -78,12 +75,6 @@ export interface ProfileDisplayChoices {
   hiddenSections: string[];
   hiddenItemIds: string[];
   pins: ProfilePin[];
-  /** Leave the activity graph off the profile. The graph is on when left out. */
-  hideActivityGraph?: boolean;
-  /** Show every timeline entry as a plain line. Cards are on when left out. */
-  hideTimelineCards?: boolean;
-  /** Items shown in the timeline as a plain line, without a preview card. */
-  noCardItemIds?: string[];
 }
 
 export interface ProfileDisplay {

@@ -7,7 +7,6 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// much was going on that week. Built from the timeline's dates. The levels are fixed steps, not relative to
 /// anyone else, and the graph carries a per-month text alternative so it never relies on colour alone.
 /// </summary>
-/// <remarks>Shown unless the member switches it off (see <see cref="Models.ProfileDisplayChoices.HideActivityGraph"/>).</remarks>
 /// <param name="Weeks">The weeks, oldest first. The first starts on the Monday on or before the window's start.</param>
 /// <param name="Months">The months in the window, oldest first, with how many items each had.</param>
 public sealed record ProfileActivityGraph(

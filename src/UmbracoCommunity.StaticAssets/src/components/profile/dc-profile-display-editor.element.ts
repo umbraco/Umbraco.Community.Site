@@ -3,7 +3,6 @@ import { customElement, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import {
   itemIconKey,
-  MAX_NO_CARD_ITEMS,
   MAX_PIN_REASON_LENGTH,
   MAX_PINNED_ITEMS,
   ProfileDisplayService,
@@ -12,7 +11,7 @@ import {
   type ProfileDisplaySection,
   type ProfilePin,
 } from "../../services/profile-display.service.js";
-import { iconEye, iconEyeOff, iconPin, iconText, iconX } from "../../svg/lucide-icons.js";
+import { iconEye, iconEyeOff, iconPin, iconX } from "../../svg/lucide-icons.js";
 import { profileKindIcon } from "../../svg/profile-kind-icons.js";
 import { moveItem, renderMoveButtons, SortableDragController } from "../sortable/sortable-list.js";
 import { formatTimelineMonth, renderProfileTimelineEntry } from "./profile-timeline-entry.js";
@@ -26,17 +25,6 @@ const emptyChoices = (): ProfileDisplayChoices => ({
   hiddenSections: [],
   hiddenItemIds: [],
   pins: [],
-  hideActivityGraph: false,
-  hideTimelineCards: false,
-  noCardItemIds: [],
-});
-
-/** The choices with every optional field filled in with its default. */
-const withDefaults = (choices: ProfileDisplayChoices): ProfileDisplayChoices => ({
-  ...choices,
-  hideActivityGraph: choices.hideActivityGraph ?? false,
-  hideTimelineCards: choices.hideTimelineCards ?? false,
-  noCardItemIds: choices.noCardItemIds ?? [],
 });
 
 /** An item with the section it is in. */
@@ -57,8 +45,7 @@ let instanceCount = 0;
 /**
  * Lets the member choose what the activity sections of their profile show: switch whole sections off, hide single
  * items, and pin up to three items to the Featured block with a short note on why, in an order they choose (drag the
- * handle, or use the up and down buttons). Also switches the activity graph off or on again, and the timeline's preview
- * cards, for the whole timeline or one item at a time. The items are listed as the profile's timeline shows them
+ * handle, or use the up and down buttons). The items are listed as the profile's timeline shows them
  * (newest first, by month, with the same icons, cards and meta lines), filtered by type and a page at a time.
  * Every change shows straight away and is saved in the background, in the order it was made; if saving fails, the
  * editor goes back to what was last saved.
@@ -119,7 +106,7 @@ export class ProfileDisplayEditorElement extends LitElement {
     try {
       const display = await ProfileDisplayService.load();
       this._sections = display.sections;
-      this._choices = withDefaults(display.choices);
+      this._choices = display.choices;
       this.#stored = this._choices;
     } catch (error) {
       this._errorMessage = error instanceof Error && error.message ? error.message : "Couldn't load your activity.";
@@ -153,7 +140,7 @@ export class ProfileDisplayEditorElement extends LitElement {
 
   async #persist(successMessage: string) {
     try {
-      const stored = withDefaults(await ProfileDisplayService.save(this._choices));
+      const stored = await ProfileDisplayService.save(this._choices);
       this.#stored = stored;
       // Later changes are still waiting to be saved; keep showing them.
       if (this.#pendingSaves === 1) {
@@ -202,34 +189,6 @@ export class ProfileDisplayEditorElement extends LitElement {
         pins: hidden ? c.pins.filter((p) => p.id !== item.id) : c.pins,
       }),
       hidden ? `“${item.title}” is hidden from your profile.` : `“${item.title}” is shown on your profile.`
-    );
-  }
-
-  #setGraphShown(shown: boolean) {
-    void this.#update(
-      (c) => ({ ...c, hideActivityGraph: !shown }),
-      shown ? "Showing the activity graph on your profile." : "No longer showing the activity graph on your profile."
-    );
-  }
-
-  #setCardsShown(shown: boolean) {
-    void this.#update(
-      (c) => ({ ...c, hideTimelineCards: !shown }),
-      shown ? "Showing preview cards in your timeline." : "Your timeline shows plain lines only."
-    );
-  }
-
-  #hasNoCard(id: string): boolean {
-    return (this._choices.noCardItemIds ?? []).includes(id);
-  }
-
-  #setItemCard(item: ProfileDisplayItem, card: boolean) {
-    void this.#update(
-      (c) => {
-        const others = (c.noCardItemIds ?? []).filter((id) => id !== item.id);
-        return { ...c, noCardItemIds: card ? others : [...others, item.id] };
-      },
-      card ? `“${item.title}” can show as a card in your timeline.` : `“${item.title}” shows as a plain line in your timeline.`
     );
   }
 
@@ -438,7 +397,7 @@ export class ProfileDisplayEditorElement extends LitElement {
     `;
   }
 
-  /** The switches: which sections show at all, and the timeline's options. Separate from the items themselves. */
+  /** The switches for which sections show at all. Separate from the items themselves. */
   #renderSettings(): TemplateResult {
     return html`
       <div class="dc-profile-display-editor__settings">
@@ -456,27 +415,6 @@ export class ProfileDisplayEditorElement extends LitElement {
                 )}
               </li>`
             )}
-          </ul>
-        </fieldset>
-        <fieldset class="dc-profile-display-editor__switches">
-          <legend class="dc-profile-display-editor__heading">Timeline</legend>
-          <p class="dc-profile-display-editor__hint">
-            An item whose page has a picture shows as a card. You can also switch single items to a plain line below.
-          </p>
-          <ul class="dc-profile-display-editor__switch-list">
-            <li>
-              ${this.#renderSwitch(`${this.#idPrefix}-cards`, "Show preview cards", !this._choices.hideTimelineCards, (checked) =>
-                this.#setCardsShown(checked)
-              )}
-            </li>
-            <li>
-              ${this.#renderSwitch(
-                `${this.#idPrefix}-graph`,
-                "Show an activity graph of the last 12 months",
-                !this._choices.hideActivityGraph,
-                (checked) => this.#setGraphShown(checked)
-              )}
-            </li>
           </ul>
         </fieldset>
       </div>
@@ -554,19 +492,13 @@ export class ProfileDisplayEditorElement extends LitElement {
     const hidden = this._choices.hiddenItemIds.includes(item.id);
     const pinned = this.#isPinned(item.id);
     const canPin = !hidden && this._choices.pins.length < MAX_PINNED_ITEMS;
-    const noCard = this.#hasNoCard(item.id);
-    // Per-item cards only matter while cards are on for the timeline and the item is shown.
-    const offerCard = !hidden && !this._choices.hideTimelineCards;
-    const canSwitchCardOff = noCard || (this._choices.noCardItemIds ?? []).length < MAX_NO_CARD_ITEMS;
-    const showCard = !!item.card && !this._choices.hideTimelineCards && !noCard;
 
     const controls = html`
       <div class="dc-profile-display-editor__entry-controls">
-        ${hidden || pinned || (offerCard && noCard)
+        ${hidden || pinned
           ? html`<span class="dc-profile-display-editor__badges">
               ${hidden ? html`<span class="dc-profile-display-editor__badge dc-profile-display-editor__badge--hidden">Hidden</span>` : nothing}
               ${pinned ? html`<span class="dc-profile-display-editor__badge dc-profile-display-editor__badge--pinned">Pinned</span>` : nothing}
-              ${offerCard && noCard ? html`<span class="dc-profile-display-editor__badge">No card</span>` : nothing}
             </span>`
           : nothing}
         <div class="dc-profile-display-editor__actions">
@@ -589,19 +521,6 @@ export class ProfileDisplayEditorElement extends LitElement {
           >
             ${pinned ? iconX : iconPin} ${pinned ? "Unpin" : "Pin"}
           </button>
-          ${offerCard
-            ? html`<button
-                class="dc-profile-display-editor__action"
-                type="button"
-                data-action="card"
-                aria-pressed=${noCard ? "true" : "false"}
-                ?disabled=${!canSwitchCardOff}
-                aria-label="Show “${item.title}” as a plain line"
-                @click=${() => this.#setItemCard(item, noCard)}
-              >
-                ${iconText} Plain line
-              </button>`
-            : nothing}
         </div>
       </div>
     `;
@@ -614,7 +533,7 @@ export class ProfileDisplayEditorElement extends LitElement {
         url: item.url,
         date: item.date,
         meta: item.meta,
-        card: showCard ? item.card : null,
+        card: item.card ?? null,
       },
       {
         itemId: item.id,

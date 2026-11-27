@@ -240,6 +240,26 @@ describe("ProfileDisplayEditorElement", () => {
     expect(item(element, "b1")).not.toBeNull();
   });
 
+  it("lists every section's switch, each with its label, in the one Sections list", async () => {
+    const save = mockSave();
+    const element = await mount();
+
+    const list = element.querySelector(".dc-profile-display-editor__switch-list")!;
+    const labels = [...list.querySelectorAll(":scope > li > label")].map((l) => l.textContent?.trim());
+    expect(labels).toEqual(["Blog posts", "Videos", "Packages", "Forum highlights"]);
+    // Each switch sits inside its own label, so the label stays with it when the list wraps.
+    for (const input of list.querySelectorAll<HTMLInputElement>("input[role='switch']")) {
+      expect(input.closest("label")?.getAttribute("for")).toBe(input.id);
+      expect(input.checked).toBe(true);
+    }
+
+    sectionSwitch(element, "Videos").click();
+    await settle(element);
+
+    expect(sectionSwitch(element, "Videos").checked).toBe(false);
+    expect(lastSaved(save).hiddenSections).toEqual(["videos"]);
+  });
+
   it("hides an item, which stays listed dimmed with a Hidden badge, and shows it again", async () => {
     const save = mockSave();
     const element = await mount();
@@ -478,77 +498,21 @@ describe("ProfileDisplayEditorElement", () => {
     expect(element.querySelector('[role="alert"]')?.textContent).toContain("Finish setting up your profile first.");
   });
 
-  it("offers the activity graph and preview cards switched on by default", async () => {
+  it("offers no timeline switches or plain-line choice, and draws every item with a picture as a card", async () => {
     const element = await mount();
 
-    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(true);
-    expect(sectionSwitch(element, "Show preview cards").checked).toBe(true);
-    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("false");
-  });
-
-  it("switches the activity graph off and on again", async () => {
-    const save = mockSave();
-    const element = await mount();
-
-    sectionSwitch(element, "Show an activity graph").click();
-    await settle(element);
-
-    expect(lastSaved(save).hideActivityGraph).toBe(true);
-    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(false);
-    expect(status(element)).toContain("No longer showing the activity graph");
-
-    sectionSwitch(element, "Show an activity graph").click();
-    await settle(element);
-
-    expect(lastSaved(save).hideActivityGraph).toBe(false);
-    expect(status(element)).toContain("Showing the activity graph");
-  });
-
-  it("switches preview cards off for the whole timeline, which draws every item plain and removes the per-item choice", async () => {
-    const save = mockSave();
-    const element = await mount();
-
-    sectionSwitch(element, "Show preview cards").click();
-    await settle(element);
-
-    expect(lastSaved(save).hideTimelineCards).toBe(true);
+    // Only the section switches are left: one box holding the Sections fieldset, with no Timeline column beside it.
+    expect(element.querySelectorAll(".dc-profile-display-editor__switch-list")).toHaveLength(1);
+    const settings = element.querySelector(".dc-profile-display-editor__settings")!;
+    expect(settings.children).toHaveLength(1);
+    expect(settings.firstElementChild?.tagName).toBe("FIELDSET");
+    expect(settings.textContent).not.toContain("Timeline");
+    expect(element.textContent).not.toContain("An item whose page has a picture shows as a card.");
+    expect(element.textContent).not.toContain("Show preview cards");
+    expect(element.textContent).not.toContain("activity graph");
+    expect(element.textContent).not.toContain("Plain line");
     expect(button(item(element, "b1"), "card")).toBeNull();
-    expect(item(element, "b1").querySelector(".community-profile__timeline-card--plain")).not.toBeNull();
-    expect(status(element)).toContain("plain lines only");
-  });
-
-  it("shows a single item as a plain line and as a card again", async () => {
-    const save = mockSave();
-    const element = await mount();
-
-    button(item(element, "b1"), "card").click();
-    await settle(element);
-
-    expect(lastSaved(save).noCardItemIds).toEqual(["b1"]);
-    expect(item(element, "b1").textContent).toContain("No card");
-    expect(item(element, "b1").querySelector(".community-profile__timeline-card--plain")).not.toBeNull();
-    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("true");
-
-    button(item(element, "b1"), "card").click();
-    await settle(element);
-
-    expect(lastSaved(save).noCardItemIds).toEqual([]);
-    expect(item(element, "b1").textContent).not.toContain("No card");
     expect(item(element, "b1").querySelector(".community-profile__timeline-card-picture")).not.toBeNull();
-  });
-
-  it("keeps the stored card choices it loaded", async () => {
-    const element = await mount(display({ hideActivityGraph: true, hideTimelineCards: false, noCardItemIds: ["v1"] }));
-
-    expect(sectionSwitch(element, "Show an activity graph").checked).toBe(false);
-    expect(button(item(element, "v1"), "card").getAttribute("aria-pressed")).toBe("true");
-    expect(button(item(element, "b1"), "card").getAttribute("aria-pressed")).toBe("false");
-  });
-
-  it("offers no card choice for a hidden item", async () => {
-    const element = await mount(display({ hiddenItemIds: ["b1"] }));
-
-    expect(button(item(element, "b1"), "card")).toBeNull();
   });
 
   it("still lists items from a response without the timeline details", async () => {

@@ -7,66 +7,67 @@
 
     // The side menu's panels, in menu order: each has a stable id, which the address's hash selects (/account#timeline).
     // Only the panels this member is offered are listed, on the same conditions as before.
-    var showProfile = Model.OnboardingCompleted || !string.IsNullOrEmpty(Model.OnboardingUrl);
     var showTimeline = Model.OnboardingCompleted && Model.CanChooseProfileDisplay;
     var showAddActivity = Model.OnboardingCompleted && Model.CanAddActivity;
     var showMvpBadge = Model.MvpBadgeYear is not null;
+    var showBadges = Model.OnboardingCompleted;
 
-    var panels = new List<(string Id, string Label)>();
-    if (showProfile) { panels.Add(("profile", "Profile")); }
+    var panels = new List<(string Id, string Label)> { ("profile", "Profile") };
     if (showTimeline) { panels.Add(("timeline", "Timeline")); }
     if (showAddActivity) { panels.Add(("add-activity", "Add activity")); }
     panels.Add(("feeds", "Feeds & links"));
+    if (showBadges) { panels.Add(("badges", "Forum badges")); }
     if (showMvpBadge) { panels.Add(("mvp-badge", "MVP badge")); }
 }
 
-<div class="account-page-wrapper">
-    @if (Model.IsEditAs)
-    {
-        @* A profile admin editing someone else's profile: every API call from this page names that member. *@
-        <div class="account-page__edit-as" role="note">
-            <p class="account-page__edit-as-text">You are editing @Model.DisplayName's profile.</p>
+@{
+    // Under the name in the header: how the member signs in, a link to their public profile and, while it's hidden, who
+    // can see it. Only they see this page, so their email shows too.
+    Func<object?, IHtmlContent> accountDetails = @<div class="account-page__hero-details">
+        <p class="account-page__hero-account">
+            @if (!string.IsNullOrEmpty(Model.GitHubHandle))
+            {
+                <a class="account-page__handle" href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
+                    <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
+                    @@@Model.GitHubHandle
+                    <span class="sr-only">on GitHub (opens in a new tab)</span>
+                </a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Email))
+            {
+                <span class="account-page__email">@Model.Email</span>
+            }
+        </p>
+
+        @if (Model.OnboardingCompleted)
+        {
+            <p class="account-page__hero-note">This is the top of your public profile. Changes you make here, such as links you add, show on it straight away.</p>
+            <p class="account-page__hero-hidden" data-profile-hero="hidden-note" hidden="@Model.IsProfileVisible">
+                Your profile is hidden: only you can see it. <a href="#profile">Show it to everyone from Profile</a>.
+            </p>
             @if (!string.IsNullOrEmpty(Model.ProfileUrl))
             {
-                <a class="account-page__edit-as-link" href="@Model.ProfileUrl">Back to @Model.DisplayName's profile</a>
+                <p class="account-page__hero-actions">
+                    <a class="btn is-transparent" href="@Model.ProfileUrl" target="_blank" rel="noopener">
+                        View public profile
+                        <partial name="~/Views/Partials/Icons/ExternalLink.cshtml" />
+                        <span class="sr-only">(opens in a new tab)</span>
+                    </a>
+                </p>
             }
-        </div>
-    }
-    <article class="account-page" data-profile-edit-as="@Model.EditAsHandle">
-        <header class="account-page__header">
-            @if (!string.IsNullOrEmpty(Model.AvatarUrl))
-            {
-                <img class="account-page__avatar" src="@Model.AvatarUrl" alt="" width="72" height="72" />
-            }
-            <div class="account-page__identity">
-                <div class="account-page__name-row">
-                    <h1 class="account-page__name">@Model.DisplayName</h1>
-                    @if (Model.OnboardingCompleted && !string.IsNullOrEmpty(Model.ProfileUrl))
-                    {
-                        <a class="account-page__profile-link no-link-animation" href="@Model.ProfileUrl" target="_blank" rel="noopener" title="View your public profile">
-                            <partial name="~/Views/Partials/Icons/ExternalLink.cshtml" />
-                            <span class="sr-only">View your public profile (opens in a new tab)</span>
-                        </a>
-                    }
-                </div>
+        }
+    </div>;
+}
 
-                @if (!string.IsNullOrEmpty(Model.GitHubHandle))
-                {
-                    <p class="account-page__handle">
-                        <a href="https://github.com/@Model.GitHubHandle" target="_blank" rel="noopener noreferrer">
-                            <partial name="~/Views/Partials/Icons/GitHub.cshtml" />
-                            @@@Model.GitHubHandle
-                        </a>
-                    </p>
-                }
+@* The header previews the public profile's hero and follows edits made below (dc-account-profile-hero). *@
+<div class="account-page__profile">
+    <dc-account-profile-hero>
+        <partial name="~/Views/Partials/Profiles/_ProfileHero.cshtml" model="@(new ProfileHeroViewModel { Identity = Model.ProfileIdentity, Badges = Model.ProfileBadges, Live = true, Footer = accountDetails })" />
+    </dc-account-profile-hero>
+</div>
 
-                @if (!string.IsNullOrEmpty(Model.Email))
-                {
-                    <p class="account-page__email">@Model.Email</p>
-                }
-            </div>
-        </header>
-
+<div class="account-page-wrapper">
+    <article class="account-page">
         @* Without JavaScript every panel shows and the menu links jump to them; <dc-account-nav> then shows one at a time. *@
         <dc-account-nav class="account-page__body">
             <nav class="account-page__nav" aria-label="Account">
@@ -89,41 +90,36 @@
             </nav>
 
             <div class="account-page__panels">
-                @if (showProfile)
-                {
-                    <section id="profile" class="account-page__panel" data-account-panel aria-labelledby="account-panel-profile-title">
-                        <h2 id="account-panel-profile-title" class="account-page__panel-title" tabindex="-1">Profile</h2>
+                <section id="profile" class="account-page__panel" data-account-panel aria-labelledby="account-panel-profile-title">
+                    <h2 id="account-panel-profile-title" class="account-page__panel-title" tabindex="-1">Profile</h2>
 
-                        @if (Model.OnboardingCompleted)
-                        {
-                            <section class="account-page__section">
-                                <h3 class="account-page__section-title">Your public profile</h3>
-                                <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"
-                                                              profile-url="@Model.ProfileUrl"></dc-profile-visibility-toggle>
-                            </section>
+                    @if (Model.OnboardingCompleted)
+                    {
+                        <section class="account-page__section">
+                            <h3 class="account-page__section-title">Your public profile</h3>
+                            <dc-profile-visibility-toggle profile-visible="@Model.IsProfileVisible"
+                                                          profile-url="@Model.ProfileUrl"></dc-profile-visibility-toggle>
+                        </section>
 
-                            <section class="account-page__section">
-                                <h3 class="account-page__section-title">Your profile details</h3>
-                                <p class="account-page__section-hint">Your photo, name, headline and bio as they appear on your public profile. Leave a field empty to use what's on your GitHub profile.</p>
-                                <dc-profile-details-editor avatar-url="@Model.AvatarUrl"
-                                                           has-custom-avatar="@Model.HasCustomAvatar"
-                                                           custom-display-name="@Model.CustomDisplayName"
-                                                           default-display-name="@Model.DefaultDisplayName"
-                                                           custom-headline="@Model.CustomHeadline"
-                                                           github-headline="@Model.GitHubHeadline"
-                                                           custom-bio="@Model.CustomBio"
-                                                           github-bio="@Model.GitHubBio"
-                                                           profile-url="@Model.ProfileUrl"></dc-profile-details-editor>
-                            </section>
-                        }
-                        else
-                        {
-                            <p class="account-page__section-hint">
-                                <a href="@Model.OnboardingUrl">Finish setting up your profile</a> to get a public page the community can find.
-                            </p>
-                        }
-                    </section>
-                }
+                        <section class="account-page__section">
+                            <h3 class="account-page__section-title">Your profile details</h3>
+                            <p class="account-page__section-hint">Your photo, name, headline and bio as they appear on your public profile. Leave the headline or bio empty to show none.</p>
+                            <dc-profile-details-editor avatar-url="@Model.AvatarUrl"
+                                                       has-custom-avatar="@Model.HasCustomAvatar"
+                                                       display-name="@Model.DisplayName"
+                                                       headline="@Model.Headline"
+                                                       bio="@Model.Bio"
+                                                       profile-url="@Model.ProfileUrl"></dc-profile-details-editor>
+                        </section>
+                    }
+                    else
+                    {
+                        @* Profile setup runs automatically on sign-in; it failed this time and is retried on the next page load. *@
+                        <p class="account-page__section-hint">
+                            We couldn't finish setting up your profile. Reload this page in a moment to try again.
+                        </p>
+                    }
+                </section>
 
                 @if (showTimeline)
                 {
@@ -161,6 +157,15 @@
                         </section>
                     }
                 </section>
+
+                @if (showBadges)
+                {
+                    <section id="badges" class="account-page__panel" data-account-panel aria-labelledby="account-panel-badges-title">
+                        <h2 id="account-panel-badges-title" class="account-page__panel-title" tabindex="-1">Forum badges</h2>
+                        <p class="account-page__section-hint">Show the badges you've earned on the Umbraco forum on your profile, under your links.</p>
+                        <dc-profile-badges-editor></dc-profile-badges-editor>
+                    </section>
+                }
 
                 @if (Model.MvpBadgeYear is { } mvpBadgeYear)
                 {

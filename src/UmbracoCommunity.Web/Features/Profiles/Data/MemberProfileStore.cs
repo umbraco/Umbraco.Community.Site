@@ -83,8 +83,8 @@ public class MemberProfileStore
     }
 
     /// <summary>
-    /// Sets the member's own bio. Empty or whitespace-only text is stored as null, so the
-    /// GitHub bio shows again. Returns the updated row, or null when the member has no profile row.
+    /// Sets the member's own bio. Empty or whitespace-only text is stored as null, so no bio
+    /// is shown. Returns the updated row, or null when the member has no profile row.
     /// </summary>
     public async Task<MemberProfileEntity?> UpdateBioAsync(Guid memberKey, string? bio, CancellationToken ct = default)
     {
@@ -99,9 +99,8 @@ public class MemberProfileStore
     }
 
     /// <summary>
-    /// Sets the member's own headline. Empty or whitespace-only text is stored as null, so the
-    /// GitHub company shows again.
-    /// Returns the updated row, or null when the member has no profile row.
+    /// Sets the member's own headline. Empty or whitespace-only text is stored as null, so no
+    /// headline is shown. Returns the updated row, or null when the member has no profile row.
     /// </summary>
     public async Task<MemberProfileEntity?> UpdateHeadlineAsync(Guid memberKey, string? headline, CancellationToken ct = default)
     {
@@ -116,22 +115,49 @@ public class MemberProfileStore
     }
 
     /// <summary>
-    /// Sets the member's own display name. Empty or whitespace-only text is stored as null, so
-    /// the GitHub name shows again. Returns the updated row, or null when the member has no profile row.
+    /// Sets the member's own display name, trimmed. A name is required, so empty or whitespace-only
+    /// text throws (the API refuses it before calling this). Returns the updated row, or null when
+    /// the member has no profile row.
     /// </summary>
-    public async Task<MemberProfileEntity?> UpdateDisplayNameAsync(Guid memberKey, string? displayName, CancellationToken ct = default)
+    public async Task<MemberProfileEntity?> UpdateDisplayNameAsync(Guid memberKey, string displayName, CancellationToken ct = default)
     {
+        var name = ProfileText.Normalize(displayName)
+            ?? throw new ArgumentException("A display name can't be empty.", nameof(displayName));
+
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
         var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
         if (entity == null) return null;
 
-        entity.DisplayNameOverride = ProfileText.Normalize(displayName);
+        entity.DisplayNameOverride = name;
         entity.UpdatedUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return entity;
     }
 
-    /// <summary>Stores the bio and company fetched from the member's GitHub profile and when they were fetched.</summary>
+    /// <summary>
+    /// Sets the member's own display name, headline and bio, but only those that are still null, so
+    /// text the member has already written is never overwritten. Empty or whitespace-only values leave
+    /// the field null.
+    /// Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> FillMissingProfileTextAsync(Guid memberKey, string? displayName, string? headline, string? bio, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.DisplayNameOverride ??= ProfileText.Normalize(displayName);
+        entity.Headline ??= ProfileText.Normalize(headline);
+        entity.Bio ??= ProfileText.Normalize(bio);
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
+    }
+
+    /// <summary>
+    /// Stores the bio and company fetched from the member's GitHub profile and when they were fetched. They are only a
+    /// source to copy from (see <see cref="FillMissingProfileTextAsync"/>), never shown themselves.
+    /// </summary>
     public async Task SetGitHubDefaultsAsync(Guid memberKey, string? gitHubBio, string? gitHubCompany, DateTime fetchedUtc, CancellationToken ct = default)
     {
         await using var context = await _contextFactory.CreateDbContextAsync(ct);
@@ -184,9 +210,6 @@ public class MemberProfileStore
 
         entity.HiddenSections = [.. choices.HiddenSections];
         entity.HiddenActivityIds = [.. choices.HiddenActivityIds];
-        entity.HideActivityGraph = choices.HideActivityGraph;
-        entity.HideTimelineCards = choices.HideTimelineCards;
-        entity.NoCardActivityIds = [.. choices.NoCardActivityIds];
 
         context.MemberPinnedItems.RemoveRange(entity.PinnedItems);
         entity.PinnedItems = choices.Pins
@@ -204,6 +227,22 @@ public class MemberProfileStore
             })
             .ToList();
 
+        entity.UpdatedUtc = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return entity;
+    }
+
+    /// <summary>
+    /// Replaces the forum badges the member chose to show on their profile. Expects ids already checked by
+    /// <see cref="ForumBadges.ForumBadgeService.TryNormalizeChoice"/>. Returns the updated row, or null when the member has no profile row.
+    /// </summary>
+    public async Task<MemberProfileEntity?> SetShownForumBadgesAsync(Guid memberKey, IReadOnlyList<int> badgeIds, CancellationToken ct = default)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync(ct);
+        var entity = await context.MemberProfiles.FirstOrDefaultAsync(p => p.MemberKey == memberKey, ct);
+        if (entity == null) return null;
+
+        entity.ShownForumBadgeIds = [.. badgeIds];
         entity.UpdatedUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return entity;

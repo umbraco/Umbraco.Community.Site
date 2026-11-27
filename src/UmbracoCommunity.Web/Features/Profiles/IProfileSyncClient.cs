@@ -6,7 +6,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// Talks to the external content platform about a profile. Reads a member's public activity from it
 /// (<see cref="FindProfileAsync"/>, <see cref="GetActivitiesAsync"/>) and asks it about a member's links
 /// (<see cref="VerifyLinksAsync"/>); the platform has no endpoints
-/// yet for profile-claim, feed and activity notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
+/// yet for feed and activity notifications, so <see cref="PlatformProfileSyncClient"/> only logs those.
 /// </summary>
 public interface IProfileSyncClient
 {
@@ -41,8 +41,6 @@ public interface IProfileSyncClient
     /// configured. Throws when the platform cannot be reached or errors.
     /// </summary>
     Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default);
-
-    Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default);
 
     Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default);
 

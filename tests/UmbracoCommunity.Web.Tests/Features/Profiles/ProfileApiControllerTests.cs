@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -42,14 +43,37 @@ public class ProfileApiControllerTests : IDisposable
         await _store.GetOrStartOnboardingAsync(_memberKey, Handle, "The Octocat");
     }
 
-    private ProfileApiController CreateController(bool signedIn = true)
+    private ProfileApiController CreateController(bool signedIn = true, string? editAsHeader = null)
     {
         var memberManager = new Mock<IMemberManager>();
         memberManager
             .Setup(m => m.GetCurrentMemberAsync())
             .ReturnsAsync(signedIn ? new MemberIdentityUser { Key = _memberKey, UserName = Handle } : null);
 
-        return new ProfileApiController(TestProfileEditSubjects.Resolver(memberManager.Object, store: _store), _store, null!, null!, null!, null!);
+        var controller = new ProfileApiController(memberManager.Object, _store, null!, null!);
+        if (editAsHeader != null)
+        {
+            // The header the removed "edit as" feature used to send: it must not change whose profile is edited.
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers["X-Profile-Edit-As"] = editAsHeader;
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
+        }
+
+        return controller;
+    }
+
+    [Fact]
+    public async Task A_request_naming_another_member_only_ever_changes_the_signed_in_members_profile()
+    {
+        await CreateProfileAsync();
+        var otherKey = Guid.NewGuid();
+        await _store.GetOrStartOnboardingAsync(otherKey, "hubot", "Hubot");
+
+        var result = await CreateController(editAsHeader: "hubot").UpdateBio(new UpdateBioRequest("Mine"), default);
+
+        Details(result).Bio.Should().Be("Mine");
+        (await _store.GetByMemberKeyAsync(_memberKey))!.Bio.Should().Be("Mine");
+        (await _store.GetByMemberKeyAsync(otherKey))!.Bio.Should().BeNull();
     }
 
     private static ProfileDetailsResponse Details(IActionResult result) =>
@@ -74,9 +98,7 @@ public class ProfileApiControllerTests : IDisposable
 
         var result = await CreateController().UpdateHeadline(new UpdateHeadlineRequest(headline), default);
 
-        var details = Details(result);
-        details.Headline.Should().Be(headline);
-        details.HasCustomHeadline.Should().BeTrue();
+        Details(result).Headline.Should().Be(headline);
     }
 
     [Fact]
@@ -91,7 +113,7 @@ public class ProfileApiControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task A_whitespace_headline_is_stored_as_null_and_the_GitHub_company_is_returned()
+    public async Task An_empty_headline_clears_it_and_never_falls_back_to_the_GitHub_company()
     {
         await CreateProfileAsync();
         await _store.SetGitHubDefaultsAsync(_memberKey, null, "umbraco", DateTime.UtcNow);
@@ -99,10 +121,7 @@ public class ProfileApiControllerTests : IDisposable
 
         var result = await CreateController().UpdateHeadline(new UpdateHeadlineRequest("   "), default);
 
-        var details = Details(result);
-        details.Headline.Should().Be("umbraco");
-        details.HasCustomHeadline.Should().BeFalse();
-        details.GitHubHeadline.Should().Be("umbraco");
+        Details(result).Headline.Should().BeNull();
         (await _store.GetByMemberKeyAsync(_memberKey))!.Headline.Should().BeNull();
     }
 
@@ -138,7 +157,7 @@ public class ProfileApiControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task An_empty_bio_is_stored_as_null_and_the_GitHub_bio_is_returned()
+    public async Task An_empty_bio_clears_it_and_never_falls_back_to_the_GitHub_bio()
     {
         await CreateProfileAsync();
         await _store.SetGitHubDefaultsAsync(_memberKey, "Bio from GitHub", null, DateTime.UtcNow);
@@ -146,9 +165,7 @@ public class ProfileApiControllerTests : IDisposable
 
         var result = await CreateController().UpdateBio(new UpdateBioRequest(""), default);
 
-        var details = Details(result);
-        details.Bio.Should().Be("Bio from GitHub");
-        details.HasCustomBio.Should().BeFalse();
+        Details(result).Bio.Should().BeNull();
         (await _store.GetByMemberKeyAsync(_memberKey))!.Bio.Should().BeNull();
     }
 
@@ -163,19 +180,30 @@ public class ProfileApiControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task A_display_name_is_saved_and_clearing_it_returns_the_GitHub_name()
+    public async Task A_display_name_is_saved_trimmed()
+    {
+        await CreateProfileAsync();
+
+        var saved = Details(await CreateController().UpdateDisplayName(new UpdateDisplayNameRequest(" Octo "), default));
+
+        saved.DisplayName.Should().Be("Octo");
+        (await _store.GetByMemberKeyAsync(_memberKey))!.DisplayNameOverride.Should().Be("Octo");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task An_empty_display_name_is_rejected_and_the_name_is_kept(string? displayName)
     {
         await CreateProfileAsync();
         var controller = CreateController();
+        await controller.UpdateDisplayName(new UpdateDisplayNameRequest("Octo"), default);
 
-        var saved = Details(await controller.UpdateDisplayName(new UpdateDisplayNameRequest(" Octo "), default));
-        saved.DisplayName.Should().Be("Octo");
-        saved.HasCustomDisplayName.Should().BeTrue();
-        saved.DefaultDisplayName.Should().Be("The Octocat");
+        var result = await controller.UpdateDisplayName(new UpdateDisplayNameRequest(displayName), default);
 
-        var cleared = Details(await controller.UpdateDisplayName(new UpdateDisplayNameRequest(""), default));
-        cleared.DisplayName.Should().Be("The Octocat");
-        cleared.HasCustomDisplayName.Should().BeFalse();
-        (await _store.GetByMemberKeyAsync(_memberKey))!.DisplayName.Should().Be("The Octocat");
+        result.Should().BeOfType<BadRequestObjectResult>()
+            .Which.Value.Should().BeEquivalentTo(new { error = "Please enter your name. It can't be empty." });
+        (await _store.GetByMemberKeyAsync(_memberKey))!.EffectiveDisplayName.Should().Be("Octo");
     }
 }

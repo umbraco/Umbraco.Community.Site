@@ -10,9 +10,8 @@ using UmbracoCommunity.Web.Features.Profiles.Data;
 namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
-/// Feed management API — always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in
-/// member, or the member a profile admin edits), never trusting an id-in-URL for whose feeds are being modified. Shared between the onboarding wizard's
-/// feeds step and the Account page (same endpoints, same behaviour in both places).
+/// Feed management API — always scoped to the current signed-in member, never trusting an
+/// id-in-URL for whose feeds are being modified. Behind the Account page's feed manager.
 /// Every POST, PUT and DELETE must carry the antiforgery request token from
 /// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// For members whose links are checked (see <see cref="ProfileAccessService.CanMatchLinksAsync"/>) a new or changed
@@ -20,11 +19,10 @@ namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
-[ProfileEditAudit]
 [Route("api/member-feeds")]
 public class MemberFeedsApiController : ControllerBase
 {
-    private readonly ProfileEditSubjectResolver _subjects;
+    private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly IProfileSyncClient _profileSyncClient;
     private readonly LinkPreviewService _linkPreviews;
@@ -33,7 +31,7 @@ public class MemberFeedsApiController : ControllerBase
     private readonly ProfileLinkMatchingService _linkMatching;
 
     public MemberFeedsApiController(
-        ProfileEditSubjectResolver subjects,
+        IMemberManager memberManager,
         MemberProfileStore store,
         IProfileSyncClient profileSyncClient,
         LinkPreviewService linkPreviews,
@@ -41,7 +39,7 @@ public class MemberFeedsApiController : ControllerBase
         ProfileAccessService profileAccessService,
         ProfileLinkMatchingService linkMatching)
     {
-        _subjects = subjects;
+        _memberManager = memberManager;
         _store = store;
         _profileSyncClient = profileSyncClient;
         _linkPreviews = linkPreviews;
@@ -53,15 +51,15 @@ public class MemberFeedsApiController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List(CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        var feeds = await _store.GetActiveFeedsAsync(subject.MemberKey, cancellationToken);
+        var feeds = await _store.GetActiveFeedsAsync(member.Key, cancellationToken);
         IReadOnlyDictionary<string, string> matchStatuses = new Dictionary<string, string>();
-        if (feeds.Count > 0 && await _profileAccessService.CanMatchLinksAsync(subject))
+        if (feeds.Count > 0 && await _profileAccessService.CanMatchLinksAsync())
         {
             matchStatuses = await _linkMatching.GetLinkStatusesAsync(
                 feeds[0].MemberProfileId, feeds.Select(f => f.Url).ToList(), cancellationToken);
@@ -73,10 +71,10 @@ public class MemberFeedsApiController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddFeedRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
         if (string.IsNullOrWhiteSpace(request.Platform))
@@ -90,25 +88,28 @@ public class MemberFeedsApiController : ControllerBase
         }
 
         var preview = await _linkPreviews.FetchAsync(request.Url.Trim(), cancellationToken);
-        var feed = await _store.AddFeedAsync(subject.MemberKey, request.Platform.Trim(), request.Url.Trim(), preview, cancellationToken);
+        var feed = await _store.AddFeedAsync(member.Key, request.Platform.Trim(), request.Url.Trim(), preview, cancellationToken);
         if (feed == null)
         {
             return BadRequest(new { error = "Start onboarding before adding feeds." });
         }
 
-        await _profileSyncClient.NotifyFeedAddedAsync(subject.Handle, feed.Platform, feed.Url, cancellationToken);
+        // Adding a link they once said wasn't theirs takes that back, so its activity can show again.
+        await _linkMatching.UndoMemberRejectionAsync(feed.MemberProfileId, feed.Url, cancellationToken);
 
-        return Ok(await WithMatchStatusAsync(subject, feed, subject.Handle, checkFirst: true, cancellationToken));
+        await _profileSyncClient.NotifyFeedAddedAsync(member.UserName ?? string.Empty, feed.Platform, feed.Url, cancellationToken);
+
+        return Ok(await WithMatchStatusAsync(feed, member.UserName, checkFirst: true, cancellationToken));
     }
 
     /// <summary>Changes a link's platform name and address. A new address is re-checked and reported to the platform as a swap.</summary>
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateFeedRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
         if (string.IsNullOrWhiteSpace(request.Platform))
@@ -121,7 +122,7 @@ public class MemberFeedsApiController : ControllerBase
             return BadRequest(new { error = "Please provide a valid https URL." });
         }
 
-        var existing = (await _store.GetActiveFeedsAsync(subject.MemberKey, cancellationToken)).FirstOrDefault(f => f.Id == id);
+        var existing = (await _store.GetActiveFeedsAsync(member.Key, cancellationToken)).FirstOrDefault(f => f.Id == id);
         if (existing == null)
         {
             return NotFound();
@@ -132,7 +133,7 @@ public class MemberFeedsApiController : ControllerBase
         var urlChanged = !string.Equals(oldUrl, url, StringComparison.Ordinal);
         var preview = urlChanged ? await _linkPreviews.FetchAsync(url, cancellationToken) : null;
 
-        var feed = await _store.UpdateFeedAsync(subject.MemberKey, id, request.Platform.Trim(), url, preview, cancellationToken);
+        var feed = await _store.UpdateFeedAsync(member.Key, id, request.Platform.Trim(), url, preview, cancellationToken);
         if (feed == null)
         {
             return NotFound();
@@ -140,25 +141,26 @@ public class MemberFeedsApiController : ControllerBase
 
         if (urlChanged)
         {
-            var handle = subject.Handle;
+            await _linkMatching.UndoMemberRejectionAsync(feed.MemberProfileId, feed.Url, cancellationToken);
+            var handle = member.UserName ?? string.Empty;
             await _profileSyncClient.NotifyFeedRemovedAsync(handle, oldUrl, "Address changed", cancellationToken);
             await _profileSyncClient.NotifyFeedAddedAsync(handle, feed.Platform, feed.Url, cancellationToken);
         }
 
-        return Ok(await WithMatchStatusAsync(subject, feed, subject.Handle, checkFirst: urlChanged, cancellationToken));
+        return Ok(await WithMatchStatusAsync(feed, member.UserName, checkFirst: urlChanged, cancellationToken));
     }
 
     /// <summary>Stores the order of all of the member's active links. The ids must be exactly those links.</summary>
     [HttpPut("order")]
     public async Task<IActionResult> Reorder([FromBody] ReorderFeedsRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        if (!await _store.ReorderFeedsAsync(subject.MemberKey, request.Ids, cancellationToken))
+        if (!await _store.ReorderFeedsAsync(member.Key, request.Ids, cancellationToken))
         {
             return BadRequest(new { error = "The list of links is out of date. Reload and try again." });
         }
@@ -172,55 +174,64 @@ public class MemberFeedsApiController : ControllerBase
     [HttpPut("{id:int}/unhide")]
     public Task<IActionResult> Unhide(int id, CancellationToken cancellationToken) => SetHidden(id, false, cancellationToken);
 
+    /// <summary>
+    /// "This isn't me": takes the link off the member's profile completely. The link is removed, and its address is
+    /// rejected as a source (see <see cref="ProfileLinkMatchingService.RejectSourceAsync"/>), so activity found through
+    /// it stops showing on the profile and it is not suggested again. Both happen here so they can't drift apart. An
+    /// address that can't be rejected (such as the member's own GitHub profile) is still removed.
+    /// </summary>
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Remove(int id, [FromBody] RemoveFeedRequest? request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        var feeds = await _store.GetActiveFeedsAsync(subject.MemberKey, cancellationToken);
+        var feeds = await _store.GetActiveFeedsAsync(member.Key, cancellationToken);
         var feed = feeds.FirstOrDefault(f => f.Id == id);
         if (feed == null)
         {
             return NotFound();
         }
 
-        var removed = await _store.RemoveFeedAsync(subject.MemberKey, id, request?.Reason, cancellationToken);
+        // Rejected first: if that fails the link stays, and the member can simply try again.
+        await _linkMatching.RejectSourceAsync(feed.MemberProfileId, member.UserName ?? string.Empty, feed.Url, cancellationToken);
+
+        var removed = await _store.RemoveFeedAsync(member.Key, id, request?.Reason, cancellationToken);
         if (!removed)
         {
             return NotFound();
         }
 
-        await _profileSyncClient.NotifyFeedRemovedAsync(subject.Handle, feed.Url, request?.Reason, cancellationToken);
+        await _profileSyncClient.NotifyFeedRemovedAsync(member.UserName ?? string.Empty, feed.Url, request?.Reason, cancellationToken);
 
         return Ok();
     }
 
     private async Task<IActionResult> SetHidden(int id, bool isHidden, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        var feeds = await _store.GetActiveFeedsAsync(subject.MemberKey, cancellationToken);
+        var feeds = await _store.GetActiveFeedsAsync(member.Key, cancellationToken);
         var feed = feeds.FirstOrDefault(f => f.Id == id);
         if (feed == null)
         {
             return NotFound();
         }
 
-        var updated = await _store.SetFeedHiddenAsync(subject.MemberKey, id, isHidden, cancellationToken);
+        var updated = await _store.SetFeedHiddenAsync(member.Key, id, isHidden, cancellationToken);
         if (!updated)
         {
             return NotFound();
         }
 
-        await _profileSyncClient.NotifyFeedHiddenAsync(subject.Handle, feed.Url, isHidden, cancellationToken);
+        await _profileSyncClient.NotifyFeedHiddenAsync(member.UserName ?? string.Empty, feed.Url, isHidden, cancellationToken);
 
         return Ok();
     }
@@ -230,9 +241,9 @@ public class MemberFeedsApiController : ControllerBase
     /// <paramref name="checkFirst"/> is set. For everyone else the link is returned as it is.
     /// </summary>
     private async Task<MemberFeedResponse> WithMatchStatusAsync(
-        ProfileEditSubject subject, MemberFeedEntity feed, string? handle, bool checkFirst, CancellationToken cancellationToken)
+        MemberFeedEntity feed, string? handle, bool checkFirst, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(handle) || !await _profileAccessService.CanMatchLinksAsync(subject))
+        if (string.IsNullOrEmpty(handle) || !await _profileAccessService.CanMatchLinksAsync())
         {
             return ToResponse(feed);
         }

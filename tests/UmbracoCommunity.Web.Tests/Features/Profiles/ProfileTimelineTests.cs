@@ -159,19 +159,6 @@ public class ProfileTimelineTests
     }
 
     [Fact]
-    public void A_devrel_view_that_shows_everything_keeps_hidden_items_on_the_timeline()
-    {
-        var profile = Everything() with
-        {
-            DisplayChoices = new ProfileDisplayChoices([PlatformActivityGroups.Forum], ["b1"], []),
-        };
-
-        var entries = ProfileTimeline.Entries(ProfileDisplay.Apply(profile, showHidden: true));
-
-        entries.Select(e => e.ActivityId).Should().Contain(["b1", "f1"]);
-    }
-
-    [Fact]
     public void An_empty_profile_has_an_empty_timeline()
     {
         var entries = ProfileTimeline.Entries(Profile());

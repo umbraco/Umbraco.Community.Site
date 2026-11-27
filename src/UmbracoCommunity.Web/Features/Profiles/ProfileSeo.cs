@@ -15,14 +15,12 @@ public static class ProfileSeo
     public const int ShareImageSize = 600;
 
     /// <summary>
-    /// True when the page is what any visitor sees: the profile is shown, and is not a preview for its owner or a view
-    /// for DevRel, and the sections are open to everyone rather than shown only because of the viewer's member group.
+    /// True when the page is what any visitor sees: the profile is shown, and is not a preview for its owner, and the
+    /// sections are open to everyone rather than shown only because of the viewer's member group.
     /// </summary>
-    public static bool IsPubliclyVisible(ViewableProfile viewable, EnrichedSectionsAccess access, bool isDevRelView) =>
+    public static bool IsPubliclyVisible(ViewableProfile viewable, EnrichedSectionsAccess access) =>
         viewable.Profile is not null
         && !viewable.IsHiddenPreview
-        && !viewable.IsHiddenFromPublic
-        && !isDevRelView
         && access is { Show: true, IsGated: false };
 
     /// <summary>
@@ -30,19 +28,11 @@ public static class ProfileSeo
     /// </summary>
     public static string Description(ProfileIdentity identity)
     {
-        var headline = identity.HeadlineIsCompany && !string.IsNullOrWhiteSpace(identity.Headline)
-            ? $"🏢 {CapitaliseWords(identity.Headline.Trim())}"
-            : identity.Headline;
-        var text = string.Join(" · ", new[] { headline, identity.Bio }
+        var text = string.Join(" · ", new[] { identity.Headline, identity.Bio }
             .Where(v => !string.IsNullOrWhiteSpace(v))
             .Select(v => v!.Trim()));
         return text.Length > MaxDescriptionLength ? text[..(MaxDescriptionLength - 3)].TrimEnd() + "..." : text;
     }
-
-    // Only the first letter of each word is changed, so "GmbH" and "IBM" stay as they were written.
-    private static string CapitaliseWords(string text) =>
-        string.Join(' ', text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-            .Select(w => char.ToUpperInvariant(w[0]) + w[1..]));
 
     /// <summary>
     /// A ProfilePage whose main entity is the member as a Person. Carries only what the page shows to everyone: the
@@ -69,7 +59,6 @@ public static class ProfileSeo
         }
 
         var sameAs = identity.SocialLinks
-            .Where(l => !l.IsHiddenByMember)
             .Select(l => Uri.TryCreate(l.Url, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps ? uri : null)
             .OfType<Uri>()
             .ToList();

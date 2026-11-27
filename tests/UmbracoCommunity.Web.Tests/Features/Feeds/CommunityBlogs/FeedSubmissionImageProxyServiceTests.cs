@@ -1,8 +1,11 @@
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs;
+using UmbracoCommunity.Web.Features.Feeds.CommunityBlogs.Controllers;
 using Xunit;
 
 namespace UmbracoCommunity.Web.Tests.Features.Feeds.CommunityBlogs;
@@ -37,5 +40,46 @@ public class FeedSubmissionImageProxyServiceTests
         var service = Create();
 
         (await service.FetchAsync(TokenOf(service.CreateProxyUrl(url)), CancellationToken.None)).Should().BeNull();
+    }
+
+    [Fact]
+    public void The_same_image_gets_the_same_url_so_the_browser_can_cache_it()
+    {
+        // Each reload of a member's links (after every reorder) used to give each icon a new URL, so the browser
+        // fetched every icon again until the rate limit answered 429 and the icons went blank.
+        var service = Create();
+
+        var first = service.CreateProxyUrl("https://example.org/favicon.ico");
+        var again = service.CreateProxyUrl("https://example.org/favicon.ico");
+        var other = service.CreateProxyUrl("https://example.org/other.ico");
+
+        again.Should().Be(first);
+        other.Should().NotBe(first);
+    }
+
+    [Fact]
+    public void A_reused_url_still_carries_a_valid_token()
+    {
+        var protector = new EphemeralDataProtectionProvider();
+        var service = new FeedSubmissionImageProxyService(
+            new FeedSubmissionImageProxyHttpClient(new HttpClient()),
+            new MemoryCache(new MemoryCacheOptions()),
+            protector,
+            NullLogger<FeedSubmissionImageProxyService>.Instance);
+        service.CreateProxyUrl("https://example.org/favicon.ico");
+
+        var token = TokenOf(service.CreateProxyUrl("https://example.org/favicon.ico"));
+
+        protector.CreateProtector("UmbracoCommunity.FeedSubmissionImageProxy.v1").ToTimeLimitedDataProtector()
+            .Unprotect(token).Should().Be("https://example.org/favicon.ico");
+    }
+
+    [Fact]
+    public void The_image_proxy_has_its_own_rate_limit_rather_than_the_submission_one()
+    {
+        var action = typeof(FeedSubmissionApiController).GetMethod(nameof(FeedSubmissionApiController.ImageProxy))!;
+
+        action.GetCustomAttribute<EnableRateLimitingAttribute>()?.PolicyName
+            .Should().Be(FeedSubmissionRateLimiting.ImageProxyPolicyName);
     }
 }

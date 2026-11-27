@@ -537,7 +537,6 @@ public class ProfileActivityServiceTests
 
         public Task<IReadOnlyList<PlatformLinkCheck>> VerifyLinksAsync(string handle, IReadOnlyList<string> urls, CancellationToken cancellationToken = default) =>
             Task.FromResult<IReadOnlyList<PlatformLinkCheck>>([]);
-        public Task NotifyProfileClaimedAsync(string handle, string? platformProfileId, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedAddedAsync(string handle, string platform, string url, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedHiddenAsync(string handle, string url, bool isHidden, CancellationToken cancellationToken = default) => Task.CompletedTask;
         public Task NotifyFeedRemovedAsync(string handle, string url, string? reason, CancellationToken cancellationToken = default) => Task.CompletedTask;

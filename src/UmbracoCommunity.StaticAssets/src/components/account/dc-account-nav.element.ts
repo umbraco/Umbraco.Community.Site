@@ -85,9 +85,12 @@ export class AccountNavElement extends HTMLElement {
     if (moveFocus) {
       const heading = panel.querySelector<HTMLElement>("h2, h3, [tabindex='-1']");
       heading?.focus({ preventScroll: true });
-      // Bring the panel's top into view, clear of the site's fixed header (the panel's scroll margin): on small
-      // screens the menu sits above it, and a long panel may have been scrolled far down.
-      const clearOfHeader = parseFloat(getComputedStyle(panel).scrollMarginTop) || 0;
+      // Bring the panel's top into view, clear of the site's fixed header and, from --md up, the compact profile bar
+      // (the page's scroll padding plus the panel's scroll margin): on small screens the menu sits above it, and a long
+      // panel may have been scrolled far down.
+      const clearOfHeader =
+        (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) +
+        (parseFloat(getComputedStyle(panel).scrollMarginTop) || 0);
       if (panel.getBoundingClientRect().top < clearOfHeader) panel.scrollIntoView?.({ block: "start" });
     }
   }

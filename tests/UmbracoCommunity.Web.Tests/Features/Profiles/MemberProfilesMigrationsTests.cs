@@ -30,4 +30,59 @@ public class MemberProfilesMigrationsTests
 
         offenders.Should().BeEmpty();
     }
+
+    /// <summary>
+    /// Profiles used to show the cached GitHub company, bio and name when the member's own were null. The
+    /// <c>CopyGitHubTextIntoOwnProfileText</c> migration copies them in, so nothing disappears now the fallback is gone.
+    /// </summary>
+    [Fact]
+    public async Task Copying_GitHub_text_keeps_what_each_profile_showed_before()
+    {
+        using var database = new MemberProfilesTestDatabase();
+        await using (var context = database.CreateDbContext())
+        {
+            await context.GetService<IMigrator>().MigrateAsync("AddShownForumBadges");
+        }
+
+        await using (var command = database.Connection.CreateCommand())
+        {
+            command.CommandText = """
+                INSERT INTO MemberProfiles (MemberKey, GitHubHandle, DisplayName, DisplayNameOverride, Headline, Bio, GitHubBio, GitHubCompany,
+                    OnboardingStatus, IsProfileVisible, HiddenSections, HiddenActivityIds, ShownForumBadgeIds, HideActivityGraph, HideTimelineCards,
+                    NoCardActivityIds, CreatedUtc, UpdatedUtc)
+                VALUES
+                    ('00000000-0000-0000-0000-000000000001', 'fallback', 'GitHub Name', NULL, NULL, NULL, 'GitHub bio', 'umbraco', 2, 1, '[]', '[]', '[]', 0, 0, '[]', '2026-01-01', '2026-01-01'),
+                    ('00000000-0000-0000-0000-000000000002', 'own', 'GitHub Name', 'Own Name', 'Own headline', 'Own bio', 'GitHub bio', 'umbraco', 2, 1, '[]', '[]', '[]', 0, 0, '[]', '2026-01-01', '2026-01-01'),
+                    ('00000000-0000-0000-0000-000000000003', 'hidden', 'GitHub Name', 'Own Name', '', NULL, NULL, 'umbraco', 2, 1, '[]', '[]', '[]', 0, 0, '[]', '2026-01-01', '2026-01-01'),
+                    ('00000000-0000-0000-0000-000000000004', 'nothing', 'GitHub Name', NULL, NULL, NULL, NULL, '', 2, 1, '[]', '[]', '[]', 0, 0, '[]', '2026-01-01', '2026-01-01');
+                """;
+            await command.ExecuteNonQueryAsync();
+        }
+
+        await using (var context = database.CreateDbContext())
+        {
+            await context.Database.MigrateAsync();
+        }
+
+        var store = new UmbracoCommunity.Web.Features.Profiles.Data.MemberProfileStore(database);
+        var fallback = (await store.GetByHandleAsync("fallback"))!;
+        fallback.Headline.Should().Be("umbraco");
+        fallback.Bio.Should().Be("GitHub bio");
+        fallback.DisplayNameOverride.Should().Be("GitHub Name");
+
+        var own = (await store.GetByHandleAsync("own"))!;
+        own.Headline.Should().Be("Own headline");
+        own.Bio.Should().Be("Own bio");
+        own.DisplayNameOverride.Should().Be("Own Name");
+
+        // A headline the member had chosen to hide stays hidden, now as null.
+        var hidden = (await store.GetByHandleAsync("hidden"))!;
+        hidden.Headline.Should().BeNull();
+        hidden.Bio.Should().BeNull();
+
+        var nothing = (await store.GetByHandleAsync("nothing"))!;
+        nothing.Headline.Should().BeNull();
+        nothing.Bio.Should().BeNull();
+        nothing.DisplayNameOverride.Should().Be("GitHub Name");
+    }
 }

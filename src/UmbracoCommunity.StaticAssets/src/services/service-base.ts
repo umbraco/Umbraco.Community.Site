@@ -1,5 +1,4 @@
 import { antiforgeryFetch } from "./antiforgery";
-import { withEditAs } from "./profile-edit-as";
 
 export class ServiceBase {
   // POST, PUT and DELETE go through antiforgeryFetch, which adds the antiforgery token for
@@ -40,9 +39,7 @@ export class ServiceBase {
     );
   }
 
-  /** GET; a member API call made while a profile admin edits someone names that member (see profile-edit-as.ts). */
   static get(url: string) {
-    const init = withEditAs(url);
-    return init ? fetch(url, init) : fetch(url);
+    return fetch(url);
   }
 }

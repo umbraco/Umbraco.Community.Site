@@ -9,13 +9,11 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// <summary>
 /// Decides what the current request may see on a community profile page.
 /// <list type="bullet">
-/// <item>The profile itself: a hidden profile is loaded only for its signed-in owner and for a
-/// signed-in member of the <see cref="DevRelGroupName"/> member group (see <see cref="GetViewableProfileAsync"/>).
-/// Everyone else gets what an unknown handle gets.</item>
+/// <item>The profile itself: a hidden profile is loaded only for its signed-in owner
+/// (see <see cref="GetViewableProfileAsync"/>). Everyone else gets what an unknown handle gets.</item>
 /// <item>The enriched sections: shown to everyone when the tenant's Settings node has
 /// <c>showEnrichedProfileSections</c> switched on, otherwise only to a signed-in member of the
-/// <see cref="EarlyAccessGroupName"/> member group viewing their own profile, and to a signed-in member of the
-/// <see cref="DevRelGroupName"/> member group viewing any profile.</item>
+/// <see cref="EarlyAccessGroupName"/> member group viewing their own profile.</item>
 /// <item>The display choices (see <see cref="ProfileDisplay"/>): offered to a signed-in member of the
 /// <see cref="EarlyAccessGroupName"/> member group, for their own profile.</item>
 /// </list>
@@ -30,14 +28,6 @@ public sealed class ProfileAccessService
     /// <summary>The member group (created in the backoffice) whose members see the sections on their own profile.</summary>
     public const string EarlyAccessGroupName = "Early access";
 
-    /// <summary>
-    /// The member group (created on start-up by <see cref="Members.Groups.CreateDevRelMemberGroupMigration"/>) whose
-    /// members can open any member's profile, including a hidden one, with the enriched sections shown and, on
-    /// request, the links, items and sections the owner hid. They may also edit another member's profile from the
-    /// account page (see <see cref="ProfileEditSubjectResolver"/>).
-    /// </summary>
-    public const string DevRelGroupName = "DevRel";
-
     private readonly IMemberManager _memberManager;
     private readonly IProfileDataProvider _profileDataProvider;
     private readonly ILogger<ProfileAccessService> _logger;
@@ -45,7 +35,6 @@ public sealed class ProfileAccessService
     private readonly Dictionary<string, ViewableProfile> _resolvedProfiles = new(StringComparer.OrdinalIgnoreCase);
     private string? _currentMemberHandle;
     private bool _currentMemberResolved;
-    private bool? _isInDevRel;
 
     public ProfileAccessService(
         IMemberManager memberManager,
@@ -69,55 +58,19 @@ public sealed class ProfileAccessService
     }
 
     /// <summary>
-    /// True when the signed-in member is in the <see cref="DevRelGroupName"/> member group and
-    /// <paramref name="handle"/> is not their own profile. Such a page is not what the public sees, so it is
-    /// served with a noindex robots tag and must not be cached.
-    /// </summary>
-    public async Task<bool> IsDevRelViewAsync(string handle) =>
-        !await IsOwnProfileAsync(handle) && await IsCurrentMemberInDevRelAsync();
-
-    /// <summary>
     /// Loads the profile for <paramref name="handle"/> as the current viewer may see it. A
-    /// hidden profile is returned as a hidden preview to its owner, and as a DevRel-only view to a
-    /// member of the <see cref="DevRelGroupName"/> member group.
+    /// hidden profile is returned (as a hidden preview) only to its owner.
     /// </summary>
-    /// <param name="handle">The member's GitHub handle.</param>
-    /// <param name="includeHiddenLinks">
-    /// Keep the links the member hid, marked with <see cref="ProfileSocialLink.IsHiddenByMember"/>. Honoured only for
-    /// a DevRel view (see <see cref="IsDevRelViewAsync"/>); everyone else never gets them.
-    /// </param>
-    /// <param name="cancellationToken">Cancels loading the profile.</param>
-    public async Task<ViewableProfile> GetViewableProfileAsync(
-        string handle,
-        bool includeHiddenLinks = false,
-        CancellationToken cancellationToken = default)
+    public async Task<ViewableProfile> GetViewableProfileAsync(string handle, CancellationToken cancellationToken = default)
     {
-        if (!_resolvedProfiles.TryGetValue(handle, out var viewable))
+        if (_resolvedProfiles.TryGetValue(handle, out var cached))
         {
-            viewable = await LoadViewableProfileAsync(handle, cancellationToken);
-            _resolvedProfiles[handle] = viewable;
+            return cached;
         }
 
-        return includeHiddenLinks && await IsDevRelViewAsync(handle)
-            ? viewable
-            : WithoutHiddenLinks(viewable);
-    }
-
-    private static ViewableProfile WithoutHiddenLinks(ViewableProfile viewable)
-    {
-        if (viewable.Profile is not { } profile || !viewable.HasHiddenSocialLinks)
-        {
-            return viewable;
-        }
-
-        var identity = profile.Identity;
-        return viewable with
-        {
-            Profile = profile with
-            {
-                Identity = identity with { SocialLinks = [.. identity.SocialLinks.Where(l => !l.IsHiddenByMember)] },
-            },
-        };
+        var viewable = await LoadViewableProfileAsync(handle, cancellationToken);
+        _resolvedProfiles[handle] = viewable;
+        return viewable;
     }
 
     /// <summary>Resolves enriched section access for the profile with the given <paramref name="handle"/> on the current request.</summary>
@@ -133,47 +86,24 @@ public sealed class ProfileAccessService
         return access;
     }
 
-    // A DevRel view loads the links the member hid too, so the request needs one load whichever view it asks for;
-    // GetViewableProfileAsync takes them out again unless they were asked for.
     private async Task<ViewableProfile> LoadViewableProfileAsync(string handle, CancellationToken cancellationToken)
     {
-        var isDevRelView = await IsDevRelViewAsync(handle);
-        var profile = await _profileDataProvider.GetProfileAsync(handle, includeHidden: false, includeHiddenLinks: isDevRelView, cancellationToken);
+        var profile = await _profileDataProvider.GetProfileAsync(handle, includeHidden: false, cancellationToken);
         if (profile != null)
         {
-            return WithHiddenLinksFlag(new ViewableProfile(profile, IsHiddenPreview: false));
+            return new ViewableProfile(profile, IsHiddenPreview: false);
         }
 
-        if (await IsOwnProfileAsync(handle))
-        {
-            var ownHiddenProfile = await _profileDataProvider.GetProfileAsync(handle, includeHidden: true, cancellationToken: cancellationToken);
-            return ownHiddenProfile != null
-                ? new ViewableProfile(ownHiddenProfile, IsHiddenPreview: true)
-                : ViewableProfile.None;
-        }
-
-        if (!isDevRelView)
+        if (!await IsOwnProfileAsync(handle))
         {
             return ViewableProfile.None;
         }
 
-        var hiddenProfile = await _profileDataProvider.GetProfileAsync(handle, includeHidden: true, includeHiddenLinks: true, cancellationToken);
-        if (hiddenProfile == null)
-        {
-            return ViewableProfile.None;
-        }
-
-        _logger.LogInformation(
-            "DevRel member {ViewerHandle} viewed the hidden profile {Handle}",
-            await GetCurrentMemberHandleAsync(),
-            hiddenProfile.Slug);
-        return WithHiddenLinksFlag(new ViewableProfile(hiddenProfile, IsHiddenPreview: false, IsHiddenFromPublic: true));
+        var ownHiddenProfile = await _profileDataProvider.GetProfileAsync(handle, includeHidden: true, cancellationToken);
+        return ownHiddenProfile != null
+            ? new ViewableProfile(ownHiddenProfile, IsHiddenPreview: true)
+            : ViewableProfile.None;
     }
-
-    private static ViewableProfile WithHiddenLinksFlag(ViewableProfile viewable) =>
-        viewable.Profile!.Identity.SocialLinks.Any(l => l.IsHiddenByMember)
-            ? viewable with { HasHiddenSocialLinks = true }
-            : viewable;
 
     private async Task<string?> GetCurrentMemberHandleAsync()
     {
@@ -228,51 +158,6 @@ public sealed class ProfileAccessService
 
     internal Task<bool> IsCurrentMemberInEarlyAccessAsync() => IsCurrentMemberInGroupAsync(EarlyAccessGroupName);
 
-    /// <summary>
-    /// True when the signed-in member is in the <see cref="DevRelGroupName"/> member group. Worked out once per
-    /// request; a failure counts as not in the group.
-    /// </summary>
-    public async Task<bool> IsCurrentMemberInDevRelAsync()
-    {
-        if (_isInDevRel is { } resolved)
-        {
-            return resolved;
-        }
-
-        try
-        {
-            _isInDevRel = await GetCurrentMemberHandleAsync() != null
-                && await IsCurrentMemberInGroupAsync(DevRelGroupName);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Could not resolve the signed-in member's groups; not treating them as DevRel.");
-            _isInDevRel = false;
-        }
-
-        return _isInDevRel.Value;
-    }
-
-    /// <summary>
-    /// True when the signed-in member may edit another member's profile, which is when they are in the
-    /// <see cref="DevRelGroupName"/> member group.
-    /// </summary>
-    public Task<bool> IsCurrentMemberProfileAdminAsync() => IsCurrentMemberInDevRelAsync();
-
-    /// <summary>
-    /// <see cref="CanChooseProfileDisplayAsync()"/> for the profile being edited: on a profile admin's edit-as request
-    /// always true (the admin gets every panel, whatever groups the member is in, if any); otherwise the signed-in
-    /// member's own answer.
-    /// </summary>
-    public Task<bool> CanChooseProfileDisplayAsync(ProfileEditSubject subject) =>
-        subject.IsEditAs ? Task.FromResult(true) : CanChooseProfileDisplayAsync();
-
-    /// <summary><see cref="CanAddActivityAsync()"/> for the profile being edited (always true on an edit-as request).</summary>
-    public Task<bool> CanAddActivityAsync(ProfileEditSubject subject) => CanChooseProfileDisplayAsync(subject);
-
-    /// <summary><see cref="CanMatchLinksAsync()"/> for the profile being edited (always true on an edit-as request).</summary>
-    public Task<bool> CanMatchLinksAsync(ProfileEditSubject subject) => CanChooseProfileDisplayAsync(subject);
-
     // Deliberately not IMemberManager.IsMemberAuthorizedAsync: in Umbraco 18 that method
     // int.Parse()s the identity Id, which is a GUID for lightweight external members, so it
     // throws for every member who signed up through GitHub. GetRolesAsync reads groups from
@@ -316,13 +201,7 @@ public sealed class ProfileAccessService
             }
 
             var isOwnProfile = await IsOwnProfileAsync(handle);
-            if (isOwnProfile && CanSeeEnrichedSections(openToAll, isOwnProfile, await IsCurrentMemberInEarlyAccessAsync()))
-            {
-                return new EnrichedSectionsAccess(Show: true, IsGated: true);
-            }
-
-            // DevRel sees the sections on every profile, their own included.
-            return await IsCurrentMemberInDevRelAsync()
+            return isOwnProfile && CanSeeEnrichedSections(openToAll, isOwnProfile, await IsCurrentMemberInEarlyAccessAsync())
                 ? new EnrichedSectionsAccess(Show: true, IsGated: true)
                 : EnrichedSectionsAccess.None;
         }

@@ -179,30 +179,16 @@ public class MemberProfileLinkTests : IDisposable
         var links = (await _provider.GetProfileAsync(Handle))!.Identity.SocialLinks;
 
         links.Select(l => l.Platform).Should().Equal("Blog");
-        links.Should().NotContain(l => l.IsHiddenByMember);
     }
 
     [Fact]
-    public async Task Hidden_links_are_included_and_marked_only_when_asked_for()
-    {
-        var memberKey = await CreateVisibleProfileAsync();
-        var ids = await AddLinksAsync(memberKey, "Blog", "Mastodon", "LinkedIn");
-        await _store.SetFeedHiddenAsync(memberKey, ids[1], true);
-
-        var links = (await _provider.GetProfileAsync(Handle, includeHiddenLinks: true))!.Identity.SocialLinks;
-
-        links.Select(l => (l.Platform, l.IsHiddenByMember))
-            .Should().Equal(("Blog", false), ("Mastodon", true), ("LinkedIn", false));
-    }
-
-    [Fact]
-    public async Task A_removed_link_is_never_included_even_with_hidden_links()
+    public async Task A_removed_link_is_never_included()
     {
         var memberKey = await CreateVisibleProfileAsync();
         var ids = await AddLinksAsync(memberKey, "Blog", "Mastodon");
         await _store.RemoveFeedAsync(memberKey, ids[1], reason: null);
 
-        var links = (await _provider.GetProfileAsync(Handle, includeHiddenLinks: true))!.Identity.SocialLinks;
+        var links = (await _provider.GetProfileAsync(Handle))!.Identity.SocialLinks;
 
         links.Select(l => l.Platform).Should().Equal("Blog");
     }

@@ -8,79 +8,41 @@ using UmbracoCommunity.Web.Features.Profiles.Models;
 namespace UmbracoCommunity.Web.Features.Profiles.Controllers;
 
 /// <summary>
-/// Onboarding + ongoing profile-editing API. Covers both the onboarding wizard and later
-/// Account-page edits (avatar/name/headline/bio are the same operation regardless of when they happen) —
-/// always scoped to the member <see cref="ProfileEditSubjectResolver"/> resolves (the signed-in member, or the
-/// member a profile admin edits; onboarding is the signed-in member's own only), never trusting an id from the caller.
+/// Profile-editing API behind the Account page (avatar, name, headline, bio, visibility) —
+/// always scoped to the current signed-in member, never trusting an id from the caller.
 /// Every POST, PUT and DELETE must carry the antiforgery request token from
 /// <c>api/antiforgery/token</c> in the <c>RequestVerificationToken</c> header.
 /// </summary>
 [ApiController]
 [AutoValidateAntiforgeryToken]
-[ProfileEditAudit]
 [Route("api/profile")]
 public class ProfileApiController : ControllerBase
 {
-    private readonly ProfileEditSubjectResolver _subjects;
+    private readonly IMemberManager _memberManager;
     private readonly MemberProfileStore _store;
     private readonly ProfileAvatarUrlResolver _avatarUrlResolver;
     private readonly AvatarUploadService _avatarUploadService;
-    private readonly IProfileSyncClient _profileSyncClient;
-    private readonly GitHubProfileDefaultsService _gitHubDefaultsService;
 
     public ProfileApiController(
-        ProfileEditSubjectResolver subjects,
+        IMemberManager memberManager,
         MemberProfileStore store,
         ProfileAvatarUrlResolver avatarUrlResolver,
-        AvatarUploadService avatarUploadService,
-        IProfileSyncClient profileSyncClient,
-        GitHubProfileDefaultsService gitHubDefaultsService)
+        AvatarUploadService avatarUploadService)
     {
-        _subjects = subjects;
+        _memberManager = memberManager;
         _store = store;
         _avatarUrlResolver = avatarUrlResolver;
         _avatarUploadService = avatarUploadService;
-        _profileSyncClient = profileSyncClient;
-        _gitHubDefaultsService = gitHubDefaultsService;
     }
 
-    /// <summary>Idempotently creates/fetches the current member's profile row and returns its current draft state.</summary>
-    [HttpPost("onboarding/start")]
-    public async Task<IActionResult> Start(CancellationToken cancellationToken)
-    {
-        var resolved = await _subjects.ResolveSelfOnlyAsync(Request);
-        if (resolved.Subject is not { } subject)
-        {
-            return resolved.FailureResult(ProfileEditSubjectResult.SelfOnlyError)!;
-        }
-
-        if (subject.Handle.Length == 0)
-        {
-            return Unauthorized();
-        }
-
-
-        var entity = await _store.GetOrStartOnboardingAsync(subject.MemberKey, subject.Handle, subject.SignedInMember.Name ?? subject.Handle, cancellationToken);
-        await _gitHubDefaultsService.EnsureGitHubDefaultsAsync(entity, cancellationToken);
-
-        return Ok(new OnboardingStateResponse(
-            entity.GitHubHandle,
-            entity.EffectiveDisplayName,
-            entity.Bio,
-            _avatarUrlResolver.Resolve(entity.AvatarMediaKey, entity.GitHubHandle),
-            entity.AvatarMediaKey.HasValue,
-            entity.OnboardingStatus.ToString(),
-            entity.GitHubBio));
-    }
-
-    /// <summary>Sets the member's own bio. Empty or whitespace-only text clears it, so the GitHub bio shows again.</summary>
+    /// <summary>Sets the member's own bio. Empty or whitespace-only text clears it, so no bio is shown.</summary>
     [HttpPut("bio")]
     public async Task<IActionResult> UpdateBio([FromBody] UpdateBioRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
         if (ProfileText.Normalize(request.Bio) is { Length: > ProfileText.MaxBioLength })
@@ -88,7 +50,7 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = $"Bio must be {ProfileText.MaxBioLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateBioAsync(subject.MemberKey, request.Bio, cancellationToken);
+        var entity = await _store.UpdateBioAsync(member.Key, request.Bio, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -97,14 +59,14 @@ public class ProfileApiController : ControllerBase
         return Ok(ToDetailsResponse(entity));
     }
 
-    /// <summary>Sets the member's own headline. Empty or whitespace-only text clears it, so the GitHub company shows again.</summary>
+    /// <summary>Sets the member's own headline. Empty or whitespace-only text clears it, so no headline is shown.</summary>
     [HttpPut("headline")]
     public async Task<IActionResult> UpdateHeadline([FromBody] UpdateHeadlineRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
         if (ProfileText.Normalize(request.Headline) is { Length: > ProfileText.MaxHeadlineLength })
@@ -112,7 +74,7 @@ public class ProfileApiController : ControllerBase
             return BadRequest(new { error = $"Headline must be {ProfileText.MaxHeadlineLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateHeadlineAsync(subject.MemberKey, request.Headline, cancellationToken);
+        var entity = await _store.UpdateHeadlineAsync(member.Key, request.Headline, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -121,22 +83,28 @@ public class ProfileApiController : ControllerBase
         return Ok(ToDetailsResponse(entity));
     }
 
-    /// <summary>Sets the member's own display name. Empty or whitespace-only text clears it, so the GitHub name shows again.</summary>
+    /// <summary>Sets the member's own display name. A name is required: empty or whitespace-only text is refused.</summary>
     [HttpPut("display-name")]
     public async Task<IActionResult> UpdateDisplayName([FromBody] UpdateDisplayNameRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        if (ProfileText.Normalize(request.DisplayName) is { Length: > ProfileText.MaxDisplayNameLength })
+        var displayName = ProfileText.Normalize(request.DisplayName);
+        if (displayName == null)
+        {
+            return BadRequest(new { error = "Please enter your name. It can't be empty." });
+        }
+
+        if (displayName.Length > ProfileText.MaxDisplayNameLength)
         {
             return BadRequest(new { error = $"Display name must be {ProfileText.MaxDisplayNameLength} characters or fewer." });
         }
 
-        var entity = await _store.UpdateDisplayNameAsync(subject.MemberKey, request.DisplayName, cancellationToken);
+        var entity = await _store.UpdateDisplayNameAsync(member.Key, displayName, cancellationToken);
         if (entity == null)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -152,13 +120,13 @@ public class ProfileApiController : ControllerBase
     [HttpPut("visibility")]
     public async Task<IActionResult> UpdateVisibility([FromBody] UpdateProfileVisibilityRequest request, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        var updated = await _store.SetProfileVisibleAsync(subject.MemberKey, request.Visible, cancellationToken);
+        var updated = await _store.SetProfileVisibleAsync(member.Key, request.Visible, cancellationToken);
         if (!updated)
         {
             return BadRequest(new { error = "Onboarding hasn't been started yet." });
@@ -171,10 +139,10 @@ public class ProfileApiController : ControllerBase
     [RequestSizeLimit(AvatarUploadService.MaxBytes)]
     public async Task<IActionResult> UpdateAvatar(IFormFile file, CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
         if (file.Length == 0)
@@ -183,65 +151,30 @@ public class ProfileApiController : ControllerBase
         }
 
         await using var stream = file.OpenReadStream();
-        var result = await _avatarUploadService.UploadAsync(subject.MemberKey, file.FileName, file.Length, stream, cancellationToken);
+        var result = await _avatarUploadService.UploadAsync(member.Key, file.FileName, file.Length, stream, cancellationToken);
         if (!result.Succeeded)
         {
             return BadRequest(new { error = result.Error });
         }
 
-        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, subject.Handle), true));
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(result.MediaKey, member.UserName ?? string.Empty), true));
     }
 
     /// <summary>Removes the member's uploaded avatar, reverting display to their GitHub default.</summary>
     [HttpDelete("avatar")]
     public async Task<IActionResult> RemoveAvatar(CancellationToken cancellationToken)
     {
-        var resolved = await _subjects.ResolveForApiAsync(Request, cancellationToken);
-        if (resolved.Subject is not { } subject)
+        var member = await _memberManager.GetCurrentMemberAsync();
+        if (member == null)
         {
-            return resolved.FailureResult()!;
+            return Unauthorized();
         }
 
-        await _avatarUploadService.RemoveAsync(subject.MemberKey, cancellationToken);
+        await _avatarUploadService.RemoveAsync(member.Key, cancellationToken);
 
-        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, subject.Handle), false));
-    }
-
-    /// <summary>
-    /// Marks onboarding complete. The profile still starts hidden: only its owner can see it
-    /// until they show it (see <see cref="UpdateVisibility"/>).
-    /// </summary>
-    [HttpPost("onboarding/complete")]
-    public async Task<IActionResult> Complete(CancellationToken cancellationToken)
-    {
-        var resolved = await _subjects.ResolveSelfOnlyAsync(Request);
-        if (resolved.Subject is not { } subject)
-        {
-            return resolved.FailureResult(ProfileEditSubjectResult.SelfOnlyError)!;
-        }
-
-        var entity = await _store.CompleteOnboardingAsync(subject.MemberKey, cancellationToken);
-        if (entity == null)
-        {
-            return BadRequest(new { error = "Onboarding hasn't been started yet." });
-        }
-
-        // Best-effort — the local write above is always the source of truth and already
-        // committed regardless of whether the platform's (currently stubbed) sync succeeds.
-        await _profileSyncClient.NotifyProfileClaimedAsync(entity.GitHubHandle, entity.PlatformProfileId, cancellationToken);
-
-        return Ok();
+        return Ok(new UpdateAvatarResponse(_avatarUrlResolver.Resolve(null, member.UserName ?? string.Empty), false));
     }
 
     private static ProfileDetailsResponse ToDetailsResponse(MemberProfileEntity entity) =>
-        new(
-            entity.EffectiveDisplayName,
-            entity.DisplayNameOverride != null,
-            entity.DisplayName,
-            entity.EffectiveHeadline,
-            entity.Headline != null,
-            entity.GitHubCompany,
-            entity.EffectiveBio,
-            entity.Bio != null,
-            entity.GitHubBio);
+        new(entity.EffectiveDisplayName, entity.Headline, entity.Bio);
 }

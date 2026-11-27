@@ -1,0 +1,128 @@
+@model ProfileHeroViewModel
+@*
+    The blue profile hero: photo (pink ring, yellow for a current MVP), name, MVP pill, headline, bio, location, the
+    member's link pills and, under them, the forum badges they chose to show. Rendered by the public profile page and, as
+    a preview of it, by the account page. With Live set, the headline, bio, links and badges are rendered even when empty
+    (hidden) and carry data-profile-hero hooks, so
+    <dc-account-profile-hero> can update them as the member edits their profile on the same page.
+*@
+@{
+    var identity = Model.Identity;
+    var live = Model.Live;
+}
+
+<header class="community-profile__hero">
+    <div class="community-profile__hero-inner">
+        <div class="community-profile__portrait">
+            @if (!string.IsNullOrEmpty(identity.AvatarUrl))
+            {
+                <img class="community-profile__avatar@(identity.IsCurrentMvp ? " community-profile__avatar--mvp" : "")"
+                     src="@identity.AvatarUrl"
+                     alt="@identity.DisplayName"
+                     width="170" height="170" loading="eager"
+                     data-member-avatar="@(live ? "" : null)" />
+            }
+            @if (identity.IsCurrentMvp)
+            {
+                <span class="community-profile__mvp-badge" role="img" aria-label="Umbraco MVP">MVP</span>
+            }
+        </div>
+
+        <div class="community-profile__identity">
+            <h1 class="community-profile__name">
+                <span data-profile-hero="name">@identity.DisplayName</span>
+                @if (!string.IsNullOrEmpty(identity.Pronouns))
+                {
+                    <span class="community-profile__pronouns">@identity.Pronouns</span>
+                }
+            </h1>
+
+            @if (identity.IsMvp && identity.MvpYears.Count > 0)
+            {
+                var yearsText = string.Join(", ", identity.MvpYears);
+                <div class="community-profile__mvp-pill" role="group" tabindex="0" aria-label="Umbraco MVP @yearsText">
+                    <span class="community-profile__mvp-pill-label">MVP × @identity.MvpYears.Count</span>
+                    <ul class="community-profile__mvp-years" aria-label="Umbraco MVP years">
+                        @foreach (var year in identity.MvpYears)
+                        {
+                            <li>@year</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(identity.Headline) || live)
+            {
+                <p class="community-profile__headline" data-profile-hero="headline" hidden="@string.IsNullOrEmpty(identity.Headline)">@identity.Headline</p>
+            }
+
+            @if (!string.IsNullOrEmpty(identity.Bio) || live)
+            {
+                <p class="community-profile__bio" data-profile-hero="bio" hidden="@string.IsNullOrEmpty(identity.Bio)">@identity.Bio</p>
+            }
+
+            @if (!string.IsNullOrEmpty(identity.Location))
+            {
+                <ul class="community-profile__meta">
+                    <li class="community-profile__location">@identity.Location</li>
+                </ul>
+            }
+
+            @if (identity.SocialLinks.Count > 0 || live)
+            {
+                <ul class="community-profile__socials" data-profile-hero="links" hidden="@(identity.SocialLinks.Count == 0)">
+                    @foreach (var link in identity.SocialLinks)
+                    {
+                        <li>
+                            <a class="no-link-animation" href="@link.Url" rel="me noopener" target="_blank">
+                                @if (!string.IsNullOrEmpty(link.FaviconUrl))
+                                {
+                                    <img class="community-profile__social-favicon" src="@link.FaviconUrl" alt="" width="16" height="16" loading="lazy" />
+                                }
+                                @link.Platform
+                            </a>
+                        </li>
+                    }
+                </ul>
+            }
+
+            @* The forum badges the member chose to show, under the link pills. Markup kept in step with
+               dc-account-profile-hero's #renderBadges. *@
+            @if (Model.Badges.Count > 0 || live)
+            {
+                <ul class="community-profile__badges-row" data-profile-hero="badges" aria-label="Forum badges" hidden="@(Model.Badges.Count == 0)">
+                    @foreach (var badge in Model.Badges)
+                    {
+                        var modifier = ProfileHeroViewModel.BadgeTypeModifier(badge);
+                        var chipClass = "community-profile__forum-badge" + (modifier != null ? $" community-profile__forum-badge--{modifier}" : "");
+                        Func<object?, IHtmlContent> chipContent = @<text>
+                            @if (!string.IsNullOrEmpty(badge.IconUrl))
+                            {
+                                <img class="community-profile__forum-badge-icon" src="@badge.IconUrl" alt="" width="16" height="16" loading="lazy" />
+                            }
+                            else
+                            {
+                                <partial name="~/Views/Partials/Icons/Award.cshtml" />
+                            }
+                            <span class="community-profile__forum-badge-name">@badge.Name</span>
+                            <span class="sr-only">(@ProfileHeroViewModel.BadgeKind(badge))</span>
+                        </text>;
+                        <li>
+                            @if (!string.IsNullOrEmpty(badge.Url))
+                            {
+                                @* A link to the badge's page on the forum, opened like the link pills. *@
+                                <a class="@chipClass no-link-animation" href="@badge.Url" target="_blank" rel="noopener noreferrer" title="@ProfileHeroViewModel.BadgeTitle(badge)">@chipContent(null)</a>
+                            }
+                            else
+                            {
+                                <span class="@chipClass" title="@ProfileHeroViewModel.BadgeTitle(badge)">@chipContent(null)</span>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @Model.Footer?.Invoke(null)
+        </div>
+    </div>
+</header>

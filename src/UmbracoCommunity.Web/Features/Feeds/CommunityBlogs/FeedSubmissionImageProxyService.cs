@@ -33,6 +33,15 @@ public sealed class FeedSubmissionImageProxyService
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(24);
 
+    /// <summary>
+    /// How long one token is handed out again for the same image. Each <see cref="IDataProtector.Protect(byte[])"/>
+    /// call gives a different token, so without reuse every response that lists an image (such as a member's links,
+    /// reloaded after each reorder) gave it a new URL: the browser's cache never matched, every icon was fetched again
+    /// and a few reorders used up the per-IP rate limit, blanking the icons. Half the lifetime, so a reused token
+    /// always has at least 12 hours left.
+    /// </summary>
+    private static readonly TimeSpan TokenReuse = TokenLifetime / 2;
+
     private static readonly HashSet<string> AllowedContentTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp", "image/tiff", "image/svg+xml",
@@ -59,7 +68,8 @@ public sealed class FeedSubmissionImageProxyService
     /// <summary>
     /// Builds the proxied URL for an absolute image URL that just appeared in a preview response — a signed
     /// token carrying the source URL, so <see cref="FetchAsync"/> can later verify it without any shared state.
-    /// Returns null unchanged if <paramref name="absoluteUrl"/> is null/empty.
+    /// Returns null unchanged if <paramref name="absoluteUrl"/> is null/empty. The same image gets the same URL for
+    /// <see cref="TokenReuse"/> (per app instance), so the browser can cache it.
     /// </summary>
     public string? CreateProxyUrl(string? absoluteUrl)
     {
@@ -68,8 +78,12 @@ public sealed class FeedSubmissionImageProxyService
             return null;
         }
 
-        var token = _protector.Protect(absoluteUrl, TokenLifetime);
-        return $"/api/feed-submission/image-proxy?token={Uri.EscapeDataString(token)}";
+        return _cache.GetOrCreate($"feed-submission-image-url:{absoluteUrl}", entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TokenReuse;
+            var token = _protector.Protect(absoluteUrl, TokenLifetime);
+            return $"/api/feed-submission/image-proxy?token={Uri.EscapeDataString(token)}";
+        });
     }
 
     /// <summary>Returns the image bytes and content type for the URL encoded in <paramref name="token"/>, or null if it can't be safely fetched.</summary>

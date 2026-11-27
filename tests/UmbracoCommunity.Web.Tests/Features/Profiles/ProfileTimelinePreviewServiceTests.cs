@@ -20,8 +20,6 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
 
     private static readonly DateTimeOffset Now = new(2026, 11, 1, 12, 0, 0, TimeSpan.Zero);
 
-    private static readonly ProfileDisplayChoices CardsOn = ProfileDisplayChoices.None;
-
     private readonly MemberProfilesTestDatabase _database = new();
     private readonly InMemoryMediaFileSystem _media = new();
 
@@ -70,7 +68,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var (service, _) = Create(Site);
 
-        var result = await service.AddCardsAsync([Entry("b1")], CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync([Entry("b1")], CancellationToken.None);
 
         var card = result.Single().Card;
         card.Should().NotBeNull();
@@ -85,7 +83,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var (service, _) = Create(Site);
 
-        var result = await service.AddCardsAsync([Entry("b1", description: "In the member's words")], CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync([Entry("b1", description: "In the member's words")], CancellationToken.None);
 
         result.Single().Card!.Description.Should().Be("In the member's words");
     }
@@ -95,7 +93,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var (service, _) = Create(_ => Html("<title>No picture here</title>"));
 
-        var result = await service.AddCardsAsync([Entry("b1")], CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync([Entry("b1")], CancellationToken.None);
 
         result.Single().Card.Should().BeNull();
     }
@@ -105,37 +103,10 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var (service, handler) = Create(Site);
 
-        var result = await service.AddCardsAsync([Entry("v1", imageUrl: $"{Host}/thumb.png")], CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync([Entry("v1", imageUrl: $"{Host}/thumb.png")], CancellationToken.None);
 
         result.Single().Card!.ImageUrl.Should().StartWith($"/media/{ProfileTimelineImageStore.Folder}/");
         handler.Requests.Should().ContainSingle().Which.AbsolutePath.Should().Be("/thumb.png");
-    }
-
-    [Fact]
-    public async Task With_cards_switched_off_for_the_timeline_every_entry_is_a_plain_line_and_nothing_is_fetched()
-    {
-        var (service, handler) = Create(Site);
-        var choices = ProfileDisplayChoices.None with { HideTimelineCards = true };
-
-        var result = await service.AddCardsAsync([Entry("b1"), Entry("v1", imageUrl: $"{Host}/thumb.png")], choices, CancellationToken.None);
-
-        result.Should().OnlyContain(e => e.Card == null);
-        handler.Requests.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task An_entry_with_its_card_switched_off_is_a_plain_line_and_the_others_keep_theirs()
-    {
-        var (service, handler) = Create(Site);
-        var choices = ProfileDisplayChoices.None with { NoCardActivityIds = ["b1", "v1"] };
-
-        var result = await service.AddCardsAsync(
-            [Entry("b1"), Entry("b2"), Entry("v1", imageUrl: $"{Host}/thumb.png")],
-            choices,
-            CancellationToken.None);
-
-        result.Select(e => e.Card != null).Should().Equal(false, true, false);
-        handler.Requests.Select(r => r.AbsolutePath).Should().BeEquivalentTo("/b2", "/share-b2.png");
     }
 
     private const string OwnPicture = "/media/profile-activity/0123456789abcdef0123456789abcdef.png";
@@ -150,25 +121,12 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
                 Entry("added:1", description: "In the member's words") with { OwnImageUrl = OwnPicture },
                 Entry("added:2", imageUrl: $"{Host}/thumb.png") with { OwnImageUrl = OwnPicture },
             ],
-            CardsOn,
             CancellationToken.None);
 
         result.Should().OnlyContain(e => e.Card != null && e.Card.ImageUrl == OwnPicture);
         result[0].Card!.Description.Should().Be("In the member's words");
         result[1].Card!.Description.Should().BeNull("the page isn't read, so it offers no description");
         handler.Requests.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task A_picture_the_member_attached_still_respects_their_choice_of_no_cards()
-    {
-        var (service, _) = Create(Site);
-        var entry = Entry("added:1") with { OwnImageUrl = OwnPicture };
-
-        (await service.AddCardsAsync([entry], ProfileDisplayChoices.None with { HideTimelineCards = true }, CancellationToken.None))
-            .Single().Card.Should().BeNull();
-        (await service.AddCardsAsync([entry], ProfileDisplayChoices.None with { NoCardActivityIds = ["added:1"] }, CancellationToken.None))
-            .Single().Card.Should().BeNull();
     }
 
     [Fact]
@@ -180,7 +138,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
             .Append(Entry("b1"))
             .ToList();
 
-        var result = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync(entries, CancellationToken.None);
 
         result.Should().OnlyContain(e => e.Card != null);
         Pages(handler).Should().Be(1);
@@ -193,7 +151,6 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
 
         var result = await service.AddCardsAsync(
             [Entry("a", url: "http://93.184.216.34/a"), Entry("b", url: "https://10.0.0.5/b")],
-            CardsOn,
             CancellationToken.None);
 
         result.Should().OnlyContain(e => e.Card == null);
@@ -206,13 +163,13 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
         var (service, handler) = Create(Site);
         var entries = Enumerable.Range(1, ProfileTimelinePreviewService.MaxFetchesPerRender + 3).Select(i => Entry($"b{i}")).ToList();
 
-        var first = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+        var first = await service.AddCardsAsync(entries, CancellationToken.None);
 
         Pages(handler).Should().Be(ProfileTimelinePreviewService.MaxFetchesPerRender);
         first.Take(ProfileTimelinePreviewService.MaxFetchesPerRender).Should().OnlyContain(e => e.Card != null);
         first.Skip(ProfileTimelinePreviewService.MaxFetchesPerRender).Should().OnlyContain(e => e.Card == null);
 
-        var second = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+        var second = await service.AddCardsAsync(entries, CancellationToken.None);
 
         second.Should().OnlyContain(e => e.Card != null);
         Pages(handler).Should().Be(entries.Count);
@@ -226,8 +183,8 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
             : Site(request));
         var entries = new[] { Entry("ok"), Entry("broken") };
 
-        await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
-        var again = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+        await service.AddCardsAsync(entries, CancellationToken.None);
+        var again = await service.AddCardsAsync(entries, CancellationToken.None);
 
         handler.Requests.Should().HaveCount(3);
         again.Select(e => e.Card != null).Should().Equal(true, false);
@@ -237,11 +194,11 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     public async Task A_card_keeps_working_after_its_page_and_picture_disappear()
     {
         var (service, _) = Create(Site);
-        var stored = (await service.AddCardsAsync([Entry("b1")], CardsOn, CancellationToken.None)).Single().Card;
+        var stored = (await service.AddCardsAsync([Entry("b1")], CancellationToken.None)).Single().Card;
 
         // Later, on a fresh server, the whole site is gone.
         var (later, handler) = Create(_ => new HttpResponseMessage(HttpStatusCode.NotFound));
-        var result = await later.AddCardsAsync([Entry("b1")], CardsOn, CancellationToken.None);
+        var result = await later.AddCardsAsync([Entry("b1")], CancellationToken.None);
 
         result.Single().Card.Should().Be(stored);
         handler.Requests.Should().BeEmpty();
@@ -252,7 +209,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var (service, _) = Create(_ => throw new HttpRequestException("boom"));
 
-        var result = await service.AddCardsAsync([Entry("b1")], CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync([Entry("b1")], CancellationToken.None);
 
         result.Single().Card.Should().BeNull();
     }
@@ -263,7 +220,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
         var (service, _) = Create(Site);
         var entries = new[] { Entry("b1"), Entry("b2", url: "http://93.184.216.34/b2"), Entry("b3") };
 
-        var result = await service.AddCardsAsync(entries, CardsOn, CancellationToken.None);
+        var result = await service.AddCardsAsync(entries, CancellationToken.None);
 
         result.Select(e => e.ActivityId).Should().Equal("b1", "b2", "b3");
         result.Select(e => e.Card != null).Should().Equal(true, false, true);
@@ -283,7 +240,7 @@ public class ProfileTimelinePreviewServiceTests : IDisposable
     {
         var meetup = new ProfileTimelineEntry(PlatformActivityGroups.Meetups, "m1", "A meet-up", null, null, Now, null, null);
 
-        ProfileTimelinePreviewService.WantsCard(CardsOn, meetup).Should().BeFalse();
-        ProfileTimelinePreviewService.WantsCard(CardsOn, Entry("b1")).Should().BeTrue();
+        ProfileTimelinePreviewService.WantsCard(meetup).Should().BeFalse();
+        ProfileTimelinePreviewService.WantsCard(Entry("b1")).Should().BeTrue();
     }
 }

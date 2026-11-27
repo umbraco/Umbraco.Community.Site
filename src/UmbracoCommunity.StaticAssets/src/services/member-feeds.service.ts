@@ -29,6 +29,25 @@ export function isPlatformSourced(feed: Pick<MemberFeed, "source">): boolean {
   return feed.source === "Platform";
 }
 
+/**
+ * Dispatched on window after the member's links change (added, edited, hidden or shown, reordered or removed), so
+ * other parts of the page that show them (the feed manager, the account page's profile header) can follow. Adding a
+ * link from the links we found is one of these: without it the feed manager never learned of the new link.
+ */
+export const MEMBER_FEEDS_CHANGED_EVENT = "dc-member-feeds-changed";
+
+export type MemberFeedsChange = "added" | "updated" | "hidden" | "reordered" | "removed";
+
+export interface MemberFeedsChangedDetail {
+  change: MemberFeedsChange;
+  /** The link as saved, for "added" and "updated". */
+  feed?: MemberFeed;
+}
+
+function notifyFeedsChanged(change: MemberFeedsChange, feed?: MemberFeed): void {
+  window.dispatchEvent(new CustomEvent<MemberFeedsChangedDetail>(MEMBER_FEEDS_CHANGED_EVENT, { detail: { change, feed } }));
+}
+
 export class MemberFeedsService extends ServiceBase {
   private static readonly BASE_URL = "/api/member-feeds";
 
@@ -41,28 +60,35 @@ export class MemberFeedsService extends ServiceBase {
   static async add(platform: string, url: string): Promise<MemberFeed> {
     const response = await ServiceBase.post(this.BASE_URL, { platform, url });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const feed: MemberFeed = await response.json();
+    notifyFeedsChanged("added", feed);
+    return feed;
   }
 
   static async update(id: number, platform: string, url: string): Promise<MemberFeed> {
     const response = await ServiceBase.put(`${this.BASE_URL}/${id}`, { platform, url });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
-    return response.json();
+    const feed: MemberFeed = await response.json();
+    notifyFeedsChanged("updated", feed);
+    return feed;
   }
 
   static async reorder(ids: number[]): Promise<void> {
     const response = await ServiceBase.put(`${this.BASE_URL}/order`, { ids });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
+    notifyFeedsChanged("reordered");
   }
 
   static async setHidden(id: number, isHidden: boolean): Promise<void> {
     const response = await ServiceBase.put(`${this.BASE_URL}/${id}/${isHidden ? "hide" : "unhide"}`, {});
     if (!response.ok) throw new Error(await this.#errorMessage(response));
+    notifyFeedsChanged("hidden");
   }
 
   static async remove(id: number, reason?: string): Promise<void> {
     const response = await ServiceBase.delete(`${this.BASE_URL}/${id}`, { reason });
     if (!response.ok) throw new Error(await this.#errorMessage(response));
+    notifyFeedsChanged("removed");
   }
 
   static async #errorMessage(response: Response): Promise<string> {

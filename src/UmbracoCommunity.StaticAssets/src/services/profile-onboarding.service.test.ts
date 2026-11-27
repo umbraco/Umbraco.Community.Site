@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ANTIFORGERY_TOKEN_URL, resetAntiforgeryToken } from "./antiforgery";
-import { ProfileOnboardingService, PROFILE_AVATAR_CHANGED_EVENT } from "./profile-onboarding.service";
+import { EMPTY_NAME_MESSAGE, ProfileOnboardingService, PROFILE_AVATAR_CHANGED_EVENT } from "./profile-onboarding.service";
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -81,14 +81,8 @@ describe("ProfileOnboardingService profile details", () => {
 
   const saved = {
     displayName: "The Octocat",
-    hasCustomDisplayName: false,
-    defaultDisplayName: "The Octocat",
     headline: "umbraco",
-    hasCustomHeadline: false,
-    gitHubHeadline: "umbraco",
-    bio: "Bio from GitHub",
-    hasCustomBio: false,
-    gitHubBio: "Bio from GitHub",
+    bio: "My own words",
   };
 
   function apiCall(): { url: string; init: RequestInit } {
@@ -99,7 +93,7 @@ describe("ProfileOnboardingService profile details", () => {
   }
 
   it("saves a trimmed headline and returns the saved details", async () => {
-    mockApi(() => json({ ...saved, headline: "Umbraco developer", hasCustomHeadline: true }));
+    mockApi(() => json({ ...saved, headline: "Umbraco developer" }));
 
     const result = await ProfileOnboardingService.updateHeadline("  Umbraco developer ");
 
@@ -110,16 +104,17 @@ describe("ProfileOnboardingService profile details", () => {
     expect(JSON.parse(init.body as string)).toEqual({ headline: "Umbraco developer" });
   });
 
-  it("sends an empty headline as null", async () => {
-    mockApi(() => json(saved));
+  it("sends an empty headline as null and returns no headline", async () => {
+    mockApi(() => json({ ...saved, headline: null }));
 
-    await ProfileOnboardingService.updateHeadline("   ");
+    const result = await ProfileOnboardingService.updateHeadline("   ");
 
+    expect(result.headline).toBeNull();
     expect(JSON.parse(apiCall().init.body as string)).toEqual({ headline: null });
   });
 
   it("saves a trimmed display name", async () => {
-    mockApi(() => json({ ...saved, displayName: "Octo", hasCustomDisplayName: true }));
+    mockApi(() => json({ ...saved, displayName: "Octo" }));
 
     const result = await ProfileOnboardingService.updateDisplayName(" Octo ");
 
@@ -130,21 +125,20 @@ describe("ProfileOnboardingService profile details", () => {
     expect(JSON.parse(init.body as string)).toEqual({ displayName: "Octo" });
   });
 
-  it("sends an empty display name as null and returns the GitHub name in use", async () => {
+  it("refuses an empty display name without asking the server", async () => {
     mockApi(() => json(saved));
 
-    const result = await ProfileOnboardingService.updateDisplayName("");
+    await expect(ProfileOnboardingService.updateDisplayName("   ")).rejects.toThrow(EMPTY_NAME_MESSAGE);
 
-    expect(result).toEqual(saved);
-    expect(JSON.parse(apiCall().init.body as string)).toEqual({ displayName: null });
+    expect(vi.mocked(global.fetch).mock.calls.some(([input]) => String(input).includes("/api/profile/"))).toBe(false);
   });
 
-  it("sends an empty bio as null and returns the GitHub bio in use", async () => {
-    mockApi(() => json(saved));
+  it("sends an empty bio as null and returns no bio", async () => {
+    mockApi(() => json({ ...saved, bio: null }));
 
     const result = await ProfileOnboardingService.updateBio("");
 
-    expect(result).toEqual(saved);
+    expect(result.bio).toBeNull();
     const { url, init } = apiCall();
     expect(url).toBe("/api/profile/bio");
     expect(JSON.parse(init.body as string)).toEqual({ bio: null });

@@ -94,7 +94,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
         }
 
         var accessService = new ProfileAccessService(memberManager.Object, _provider, NullLogger<ProfileAccessService>.Instance);
-        return new ProfileDisplayApiController(TestProfileEditSubjects.Resolver(memberManager.Object, accessService, _store), _store, accessService, _provider, CreateActivityService(), CreatePreviewService());
+        return new ProfileDisplayApiController(memberManager.Object, _store, accessService, _provider, CreateActivityService(), CreatePreviewService());
     }
 
     private ProfileTimelinePreviewService CreatePreviewService()
@@ -442,59 +442,7 @@ public class ProfileDisplayApiControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task The_graph_and_card_choices_are_stored_and_read_back()
-    {
-        await CreateProfileAsync();
-        var controller = CreateController();
-
-        var saved = Saved(await controller.Update(
-            new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true, HideTimelineCards: true, NoCardItemIds: ["b1"]),
-            default));
-
-        saved.HideActivityGraph.Should().BeTrue();
-        saved.HideTimelineCards.Should().BeTrue();
-        saved.NoCardItemIds.Should().Equal("b1");
-
-        var response = (await controller.Get(default)).Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().BeOfType<ProfileDisplayResponse>().Subject;
-        response.Choices.HideActivityGraph.Should().BeTrue();
-        response.Choices.HideTimelineCards.Should().BeTrue();
-        response.Choices.NoCardItemIds.Should().Equal("b1");
-
-        var profile = await PublicProfileAsync();
-        profile.DisplayChoices.HideActivityGraph.Should().BeTrue();
-        profile.DisplayChoices.HideTimelineCards.Should().BeTrue();
-        profile.DisplayChoices.NoCardActivityIds.Should().Equal("b1");
-    }
-
-    [Fact]
-    public async Task Saving_without_the_new_choices_switches_the_graph_and_cards_back_on()
-    {
-        await CreateProfileAsync();
-        var controller = CreateController();
-        await controller.Update(new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true, HideTimelineCards: true, NoCardItemIds: ["b1"]), default);
-
-        var saved = Saved(await controller.Update(Choices(), default));
-
-        saved.HideActivityGraph.Should().BeFalse();
-        saved.HideTimelineCards.Should().BeFalse();
-        saved.NoCardItemIds.Should().BeEmpty();
-    }
-
-    [Fact]
-    public async Task Members_outside_early_access_cannot_change_the_graph_or_cards()
-    {
-        await CreateProfileAsync();
-
-        var result = await CreateController(inEarlyAccess: false)
-            .Update(new UpdateProfileDisplayRequest([], [], [], HideActivityGraph: true), default);
-
-        result.Should().BeOfType<ObjectResult>().Which.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
-        (await _store.GetByMemberKeyAsync(_memberKey))!.HideActivityGraph.Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task The_migration_leaves_existing_profiles_with_the_graph_and_cards_on()
+    public async Task The_migration_keeps_existing_profiles_choices()
     {
         await using (var context = _database.CreateDbContext())
         {
@@ -510,14 +458,8 @@ public class ProfileDisplayApiControllerTests : IDisposable
         }
 
         var entity = await _store.GetByMemberKeyAsync(_memberKey);
-        entity!.HideActivityGraph.Should().BeFalse();
-        entity.HideTimelineCards.Should().BeFalse();
-        entity.NoCardActivityIds.Should().BeEmpty();
-        entity.HiddenActivityIds.Should().Equal("b1");
-
-        var choices = ProfileDisplay.StoredChoices(entity);
-        choices.HideActivityGraph.Should().BeFalse();
-        choices.HideTimelineCards.Should().BeFalse();
+        entity!.HiddenActivityIds.Should().Equal("b1");
+        ProfileDisplay.StoredChoices(entity).HiddenActivityIds.Should().Equal("b1");
     }
 
     private async Task<ProfileDisplayResponse> ReadAsync() =>
@@ -583,10 +525,9 @@ public class ProfileDisplayApiControllerTests : IDisposable
     }
 
     [Fact]
-    public async Task Reading_gives_items_their_preview_card_even_when_the_member_switched_cards_off()
+    public async Task Reading_gives_items_their_preview_card()
     {
         await CreateProfileAsync();
-        await CreateController().Update(new UpdateProfileDisplayRequest([], [], [], HideTimelineCards: true, NoCardItemIds: ["b2"]), default);
         _respond = SiteWithPictures;
 
         var response = await ReadAsync();
@@ -596,7 +537,6 @@ public class ProfileDisplayApiControllerTests : IDisposable
         blog[0].Card!.Title.Should().Be("First post");
         blog[0].Card!.Description.Should().Be("What the page says");
         blog[0].Card!.ImageUrl.Should().NotStartWith(Host, "only our stored copy of a picture is ever shown");
-        response.Choices.HideTimelineCards.Should().BeTrue();
     }
 
     [Fact]

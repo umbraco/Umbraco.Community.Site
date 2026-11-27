@@ -17,7 +17,7 @@ namespace UmbracoCommunity.Web.Features.Profiles;
 /// longer than <see cref="RenderBudget"/>; anything not ready by then is shown as a plain line, so a slow or failing
 /// site never makes the profile slow or fail. Pictures are never loaded from the other site by the visitor's browser.
 /// An entry with a picture the member attached themselves (<see cref="ProfileTimelineEntry.OwnImageUrl"/>) gets its card
-/// from that picture straight away, with no outside work, still only when the member wants a card for it.
+/// from that picture straight away, with no outside work.
 /// </summary>
 public sealed class ProfileTimelinePreviewService
 {
@@ -56,17 +56,11 @@ public sealed class ProfileTimelinePreviewService
         _logger = logger;
     }
 
-    /// <summary>
-    /// True when the member wants <paramref name="entry"/> shown as a card: cards are on for the timeline, the entry
-    /// isn't switched to a plain line on its own, and it links to a page.
-    /// </summary>
-    public static bool WantsCard(ProfileDisplayChoices choices, ProfileTimelineEntry entry) =>
-        !choices.HideTimelineCards
-        && entry.Url != null
-        && (entry.ActivityId == null || !choices.NoCardActivityIds.Contains(entry.ActivityId, StringComparer.Ordinal));
+    /// <summary>True when <paramref name="entry"/> can be shown as a card: it links to a page.</summary>
+    public static bool WantsCard(ProfileTimelineEntry entry) => entry.Url != null;
 
     /// <summary>
-    /// The card for an entry the member wants as a card, from our stored copy of its picture. Null when there is no
+    /// The card for an entry that can be shown as a card, from our stored copy of its picture. Null when there is no
     /// picture, so the entry stays a plain line.
     /// </summary>
     public static ProfileTimelineCard? Card(ProfileTimelineEntry entry, string? storedImageUrl, string? pageDescription) =>
@@ -77,10 +71,9 @@ public sealed class ProfileTimelinePreviewService
     /// <summary>Returns <paramref name="entries"/> in the same order, each with its card when it has one.</summary>
     public async Task<IReadOnlyList<ProfileTimelineEntry>> AddCardsAsync(
         IReadOnlyList<ProfileTimelineEntry> entries,
-        ProfileDisplayChoices choices,
         CancellationToken cancellationToken)
     {
-        var wanted = choices.HideTimelineCards ? [] : entries.Where(e => WantsCard(choices, e)).ToList();
+        var wanted = entries.Where(WantsCard).ToList();
         if (wanted.Count == 0)
         {
             return entries;
