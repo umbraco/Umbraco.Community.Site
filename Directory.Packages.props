@@ -7,13 +7,13 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Umbraco -->
-    <PackageVersion Include="Umbraco.Cms" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="19.0.0-rc1" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="19.0.0-rc1" />
+    <PackageVersion Include="Umbraco.Cms" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Api.Common" Version="19.0.0-rc2" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="19.0.0-rc2" />
     <!-- Umbraco Cloud & Deploy -->
     <PackageVersion Include="Umbraco.Cloud.Cms" Version="19.0.0-rc1" />
     <PackageVersion Include="Umbraco.Cloud.StorageProviders.AzureBlob" Version="19.0.0-rc1" />

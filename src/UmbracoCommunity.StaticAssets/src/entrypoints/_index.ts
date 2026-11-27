@@ -62,11 +62,69 @@ function initializeNavScrollingBehavior() {
 
   createObserver(document.querySelector(".nav-header__pointer")!, scrollDownObserver!, (entry) => {
     if (entry.isIntersecting && body.classList.contains(scrollClassName)) {
-      body.classList.remove(scrollClassName);
+      toggleWithGlide(() => body.classList.remove(scrollClassName));
     } else if (!entry.isIntersecting && !body.classList.contains(scrollClassName)) {
-      body.classList.add(scrollClassName);
+      toggleWithGlide(() => body.classList.add(scrollClassName));
     }
   });
+}
+
+function toggleWithGlide(toggle: () => void) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    toggle();
+  } else if (document.body.classList.contains("mobile")) {
+    toggleWithLogoScale(toggle);
+  } else {
+    toggleWithLinkSlide(toggle);
+  }
+}
+
+// The mobile logo's size comes from its viewBox, which CSS can't transition, so scale it from its old size.
+function toggleWithLogoScale(toggle: () => void) {
+  const logo = document.querySelector<SVGSVGElement>(".nav-header .nav-mobile .logo-link svg");
+  if (!logo) {
+    toggle();
+    return;
+  }
+
+  const viewBox = logo.viewBox.baseVal;
+  const drawnScale = (r: DOMRect) => Math.min(r.width / viewBox.width, r.height / viewBox.height);
+
+  const before = logo.getBoundingClientRect();
+  toggle();
+  const after = logo.getBoundingClientRect();
+  if (!viewBox?.width || !drawnScale(after)) return;
+
+  const scale = drawnScale(before) / drawnScale(after);
+  const dx = before.left + before.width / 2 - (after.left + after.width / 2);
+  const dy = before.top + before.height / 2 - (after.top + after.height / 2);
+
+  logo.animate(
+    [{ transform: `translate(${dx}px, ${dy}px) scale(${scale})` }, { transform: "none" }],
+    { duration: 300, easing: "ease" }
+  );
+}
+
+// The nav links switch between right-aligned and centred, which CSS can't transition, so slide them across.
+function toggleWithLinkSlide(toggle: () => void) {
+  const list = document.querySelector<HTMLElement>(".nav-header .nav-list__list");
+  const first = list?.firstElementChild;
+  if (!list || !first) {
+    toggle();
+    return;
+  }
+
+  const offset = () => first.getBoundingClientRect().left - list.getBoundingClientRect().left;
+  const before = offset();
+  toggle();
+  const dx = before - offset();
+
+  if (Math.abs(dx) > 1) {
+    list.animate(
+      [{ transform: `translateX(${dx}px)` }, { transform: "translateX(0)" }],
+      { duration: 300, easing: "ease" }
+    );
+  }
 }
 
 /**

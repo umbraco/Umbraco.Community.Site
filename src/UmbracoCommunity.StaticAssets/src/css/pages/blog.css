@@ -48,7 +48,7 @@
 }
 
 .dc-block-list {
-  gap: var(--unit-lg);
+  --block-list-gap: var(--unit-lg);
 }
 
 .dc-text-block:first-child {
