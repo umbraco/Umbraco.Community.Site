@@ -42,7 +42,8 @@
 .dc-block-list {
   display: flex;
   flex-direction: column;
-  gap: var(--unit-md);
+  --block-list-gap: var(--unit-md);
+  gap: var(--block-list-gap);
   max-width: var(--max-width);
   margin: 0 auto;
 
@@ -50,8 +51,12 @@
     margin-top: var(--unit-lg);
   }
 
+  > .dc-block-anchor {
+    margin-top: calc(-1 * var(--block-list-gap));
+  }
+
   @media (--md) {
-    gap: var(--unit-xl);
+    --block-list-gap: var(--unit-xl);
 
     &:not(:first-child) {
       margin-top: var(--unit-xl);

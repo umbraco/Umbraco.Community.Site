@@ -1,3 +1,5 @@
+@import "../base/media-queries.css";
+
 .dc-image-carousel {
     --image-carousel-text-color: var(--color-blue);
     --image-carousel-caption-color: var(--color-light-blue);
@@ -21,6 +23,30 @@
 .dc-image-carousel dc-image-slider {
     align-items: flex-start;
     padding-inline: calc(50vw - 50%);
+}
+
+.dc-image-carousel--spacing-medium dc-image-slider {
+    gap: 2.25rem;
+
+    @media (--sm) {
+        gap: 2.5rem;
+    }
+
+    @media (--xl) {
+        gap: 3rem;
+    }
+}
+
+.dc-image-carousel--spacing-large dc-image-slider {
+    gap: 4.5rem;
+
+    @media (--sm) {
+        gap: 4.875rem;
+    }
+
+    @media (--xl) {
+        gap: 6rem;
+    }
 }
 
 .dc-image-carousel__item {

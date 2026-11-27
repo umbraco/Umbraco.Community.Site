@@ -28,6 +28,14 @@
           "Description": "Scrolls the images automatically. Visitors can pause it.",
           "Name": "Auto-slide images",
           "SortOrder": -1
+        },
+        {
+          "Key": "b9f7b6e3-8c8a-4821-833a-bc79a2218e0c",
+          "Alias": "imageSpacing",
+          "DataType": "umb://data-type/0b63901b3d1a4ee2b12e866f228773c8",
+          "ValueType": "System.String",
+          "Description": "Space between the images. Small is used when nothing is picked.",
+          "Name": "Image spacing"
         }
       ]
     }
@@ -35,6 +43,10 @@
   "PropertyTypes": [],
   "Udi": "umb://document-type/858a88b9eeb7447d8d3ad3a67601045f",
   "Dependencies": [
+    {
+      "Udi": "umb://data-type/0b63901b3d1a4ee2b12e866f228773c8",
+      "Ordering": true
+    },
     {
       "Udi": "umb://data-type/efa3434a4f3849ae90a77b7c82a3a965",
       "Ordering": true

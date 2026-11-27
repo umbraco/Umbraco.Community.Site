@@ -5,9 +5,10 @@
     bool hasBg = Model.Settings?.HasBg() ?? false;
     bool bgIsDark = hasBg && (Model.Settings?.IsDark() ?? false);
     bool autoSlide = Model.Settings?.AutoSlideImages ?? true;
+    var spacing = Model.Settings?.ImageSpacing is "medium" or "large" ? Model.Settings.ImageSpacing : "small";
 }
 
-<div class="dc-image-carousel-preview @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@(hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null)">
+<div class="dc-image-carousel-preview dc-image-carousel-preview--spacing-@spacing @(hasBg ? "has-bg" : string.Empty) @(bgIsDark ? "bg-dark" : string.Empty)" style="@(hasBg ? $"--block-background-color: {Model.Settings?.BackgroundColour?.Color}" : null)">
     @if (!string.IsNullOrEmpty(Model.Content.Title))
     {
         <h2 class="block-title">@Model.Content.Title</h2>
@@ -46,6 +47,7 @@
     <ul class="dc-image-carousel-preview__meta">
         <li>@items.Count @(items.Count == 1 ? "image" : "images")</li>
         <li>Auto-slide @(autoSlide ? "on" : "off")</li>
+        <li>@(char.ToUpperInvariant(spacing[0]) + spacing[1..]) spacing</li>
         @{ var linkCount = items.Count(i => !string.IsNullOrWhiteSpace(i.Link?.Url)); }
         @if (linkCount > 0)
         {

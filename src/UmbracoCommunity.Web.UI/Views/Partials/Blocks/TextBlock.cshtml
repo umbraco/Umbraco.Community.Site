@@ -1,6 +1,13 @@
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Umbraco.Cms.Core.Models.Blocks.BlockGridItem<TextBlock, SettingsTextBlock>>
 
-@if (Model.Content.Text != null)
+@if (Model.Content.Text.IsEmptyHtmlString() && !Model.Settings.HasBg() && Model.Settings?.BackgroundImage == null)
+{
+    if (!string.IsNullOrWhiteSpace(Model.Settings?.BlockId))
+    {
+        <div class="dc-block-anchor" id="@Model.Settings.BlockId"></div>
+    }
+}
+else if (Model.Content.Text != null)
 {
     bool hasBg = Model.Settings.HasBg();
     bool bgIsDark = hasBg && Model.Settings.IsDark() || Model.Settings?.BackgroundImage != null;

@@ -377,6 +377,16 @@ ol.no-margin p {
     margin: 0;
 }
 
+.dc-form-block {
+    padding: 20px;
+}
+
+.dc-form-block .block-tagline,
+.dc-form-block .block-title,
+.dc-form-block .block-subtitle {
+    text-align: center;
+}
+
 /* cards block */
 .dc-boxes.has-bg {
     background-color: var(--block-background-color);
@@ -1327,6 +1337,14 @@ dc-image-slider img {
     display: flex;
     gap: 10px;
     overflow: hidden;
+}
+
+.dc-image-carousel-preview--spacing-medium .dc-image-carousel-preview__items {
+    gap: 18px;
+}
+
+.dc-image-carousel-preview--spacing-large .dc-image-carousel-preview__items {
+    gap: 36px;
 }
 
 .dc-image-carousel-preview__item {
@@ -2657,9 +2675,14 @@ dc-image-slider img {
     margin: 0;
 }
 
+.dc-tile {
+    container-type: inline-size;
+}
+
 .dc-tile-stat__number {
-    font-size: 48px;
+    font-size: min(48px, 100cqi / (var(--stat-chars, 1) * 0.55));
     font-weight: 700;
+    overflow-wrap: anywhere;
     line-height: 1;
 }
 
@@ -2811,4 +2834,57 @@ p.callout > .rte-icon:first-child {
 
 .dc-faqs.bg-dark .dc-faq-block label::after {
     border-color: #ffffff;
+}
+
+.intro-beside {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: 40px;
+    align-items: start;
+}
+
+.intro-beside > * {
+    grid-area: 1 / 2;
+    min-width: 0;
+    margin-top: 0;
+}
+
+.intro-beside > .block-intro {
+    grid-area: 1 / 1;
+}
+
+.dc-faqs.intro-beside {
+    padding: 20px;
+}
+
+.intro-beside > .block-intro .block-title,
+.intro-beside > .block-intro > h2,
+.intro-beside > .block-intro > h3 {
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.intro-beside > .block-intro > :first-child,
+.intro-beside > :not(.block-intro) > :first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.dc-faqs.intro-beside,
+.dc-big-cta-block__content.intro-beside,
+.intro-beside .block-tagline,
+.intro-beside .block-title,
+.intro-beside .block-subtitle {
+    text-align: left;
+}
+
+.intro-beside .umbraco-forms-form {
+    justify-content: flex-start;
+}
+
+.intro-beside .umbraco-forms-page {
+    width: auto;
+    flex: 1;
+    margin: 0;
 }

@@ -23,6 +23,10 @@ body:not(.mobile) .nav-header .nav-mobile {
     position: relative;
 }
 
+body.mobile .nav-header .header .nav {
+    transition: padding var(--nav-animation-duration) ease;
+}
+
 .mobile.scroll .nav-header .header {
     padding: 31px 18px;
 }
@@ -37,6 +41,7 @@ body:not(.mobile) .nav-header .nav-mobile {
     height: auto;
     z-index: 10;
     background: transparent;
+    transition: padding var(--nav-animation-duration) ease;
 }
 
 .mobile .nav-header .header.menu-active {
@@ -120,8 +125,20 @@ body:not(.mobile) .nav-header .nav-mobile {
 }
 
 .mobile .nav-header .header .logo-link svg {
+    display: block;
     width: 100%;
-    height: 100%;
+    height: 52px;
+}
+
+.mobile .nav-header .header .logo-link svg g:not(.main-logo) {
+    transition: opacity var(--nav-animation-duration) ease;
+}
+
+.mobile .nav-header .nav-mobile .logo-link svg :is(path, .st0, .st1),
+.mobile .nav-header .nav-mobile .icon-btn svg path {
+    transition:
+        fill var(--nav-animation-duration) ease,
+        stroke var(--nav-animation-duration) ease;
 }
 
 .mobile .nav-header .header .nav-start {
@@ -138,8 +155,13 @@ body:not(.mobile) .nav-header .nav-mobile {
     z-index: 1;
     position: relative;
     width: 100%;
+    height: 52px;
     justify-content: space-between;
     z-index: 2;
+    transition:
+        background-color var(--nav-animation-duration) ease,
+        padding var(--nav-animation-duration) ease,
+        height var(--nav-animation-duration) ease;
 }
 
 .mobile .nav-header .header .nav-mobile__buttons {
@@ -257,7 +279,7 @@ body:not(.mobile) .nav-header .nav-mobile {
     backdrop-filter: unset;
     position: initial;
     align-items: flex-start;
-    height: 40px;
+    height: auto;
     width: 100%;
 }
 
@@ -280,12 +302,16 @@ body:not(.mobile) .nav-header .nav-mobile {
 
 .mobile.scroll .header .nav .logo-container {
     height: 26px;
-    margin-left: 8px;
     display: flex;
 }
 
+.mobile.scroll .header .nav .logo-container svg {
+    width: auto;
+    height: 26px;
+}
+
 .mobile.scroll .header .nav .logo-container svg g:not(.main-logo) {
-    display: none;
+    opacity: 0;
 }
 
 .mobile .nav-mobile .search-btn {

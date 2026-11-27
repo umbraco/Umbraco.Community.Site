@@ -189,8 +189,12 @@
 }
 
 .dc-tile-stat__number {
-    font-size: clamp(var(--font-size-display-xs), min(6vw, 22cqi), var(--font-size-display-xl));
+    font-size: min(
+        clamp(var(--font-size-display-xs), min(6vw, 22cqi), var(--font-size-display-xl)),
+        100cqi / (var(--stat-chars, 1) * 0.55)
+    );
     font-weight: var(--font-weight-bold);
+    overflow-wrap: anywhere;
     line-height: 1;
     letter-spacing: -0.02em;
 }
